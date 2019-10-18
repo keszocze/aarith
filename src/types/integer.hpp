@@ -15,7 +15,7 @@ constexpr size_t size_in__words(const size_t w) {
 }
 
 
-template <size_t Width> class integer {
+template <size_t Width> class uinteger {
 private:
 
     static_assert(Width > 0, "Need at least 1 bit");
@@ -27,9 +27,11 @@ private:
 public:
 
     template <class T>
-    integer(T n) {
+    uinteger(T n) {
+
 
         static_assert(std::is_integral<T>::value, "Only integral values are supported");
+        static_assert(!std::is_signed<T>::value, "Only unsigned numbers are supported");
         static_assert(sizeof(T)*8<=64,"Only up to 64 bit integers are supported");
         static_assert(sizeof(T)*8 <= Width, "Data type can not fit provided number");
 

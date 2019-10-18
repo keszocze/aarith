@@ -5,7 +5,7 @@
 int main() {
 
 
-    integer<32> foo{0};
+    uinteger<32> foo{0u};
     std::cout << "Hello, World!" << std::endl;
     return 0;
 }
