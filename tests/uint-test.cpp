@@ -1,4 +1,5 @@
 #include "aarith/operations/exact_operations.hpp"
+#include <aarith/operations/comparisons.hpp>
 #include "aarith/types/integer.hpp"
 #include <catch.hpp>
 #include <sstream>
@@ -91,6 +92,29 @@ SCENARIO("Exact sum of unsigned integers", "[uinteger]")
             {
                 REQUIRE(result.word(0) == 0);
             }
+        }
+    }
+}
+
+
+SCENARIO("Comparison operators work as expected", "[uinteger]")
+{
+    GIVEN("Two uintegers a and b")
+    {
+
+       const size_t TestWidth = 16;
+
+        WHEN("a < b")
+        {
+            static constexpr uint16_t number_a = 7;
+            static constexpr uint16_t number_b = 23;
+            const uinteger<TestWidth> a{number_a};
+            const uinteger<TestWidth> b{number_b};
+
+            REQUIRE(a < b);
+            REQUIRE(a<=b);
+            REQUIRE(!(a>b));
+            REQUIRE(!(a>=b));
         }
     }
 }
