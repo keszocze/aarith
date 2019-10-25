@@ -1,0 +1,28 @@
+stages:
+    - compile
+    - test
+
+compile_aarith:
+    stage: compile
+    artifacts:
+        paths:
+            - build
+        expire_in: 30 minutes
+
+    script:
+        - mkdir -p build/bw_output
+        - cd build
+        - cmake ..
+        - /opt/sonar-build-wrapper/build-wrapper-linux-x86-64 --out-dir bw_output make all
+
+run_sonarqube:
+    stage: test # we have to wait for new data to be present in bw_output
+    script: 
+        - /opt/sonar-scanner/bin/sonar-scanner
+
+run_tests:
+    stage: test
+    script:
+        - cd build/tests
+          # the leading dot seems to be necessary
+        - ./uint-test
