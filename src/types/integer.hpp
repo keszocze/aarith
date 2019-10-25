@@ -1,17 +1,13 @@
 #pragma once
 
+#include "traits.hpp"
+#include "utilities/bit_operations.hpp"
 #include <array>
 #include <cstdint>
 #include <iostream>
 #include <type_traits>
 
 namespace aarith {
-
-template <class T> constexpr size_t size_in_words(const size_t w)
-{
-    const auto word_size = sizeof(T) * 8;
-    return (w / word_size) + (w % word_size ? 1 : 0);
-}
 
 template <size_t Width> class uinteger
 {
@@ -52,6 +48,11 @@ public:
         return index == word_count() - 1 ? last_mask : other_masks;
     };
 
+    static constexpr auto width() -> size_t
+    {
+        return Width;
+    }
+
     auto word(size_t index) const -> word_type
     {
         return words[index];
@@ -73,16 +74,16 @@ private:
     std::array<word_type, word_count()> words{0};
 };
 
-template <class Type> class is_integral
-{
-public:
-    static constexpr bool value = false;
-};
-
 template <size_t Width> class is_integral<uinteger<Width>>
 {
 public:
     static constexpr bool value = true;
+};
+
+template <size_t Width> class is_unsigned<uinteger<Width>>
+{
+public:
+	static constexpr bool value = true;
 };
 
 template <size_t DestinationWidth, size_t SourceWidth>
@@ -91,18 +92,19 @@ auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidt
     uinteger<DestinationWidth> destination;
     if constexpr (DestinationWidth >= SourceWidth)
     {
-        for (auto i = 0U; i < SourceWidth; ++i)
+        for (auto i = 0U; i < source.word_count(); ++i)
         {
             destination.set_word(i, source.word(i));
         }
     }
     else
     {
-        for (auto i = 0U; i < DestinationWidth; ++i)
+        for (auto i = 0U; i < destination.word_count(); ++i)
         {
             destination.set_word(i, source.word(i));
         }
     }
+	return destination;
 }
 
 template <size_t Width>
