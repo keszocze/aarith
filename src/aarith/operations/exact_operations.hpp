@@ -1,5 +1,7 @@
 #pragma once
 
+#include "aarith/types/traits.hpp"
+
 namespace aarith {
 
 template <class UInteger> auto exact_uint_add(const UInteger& a, const UInteger& b) -> UInteger

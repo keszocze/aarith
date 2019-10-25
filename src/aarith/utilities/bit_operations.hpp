@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 namespace aarith {
 
 template <class T> constexpr size_t size_in_words(const size_t w)
