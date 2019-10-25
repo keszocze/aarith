@@ -1,7 +1,7 @@
 #pragma once
 
-#include "traits.hpp"
 #include "aarith/utilities/bit_operations.hpp"
+#include "traits.hpp"
 #include <array>
 #include <cstdint>
 #include <iostream>
@@ -43,8 +43,8 @@ public:
 
     static constexpr auto word_mask(size_t index) -> word_type
     {
-        auto const last_mask = (static_cast<word_type>(1) << (Width % word_width())) - 1;
-        auto const other_masks = static_cast<word_type>(-1);
+        constexpr auto last_mask = (static_cast<word_type>(1) << (width() % word_width())) - 1;
+        constexpr auto other_masks = static_cast<word_type>(-1);
         return index == word_count() - 1 ? last_mask : other_masks;
     };
 
@@ -83,7 +83,7 @@ public:
 template <size_t Width> class is_unsigned<uinteger<Width>>
 {
 public:
-	static constexpr bool value = true;
+    static constexpr bool value = true;
 };
 
 template <size_t DestinationWidth, size_t SourceWidth>
@@ -104,15 +104,15 @@ auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidt
             destination.set_word(i, source.word(i));
         }
     }
-	return destination;
+    return destination;
 }
 
 template <size_t Width>
-auto operator<<(const uinteger<Width>& value, std::ostream& out) -> std::ostream&
+auto operator<<(std::ostream& out, const uinteger<Width>& value) -> std::ostream&
 {
     for (auto i = Width; i > 0; --i)
     {
-        std::cout << value.bit(i - 1);
+        out << value.bit(i - 1);
     }
     return out;
 }

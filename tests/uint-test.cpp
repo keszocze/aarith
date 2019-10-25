@@ -1,9 +1,24 @@
 #include "aarith/operations/exact_operations.hpp"
 #include "aarith/types/integer.hpp"
 #include <catch.hpp>
-#include <iostream>
+#include <sstream>
 
 using namespace aarith;
+
+SCENARIO("Outputting uintegers", "[uinteger]")
+{
+    WHEN("Writing a uinteger into a stream")
+    {
+        const uinteger<16> uint{static_cast<uint16_t>(0b11001100)};
+		std::stringstream ss;
+		ss << uint;
+
+        THEN("Its bit representation is output")
+        {
+			REQUIRE(ss.str() == "0000000011001100");
+        }
+    }
+}
 
 SCENARIO("Casting unsigned integers into different width", "[uinteger]")
 {
@@ -16,7 +31,7 @@ SCENARIO("Casting unsigned integers into different width", "[uinteger]")
         WHEN("The source width <= destination width")
         {
             static constexpr size_t DestinationWidth = 32;
-            auto const result = width_cast<32>(uint);
+            auto const result = width_cast<DestinationWidth>(uint);
 
             THEN("The result has the destination width")
             {
@@ -30,7 +45,7 @@ SCENARIO("Casting unsigned integers into different width", "[uinteger]")
         WHEN("The source width > destination width")
         {
             static constexpr size_t DestinationWidth = 8;
-            auto const result = width_cast<8>(uint);
+            auto const result = width_cast<DestinationWidth>(uint);
 
             THEN("The result has the destination width")
             {
