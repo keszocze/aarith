@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.10.2)
 project(aarith)
 
 include(TargetWarnings.cmake)
@@ -8,5 +8,5 @@ add_subdirectory(src)
 add_subdirectory(lib)
 add_subdirectory(tests)
 
-#add_executable(aarith main.cpp)
-#target_link_libraries(aarith aarith::Types)
+add_executable(aarith_main main.cpp)
+target_link_libraries(aarith_main aarith::Library)
