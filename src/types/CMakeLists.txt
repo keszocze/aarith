@@ -1,5 +1,0 @@
-add_library(aarith-types INTERFACE)
-target_sources(aarith-types INTERFACE integer.hpp)
-target_include_directories(aarith-types INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-target_compile_features(aarith-types INTERFACE cxx_std_17)
-add_library(aarith::Types ALIAS aarith-types)
