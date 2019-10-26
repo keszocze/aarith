@@ -43,9 +43,11 @@ public:
 
     static constexpr auto word_mask(size_t index) -> word_type
     {
-        constexpr auto last_mask = (static_cast<word_type>(1) << (width() % word_width())) - 1;
-        constexpr auto other_masks = static_cast<word_type>(-1);
-        return index == word_count() - 1 ? last_mask : other_masks;
+
+        constexpr word_type other_masks = static_cast<word_type>(-1); // all ones, e.g. no masking
+        constexpr word_type last_mask = (static_cast<word_type>(1) << (width() % word_width())) - 1;
+
+        return ((index == word_count() - 1) && (width() != word_width())) ? last_mask : other_masks;
     };
 
     static constexpr auto width() -> size_t
