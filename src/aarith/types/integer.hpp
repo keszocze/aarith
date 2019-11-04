@@ -119,4 +119,22 @@ auto operator<<(std::ostream& out, const uinteger<Width>& value) -> std::ostream
     return out;
 }
 
+template <size_t Width>
+auto operator<<(const uinteger<Width>& lhs, const uint32_t rhs)
+-> uinteger<Width>
+{
+    uinteger<Width> shifted;
+	//TODO
+    return shifted;
+}
+
+template <size_t Width>
+auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
+-> uinteger<Width>
+{
+    uinteger<Width> logical_sum;
+	//TODO
+    return logical_sum;
+}
+
 } // namespace aarith
