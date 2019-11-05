@@ -169,5 +169,17 @@ auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
     return logical_or;
 }
 
+template <size_t Width>
+auto operator~(const uinteger<Width>& rhs)
+-> uinteger<Width>
+{
+    uinteger<Width> logical_not;
+    for(auto counter = 0U; counter < rhs.word_count(); ++counter)
+    {
+        logical_not.set_word(counter, ~rhs.word(counter));
+    }
+    return logical_not;
+}
+
 } // namespace aarith
 

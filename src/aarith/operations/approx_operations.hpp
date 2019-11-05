@@ -37,7 +37,8 @@ auto approx_uint_bitmasking_add(const UInteger& opd1, const UInteger& opd2, cons
 {
     UInteger sum, mask;
 
-    mask = generate_bitmask<UInteger>(bits);
+    mask = generate_bitmask<UInteger>(UInteger::width()-bits);
+    mask = ~mask;
 
     UInteger opd1_masked = opd1 & mask;
     UInteger opd2_masked = opd2 & mask;
