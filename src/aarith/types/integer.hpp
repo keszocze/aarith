@@ -124,7 +124,24 @@ auto operator<<(const uinteger<Width>& lhs, const uint32_t rhs)
 -> uinteger<Width>
 {
     uinteger<Width> shifted;
-	//TODO
+    const auto skip_words = rhs / lhs.word_width();
+    const auto shift_word_left = rhs - skip_words * lhs.word_width();
+    const auto shift_word_right = lhs.word_width() - shift_word_left;
+
+    for(auto counter = lhs.word_count(); counter > 0; --counter)
+    {
+        if(counter + skip_words < lhs.word_count())
+        {
+            typename uinteger<Width>::word_type new_word = 0U;
+            new_word = lhs.word(counter) << shift_word_left;
+            new_word = new_word | (lhs.word(counter-1) >> shift_word_right);
+            shifted.set_word(counter+skip_words, new_word);
+        }
+    }
+    typename uinteger<Width>::word_type new_word = 0U;
+    new_word = lhs.word(0) << shift_word_left;
+    shifted.set_word(skip_words, new_word);
+
     return shifted;
 }
 
@@ -132,9 +149,25 @@ template <size_t Width>
 auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
 -> uinteger<Width>
 {
-    uinteger<Width> logical_sum;
-	//TODO
-    return logical_sum;
+    uinteger<Width> logical_and;
+    for(auto counter = 0U; counter < lhs.word_count(); ++counter)
+    {
+        logical_and.set_word(counter, lhs.word(counter) & rhs.word(counter));
+    }
+    return logical_and;
+}
+
+template <size_t Width>
+auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
+-> uinteger<Width>
+{
+    uinteger<Width> logical_or;
+    for(auto counter = 0U; counter < lhs.word_count(); ++counter)
+    {
+        logical_and.set_word(counter, lhs.word(counter) | rhs.word(counter));
+    }
+    return logical_or;
 }
 
 } // namespace aarith
+

@@ -147,6 +147,60 @@ SCENARIO("Comparison operators work as expected", "[uinteger][utility]")
     }
 }
 
+SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
+{
+    GIVEN("One uinteger a and a number of shifted bits s")
+    {
+
+        const size_t TestWidth = 16;
+
+        WHEN("The result still fits the width")
+        {
+            static constexpr uint16_t number_a = 7;
+            static constexpr auto s = 4U;
+            const uinteger<TestWidth> a{number_a};
+
+            const auto result = a << s;
+            REQUIRE(result.word(0) == 112);
+        }
+        WHEN("The result does not fit the width anymore")
+        {
+            static constexpr uint16_t number_a = 7;
+            static constexpr auto s = 14U;
+            const uinteger<TestWidth> a{number_a};
+
+            const auto result = a << s;
+            REQUIRE(result.word(0) == 49152);
+        }
+
+        WHEN("Some bits are shifted to the next word")
+        {
+            const size_t Width = 70;
+
+            static constexpr uint16_t number_a = 7;
+            static constexpr auto s = 63U;
+            const uinteger<Width> a{number_a};
+
+            const auto result = a << s;
+            REQUIRE(result.word(0) == 0x8000000000000000);
+            REQUIRE(result.word(1) == 3);
+        }
+        WHEN("The bits are shifted to the second next word")
+        {
+            const size_t Width = 130;
+
+            static constexpr uint16_t number_a = 7;
+            static constexpr auto s = 127U;
+            const uinteger<Width> a{number_a};
+
+            const auto result = a << s;
+            REQUIRE(result.word(0) == 0);
+            REQUIRE(result.word(1) == 0x8000000000000000);
+            REQUIRE(result.word(2) == 3);
+        }
+    }
+}
+
 SCENARIO("Exact difference of unsigned integers", "[uinteger][arithmetic]")
 {
 
