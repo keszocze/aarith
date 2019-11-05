@@ -147,6 +147,39 @@ SCENARIO("Comparison operators work as expected", "[uinteger][utility]")
     }
 }
 
+SCENARIO("Exact difference of unsigned integers", "[uinteger][arithmetic]")
+{
+
+    static constexpr uint8_t number_a = 20;
+    static constexpr uint8_t number_b = 100;
+
+    static constexpr uint8_t num_res1 = number_a - number_b;
+    static constexpr uint8_t num_res2 = number_b - number_a;
+
+    static constexpr size_t TestWidth1 = 8;
+
+    const uinteger<TestWidth1> a{number_a};
+    const uinteger<TestWidth1> b{number_b};
+
+    static constexpr uint8_t number_zero =0;
+
+    static const uinteger<TestWidth1> zero{number_zero};
+
+    auto const result1 = exact_uint_sub(a, b);
+    auto const result2 = exact_uint_sub(b, a);
+    auto const result3 = exact_uint_sub(a, a);
+    auto const result4 = exact_uint_sub(b, b);
+
+    CHECK(result1.word(0) == num_res1);
+    CHECK(result2.word(0) == num_res2);
+    CHECK(result1 == uinteger<TestWidth1>{num_res1});
+    CHECK(result2 == uinteger<TestWidth1>{num_res2});
+    CHECK(result3 == zero);
+    CHECK(result4 == zero);
+    CHECK(result3.word(0) == 0U);
+    CHECK(result4.word(0) == 0U);
+}
+
 SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
 {
     GIVEN("One uinteger a and a number of shifted bits s")
@@ -201,37 +234,46 @@ SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
     }
 }
 
-SCENARIO("Exact difference of unsigned integers", "[uinteger][arithmetic]")
+SCENARIO("Logical AND works as expected", "[uinteger][arithmetic]")
 {
+    GIVEN("Two uintegers")
+    {
+        WHEN("The uintegers consists of only one word")
+        {
+            const size_t Width = 70;
 
-    static constexpr uint8_t number_a = 20;
-    static constexpr uint8_t number_b = 100;
+            static constexpr uint16_t number_a = 7;
+            static constexpr uint16_t number_b = 14;
+            const uinteger<Width> a{number_a};
+            const uinteger<Width> b{number_b};
 
-    static constexpr uint8_t num_res1 = number_a - number_b;
-    static constexpr uint8_t num_res2 = number_b - number_a;
+            const auto result = a & b;
+            const auto result_ref = number_a & number_b;
+            REQUIRE(result.word(0) == result_ref);
+          
+        }
+    }
+}
 
-    static constexpr size_t TestWidth1 = 8;
+SCENARIO("Logical OR works as expected", "[uinteger][arithmetic]")
+{
+    GIVEN("Two uintegers")
+    {
+        WHEN("The uintegers consists of only one word")
+        {
+            const size_t Width = 70;
 
-    const uinteger<TestWidth1> a{number_a};
-    const uinteger<TestWidth1> b{number_b};
+            static constexpr uint16_t number_a = 7;
+            static constexpr uint16_t number_b = 14;
+            const uinteger<Width> a{number_a};
+            const uinteger<Width> b{number_b};
 
-    static constexpr uint8_t number_zero =0;
-
-    static const uinteger<TestWidth1> zero{number_zero};
-
-    auto const result1 = exact_uint_sub(a, b);
-    auto const result2 = exact_uint_sub(b, a);
-    auto const result3 = exact_uint_sub(a, a);
-    auto const result4 = exact_uint_sub(b, b);
-
-    CHECK(result1.word(0) == num_res1);
-    CHECK(result2.word(0) == num_res2);
-    CHECK(result1 == uinteger<TestWidth1>{num_res1});
-    CHECK(result2 == uinteger<TestWidth1>{num_res2});
-    CHECK(result3 == zero);
-    CHECK(result4 == zero);
-    CHECK(result3.word(0) == 0U);
-    CHECK(result4.word(0) == 0U);
+            const auto result = a | b;
+            const auto result_ref = number_a | number_b;
+            REQUIRE(result.word(0) == result_ref);
+          
+        }
+    }
 }
 
 // for static_assert tests:

@@ -164,7 +164,7 @@ auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
     uinteger<Width> logical_or;
     for(auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
-        logical_and.set_word(counter, lhs.word(counter) | rhs.word(counter));
+        logical_or.set_word(counter, lhs.word(counter) | rhs.word(counter));
     }
     return logical_or;
 }
