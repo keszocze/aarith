@@ -132,13 +132,13 @@ auto operator<<(const uinteger<Width>& lhs, const uint32_t rhs)
     {
         if(counter + skip_words < lhs.word_count())
         {
-            typename uinteger<Width>::word_type new_word = 0U;
+            typename uinteger<Width>::word_type new_word;
             new_word = lhs.word(counter) << shift_word_left;
             new_word = new_word | (lhs.word(counter-1) >> shift_word_right);
             shifted.set_word(counter+skip_words, new_word);
         }
     }
-    typename uinteger<Width>::word_type new_word = 0U;
+    typename uinteger<Width>::word_type new_word;
     new_word = lhs.word(0) << shift_word_left;
     shifted.set_word(skip_words, new_word);
 
