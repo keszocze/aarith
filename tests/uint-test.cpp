@@ -1,6 +1,4 @@
-#include "aarith/operations/exact_operations.hpp"
 #include "aarith/types/integer.hpp"
-#include <aarith/operations/comparisons.hpp>
 #include <catch.hpp>
 #include <sstream>
 
@@ -21,7 +19,7 @@ SCENARIO("Outputting uintegers", "[uinteger]")
     }
 }
 
-SCENARIO("Casting unsigned integers into different width", "[uinteger]")
+SCENARIO("Casting uintegers into different width", "[uinteger]")
 {
     GIVEN("width_cast is called")
     {
@@ -60,124 +58,48 @@ SCENARIO("Casting unsigned integers into different width", "[uinteger]")
     }
 }
 
-TEMPLATE_TEST_CASE("word_mask works nicely", "[uinteger][utility]", uinteger<8>, uinteger<12>,
-                   uinteger<13>, uinteger<16>, uinteger<23>, uinteger<32>, uinteger<45>,
-                   uinteger<63>, uinteger<64>, uinteger<65>, uinteger<75>)
+SCENARIO("Calculating the word_masks of uintegers", "[uinteger][utility]")
 {
-    static constexpr uint8_t number_a = 23U; // random number without semantic meaning
+    // The tests all assume that uinteger uses 64-bit words.
+    static_assert(uinteger<64>::word_width() == 64);
 
-    const TestType a{number_a};
-
-    static constexpr uint64_t zero{0U};
-
-//    std::cout << uinteger<64>{a.word_mask(0)} << "\n";
-
-    CHECK(a.word_mask(0) != zero);
-}
-
-TEMPLATE_TEST_CASE("addition actually works as expected", "[uinteger][arithmetic]", uinteger<8>,
-                   uinteger<12>, uinteger<13>, uinteger<16>, uinteger<23>, uinteger<32>,
-                   uinteger<45>, uinteger<63>, uinteger<64>, uinteger<65>, uinteger<75>)
-{
-    static constexpr uint8_t number_a = 17U;
-    static constexpr uint8_t number_b = 23U;
-
-    TestType a{number_a};
-    TestType b{number_b};
-    const TestType result = exact_uint_add(a, b);
-
-    CHECK(result.word(0) == number_a + number_b);
-}
-
-SCENARIO("Exact sum of unsigned integers", "[uinteger][arithmetic]")
-{
-    GIVEN("Two uintegers with width < word_width")
+    GIVEN("A uinteger<N> where N < word_width")
     {
-        static constexpr size_t TestWidth = 16;
-        static_assert(uinteger<TestWidth>::word_count() == 1);
-
-        WHEN("The result still fits the width")
+        uinteger<32> uint;
+        THEN("The mask is correct")
         {
-            static constexpr uint8_t number_a = 32;
-            static constexpr uint8_t number_b = 16;
-            const uinteger<TestWidth> a{number_a};
-            const uinteger<TestWidth> b{number_b};
-            auto const result = exact_uint_add(a, b);
-
-            THEN("It should be the correct sum")
-            {
-                REQUIRE(result.word(0) == number_a + number_b);
-            }
-        }
-        WHEN("The result does not fit the width")
-        {
-            static constexpr uint16_t number_a = (1 << TestWidth) - 1;
-            static constexpr uint16_t number_b = 1;
-            const uinteger<TestWidth> a{number_a};
-            const uinteger<TestWidth> b{number_b};
-            auto const result = exact_uint_add(a, b);
-
-            THEN("It should be the masked to fit")
-            {
-                REQUIRE(result.word(0) == 0);
-            }
+            REQUIRE(uint.word_mask(0) == 0xffffffff);
         }
     }
-}
-
-SCENARIO("Comparison operators work as expected", "[uinteger][utility]")
-{
-    GIVEN("Two uintegers a and b")
+    GIVEN("A uinteger<N> where N == word_width")
     {
-
-        const size_t TestWidth = 16;
-
-        WHEN("a < b")
+        uinteger<64> uint;
+        THEN("The mask is all 1s")
         {
-            static constexpr uint16_t number_a = 7;
-            static constexpr uint16_t number_b = 23;
-            const uinteger<TestWidth> a{number_a};
-            const uinteger<TestWidth> b{number_b};
-
-            REQUIRE(a < b);
-            REQUIRE(a <= b);
-            REQUIRE(!(a > b));
-            REQUIRE(!(a >= b));
+            REQUIRE(uint.word_mask(0) == 0xffffffffffffffff);
         }
     }
-}
-
-SCENARIO("Exact difference of unsigned integers", "[uinteger][arithmetic]")
-{
-
-    static constexpr uint8_t number_a = 20;
-    static constexpr uint8_t number_b = 100;
-
-    static constexpr uint8_t num_res1 = number_a - number_b;
-    static constexpr uint8_t num_res2 = number_b - number_a;
-
-    static constexpr size_t TestWidth1 = 8;
-
-    const uinteger<TestWidth1> a{number_a};
-    const uinteger<TestWidth1> b{number_b};
-
-    static constexpr uint8_t number_zero =0;
-
-    static const uinteger<TestWidth1> zero{number_zero};
-
-    auto const result1 = exact_uint_sub(a, b);
-    auto const result2 = exact_uint_sub(b, a);
-    auto const result3 = exact_uint_sub(a, a);
-    auto const result4 = exact_uint_sub(b, b);
-
-    CHECK(result1.word(0) == num_res1);
-    CHECK(result2.word(0) == num_res2);
-    CHECK(result1 == uinteger<TestWidth1>{num_res1});
-    CHECK(result2 == uinteger<TestWidth1>{num_res2});
-    CHECK(result3 == zero);
-    CHECK(result4 == zero);
-    CHECK(result3.word(0) == 0U);
-    CHECK(result4.word(0) == 0U);
+    GIVEN("A uinteger<N> where N > word_width and N % word_width != 0")
+    {
+        uinteger<96> uint;
+        THEN("All masks except the last are all 1s")
+        {
+            REQUIRE(uint.word_mask(0) == 0xffffffffffffffff);
+        }
+        THEN("The last mask is all ones up to the correct bit")
+        {
+            REQUIRE(uint.word_mask(1) == 0xffffffff);
+        }
+    }
+    GIVEN("A uinteger<N> where N > word_width and N % word_width == 0")
+    {
+        uinteger<128> uint;
+        THEN("All masks are all 1s")
+        {
+            REQUIRE(uint.word_mask(0) == 0xffffffffffffffff);
+            REQUIRE(uint.word_mask(1) == 0xffffffffffffffff);
+        }
+    }
 }
 
 // for static_assert tests:
