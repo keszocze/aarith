@@ -3,6 +3,7 @@ target_sources(aarith INTERFACE
   aarith/types/integer.hpp
   aarith/types/traits.hpp
   aarith/operations/exact_operations.hpp
+  aarith/operations/approx_operations.hpp
   aarith/operations/comparisons.hpp
   aarith/utilities/bit_operations.hpp
 )
