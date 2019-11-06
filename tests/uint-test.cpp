@@ -1,6 +1,6 @@
 #include "aarith/operations/exact_operations.hpp"
-#include <aarith/operations/comparisons.hpp>
 #include "aarith/types/integer.hpp"
+#include <aarith/operations/comparisons.hpp>
 #include <catch.hpp>
 #include <sstream>
 
@@ -11,12 +11,12 @@ SCENARIO("Outputting uintegers", "[uinteger]")
     WHEN("Writing a uinteger into a stream")
     {
         const uinteger<16> uint{static_cast<uint16_t>(0b11001100)};
-		std::stringstream ss;
-		ss << uint;
+        std::stringstream ss;
+        ss << uint;
 
         THEN("Its bit representation is output")
         {
-			REQUIRE(ss.str() == "0000000011001100");
+            REQUIRE(ss.str() == "0000000011001100");
         }
     }
 }
@@ -60,7 +60,36 @@ SCENARIO("Casting unsigned integers into different width", "[uinteger]")
     }
 }
 
-SCENARIO("Exact sum of unsigned integers", "[uinteger]")
+TEMPLATE_TEST_CASE("word_mask works nicely", "[uinteger][utility]", uinteger<8>, uinteger<12>,
+                   uinteger<13>, uinteger<16>, uinteger<23>, uinteger<32>, uinteger<45>,
+                   uinteger<63>, uinteger<64>, uinteger<65>, uinteger<75>)
+{
+    static constexpr uint8_t number_a = 23U; // random number without semantic meaning
+
+    const TestType a{number_a};
+
+    static constexpr uint64_t zero{0U};
+
+//    std::cout << uinteger<64>{a.word_mask(0)} << "\n";
+
+    CHECK(a.word_mask(0) != zero);
+}
+
+TEMPLATE_TEST_CASE("addition actually works as expected", "[uinteger][arithmetic]", uinteger<8>,
+                   uinteger<12>, uinteger<13>, uinteger<16>, uinteger<23>, uinteger<32>,
+                   uinteger<45>, uinteger<63>, uinteger<64>, uinteger<65>, uinteger<75>)
+{
+    static constexpr uint8_t number_a = 17U;
+    static constexpr uint8_t number_b = 23U;
+
+    TestType a{number_a};
+    TestType b{number_b};
+    const TestType result = exact_uint_add(a, b);
+
+    CHECK(result.word(0) == number_a + number_b);
+}
+
+SCENARIO("Exact sum of unsigned integers", "[uinteger][arithmetic]")
 {
     GIVEN("Two uintegers with width < word_width")
     {
@@ -69,8 +98,8 @@ SCENARIO("Exact sum of unsigned integers", "[uinteger]")
 
         WHEN("The result still fits the width")
         {
-            static constexpr uint16_t number_a = 32;
-            static constexpr uint16_t number_b = 16;
+            static constexpr uint8_t number_a = 32;
+            static constexpr uint8_t number_b = 16;
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
             auto const result = exact_uint_add(a, b);
@@ -96,13 +125,12 @@ SCENARIO("Exact sum of unsigned integers", "[uinteger]")
     }
 }
 
-
-SCENARIO("Comparison operators work as expected", "[uinteger]")
+SCENARIO("Comparison operators work as expected", "[uinteger][utility]")
 {
     GIVEN("Two uintegers a and b")
     {
 
-       const size_t TestWidth = 16;
+        const size_t TestWidth = 16;
 
         WHEN("a < b")
         {
@@ -112,9 +140,157 @@ SCENARIO("Comparison operators work as expected", "[uinteger]")
             const uinteger<TestWidth> b{number_b};
 
             REQUIRE(a < b);
-            REQUIRE(a<=b);
-            REQUIRE(!(a>b));
-            REQUIRE(!(a>=b));
+            REQUIRE(a <= b);
+            REQUIRE(!(a > b));
+            REQUIRE(!(a >= b));
+        }
+    }
+}
+
+SCENARIO("Exact difference of unsigned integers", "[uinteger][arithmetic]")
+{
+
+    static constexpr uint8_t number_a = 20;
+    static constexpr uint8_t number_b = 100;
+
+    static constexpr uint8_t num_res1 = number_a - number_b;
+    static constexpr uint8_t num_res2 = number_b - number_a;
+
+    static constexpr size_t TestWidth1 = 8;
+
+    const uinteger<TestWidth1> a{number_a};
+    const uinteger<TestWidth1> b{number_b};
+
+    static constexpr uint8_t number_zero =0;
+
+    static const uinteger<TestWidth1> zero{number_zero};
+
+    auto const result1 = exact_uint_sub(a, b);
+    auto const result2 = exact_uint_sub(b, a);
+    auto const result3 = exact_uint_sub(a, a);
+    auto const result4 = exact_uint_sub(b, b);
+
+    CHECK(result1.word(0) == num_res1);
+    CHECK(result2.word(0) == num_res2);
+    CHECK(result1 == uinteger<TestWidth1>{num_res1});
+    CHECK(result2 == uinteger<TestWidth1>{num_res2});
+    CHECK(result3 == zero);
+    CHECK(result4 == zero);
+    CHECK(result3.word(0) == 0U);
+    CHECK(result4.word(0) == 0U);
+}
+
+SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
+{
+    GIVEN("One uinteger a and a number of shifted bits s")
+    {
+
+        const size_t TestWidth = 16;
+
+        WHEN("The result still fits the width")
+        {
+            static constexpr uint16_t number_a = 7;
+            static constexpr auto s = 4U;
+            const uinteger<TestWidth> a{number_a};
+
+            const auto result = a << s;
+            REQUIRE(result.word(0) == 112);
+        }
+        WHEN("The result does not fit the width anymore")
+        {
+            static constexpr uint16_t number_a = 7;
+            static constexpr auto s = 14U;
+            const uinteger<TestWidth> a{number_a};
+
+            const auto result = a << s;
+            REQUIRE(result.word(0) == 49152);
+        }
+
+        WHEN("Some bits are shifted to the next word")
+        {
+            const size_t Width = 70;
+
+            static constexpr uint16_t number_a = 7;
+            static constexpr auto s = 63U;
+            const uinteger<Width> a{number_a};
+
+            const auto result = a << s;
+            REQUIRE(result.word(0) == 0x8000000000000000);
+            REQUIRE(result.word(1) == 3);
+        }
+        WHEN("The bits are shifted to the second next word")
+        {
+            const size_t Width = 130;
+
+            static constexpr uint16_t number_a = 7;
+            static constexpr auto s = 127U;
+            const uinteger<Width> a{number_a};
+
+            const auto result = a << s;
+            REQUIRE(result.word(0) == 0);
+            REQUIRE(result.word(1) == 0x8000000000000000);
+            REQUIRE(result.word(2) == 3);
+        }
+    }
+}
+
+SCENARIO("Logical AND works as expected", "[uinteger][arithmetic]")
+{
+    GIVEN("Two uintegers")
+    {
+        WHEN("The uintegers consists of only one word")
+        {
+            const size_t Width = 70;
+
+            static constexpr uint16_t number_a = 7;
+            static constexpr uint16_t number_b = 14;
+            const uinteger<Width> a{number_a};
+            const uinteger<Width> b{number_b};
+
+            const auto result = a & b;
+            const auto result_ref = number_a & number_b;
+            REQUIRE(result.word(0) == result_ref);
+          
+        }
+    }
+}
+
+SCENARIO("Logical OR works as expected", "[uinteger][arithmetic]")
+{
+    GIVEN("Two uintegers")
+    {
+        WHEN("The uintegers consists of only one word")
+        {
+            const size_t Width = 70;
+
+            static constexpr uint16_t number_a = 7;
+            static constexpr uint16_t number_b = 14;
+            const uinteger<Width> a{number_a};
+            const uinteger<Width> b{number_b};
+
+            const auto result = a | b;
+            const auto result_ref = number_a | number_b;
+            REQUIRE(result.word(0) == result_ref);
+          
+        }
+    }
+}
+
+SCENARIO("Logical NOT works as expected", "[uinteger][arithmetic]")
+{
+    GIVEN("One uintegers")
+    {
+        WHEN("The uinteger consists of only one word")
+        {
+            const size_t Width = 70;
+
+            static constexpr uint16_t number_a = 7;
+            const uinteger<Width> a{number_a};
+
+            const auto result = ~a;
+            const auto result_ref = ~number_a;
+            REQUIRE(result.word(0) == result_ref);
+          
         }
     }
 }

@@ -1,21 +1,27 @@
 #include <iostream>
-
-#include <aarith/types/integer.hpp>
-#include <aarith/utilities/bit_operations.hpp>
 #include <bitset>
+#include <aarith/types/integer.hpp>
+#include <aarith/operations/exact_operations.hpp>
 
+#include <integer.hpp>
 
 int main() {
 
-    uint64_t n = 1u <<30;
-    n += 0b10101 << 5;
-    n = n << 10;
+    using namespace aarith;
 
-    std::cout << std::bitset<64>(n) << "\n";
+    static constexpr uint8_t number_a1 = 20;
+    static constexpr uint8_t number_b1 = 100;
 
-    auto [upper,lower] = aarith::split(n);
+    static constexpr uint8_t num_res = number_a1 - number_b1;
 
-    std::cout << std::bitset<32>(upper) << std::bitset<32>(lower) << "\n";
+    static constexpr size_t TestWidth1 = 8;
+
+    const uinteger<TestWidth1> a1{number_a1};
+    const uinteger<TestWidth1> b1{number_b1};
+
+    auto const result = exact_uint_sub(a1, b1);
+
+    std::cout << result << "\t" << result.word_mask(0) << "\t" << uinteger<64>{result.word(0)} << "\t" << num_res << "\n";
 
 
     return 0;
