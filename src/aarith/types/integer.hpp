@@ -149,4 +149,66 @@ auto operator<<(std::ostream& out, const uinteger<Width>& value) -> std::ostream
     return out;
 }
 
+template <size_t Width>
+auto operator<<(const uinteger<Width>& lhs, const uint32_t rhs)
+-> uinteger<Width>
+{
+    uinteger<Width> shifted;
+    const auto skip_words = rhs / lhs.word_width();
+    const auto shift_word_left = rhs - skip_words * lhs.word_width();
+    const auto shift_word_right = lhs.word_width() - shift_word_left;
+
+    for(auto counter = lhs.word_count(); counter > 0; --counter)
+    {
+        if(counter + skip_words < lhs.word_count())
+        {
+            typename uinteger<Width>::word_type new_word;
+            new_word = lhs.word(counter) << shift_word_left;
+            new_word = new_word | (lhs.word(counter-1) >> shift_word_right);
+            shifted.set_word(counter+skip_words, new_word);
+        }
+    }
+    typename uinteger<Width>::word_type new_word;
+    new_word = lhs.word(0) << shift_word_left;
+    shifted.set_word(skip_words, new_word);
+
+    return shifted;
+}
+
+template <size_t Width>
+auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
+-> uinteger<Width>
+{
+    uinteger<Width> logical_and;
+    for(auto counter = 0U; counter < lhs.word_count(); ++counter)
+    {
+        logical_and.set_word(counter, lhs.word(counter) & rhs.word(counter));
+    }
+    return logical_and;
+}
+
+template <size_t Width>
+auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
+-> uinteger<Width>
+{
+    uinteger<Width> logical_or;
+    for(auto counter = 0U; counter < lhs.word_count(); ++counter)
+    {
+        logical_or.set_word(counter, lhs.word(counter) | rhs.word(counter));
+    }
+    return logical_or;
+}
+
+template <size_t Width>
+auto operator~(const uinteger<Width>& rhs)
+-> uinteger<Width>
+{
+    uinteger<Width> logical_not;
+    for(auto counter = 0U; counter < rhs.word_count(); ++counter)
+    {
+        logical_not.set_word(counter, ~rhs.word(counter));
+    }
+    return logical_not;
+}
+
 } // namespace aarith
