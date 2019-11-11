@@ -12,7 +12,7 @@ variables:
         variables:
             - $CI_PROJECT_NAMESPACE == "keszocze"
 
-try_compiling:
+.try_compiling:
     extends: .ciconf
     stage: compile
     artifacts:
@@ -27,7 +27,7 @@ try_compiling:
         - /opt/sonar-build-wrapper/build-wrapper-linux-x86-64 --out-dir bw_output make -j 4 all
 
 
-run_sonarqube:
+.run_sonarqube:
     extends: .ciconf
     stage: test # we have to wait for new data to be present in bw_output
     script: 
