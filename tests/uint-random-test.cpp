@@ -25,6 +25,7 @@ private:
     std::uniform_int_distribution<uint64_t> random_word{1, std::numeric_limits<uint64_t>::max()};
 };
 
+static constexpr size_t MinimumBitWidth = 16;
 static constexpr size_t MaximumBitWidth = 256;
 
 static constexpr auto numbers_per_width(size_t) -> size_t
@@ -71,5 +72,5 @@ int main()
 {
     std::random_device dev;
     std::mt19937_64 rng(dev());
-    return test_widths_recursive<1>(rng);
+    return test_widths_recursive<MinimumBitWidth>(rng);
 }
