@@ -37,7 +37,7 @@ run_tests:
     extends: .ciconf
     stage: test
     script:
-        - de build/tests
+        - cd build/tests
         #  # the leading dot seems to be necessary
         - ./uint-test
         - ./uint-anytime-test
