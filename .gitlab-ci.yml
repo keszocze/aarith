@@ -12,7 +12,7 @@ variables:
         variables:
             - $CI_PROJECT_NAMESPACE == "keszocze"
 
-.try_compiling:
+try_compiling:
     extends: .ciconf
     stage: compile
     artifacts:
@@ -27,7 +27,7 @@ variables:
         - /opt/sonar-build-wrapper/build-wrapper-linux-x86-64 --out-dir bw_output make -j 4 all
 
 
-.run_sonarqube:
+run_sonarqube:
     extends: .ciconf
     stage: test # we have to wait for new data to be present in bw_output
     script: 
@@ -37,9 +37,8 @@ run_tests:
     extends: .ciconf
     stage: test
     script:
-        - echo "We should automatically run tests"
-        #- cd build/tests
+        - de build/tests
         #  # the leading dot seems to be necessary
-        #- ./error_metrics_test
-        #- ./operations_test
-        #- ./parsing_test
+        - ./uint-test
+        - ./uint-anytime-test
+        
