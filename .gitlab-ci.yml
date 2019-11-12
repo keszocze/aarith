@@ -38,7 +38,5 @@ run_tests:
     stage: test
     script:
         - cd build/tests
-        #  # the leading dot seems to be necessary
-        - ./uint-test
-        - ./uint-anytime-test
+        - ../../scripts/test-and-coverage.sh
         
