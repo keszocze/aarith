@@ -43,6 +43,7 @@ run_tests:
         expire_in: 30 minutes
     script:
         - cd build/tests
+        - find -name "*-test" -exec {} \;
         - rm -rf coverage
         - mkdir -p coverage
-        - gcovr -r ../../src --object-directory CMakeFiles --sonarqube coverage/coverage.xml 
+        - /opt/software/usr/local/bin/gcovr -r ../../src --object-directory CMakeFiles --sonarqube coverage/coverage.xml 
