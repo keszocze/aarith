@@ -1,6 +1,7 @@
 stages:
     - compile
     - test
+    - quality
 
 variables:
     GIT_SUBMODULE_STRATEGY: recursive
@@ -29,16 +30,18 @@ try_compiling:
 
 run_sonarqube:
     extends: .ciconf
-    stage: test # we have to wait for new data to be present in bw_output
+    stage: quality
     script: 
         - /opt/sonar-scanner/bin/sonar-scanner
 
 run_tests:
     extends: .ciconf
     stage: test
+    artifacts:
+        paths:
+            - build/tests/coverage
+        expire_in: 30 minutes
     script:
         - cd build/tests
-        #  # the leading dot seems to be necessary
-        - ./uint-test
-        - ./uint-anytime-test
+        - ../../scripts/test-and-coverage.sh
         
