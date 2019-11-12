@@ -86,6 +86,11 @@ public:
         return static_cast<bit_type>(masked_bit > 0 ? 1 : 0);
     }
 
+    auto operator<<=(const size_t shift_by) -> uinteger&
+    {
+        return *this = *this << shift_by;
+    }
+
 private:
     template <size_t index, class... Args>
     auto set_word_recursively(word_type value, Args... args) -> size_t
