@@ -61,66 +61,108 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic]")
     }
 }
 
-SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic]")
-{
-    GIVEN("Two uinteger<N> a and b are subtracted")
-    {
-        WHEN("N <= word_width")
-        {
-            AND_WHEN("a >= b")
-            {
+SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic]") {
+    GIVEN("Two uinteger<N> a and b are subtracted") {
+        WHEN("N <= word_width") {
+            AND_WHEN("a >= b") {
                 const uinteger<32> a{15u};
                 const uinteger<32> b{7u};
                 const uinteger<32> expected{static_cast<uint32_t>(15 - 7)};
                 auto const result = exact_uint_sub(a, b);
 
-                THEN("The result is a - b")
-                {
+                THEN("The result is a - b") {
                     REQUIRE(result == expected);
                 }
             }
-            AND_WHEN("a < b")
-            {
+            AND_WHEN("a < b") {
                 const uinteger<32> a{7u};
                 const uinteger<32> b{15u};
                 const uinteger<32> expected{static_cast<uint32_t>(7 - 15)};
                 auto const result = exact_uint_sub(a, b);
 
-                THEN("The result wraps around")
-                {
+                THEN("The result wraps around") {
                     REQUIRE(result == expected);
                 }
             }
         }
     }
-    GIVEN("Two uinteger<N> a and b are subtracted")
-    {
-        WHEN("N > word_width")
-        {
-            AND_WHEN("There is a borrow between words")
-            {
+    GIVEN("Two uinteger<N> a and b are subtracted") {
+        WHEN("N > word_width") {
+            AND_WHEN("There is a borrow between words") {
                 auto const a = uinteger<128>::from_words(1, 0);
                 auto const b = uinteger<128>::from_words(0, 1);
                 auto const expected = uinteger<128>::from_words(0, static_cast<uint64_t>(-1));
                 auto const result = exact_uint_sub(a, b);
 
-                THEN("The result borrow is subtracted from the next word")
-                {
+                THEN("The result borrow is subtracted from the next word") {
                     REQUIRE(result == expected);
                 }
             }
-            AND_WHEN("There is no borrow between words")
-            {
+            AND_WHEN("There is no borrow between words") {
                 auto const a = uinteger<128>::from_words(1, 1);
                 auto const b = uinteger<128>::from_words(0, 1);
                 auto const expected = uinteger<128>::from_words(1, 0);
                 auto const result = exact_uint_sub(a, b);
 
-                THEN("No borrow is subtracted from the next word")
-                {
+                THEN("No borrow is subtracted from the next word") {
                     REQUIRE(result == expected);
                 }
             }
         }
+    }
+}
+
+SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]") {
+
+    GIVEN("Two uinteger<N> a and b to be multiplied") {
+        uint64_t val = 1;
+        val =  val <<35;
+        auto const a = uinteger<128>::from_words(1,val);
+        auto const b = uinteger<128>::from_words(1, 0);
+        auto const c = uinteger<128>::from_words(13435, 345897);
+        auto const d = uinteger<128>::from_words(0, 0);
+        auto const zero = uinteger<128>::from_words(0, 0);
+        auto const one = uinteger<128>::from_words(0, 1);
+
+        const std::vector<uinteger<128>> numbers{a,b,c,d,one,zero};
+
+        THEN("The operation should be commutative")
+        {
+            for(const uinteger<128> &num_a: numbers)
+            {
+                for (const uinteger<128> &num_b: numbers) {
+                    CHECK(exact_uint_mul(num_a,num_b) == exact_uint_mul(num_b,num_a));
+                }
+            }
+
+            CHECK(exact_uint_mul(a, b) == exact_uint_mul(a, b));
+        }
+
+        WHEN("One multiplicant is zero")
+        {
+
+            THEN("The result should be zero")
+            {
+                for (const uinteger<128> &num: numbers)
+                {
+                    CHECK(exact_uint_mul(num, zero) == zero);
+                    CHECK(exact_uint_mul(zero, num) == zero);
+                }
+            }
+        }
+        WHEN ("One multiplicant is one")
+        {
+            THEN("Multiplication does not do much")
+            {
+
+                for (const uinteger<128> &num: numbers)
+                {
+                    CHECK(exact_uint_mul(num, one) == num);
+                    CHECK(exact_uint_mul(one, num) == num);
+                }
+            }
+
+        }
+
     }
 }
