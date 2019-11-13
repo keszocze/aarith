@@ -110,20 +110,22 @@ template <class UInteger> [[nodiscard]] auto exact_uint_mul(const UInteger& a, c
             const typename UInteger::word_type pp3 = a_upper * b_lower;
             const typename UInteger::word_type pp4 = a_upper * b_upper;
 
-            const auto column0 = pp1 + carry;
-            const uint32_t column0_carry = column0 < pp1 || column0 < carry;
+            const auto foo = [](const uint64_t x, const uint64_t y, const uint64_t carry_in) {
+                const auto sum = x + y + carry_in;
+                const uint32_t sum_carry = sum < x || sum < y || sum < carry_in;
 
-            const auto [column0_upper, column0_lower] = split(column0);
-            carry = unsplit(column0_carry, column0_upper);
+                const auto [upper, lower] = split(sum);
+                const auto carry_out = unsplit(sum_carry,upper);
 
-            const auto column1_sum = carry + pp2 + pp3;
-            const auto [column1_upper, column1_lower] = split(column1_sum);
+                return std::make_pair(carry_out,lower);
+            };
 
-            const uint32_t column1_carry =
-                column1_sum < carry || column1_sum < pp2 || column1_sum < pp3;
-            carry = unsplit(column1_carry, column1_upper);
 
-            carry = pp4 + carry;
+            const auto [inner_carry_1,column0_lower] = foo(pp1, 0, carry);
+            
+            const auto [inner_carry2,column1_lower] = foo(pp2, pp3, inner_carry_1);
+
+            carry = pp4 + inner_carry2;
 
             partial_product.set_word(i + j, unsplit(column1_lower, column0_lower));
         }
