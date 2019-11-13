@@ -36,7 +36,7 @@ template <class UInteger> auto exact_uint_sub(const UInteger& a, const UInteger&
         auto const partial_diff = a_word - subtrahend;
 
         /*
-         * The new borrow oroginates from either
+         * The new borrow originates from either
          * a) the minuend being smaller than the subtrahend or
          * b) the subtrahend being smaller than the raw word of the uinteger b
          *
@@ -44,7 +44,7 @@ template <class UInteger> auto exact_uint_sub(const UInteger& a, const UInteger&
          * an "incoming" borrow.
          */
 
-        borrow = ((a.word(i) < subtrahend) || (subtrahend < b_word)) ? 1 : 0;
+        borrow = ((a_word < subtrahend) || (subtrahend < b_word)) ? 1 : 0;
         sum.set_word(i, partial_diff);
     }
     return sum;
