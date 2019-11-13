@@ -11,6 +11,6 @@ target_link_libraries(uint-anytime-test Catch2::WithMain aarith::Library)
 add_test(NAME uint-anytime-test COMMAND uint-anytime-test)
 
 
-add_executable(bit-oprations-test bit_operations-test.cpp)
-target_link_libraries(bit-oprations-test Catch2::WithMain aarith::Library)
-add_test(NAME bit-oprations-test COMMAND bit-oprations-test)
+add_executable(bit-operations-test bit_operations-test.cpp)
+target_link_libraries(bit-operations-test Catch2::WithMain aarith::Library)
+add_test(NAME bit-operations-test COMMAND bit-operations-test)
