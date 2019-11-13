@@ -3,26 +3,23 @@
 #include <aarith/types/integer.hpp>
 #include <aarith/operations/exact_operations.hpp>
 
-#include <integer.hpp>
+//#include <integer.hpp>
 
 int main() {
 
     using namespace aarith;
+    using namespace std;
 
-    static constexpr uint8_t number_a1 = 20;
-    static constexpr uint8_t number_b1 = 100;
+    uint64_t a =1u;
+    a = a << 35;
+    auto [a_upper, a_lower] = split(a);
 
-    static constexpr uint8_t num_res = number_a1 - number_b1;
+    uinteger<64> a_int{a};
+    uinteger<64> a_upper_int{a_upper};
+    uinteger<64> a_lower_int{a_lower};
 
-    static constexpr size_t TestWidth1 = 8;
 
-    const uinteger<TestWidth1> a1{number_a1};
-    const uinteger<TestWidth1> b1{number_b1};
-
-    auto const result = exact_uint_sub(a1, b1);
-
-    std::cout << result << "\t" << result.word_mask(0) << "\t" << uinteger<64>{result.word(0)} << "\t" << num_res << "\n";
-
+    cout << a_int << "\n" << a_upper_int << "\n" << a_lower_int << "\n";
 
     return 0;
 }

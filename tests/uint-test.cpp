@@ -295,5 +295,7 @@ SCENARIO("Logical NOT works as expected", "[uinteger][arithmetic]")
     }
 }
 
+
+
 // for static_assert tests:
 // https://stackoverflow.com/questions/30155619/expected-build-failure-tests-in-cmake
