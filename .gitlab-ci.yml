@@ -43,7 +43,7 @@ run_tests:
         expire_in: 30 minutes
     script:
         - cd build/tests
-        - pwd
+        - export GCOV_PREFIX_STRIP=10
         - find -name "*-test" -exec {} \;
         - ls -l CMakeFiles/uint-test.dir
         - rm -rf coverage
