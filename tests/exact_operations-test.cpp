@@ -92,7 +92,45 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic]")
                 }
             }
         }
+        WHEN ("b equals zero")
+        {
+            const uinteger<150> b{0u};
+            THEN("Subtracting b (i.e. zero) should not change a")
+            {
+                uinteger<150> a;
+
+                for (const unsigned a_num: {0u,23u,1337u}) {
+                    a=uinteger<150>{a_num};
+                    uinteger<150> result=exact_uint_sub(a,b);
+                    REQUIRE(result == a);
+                }
+
+            }
+        }
+        WHEN ("There is a borrow into the next word")
+        {
+            AND_WHEN("The next word is 2^64-1")
+            {
+                THEN("The new borrow must be set as well")
+                {
+                    const uint64_t all_ones=static_cast<uint64_t>(-1);
+                    const uint64_t zero=0u;
+                    const uint64_t one=1u;
+
+                    const uinteger<192> a=uinteger<192>::from_words(one,zero,zero);
+                    const uinteger<192> b=uinteger<192>::from_words(zero,all_ones,one);
+
+                    const uinteger<192> result=exact_uint_sub(a,b);
+                    const uinteger<192> expected=uinteger<192>::from_words(zero,zero,all_ones);
+
+                    REQUIRE(expected == result);
+
+                }
+            }
+        }
     }
+
+
     GIVEN("Two uinteger<N> a and b are subtracted")
     {
         WHEN("N > word_width")
