@@ -24,7 +24,7 @@ try_compiling:
     script:
         - mkdir -p build/bw_output
         - cd build
-        - cmake ..
+        - CC=gcc-8 CXX=g++-8 cmake ..
         - /opt/sonar-build-wrapper/build-wrapper-linux-x86-64 --out-dir bw_output make -j 4 all
 
 
@@ -46,4 +46,4 @@ run_tests:
         - find -name "*-test" -exec {} \;
         - rm -rf coverage
         - mkdir -p coverage
-        - /opt/software/usr/local/bin/gcovr -v -r ../../ --object-directory CMakeFiles --sonarqube coverage/coverage.xml 
+        - /opt/software/usr/local/bin/gcovr --gcov-executable gcov-8 -v -r ../../ --object-directory CMakeFiles --sonarqube coverage/coverage.xml 
