@@ -92,7 +92,24 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic]")
                 }
             }
         }
+        WHEN ("b equals zero")
+        {
+            const uinteger<150> b{0u};
+            THEN("Subtracting b (i.e. zero) should not change a")
+            {
+                uinteger<150> a;
+
+                for (const unsigned a_num: {0u,23u,1337u}) {
+                    a=uinteger<150>{a_num};
+                    uinteger<150> result=exact_uint_sub(a,b);
+                    REQUIRE(result == a);
+                }
+
+            }
+        }
     }
+
+
     GIVEN("Two uinteger<N> a and b are subtracted")
     {
         WHEN("N > word_width")
