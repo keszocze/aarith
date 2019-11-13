@@ -21,5 +21,7 @@ int main() {
 
     cout << a_int << "\n" << a_upper_int << "\n" << a_lower_int << "\n";
 
+    exact_uint_mul(uinteger<64>{a}, uinteger<64>{a});
+
     return 0;
 }

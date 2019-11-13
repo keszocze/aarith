@@ -17,7 +17,7 @@ namespace aarith {
  * @param b Second summand
  * @return Sum of a and b
  */
-template <class UInteger> auto exact_uint_add(const UInteger& a, const UInteger& b) -> UInteger
+template <class UInteger> [[nodiscard]] auto exact_uint_add(const UInteger& a, const UInteger& b) -> UInteger
 {
     static_assert(is_integral<UInteger>::value);
     static_assert(is_unsigned<UInteger>::value);
@@ -43,7 +43,7 @@ template <class UInteger> auto exact_uint_add(const UInteger& a, const UInteger&
  * @param b Subtrahend
  * @return Difference between a and b
  */
-template <class UInteger> auto exact_uint_sub(const UInteger& a, const UInteger& b) -> UInteger
+template <class UInteger> [[nodiscard]] auto exact_uint_sub(const UInteger& a, const UInteger& b) -> UInteger
 {
     static_assert(is_integral<UInteger>::value);
     static_assert(is_unsigned<UInteger>::value);
@@ -69,7 +69,8 @@ template <class UInteger> auto exact_uint_sub(const UInteger& a, const UInteger&
  * @param b Second multiplicant
  * @return Product of a and b
  */
-template <class UInteger> auto exact_uint_mul(const UInteger& a, const UInteger& b) -> UInteger
+
+template <class UInteger> [[nodiscard]] auto exact_uint_mul(const UInteger& a, const UInteger& b) -> UInteger
 {
 
     static_assert(is_integral<UInteger>::value);
