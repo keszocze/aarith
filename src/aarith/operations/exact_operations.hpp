@@ -52,8 +52,22 @@ template <class UInteger> [[nodiscard]] auto exact_uint_sub(const UInteger& a, c
     typename UInteger::word_type borrow{0};
     for (auto i = 0U; i < a.word_count(); ++i)
     {
-        auto const partial_diff = a.word(i) - (b.word(i) + borrow);
-        borrow = (partial_diff > a.word(i) || partial_diff > b.word(i)) ? 1 : 0;
+
+        auto const a_word = a.word(i);
+        auto const b_word = b.word(i);
+        auto const subtrahend = b_word + borrow;
+        auto const partial_diff = a_word - subtrahend;
+
+        /*
+         * The new borrow originates from either
+         * a) the minuend being smaller than the subtrahend or
+         * b) the subtrahend being smaller than the raw word of the uinteger b
+         *
+         * The case b) arises when the current word of b consists of ones only and there is
+         * an "incoming" borrow.
+         */
+
+        borrow = ((a_word < subtrahend) || (subtrahend < b_word)) ? 1 : 0;
         sum.set_word(i, partial_diff);
     }
     return sum;
