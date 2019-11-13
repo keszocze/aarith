@@ -113,7 +113,7 @@ template <class UInteger> [[nodiscard]] auto exact_uint_mul(const UInteger& a, c
             const auto column0 = pp1 + carry;
             const uint32_t column0_carry = column0 < pp1 || column0 < carry;
 
-            const auto [column0_upper, column0_lower] = split(pp1);
+            const auto [column0_upper, column0_lower] = split(column0);
             carry = unsplit(column0_carry, column0_upper);
 
             const auto column1_sum = carry + pp2 + pp3;
