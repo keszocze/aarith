@@ -31,6 +31,13 @@ public:
         words[0] = n;
     }
 
+    template <class... Args> static auto from_words(Args... args) -> uinteger
+    {
+        uinteger uint;
+        uint.set_words(args...);
+        return uint;
+    }
+
     static constexpr auto word_width() -> size_t
     {
         return sizeof(word_type) * 8;
@@ -43,11 +50,12 @@ public:
 
     static constexpr auto word_mask(size_t index) -> word_type
     {
-
         constexpr word_type other_masks = static_cast<word_type>(-1); // all ones, e.g. no masking
-        constexpr word_type last_mask = (static_cast<word_type>(1) << (width() % word_width())) - 1;
-
-        return ((index == word_count() - 1) && (width() % word_width() != 0)) ? last_mask : other_masks;
+        constexpr word_type last_mask =
+            (width() % word_width() != 0)
+                ? (static_cast<word_type>(1) << (width() % word_width())) - 1
+                : static_cast<word_type>(-1);
+        return (index == word_count() - 1) ? last_mask : other_masks;
     };
 
     static constexpr auto width() -> size_t
@@ -65,6 +73,12 @@ public:
         words[index] = value & word_mask(index);
     }
 
+    /// Sets the words to the given values, where the rightern-most argument corresponds to word 0.
+    template <class... Args> void set_words(Args... args)
+    {
+        set_word_recursively<0>(args...);
+    }
+
     auto bit(size_t index) const -> bit_type
     {
         auto const the_word = word(index / word_width());
@@ -72,7 +86,28 @@ public:
         return static_cast<bit_type>(masked_bit > 0 ? 1 : 0);
     }
 
+    auto operator<<=(const size_t shift_by) -> uinteger&
+    {
+        return *this = *this << shift_by;
+    }
+
 private:
+    template <size_t index, class... Args>
+    auto set_word_recursively(word_type value, Args... args) -> size_t
+    {
+        static_assert(index < word_count(), "too many initializer words");
+        auto const count = set_word_recursively<index + 1>(args...);
+        words[count - index] = value;
+        return count;
+    }
+
+    template <size_t index> auto set_word_recursively(word_type value) -> size_t
+    {
+        static_assert(index < word_count(), "too many initializer words");
+        words[0] = value;
+        return index;
+    }
+
     std::array<word_type, word_count()> words{0};
 };
 
@@ -182,4 +217,3 @@ auto operator~(const uinteger<Width>& rhs)
 }
 
 } // namespace aarith
-
