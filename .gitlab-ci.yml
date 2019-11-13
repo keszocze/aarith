@@ -45,7 +45,7 @@ run_tests:
         - cd build/tests
         - pwd
         - find -name "*-test" -exec {} \;
-        - ll CMakeFiles/uint-test.dir
+        - ls -l CMakeFiles/uint-test.dir
         - rm -rf coverage
         - mkdir -p coverage
         - /opt/software/usr/local/bin/gcovr --gcov-executable gcov-8 -v --filter '/var/lib/gitlab-runner/builds/.+/0/keszocze/aarith' --object-directory CMakeFiles --sonarqube coverage/coverage.xml 
