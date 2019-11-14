@@ -170,7 +170,7 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
         auto const a = uinteger<128>::from_words(1, val);
         auto const b = uinteger<128>::from_words(1, 0);
         auto const c = uinteger<128>::from_words(13435, 345897);
-        auto const d = uinteger<128>::from_words(0, 0);
+        auto const d = uinteger<128>::from_words(static_cast<typename uinteger<128>::word_type>(-1), static_cast<typename uinteger<128>::word_type>(-1));
         auto const zero = uinteger<128>::from_words(0, 0);
         auto const one = uinteger<128>::from_words(0, 1);
 
@@ -211,6 +211,13 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
                     CHECK(exact_uint_mul(num, one) == num);
                     CHECK(exact_uint_mul(one, num) == num);
                 }
+            }
+        }
+        WHEN("Both multiplicands are maximum")
+        {
+            THEN("The product is 1")
+            {
+                REQUIRE(exact_uint_mul(d, d) == one);
             }
         }
     }
