@@ -97,14 +97,14 @@ private:
     {
         static_assert(index < word_count(), "too many initializer words");
         auto const count = set_word_recursively<index + 1>(args...);
-        words[count - index] = value;
+        words[count - index] = value & word_mask(index);
         return count;
     }
 
     template <size_t index> auto set_word_recursively(word_type value) -> size_t
     {
         static_assert(index < word_count(), "too many initializer words");
-        words[0] = value;
+        words[0] = value & word_mask(index);
         return index;
     }
 
