@@ -162,3 +162,62 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic]")
         }
     }
 }
+
+SCENARIO("Bit and Word operations work correctly")
+{
+    WHEN("A uinteger<N> is created using uinteger<N>::from_words")
+    {
+        THEN("All words should be correctly masked")
+        {
+            const uint64_t ones = static_cast<uint64_t>(-1);
+            uint64_t pos = 1;
+            constexpr size_t width = 15;
+            auto const a = uinteger<width>::from_words(ones);
+
+            for (auto i=0U; i < a.word_width();i++)
+            {
+                auto mask = (pos << i);
+                bool is_one = a.word(0) & mask ;
+                bool in_word = i < width;
+
+                if (in_word)
+                {
+                    CHECK(is_one);
+                }
+                else
+                {
+//                                    std::cout << uinteger<64>{mask} << "\t" << a << "\t" << uinteger<64>{a.word(0)} << "\n";
+                    CHECK(!is_one);
+                }
+            }
+
+
+        }
+    }
+    WHEN ("Two uinteger<N>'s are created")
+    {
+        AND_WHEN("One is created via ::from_words and the other uses .set_word")
+        {
+            THEN("The resulting uinteger<N>'s should be identical")
+            {
+                const uint64_t ones = static_cast<uint64_t>(-1);
+                auto const a = uinteger<15>::from_words(ones);
+                uinteger<15> b;
+                b.set_word(0,ones);
+
+                uinteger<15> c;
+                c.set_words(ones);
+
+                // If this check fails, the generated expansion might not be helpful as only the lowest 15 bits are
+                // sent to std::cout. These are the bits, were the two functions aren't differing in the first place.
+                CHECK(a == b);
+                CHECK(a == c);
+                CHECK(b==c);
+//                std::cout << "a: " << uinteger<64>{a.word(0)} << "\n";
+//                std::cout << "b: " << uinteger<64>{b.word(0)} << "\n";
+//                std::cout << "c: " << uinteger<64>{c.word(0)} << "\n";
+            }
+        }
+    }
+
+}
