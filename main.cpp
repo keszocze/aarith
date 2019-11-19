@@ -10,18 +10,8 @@ int main() {
     using namespace aarith;
     using namespace std;
 
-    uint64_t a =1u;
-    a = a << 35;
-    auto [a_upper, a_lower] = split(a);
-
-    uinteger<64> a_int{a};
-    uinteger<64> a_upper_int{a_upper};
-    uinteger<64> a_lower_int{a_lower};
-
-
-    cout << a_int << "\n" << a_upper_int << "\n" << a_lower_int << "\n";
-
-    exact_uint_mul(uinteger<64>{a}, uinteger<64>{a});
-
+    const uinteger<64> n =uinteger<64>::from_words(static_cast<uint64_t>(-1));
+    cout << n << "\n";
+    cout << prepend_zero_word(n) << "\n";
     return 0;
 }

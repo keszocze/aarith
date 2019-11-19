@@ -2,6 +2,7 @@
 
 #include <aarith/types/traits.hpp>
 #include <aarith/utilities/bit_operations.hpp>
+#include <aarith/types/integer.hpp>
 
 #include <iostream>
 
@@ -17,7 +18,8 @@ namespace aarith {
  * @param b Second summand
  * @return Sum of a and b
  */
-template <class UInteger> [[nodiscard]] auto exact_uint_add(const UInteger& a, const UInteger& b) -> UInteger
+template <class UInteger>
+[[nodiscard]] auto exact_uint_add(const UInteger& a, const UInteger& b) -> UInteger
 {
     static_assert(is_integral<UInteger>::value);
     static_assert(is_unsigned<UInteger>::value);
@@ -43,7 +45,8 @@ template <class UInteger> [[nodiscard]] auto exact_uint_add(const UInteger& a, c
  * @param b Subtrahend
  * @return Difference between a and b
  */
-template <class UInteger> [[nodiscard]] auto exact_uint_sub(const UInteger& a, const UInteger& b) -> UInteger
+template <class UInteger>
+[[nodiscard]] auto exact_uint_sub(const UInteger& a, const UInteger& b) -> UInteger
 {
     static_assert(is_integral<UInteger>::value);
     static_assert(is_unsigned<UInteger>::value);
@@ -78,62 +81,100 @@ template <class UInteger> [[nodiscard]] auto exact_uint_sub(const UInteger& a, c
  *
  * @note No Type conversion is performed. If the bit widths do not match, the code will not compile!
  *
+ * The method implements Karatsuba's Algorithm https://en.wikipedia.org/wiki/Karatsuba_algorithm
+ *
+ * @todo Actually complete the implementation
+ *
  * @tparam UInteger The unsigned integer instance used for the operation
  * @param a First multiplicant
  * @param b Second multiplicant
  * @return Product of a and b
  */
-
-template <class UInteger> [[nodiscard]] auto exact_uint_mul(const UInteger& a, const UInteger& b) -> UInteger
+template <class UInteger>
+[[nodiscard]] auto exact_uint_mul(const UInteger& a, const UInteger& b) -> UInteger
 {
-
-    static_assert(is_integral<UInteger>::value);
-    static_assert(is_unsigned<UInteger>::value);
-
-    UInteger product;
-    typename UInteger::word_type carry{0};
-
-    for (auto j = 0U; j < b.word_count(); ++j)
+    // base case, we can stop recursion now
+    if (UInteger::width() <= 32)
     {
 
-        const auto b_word = b.word(j);
-
-        UInteger partial_product;
-        for (auto i = 0U; (i + j) < a.word_count(); ++i)
-        {
-
-            const auto [a_upper, a_lower] = split(a.word(i));
-            const auto [b_upper, b_lower] = split(b_word);
-
-            const typename UInteger::word_type pp1 = a_lower * b_lower;
-            const typename UInteger::word_type pp2 = a_lower * b_upper;
-            const typename UInteger::word_type pp3 = a_upper * b_lower;
-            const typename UInteger::word_type pp4 = a_upper * b_upper;
-
-            const auto foo = [](const uint64_t x, const uint64_t y, const uint64_t carry_in) {
-                const auto sum = x + y + carry_in;
-                const uint32_t sum_carry = sum < x || sum < y || sum < carry_in;
-
-                const auto [upper, lower] = split(sum);
-                const auto carry_out = unsplit(sum_carry,upper);
-
-                return std::make_pair(carry_out,lower);
-            };
-
-
-            const auto [inner_carry_1,column0_lower] = foo(pp1, 0, carry);
-            
-            const auto [inner_carry2,column1_lower] = foo(pp2, pp3, inner_carry_1);
-
-            carry = pp4 + inner_carry2;
-
-            partial_product.set_word(i + j, unsplit(column1_lower, column0_lower));
-        }
-
-        product = exact_uint_add(product, partial_product);
+        uint64_t result_uint64 = a.word(0)*b.word(0);
+        UInteger result=UInteger::from_words(result_uint64);
+        return result;
     }
-    return product;
+    else
+    {
+        throw "currently unsupported";
+    }
+
 }
+
+/**
+ * @brief Prepends an empty (i.e. zero) word to a given uinteger.
+ * @tparam UInteger The unsigned integer instance used for the operation
+ * @param a The uinteger that is prepended a zero word
+ * @return The uinteger with a prepended zero word
+ */
+template <class UInteger>[[nodiscard]] auto prepend_zero_word(const UInteger& a) -> uinteger<UInteger::width()+UInteger::word_width()>
+{
+    uinteger<UInteger::width()+UInteger::word_width()> result;
+    for (auto i = 0U; i < a.word_count(); i++)
+    {
+        result.set_word(i,a.word(i));
+    }
+    return result;
+}
+
+// template <class UInteger> [[nodiscard]] auto exact_uint_mul(const UInteger& a, const UInteger& b)
+// -> UInteger
+//{
+//
+//    static_assert(is_integral<UInteger>::value);
+//    static_assert(is_unsigned<UInteger>::value);
+//
+//    UInteger product;
+//    typename UInteger::word_type carry{0};
+//
+//    for (auto j = 0U; j < b.word_count(); ++j)
+//    {
+//
+//        const auto b_word = b.word(j);
+//
+//        UInteger partial_product;
+//        for (auto i = 0U; (i + j) < a.word_count(); ++i)
+//        {
+//
+//            const auto [a_upper, a_lower] = split(a.word(i));
+//            const auto [b_upper, b_lower] = split(b_word);
+//
+//            const typename UInteger::word_type pp1 = a_lower * b_lower;
+//            const typename UInteger::word_type pp2 = a_lower * b_upper;
+//            const typename UInteger::word_type pp3 = a_upper * b_lower;
+//            const typename UInteger::word_type pp4 = a_upper * b_upper;
+//
+//            const auto foo = [](const uint64_t x, const uint64_t y, const uint64_t carry_in) {
+//                const auto sum = x + y + carry_in;
+//                const uint32_t sum_carry = sum < x || sum < y || sum < carry_in;
+//
+//                const auto [upper, lower] = split(sum);
+//                const auto carry_out = unsplit(sum_carry,upper);
+//
+//                return std::make_pair(carry_out,lower);
+//            };
+//
+//
+//            const auto [inner_carry_1,column0_lower] = foo(pp1, 0, carry);
+//
+//            const auto [inner_carry2,column1_lower] = foo(pp2, pp3, inner_carry_1);
+//
+//            carry = pp4 + inner_carry2;
+//
+//            partial_product.set_word(i + j, unsplit(column1_lower, column0_lower));
+//        }
+//
+//        product = exact_uint_add(product, partial_product);
+//    }
+//    return product;
+//}
 /*
 template <class UInteger> class exact_integer_operations
 {
