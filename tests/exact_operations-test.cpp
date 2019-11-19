@@ -281,6 +281,27 @@ SCENARIO("Bit operations are performed correctly", "[uinteger][bit]")
                     CHECK(prepend_n.word(i) == n.word(i));
                 }
                 CHECK(prepend_n.word(n.word_count()) == static_cast<uint64_t>(0));
+        WHEN("One the size is oubled")
+        {
+            THEN("The result should have twice the words of the original uinteger")
+            {
+                const auto doubled = double_size(n);
+
+                CHECK(doubled.word_count() == 2*n.word_count());
+            }
+            THEN(
+                    "The prepended words should equal zero and the other values should have been copied")
+            {
+                const auto doubled = double_size(n);
+                for (auto i = 0U; i < n.word_count(); ++i)
+                {
+                    CHECK(doubled.word(i) == n.word(i));
+                }
+                for (auto i = n.word_count(); i < doubled.word_count(); ++i)
+                {
+                    CHECK(doubled.word(n.word_count()) == static_cast<uint64_t>(0));
+                }
+
             }
         }
     }
