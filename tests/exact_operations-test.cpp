@@ -167,25 +167,27 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
     {
 
         auto val_a =
-                GENERATE(0, 1,56567, 23, static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
-        auto val_b = GENERATE(0, 1,56567, 23, 234,76856,2342353456, static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
-        const uinteger<32> a= uinteger<32>::from_words(val_a);
-        const uinteger<32> b=uinteger<32>::from_words(val_b);
+            GENERATE(0, 1, 56567, 23, static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
+        auto val_b = GENERATE(0, 1, 56567, 23, 234, 76856, 2342353456, static_cast<uint32_t>(-4366),
+                              static_cast<uint32_t>(-1));
+        const uinteger<32> a = uinteger<32>::from_words(val_a);
+        const uinteger<32> b = uinteger<32>::from_words(val_b);
 
         THEN("Multiplication should be commutative")
         {
-            CHECK(exact_uint_mul(a,b) == exact_uint_mul(b,a));
+            CHECK(exact_uint_mul(a, b) == exact_uint_mul(b, a));
         }
 
         THEN("Multiplication by 1 should not change the other multiplicant")
         {
             const uinteger<32> one{1U};
-            CHECK(exact_uint_mul(a,one) == a);
-            CHECK(exact_uint_mul(one,a) == a);
-            CHECK(exact_uint_mul(b,one) == b);
-            CHECK(exact_uint_mul(one,b) == b);
+            CHECK(exact_uint_mul(a, one) == a);
+            CHECK(exact_uint_mul(one, a) == a);
+            CHECK(exact_uint_mul(b, one) == b);
+            CHECK(exact_uint_mul(one, b) == b);
         }
-        THEN("Multiplication by 0 should result in 0") {
+        THEN("Multiplication by 0 should result in 0")
+        {
             const uinteger<32> zero{0U};
             CHECK(exact_uint_mul(a, zero) == zero);
             CHECK(exact_uint_mul(zero, a) == zero);
@@ -194,66 +196,66 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
         }
     }
 
-//    GIVEN("Two uinteger<N> a and b to be multiplied")
-//    {
-//        uint64_t val = 1;
-//        val = val << 35;
-//        auto const a = uinteger<128>::from_words(1, val);
-//        auto const b = uinteger<128>::from_words(1, 0);
-//        auto const c = uinteger<128>::from_words(13435, 345897);
-//        auto const d =
-//            uinteger<128>::from_words(static_cast<typename uinteger<128>::word_type>(-1),
-//                                      static_cast<typename uinteger<128>::word_type>(-1));
-//        auto const zero = uinteger<128>::from_words(0, 0);
-//        auto const one = uinteger<128>::from_words(0, 1);
-//
-//        const std::vector<uinteger<128>> numbers{a, b, c, d, one, zero};
-//
-//        THEN("The operation should be commutative")
-//        {
-//            for (const uinteger<128>& num_a : numbers)
-//            {
-//                for (const uinteger<128>& num_b : numbers)
-//                {
-//                    CHECK(exact_uint_mul(num_a, num_b) == exact_uint_mul(num_b, num_a));
-//                }
-//            }
-//
-//            CHECK(exact_uint_mul(a, b) == exact_uint_mul(a, b));
-//        }
-//
-//        WHEN("One multiplicant is zero")
-//        {
-//
-//            THEN("The result should be zero")
-//            {
-//                for (const uinteger<128>& num : numbers)
-//                {
-//                    CHECK(exact_uint_mul(num, zero) == zero);
-//                    CHECK(exact_uint_mul(zero, num) == zero);
-//                }
-//            }
-//        }
-//        WHEN("One multiplicant is one")
-//        {
-//            THEN("Multiplication does not do much")
-//            {
-//
-//                for (const uinteger<128>& num : numbers)
-//                {
-//                    CHECK(exact_uint_mul(num, one) == num);
-//                    CHECK(exact_uint_mul(one, num) == num);
-//                }
-//            }
-//        }
-//        WHEN("Both multiplicands are maximum")
-//        {
-//            THEN("The product is 1")
-//            {
-//                REQUIRE(exact_uint_mul(d, d) == one);
-//            }
-//        }
-//    }
+    //    GIVEN("Two uinteger<N> a and b to be multiplied")
+    //    {
+    //        uint64_t val = 1;
+    //        val = val << 35;
+    //        auto const a = uinteger<128>::from_words(1, val);
+    //        auto const b = uinteger<128>::from_words(1, 0);
+    //        auto const c = uinteger<128>::from_words(13435, 345897);
+    //        auto const d =
+    //            uinteger<128>::from_words(static_cast<typename uinteger<128>::word_type>(-1),
+    //                                      static_cast<typename uinteger<128>::word_type>(-1));
+    //        auto const zero = uinteger<128>::from_words(0, 0);
+    //        auto const one = uinteger<128>::from_words(0, 1);
+    //
+    //        const std::vector<uinteger<128>> numbers{a, b, c, d, one, zero};
+    //
+    //        THEN("The operation should be commutative")
+    //        {
+    //            for (const uinteger<128>& num_a : numbers)
+    //            {
+    //                for (const uinteger<128>& num_b : numbers)
+    //                {
+    //                    CHECK(exact_uint_mul(num_a, num_b) == exact_uint_mul(num_b, num_a));
+    //                }
+    //            }
+    //
+    //            CHECK(exact_uint_mul(a, b) == exact_uint_mul(a, b));
+    //        }
+    //
+    //        WHEN("One multiplicant is zero")
+    //        {
+    //
+    //            THEN("The result should be zero")
+    //            {
+    //                for (const uinteger<128>& num : numbers)
+    //                {
+    //                    CHECK(exact_uint_mul(num, zero) == zero);
+    //                    CHECK(exact_uint_mul(zero, num) == zero);
+    //                }
+    //            }
+    //        }
+    //        WHEN("One multiplicant is one")
+    //        {
+    //            THEN("Multiplication does not do much")
+    //            {
+    //
+    //                for (const uinteger<128>& num : numbers)
+    //                {
+    //                    CHECK(exact_uint_mul(num, one) == num);
+    //                    CHECK(exact_uint_mul(one, num) == num);
+    //                }
+    //            }
+    //        }
+    //        WHEN("Both multiplicands are maximum")
+    //        {
+    //            THEN("The product is 1")
+    //            {
+    //                REQUIRE(exact_uint_mul(d, d) == one);
+    //            }
+    //        }
+    //    }
 }
 
 SCENARIO("Bit operations are performed correctly", "[uinteger][bit]")
@@ -263,42 +265,45 @@ SCENARIO("Bit operations are performed correctly", "[uinteger][bit]")
         // TODO Understand how to generate various bit widths
         auto val =
             GENERATE(0, 56567, 23, static_cast<uint64_t>(-4354566), static_cast<uint64_t>(-1));
-        const uinteger<64> n = uinteger<64>::from_words(val);
+        const uinteger<150> n = uinteger<150>::from_words(2 * val, val);
         WHEN("One zero word is prepended")
         {
+            const auto prepended_n = prepend_zero_word(n);
             THEN("The result should have one additional word")
             {
-                const auto prepended_n = prepend_zero_word(n);
 
                 CHECK(prepended_n.word_count() == n.word_count() + 1);
             }
             THEN(
                 "The prepended word should equal zero and the other values should have been copied")
             {
-                const auto prepend_n = prepend_zero_word(n);
                 for (auto i = 0U; i < n.word_count(); ++i)
                 {
-                    CHECK(prepend_n.word(i) == n.word(i));
+                    CHECK(prepended_n.word(i) == n.word(i));
                 }
-                for (auto i = n.word_count(); i < prepend_n.word_count(); ++i)
+                for (auto i = n.word_count(); i < prepended_n.word_count(); ++i)
                 {
-                    CHECK(prepend_n.word(n.word_count()) == static_cast<uint64_t>(0));
+                    CHECK(prepended_n.word(n.word_count()) == static_cast<uint64_t>(0));
                 }
-
             }
         }
         WHEN("One the size is oubled")
         {
-            THEN("The result should have twice the words of the original uinteger")
+            const auto doubled = double_bits(n);
+            THEN("The result should have twice the bits of the original uinteger")
             {
-                const auto doubled = double_size(n);
-
-                CHECK(doubled.word_count() == 2*n.word_count());
+                CHECK(doubled.width() == 2 * n.width());
             }
-            THEN(
-                    "The prepended words should equal zero and the other values should have been copied")
+            THEN("The result must have twice or twice minus one the number of words")
             {
-                const auto doubled = double_size(n);
+                const auto two_n_words = doubled.word_count();
+                const auto n_words = n.word_count();
+                CHECK(((two_n_words == 2*n_words) || (two_n_words == (2*n_words)-1)) );
+            }
+            THEN("The prepended words should equal zero and the other values should have been "
+                 "copied")
+            {
+
                 for (auto i = 0U; i < n.word_count(); ++i)
                 {
                     CHECK(doubled.word(i) == n.word(i));
@@ -307,7 +312,6 @@ SCENARIO("Bit operations are performed correctly", "[uinteger][bit]")
                 {
                     CHECK(doubled.word(n.word_count()) == static_cast<uint64_t>(0));
                 }
-
             }
         }
     }

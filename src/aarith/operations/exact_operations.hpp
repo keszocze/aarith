@@ -133,7 +133,7 @@ template <class UInteger>[[nodiscard]] auto prepend_zero_word(const UInteger& a)
  *
  * @todo test this method!
  */
-    template <class UInteger>[[nodiscard]] auto double_size(const UInteger& a) -> uinteger<2*UInteger::width()>
+    template <class UInteger>[[nodiscard]] auto double_bits(const UInteger& a) -> uinteger<2 * UInteger::width()>
     {
         uinteger<2*UInteger::width()> result;
         for (auto i = 0U; i < a.word_count(); i++)
