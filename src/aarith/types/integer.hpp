@@ -73,7 +73,7 @@ public:
         words[index] = value & word_mask(index);
     }
 
-    /// Sets the words to the given values, where the rightern-most argument corresponds to word 0.
+    /// Sets the words to the given values, where the right-most argument corresponds to word 0.
     template <class... Args> void set_words(Args... args)
     {
         set_word_recursively<0>(args...);
