@@ -124,6 +124,25 @@ template <class UInteger>[[nodiscard]] auto prepend_zero_word(const UInteger& a)
     return result;
 }
 
+
+/**
+ * @brief Dobles the size of a given uinteger by prepending zeros.
+ * @tparam UInteger The unsigned integer instance used for the operation
+ * @param a The uinteger that is doubled in size
+ * @return The uinteger with twice the bits (zeros prepended)
+ *
+ * @todo test this method!
+ */
+    template <class UInteger>[[nodiscard]] auto double_size(const UInteger& a) -> uinteger<2*UInteger::width()>
+    {
+        uinteger<2*UInteger::width()> result;
+        for (auto i = 0U; i < a.word_count(); i++)
+        {
+            result.set_word(i,a.word(i));
+        }
+        return result;
+    }
+
 // template <class UInteger> [[nodiscard]] auto exact_uint_mul(const UInteger& a, const UInteger& b)
 // -> UInteger
 //{
