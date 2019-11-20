@@ -1,5 +1,5 @@
-#include <aarith/types/integer.hpp>
 #include <aarith/operations/comparisons.hpp>
+#include <aarith/types/integer.hpp>
 #include <catch.hpp>
 #include <sstream>
 
@@ -154,7 +154,39 @@ SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
             REQUIRE(result.word(1) == 0x8000000000000000);
             REQUIRE(result.word(2) == 3);
         }
-        WHEN("The shift is a multiple of the word width")
+
+        WHEN("The shift amount is a multiple of the word width")
+        {
+
+            THEN("The result should still be correct")
+            {
+                static constexpr size_t width = 256;
+                static constexpr size_t word_width = uinteger<width>::word_width();
+
+                static const uinteger<width> a{1U};
+                static  const uinteger<width> expected0 =
+                    uinteger<width>::from_words(0U, 0U, 0U, 1U);
+                static  const uinteger<width> expected1 =
+                    uinteger<width>::from_words(0U, 0U, 1U, 0U);
+                static  const uinteger<width> expected2 =
+                    uinteger<width>::from_words(0U, 1U, 0U, 0U);
+                static  const uinteger<width> expected3 =
+                    uinteger<width>::from_words(1U, 0U, 0U, 0U);
+                static const uinteger<width> expected4 =
+                    uinteger<width>::from_words(0U, 0U, 0U, 0U);
+
+                std::vector<uinteger<width>> expecteds{expected0, expected1, expected2, expected3,
+                                                       expected4};
+
+                for (auto i = 0U; i < expecteds.size(); ++i)
+                {
+                    uinteger<width> result = a << (word_width * i);
+                    CHECK(result == expecteds[i]);
+                }
+            }
+        }
+
+        AND_WHEN("The shift amount is the integer width")
         {
             THEN("The result should still be correct")
             {
@@ -164,10 +196,7 @@ SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
                 const uinteger<w> result = a << w;
 
                 CHECK(expected == result);
-
             }
-
-
         }
     }
 }
@@ -188,7 +217,6 @@ SCENARIO("Logical AND works as expected", "[uinteger][arithmetic]")
             const auto result = a & b;
             const auto result_ref = number_a & number_b;
             REQUIRE(result.word(0) == result_ref);
-          
         }
     }
 }
@@ -209,7 +237,6 @@ SCENARIO("Logical OR works as expected", "[uinteger][arithmetic]")
             const auto result = a | b;
             const auto result_ref = number_a | number_b;
             REQUIRE(result.word(0) == result_ref);
-          
         }
     }
 }
@@ -228,7 +255,6 @@ SCENARIO("Logical NOT works as expected", "[uinteger][arithmetic]")
             const auto result = ~a;
             const auto result_ref = ~number_a;
             REQUIRE(result.word(0) == result_ref);
-          
         }
     }
 }
