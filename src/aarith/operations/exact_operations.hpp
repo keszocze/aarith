@@ -157,41 +157,6 @@ template <class UInteger>
     }
 }
 
-/**
- * @brief Prepends an empty (i.e. zero) word to a given uinteger.
- * @tparam UInteger The unsigned integer instance used for the operation
- * @param a The uinteger that is prepended a zero word
- * @return The uinteger with a prepended zero word
- */
-template <class UInteger>
-[[nodiscard]] auto prepend_zero_word(const UInteger& a)
-    -> uinteger<UInteger::width() + UInteger::word_width()>
-{
-    uinteger<UInteger::width() + UInteger::word_width()> result;
-    for (auto i = 0U; i < a.word_count(); i++)
-    {
-        result.set_word(i, a.word(i));
-    }
-    return result;
-}
 
-/**
- * @brief Dobles the size of a given uinteger by prepending zeros.
- * @tparam UInteger The unsigned integer instance used for the operation
- * @param a The uinteger that is doubled in size
- * @return The uinteger with twice the bits (zeros prepended)
- *
- * @todo test this method!
- */
-template <class UInteger>
-[[nodiscard]] auto double_bits(const UInteger& a) -> uinteger<2 * UInteger::width()>
-{
-    uinteger<2 * UInteger::width()> result;
-    for (auto i = 0U; i < a.word_count(); i++)
-    {
-        result.set_word(i, a.word(i));
-    }
-    return result;
-}
 
 } // namespace aarith
