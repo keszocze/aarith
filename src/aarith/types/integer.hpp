@@ -183,6 +183,10 @@ template <size_t Width> auto operator<<(const uinteger<Width>& lhs, size_t rhs) 
     {
         return uinteger<Width>(0U);
     }
+    if (rhs == 0)
+    {
+        return lhs;
+    }
 
     uinteger<Width> shifted;
     const auto skip_words = rhs / lhs.word_width();
@@ -215,6 +219,10 @@ auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
     if (rhs >= Width)
     {
         return uinteger<Width>(0U);
+    }
+    if (rhs == 0)
+    {
+        return lhs;
     }
 
     uinteger<Width> shifted;
