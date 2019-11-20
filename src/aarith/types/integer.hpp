@@ -105,6 +105,36 @@ public:
         });
     }
 
+    constexpr word_type* begin() noexcept
+    {
+        return words.begin();
+    }
+
+    constexpr word_type* end() noexcept
+    {
+        return words.end();
+    }
+
+    constexpr const word_type* begin() const noexcept
+    {
+        return words.begin();
+    }
+
+    constexpr const word_type* end() const noexcept
+    {
+        return words.end();
+    }
+
+    constexpr const word_type* cbegin() const noexcept
+    {
+        return words.begin();
+    }
+
+    constexpr const word_type* cend() const noexcept
+    {
+        return words.end();
+    }
+
     auto operator<<=(const size_t shift_by) -> uinteger&
     {
         return *this = *this << shift_by;

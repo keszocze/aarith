@@ -283,5 +283,41 @@ SCENARIO("Checking whether an uinteger is not equal to zero/false")
     }
 }
 
+SCENARIO("Using the for loop operation feature from ")
+{
+    GIVEN("An unsigned integer")
+    {
+        THEN("The forward iterators should give the words as expected")
+        {
+            uint64_t val_a = GENERATE(0,1,2,3);
+            uint64_t val_b = GENERATE(3,56,567,324);
+
+            uinteger<64> a{val_a};
+            uinteger<128> b = uinteger<128>::from_words(val_a,val_b);
+
+            std::vector<uint64_t > collector;
+            for (const uinteger<64>::word_type w: a) {
+                collector.push_back(w);
+            }
+
+            CHECK(collector.size() == 1U);
+            CHECK(collector[0] == val_a);
+
+            collector.clear();
+
+
+            // note that this iteration starts with the most significant word!
+            for (const uinteger<128>::word_type w: b) {
+                collector.push_back(w);
+            }
+
+            CHECK(collector.size() == 2U);
+            CHECK(collector[0] == val_b);
+            CHECK(collector[1] == val_a);
+
+        }
+    }
+}
+
 // for static_assert tests:
 // https://stackoverflow.com/questions/30155619/expected-build-failure-tests-in-cmake
