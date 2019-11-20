@@ -289,7 +289,6 @@ SCENARIO("Using the for loop operation feature from ")
 
             uinteger<64> a{val_a};
             uinteger<128> b = uinteger<128>::from_words(val_a, val_b);
-            //            std::array<uinteger<64>::word_type ,2> b_arr{val_a,val_b};
 
             size_t index = 0;
             for (const uinteger<64>::word_type w : a)
@@ -317,7 +316,6 @@ SCENARIO("Using the for loop operation feature from ")
 
             uinteger<64> a{val_a};
             uinteger<128> b = uinteger<128>::from_words(val_a, val_b);
-            //            std::array<uinteger<64>::word_type ,2> b_arr{val_a,val_b};
 
             size_t index = 0;
             for (auto iter = a.begin(); iter != a.end(); ++iter)
@@ -346,7 +344,6 @@ SCENARIO("Using the for loop operation feature from ")
 
             uinteger<64> a{val_a};
             uinteger<128> b = uinteger<128>::from_words(val_a, val_b);
-            //            std::array<uinteger<64>::word_type ,2> b_arr{val_a,val_b};
 
             size_t index = 0;
             for (auto iter = a.rbegin(); iter != a.rend(); ++iter)
