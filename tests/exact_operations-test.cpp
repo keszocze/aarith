@@ -180,24 +180,24 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
 
         THEN("Multiplication should be commutative")
         {
-            CHECK(better_mul(a, b) == better_mul(b, a));
+            CHECK(exact_uint_mul(a, b) == exact_uint_mul(b, a));
         }
 
         THEN("Multiplication by 1 should not change the other multiplicant")
         {
             const uinteger<32> one{1U};
-            CHECK(better_mul(a, one) == a);
-            CHECK(better_mul(one, a) == a);
-            CHECK(better_mul(b, one) == b);
-            CHECK(better_mul(one, b) == b);
+            CHECK(exact_uint_mul(a, one) == a);
+            CHECK(exact_uint_mul(one, a) == a);
+            CHECK(exact_uint_mul(b, one) == b);
+            CHECK(exact_uint_mul(one, b) == b);
         }
         THEN("Multiplication by 0 should result in 0")
         {
             const uinteger<32> zero{0U};
-            CHECK(better_mul(a, zero) == zero);
-            CHECK(better_mul(zero, a) == zero);
-            CHECK(better_mul(b, zero) == zero);
-            CHECK(better_mul(zero, b) == zero);
+            CHECK(exact_uint_mul(a, zero) == zero);
+            CHECK(exact_uint_mul(zero, a) == zero);
+            CHECK(exact_uint_mul(b, zero) == zero);
+            CHECK(exact_uint_mul(zero, b) == zero);
         }
         THEN("The result matches the uint64_t computation")
         {
@@ -207,7 +207,7 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
             uint64_t int_res = a_large * b_large;
 
             uint32_t small_res = static_cast<uint32_t>(int_res);
-            uinteger<32> result=better_mul(a,b);
+            uinteger<32> result= exact_uint_mul(a, b);
              CHECK(small_res == result.word(0));
 
         }
@@ -234,11 +234,11 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
                 {
                     for (const uinteger<128>& num_b : numbers)
                     {
-                        CHECK(better_mul(num_a, num_b) == better_mul(num_b, num_a));
+                        CHECK(exact_uint_mul(num_a, num_b) == exact_uint_mul(num_b, num_a));
                     }
                 }
 
-                CHECK(better_mul(a, b) == better_mul(a, b));
+                CHECK(exact_uint_mul(a, b) == exact_uint_mul(a, b));
             }
 
             WHEN("One multiplicant is zero")
@@ -248,8 +248,8 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
                 {
                     for (const uinteger<128>& num : numbers)
                     {
-                        CHECK(better_mul(num, zero) == zero);
-                        CHECK(better_mul(zero, num) == zero);
+                        CHECK(exact_uint_mul(num, zero) == zero);
+                        CHECK(exact_uint_mul(zero, num) == zero);
                     }
                 }
             }
@@ -260,8 +260,8 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
 
                     for (const uinteger<128>& num : numbers)
                     {
-                        CHECK(better_mul(num, one) == num);
-                        CHECK(better_mul(one, num) == num);
+                        CHECK(exact_uint_mul(num, one) == num);
+                        CHECK(exact_uint_mul(one, num) == num);
                     }
                 }
             }
@@ -269,7 +269,7 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
             {
                 THEN("The product is 1")
                 {
-                    REQUIRE(better_mul(d, d) == one);
+                    REQUIRE(exact_uint_mul(d, d) == one);
                 }
             }
         }

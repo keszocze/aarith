@@ -91,46 +91,7 @@ template <class UInteger>
  * @param b Second multiplicant
  * @return Product of a and b
  */
-template <class UInteger>
-[[nodiscard]] auto exact_uint_mul(const UInteger& a, const UInteger& b) -> UInteger
-{
-
-    // trivial case, we can simply make use of the uint64_t support of modern systems
-    if (UInteger::width() <= 32)
-    {
-
-        uint64_t result_uint64 = a.word(0) * b.word(0);
-        UInteger result;
-        result.set_word(0, result_uint64);
-        return result;
-    }
-
-    // we only want to add as few times as possible
-    UInteger counter;
-    UInteger summand;
-    UInteger result;
-    if (a < b)
-    {
-        counter = a;
-        summand = b;
-    }
-    else
-    {
-        counter = b;
-        summand = a;
-    }
-
-    UInteger one = UInteger::from_words(1U);
-    while (!counter.is_zero())
-    {
-        result = exact_uint_add(result, summand);
-        counter = exact_uint_sub(counter, one);
-    }
-
-    return result;
-}
-
-template <class UInteger>[[nodiscard]] UInteger better_mul(const UInteger& a, const UInteger& b)
+template <class UInteger>[[nodiscard]] UInteger exact_uint_mul(const UInteger& a, const UInteger& b)
 {
 
     // TODO does it make sense to count the ones first?
