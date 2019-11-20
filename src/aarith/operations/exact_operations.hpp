@@ -158,16 +158,37 @@ template <class UInteger>
     }
 }
 
-template <std::size_t W> auto restoring_division(const uinteger<W>& a, const uinteger<W>& b) -> uinteger<W>
+template <std::size_t W>
+auto restoring_division(const uinteger<W>& a, const uinteger<W>& b) -> uinteger<W>
 {
     using UInteger = uinteger<W>;
-    using LargeUInteger = uinteger<2*W>;
-    LargeUInteger R = width_cast<2*W>(a);
-    LargeUInteger D = (a << a.width());
+    using LargeUInteger = uinteger<2 * W>;
 
-    UInteger result{0U};
 
-    
+    const size_t n = a.width();
+    const LargeUInteger two = LargeUInteger::from_words(2U);
+
+    LargeUInteger R = width_cast<2 * W>(a);
+    LargeUInteger D = (a << n);
+
+    UInteger Q{0U};
+
+    for (size_t i = (n - 1); i >= 0; --i)
+    {
+        LargeUInteger TwoR = (R << 1);
+        if (TwoR >= D)
+        {
+            R = exact_uint_sub(TwoR, D);
+            // TODO set the corresponding bit to 1
+        }
+        else
+        {
+            // TODO set the corresponding bit to 0
+            R = TwoR;
+        }
+    }
+
+    return Q;
 }
 
 } // namespace aarith
