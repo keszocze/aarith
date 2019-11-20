@@ -20,7 +20,7 @@ template <size_t N, size_t Width> auto to_base_2n(const uinteger<Width>& value)
     std::string result;
     for (auto i = digit_count; i > 0; --i)
     {
-        auto const bits = value.bits<N>((i - 1) * N);
+        auto const bits = value.template bits<N>((i - 1) * N);
         result += digits[bits.word(0)];
     }
     return result;
