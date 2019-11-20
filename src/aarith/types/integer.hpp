@@ -6,6 +6,7 @@
 #include <array>
 #include <cstdint>
 #include <iostream>
+#include <algorithm>
 #include <type_traits>
 #include <stdexcept>
 
@@ -101,6 +102,15 @@ public:
         return static_cast<bit_type>(masked_bit > 0 ? 1 : 0);
     }
 
+    [[nodiscard]] bool is_zero() const
+    {
+        return std::all_of(words.begin(), words.end(), [](const word_type &w) {
+            word_type zero = 0U;
+            return w == zero;
+        });
+    }
+
+
     auto operator<<=(const size_t shift_by) -> uinteger&
     {
         return *this = *this << shift_by;
@@ -148,16 +158,6 @@ public:
     static constexpr bool value = true;
 };
 
-template<class UInteger>  [[nodiscard]]
-bool is_zero(const UInteger &a)
-{
-    for (auto i=0U; i < a.word_count(); ++i) {
-        if (a.word(i) != 0U) {
-            return false;
-        }
-    }
-    return true;
-}
 
 
 template <size_t DestinationWidth, size_t SourceWidth>
