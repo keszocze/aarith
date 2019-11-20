@@ -39,17 +39,17 @@ public:
         return uint;
     }
 
-    static constexpr auto word_width() -> size_t
+    [[nodiscard]] static constexpr auto word_width() noexcept -> size_t
     {
         return sizeof(word_type) * 8;
     }
 
-    static constexpr auto word_count() -> size_t
+    [[nodiscard]] static constexpr auto word_count() noexcept -> size_t
     {
         return size_in_words<word_type>(Width);
     }
 
-    static constexpr auto word_mask(size_t index) -> word_type
+    [[nodiscard]] static constexpr auto word_mask(size_t index) noexcept -> word_type
     {
         constexpr word_type other_masks = static_cast<word_type>(-1); // all ones, e.g. no masking
         constexpr word_type last_mask =
@@ -59,12 +59,12 @@ public:
         return (index == word_count() - 1) ? last_mask : other_masks;
     };
 
-    static constexpr auto width() -> size_t
+    [[nodiscard]] static constexpr auto width() noexcept -> size_t
     {
         return Width;
     }
 
-    auto word(size_t index) const -> word_type
+    [[nodiscard]] auto word(size_t index) const -> word_type
     {
         return words[index];
     }
@@ -87,7 +87,7 @@ public:
         return static_cast<bit_type>(masked_bit > 0 ? 1 : 0);
     }
 
-    [[nodiscard]] bool is_zero() const
+    [[nodiscard]] bool is_zero() const noexcept
     {
         return std::all_of(words.begin(), words.end(), [](const word_type& w) {
             word_type zero = 0U;
@@ -95,7 +95,7 @@ public:
         });
     }
 
-    explicit operator bool() const
+    [[nodiscard]] explicit operator bool() const noexcept
     {
         return std::any_of(words.begin(), words.end(), [](const word_type& w) {
             word_type zero = 0U;
@@ -181,7 +181,7 @@ public:
 };
 
 template <size_t DestinationWidth, size_t SourceWidth>
-auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>
+[[nodiscard]] auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>
 {
     uinteger<DestinationWidth> destination;
     if constexpr (DestinationWidth >= SourceWidth)
@@ -212,7 +212,7 @@ auto operator<<(std::ostream& out, const uinteger<Width>& value) -> std::ostream
 }
 
 template <size_t Width>
-auto operator<<(const uinteger<Width>& lhs, const uint32_t rhs) -> uinteger<Width>
+[[nodiscard]] auto operator<<(const uinteger<Width>& lhs, const uint32_t rhs) -> uinteger<Width>
 {
     uinteger<Width> shifted;
     const auto skip_words = rhs / lhs.word_width();
@@ -237,7 +237,8 @@ auto operator<<(const uinteger<Width>& lhs, const uint32_t rhs) -> uinteger<Widt
 }
 
 template <size_t Width>
-auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
+[[nodiscard]] auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
+    -> uinteger<Width>
 {
     uinteger<Width> logical_and;
     for (auto counter = 0U; counter < lhs.word_count(); ++counter)
@@ -248,7 +249,8 @@ auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteg
 }
 
 template <size_t Width>
-auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
+[[nodiscard]] auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
+    -> uinteger<Width>
 {
     uinteger<Width> logical_or;
     for (auto counter = 0U; counter < lhs.word_count(); ++counter)
@@ -258,7 +260,7 @@ auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteg
     return logical_or;
 }
 
-template <size_t Width> auto operator~(const uinteger<Width>& rhs) -> uinteger<Width>
+template <size_t Width>[[nodiscard]] auto operator~(const uinteger<Width>& rhs) -> uinteger<Width>
 {
     uinteger<Width> logical_not;
     for (auto counter = 0U; counter < rhs.word_count(); ++counter)
