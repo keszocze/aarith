@@ -1,0 +1,91 @@
+#include "aarith/types/integer.hpp"
+#include "aarith/utilities/string_utils.hpp"
+#include <catch.hpp>
+
+using namespace aarith;
+
+SCENARIO("Converting uintegers into strings", "[uinteger][string]")
+{
+    const uinteger<16> uint{static_cast<uint16_t>(204)};
+
+    WHEN("Converting a uinteger into a decimal string")
+    {
+        THEN("The string represents the uinteger")
+        {
+            REQUIRE(to_decimal(uint) == "204");
+        }
+    }
+    WHEN("Converting a uinteger into a hexadecimal string")
+    {
+        THEN("The string represents the uinteger")
+        {
+            REQUIRE(to_hex(uint) == "00cc");
+        }
+    }
+    WHEN("Converting a uinteger into an octal string")
+    {
+        THEN("The string represents the uinteger")
+        {
+            REQUIRE(to_octal(uint) == "000314");
+        }
+    }
+}
+
+SCENARIO("Grouping digits in string representations", "[utilities][string]")
+{
+    GIVEN("group_digits is called")
+    {
+        WHEN("The string length is divisible by the group size")
+        {
+            THEN("The grouping is correct")
+            {
+                REQUIRE(group_digits("100000", 3, '.') == "100.000");
+            }
+        }
+        WHEN("The string length is not divisible by the group size")
+        {
+            THEN("The grouping is correct")
+            {
+                REQUIRE(group_digits("1000", 3, '.') == "1.000");
+            }
+        }
+        WHEN("The string length is smaller than the group size")
+        {
+            THEN("There is no additional grouping")
+            {
+                REQUIRE(group_digits("100", 3, '.') == "100");
+            }
+        }
+    }
+}
+
+SCENARIO("Removing leading zeroes from string representations", "[utilities][string]")
+{
+    GIVEN("remove_leading_zeroes() is called")
+    {
+        WHEN("The string is all 0s")
+        {
+            AND_WHEN("can_be_empty is true")
+            {
+                THEN("The empty string is returned")
+                {
+                    REQUIRE(remove_leading_zeroes("000", true) == "");
+                }
+            }
+            AND_WHEN("can_be_empty is false")
+            {
+                THEN("\"0\" is returned")
+                {
+                    REQUIRE(remove_leading_zeroes("000", false) == "0");
+                }
+            }
+        }
+        WHEN("The string is not all 0s")
+        {
+            THEN("All leading zeroes are removed")
+            {
+                REQUIRE(remove_leading_zeroes("00010") == "10");
+            }
+        }
+    }
+}

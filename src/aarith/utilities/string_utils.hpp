@@ -86,7 +86,8 @@ template <size_t Width> auto to_binary(const uinteger<Width>& value) -> std::str
 }
 
 /// Remove all leading zeroes from a string that represents a number.
-inline auto remove_leading_zeroes(const std::string& number) -> std::string
+inline auto remove_leading_zeroes(const std::string& number, bool can_be_empty = false)
+    -> std::string
 {
     for (auto i = 0U; i < number.length(); ++i)
     {
@@ -95,7 +96,7 @@ inline auto remove_leading_zeroes(const std::string& number) -> std::string
             return number.substr(i);
         }
     }
-    return "0";
+    return can_be_empty ? "" : "0";
 }
 
 /// Group digits within the given string that represents a number using the given separator.
@@ -113,12 +114,14 @@ inline auto group_digits(const std::string& number, size_t group_size, char sepa
     if (partial_group_size != 0)
     {
         result += number.substr(0, partial_group_size);
-        result += separator;
     }
-    for (auto i = partial_group_size; i <= number.length(); i += group_size)
+    for (auto i = partial_group_size; i < number.length(); i += group_size)
     {
-        result += number.substr(number.length() - i - group_size, group_size);
-        result += separator;
+        if (i > 0)
+        {
+            result += separator;
+        }
+        result += number.substr(i, group_size);
     }
     return result;
 }

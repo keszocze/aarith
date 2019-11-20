@@ -6,21 +6,6 @@
 
 using namespace aarith;
 
-SCENARIO("Outputting uintegers", "[uinteger]")
-{
-    WHEN("Writing a uinteger into a stream")
-    {
-        const uinteger<16> uint{static_cast<uint16_t>(0b11001100)};
-        std::stringstream ss;
-        ss << std::dec << uint;
-
-        THEN("Its decimal representation is output")
-        {
-            REQUIRE(ss.str() == "204");
-        }
-    }
-}
-
 SCENARIO("Casting uintegers into different width", "[uinteger]")
 {
     GIVEN("width_cast is called")
