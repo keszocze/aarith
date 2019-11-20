@@ -1,6 +1,7 @@
 #pragma once
 
-#include "aarith/types/traits.hpp"
+#include <aarith/types/integer.hpp>
+#include <aarith/types/traits.hpp>
 
 namespace aarith {
 
@@ -48,6 +49,17 @@ template <class UInteger> auto exact_uint_sub(const UInteger& a, const UInteger&
         sum.set_word(i, partial_diff);
     }
     return sum;
+}
+
+
+template <std::size_t W> auto restoring_division(const uinteger<W>& a, const uinteger<W>& b) -> uinteger<W>
+{
+    using UInteger = uinteger<W>;
+    using LargeUInteger = uinteger<2*W>;
+    LargeUInteger R = width_cast<2*W>(a);
+    LargeUInteger D = (a << a.width());
+
+    
 }
 
 /*
