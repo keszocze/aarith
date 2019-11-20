@@ -9,35 +9,37 @@
 
 namespace aarith {
 
-template <size_t Width> auto to_hex(const uinteger<Width>& value) -> std::string
+/// Convert the given uinteger value into a string representation with base 2^N.
+template <size_t N, size_t Width> auto to_base_2n(const uinteger<Width>& value)
 {
+    static_assert(N <= 4);
     static constexpr char digits[16] = {'0', '1', '2', '3', '4', '5', '6', '7',
                                         '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
-    static constexpr auto hex_digit_count = rounded_integer_division(Width, 4);
+    static constexpr auto digit_count = rounded_integer_division(Width, N);
 
     std::string result;
-    for (auto i = hex_digit_count; i > 0; --i)
+    for (auto i = digit_count; i > 0; --i)
     {
-        auto const bits = value.bits<4>((i - 1) * 4);
+        auto const bits = value.bits<N>((i - 1) * N);
         result += digits[bits.word(0)];
     }
     return result;
 }
 
+/// Convert the given uinteger value into a hexadecimal string representation.
+template <size_t Width> auto to_hex(const uinteger<Width>& value) -> std::string
+{
+    return to_base_2n<4>(value);
+}
+
+/// Convert the given uinteger value into a octal string representation.
 template <size_t Width> auto to_octal(const uinteger<Width>& value) -> std::string
 {
-    static constexpr char digits[16] = {'0', '1', '2', '3', '4', '5', '6', '7'};
-    static constexpr auto hex_digit_count = rounded_integer_division(Width, 3);
-
-    std::string result;
-    for (auto i = hex_digit_count; i > 0; --i)
-    {
-        auto const bits = value.bits<3>((i - 1) * 3);
-        result += digits[bits.word(0)];
-    }
-    return result;
+    return to_base_2n<3>(value);
 }
 
+/// Convert the given uinteger value into a binary coded decimal (BCD), represented within a new
+/// uinteger.
 template <size_t Width>
 auto to_bcd(const uinteger<Width>& num) -> uinteger<number_of_decimal_digits(Width) * 4>
 {
@@ -72,6 +74,7 @@ auto to_bcd(const uinteger<Width>& num) -> uinteger<number_of_decimal_digits(Wid
     return bcd;
 }
 
+/// Convert the given uinteger value into a binary string representation.
 template <size_t Width> auto to_binary(const uinteger<Width>& value) -> std::string
 {
     std::string result;
@@ -82,6 +85,7 @@ template <size_t Width> auto to_binary(const uinteger<Width>& value) -> std::str
     return result;
 }
 
+/// Remove all leading zeroes from a string that represents a number.
 inline auto remove_leading_zeroes(const std::string& number) -> std::string
 {
     for (auto i = 0U; i < number.length(); ++i)
@@ -94,6 +98,8 @@ inline auto remove_leading_zeroes(const std::string& number) -> std::string
     return "0";
 }
 
+/// Group digits within the given string that represents a number using the given separator.
+/// For example, `group_digits("1000", 3, '.')` yields `"1.000"`.
 inline auto group_digits(const std::string& number, size_t group_size, char separator = ' ')
     -> std::string
 {
@@ -117,6 +123,7 @@ inline auto group_digits(const std::string& number, size_t group_size, char sepa
     return result;
 }
 
+/// Convert the given uinteger value into a decimal string representation.
 template <size_t Width> auto to_decimal(const uinteger<Width>& value) -> std::string
 {
     return remove_leading_zeroes(to_hex(to_bcd(value)));
