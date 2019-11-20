@@ -153,6 +153,21 @@ SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
             REQUIRE(result.word(1) == 0x8000000000000000);
             REQUIRE(result.word(2) == 3);
         }
+        WHEN("The shift is a multiple of the word width")
+        {
+            THEN("The result should still be correct")
+            {
+                const size_t w = 128;
+                const uinteger<w> a{1U};
+                const uinteger<w> expected;
+                const uinteger<w> result = a << w;
+
+                CHECK(expected == result);
+
+            }
+
+
+        }
     }
 }
 
