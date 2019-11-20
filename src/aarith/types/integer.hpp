@@ -1,7 +1,6 @@
 #pragma once
 
 #include "aarith/utilities/bit_operations.hpp"
-#include "aarith/utilities/string_utils.hpp"
 #include "traits.hpp"
 #include <array>
 #include <cstdint>
@@ -29,7 +28,7 @@ public:
         static_assert(sizeof(T) * 8 <= sizeof(word_type) * 8,
                       "Only up to 64 bit integers are supported");
         // TODO understand, why this has to be commented out!
-//        static_assert(sizeof(T) * 8 <= Width, "Data type can not fit provided number");
+        // static_assert(sizeof(T) * 8 <= Width, "Data type can not fit provided number");
 
         words[0] = n;
     }
@@ -94,11 +93,34 @@ public:
         set_word_recursively<0>(args...);
     }
 
+    static constexpr auto word_index(size_t bit_index) -> size_t
+    {
+        return bit_index / word_width();
+    }
+
+    void set_bit(size_t index, bit_type value)
+    {
+        auto const the_word = word(word_index(index));
+        auto const masked_word = the_word & ~(static_cast<word_type>(1) << (index % word_width()));
+        set_word(word_index(index),
+                 masked_word | (static_cast<word_type>(value & 1) << (index % word_width())));
+    }
+
     auto bit(size_t index) const -> bit_type
     {
         auto const the_word = word(index / word_width());
         auto const masked_bit = the_word & (static_cast<word_type>(1) << (index % word_width()));
         return static_cast<bit_type>(masked_bit > 0 ? 1 : 0);
+    }
+
+    template <size_t Count> auto bits(size_t index) const -> uinteger<Count>
+    {
+        uinteger<Count> result;
+        for (auto i = 0U; i < Count; ++i)
+        {
+            result.set_bit(i, bit(index + i));
+        }
+        return result;
     }
 
     auto operator<<=(const size_t shift_by) -> uinteger&
@@ -169,75 +191,9 @@ auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidt
     return destination;
 }
 
-template <size_t Width>
-auto operator+(const uinteger<Width>& lhs, const uinteger<Width>& rhs) 
--> uinteger<Width>
+template <size_t Width> auto operator<<(const uinteger<Width>& lhs, size_t rhs) -> uinteger<Width>
 {
-    return exact_uint_add(lhs, rhs);
-}
-
-template <size_t Width>
-auto operator-(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
--> uinteger<Width>
-{
-    return exact_uint_sub(lhs, rhs);
-}
-
-template<size_t W>
-auto to_bits(std::ostream &out, const uinteger<W> &value, const unsigned int divide_after)
--> std::ostream&
-{
-    for(auto counter = W; counter > 0; --counter)
-    {
-        if(divide_after > 0 && counter < W && counter % divide_after == 0)
-        {
-            out << " ";
-        }
-        out << value.bit(counter-1);
-    }
-    return out;
-}
-
-template<size_t W>
-auto to_bits(std::ostream &out, const uinteger<W> &value)
--> std::ostream&
-{
-    to_bits(out, value, 0);
-    return out;
-}
-
-template<size_t W>
-auto to_hex(std::ostream &out, const uinteger<W> &value)
--> std::ostream&
-{
-    using word_t = typename uinteger<W>::word_type;
-
-    auto cull = sizeof(word_t) * 8 - (W % (sizeof(word_t) * 8)); 
-    if(cull == 64)
-    {
-        cull = 0;
-    }
-
-    for(auto counter = value.word_count(); counter > 0; --counter)
-    {
-        to_hex(out, value.word(counter-1), cull, true, counter == 1);
-        cull = 0;
-    }
-    return out;
-}
-
-template <size_t Width>
-auto operator<<(std::ostream& out, const uinteger<Width>& value) -> std::ostream&
-{
-    to_bits(out, value);
-    return out;
-}
-
-template <size_t Width>
-auto operator<<(const uinteger<Width>& lhs, size_t rhs)
--> uinteger<Width>
-{
-    if(rhs >= Width)
+    if (rhs >= Width)
     {
         return uinteger<Width>(0U);
     }
@@ -247,17 +203,17 @@ auto operator<<(const uinteger<Width>& lhs, size_t rhs)
     const auto shift_word_left = rhs - skip_words * lhs.word_width();
     const auto shift_word_right = lhs.word_width() - shift_word_left;
 
-    for(auto counter = lhs.word_count(); counter > 0; --counter)
+    for (auto counter = lhs.word_count(); counter > 0; --counter)
     {
-        if(counter + skip_words < lhs.word_count())
+        if (counter + skip_words < lhs.word_count())
         {
             typename uinteger<Width>::word_type new_word;
             new_word = lhs.word(counter) << shift_word_left;
-            if(shift_word_right < lhs.word_width())
+            if (shift_word_right < lhs.word_width())
             {
-                new_word = new_word | (lhs.word(counter-1) >> shift_word_right);
+                new_word = new_word | (lhs.word(counter - 1) >> shift_word_right);
             }
-            shifted.set_word(counter+skip_words, new_word);
+            shifted.set_word(counter + skip_words, new_word);
         }
     }
     typename uinteger<Width>::word_type new_word;
@@ -268,10 +224,9 @@ auto operator<<(const uinteger<Width>& lhs, size_t rhs)
 }
 
 template <size_t Width>
-auto operator>>(const uinteger<Width>& lhs, const size_t rhs)
--> uinteger<Width>
+auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
 {
-    if(rhs >= Width)
+    if (rhs >= Width)
     {
         return uinteger<Width>(0U);
     }
@@ -281,33 +236,31 @@ auto operator>>(const uinteger<Width>& lhs, const size_t rhs)
     const auto shift_word_right = rhs - skip_words * lhs.word_width();
     const auto shift_word_left = lhs.word_width() - shift_word_right;
 
-    for(auto counter = 0U; counter < lhs.word_count(); ++counter)
+    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
-        if(skip_words <= counter)
+        if (skip_words <= counter)
         {
             typename uinteger<Width>::word_type new_word;
             new_word = lhs.word(counter) >> shift_word_right;
-            if(shift_word_left < lhs.word_width())
+            if (shift_word_left < lhs.word_width())
             {
-                new_word = new_word | (lhs.word(counter+1) << shift_word_left);
+                new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
             }
-            shifted.set_word(counter-skip_words, new_word);
+            shifted.set_word(counter - skip_words, new_word);
         }
     }
     typename uinteger<Width>::word_type new_word;
-    new_word = lhs.word(lhs.word_count()-1) >> shift_word_right;
-    shifted.set_word(lhs.word_count()-skip_words-1, new_word);
+    new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
+    shifted.set_word(lhs.word_count() - skip_words - 1, new_word);
 
     return shifted;
 }
 
-
 template <size_t Width>
-auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
--> uinteger<Width>
+auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
 {
     uinteger<Width> logical_and;
-    for(auto counter = 0U; counter < lhs.word_count(); ++counter)
+    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
         logical_and.set_word(counter, lhs.word(counter) & rhs.word(counter));
     }
@@ -315,82 +268,34 @@ auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
 }
 
 template <size_t Width>
-auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
--> uinteger<Width>
+auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
 {
     uinteger<Width> logical_or;
-    for(auto counter = 0U; counter < lhs.word_count(); ++counter)
+    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
         logical_or.set_word(counter, lhs.word(counter) | rhs.word(counter));
     }
     return logical_or;
 }
 
-template <size_t Width>
-auto operator~(const uinteger<Width>& rhs)
--> uinteger<Width>
+template <size_t Width> auto operator~(const uinteger<Width>& rhs) -> uinteger<Width>
 {
     uinteger<Width> logical_not;
-    for(auto counter = 0U; counter < rhs.word_count(); ++counter)
+    for (auto counter = 0U; counter < rhs.word_count(); ++counter)
     {
         logical_not.set_word(counter, ~rhs.word(counter));
     }
     return logical_not;
 }
 
-template <size_t Width>
-auto abs_two_complement(const uinteger<Width> &value)
--> uinteger<Width>
+template <size_t Width> auto abs_two_complement(const uinteger<Width>& value) -> uinteger<Width>
 {
-    if(value.bit(Width-1) == 1)
+    if (value.bit(Width - 1) == 1)
     {
         const uinteger<Width> one(1U);
         return ~value + one;
     }
     return value;
-}
-
-template <size_t Width>
-auto to_bcd(const uinteger<Width> &num)
--> uinteger<Width + Width/4 + (Width+Width/4)%4>
-{
-    constexpr auto bcd_width = Width + Width/4 + (Width+Width/4)%4;
-    constexpr auto num_bcds = bcd_width/4;
-    
-    uinteger<bcd_width> bcd;
-
-    for(auto i = Width; i > 0; --i)
-    {
-        uinteger<bcd_width> three(3U);
-        uinteger<bcd_width> four(4U);
-        uinteger<bcd_width> mask(15U);
-
-        for(auto c_bcd = 0U; c_bcd < num_bcds; ++c_bcd)
-        {
-            if((bcd & mask) > four)
-            {
-                bcd = bcd + three;
-            }
-            
-            three <<= 4;
-            four <<= 4;
-            mask <<= 4;
-        }
-
-        bcd <<= 1;
-        const auto new_word = bcd.word(0) | (num.bit(i-1));
-        bcd.set_word(0, new_word);
-    }
-    
-    return bcd;
-}
-
-template<size_t W>
-auto print_uint(std::ostream &out, const uinteger<W> &value)
--> std::ostream&
-{
-    to_hex(out, to_bcd(value));
-    return out;
 }
 
 } // namespace aarith

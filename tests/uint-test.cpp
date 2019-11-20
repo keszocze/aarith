@@ -1,5 +1,6 @@
 #include <aarith/operations/comparisons.hpp>
 #include <aarith/types/integer.hpp>
+#include <aarith/utilities/string_utils.hpp>
 #include <catch.hpp>
 #include <sstream>
 
@@ -11,11 +12,11 @@ SCENARIO("Outputting uintegers", "[uinteger]")
     {
         const uinteger<16> uint{static_cast<uint16_t>(0b11001100)};
         std::stringstream ss;
-        ss << uint;
+        ss << std::dec << uint;
 
-        THEN("Its bit representation is output")
+        THEN("Its decimal representation is output")
         {
-            REQUIRE(ss.str() == "0000000011001100");
+            REQUIRE(ss.str() == "204");
         }
     }
 }
