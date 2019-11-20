@@ -123,6 +123,18 @@ public:
     static constexpr bool value = true;
 };
 
+template<class UInteger>  [[nodiscard]]
+bool is_zero(const UInteger &a)
+{
+    for (auto i=0U; i < a.word_count(); ++i) {
+        if (a.word(i) != 0U) {
+            return false;
+        }
+    }
+    return true;
+}
+
+
 template <size_t DestinationWidth, size_t SourceWidth>
 auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>
 {
