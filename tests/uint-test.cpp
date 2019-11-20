@@ -217,7 +217,7 @@ SCENARIO("Logical NOT works as expected", "[uinteger][arithmetic]")
     }
 }
 
-SCENARIO("Checking whether an uinteger is not equal to zero")
+SCENARIO("Checking whether an uinteger is not equal to zero/false")
 {
     GIVEN("An uinteger<N>=0=a for various N")
     {
@@ -234,6 +234,21 @@ SCENARIO("Checking whether an uinteger is not equal to zero")
             CHECK(uinteger<256>{zero}.is_zero());
             CHECK(uinteger<1337>{zero}.is_zero());
             CHECK(uinteger<8>{zero}.is_zero());
+
+        }
+        THEN("a should evaluate to false in a Boolean context")
+        {
+
+            const uint8_t zero = 0U;
+
+            CHECK_FALSE(uinteger<64>{zero});
+            CHECK_FALSE(uinteger<128>{zero});
+            CHECK_FALSE(uinteger<150>{zero});
+            CHECK_FALSE(uinteger<32>{zero});
+            CHECK_FALSE(uinteger<23>{zero});
+            CHECK_FALSE(uinteger<256>{zero});
+            CHECK_FALSE(uinteger<1337>{zero});
+            CHECK_FALSE(uinteger<8>{zero});
 
         }
     }
@@ -256,6 +271,14 @@ SCENARIO("Checking whether an uinteger is not equal to zero")
             CHECK_FALSE(c.is_zero());
             CHECK_FALSE(d.is_zero());
             CHECK_FALSE(e.is_zero());
+        }
+        THEN("The integer should evaluate to true in a Boolean context")
+        {
+            CHECK(a);
+            CHECK(b);
+            CHECK(c);
+            CHECK(d);
+            CHECK(e);
         }
     }
 }

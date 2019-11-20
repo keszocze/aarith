@@ -89,12 +89,21 @@ public:
 
     [[nodiscard]] bool is_zero() const
     {
-        return std::all_of(words.begin(), words.end(), [](const word_type &w) {
+        return std::all_of(words.begin(), words.end(), [](const word_type &w)
+        {
             word_type zero = 0U;
             return w == zero;
         });
     }
 
+    explicit operator bool() const
+    {
+        return std::any_of(words.begin(), words.end(), [](const word_type &w)
+        {
+           word_type zero =0U;
+           return w != zero;
+        });
+    }
 
     auto operator<<=(const size_t shift_by) -> uinteger&
     {
