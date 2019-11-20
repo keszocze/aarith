@@ -242,7 +242,7 @@ auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
         {
             typename uinteger<Width>::word_type new_word;
             new_word = lhs.word(counter) >> shift_word_right;
-            if (shift_word_left < lhs.word_width())
+            if(shift_word_left < lhs.word_width() && counter+1 < lhs.word_count())
             {
                 new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
             }
