@@ -1,4 +1,5 @@
 #include "aarith/types/integer.hpp"
+#include "aarith/utilities/string_utils.hpp"
 #include <catch.hpp>
 #include <sstream>
 
@@ -10,11 +11,11 @@ SCENARIO("Outputting uintegers", "[uinteger]")
     {
         const uinteger<16> uint{static_cast<uint16_t>(0b11001100)};
         std::stringstream ss;
-        ss << uint;
+        ss << std::dec << uint;
 
-        THEN("Its bit representation is output")
+        THEN("Its decimal representation is output")
         {
-            REQUIRE(ss.str() == "0000000011001100");
+            REQUIRE(ss.str() == "204");
         }
     }
 }
@@ -171,7 +172,7 @@ SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
             const size_t Width = 192;
 
             static constexpr uint16_t number_a = 3;
-            static constexpr auto s = 2*static_cast<size_t>(uinteger<Width>::word_width());
+            static constexpr auto s = 2 * static_cast<size_t>(uinteger<Width>::word_width());
             const uinteger<Width> a{number_a};
 
             const auto result = a << s;
@@ -184,7 +185,7 @@ SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
             const size_t Width = 192;
 
             static constexpr uint16_t number_a = 3;
-            static constexpr auto s = static_cast<size_t>(uinteger<Width>::word_width())-1U;
+            static constexpr auto s = static_cast<size_t>(uinteger<Width>::word_width()) - 1U;
             const uinteger<Width> a{number_a};
 
             auto reference = a.word(0) << s;
@@ -199,10 +200,10 @@ SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
             const size_t Width = 192;
 
             static constexpr uint16_t number_a = 3;
-            static constexpr auto s = 2U*static_cast<size_t>(uinteger<Width>::word_width())-1U;
+            static constexpr auto s = 2U * static_cast<size_t>(uinteger<Width>::word_width()) - 1U;
             const uinteger<Width> a{number_a};
 
-            auto reference = a.word(0) << (s% (sizeof(uinteger<Width>::word_width())*8));
+            auto reference = a.word(0) << (s % (sizeof(uinteger<Width>::word_width()) * 8));
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 0);
@@ -221,10 +222,10 @@ SCENARIO("Right shift operator works as expected", "[uinteger][utility]")
             const size_t Width = 192;
 
             typename uinteger<Width>::word_type number_a = 3;
-            number_a <<= uinteger<Width>::word_width()-2;
+            number_a <<= uinteger<Width>::word_width() - 2;
             static constexpr auto s = static_cast<size_t>(uinteger<Width>::word_width());
             uinteger<Width> a(0U);
-            a.set_word(a.word_count()-1, number_a);
+            a.set_word(a.word_count() - 1, number_a);
 
             const auto result = a >> s;
             REQUIRE(result.word(a.word_count() - 3) == 0);
@@ -236,10 +237,10 @@ SCENARIO("Right shift operator works as expected", "[uinteger][utility]")
             const size_t Width = 192;
 
             typename uinteger<Width>::word_type number_a = 3;
-            number_a <<= uinteger<Width>::word_width()-2;
-            static constexpr auto s = 2*static_cast<size_t>(uinteger<Width>::word_width());
+            number_a <<= uinteger<Width>::word_width() - 2;
+            static constexpr auto s = 2 * static_cast<size_t>(uinteger<Width>::word_width());
             uinteger<Width> a(0U);
-            a.set_word(a.word_count()-1, number_a);
+            a.set_word(a.word_count() - 1, number_a);
 
             const auto result = a >> s;
             REQUIRE(result.word(a.word_count() - 3) == number_a);
@@ -251,10 +252,10 @@ SCENARIO("Right shift operator works as expected", "[uinteger][utility]")
             const size_t Width = 192;
 
             typename uinteger<Width>::word_type number_a = 3;
-            number_a <<= uinteger<Width>::word_width()-2;
+            number_a <<= uinteger<Width>::word_width() - 2;
             static constexpr auto s = static_cast<size_t>(uinteger<Width>::word_width()) - 1;
             uinteger<Width> a(0U);
-            a.set_word(a.word_count()-1, number_a);
+            a.set_word(a.word_count() - 1, number_a);
 
             auto ref = number_a << 1;
 
@@ -268,10 +269,10 @@ SCENARIO("Right shift operator works as expected", "[uinteger][utility]")
             const size_t Width = 192;
 
             typename uinteger<Width>::word_type number_a = 3;
-            number_a <<= uinteger<Width>::word_width()-2;
-            static constexpr auto s = 2*static_cast<size_t>(uinteger<Width>::word_width()) - 1;
+            number_a <<= uinteger<Width>::word_width() - 2;
+            static constexpr auto s = 2 * static_cast<size_t>(uinteger<Width>::word_width()) - 1;
             uinteger<Width> a(0U);
-            a.set_word(a.word_count()-1, number_a);
+            a.set_word(a.word_count() - 1, number_a);
 
             auto ref = number_a << 1;
 
@@ -299,7 +300,6 @@ SCENARIO("Logical AND works as expected", "[uinteger][arithmetic]")
             const auto result = a & b;
             const auto result_ref = number_a & number_b;
             REQUIRE(result.word(0) == result_ref);
-          
         }
     }
 }
@@ -320,7 +320,6 @@ SCENARIO("Logical OR works as expected", "[uinteger][arithmetic]")
             const auto result = a | b;
             const auto result_ref = number_a | number_b;
             REQUIRE(result.word(0) == result_ref);
-          
         }
     }
 }
@@ -339,7 +338,6 @@ SCENARIO("Logical NOT works as expected", "[uinteger][arithmetic]")
             const auto result = ~a;
             const auto result_ref = ~number_a;
             REQUIRE(result.word(0) == result_ref);
-          
         }
     }
 }
