@@ -103,42 +103,42 @@ public:
         });
     }
 
-    constexpr const word_type* begin() const noexcept
+    constexpr auto begin() const noexcept
     {
         return words.begin();
     }
 
-    constexpr const word_type* end() const noexcept
+    constexpr auto end() const noexcept
     {
         return words.end();
     }
 
-    constexpr const word_type* cbegin() const noexcept
+    constexpr auto cbegin() const noexcept
     {
         return words.cbegin();
     }
 
-    constexpr const word_type* cend() const noexcept
+    constexpr auto cend() const noexcept
     {
         return words.cend();
     }
 
-    constexpr std::reverse_iterator<const word_type*> rbegin() const noexcept
+    constexpr auto rbegin() const noexcept
     {
         return words.rbegin();
     }
 
-    constexpr std::reverse_iterator<const word_type*> rend() const noexcept
+    constexpr auto rend() const noexcept
     {
         return words.rend();
     }
 
-    constexpr std::reverse_iterator<const word_type*> crbegin() const noexcept
+    constexpr auto  crbegin() const noexcept
     {
         return words.bcregin();
     }
 
-    constexpr std::reverse_iterator<const word_type*> crend() const noexcept
+    constexpr auto crend() const noexcept
     {
         return words.crend();
     }
