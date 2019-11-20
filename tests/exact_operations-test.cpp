@@ -208,66 +208,66 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
         }
     }
 
-    //    GIVEN("Two uinteger<N> a and b to be multiplied")
-    //    {
-    //        uint64_t val = 1;
-    //        val = val << 35;
-    //        auto const a = uinteger<128>::from_words(1, val);
-    //        auto const b = uinteger<128>::from_words(1, 0);
-    //        auto const c = uinteger<128>::from_words(13435, 345897);
-    //        auto const d =
-    //            uinteger<128>::from_words(static_cast<typename uinteger<128>::word_type>(-1),
-    //                                      static_cast<typename uinteger<128>::word_type>(-1));
-    //        auto const zero = uinteger<128>::from_words(0, 0);
-    //        auto const one = uinteger<128>::from_words(0, 1);
-    //
-    //        const std::vector<uinteger<128>> numbers{a, b, c, d, one, zero};
-    //
-    //        THEN("The operation should be commutative")
-    //        {
-    //            for (const uinteger<128>& num_a : numbers)
-    //            {
-    //                for (const uinteger<128>& num_b : numbers)
-    //                {
-    //                    CHECK(exact_uint_mul(num_a, num_b) == exact_uint_mul(num_b, num_a));
-    //                }
-    //            }
-    //
-    //            CHECK(exact_uint_mul(a, b) == exact_uint_mul(a, b));
-    //        }
-    //
-    //        WHEN("One multiplicant is zero")
-    //        {
-    //
-    //            THEN("The result should be zero")
-    //            {
-    //                for (const uinteger<128>& num : numbers)
-    //                {
-    //                    CHECK(exact_uint_mul(num, zero) == zero);
-    //                    CHECK(exact_uint_mul(zero, num) == zero);
-    //                }
-    //            }
-    //        }
-    //        WHEN("One multiplicant is one")
-    //        {
-    //            THEN("Multiplication does not do much")
-    //            {
-    //
-    //                for (const uinteger<128>& num : numbers)
-    //                {
-    //                    CHECK(exact_uint_mul(num, one) == num);
-    //                    CHECK(exact_uint_mul(one, num) == num);
-    //                }
-    //            }
-    //        }
-    //        WHEN("Both multiplicands are maximum")
-    //        {
-    //            THEN("The product is 1")
-    //            {
-    //                REQUIRE(exact_uint_mul(d, d) == one);
-    //            }
-    //        }
-    //    }
+//        GIVEN("Two uinteger<N> a and b to be multiplied")
+//        {
+//            uint64_t val = 1;
+//            val = val << 35;
+//            auto const a = uinteger<128>::from_words(1, val);
+//            auto const b = uinteger<128>::from_words(1, 0);
+//            auto const c = uinteger<128>::from_words(13435, 345897);
+//            auto const d =
+//                uinteger<128>::from_words(static_cast<typename uinteger<128>::word_type>(-1),
+//                                          static_cast<typename uinteger<128>::word_type>(-1));
+//            auto const zero = uinteger<128>::from_words(0, 0);
+//            auto const one = uinteger<128>::from_words(0, 1);
+//
+//            const std::vector<uinteger<128>> numbers{a, b, c, d, one, zero};
+//
+//            THEN("The operation should be commutative")
+//            {
+//                for (const uinteger<128>& num_a : numbers)
+//                {
+//                    for (const uinteger<128>& num_b : numbers)
+//                    {
+//                        CHECK(exact_uint_mul(num_a, num_b) == exact_uint_mul(num_b, num_a));
+//                    }
+//                }
+//
+//                CHECK(exact_uint_mul(a, b) == exact_uint_mul(a, b));
+//            }
+//
+//            WHEN("One multiplicant is zero")
+//            {
+//
+//                THEN("The result should be zero")
+//                {
+//                    for (const uinteger<128>& num : numbers)
+//                    {
+//                        CHECK(exact_uint_mul(num, zero) == zero);
+//                        CHECK(exact_uint_mul(zero, num) == zero);
+//                    }
+//                }
+//            }
+//            WHEN("One multiplicant is one")
+//            {
+//                THEN("Multiplication does not do much")
+//                {
+//
+//                    for (const uinteger<128>& num : numbers)
+//                    {
+//                        CHECK(exact_uint_mul(num, one) == num);
+//                        CHECK(exact_uint_mul(one, num) == num);
+//                    }
+//                }
+//            }
+//            WHEN("Both multiplicands are maximum")
+//            {
+//                THEN("The product is 1")
+//                {
+//                    REQUIRE(exact_uint_mul(d, d) == one);
+//                }
+//            }
+//        }
 }
 
 SCENARIO("Bit operations are performed correctly", "[uinteger][bit]")

@@ -81,7 +81,8 @@ template <class UInteger>
  *
  * @note No Type conversion is performed. If the bit widths do not match, the code will not compile!
  *
- * The method implements Karatsuba's Algorithm https://en.wikipedia.org/wiki/Karatsuba_algorithm
+ * This implements the most simply multiplication by adding up the number the correct number of times. This is,
+ * of course, rather slow.
  *
  * @todo Actually complete the implementation
  *
@@ -93,7 +94,8 @@ template <class UInteger>
 template <class UInteger>
 [[nodiscard]] auto exact_uint_mul(const UInteger& a, const UInteger& b) -> UInteger
 {
-    // base case, we can stop recursion now
+
+    // trivial case, we can simply make use of the uint64_t support of modern systems
     if (UInteger::width() <= 32)
     {
 
@@ -102,12 +104,64 @@ template <class UInteger>
         result.set_word(0,result_uint64);
         return result;
     }
-    else
+
+    // we only want to add as few times as possible
+    UInteger counter;
+    UInteger summand;
+    UInteger result;
+    if (a<b)
     {
-        throw "currently unsupported";
+        counter = a;
+        summand = b;
+    }
+    else {
+        counter = b;
+        summand = a;
     }
 
+    UInteger one=UInteger::from_words(1U);
+    while (!is_zero(counter))
+    {
+        result = exact_uint_add(result,summand);
+        counter = exact_uint_sub(counter,one);
+    }
+
+    return result;
+
 }
+
+/**
+ * @brief Multiplies two unsigned integers.
+ *
+ * @note No Type conversion is performed. If the bit widths do not match, the code will not compile!
+ *
+ * The method implements Karatsuba's Algorithm https://en.wikipedia.org/wiki/Karatsuba_algorithm
+ *
+ * @todo Actually complete the implementation
+ *
+ * @tparam UInteger The unsigned integer instance used for the operation
+ * @param a First multiplicant
+ * @param b Second multiplicant
+ * @return Product of a and b
+ */
+    template <class UInteger>
+    [[nodiscard]] auto karatsuba(const UInteger& a, const UInteger& b) -> UInteger
+    {
+        // base case, we can stop recursion now
+        if (UInteger::width() <= 32)
+        {
+
+            uint64_t result_uint64 = a.word(0)*b.word(0);
+            UInteger result;
+            result.set_word(0,result_uint64);
+            return result;
+        }
+        else
+        {
+            throw "currently unsupported";
+        }
+
+    }
 
 /**
  * @brief Prepends an empty (i.e. zero) word to a given uinteger.
