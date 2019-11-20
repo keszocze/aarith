@@ -105,16 +105,6 @@ public:
         });
     }
 
-    constexpr word_type* begin() noexcept
-    {
-        return words.begin();
-    }
-
-    constexpr word_type* end() noexcept
-    {
-        return words.end();
-    }
-
     constexpr const word_type* begin() const noexcept
     {
         return words.begin();
@@ -127,12 +117,32 @@ public:
 
     constexpr const word_type* cbegin() const noexcept
     {
-        return words.begin();
+        return words.cbegin();
     }
 
     constexpr const word_type* cend() const noexcept
     {
-        return words.end();
+        return words.cend();
+    }
+
+    constexpr std::reverse_iterator<const word_type*> rbegin() const noexcept
+    {
+        return words.rbegin();
+    }
+
+    constexpr std::reverse_iterator<const word_type*> rend() const noexcept
+    {
+        return words.rend();
+    }
+
+    constexpr std::reverse_iterator<const word_type*> crbegin() const noexcept
+    {
+        return words.bcregin();
+    }
+
+    constexpr std::reverse_iterator<const word_type*> crend() const noexcept
+    {
+        return words.crend();
     }
 
     auto operator<<=(const size_t shift_by) -> uinteger&

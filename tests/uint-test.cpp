@@ -294,27 +294,78 @@ SCENARIO("Using the for loop operation feature from ")
 
             uinteger<64> a{val_a};
             uinteger<128> b = uinteger<128>::from_words(val_a,val_b);
+//            std::array<uinteger<64>::word_type ,2> b_arr{val_a,val_b};
 
-            std::vector<uint64_t > collector;
+            size_t index=0;
             for (const uinteger<64>::word_type w: a) {
-                collector.push_back(w);
+                CHECK(w == a.word(index));
+                index++;
             }
 
-            CHECK(collector.size() == 1U);
-            CHECK(collector[0] == val_a);
+            CHECK(index == 1);
 
-            collector.clear();
+            index=0;
 
 
-            // note that this iteration starts with the most significant word!
             for (const uinteger<128>::word_type w: b) {
-                collector.push_back(w);
+                CHECK(w == b.word(index));
+                index++;
             }
 
-            CHECK(collector.size() == 2U);
-            CHECK(collector[0] == val_b);
-            CHECK(collector[1] == val_a);
+            CHECK(index == 2);
+        }
+        THEN("Using forward iterators explicitly should give the words as expected")
+        {
+            uint64_t val_a = GENERATE(0,1,2,3);
+            uint64_t val_b = GENERATE(3,56,567,324);
 
+            uinteger<64> a{val_a};
+            uinteger<128> b = uinteger<128>::from_words(val_a,val_b);
+//            std::array<uinteger<64>::word_type ,2> b_arr{val_a,val_b};
+
+            size_t index=0;
+            for (auto iter = a.begin(); iter != a.end(); ++iter) {
+                CHECK(*iter == a.word(index));
+                index++;
+            }
+
+            CHECK(index == 1);
+
+            index=0;
+
+            for (auto iter = b.begin(); iter != b.end(); ++iter) {
+                CHECK(*iter == b.word(index));
+                index++;
+            }
+
+            CHECK(index == 2);
+        }
+
+        THEN("Using backwards iterators explicitly should give the words as expected")
+        {
+            uint64_t val_a = GENERATE(0,1,2,3);
+            uint64_t val_b = GENERATE(3,56,567,324);
+
+            uinteger<64> a{val_a};
+            uinteger<128> b = uinteger<128>::from_words(val_a,val_b);
+//            std::array<uinteger<64>::word_type ,2> b_arr{val_a,val_b};
+
+            size_t index=0;
+            for (auto iter = a.rbegin(); iter != a.rend(); ++iter) {
+                CHECK(*iter == a.word((a.word_count()-1)-index));
+                index++;
+            }
+
+            CHECK(index == 1);
+
+            index=0;
+
+            for (auto iter = b.rbegin(); iter != b.rend(); ++iter) {
+                CHECK(*iter == b.word((b.word_count()-1)-index));
+                index++;
+            }
+
+            CHECK(index == 2);
         }
     }
 }
