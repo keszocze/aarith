@@ -161,8 +161,26 @@ template <class UInteger>
 template <std::size_t W>
 auto restoring_division(const uinteger<W>& a, const uinteger<W>& b) -> uinteger<W>
 {
+
     using UInteger = uinteger<W>;
     using LargeUInteger = uinteger<2 * W>;
+
+    /*
+     * According to Wikipedia https://en.wikipedia.org/wiki/Division_algorithm#Restoring_division the
+     * denominator is expected to be smaller than the numerator. The following two special cases are
+     * here to ensure this
+     */
+
+    if (a == b)
+    {
+        return UInteger{1U};
+    }
+
+    if (a < b) {
+        return UInteger{0U};
+    }
+
+
 
 
     const size_t n = a.width();
