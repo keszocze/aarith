@@ -2,10 +2,24 @@
 
 #include <aarith/types/integer.hpp>
 #include <aarith/types/traits.hpp>
+#include <aarith/utilities/bit_operations.hpp>
+
+#include <iostream>
 
 namespace aarith {
 
-template <class UInteger> auto exact_uint_add(const UInteger& a, const UInteger& b) -> UInteger
+/**
+ * @brief Adds two unsigned integers
+ *
+ * @note No Type conversion is performed. If the bit widths do not match, the code will not compile!
+ *
+ * @tparam UInteger The unsigned integer instance used for the operation
+ * @param a First summand
+ * @param b Second summand
+ * @return Sum of a and b
+ */
+template <class UInteger>
+[[nodiscard]] auto exact_uint_add(const UInteger& a, const UInteger& b) -> UInteger
 {
     static_assert(is_integral<UInteger>::value);
     static_assert(is_unsigned<UInteger>::value);
@@ -21,7 +35,18 @@ template <class UInteger> auto exact_uint_add(const UInteger& a, const UInteger&
     return sum;
 }
 
-template <class UInteger> auto exact_uint_sub(const UInteger& a, const UInteger& b) -> UInteger
+/**
+ * @brief Computes the difference of two unsigned integers.
+ *
+ * @note No Type conversion is performed. If the bit widths do not match, the code will not compile!
+ *
+ * @tparam UInteger The unsigned integer instance used for the operation
+ * @param a Minuend
+ * @param b Subtrahend
+ * @return Difference between a and b
+ */
+template <class UInteger>
+[[nodiscard]] auto exact_uint_sub(const UInteger& a, const UInteger& b) -> UInteger
 {
     static_assert(is_integral<UInteger>::value);
     static_assert(is_unsigned<UInteger>::value);
@@ -51,6 +76,87 @@ template <class UInteger> auto exact_uint_sub(const UInteger& a, const UInteger&
     return sum;
 }
 
+/**
+ * @brief Multiplies two unsigned integers.
+ *
+ * @note No Type conversion is performed. If the bit widths do not match, the code will not compile!
+ *
+ * This implements the most simply multiplication by adding up the number the correct number of
+ * times. This is, of course, rather slow.
+ *
+ * @todo Actually complete the implementation
+ *
+ * @tparam UInteger The unsigned integer instance used for the operation
+ * @param a First multiplicant
+ * @param b Second multiplicant
+ * @return Product of a and b
+ */
+template <class UInteger>[[nodiscard]] UInteger exact_uint_mul(const UInteger& a, const UInteger& b)
+{
+    static_assert(is_integral<UInteger>::value);
+
+    // TODO does it make sense to count the ones first?
+
+    UInteger shift_creation_mask = b;
+    UInteger summand = a;
+    UInteger result{0U};
+
+    auto last_bit_set = [](const UInteger n) {
+        typename UInteger::word_type one{1U};
+        return (n.word(0) & one);
+    };
+
+    size_t to_shift = 0;
+
+    while (!shift_creation_mask.is_zero())
+    {
+        if (last_bit_set(shift_creation_mask))
+        {
+            summand = (summand << to_shift);
+            result = exact_uint_add(result, summand);
+            to_shift = 1;
+        }
+        else
+        {
+            ++to_shift;
+        }
+        shift_creation_mask = (shift_creation_mask >> 1);
+    }
+
+    return result;
+}
+
+/**
+ * @brief Multiplies two unsigned integers.
+ *
+ * @note No Type conversion is performed. If the bit widths do not match, the code will not compile!
+ *
+ * The method implements Karatsuba's Algorithm https://en.wikipedia.org/wiki/Karatsuba_algorithm
+ *
+ * @todo Actually complete the implementation
+ *
+ * @tparam UInteger The unsigned integer instance used for the operation
+ * @param a First multiplicant
+ * @param b Second multiplicant
+ * @return Product of a and b
+ */
+template <class UInteger>
+[[nodiscard]] auto karatsuba(const UInteger& a, const UInteger& b) -> UInteger
+{
+    // base case, we can stop recursion now
+    if (UInteger::width() <= 32)
+    {
+
+        uint64_t result_uint64 = a.word(0) * b.word(0);
+        UInteger result;
+        result.set_word(0, result_uint64);
+        return result;
+    }
+    else
+    {
+        throw "currently unsupported";
+    }
+}
 
 template <std::size_t W> auto restoring_division(const uinteger<W>& a, const uinteger<W>& b) -> uinteger<W>
 {
@@ -59,17 +165,9 @@ template <std::size_t W> auto restoring_division(const uinteger<W>& a, const uin
     LargeUInteger R = width_cast<2*W>(a);
     LargeUInteger D = (a << a.width());
 
+    UInteger result{0U};
+
     
 }
-
-/*
-template <class UInteger> class exact_integer_operations
-{
-public:
-    static_assert(is_integral<UInteger>::value);
-
-    void add(const UInteger& a, const UInteger& b) {}
-};
-*/
 
 } // namespace aarith

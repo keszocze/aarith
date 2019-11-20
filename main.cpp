@@ -3,25 +3,15 @@
 #include <aarith/types/integer.hpp>
 #include <aarith/operations/exact_operations.hpp>
 
+//#include <integer.hpp>
 
 int main() {
 
     using namespace aarith;
+    using namespace std;
 
-    static constexpr uint8_t number_a1 = 20;
-    static constexpr uint8_t number_b1 = 100;
-
-    static constexpr uint8_t num_res = number_a1 - number_b1;
-
-    static constexpr size_t TestWidth1 = 8;
-
-    const uinteger<TestWidth1> a1{number_a1};
-    const uinteger<TestWidth1> b1{number_b1};
-
-    auto const result = exact_uint_sub(a1, b1);
-
-    std::cout << result << "\t" << result.word_mask(0) << "\t" << uinteger<64>{result.word(0)} << "\t" << num_res << "\n";
-
-
+    const uinteger<64> n =uinteger<64>::from_words(static_cast<uint64_t>(-1));
+    cout << n << "\n";
+    cout << prepend_zero_word(n) << "\n";
     return 0;
 }

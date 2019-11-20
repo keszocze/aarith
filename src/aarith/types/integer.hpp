@@ -6,6 +6,7 @@
 #include <array>
 #include <cstdint>
 #include <iostream>
+#include <algorithm>
 #include <type_traits>
 #include <stdexcept>
 
@@ -88,7 +89,7 @@ public:
         words[index] = value & word_mask(index);
     }
 
-    /// Sets the words to the given values, where the rightern-most argument corresponds to word 0.
+    /// Sets the words to the given values, where the right-most argument corresponds to word 0.
     template <class... Args> void set_words(Args... args)
     {
         set_word_recursively<0>(args...);
@@ -100,6 +101,15 @@ public:
         auto const masked_bit = the_word & (static_cast<word_type>(1) << (index % word_width()));
         return static_cast<bit_type>(masked_bit > 0 ? 1 : 0);
     }
+
+    [[nodiscard]] bool is_zero() const
+    {
+        return std::all_of(words.begin(), words.end(), [](const word_type &w) {
+            word_type zero = 0U;
+            return w == zero;
+        });
+    }
+
 
     auto operator<<=(const size_t shift_by) -> uinteger&
     {
@@ -147,6 +157,8 @@ template <size_t Width> class is_unsigned<uinteger<Width>>
 public:
     static constexpr bool value = true;
 };
+
+
 
 template <size_t DestinationWidth, size_t SourceWidth>
 auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>
