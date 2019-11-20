@@ -195,6 +195,36 @@ auto operator<<(const uinteger<Width>& lhs, const uint32_t rhs)
 }
 
 template <size_t Width>
+auto operator>>(const uinteger<Width>& lhs, const uint32_t rhs)
+-> uinteger<Width>
+{
+    uinteger<Width> shifted;
+    const auto skip_words = rhs / lhs.word_width();
+    const auto shift_word_right = rhs - skip_words * lhs.word_width();
+    const auto shift_word_left = lhs.word_width() - shift_word_right;
+
+    for(auto counter = 0; counter < lhs.word_count(); ++counter)
+    {
+        if(skip_words <= counter)
+        {
+            typename uinteger<Width>::word_type new_word;
+            new_word = lhs.word(counter) >> shift_word_right;
+            if(shift_word_left < lhs.word_width())
+            {
+                new_word = new_word | (lhs.word(counter+1) << shift_word_left);
+            }
+            shifted.set_word(counter-skip_words, new_word);
+        }
+    }
+    typename uinteger<Width>::word_type new_word;
+    new_word = lhs.word(lhs.word_count()-1) >> shift_word_right;
+    shifted.set_word(lhs.word_count()-skip_words-1, new_word);
+
+    return shifted;
+}
+
+
+template <size_t Width>
 auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
 -> uinteger<Width>
 {
