@@ -20,7 +20,7 @@ public:
 
     template <class T>
     explicit uinteger(T n)
-        : words{0}
+        : words{{0}}
     {
         static_assert(std::is_integral<T>::value, "Only integral values are supported");
         static_assert(!std::is_signed<T>::value, "Only unsigned numbers are supported");
@@ -141,7 +141,7 @@ private:
         return index;
     }
 
-    std::array<word_type, word_count()> words{0};
+    std::array<word_type, word_count()> words{{0}};
 };
 
 template <size_t Width> class is_integral<uinteger<Width>>
