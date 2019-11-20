@@ -217,5 +217,48 @@ SCENARIO("Logical NOT works as expected", "[uinteger][arithmetic]")
     }
 }
 
+SCENARIO("Checking whether an uinteger is not equal to zero")
+{
+    GIVEN("An uinteger<N>=0=a for various N")
+    {
+        THEN("a.is_zero() should be true")
+        {
+
+            const uint8_t zero = 0U;
+
+            CHECK(uinteger<64>{zero}.is_zero());
+            CHECK(uinteger<128>{zero}.is_zero());
+            CHECK(uinteger<150>{zero}.is_zero());
+            CHECK(uinteger<32>{zero}.is_zero());
+            CHECK(uinteger<23>{zero}.is_zero());
+            CHECK(uinteger<256>{zero}.is_zero());
+            CHECK(uinteger<1337>{zero}.is_zero());
+            CHECK(uinteger<8>{zero}.is_zero());
+
+        }
+    }
+
+    GIVEN("An non-zero uinteger")
+    {
+
+        uint64_t val = GENERATE(1,2,4,5567868,234,21,45,56768);
+        uinteger<64> a{val};
+        uinteger<128> b=uinteger<128>::from_words(val,0U);
+        uinteger<128> c=uinteger<128>::from_words(val,val);
+
+        uinteger<150> d=uinteger<150>::from_words(val,0U,0U);
+        uinteger<256> e=uinteger<256>::from_words(val,val,0U,0U);
+
+        THEN("is_zero should correctly return this fact")
+        {
+            CHECK_FALSE(a.is_zero());
+            CHECK_FALSE(b.is_zero());
+            CHECK_FALSE(c.is_zero());
+            CHECK_FALSE(d.is_zero());
+            CHECK_FALSE(e.is_zero());
+        }
+    }
+}
+
 // for static_assert tests:
 // https://stackoverflow.com/questions/30155619/expected-build-failure-tests-in-cmake
