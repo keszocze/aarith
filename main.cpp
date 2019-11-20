@@ -19,7 +19,9 @@ int main() {
     const uinteger<TestWidth1> b1{number_b1};
 
     auto const result = exact_uint_sub(a1, b1);
+    auto const blub = uinteger<192>::from_words(1, 2, 3);
 
+    std::cout << blub;
     std::cout << result << "\t" << result.word_mask(0) << "\t" << uinteger<64>{result.word(0)} << "\t" << num_res << "\n";
 
 
