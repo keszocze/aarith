@@ -2,10 +2,10 @@
 
 #include "aarith/utilities/bit_operations.hpp"
 #include "traits.hpp"
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <iostream>
-#include <algorithm>
 #include <type_traits>
 
 namespace aarith {
@@ -74,7 +74,7 @@ public:
         words[index] = value & word_mask(index);
     }
 
-    /// Sets the words to the given values, where the rightern-most argument corresponds to word 0.
+    // Sets the words to the given values, where the rightern-most argument corresponds to word 0.
     template <class... Args> void set_words(Args... args)
     {
         set_word_recursively<0>(args...);
@@ -89,8 +89,7 @@ public:
 
     [[nodiscard]] bool is_zero() const
     {
-        return std::all_of(words.begin(), words.end(), [](const word_type &w)
-        {
+        return std::all_of(words.begin(), words.end(), [](const word_type& w) {
             word_type zero = 0U;
             return w == zero;
         });
@@ -98,10 +97,9 @@ public:
 
     explicit operator bool() const
     {
-        return std::any_of(words.begin(), words.end(), [](const word_type &w)
-        {
-           word_type zero =0U;
-           return w != zero;
+        return std::any_of(words.begin(), words.end(), [](const word_type& w) {
+            word_type zero = 0U;
+            return w != zero;
         });
     }
 
@@ -182,8 +180,6 @@ public:
     static constexpr bool value = true;
 };
 
-
-
 template <size_t DestinationWidth, size_t SourceWidth>
 auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>
 {
@@ -216,22 +212,21 @@ auto operator<<(std::ostream& out, const uinteger<Width>& value) -> std::ostream
 }
 
 template <size_t Width>
-auto operator<<(const uinteger<Width>& lhs, const uint32_t rhs)
--> uinteger<Width>
+auto operator<<(const uinteger<Width>& lhs, const uint32_t rhs) -> uinteger<Width>
 {
     uinteger<Width> shifted;
     const auto skip_words = rhs / lhs.word_width();
     const auto shift_word_left = rhs - skip_words * lhs.word_width();
     const auto shift_word_right = lhs.word_width() - shift_word_left;
 
-    for(auto counter = lhs.word_count(); counter > 0; --counter)
+    for (auto counter = lhs.word_count(); counter > 0; --counter)
     {
-        if(counter + skip_words < lhs.word_count())
+        if (counter + skip_words < lhs.word_count())
         {
             typename uinteger<Width>::word_type new_word;
             new_word = lhs.word(counter) << shift_word_left;
-            new_word = new_word | (lhs.word(counter-1) >> shift_word_right);
-            shifted.set_word(counter+skip_words, new_word);
+            new_word = new_word | (lhs.word(counter - 1) >> shift_word_right);
+            shifted.set_word(counter + skip_words, new_word);
         }
     }
     typename uinteger<Width>::word_type new_word;
@@ -242,11 +237,10 @@ auto operator<<(const uinteger<Width>& lhs, const uint32_t rhs)
 }
 
 template <size_t Width>
-auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
--> uinteger<Width>
+auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
 {
     uinteger<Width> logical_and;
-    for(auto counter = 0U; counter < lhs.word_count(); ++counter)
+    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
         logical_and.set_word(counter, lhs.word(counter) & rhs.word(counter));
     }
@@ -254,23 +248,20 @@ auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
 }
 
 template <size_t Width>
-auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
--> uinteger<Width>
+auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
 {
     uinteger<Width> logical_or;
-    for(auto counter = 0U; counter < lhs.word_count(); ++counter)
+    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
         logical_or.set_word(counter, lhs.word(counter) | rhs.word(counter));
     }
     return logical_or;
 }
 
-template <size_t Width>
-auto operator~(const uinteger<Width>& rhs)
--> uinteger<Width>
+template <size_t Width> auto operator~(const uinteger<Width>& rhs) -> uinteger<Width>
 {
     uinteger<Width> logical_not;
-    for(auto counter = 0U; counter < rhs.word_count(); ++counter)
+    for (auto counter = 0U; counter < rhs.word_count(); ++counter)
     {
         logical_not.set_word(counter, ~rhs.word(counter));
     }

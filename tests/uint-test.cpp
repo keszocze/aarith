@@ -172,7 +172,6 @@ SCENARIO("Logical AND works as expected", "[uinteger][arithmetic]")
             const auto result = a & b;
             const auto result_ref = number_a & number_b;
             REQUIRE(result.word(0) == result_ref);
-          
         }
     }
 }
@@ -193,7 +192,6 @@ SCENARIO("Logical OR works as expected", "[uinteger][arithmetic]")
             const auto result = a | b;
             const auto result_ref = number_a | number_b;
             REQUIRE(result.word(0) == result_ref);
-          
         }
     }
 }
@@ -212,7 +210,6 @@ SCENARIO("Logical NOT works as expected", "[uinteger][arithmetic]")
             const auto result = ~a;
             const auto result_ref = ~number_a;
             REQUIRE(result.word(0) == result_ref);
-          
         }
     }
 }
@@ -234,7 +231,6 @@ SCENARIO("Checking whether an uinteger is not equal to zero/false")
             CHECK(uinteger<256>{zero}.is_zero());
             CHECK(uinteger<1337>{zero}.is_zero());
             CHECK(uinteger<8>{zero}.is_zero());
-
         }
         THEN("a should evaluate to false in a Boolean context")
         {
@@ -249,20 +245,19 @@ SCENARIO("Checking whether an uinteger is not equal to zero/false")
             CHECK_FALSE(uinteger<256>{zero});
             CHECK_FALSE(uinteger<1337>{zero});
             CHECK_FALSE(uinteger<8>{zero});
-
         }
     }
 
     GIVEN("An non-zero uinteger")
     {
 
-        uint64_t val = GENERATE(1,2,4,5567868,234,21,45,56768);
+        uint64_t val = GENERATE(1, 2, 4, 5567868, 234, 21, 45, 56768);
         uinteger<64> a{val};
-        uinteger<128> b=uinteger<128>::from_words(val,0U);
-        uinteger<128> c=uinteger<128>::from_words(val,val);
+        uinteger<128> b = uinteger<128>::from_words(val, 0U);
+        uinteger<128> c = uinteger<128>::from_words(val, val);
 
-        uinteger<150> d=uinteger<150>::from_words(val,0U,0U);
-        uinteger<256> e=uinteger<256>::from_words(val,val,0U,0U);
+        uinteger<150> d = uinteger<150>::from_words(val, 0U, 0U);
+        uinteger<256> e = uinteger<256>::from_words(val, val, 0U, 0U);
 
         THEN("is_zero should correctly return this fact")
         {
@@ -289,25 +284,26 @@ SCENARIO("Using the for loop operation feature from ")
     {
         THEN("The forward iterators should give the words as expected")
         {
-            uint64_t val_a = GENERATE(0,1,2,3);
-            uint64_t val_b = GENERATE(3,56,567,324);
+            uint64_t val_a = GENERATE(0, 1, 2, 3);
+            uint64_t val_b = GENERATE(3, 56, 567, 324);
 
             uinteger<64> a{val_a};
-            uinteger<128> b = uinteger<128>::from_words(val_a,val_b);
-//            std::array<uinteger<64>::word_type ,2> b_arr{val_a,val_b};
+            uinteger<128> b = uinteger<128>::from_words(val_a, val_b);
+            //            std::array<uinteger<64>::word_type ,2> b_arr{val_a,val_b};
 
-            size_t index=0;
-            for (const uinteger<64>::word_type w: a) {
+            size_t index = 0;
+            for (const uinteger<64>::word_type w : a)
+            {
                 CHECK(w == a.word(index));
                 index++;
             }
 
             CHECK(index == 1);
 
-            index=0;
+            index = 0;
 
-
-            for (const uinteger<128>::word_type w: b) {
+            for (const uinteger<128>::word_type w : b)
+            {
                 CHECK(w == b.word(index));
                 index++;
             }
@@ -316,24 +312,26 @@ SCENARIO("Using the for loop operation feature from ")
         }
         THEN("Using forward iterators explicitly should give the words as expected")
         {
-            uint64_t val_a = GENERATE(0,1,2,3);
-            uint64_t val_b = GENERATE(3,56,567,324);
+            uint64_t val_a = GENERATE(0, 1, 2, 3);
+            uint64_t val_b = GENERATE(3, 56, 567, 324);
 
             uinteger<64> a{val_a};
-            uinteger<128> b = uinteger<128>::from_words(val_a,val_b);
-//            std::array<uinteger<64>::word_type ,2> b_arr{val_a,val_b};
+            uinteger<128> b = uinteger<128>::from_words(val_a, val_b);
+            //            std::array<uinteger<64>::word_type ,2> b_arr{val_a,val_b};
 
-            size_t index=0;
-            for (auto iter = a.begin(); iter != a.end(); ++iter) {
+            size_t index = 0;
+            for (auto iter = a.begin(); iter != a.end(); ++iter)
+            {
                 CHECK(*iter == a.word(index));
                 index++;
             }
 
             CHECK(index == 1);
 
-            index=0;
+            index = 0;
 
-            for (auto iter = b.begin(); iter != b.end(); ++iter) {
+            for (auto iter = b.begin(); iter != b.end(); ++iter)
+            {
                 CHECK(*iter == b.word(index));
                 index++;
             }
@@ -343,25 +341,27 @@ SCENARIO("Using the for loop operation feature from ")
 
         THEN("Using backwards iterators explicitly should give the words as expected")
         {
-            uint64_t val_a = GENERATE(0,1,2,3);
-            uint64_t val_b = GENERATE(3,56,567,324);
+            uint64_t val_a = GENERATE(0, 1, 2, 3);
+            uint64_t val_b = GENERATE(3, 56, 567, 324);
 
             uinteger<64> a{val_a};
-            uinteger<128> b = uinteger<128>::from_words(val_a,val_b);
-//            std::array<uinteger<64>::word_type ,2> b_arr{val_a,val_b};
+            uinteger<128> b = uinteger<128>::from_words(val_a, val_b);
+            //            std::array<uinteger<64>::word_type ,2> b_arr{val_a,val_b};
 
-            size_t index=0;
-            for (auto iter = a.rbegin(); iter != a.rend(); ++iter) {
-                CHECK(*iter == a.word((a.word_count()-1)-index));
+            size_t index = 0;
+            for (auto iter = a.rbegin(); iter != a.rend(); ++iter)
+            {
+                CHECK(*iter == a.word((a.word_count() - 1) - index));
                 index++;
             }
 
             CHECK(index == 1);
 
-            index=0;
+            index = 0;
 
-            for (auto iter = b.rbegin(); iter != b.rend(); ++iter) {
-                CHECK(*iter == b.word((b.word_count()-1)-index));
+            for (auto iter = b.rbegin(); iter != b.rend(); ++iter)
+            {
+                CHECK(*iter == b.word((b.word_count() - 1) - index));
                 index++;
             }
 
