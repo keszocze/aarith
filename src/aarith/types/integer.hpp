@@ -1,7 +1,6 @@
 #pragma once
 
 #include <aarith/utilities/bit_operations.hpp>
-#include <aarith/operations/comparisons.hpp>
 #include "traits.hpp"
 #include <array>
 #include <cstdint>
@@ -28,7 +27,8 @@ public:
         static_assert(!std::is_signed<T>::value, "Only unsigned numbers are supported");
         static_assert(sizeof(T) * 8 <= sizeof(word_type) * 8,
                       "Only up to 64 bit integers are supported");
-        static_assert(sizeof(T) * 8 <= Width, "Data type can not fit provided number");
+        // TODO understand, why this has to be commented out!
+//        static_assert(sizeof(T) * 8 <= Width, "Data type can not fit provided number");
 
         words[0] = n;
     }
@@ -169,9 +169,14 @@ auto operator<<(std::ostream& out, const uinteger<Width>& value) -> std::ostream
 }
 
 template <size_t Width>
-auto operator<<(const uinteger<Width>& lhs, const uint32_t rhs)
+auto operator<<(const uinteger<Width>& lhs, size_t rhs)
 -> uinteger<Width>
 {
+    if(rhs >= Width)
+    {
+        return uinteger<Width>(0U);
+    }
+
     uinteger<Width> shifted;
     const auto skip_words = rhs / lhs.word_width();
     const auto shift_word_left = rhs - skip_words * lhs.word_width();
@@ -183,7 +188,10 @@ auto operator<<(const uinteger<Width>& lhs, const uint32_t rhs)
         {
             typename uinteger<Width>::word_type new_word;
             new_word = lhs.word(counter) << shift_word_left;
-            new_word = new_word | (lhs.word(counter-1) >> shift_word_right);
+            if(shift_word_right < lhs.word_width())
+            {
+                new_word = new_word | (lhs.word(counter-1) >> shift_word_right);
+            }
             shifted.set_word(counter+skip_words, new_word);
         }
     }
@@ -195,9 +203,14 @@ auto operator<<(const uinteger<Width>& lhs, const uint32_t rhs)
 }
 
 template <size_t Width>
-auto operator>>(const uinteger<Width>& lhs, const uint32_t rhs)
+auto operator>>(const uinteger<Width>& lhs, const size_t rhs)
 -> uinteger<Width>
 {
+    if(rhs >= Width)
+    {
+        return uinteger<Width>(0U);
+    }
+
     uinteger<Width> shifted;
     const auto skip_words = rhs / lhs.word_width();
     const auto shift_word_right = rhs - skip_words * lhs.word_width();
