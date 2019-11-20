@@ -1,8 +1,8 @@
 #pragma once
 
+#include <aarith/types/integer.hpp>
 #include <aarith/types/traits.hpp>
 #include <aarith/utilities/bit_operations.hpp>
-#include <aarith/types/integer.hpp>
 
 #include <iostream>
 
@@ -81,8 +81,8 @@ template <class UInteger>
  *
  * @note No Type conversion is performed. If the bit widths do not match, the code will not compile!
  *
- * This implements the most simply multiplication by adding up the number the correct number of times. This is,
- * of course, rather slow.
+ * This implements the most simply multiplication by adding up the number the correct number of
+ * times. This is, of course, rather slow.
  *
  * @todo Actually complete the implementation
  *
@@ -99,9 +99,9 @@ template <class UInteger>
     if (UInteger::width() <= 32)
     {
 
-        uint64_t result_uint64 = a.word(0)*b.word(0);
+        uint64_t result_uint64 = a.word(0) * b.word(0);
         UInteger result;
-        result.set_word(0,result_uint64);
+        result.set_word(0, result_uint64);
         return result;
     }
 
@@ -109,25 +109,59 @@ template <class UInteger>
     UInteger counter;
     UInteger summand;
     UInteger result;
-    if (a<b)
+    if (a < b)
     {
         counter = a;
         summand = b;
     }
-    else {
+    else
+    {
         counter = b;
         summand = a;
     }
 
-    UInteger one=UInteger::from_words(1U);
-    while (!is_zero(counter))
+    UInteger one = UInteger::from_words(1U);
+    while (!counter.is_zero())
     {
-        result = exact_uint_add(result,summand);
-        counter = exact_uint_sub(counter,one);
+        result = exact_uint_add(result, summand);
+        counter = exact_uint_sub(counter, one);
     }
 
     return result;
+}
 
+template <class UInteger>[[nodiscard]] UInteger better_mul(const UInteger& a, const UInteger& b)
+{
+
+    // TODO does it make sense to count the ones first?
+
+    UInteger shift_creation_mask = b;
+    UInteger summand = a;
+    UInteger result{0U};
+
+    auto last_bit_set = [](const UInteger n) {
+        typename UInteger::word_type one{1U};
+        return (n.word(0) & one);
+    };
+
+    size_t to_shift = 0;
+
+    while (!shift_creation_mask.is_zero())
+    {
+        if (last_bit_set(shift_creation_mask))
+        {
+            summand = (summand << to_shift);
+            result = exact_uint_add(result, summand);
+            to_shift = 1;
+        }
+        else
+        {
+            ++to_shift;
+        }
+        shift_creation_mask = (shift_creation_mask >> 1);
+    }
+
+    return result;
 }
 
 /**
@@ -144,24 +178,23 @@ template <class UInteger>
  * @param b Second multiplicant
  * @return Product of a and b
  */
-    template <class UInteger>
-    [[nodiscard]] auto karatsuba(const UInteger& a, const UInteger& b) -> UInteger
+template <class UInteger>
+[[nodiscard]] auto karatsuba(const UInteger& a, const UInteger& b) -> UInteger
+{
+    // base case, we can stop recursion now
+    if (UInteger::width() <= 32)
     {
-        // base case, we can stop recursion now
-        if (UInteger::width() <= 32)
-        {
 
-            uint64_t result_uint64 = a.word(0)*b.word(0);
-            UInteger result;
-            result.set_word(0,result_uint64);
-            return result;
-        }
-        else
-        {
-            throw "currently unsupported";
-        }
-
+        uint64_t result_uint64 = a.word(0) * b.word(0);
+        UInteger result;
+        result.set_word(0, result_uint64);
+        return result;
     }
+    else
+    {
+        throw "currently unsupported";
+    }
+}
 
 /**
  * @brief Prepends an empty (i.e. zero) word to a given uinteger.
@@ -169,16 +202,17 @@ template <class UInteger>
  * @param a The uinteger that is prepended a zero word
  * @return The uinteger with a prepended zero word
  */
-template <class UInteger>[[nodiscard]] auto prepend_zero_word(const UInteger& a) -> uinteger<UInteger::width()+UInteger::word_width()>
+template <class UInteger>
+[[nodiscard]] auto prepend_zero_word(const UInteger& a)
+    -> uinteger<UInteger::width() + UInteger::word_width()>
 {
-    uinteger<UInteger::width()+UInteger::word_width()> result;
+    uinteger<UInteger::width() + UInteger::word_width()> result;
     for (auto i = 0U; i < a.word_count(); i++)
     {
-        result.set_word(i,a.word(i));
+        result.set_word(i, a.word(i));
     }
     return result;
 }
-
 
 /**
  * @brief Dobles the size of a given uinteger by prepending zeros.
@@ -188,15 +222,16 @@ template <class UInteger>[[nodiscard]] auto prepend_zero_word(const UInteger& a)
  *
  * @todo test this method!
  */
-    template <class UInteger>[[nodiscard]] auto double_bits(const UInteger& a) -> uinteger<2 * UInteger::width()>
+template <class UInteger>
+[[nodiscard]] auto double_bits(const UInteger& a) -> uinteger<2 * UInteger::width()>
+{
+    uinteger<2 * UInteger::width()> result;
+    for (auto i = 0U; i < a.word_count(); i++)
     {
-        uinteger<2*UInteger::width()> result;
-        for (auto i = 0U; i < a.word_count(); i++)
-        {
-            result.set_word(i,a.word(i));
-        }
-        return result;
+        result.set_word(i, a.word(i));
     }
+    return result;
+}
 
 // template <class UInteger> [[nodiscard]] auto exact_uint_mul(const UInteger& a, const UInteger& b)
 // -> UInteger
