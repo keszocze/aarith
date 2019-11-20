@@ -166,9 +166,9 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
     GIVEN("Two uinteger<N> a and b with N <= 32")
     {
 
-        auto val_a =
+        uint32_t val_a =
             GENERATE(0, 1, 56567, 23, static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
-        auto val_b = GENERATE(0, 1, 56567, 23, 234, 76856, 2342353456, static_cast<uint32_t>(-4366),
+        uint32_t val_b = GENERATE(0, 1, 56567, 23, 234, 76856, 2342353456, static_cast<uint32_t>(-4366),
                               static_cast<uint32_t>(-1));
         const uinteger<32> a = uinteger<32>::from_words(val_a);
         const uinteger<32> b = uinteger<32>::from_words(val_b);
@@ -193,6 +193,18 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
             CHECK(exact_uint_mul(zero, a) == zero);
             CHECK(exact_uint_mul(b, zero) == zero);
             CHECK(exact_uint_mul(zero, b) == zero);
+        }
+        THEN("The result matches the uint64_t computation")
+        {
+            uint64_t a_large = val_a;
+            uint64_t b_large = val_b;
+
+            uint64_t int_res = a_large * b_large;
+
+            uint32_t small_res = static_cast<uint32_t>(int_res);
+            uinteger<32> result=exact_uint_mul(a,b);
+             CHECK(small_res == result.word(0));
+
         }
     }
 

@@ -98,7 +98,8 @@ template <class UInteger>
     {
 
         uint64_t result_uint64 = a.word(0)*b.word(0);
-        UInteger result=UInteger::from_words(result_uint64);
+        UInteger result;
+        result.set_word(0,result_uint64);
         return result;
     }
     else
