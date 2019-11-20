@@ -1,4 +1,5 @@
-#include "aarith/types/integer.hpp"
+#include <aarith/operations/comparisons.hpp>
+#include <aarith/types/integer.hpp>
 #include <catch.hpp>
 #include <sstream>
 
@@ -279,6 +280,49 @@ SCENARIO("Right shift operator works as expected", "[uinteger][utility]")
             REQUIRE(result.word(a.word_count() - 3) == ref);
             REQUIRE(result.word(a.word_count() - 2) == 1);
             REQUIRE(result.word(a.word_count() - 1) == 0);
+        }
+        WHEN("The shift amount is a multiple of the word width")
+        {
+
+            THEN("The result should still be correct")
+            {
+                static constexpr size_t width = 256;
+                static constexpr size_t word_width = uinteger<width>::word_width();
+
+                static const uinteger<width> a{1U};
+                static  const uinteger<width> expected0 =
+                    uinteger<width>::from_words(0U, 0U, 0U, 1U);
+                static  const uinteger<width> expected1 =
+                    uinteger<width>::from_words(0U, 0U, 1U, 0U);
+                static  const uinteger<width> expected2 =
+                    uinteger<width>::from_words(0U, 1U, 0U, 0U);
+                static  const uinteger<width> expected3 =
+                    uinteger<width>::from_words(1U, 0U, 0U, 0U);
+                static const uinteger<width> expected4 =
+                    uinteger<width>::from_words(0U, 0U, 0U, 0U);
+
+                std::vector<uinteger<width>> expecteds{expected0, expected1, expected2, expected3,
+                                                       expected4};
+
+                for (auto i = 0U; i < expecteds.size(); ++i)
+                {
+                    uinteger<width> result = a << (word_width * i);
+                    CHECK(result == expecteds[i]);
+                }
+            }
+        }
+
+        AND_WHEN("The shift amount is the integer width")
+        {
+            THEN("The result should still be correct")
+            {
+                const size_t w = 128;
+                const uinteger<w> a{1U};
+                const uinteger<w> expected;
+                const uinteger<w> result = a << w;
+
+                CHECK(expected == result);
+            }
         }
     }
 }

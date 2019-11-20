@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <iostream>
 #include <type_traits>
+#include <stdexcept>
 
 namespace aarith {
 
@@ -27,7 +28,8 @@ public:
         static_assert(!std::is_signed<T>::value, "Only unsigned numbers are supported");
         static_assert(sizeof(T) * 8 <= sizeof(word_type) * 8,
                       "Only up to 64 bit integers are supported");
-        //static_assert(sizeof(T) * 8 <= Width, "Data type can not fit provided number");
+        // TODO understand, why this has to be commented out!
+//        static_assert(sizeof(T) * 8 <= Width, "Data type can not fit provided number");
 
         words[0] = n;
     }
@@ -71,6 +73,18 @@ public:
 
     void set_word(size_t index, word_type value)
     {
+        if (index >= word_count()) {
+            std::string msg;
+            msg += "Trying to access word with index ";
+            msg += std::to_string(index);
+            msg +=" for uinteger<";
+            msg += std::to_string(width());
+            msg +="> with max index ";
+            msg += std::to_string(word_count()-1);
+
+
+            throw std::out_of_range(msg);
+        }
         words[index] = value & word_mask(index);
     }
 
