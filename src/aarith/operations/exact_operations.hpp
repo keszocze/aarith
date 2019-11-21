@@ -158,55 +158,68 @@ template <class UInteger>
     }
 }
 
+
+    template <std::size_t W>
+    auto res_div(const uinteger<W>& numerator, const uinteger<W>& denominator) -> std::pair<uinteger<W>,uinteger<W>>
+    {
+
+        if (denominator.is_zero()) {
+            throw std::runtime_error("Attempted division by zero");
+        }
+
+        using UInteger = uinteger<W>;
+        using LargeUInteger = uinteger<2 * W>;
+
+        /*
+         * According to Wikipedia https://en.wikipedia.org/wiki/Division_algorithm#Restoring_division the
+         * denominator is expected to be smaller than the numerator. The following two special cases are
+         * here to ensure this
+         */
+
+        if (numerator == denominator)
+        {
+            return std::make_pair(UInteger{1U},UInteger{0U});
+        }
+
+        if (numerator < denominator) {
+            return std::make_pair(UInteger{0U},numerator);
+        }
+
+
+
+
+        const size_t n = numerator.width();
+
+        LargeUInteger R = width_cast<2 * W>(numerator);
+        LargeUInteger D = (width_cast<2*W>(denominator) << n);
+
+        UInteger Q{0U};
+
+        for (size_t i = 0; i<n; ++i)
+        {
+            size_t j = (n-1)-i;
+            LargeUInteger TwoR = (R << 1);
+            if (TwoR >= D)
+            {
+                R = exact_uint_sub(TwoR, D);
+                Q.set_bit(j,true);
+            }
+            else
+            {
+                R = TwoR;
+                Q.set_bit(j,false);
+            }
+        }
+
+        uinteger<W> remainder = width_cast<W>(Q);
+        return std::make_pair(Q, remainder);
+    }
+
 template <std::size_t W>
-auto restoring_division(const uinteger<W>& a, const uinteger<W>& b) -> uinteger<W>
+auto restoring_division(const uinteger<W>& numerator, const uinteger<W>& denominator) -> uinteger<W>
 {
-
-    using UInteger = uinteger<W>;
-    using LargeUInteger = uinteger<2 * W>;
-
-    /*
-     * According to Wikipedia https://en.wikipedia.org/wiki/Division_algorithm#Restoring_division the
-     * denominator is expected to be smaller than the numerator. The following two special cases are
-     * here to ensure this
-     */
-
-    if (a == b)
-    {
-        return UInteger{1U};
-    }
-
-    if (a < b) {
-        return UInteger{0U};
-    }
-
-
-
-
-    const size_t n = a.width();
-    const LargeUInteger two = LargeUInteger::from_words(2U);
-
-    LargeUInteger R = width_cast<2 * W>(a);
-    LargeUInteger D = (a << n);
-
-    UInteger Q{0U};
-
-    for (size_t i = (n - 1); i >= 0; --i)
-    {
-        LargeUInteger TwoR = (R << 1);
-        if (TwoR >= D)
-        {
-            R = exact_uint_sub(TwoR, D);
-            // TODO set the corresponding bit to 1
-        }
-        else
-        {
-            // TODO set the corresponding bit to 0
-            R = TwoR;
-        }
-    }
-
-    return Q;
+    auto [quotient, remainder] = res_div(numerator,denominator);
+    return quotient;
 }
 
 } // namespace aarith
