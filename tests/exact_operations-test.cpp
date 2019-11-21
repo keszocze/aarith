@@ -323,6 +323,24 @@ SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic]") {
 
 SCENARIO("Computing the modulo of two uintegers works as expected", "[uinteger][arithmetic]") {
 
+    GIVEN("A fixed test case a=56567 and b=234")
+    {
+        const uint32_t val_a=56567;
+        const uint32_t val_b=234;
+
+        const uinteger<32> a{val_a};
+        const uinteger<32> b{val_b};
+
+        const uinteger<32> div=restoring_division(a,b);
+        const uinteger<32> mod=modulo(a,b);
+
+        const uint32_t int_div = val_a/val_b;
+        const uint32_t int_mod = val_a%val_b;
+
+        CHECK(int_div == div.word(0));
+        REQUIRE(int_mod == mod.word(0));
+    }
+
     GIVEN("Two uinteger<N> a and b with N <= 32") {
 
         uint32_t val_a =
