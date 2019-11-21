@@ -72,6 +72,33 @@ public:
         return words[index];
     }
 
+    void set_bit(size_t index, bool value = true)
+    {
+        if (index >= width()) {
+            std::string msg;
+            msg += "Trying to access bit with index ";
+            msg += std::to_string(index);
+            msg +=" for uinteger<";
+            msg += std::to_string(width());
+            msg +="> with max index ";
+            msg += std::to_string(width()-1);
+            throw std::out_of_range(msg);
+        }
+        const size_t word_index = index / word_width();
+        const size_t inner_word_index = index % word_width();
+        word_type mask = (1U << inner_word_index);
+
+        if (value)
+        {
+            words[word_index] |= mask;
+        }
+        else
+        {
+            words[word_index] &= ~mask;
+        }
+
+    }
+
     void set_word(size_t index, word_type value)
     {
         if (index >= word_count()) {
