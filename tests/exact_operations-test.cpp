@@ -335,61 +335,66 @@ SCENARIO("Computing the modulo of two uintegers works as expected", "[uinteger][
         const uint32_t int_div = val_a / val_b;
         const uint32_t int_mod = val_a % val_b;
 
+        std::cout << val_a << " % " << val_b << " = " << int_mod << "\n";
+        std::cout << uinteger<32>{val_a} << " % " << uinteger<32>{val_b} << " = " << uinteger<32>{int_mod} << "\n";
+        std::cout << a << " % " << b << " = " << mod << "\n";
+
         CHECK(int_div == div.word(0));
         REQUIRE(int_mod == mod.word(0));
+
+
     }
 
-    GIVEN("An uinteger<N> a")
-    {
-
-        const size_t width = 150;
-        auto val_a =
-            GENERATE(take(100, random(1U, 10000000U)));
-
-        uinteger<width> a{val_a};
-        const uinteger<width> zero{0U};
-        const uinteger<width> one{1U};
-
-        THEN("A modul of zero should throw an exception")
-        {
-
-            CHECK_THROWS_AS(modulo(a, zero), std::runtime_error);
-        }
-
-        THEN("A modul of 1 should yield zero")
-        {
-            CHECK(modulo(a, one) == zero);
-        }
-        THEN("Computing zero modulo something in 0")
-        {
-
-            CHECK(modulo(zero, a) == zero);
-        }
-    }
-
-    // TODO we can go up to 64 bits here! -> let's do so
-    GIVEN("Two uinteger<N> a and b with N <= 64")
-    {
-
-        uint32_t val_a =
-            GENERATE(1, 56567, 23, static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
-        uint32_t val_b = GENERATE(1, 56567, 23, 234, 76856, 2342353456,
-                                  static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
-
-        const uinteger<32> a = uinteger<32>::from_words(val_a);
-        const uinteger<32> b = uinteger<32>::from_words(val_b);
-
-        THEN("The result matches the uint64_t computation")
-        {
-
-            uint32_t int_res = val_a % val_b;
-
-            uinteger<32> result = modulo(a, b);
-            std::cout << val_a << " % " << val_b << " = " << int_res << "\n";
-            std::cout << a << " % " << b << " = " << result << "(" << restoring_division(a, b)
-                      << ")"
-                      << "\n";
-            CHECK(int_res == result.word(0));
-        }
-    }
+//    GIVEN("An uinteger<N> a")
+//    {
+//
+//        const size_t width = 150;
+//        auto val_a = GENERATE(take(100, random(1U, 10000000U)));
+//
+//        uinteger<width> a{val_a};
+//        const uinteger<width> zero{0U};
+//        const uinteger<width> one{1U};
+//
+//        THEN("A modul of zero should throw an exception")
+//        {
+//
+//            CHECK_THROWS_AS(modulo(a, zero), std::runtime_error);
+//        }
+//
+//        THEN("A modul of 1 should yield zero")
+//        {
+//            CHECK(modulo(a, one) == zero);
+//        }
+//        THEN("Computing zero modulo something in 0")
+//        {
+//
+//            CHECK(modulo(zero, a) == zero);
+//        }
+//    }
+//
+//    // TODO we can go up to 64 bits here! -> let's do so
+//    GIVEN("Two uinteger<N> a and b with N <= 64")
+//    {
+//
+//        uint32_t val_a =
+//            GENERATE(1, 56567, 23, static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
+//        uint32_t val_b = GENERATE(1, 56567, 23, 234, 76856, 2342353456,
+//                                  static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
+//
+//        const uinteger<32> a = uinteger<32>::from_words(val_a);
+//        const uinteger<32> b = uinteger<32>::from_words(val_b);
+//
+//        THEN("The result matches the uint64_t computation")
+//        {
+//
+//            uint32_t int_res = val_a % val_b;
+//
+//            uinteger<32> result = modulo(a, b);
+//            std::cout << val_a << " % " << val_b << " = " << int_res << "\n";
+//            std::cout << a << " % " << b << " = " << result << "(" << restoring_division(a, b)
+//                      << ")"
+//                      << "\n";
+//            CHECK(int_res == result.word(0));
+//        }
+//    }
 }

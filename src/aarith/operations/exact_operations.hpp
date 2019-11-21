@@ -166,8 +166,6 @@ auto res_div(const uinteger<W>& numerator, const uinteger<W>& denominator)
     using UInteger = uinteger<W>;
     using LargeUInteger = uinteger<2 * W>;
 
-
-
     if (denominator.is_zero())
     {
         throw std::runtime_error("Attempted division by zero");
@@ -189,7 +187,7 @@ auto res_div(const uinteger<W>& numerator, const uinteger<W>& denominator)
 
     if (denominator == UInteger{1U})
     {
-        return std::make_pair(numerator,UInteger{0U});
+        return std::make_pair(numerator, UInteger{0U});
     }
 
     const size_t n = numerator.width();
