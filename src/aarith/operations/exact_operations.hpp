@@ -158,67 +158,78 @@ template <class UInteger>
     }
 }
 
+template <std::size_t W>
+auto res_div(const uinteger<W>& numerator, const uinteger<W>& denominator)
+    -> std::pair<uinteger<W>, uinteger<W>>
+{
 
-    template <std::size_t W>
-    auto res_div(const uinteger<W>& numerator, const uinteger<W>& denominator) -> std::pair<uinteger<W>,uinteger<W>>
+    using UInteger = uinteger<W>;
+    using LargeUInteger = uinteger<2 * W>;
+
+
+
+    if (denominator.is_zero())
     {
-
-        if (denominator.is_zero()) {
-            throw std::runtime_error("Attempted division by zero");
-        }
-
-        using UInteger = uinteger<W>;
-        using LargeUInteger = uinteger<2 * W>;
-
-        /*
-         * According to Wikipedia https://en.wikipedia.org/wiki/Division_algorithm#Restoring_division the
-         * denominator is expected to be smaller than the numerator. The following two special cases are
-         * here to ensure this
-         */
-
-        if (numerator == denominator)
-        {
-            return std::make_pair(UInteger{1U},UInteger{0U});
-        }
-
-        if (numerator < denominator) {
-            return std::make_pair(UInteger{0U},numerator);
-        }
-
-
-
-
-        const size_t n = numerator.width();
-
-        LargeUInteger R = width_cast<2 * W>(numerator);
-        LargeUInteger D = (width_cast<2*W>(denominator) << n);
-
-        UInteger Q{0U};
-
-        for (size_t i = 0; i<n; ++i)
-        {
-            size_t j = (n-1)-i;
-            LargeUInteger TwoR = (R << 1);
-            if (TwoR >= D)
-            {
-                R = exact_uint_sub(TwoR, D);
-                Q.set_bit(j,true);
-            }
-            else
-            {
-                R = TwoR;
-                Q.set_bit(j,false);
-            }
-        }
-
-        uinteger<W> remainder = width_cast<W>(Q);
-        return std::make_pair(Q, remainder);
+        throw std::runtime_error("Attempted division by zero");
     }
+
+    /**
+     * Cover some special cases in order to speed everything up
+     */
+
+    if (numerator == denominator)
+    {
+        return std::make_pair(UInteger{1U}, UInteger{0U});
+    }
+
+    if (numerator < denominator)
+    {
+        return std::make_pair(UInteger{0U}, numerator);
+    }
+
+    if (denominator == UInteger{1U})
+    {
+        return std::make_pair(numerator,UInteger{0U});
+    }
+
+    const size_t n = numerator.width();
+
+    LargeUInteger R = width_cast<2 * W>(numerator);
+    LargeUInteger D = (width_cast<2 * W>(denominator) << n);
+
+    UInteger Q{0U};
+
+    for (size_t i = 0; i < n; ++i)
+    {
+        size_t j = (n - 1) - i;
+        LargeUInteger TwoR = (R << 1);
+        if (TwoR >= D)
+        {
+            R = exact_uint_sub(TwoR, D);
+            Q.set_bit(j, true);
+        }
+        else
+        {
+            R = TwoR;
+            Q.set_bit(j, false);
+        }
+    }
+
+    uinteger<W> remainder = width_cast<W>(Q);
+    return std::make_pair(Q, remainder);
+}
+
+template <class UInteger>
+auto modulo(const UInteger& numerator, const UInteger& denominator) -> UInteger
+{
+    auto [quotient, remainder] = res_div(numerator, denominator);
+    return remainder;
+}
 
 template <class UInteger>
 auto restoring_division(const UInteger& numerator, const UInteger& denominator) -> UInteger
 {
-    auto [quotient, remainder] = res_div(numerator,denominator);
+    auto [quotient, _] = res_div(numerator, denominator);
     return quotient;
 }
 

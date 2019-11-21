@@ -293,6 +293,7 @@ SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic]") {
         {
             const uinteger<32> zero{0U};
             CHECK_THROWS_AS(restoring_division(b,zero), std::runtime_error);
+            CHECK_THROWS_AS(restoring_division(a,zero), std::runtime_error);
         }
 
         THEN("Division by 1 should not change the other numerator") {
@@ -306,7 +307,7 @@ SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic]") {
             CHECK(restoring_division(zero, a) == zero);
             CHECK(restoring_division(zero, b) == zero);
         }
-        THEN("The result matches the-- uint64_t computation") {
+        THEN("The result matches the uint64_t computation") {
             uint64_t a_large = val_a;
             uint64_t b_large = val_b;
 
@@ -315,6 +316,52 @@ SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic]") {
             uint32_t small_res = static_cast<uint32_t>(int_res);
             uinteger<32> result = restoring_division(a, b);
             CHECK(small_res == result.word(0));
+
+        }
+    }
+}
+
+SCENARIO("Computing the modulo of two uintegers works as expected", "[uinteger][arithmetic]") {
+
+    GIVEN("Two uinteger<N> a and b with N <= 32") {
+
+        uint32_t val_a =
+                GENERATE( 1, 56567, 23, static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
+        uint32_t val_b = GENERATE(1, 56567, 23, 234, 76856, 2342353456, static_cast<uint32_t>(-4366),
+                                  static_cast<uint32_t>(-1));
+
+
+        const uinteger<32> a = uinteger<32>::from_words(val_a);
+        const uinteger<32> b = uinteger<32>::from_words(val_b);
+
+
+        THEN("A modul of zero should throw an exception")
+        {
+            const uinteger<32> zero{0U};
+            CHECK_THROWS_AS(modulo(b,zero), std::runtime_error);
+            CHECK_THROWS_AS(modulo(a,zero), std::runtime_error);
+        }
+
+        THEN("A modul of 1 should yield zero") {
+            const uinteger<32> one{1U};
+            const uinteger<32> zero{0U};
+            CHECK(modulo(a, one) == zero);
+            CHECK(modulo(b, one) == zero);
+        }
+        THEN("Computing zero modulo something in 0") {
+            const uinteger<32> zero{0U};
+
+            CHECK(modulo(zero, a) == zero);
+            CHECK(modulo(zero, b) == zero);
+        }
+        THEN("The result matches the uint64_t computation") {
+
+            uint32_t int_res = val_a % val_b;
+
+            uinteger<32> result = modulo(a, b);
+            std::cout << val_a << " % " << val_b << " = " << int_res << "\n";
+            std::cout << a << " % " << b << " = " << result << "(" << restoring_division(a,b) << ")" << "\n";
+            CHECK(int_res == result.word(0));
 
         }
     }
