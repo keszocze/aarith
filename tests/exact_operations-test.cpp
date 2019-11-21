@@ -168,15 +168,11 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
 
         uint32_t val_a =
             GENERATE(0, 1, 56567, 23, static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
-        uint32_t val_b = GENERATE(0, 1, 56567, 23, 234, 76856, 2342353456, static_cast<uint32_t>(-4366),
-                              static_cast<uint32_t>(-1));
-
-
+        uint32_t val_b = GENERATE(0, 1, 56567, 23, 234, 76856, 2342353456,
+                                  static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
 
         const uinteger<32> a = uinteger<32>::from_words(val_a);
         const uinteger<32> b = uinteger<32>::from_words(val_b);
-
-
 
         THEN("Multiplication should be commutative")
         {
@@ -207,107 +203,109 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
             uint64_t int_res = a_large * b_large;
 
             uint32_t small_res = static_cast<uint32_t>(int_res);
-            uinteger<32> result= exact_uint_mul(a, b);
-             CHECK(small_res == result.word(0));
-
+            uinteger<32> result = exact_uint_mul(a, b);
+            CHECK(small_res == result.word(0));
         }
     }
 
-        GIVEN("Two uinteger<N> a and b to be multiplied")
+    GIVEN("Two uinteger<N> a and b to be multiplied")
+    {
+        uint64_t val = 1;
+        val = val << 35;
+        auto const a = uinteger<128>::from_words(1, val);
+        auto const b = uinteger<128>::from_words(1, 0);
+        auto const c = uinteger<128>::from_words(13435, 345897);
+        auto const d =
+            uinteger<128>::from_words(static_cast<typename uinteger<128>::word_type>(-1),
+                                      static_cast<typename uinteger<128>::word_type>(-1));
+        auto const zero = uinteger<128>::from_words(0, 0);
+        auto const one = uinteger<128>::from_words(0, 1);
+
+        const std::vector<uinteger<128>> numbers{a, b, c, d, one, zero};
+
+        THEN("The operation should be commutative")
         {
-            uint64_t val = 1;
-            val = val << 35;
-            auto const a = uinteger<128>::from_words(1, val);
-            auto const b = uinteger<128>::from_words(1, 0);
-            auto const c = uinteger<128>::from_words(13435, 345897);
-            auto const d =
-                uinteger<128>::from_words(static_cast<typename uinteger<128>::word_type>(-1),
-                                          static_cast<typename uinteger<128>::word_type>(-1));
-            auto const zero = uinteger<128>::from_words(0, 0);
-            auto const one = uinteger<128>::from_words(0, 1);
-
-            const std::vector<uinteger<128>> numbers{a, b, c, d, one, zero};
-
-            THEN("The operation should be commutative")
+            for (const uinteger<128>& num_a : numbers)
             {
-                for (const uinteger<128>& num_a : numbers)
+                for (const uinteger<128>& num_b : numbers)
                 {
-                    for (const uinteger<128>& num_b : numbers)
-                    {
-                        CHECK(exact_uint_mul(num_a, num_b) == exact_uint_mul(num_b, num_a));
-                    }
-                }
-
-                CHECK(exact_uint_mul(a, b) == exact_uint_mul(a, b));
-            }
-
-            WHEN("One multiplicant is zero")
-            {
-
-                THEN("The result should be zero")
-                {
-                    for (const uinteger<128>& num : numbers)
-                    {
-                        CHECK(exact_uint_mul(num, zero) == zero);
-                        CHECK(exact_uint_mul(zero, num) == zero);
-                    }
+                    CHECK(exact_uint_mul(num_a, num_b) == exact_uint_mul(num_b, num_a));
                 }
             }
-            WHEN("One multiplicant is one")
-            {
-                THEN("Multiplication does not do much")
-                {
 
-                    for (const uinteger<128>& num : numbers)
-                    {
-                        CHECK(exact_uint_mul(num, one) == num);
-                        CHECK(exact_uint_mul(one, num) == num);
-                    }
-                }
-            }
-            WHEN("Both multiplicands are maximum")
+            CHECK(exact_uint_mul(a, b) == exact_uint_mul(a, b));
+        }
+
+        WHEN("One multiplicant is zero")
+        {
+
+            THEN("The result should be zero")
             {
-                THEN("The product is 1")
+                for (const uinteger<128>& num : numbers)
                 {
-                    REQUIRE(exact_uint_mul(d, d) == one);
+                    CHECK(exact_uint_mul(num, zero) == zero);
+                    CHECK(exact_uint_mul(zero, num) == zero);
                 }
             }
         }
+        WHEN("One multiplicant is one")
+        {
+            THEN("Multiplication does not do much")
+            {
+
+                for (const uinteger<128>& num : numbers)
+                {
+                    CHECK(exact_uint_mul(num, one) == num);
+                    CHECK(exact_uint_mul(one, num) == num);
+                }
+            }
+        }
+        WHEN("Both multiplicands are maximum")
+        {
+            THEN("The product is 1")
+            {
+                REQUIRE(exact_uint_mul(d, d) == one);
+            }
+        }
+    }
 }
 
-SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic]") {
+SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic]")
+{
 
-    GIVEN("Two uinteger<N> a and b with N <= 32") {
+    GIVEN("Two uinteger<N> a and b with N <= 32")
+    {
 
         uint32_t val_a =
-                GENERATE( 1, 56567, 23, static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
-        uint32_t val_b = GENERATE(1, 56567, 23, 234, 76856, 2342353456, static_cast<uint32_t>(-4366),
-                                  static_cast<uint32_t>(-1));
-
+            GENERATE(1, 56567, 23, static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
+        uint32_t val_b = GENERATE(1, 56567, 23, 234, 76856, 2342353456,
+                                  static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
 
         const uinteger<32> a = uinteger<32>::from_words(val_a);
         const uinteger<32> b = uinteger<32>::from_words(val_b);
 
-
         THEN("Division by zero should throw an exception")
         {
             const uinteger<32> zero{0U};
-            CHECK_THROWS_AS(restoring_division(b,zero), std::runtime_error);
-            CHECK_THROWS_AS(restoring_division(a,zero), std::runtime_error);
+            CHECK_THROWS_AS(restoring_division(b, zero), std::runtime_error);
+            CHECK_THROWS_AS(restoring_division(a, zero), std::runtime_error);
         }
 
-        THEN("Division by 1 should not change the other numerator") {
+        THEN("Division by 1 should not change the other numerator")
+        {
             const uinteger<32> one{1U};
             CHECK(restoring_division(a, one) == a);
             CHECK(restoring_division(b, one) == b);
         }
-        THEN("Divison of 0 should result in 0") {
+        THEN("Divison of 0 should result in 0")
+        {
             const uinteger<32> zero{0U};
 
             CHECK(restoring_division(zero, a) == zero);
             CHECK(restoring_division(zero, b) == zero);
         }
-        THEN("The result matches the uint64_t computation") {
+        THEN("The result matches the uint64_t computation")
+        {
             uint64_t a_large = val_a;
             uint64_t b_large = val_b;
 
@@ -316,71 +314,82 @@ SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic]") {
             uint32_t small_res = static_cast<uint32_t>(int_res);
             uinteger<32> result = restoring_division(a, b);
             CHECK(small_res == result.word(0));
-
         }
     }
 }
 
-SCENARIO("Computing the modulo of two uintegers works as expected", "[uinteger][arithmetic]") {
+SCENARIO("Computing the modulo of two uintegers works as expected", "[uinteger][arithmetic]")
+{
 
     GIVEN("A fixed test case a=56567 and b=234")
     {
-        const uint32_t val_a=56567;
-        const uint32_t val_b=234;
+        const uint32_t val_a = 56567;
+        const uint32_t val_b = 234;
 
         const uinteger<32> a{val_a};
         const uinteger<32> b{val_b};
 
-        const uinteger<32> div=restoring_division(a,b);
-        const uinteger<32> mod=modulo(a,b);
+        const uinteger<32> div = restoring_division(a, b);
+        const uinteger<32> mod = modulo(a, b);
 
-        const uint32_t int_div = val_a/val_b;
-        const uint32_t int_mod = val_a%val_b;
+        const uint32_t int_div = val_a / val_b;
+        const uint32_t int_mod = val_a % val_b;
 
         CHECK(int_div == div.word(0));
         REQUIRE(int_mod == mod.word(0));
     }
 
-    GIVEN("Two uinteger<N> a and b with N <= 32") {
+    GIVEN("An uinteger<N> a")
+    {
+
+        const size_t width = 150;
+        auto val_a =
+            GENERATE(take(100, random(1U, 10000000U)));
+
+        uinteger<width> a{val_a};
+        const uinteger<width> zero{0U};
+        const uinteger<width> one{1U};
+
+        THEN("A modul of zero should throw an exception")
+        {
+
+            CHECK_THROWS_AS(modulo(a, zero), std::runtime_error);
+        }
+
+        THEN("A modul of 1 should yield zero")
+        {
+            CHECK(modulo(a, one) == zero);
+        }
+        THEN("Computing zero modulo something in 0")
+        {
+
+            CHECK(modulo(zero, a) == zero);
+        }
+    }
+
+    // TODO we can go up to 64 bits here! -> let's do so
+    GIVEN("Two uinteger<N> a and b with N <= 64")
+    {
 
         uint32_t val_a =
-                GENERATE( 1, 56567, 23, static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
-        uint32_t val_b = GENERATE(1, 56567, 23, 234, 76856, 2342353456, static_cast<uint32_t>(-4366),
-                                  static_cast<uint32_t>(-1));
-
+            GENERATE(1, 56567, 23, static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
+        uint32_t val_b = GENERATE(1, 56567, 23, 234, 76856, 2342353456,
+                                  static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
 
         const uinteger<32> a = uinteger<32>::from_words(val_a);
         const uinteger<32> b = uinteger<32>::from_words(val_b);
 
-
-        THEN("A modul of zero should throw an exception")
+        THEN("The result matches the uint64_t computation")
         {
-            const uinteger<32> zero{0U};
-            CHECK_THROWS_AS(modulo(b,zero), std::runtime_error);
-            CHECK_THROWS_AS(modulo(a,zero), std::runtime_error);
-        }
-
-        THEN("A modul of 1 should yield zero") {
-            const uinteger<32> one{1U};
-            const uinteger<32> zero{0U};
-            CHECK(modulo(a, one) == zero);
-            CHECK(modulo(b, one) == zero);
-        }
-        THEN("Computing zero modulo something in 0") {
-            const uinteger<32> zero{0U};
-
-            CHECK(modulo(zero, a) == zero);
-            CHECK(modulo(zero, b) == zero);
-        }
-        THEN("The result matches the uint64_t computation") {
 
             uint32_t int_res = val_a % val_b;
 
             uinteger<32> result = modulo(a, b);
             std::cout << val_a << " % " << val_b << " = " << int_res << "\n";
-            std::cout << a << " % " << b << " = " << result << "(" << restoring_division(a,b) << ")" << "\n";
+            std::cout << a << " % " << b << " = " << result << "(" << restoring_division(a, b)
+                      << ")"
+                      << "\n";
             CHECK(int_res == result.word(0));
-
         }
     }
 }
