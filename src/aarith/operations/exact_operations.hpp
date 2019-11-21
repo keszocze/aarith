@@ -215,8 +215,8 @@ template <class UInteger>
         return std::make_pair(Q, remainder);
     }
 
-template <std::size_t W>
-auto restoring_division(const uinteger<W>& numerator, const uinteger<W>& denominator) -> uinteger<W>
+template <class UInteger>
+auto restoring_division(const UInteger& numerator, const UInteger& denominator) -> UInteger
 {
     auto [quotient, remainder] = res_div(numerator,denominator);
     return quotient;
