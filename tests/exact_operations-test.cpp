@@ -275,3 +275,47 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
         }
 }
 
+SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic]") {
+
+    GIVEN("Two uinteger<N> a and b with N <= 32") {
+
+        uint32_t val_a =
+                GENERATE( 1, 56567, 23, static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
+        uint32_t val_b = GENERATE(1, 56567, 23, 234, 76856, 2342353456, static_cast<uint32_t>(-4366),
+                                  static_cast<uint32_t>(-1));
+
+
+        const uinteger<32> a = uinteger<32>::from_words(val_a);
+        const uinteger<32> b = uinteger<32>::from_words(val_b);
+
+
+        THEN("Division by zero should throw an exception")
+        {
+            const uinteger<32> zero{0U};
+            CHECK_THROWS_AS(restoring_division(b,zero), std::runtime_error);
+        }
+
+        THEN("Division by 1 should not change the other numerator") {
+            const uinteger<32> one{1U};
+            CHECK(restoring_division(a, one) == a);
+            CHECK(restoring_division(b, one) == b);
+        }
+        THEN("Divison of 0 should result in 0") {
+            const uinteger<32> zero{0U};
+
+            CHECK(restoring_division(zero, a) == zero);
+            CHECK(restoring_division(zero, b) == zero);
+        }
+        THEN("The result matches the-- uint64_t computation") {
+            uint64_t a_large = val_a;
+            uint64_t b_large = val_b;
+
+            uint64_t int_res = a_large / b_large;
+
+            uint32_t small_res = static_cast<uint32_t>(int_res);
+            uinteger<32> result = restoring_division(a, b);
+            CHECK(small_res == result.word(0));
+
+        }
+    }
+}
