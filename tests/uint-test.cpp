@@ -17,7 +17,7 @@ SCENARIO("Outputting uintegers", "[uinteger]")
 
         ss_dec << uint;
         ss_oct << uint;
-        ss_oct << uint;
+        ss_hex << uint;
 
         THEN("Its bit representation is output")
         {
