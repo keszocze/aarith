@@ -14,20 +14,22 @@ template <class T>[[nodiscard]] constexpr size_t size_in_words(const size_t w)
 
 [[nodiscard]] constexpr std::pair<uint32_t, uint32_t> split(const uint64_t n)
 {
-    uint64_t bitmask{1};
-    bitmask = (bitmask << 32) - 1;
+    uint64_t bitmask{(1ULL << 32) - 1};
 
     return {static_cast<uint32_t>(n >> 32), static_cast<uint32_t>(n & bitmask)};
 }
 
-[[nodiscard]] constexpr uint64_t unsplit(const uint32_t upper, const uint32_t lower)
+inline constexpr auto number_of_decimal_digits(size_t bits) -> size_t
 {
-    uint64_t result{upper};
+    // When converted to decimal, an n-bit binary numeral will have at most k*n decimal digits,
+    // rounded up, where k = log_10 2 ~ 0.301.
+    return (bits * 301) / 1000 + ((bits * 301) % 1000 == 0 ? 0 : 1);
+}
 
-    result <<= 32;
-    result += lower;
-
-    return result;
+template <class T, class U>
+constexpr auto rounded_integer_division(T dividend, U divisor) -> decltype(T{} / U{})
+{
+    return dividend / divisor + (dividend % divisor ? 1 : 0);
 }
 
 } // namespace aarith

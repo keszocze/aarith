@@ -157,6 +157,22 @@ template <class UInteger>
     }
 }
 
-
-
 } // namespace aarith
+
+#include "aarith/types/integer.hpp"
+
+namespace aarith::exact_operators {
+
+template <size_t Width>
+auto operator+(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
+{
+    return exact_uint_add(lhs, rhs);
+}
+
+template <size_t Width>
+auto operator-(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
+{
+    return exact_uint_sub(lhs, rhs);
+}
+
+} // namespace aarith::exact_operators
