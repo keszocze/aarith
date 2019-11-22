@@ -195,17 +195,6 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
             CHECK(exact_uint_mul(b, zero) == zero);
             CHECK(exact_uint_mul(zero, b) == zero);
         }
-        THEN("The result matches the uint64_t computation")
-        {
-            uint64_t a_large = val_a;
-            uint64_t b_large = val_b;
-
-            uint64_t int_res = a_large * b_large;
-
-            uint32_t small_res = static_cast<uint32_t>(int_res);
-            uinteger<32> result = exact_uint_mul(a, b);
-            CHECK(small_res == result.word(0));
-        }
     }
 
     GIVEN("Two uinteger<N> a and b to be multiplied")
@@ -213,7 +202,6 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
         uint64_t val = 1;
         val = val << 35;
         auto const a = uinteger<128>::from_words(1, val);
-        auto const b = uinteger<128>::from_words(1, 0);
         auto const c = uinteger<128>::from_words(13435, 345897);
         auto const d =
             uinteger<128>::from_words(static_cast<typename uinteger<128>::word_type>(-1),
@@ -221,7 +209,7 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
         auto const zero = uinteger<128>::from_words(0, 0);
         auto const one = uinteger<128>::from_words(0, 1);
 
-        const std::vector<uinteger<128>> numbers{a, b, c, d, one, zero};
+        const std::vector<uinteger<128>> numbers{a, c, d, one, zero};
 
         THEN("The operation should be commutative")
         {
@@ -232,8 +220,6 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
                     CHECK(exact_uint_mul(num_a, num_b) == exact_uint_mul(num_b, num_a));
                 }
             }
-
-            CHECK(exact_uint_mul(a, b) == exact_uint_mul(a, b));
         }
 
         WHEN("One multiplicant is zero")
@@ -265,6 +251,32 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
             THEN("The product is 1")
             {
                 REQUIRE(exact_uint_mul(d, d) == one);
+            }
+        }
+    }
+}
+
+SCENARIO("Multiplication of numbers fitting in a uint64_t",
+         "[uinteger][arithmetic][multiplication]")
+{
+    GIVEN("A random number a")
+    {
+        uint64_t val_a = GENERATE(
+            take(100, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
+        uinteger<64> a{val_a};
+        AND_GIVEN("A random number b")
+        {
+            uint64_t val_b = GENERATE(
+                take(1000, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
+            uinteger<64> b{val_b};
+
+            THEN("The multiplication should match its uint64_t counterpart")
+            {
+                uint64_t expected = val_a * val_b;
+                uinteger<64> result = exact_uint_mul(a, b);
+
+                REQUIRE(expected == result.word(0));
+                REQUIRE(uinteger<64>{expected} == result);
             }
         }
     }
