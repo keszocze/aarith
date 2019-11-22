@@ -2,6 +2,7 @@
 
 #include "aarith/utilities/bit_operations.hpp"
 #include "traits.hpp"
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <iostream>
@@ -40,17 +41,17 @@ public:
         return uint;
     }
 
-    static constexpr auto word_width() -> size_t
+    [[nodiscard]] static constexpr auto word_width() noexcept -> size_t
     {
         return sizeof(word_type) * 8;
     }
 
-    static constexpr auto word_count() -> size_t
+    [[nodiscard]] static constexpr auto word_count() noexcept -> size_t
     {
         return size_in_words<word_type>(Width);
     }
 
-    static constexpr auto word_mask(size_t index) -> word_type
+    [[nodiscard]] static constexpr auto word_mask(size_t index) noexcept -> word_type
     {
         constexpr word_type other_masks = static_cast<word_type>(-1); // all ones, e.g. no masking
         constexpr word_type last_mask =
@@ -60,12 +61,12 @@ public:
         return (index == word_count() - 1) ? last_mask : other_masks;
     };
 
-    static constexpr auto width() -> size_t
+    [[nodiscard]] static constexpr auto width() noexcept -> size_t
     {
         return Width;
     }
 
-    auto word(size_t index) const -> word_type
+    [[nodiscard]] auto word(size_t index) const -> word_type
     {
         return words[index];
     }
@@ -87,7 +88,7 @@ public:
         words[index] = value & word_mask(index);
     }
 
-    /// Sets the words to the given values, where the rightern-most argument corresponds to word 0.
+    // Sets the words to the given values, where the rightern-most argument corresponds to word 0.
     template <class... Args> void set_words(Args... args)
     {
         set_word_recursively<0>(args...);
@@ -138,6 +139,62 @@ public:
         return *this = *this + addend;
     }
 
+    [[nodiscard]] bool is_zero() const noexcept
+    {
+        return std::all_of(words.begin(), words.end(), [](const word_type& w) {
+            word_type zero = 0U;
+            return w == zero;
+        });
+    }
+
+    [[nodiscard]] explicit operator bool() const noexcept
+    {
+        return std::any_of(words.begin(), words.end(), [](const word_type& w) {
+            word_type zero = 0U;
+            return w != zero;
+        });
+    }
+
+    constexpr auto begin() const noexcept
+    {
+        return words.begin();
+    }
+
+    constexpr auto end() const noexcept
+    {
+        return words.end();
+    }
+
+    constexpr auto cbegin() const noexcept
+    {
+        return words.cbegin();
+    }
+
+    constexpr auto cend() const noexcept
+    {
+        return words.cend();
+    }
+
+    constexpr auto rbegin() const noexcept
+    {
+        return words.rbegin();
+    }
+
+    constexpr auto rend() const noexcept
+    {
+        return words.rend();
+    }
+
+    constexpr auto  crbegin() const noexcept
+    {
+        return words.bcregin();
+    }
+
+    constexpr auto crend() const noexcept
+    {
+        return words.crend();
+    }
+
 private:
     template <size_t index, class... Args>
     auto set_word_recursively(word_type value, Args... args) -> size_t
@@ -171,7 +228,7 @@ public:
 };
 
 template <size_t DestinationWidth, size_t SourceWidth>
-auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>
+[[nodiscard]] auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>
 {
     uinteger<DestinationWidth> destination;
     if constexpr (DestinationWidth >= SourceWidth)
@@ -191,8 +248,11 @@ auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidt
     return destination;
 }
 
-template <size_t Width> auto operator<<(const uinteger<Width>& lhs, size_t rhs) -> uinteger<Width>
+template <size_t Width>
+[[nodiscard]] auto operator<<(const uinteger<Width>& lhs, const uint32_t rhs)
+-> uinteger<Width>
 {
+
     if (rhs >= Width)
     {
         return uinteger<Width>(0U);
@@ -207,9 +267,9 @@ template <size_t Width> auto operator<<(const uinteger<Width>& lhs, size_t rhs) 
     const auto shift_word_left = rhs - skip_words * lhs.word_width();
     const auto shift_word_right = lhs.word_width() - shift_word_left;
 
-    for (auto counter = lhs.word_count(); counter > 0; --counter)
+    for(auto counter = lhs.word_count(); counter > 0; --counter)
     {
-        if (counter + skip_words < lhs.word_count())
+        if(counter + skip_words < lhs.word_count())
         {
             typename uinteger<Width>::word_type new_word;
             new_word = lhs.word(counter) << shift_word_left;
@@ -265,10 +325,11 @@ auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
 }
 
 template <size_t Width>
-auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
+[[nodiscard]] auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
+-> uinteger<Width>
 {
     uinteger<Width> logical_and;
-    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
+    for(auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
         logical_and.set_word(counter, lhs.word(counter) & rhs.word(counter));
     }
@@ -276,20 +337,21 @@ auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteg
 }
 
 template <size_t Width>
-auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
+[[nodiscard]] auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
+    -> uinteger<Width>
 {
     uinteger<Width> logical_or;
-    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
+    for(auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
         logical_or.set_word(counter, lhs.word(counter) | rhs.word(counter));
     }
     return logical_or;
 }
 
-template <size_t Width> auto operator~(const uinteger<Width>& rhs) -> uinteger<Width>
+template <size_t Width>[[nodiscard]] auto operator~(const uinteger<Width>& rhs) -> uinteger<Width>
 {
     uinteger<Width> logical_not;
-    for (auto counter = 0U; counter < rhs.word_count(); ++counter)
+    for(auto counter = 0U; counter < rhs.word_count(); ++counter)
     {
         logical_not.set_word(counter, ~rhs.word(counter));
     }

@@ -1,10 +1,32 @@
-#include <aarith/operations/comparisons.hpp>
-#include <aarith/types/integer.hpp>
-#include <aarith/utilities/string_utils.hpp>
+#include "aarith/types/integer.hpp"
+#include "aarith/operations/comparisons.hpp"
+#include "aarith/utilities/string_utils.hpp"
 #include <catch.hpp>
 #include <sstream>
 
 using namespace aarith;
+
+SCENARIO("Outputting uintegers", "[uinteger]")
+{
+    WHEN("Writing a uinteger into a stream")
+    {
+        const uinteger<16> uint{static_cast<uint16_t>(0b11001100)};
+        std::stringstream ss_dec, ss_oct, ss_hex;
+        ss_oct.setf(std::ios::oct);
+        ss_hex.setf(std::ios::hex);
+
+        ss_dec << uint;
+        ss_oct << uint;
+        ss_oct << uint;
+
+        THEN("Its bit representation is output")
+        {
+            CHECK(ss_dec.str() == "204");
+            CHECK(ss_oct.str() == "314");
+            CHECK(ss_hex.str() == "CC");
+        }
+    }
+}
 
 SCENARIO("Casting uintegers into different width", "[uinteger]")
 {
@@ -357,6 +379,7 @@ SCENARIO("Logical AND works as expected", "[uinteger][arithmetic]")
             const auto result = a & b;
             const auto result_ref = number_a & number_b;
             REQUIRE(result.word(0) == result_ref);
+          
         }
     }
 }
@@ -377,6 +400,7 @@ SCENARIO("Logical OR works as expected", "[uinteger][arithmetic]")
             const auto result = a | b;
             const auto result_ref = number_a | number_b;
             REQUIRE(result.word(0) == result_ref);
+          
         }
     }
 }
@@ -395,6 +419,160 @@ SCENARIO("Logical NOT works as expected", "[uinteger][arithmetic]")
             const auto result = ~a;
             const auto result_ref = ~number_a;
             REQUIRE(result.word(0) == result_ref);
+          
+        }
+    }
+}
+
+SCENARIO("Checking whether an uinteger is not equal to zero/false")
+{
+    GIVEN("An uinteger<N>=0=a for various N")
+    {
+        THEN("a.is_zero() should be true")
+        {
+
+            const uint8_t zero = 0U;
+
+            CHECK(uinteger<64>{zero}.is_zero());
+            CHECK(uinteger<128>{zero}.is_zero());
+            CHECK(uinteger<150>{zero}.is_zero());
+            CHECK(uinteger<32>{zero}.is_zero());
+            CHECK(uinteger<23>{zero}.is_zero());
+            CHECK(uinteger<256>{zero}.is_zero());
+            CHECK(uinteger<1337>{zero}.is_zero());
+            CHECK(uinteger<8>{zero}.is_zero());
+        }
+        THEN("a should evaluate to false in a Boolean context")
+        {
+
+            const uint8_t zero = 0U;
+
+            CHECK_FALSE(uinteger<64>{zero});
+            CHECK_FALSE(uinteger<128>{zero});
+            CHECK_FALSE(uinteger<150>{zero});
+            CHECK_FALSE(uinteger<32>{zero});
+            CHECK_FALSE(uinteger<23>{zero});
+            CHECK_FALSE(uinteger<256>{zero});
+            CHECK_FALSE(uinteger<1337>{zero});
+            CHECK_FALSE(uinteger<8>{zero});
+        }
+    }
+
+    GIVEN("An non-zero uinteger")
+    {
+
+        uint64_t val = GENERATE(1, 2, 4, 5567868, 234, 21, 45, 56768);
+        uinteger<64> a{val};
+        uinteger<128> b = uinteger<128>::from_words(val, 0U);
+        uinteger<128> c = uinteger<128>::from_words(val, val);
+
+        uinteger<150> d = uinteger<150>::from_words(val, 0U, 0U);
+        uinteger<256> e = uinteger<256>::from_words(val, val, 0U, 0U);
+
+        THEN("is_zero should correctly return this fact")
+        {
+            CHECK_FALSE(a.is_zero());
+            CHECK_FALSE(b.is_zero());
+            CHECK_FALSE(c.is_zero());
+            CHECK_FALSE(d.is_zero());
+            CHECK_FALSE(e.is_zero());
+        }
+        THEN("The integer should evaluate to true in a Boolean context")
+        {
+            CHECK(a);
+            CHECK(b);
+            CHECK(c);
+            CHECK(d);
+            CHECK(e);
+        }
+    }
+}
+
+SCENARIO("Using the for loop operation feature from ")
+{
+    GIVEN("An unsigned integer")
+    {
+        THEN("The forward iterators should give the words as expected")
+        {
+            uint64_t val_a = GENERATE(0, 1, 2, 3);
+            uint64_t val_b = GENERATE(3, 56, 567, 324);
+
+            uinteger<64> a{val_a};
+            uinteger<128> b = uinteger<128>::from_words(val_a, val_b);
+
+            size_t index = 0;
+            for (const uinteger<64>::word_type w : a)
+            {
+                CHECK(w == a.word(index));
+                index++;
+            }
+
+            CHECK(index == 1);
+
+            index = 0;
+
+            for (const uinteger<128>::word_type w : b)
+            {
+                CHECK(w == b.word(index));
+                index++;
+            }
+
+            CHECK(index == 2);
+        }
+        THEN("Using forward iterators explicitly should give the words as expected")
+        {
+            uint64_t val_a = GENERATE(0, 1, 2, 3);
+            uint64_t val_b = GENERATE(3, 56, 567, 324);
+
+            uinteger<64> a{val_a};
+            uinteger<128> b = uinteger<128>::from_words(val_a, val_b);
+
+            size_t index = 0;
+            for (auto iter = a.begin(); iter != a.end(); ++iter)
+            {
+                CHECK(*iter == a.word(index));
+                index++;
+            }
+
+            CHECK(index == 1);
+
+            index = 0;
+
+            for (auto iter = b.begin(); iter != b.end(); ++iter)
+            {
+                CHECK(*iter == b.word(index));
+                index++;
+            }
+
+            CHECK(index == 2);
+        }
+
+        THEN("Using backwards iterators explicitly should give the words as expected")
+        {
+            uint64_t val_a = GENERATE(0, 1, 2, 3);
+            uint64_t val_b = GENERATE(3, 56, 567, 324);
+
+            uinteger<64> a{val_a};
+            uinteger<128> b = uinteger<128>::from_words(val_a, val_b);
+
+            size_t index = 0;
+            for (auto iter = a.rbegin(); iter != a.rend(); ++iter)
+            {
+                CHECK(*iter == a.word((a.word_count() - 1) - index));
+                index++;
+            }
+
+            CHECK(index == 1);
+
+            index = 0;
+
+            for (auto iter = b.rbegin(); iter != b.rend(); ++iter)
+            {
+                CHECK(*iter == b.word((b.word_count() - 1) - index));
+                index++;
+            }
+
+            CHECK(index == 2);
         }
     }
 }
