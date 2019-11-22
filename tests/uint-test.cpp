@@ -1,32 +1,10 @@
-#include "aarith/types/integer.hpp"
 #include "aarith/operations/comparisons.hpp"
+#include "aarith/types/integer.hpp"
 #include "aarith/utilities/string_utils.hpp"
 #include <catch.hpp>
 #include <sstream>
 
 using namespace aarith;
-
-SCENARIO("Outputting uintegers", "[uinteger]")
-{
-    WHEN("Writing a uinteger into a stream")
-    {
-        const uinteger<16> uint{static_cast<uint16_t>(0b11001100)};
-        std::stringstream ss_dec, ss_oct, ss_hex;
-        ss_oct.setf(std::ios::oct);
-        ss_hex.setf(std::ios::hex);
-
-        ss_dec << uint;
-        ss_oct << uint;
-        ss_oct << uint;
-
-        THEN("Its bit representation is output")
-        {
-            CHECK(ss_dec.str() == "204");
-            CHECK(ss_oct.str() == "314");
-            CHECK(ss_hex.str() == "CC");
-        }
-    }
-}
 
 SCENARIO("Casting uintegers into different width", "[uinteger]")
 {
@@ -243,10 +221,10 @@ SCENARIO("Right shift operator works as expected", "[uinteger][utility]")
             const size_t Width = 192;
 
             typename uinteger<Width>::word_type number_a = 3;
-            number_a <<= uinteger<Width>::word_width()-2;
+            number_a <<= uinteger<Width>::word_width() - 2;
             static constexpr auto s = 0;
             uinteger<Width> a(0U);
-            a.set_word(a.word_count()-1, number_a);
+            a.set_word(a.word_count() - 1, number_a);
 
             const auto result = a >> s;
             REQUIRE(result.word(a.word_count() - 3) == 0);
@@ -379,7 +357,6 @@ SCENARIO("Logical AND works as expected", "[uinteger][arithmetic]")
             const auto result = a & b;
             const auto result_ref = number_a & number_b;
             REQUIRE(result.word(0) == result_ref);
-          
         }
     }
 }
@@ -400,7 +377,6 @@ SCENARIO("Logical OR works as expected", "[uinteger][arithmetic]")
             const auto result = a | b;
             const auto result_ref = number_a | number_b;
             REQUIRE(result.word(0) == result_ref);
-          
         }
     }
 }
@@ -419,7 +395,6 @@ SCENARIO("Logical NOT works as expected", "[uinteger][arithmetic]")
             const auto result = ~a;
             const auto result_ref = ~number_a;
             REQUIRE(result.word(0) == result_ref);
-          
         }
     }
 }
