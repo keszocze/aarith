@@ -8,7 +8,7 @@ sonar.cfamily.build-wrapper-output=./build/bw_output
 sonar.sourceEncoding=UTF-8
 
 
-sonar.branch.name=development
+sonar.branch.name=@@BRANCH_NAME@@
 
 
 sonar.host.url=https://codesigni182.informatik.uni-erlangen.de/sonarqube
