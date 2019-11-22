@@ -81,10 +81,9 @@ template <class UInteger>
  *
  * @note No Type conversion is performed. If the bit widths do not match, the code will not compile!
  *
- * This implements the most simply multiplication by adding up the number the correct number of
- * times. This is, of course, rather slow.
- *
- * @todo Actually complete the implementation
+ * This implements the simplest multiplication algorithm (binary "long multiplication") that adds up
+ * the partial products everywhere where the first multiplicand has a 1 bit. The simplicity, of
+ * course, comes at the cost of performance.
  *
  * @tparam UInteger The unsigned integer instance used for the operation
  * @param a First multiplicant
@@ -93,33 +92,19 @@ template <class UInteger>
  */
 template <class UInteger>[[nodiscard]] UInteger exact_uint_mul(const UInteger& a, const UInteger& b)
 {
+    static_assert(is_integral<UInteger>::value);
+    static_assert(is_unsigned<UInteger>::value);
 
-    // TODO does it make sense to count the ones first?
-
-    UInteger shift_creation_mask = b;
-    UInteger summand = a;
     UInteger result{0U};
-
-    auto last_bit_set = [](const UInteger n) {
-        typename UInteger::word_type one{1U};
-        return (n.word(0) & one);
-    };
-
-    size_t to_shift = 0;
-
-    while (!shift_creation_mask.is_zero())
+    const auto leading_zeroes = count_leading_zeroes(b);
+    size_t bit_index{0};
+    while (bit_index < leading_zeroes)
     {
-        if (last_bit_set(shift_creation_mask))
+        if (b.bit(bit_index))
         {
-            summand = (summand << to_shift);
-            result = exact_uint_add(result, summand);
-            to_shift = 1;
+            result = exact_uint_add(result, a << bit_index);
         }
-        else
-        {
-            ++to_shift;
-        }
-        shift_creation_mask = (shift_creation_mask >> 1);
+        ++bit_index;
     }
 
     return result;
@@ -173,6 +158,12 @@ template <size_t Width>
 auto operator-(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
 {
     return exact_uint_sub(lhs, rhs);
+}
+
+template <size_t Width>
+auto operator*(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
+{
+    return exact_uint_mul(lhs, rhs);
 }
 
 } // namespace aarith::exact_operators

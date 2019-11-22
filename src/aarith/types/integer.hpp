@@ -2,12 +2,12 @@
 
 #include "aarith/utilities/bit_operations.hpp"
 #include "traits.hpp"
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <iostream>
-#include <algorithm>
-#include <type_traits>
 #include <stdexcept>
+#include <type_traits>
 
 namespace aarith {
 
@@ -73,15 +73,15 @@ public:
 
     void set_word(size_t index, word_type value)
     {
-        if (index >= word_count()) {
+        if (index >= word_count())
+        {
             std::string msg;
             msg += "Trying to access word with index ";
             msg += std::to_string(index);
-            msg +=" for uinteger<";
+            msg += " for uinteger<";
             msg += std::to_string(width());
-            msg +="> with max index ";
-            msg += std::to_string(word_count()-1);
-
+            msg += "> with max index ";
+            msg += std::to_string(word_count() - 1);
 
             throw std::out_of_range(msg);
         }
@@ -116,7 +116,7 @@ public:
 
     [[nodiscard]] bool is_zero() const
     {
-        return std::all_of(words.begin(), words.end(), [](const word_type &w) {
+        return std::all_of(words.begin(), words.end(), [](const word_type& w) {
             word_type zero = 0U;
             return w == zero;
         });
@@ -178,8 +178,6 @@ template <size_t Width> class is_unsigned<uinteger<Width>>
 public:
     static constexpr bool value = true;
 };
-
-
 
 template <size_t DestinationWidth, size_t SourceWidth>
 auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>
@@ -315,6 +313,18 @@ template <size_t Width> auto abs_two_complement(const uinteger<Width>& value) ->
         return ~value + one;
     }
     return value;
+}
+
+template <size_t Width> auto count_leading_zeroes(const uinteger<Width>& value) -> size_t
+{
+    for (auto i = Width; i > 0; --i)
+    {
+        if (value.bit(i - 1))
+        {
+            return i;
+        }
+    }
+    return Width;
 }
 
 } // namespace aarith
