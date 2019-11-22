@@ -19,6 +19,11 @@ template <class T>[[nodiscard]] constexpr size_t size_in_words(const size_t w)
     return {static_cast<uint32_t>(n >> 32), static_cast<uint32_t>(n & bitmask)};
 }
 
+[[nodiscard]] constexpr uint64_t unsplit(const uint32_t upper, const uint32_t lower)
+{
+    return (static_cast<uint64_t>(upper) << 32) | lower;
+}
+
 inline constexpr auto number_of_decimal_digits(size_t bits) -> size_t
 {
     // When converted to decimal, an n-bit binary numeral will have at most k*n decimal digits,
