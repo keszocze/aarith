@@ -1,6 +1,7 @@
 #include "aarith/types/integer.hpp"
 #include "aarith/utilities/string_utils.hpp"
 #include <catch.hpp>
+#include <sstream>
 
 using namespace aarith;
 
@@ -14,6 +15,12 @@ SCENARIO("Converting uintegers into strings", "[uinteger][string]")
         {
             REQUIRE(to_decimal(uint) == "204");
         }
+        THEN("Using << works as well")
+        {
+            std::stringstream ss;
+            ss << uint;
+            REQUIRE(ss.str() == "204");
+        }
     }
     WHEN("Converting a uinteger into a hexadecimal string")
     {
@@ -21,12 +28,26 @@ SCENARIO("Converting uintegers into strings", "[uinteger][string]")
         {
             REQUIRE(to_hex(uint) == "00cc");
         }
+        THEN("Using << works as well")
+        {
+            std::stringstream ss;
+            ss.setf(std::ios::hex);
+            ss << uint;
+            REQUIRE(ss.str() == "00cc");
+        }
     }
     WHEN("Converting a uinteger into an octal string")
     {
         THEN("The string represents the uinteger")
         {
             REQUIRE(to_octal(uint) == "000314");
+        }
+        THEN("Using << works as well")
+        {
+            std::stringstream ss;
+            ss.setf(std::ios::oct);
+            ss << uint;
+            REQUIRE(ss.str() == "000314");
         }
     }
 }
