@@ -5,7 +5,7 @@
 
 using namespace aarith;
 
-SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic]")
+SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
 {
     GIVEN("Two uinteger<N> a and b with N <= word_width")
     {
@@ -61,7 +61,7 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic]")
     }
 }
 
-SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic]")
+SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtraction]")
 {
     GIVEN("Two uinteger<N> a and b are subtracted")
     {
@@ -160,7 +160,7 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic]")
     }
 }
 
-SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
+SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplication]")
 {
 
     GIVEN("Two uinteger<N> a and b with N <= 32")
@@ -266,8 +266,8 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
         uinteger<64> a{val_a};
         AND_GIVEN("A random number b")
         {
-            uint64_t val_b = GENERATE(
-                take(1000, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
+            uint64_t val_b = GENERATE(take(
+                1000, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
             uinteger<64> b{val_b};
 
             THEN("The multiplication should match its uint64_t counterpart")
@@ -282,7 +282,7 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
     }
 }
 
-SCENARIO("Bit and Word operations work correctly")
+SCENARIO("Bit and Word operations work correctly", "[uinteger][utility]")
 {
     WHEN("A uinteger<N> is created using uinteger<N>::from_words")
     {
