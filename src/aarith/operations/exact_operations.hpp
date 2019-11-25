@@ -92,21 +92,28 @@ template <class UInteger>
  */
 template <class UInteger>[[nodiscard]] UInteger exact_uint_mul(const UInteger& a, const UInteger& b)
 {
-    static_assert(is_integral<UInteger>::value);
-    static_assert(is_unsigned<UInteger>::value);
-
     UInteger result{0U};
-    const auto leading_zeroes = count_leading_zeroes(b);
-    size_t bit_index{0};
-    while (bit_index < leading_zeroes)
+    if constexpr (UInteger::width() <= 32)
     {
-        if (b.bit(bit_index))
-        {
-            result = exact_uint_add(result, a << bit_index);
-        }
-        ++bit_index;
+        uint64_t result_uint64 = a.word(0) * b.word(0);
+        result.set_word(0, result_uint64);
     }
+    else
+    {
+        static_assert(is_integral<UInteger>::value);
+        static_assert(is_unsigned<UInteger>::value);
 
+        const auto leading_zeroes = count_leading_zeroes(b);
+        size_t bit_index{0};
+        while (bit_index < leading_zeroes)
+        {
+            if (b.bit(bit_index))
+            {
+                result = exact_uint_add(result, a << bit_index);
+            }
+            ++bit_index;
+        }
+    }
     return result;
 }
 
@@ -128,9 +135,8 @@ template <class UInteger>
 [[nodiscard]] auto karatsuba(const UInteger& a, const UInteger& b) -> UInteger
 {
     // base case, we can stop recursion now
-    if (UInteger::width() <= 32)
+    if constexpr (UInteger::width() <= 32)
     {
-
         uint64_t result_uint64 = a.word(0) * b.word(0);
         UInteger result;
         result.set_word(0, result_uint64);
