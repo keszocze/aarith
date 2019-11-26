@@ -1,4 +1,5 @@
-sonar.projectKey=aarith:FAU
+
+sonar.projectKey=aarith
 
 sonar.projectName=Aarith
 sonar.projectVersion=0.1
@@ -8,7 +9,7 @@ sonar.cfamily.build-wrapper-output=./build/bw_output
 sonar.sourceEncoding=UTF-8
 
 
-#sonar.branch.name=master
+sonar.branch.name=@@BRANCH_NAME@@
 
 
-sonar.host.url=http://codesignp211.informatik.uni-erlangen.de/sonarqube
+sonar.host.url=https://codesignp211.informatik.uni-erlangen.de/sonarqube

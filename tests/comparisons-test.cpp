@@ -44,8 +44,6 @@ SCENARIO("Comparing two uintegers", "[uinteger][utility]")
         WHEN("N > word_width")
         {
             const size_t TestWidth = 80;
-            static constexpr uint16_t number_a = 7;
-            static constexpr uint16_t number_b = 23;
             auto const a = uinteger<TestWidth>::from_words(7, 0);
             auto const b = uinteger<TestWidth>::from_words(23, 0);
 

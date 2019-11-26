@@ -1,0 +1,46 @@
+stages:
+    - compile
+    - test
+
+variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+    GIT_STRATEGY: fetch
+
+
+.ciconf:
+    only:
+        variables:
+            - $CI_PROJECT_NAMESPACE == "keszocze"
+
+try_compiling:
+    extends: .ciconf
+    stage: compile
+    artifacts:
+        paths:
+            - build
+        expire_in: 30 minutes
+
+    script:
+        - mkdir -p build/bw_output
+        - cd build
+        - cmake ..
+        - /opt/sonar-build-wrapper/build-wrapper-linux-x86-64 --out-dir bw_output make -j 4 all
+
+
+run_sonarqube:
+    extends: .ciconf
+    stage: test # we have to wait for new data to be present in bw_output
+    script: 
+        - echo $CI_COMMIT_REF_NAME
+        - sed "s/@@BRANCH_NAME@@/${CI_COMMIT_REF_NAME}/" sonar-project.properties.in >> sonar-project.properties
+        - /opt/sonar-scanner/bin/sonar-scanner
+
+run_tests:
+    extends: .ciconf
+    stage: test
+    script:
+        - cd build/tests
+        #  # the leading dot seems to be necessary
+        - ./uint-test
+        - ./uint-anytime-test
+        

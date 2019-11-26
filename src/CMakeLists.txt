@@ -6,6 +6,7 @@ target_sources(aarith INTERFACE
   aarith/operations/approx_operations.hpp
   aarith/operations/comparisons.hpp
   aarith/utilities/bit_operations.hpp
+  aarith/utilities/string_utils.hpp
 )
 target_include_directories(aarith INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_features(aarith INTERFACE cxx_std_17)
