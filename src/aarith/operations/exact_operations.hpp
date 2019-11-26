@@ -81,10 +81,9 @@ template <class UInteger>
  *
  * @note No Type conversion is performed. If the bit widths do not match, the code will not compile!
  *
- * This implements the most simply multiplication by adding up the number the correct number of
- * times. This is, of course, rather slow.
- *
- * @todo Actually complete the implementation
+ * This implements the simplest multiplication algorithm (binary "long multiplication") that adds up
+ * the partial products everywhere where the first multiplicand has a 1 bit. The simplicity, of
+ * course, comes at the cost of performance.
  *
  * @tparam UInteger The unsigned integer instance used for the operation
  * @param a First multiplicant
@@ -93,36 +92,28 @@ template <class UInteger>
  */
 template <class UInteger>[[nodiscard]] UInteger exact_uint_mul(const UInteger& a, const UInteger& b)
 {
-    static_assert(is_integral<UInteger>::value);
-
-    // TODO does it make sense to count the ones first?
-
-    UInteger shift_creation_mask = b;
-    UInteger summand = a;
     UInteger result{0U};
-
-    auto last_bit_set = [](const UInteger n) {
-        typename UInteger::word_type one{1U};
-        return (n.word(0) & one);
-    };
-
-    size_t to_shift = 0;
-
-    while (!shift_creation_mask.is_zero())
+    if constexpr (UInteger::width() <= 32)
     {
-        if (last_bit_set(shift_creation_mask))
-        {
-            summand = (summand << to_shift);
-            result = exact_uint_add(result, summand);
-            to_shift = 1;
-        }
-        else
-        {
-            ++to_shift;
-        }
-        shift_creation_mask = (shift_creation_mask >> 1);
+        uint64_t result_uint64 = a.word(0) * b.word(0);
+        result.set_word(0, result_uint64);
     }
+    else
+    {
+        static_assert(is_integral<UInteger>::value);
+        static_assert(is_unsigned<UInteger>::value);
 
+        const auto leading_zeroes = count_leading_zeroes(b);
+        auto bit_index = 0U;
+        while (bit_index < leading_zeroes)
+        {
+            if (b.bit(bit_index))
+            {
+                result = exact_uint_add(result, a << bit_index);
+            }
+            ++bit_index;
+        }
+    }
     return result;
 }
 
@@ -144,9 +135,8 @@ template <class UInteger>
 [[nodiscard]] auto karatsuba(const UInteger& a, const UInteger& b) -> UInteger
 {
     // base case, we can stop recursion now
-    if (UInteger::width() <= 32)
+    if constexpr (UInteger::width() <= 32)
     {
-
         uint64_t result_uint64 = a.word(0) * b.word(0);
         UInteger result;
         result.set_word(0, result_uint64);
@@ -224,3 +214,39 @@ auto restoring_division(const UInteger& numerator, const UInteger& denominator) 
 }
 
 } // namespace aarith
+
+#include "aarith/types/integer.hpp"
+
+namespace aarith::exact_operators {
+
+template <size_t Width>
+auto operator+(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
+{
+    return exact_uint_add(lhs, rhs);
+}
+
+template <size_t Width>
+auto operator-(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
+{
+    return exact_uint_sub(lhs, rhs);
+}
+
+template <size_t Width>
+auto operator*(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
+{
+    return exact_uint_mul(lhs, rhs);
+}
+
+template <size_t Width>
+auto operator/(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
+{
+    return restoring_division(lhs, rhs);
+}
+
+template <size_t Width>
+auto operator%(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
+{
+    return remainder(lhs, rhs);
+}
+
+} // namespace aarith::exact_operators

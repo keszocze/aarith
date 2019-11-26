@@ -31,6 +31,8 @@ run_sonarqube:
     extends: .ciconf
     stage: test # we have to wait for new data to be present in bw_output
     script: 
+        - echo $CI_COMMIT_REF_NAME
+        - sed "s/@@BRANCH_NAME@@/${CI_COMMIT_REF_NAME}/" sonar-project.properties.in >> sonar-project.properties
         - /opt/sonar-scanner/bin/sonar-scanner
 
 run_tests:
