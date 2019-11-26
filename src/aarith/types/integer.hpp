@@ -2,12 +2,12 @@
 
 #include "aarith/utilities/bit_operations.hpp"
 #include "traits.hpp"
-#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <iostream>
 #include <type_traits>
 #include <stdexcept>
+#include <algorithm>
 
 namespace aarith {
 
@@ -267,9 +267,9 @@ template <size_t Width>
     const auto shift_word_left = rhs - skip_words * lhs.word_width();
     const auto shift_word_right = lhs.word_width() - shift_word_left;
 
-    for(auto counter = lhs.word_count(); counter > 0; --counter)
+    for (auto counter = lhs.word_count(); counter > 0; --counter)
     {
-        if(counter + skip_words < lhs.word_count())
+        if (counter + skip_words < lhs.word_count())
         {
             typename uinteger<Width>::word_type new_word;
             new_word = lhs.word(counter) << shift_word_left;
@@ -329,7 +329,7 @@ template <size_t Width>
 -> uinteger<Width>
 {
     uinteger<Width> logical_and;
-    for(auto counter = 0U; counter < lhs.word_count(); ++counter)
+    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
         logical_and.set_word(counter, lhs.word(counter) & rhs.word(counter));
     }
@@ -341,7 +341,7 @@ template <size_t Width>
     -> uinteger<Width>
 {
     uinteger<Width> logical_or;
-    for(auto counter = 0U; counter < lhs.word_count(); ++counter)
+    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
         logical_or.set_word(counter, lhs.word(counter) | rhs.word(counter));
     }
@@ -351,7 +351,7 @@ template <size_t Width>
 template <size_t Width>[[nodiscard]] auto operator~(const uinteger<Width>& rhs) -> uinteger<Width>
 {
     uinteger<Width> logical_not;
-    for(auto counter = 0U; counter < rhs.word_count(); ++counter)
+    for (auto counter = 0U; counter < rhs.word_count(); ++counter)
     {
         logical_not.set_word(counter, ~rhs.word(counter));
     }
@@ -366,6 +366,18 @@ template <size_t Width> auto abs_two_complement(const uinteger<Width>& value) ->
         return ~value + one;
     }
     return value;
+}
+
+template <size_t Width> auto count_leading_zeroes(const uinteger<Width>& value) -> size_t
+{
+    for (auto i = Width; i > 0; --i)
+    {
+        if (value.bit(i - 1))
+        {
+            return i;
+        }
+    }
+    return Width;
 }
 
 } // namespace aarith
