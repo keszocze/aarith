@@ -221,15 +221,13 @@ auto res_div(const uinteger<W>& numerator, const uinteger<W>& denominator)
 template <class UInteger>
 auto modulo(const UInteger& numerator, const UInteger& denominator) -> UInteger
 {
-    auto [quotient, remainder] = res_div(numerator, denominator);
-    return remainder;
+    return res_div(numerator, denominator).second;
 }
 
 template <class UInteger>
 auto restoring_division(const UInteger& numerator, const UInteger& denominator) -> UInteger
 {
-    auto [quotient, _] = res_div(numerator, denominator);
-    return quotient;
+    return res_div(numerator, denominator).first;
 }
 
 } // namespace aarith
