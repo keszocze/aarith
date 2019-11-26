@@ -2,12 +2,13 @@
 
 #include "aarith/utilities/bit_operations.hpp"
 #include "traits.hpp"
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include <iostream>
-#include <type_traits>
 #include <stdexcept>
-#include <algorithm>
+#include <string>
+#include <type_traits>
 
 namespace aarith {
 
@@ -28,8 +29,7 @@ public:
         static_assert(!std::is_signed<T>::value, "Only unsigned numbers are supported");
         static_assert(sizeof(T) * 8 <= sizeof(word_type) * 8,
                       "Only up to 64 bit integers are supported");
-        // TODO understand, why this has to be commented out!
-        // static_assert(sizeof(T) * 8 <= Width, "Data type can not fit provided number");
+//        static_assert(sizeof(T) * 8 <= Width, "Data type can not fit provided number");
 
         words[0] = n;
     }
@@ -53,6 +53,7 @@ public:
 
     [[nodiscard]] static constexpr auto word_mask(size_t index) noexcept -> word_type
     {
+
         constexpr word_type other_masks = static_cast<word_type>(-1); // all ones, e.g. no masking
         constexpr word_type last_mask =
             (width() % word_width() != 0)
@@ -73,15 +74,15 @@ public:
 
     void set_word(size_t index, word_type value)
     {
-        if (index >= word_count()) {
+        if (index >= word_count())
+        {
             std::string msg;
             msg += "Trying to access word with index ";
             msg += std::to_string(index);
-            msg +=" for uinteger<";
+            msg += " for uinteger<";
             msg += std::to_string(width());
-            msg +="> with max index ";
-            msg += std::to_string(word_count()-1);
-
+            msg += "> with max index ";
+            msg += std::to_string(word_count() - 1);
 
             throw std::out_of_range(msg);
         }
@@ -185,7 +186,7 @@ public:
         return words.rend();
     }
 
-    constexpr auto  crbegin() const noexcept
+    constexpr auto crbegin() const noexcept
     {
         return words.bcregin();
     }
@@ -249,8 +250,7 @@ template <size_t DestinationWidth, size_t SourceWidth>
 }
 
 template <size_t Width>
-[[nodiscard]] auto operator<<(const uinteger<Width>& lhs, const uint32_t rhs)
--> uinteger<Width>
+[[nodiscard]] auto operator<<(const uinteger<Width>& lhs, const uint32_t rhs) -> uinteger<Width>
 {
 
     if (rhs >= Width)
@@ -261,7 +261,6 @@ template <size_t Width>
     {
         return lhs;
     }
-
     uinteger<Width> shifted;
     const auto skip_words = rhs / lhs.word_width();
     const auto shift_word_left = rhs - skip_words * lhs.word_width();
@@ -326,7 +325,7 @@ auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
 
 template <size_t Width>
 [[nodiscard]] auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
--> uinteger<Width>
+    -> uinteger<Width>
 {
     uinteger<Width> logical_and;
     for (auto counter = 0U; counter < lhs.word_count(); ++counter)
@@ -337,8 +336,7 @@ template <size_t Width>
 }
 
 template <size_t Width>
-[[nodiscard]] auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
-    -> uinteger<Width>
+auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
 {
     uinteger<Width> logical_or;
     for (auto counter = 0U; counter < lhs.word_count(); ++counter)
