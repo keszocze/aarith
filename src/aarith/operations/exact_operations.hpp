@@ -213,7 +213,8 @@ auto res_div(const uinteger<W>& numerator, const uinteger<W>& denominator)
         }
     }
 
-    uinteger<W> remainder = width_cast<W>(Q);
+    uinteger<W> remainder = width_cast<W>(R >> n);
+
     return std::make_pair(Q, remainder);
 }
 
