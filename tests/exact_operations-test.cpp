@@ -318,7 +318,7 @@ SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic]")
     }
 }
 
-SCENARIO("Computing the modulo of two uintegers works as expected", "[uinteger][arithmetic]")
+SCENARIO("Computing the remainder of two uintegers works as expected", "[uinteger][arithmetic]")
 {
 
     GIVEN("A fixed test case a=56567 and b=234")
@@ -330,7 +330,7 @@ SCENARIO("Computing the modulo of two uintegers works as expected", "[uinteger][
         const uinteger<32> b{val_b};
 
         const uinteger<32> div = restoring_division(a, b);
-        const uinteger<32> mod = modulo(a, b);
+        const uinteger<32> mod = remainder(a, b);
 
         const uint32_t int_div = val_a / val_b;
         const uint32_t int_mod = val_a % val_b;
@@ -351,20 +351,20 @@ SCENARIO("Computing the modulo of two uintegers works as expected", "[uinteger][
         const uinteger<width> zero{0U};
         const uinteger<width> one{1U};
 
-        THEN("A modul of zero should throw an exception")
+        THEN("Computing the remainder of division by zero should trhow an exception")
         {
 
-            CHECK_THROWS_AS(modulo(a, zero), std::runtime_error);
+            CHECK_THROWS_AS(remainder(a, zero), std::runtime_error);
         }
 
-        THEN("A modul of 1 should yield zero")
+        THEN("A remainder when dividing by 1 should yield zero")
         {
-            CHECK(modulo(a, one) == zero);
+            CHECK(remainder(a, one) == zero);
         }
-        THEN("Computing zero modulo something in 0")
+        THEN("Computing the remainder of zero should yield 0")
         {
 
-            CHECK(modulo(zero, a) == zero);
+            CHECK(remainder(zero, a) == zero);
         }
     }
 
@@ -385,7 +385,7 @@ SCENARIO("Computing the modulo of two uintegers works as expected", "[uinteger][
 
             uint32_t int_res = val_a % val_b;
 
-            uinteger<32> result = modulo(a, b);
+            uinteger<32> result = remainder(a, b);
             CHECK(int_res == result.word(0));
         }
     }

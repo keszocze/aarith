@@ -219,7 +219,7 @@ auto res_div(const uinteger<W>& numerator, const uinteger<W>& denominator)
 }
 
 template <class UInteger>
-auto modulo(const UInteger& numerator, const UInteger& denominator) -> UInteger
+auto remainder(const UInteger& numerator, const UInteger& denominator) -> UInteger
 {
     return res_div(numerator, denominator).second;
 }
