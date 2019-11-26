@@ -12,4 +12,4 @@ sonar.sourceEncoding=UTF-8
 sonar.branch.name=@@BRANCH_NAME@@
 
 
-sonar.host.url=https://codesigni182.informatik.uni-erlangen.de/sonarqube
+sonar.host.url=https://codesignp211.informatik.uni-erlangen.de/sonarqube
