@@ -12,6 +12,5 @@ int main() {
 
     const uinteger<64> n =uinteger<64>::from_words(static_cast<uint64_t>(-1));
     cout << n << "\n";
-    cout << prepend_zero_word(n) << "\n";
     return 0;
 }
