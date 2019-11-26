@@ -272,10 +272,8 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic]")
 
 SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic]")
 {
-
     GIVEN("Two uinteger<N> a and b with N <= 32")
     {
-
         uint32_t val_a =
             GENERATE(1, 56567, 23, static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
         uint32_t val_b = GENERATE(1, 56567, 23, 234, 76856, 2342353456,
@@ -320,7 +318,6 @@ SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic]")
 
 SCENARIO("Computing the remainder of two uintegers works as expected", "[uinteger][arithmetic]")
 {
-
     GIVEN("A fixed test case a=56567 and b=234")
     {
         const uint32_t val_a = 56567;
@@ -337,8 +334,6 @@ SCENARIO("Computing the remainder of two uintegers works as expected", "[uintege
 
         CHECK(int_div == div.word(0));
         REQUIRE(int_mod == mod.word(0));
-
-
     }
 
     GIVEN("An uinteger<N> a")

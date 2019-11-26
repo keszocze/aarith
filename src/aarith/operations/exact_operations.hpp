@@ -162,7 +162,6 @@ template <std::size_t W>
 auto res_div(const uinteger<W>& numerator, const uinteger<W>& denominator)
     -> std::pair<uinteger<W>, uinteger<W>>
 {
-
     using UInteger = uinteger<W>;
     using LargeUInteger = uinteger<2 * W>;
 
@@ -171,49 +170,43 @@ auto res_div(const uinteger<W>& numerator, const uinteger<W>& denominator)
         throw std::runtime_error("Attempted division by zero");
     }
 
-    /**
-     * Cover some special cases in order to speed everything up
-     */
-
+    // Cover some special cases in order to speed everything up
     if (numerator == denominator)
     {
         return std::make_pair(UInteger{1U}, UInteger{0U});
     }
-
     if (numerator < denominator)
     {
         return std::make_pair(UInteger{0U}, numerator);
     }
-
     if (denominator == UInteger{1U})
     {
         return std::make_pair(numerator, UInteger{0U});
     }
 
-    const size_t n = numerator.width();
-
+    // Perform restoring division in all other cases
+    const auto n = numerator.width();
+    const LargeUInteger D = (width_cast<2 * W>(denominator) << n);
     LargeUInteger R = width_cast<2 * W>(numerator);
-    LargeUInteger D = (width_cast<2 * W>(denominator) << n);
-
     UInteger Q{0U};
 
     for (size_t i = 0; i < n; ++i)
     {
-        size_t j = (n - 1) - i;
-        LargeUInteger TwoR = (R << 1);
+        const auto bit = (n - 1) - i;
+        const LargeUInteger TwoR = (R << 1);
         if (TwoR >= D)
         {
             R = exact_uint_sub(TwoR, D);
-            Q.set_bit(j, true);
+            Q.set_bit(bit, true);
         }
         else
         {
             R = TwoR;
-            Q.set_bit(j, false);
+            Q.set_bit(bit, false);
         }
     }
 
-    uinteger<W> remainder = width_cast<W>(R >> n);
+    const uinteger<W> remainder = width_cast<W>(R >> n);
 
     return std::make_pair(Q, remainder);
 }
