@@ -65,7 +65,7 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
             static constexpr uint64_t number_b = 0;
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
-            auto const result = exact_uint_add(a, b);
+            auto const result = add(a, b);
 
             THEN("The next word is unchanged")
             {
