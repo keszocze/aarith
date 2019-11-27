@@ -88,26 +88,44 @@ template <class UInteger>[[nodiscard]] auto sub(const UInteger& a, const UIntege
  * @param b Second multiplicant
  * @return Product of a and b
  */
-template <class UInteger>[[nodiscard]] UInteger mul(const UInteger& a, const UInteger& b)
+template <size_t W>[[nodiscard]] uinteger<W> mul(const uinteger<W>& a, const uinteger<W>& b)
 {
-    UInteger result{0U};
-    if constexpr (UInteger::width() <= 32)
+    return width_cast<W>(expanding_mul(a, b));
+}
+
+/**
+ * @brief Multiplies two unsigned integers expanding the bit width so that the result fits.
+ *
+ *
+ * @tparam UInteger The unsigned integer instance used for the operation
+ * @param a First multiplicant
+ * @param b Second multiplicant
+ * @return Product of a and b
+ */
+template <std::size_t W, std::size_t V>
+[[nodiscard]] uinteger<W + V> expanding_mul(const uinteger<W>& a, const uinteger<V>& b)
+{
+    constexpr std::size_t res_width = W + V;
+    uinteger<res_width> result{0U};
+    if constexpr (res_width <= 64)
     {
         uint64_t result_uint64 = a.word(0) * b.word(0);
         result.set_word(0, result_uint64);
     }
     else
     {
-        static_assert(is_integral<UInteger>::value);
-        static_assert(is_unsigned<UInteger>::value);
+        static_assert(is_integral<uinteger<res_width>>::value);
+        static_assert(is_unsigned<uinteger<res_width>>::value);
 
         const auto leading_zeroes = count_leading_zeroes(b);
+        uinteger<res_width> a_ = width_cast<res_width>(a);
+
         auto bit_index = 0U;
         while (bit_index < leading_zeroes)
         {
             if (b.bit(bit_index))
             {
-                result = add(result, a << bit_index);
+                result = add(result, a_ << bit_index);
             }
             ++bit_index;
         }
