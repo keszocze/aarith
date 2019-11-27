@@ -117,36 +117,6 @@ template <class UInteger>[[nodiscard]] UInteger mul(const UInteger& a, const UIn
     return result;
 }
 
-/**
- * @brief Multiplies two unsigned integers.
- *
- * @note No Type conversion is performed. If the bit widths do not match, the code will not compile!
- *
- * The method implements Karatsuba's Algorithm https://en.wikipedia.org/wiki/Karatsuba_algorithm
- *
- * @todo Actually complete the implementation
- *
- * @tparam UInteger The unsigned integer instance used for the operation
- * @param a First multiplicant
- * @param b Second multiplicant
- * @return Product of a and b
- */
-template <class UInteger>
-[[nodiscard]] auto karatsuba(const UInteger& a, const UInteger& b) -> UInteger
-{
-    // base case, we can stop recursion now
-    if constexpr (UInteger::width() <= 32)
-    {
-        uint64_t result_uint64 = a.word(0) * b.word(0);
-        UInteger result;
-        result.set_word(0, result_uint64);
-        return result;
-    }
-    else
-    {
-        throw "currently unsupported";
-    }
-}
 
 template <std::size_t W>
 auto restoring_division(const uinteger<W>& numerator, const uinteger<W>& denominator)
