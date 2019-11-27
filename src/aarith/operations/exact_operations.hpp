@@ -19,7 +19,7 @@ namespace aarith {
  * @return Sum of a and b
  */
 template <class UInteger>
-[[nodiscard]] auto exact_uint_add(const UInteger& a, const UInteger& b) -> UInteger
+[[nodiscard]] auto add(const UInteger& a, const UInteger& b) -> UInteger
 {
     static_assert(is_integral<UInteger>::value);
     static_assert(is_unsigned<UInteger>::value);
@@ -46,7 +46,7 @@ template <class UInteger>
  * @return Difference between a and b
  */
 template <class UInteger>
-[[nodiscard]] auto exact_uint_sub(const UInteger& a, const UInteger& b) -> UInteger
+[[nodiscard]] auto sub(const UInteger& a, const UInteger& b) -> UInteger
 {
     static_assert(is_integral<UInteger>::value);
     static_assert(is_unsigned<UInteger>::value);
@@ -90,7 +90,7 @@ template <class UInteger>
  * @param b Second multiplicant
  * @return Product of a and b
  */
-template <class UInteger>[[nodiscard]] UInteger exact_uint_mul(const UInteger& a, const UInteger& b)
+template <class UInteger>[[nodiscard]] UInteger mul(const UInteger& a, const UInteger& b)
 {
     UInteger result{0U};
     if constexpr (UInteger::width() <= 32)
@@ -109,7 +109,7 @@ template <class UInteger>[[nodiscard]] UInteger exact_uint_mul(const UInteger& a
         {
             if (b.bit(bit_index))
             {
-                result = exact_uint_add(result, a << bit_index);
+                result = add(result, a << bit_index);
             }
             ++bit_index;
         }
@@ -149,7 +149,7 @@ template <class UInteger>
 }
 
 template <std::size_t W>
-auto res_div(const uinteger<W>& numerator, const uinteger<W>& denominator)
+auto restoring_division(const uinteger<W>& numerator, const uinteger<W>& denominator)
     -> std::pair<uinteger<W>, uinteger<W>>
 {
     using UInteger = uinteger<W>;
@@ -186,7 +186,7 @@ auto res_div(const uinteger<W>& numerator, const uinteger<W>& denominator)
         const LargeUInteger TwoR = (R << 1);
         if (TwoR >= D)
         {
-            R = exact_uint_sub(TwoR, D);
+            R = sub(TwoR, D);
             Q.set_bit(bit, true);
         }
         else
@@ -204,13 +204,13 @@ auto res_div(const uinteger<W>& numerator, const uinteger<W>& denominator)
 template <class UInteger>
 auto remainder(const UInteger& numerator, const UInteger& denominator) -> UInteger
 {
-    return res_div(numerator, denominator).second;
+    return restoring_division(numerator, denominator).second;
 }
 
 template <class UInteger>
-auto restoring_division(const UInteger& numerator, const UInteger& denominator) -> UInteger
+auto div(const UInteger& numerator, const UInteger& denominator) -> UInteger
 {
-    return res_div(numerator, denominator).first;
+    return restoring_division(numerator, denominator).first;
 }
 
 } // namespace aarith
@@ -222,25 +222,25 @@ namespace aarith::exact_operators {
 template <size_t Width>
 auto operator+(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
 {
-    return exact_uint_add(lhs, rhs);
+    return add(lhs, rhs);
 }
 
 template <size_t Width>
 auto operator-(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
 {
-    return exact_uint_sub(lhs, rhs);
+    return sub(lhs, rhs);
 }
 
 template <size_t Width>
 auto operator*(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
 {
-    return exact_uint_mul(lhs, rhs);
+    return mul(lhs, rhs);
 }
 
 template <size_t Width>
 auto operator/(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
 {
-    return restoring_division(lhs, rhs);
+    return div(lhs, rhs);
 }
 
 template <size_t Width>
