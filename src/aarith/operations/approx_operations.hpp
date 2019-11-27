@@ -27,7 +27,7 @@ template <class UInteger> auto generate_bitmask(const size_t bits) -> UInteger
     {
         mask.set_word(counter, last_word_mask);
     }
-    return mask;
+    return ~mask;
 }
 
 template <class UInteger, class Function>
@@ -37,7 +37,7 @@ approx_operation_post_masking(const UInteger& a, const UInteger b,
                               const size_t bits = UInteger::width())
 {
     const UInteger result = fun(a,b);
-    const UInteger mask = ~generate_bitmask<UInteger>(UInteger::width() - bits);
+    const UInteger mask = generate_bitmask<UInteger>(UInteger::width() - bits);
 
     return result & mask;
 }
@@ -81,7 +81,7 @@ template <class UInteger>
 auto approx_add_pre_masking(const UInteger& opd1, const UInteger& opd2,
                             const size_t bits = UInteger::width()) -> UInteger
 {
-    auto const mask = ~generate_bitmask<UInteger>(UInteger::width() - bits);
+    auto const mask = generate_bitmask<UInteger>(UInteger::width() - bits);
 
     auto const opd1_masked = opd1 & mask;
     auto const opd2_masked = opd2 & mask;
@@ -96,7 +96,7 @@ auto approx_uint_bitmasking_mul(const uinteger<width>& opd1, const uinteger<widt
 {
     constexpr auto product_width = 2 * width;
 
-    auto const mask = ~generate_bitmask<uinteger<product_width>>(product_width - bits);
+    auto const mask = generate_bitmask<uinteger<product_width>>(product_width - bits);
 
     uinteger<product_width> opd2_extended = width_cast<product_width, width>(opd2);
 
