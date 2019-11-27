@@ -45,6 +45,78 @@ SCENARIO("Casting uintegers into different width", "[uinteger]")
     }
 }
 
+SCENARIO("Copy constructor of uintegers with various bit widths", "[uinteger][utility]")
+{
+    GIVEN("An uinteger<N> a")
+    {
+
+        //        const uint64_t val_a = GENERATE(take(10, random(0U,
+        //        std::numeric_limits<uint64_t>::max()));
+        const uint64_t val_a = 24;
+        uinteger<196> a = uinteger<196>::from_words(0U, val_a, 0U);
+
+        THEN("Assignment of individual words is correct")
+        {
+            CHECK(a.word(0) == 0U);
+            CHECK(a.word(1) == val_a);
+            CHECK(a.word(2) == 0U);
+        }
+
+        AND_GIVEN("An uinteger<N> b")
+        {
+            const uint64_t val_b = 1337;
+            const uinteger<196> b = uinteger<196>::from_words(val_b, 0U, 2 * val_b);
+
+            THEN("Assignment opeator of individual words is correct")
+            {
+
+                a = b;
+                CHECK(a.word(0) == 2 * val_b);
+                CHECK(a.word(1) == 0U);
+                CHECK(a.word(2) == val_b);
+            }
+        }
+        AND_GIVEN("An uinteger<M> b")
+        {
+            WHEN("M < N")
+            {
+                const uint64_t val_b = 23;
+                const uinteger<64> tmp = uinteger<64>::from_words(val_b);
+
+                THEN("The copy constructor should work")
+                {
+                    uinteger<128> b{tmp};
+
+                    CHECK(b.word(0) == val_b);
+                    CHECK(b.word(1) == 0U);
+                }
+                THEN("The assignment operator should work")
+                {
+                    uinteger<128> b;
+                    b = tmp;
+                    CHECK(b.word(0) == val_b);
+                    CHECK(b.word(1) == 0U);
+
+                    a = tmp;
+                    CHECK(a.word(0) == val_b);
+                    CHECK(a.word(1) == 0U);
+                    CHECK(a.word(2) == 0U);
+                }
+            }
+            //        // does not compile, as expected and intended
+            //        //        WHEN("M > N")
+            //        //        {
+            //        //            const uint64_t val_b = 23;
+            //        //            const uinteger<150> tmp =
+            //        uinteger<150>::from_words(0U,val_b,0U);
+            //        //            std::cout << tmp << "\n";
+            //        //            const uinteger<128> b = tmp;
+            //        //            std::cout << b << "\n";
+            //        //        }
+        }
+    }
+}
+
 SCENARIO("Calculating the word_masks of uintegers", "[uinteger][utility]")
 {
     // The tests all assume that uinteger uses 64-bit words.
@@ -558,7 +630,7 @@ SCENARIO("Bit operations are performed correctly", "[uinteger][bit]")
     {
         // TODO Understand how to generate various bit widths
         auto val =
-                GENERATE(0, 56567, 23, static_cast<uint64_t>(-4354566), static_cast<uint64_t>(-1));
+            GENERATE(0, 56567, 23, static_cast<uint64_t>(-4354566), static_cast<uint64_t>(-1));
         const uinteger<150> n = uinteger<150>::from_words(2 * val, val);
         WHEN("One zero word is prepended")
         {
@@ -568,8 +640,8 @@ SCENARIO("Bit operations are performed correctly", "[uinteger][bit]")
 
                 CHECK(prepended_n.word_count() == n.word_count() + 1);
             }
-            THEN(
-                    "The prepended word should equal zero and the other values should have been copied")
+            THEN("The prepended word should equal zero and the other values should have been "
+                 "copied")
             {
                 for (auto i = 0U; i < n.word_count(); ++i)
                 {
@@ -592,7 +664,7 @@ SCENARIO("Bit operations are performed correctly", "[uinteger][bit]")
             {
                 const auto two_n_words = doubled.word_count();
                 const auto n_words = n.word_count();
-                CHECK(((two_n_words == 2*n_words) || (two_n_words == (2*n_words)-1)) );
+                CHECK(((two_n_words == 2 * n_words) || (two_n_words == (2 * n_words) - 1)));
             }
             THEN("The prepended words should equal zero and the other values should have been "
                  "copied")
