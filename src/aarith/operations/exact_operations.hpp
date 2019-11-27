@@ -146,9 +146,9 @@ template <size_t W>[[nodiscard]] uinteger<W> mul(const uinteger<W>& a, const uin
  * @return Pair of (quotient, remainder)
  *
  */
-template <std::size_t W>
+template <std::size_t W, std::size_t V>
 [[nodiscard]] std::pair<uinteger<W>, uinteger<W>> restoring_division(const uinteger<W>& numerator,
-                                                                     const uinteger<W>& denominator)
+                                                                     const uinteger<V>& denominator)
 
 {
     using UInteger = uinteger<W>;

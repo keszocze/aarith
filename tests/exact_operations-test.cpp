@@ -92,7 +92,7 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
                 }
             }
         }
-        WHEN ("b equals zero")
+        WHEN("b equals zero")
         {
             const uinteger<150> b{0u};
             THEN("Subtracting b (i.e. zero) should not change a")
@@ -105,10 +105,9 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
                     uinteger<150> result = sub(a, b);
                     REQUIRE(result == a);
                 }
-
             }
         }
-        WHEN ("There is a borrow into the next word")
+        WHEN("There is a borrow into the next word")
         {
             AND_WHEN("The next word is 2^64-1")
             {
@@ -125,12 +124,10 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
                     const uinteger<192> expected = uinteger<192>::from_words(zero, zero, all_ones);
 
                     REQUIRE(expected == result);
-
                 }
             }
         }
     }
-
 
     GIVEN("Two uinteger<N> a and b are subtracted")
     {
@@ -309,15 +306,15 @@ SCENARIO("Bit and Word operations work correctly", "[uinteger][utility]")
                 }
                 else
                 {
-//                                    std::cout << uinteger<64>{mask} << "\t" << a << "\t" << uinteger<64>{a.word(0)} << "\n";
+                    //                                    std::cout << uinteger<64>{mask} << "\t" <<
+                    //                                    a << "\t" << uinteger<64>{a.word(0)} <<
+                    //                                    "\n";
                     CHECK(!is_one);
                 }
             }
-
-
         }
     }
-    WHEN ("Two uinteger<N>'s are created")
+    WHEN("Two uinteger<N>'s are created")
     {
         AND_WHEN("One is created via ::from_words and the other uses .set_word")
         {
@@ -349,27 +346,27 @@ SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic]")
         uint32_t val_a =
             GENERATE(1, 56567, 23, static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
         uint32_t val_b = GENERATE(1, 56567, 23, 234, 76856, 2342353456,
-            static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
+                                  static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
 
         const uinteger<32> a = uinteger<32>::from_words(val_a);
         const uinteger<32> b = uinteger<32>::from_words(val_b);
 
         THEN("Division by zero should throw an exception")
         {
-            const uinteger<32> zero{ 0U };
+            const uinteger<32> zero{0U};
             CHECK_THROWS_AS(div(b, zero), std::runtime_error);
             CHECK_THROWS_AS(div(a, zero), std::runtime_error);
         }
 
         THEN("Division by 1 should not change the other numerator")
         {
-            const uinteger<32> one{ 1U };
+            const uinteger<32> one{1U};
             CHECK(div(a, one) == a);
             CHECK(div(b, one) == b);
         }
         THEN("Divison of 0 should result in 0")
         {
-            const uinteger<32> zero{ 0U };
+            const uinteger<32> zero{0U};
 
             CHECK(div(zero, a) == zero);
             CHECK(div(zero, b) == zero);
@@ -395,8 +392,8 @@ SCENARIO("Computing the remainder of two uintegers works as expected", "[uintege
         const uint32_t val_a = 56567;
         const uint32_t val_b = 234;
 
-        const uinteger<32> a{ val_a };
-        const uinteger<32> b{ val_b };
+        const uinteger<32> a{val_a};
+        const uinteger<32> b{val_b};
 
         const uinteger<32> d = div(a, b);
         const uinteger<32> m = remainder(a, b);
@@ -414,9 +411,9 @@ SCENARIO("Computing the remainder of two uintegers works as expected", "[uintege
         const size_t width = 150;
         auto val_a = GENERATE(take(100, random(1U, 10000000U)));
 
-        uinteger<width> a{ val_a };
-        const uinteger<width> zero{ 0U };
-        const uinteger<width> one{ 1U };
+        uinteger<width> a{val_a};
+        const uinteger<width> zero{0U};
+        const uinteger<width> one{1U};
 
         THEN("Computing the remainder of division by zero should trhow an exception")
         {
@@ -435,25 +432,47 @@ SCENARIO("Computing the remainder of two uintegers works as expected", "[uintege
         }
     }
 
-    // TODO we can go up to 64 bits here! -> let's do so
-    GIVEN("Two uinteger<N> a and b with N <= 64")
+    GIVEN("Two uinteger<N> a and b with N <= 32")
     {
 
         uint32_t val_a =
             GENERATE(1, 56567, 23, static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
         uint32_t val_b = GENERATE(1, 56567, 23, 234, 76856, 2342353456,
-            static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
+                                  static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
 
         const uinteger<32> a = uinteger<32>::from_words(val_a);
         const uinteger<32> b = uinteger<32>::from_words(val_b);
 
-        THEN("The result matches the uint64_t computation")
+        THEN("The result matches the uint32_t computation")
         {
 
             uint32_t int_res = val_a % val_b;
 
             uinteger<32> result = remainder(a, b);
             CHECK(int_res == result.word(0));
+        }
+    }
+    GIVEN("Two uinteger<N> a and b with N <= 64 with different bit widths")
+    {
+
+        uint32_t val_a = GENERATE(1, 56567, 23, 234, 76856, 2342353456,
+                                  static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
+        uint32_t val_b = GENERATE(1, 56567, 23, 234, 76856, 2342353456,
+                                  static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
+
+        const uinteger<32> a = uinteger<32>::from_words(val_a);
+        const uinteger<64> b = uinteger<64>::from_words(val_b);
+
+        THEN("The result matches the uint64_t computation")
+        {
+
+            const auto [quotient, remainder] = restoring_division(a, b);
+
+            uint64_t quot_int = val_a / val_b;
+            uint64_t rem_int = val_a % val_b;
+            CHECK(quot_int == quotient.word(0));
+            CHECK(rem_int == remainder.word(0));
+
         }
     }
 }
