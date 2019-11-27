@@ -18,7 +18,7 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
             static constexpr uint8_t number_b = 16;
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
-            auto const result = add(a, b);
+            const uinteger<TestWidth> result = add(a, b);
 
             THEN("It should be the correct sum")
             {

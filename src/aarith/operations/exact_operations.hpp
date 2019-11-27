@@ -9,22 +9,26 @@
 namespace aarith {
 
 /**
- * @brief Adds two unsigned integers
+ * @brief Adds two unsigned integers of, possibly, different bit widths.
  *
- * @note No Type conversion is performed. If the bit widths do not match, the code will not compile!
- *
- * @tparam UInteger The unsigned integer instance used for the operation
+ * @tparam W Width of the first summand
+ * @tparam V Width of the second summand
  * @param a First summand
  * @param b Second summand
- * @return Sum of a and b
+ * @return Sum of correct maximal bit width
  */
-template <class UInteger>[[nodiscard]] auto add(const UInteger& a, const UInteger& b) -> UInteger
+template <size_t W, size_t V>
+[[nodiscard]] uinteger<std::max(W, V) + 1> expanding_add(const uinteger<W>& a, const uinteger<V>& b)
 {
-    static_assert(is_integral<UInteger>::value);
-    static_assert(is_unsigned<UInteger>::value);
+    static_assert(is_integral<uinteger<W>>::value);
+    static_assert(is_unsigned<uinteger<W>>::value);
+    static_assert(is_integral<uinteger<V>>::value);
+    static_assert(is_unsigned<uinteger<V>>::value);
 
-    UInteger sum;
-    typename UInteger::word_type carry{0};
+    constexpr size_t res_width = std::max(W, V) + 1U;
+
+    uinteger<res_width> sum;
+    typename uinteger<res_width>::word_type carry{0};
     for (auto i = 0U; i < a.word_count(); ++i)
     {
         auto const partial_sum = a.word(i) + b.word(i) + carry;
@@ -35,9 +39,21 @@ template <class UInteger>[[nodiscard]] auto add(const UInteger& a, const UIntege
 }
 
 /**
- * @brief Computes the difference of two unsigned integers.
+ * @brief Adds two unsigned integers
  *
- * @note No Type conversion is performed. If the bit widths do not match, the code will not compile!
+ * @tparam UInteger The unsigned integer instance used for the addition
+ * @param a First summand
+ * @param b Second summand
+ * @return Sum of a and b
+ */
+template <size_t W>[[nodiscard]] uinteger<W> add(const uinteger<W>& a, const uinteger<W>& b)
+{
+    uinteger<W + 1> result = expanding_add<W, W>(a, b);
+    return width_cast<W>(result);
+}
+
+/**
+ * @brief Computes the difference of two unsigned integers.
  *
  * @tparam UInteger The unsigned integer instance used for the operation
  * @param a Minuend
@@ -72,25 +88,6 @@ template <class UInteger>[[nodiscard]] auto sub(const UInteger& a, const UIntege
         sum.set_word(i, partial_diff);
     }
     return sum;
-}
-
-/**
- * @brief Multiplies two unsigned integers.
- *
- * @note No Type conversion is performed. If the bit widths do not match, the code will not compile!
- *
- * This implements the simplest multiplication algorithm (binary "long multiplication") that adds up
- * the partial products everywhere where the first multiplicand has a 1 bit. The simplicity, of
- * course, comes at the cost of performance.
- *
- * @tparam UInteger The unsigned integer instance used for the operation
- * @param a First multiplicant
- * @param b Second multiplicant
- * @return Product of a and b
- */
-template <size_t W>[[nodiscard]] uinteger<W> mul(const uinteger<W>& a, const uinteger<W>& b)
-{
-    return width_cast<W>(expanding_mul(a, b));
 }
 
 /**
@@ -131,6 +128,25 @@ template <std::size_t W, std::size_t V>
         }
     }
     return result;
+}
+
+/**
+ * @brief Multiplies two unsigned integers.
+ *
+ * @note No Type conversion is performed. If the bit widths do not match, the code will not compile!
+ *
+ * This implements the simplest multiplication algorithm (binary "long multiplication") that adds up
+ * the partial products everywhere where the first multiplicand has a 1 bit. The simplicity, of
+ * course, comes at the cost of performance.
+ *
+ * @tparam UInteger The unsigned integer instance used for the operation
+ * @param a First multiplicant
+ * @param b Second multiplicant
+ * @return Product of a and b
+ */
+template <size_t W>[[nodiscard]] uinteger<W> mul(const uinteger<W>& a, const uinteger<W>& b)
+{
+    return width_cast<W>(expanding_mul(a, b));
 }
 
 /**
