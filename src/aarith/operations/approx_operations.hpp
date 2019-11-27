@@ -38,7 +38,7 @@ auto approx_uint_bitmasking_add(const UInteger& opd1, const UInteger& opd2, cons
     auto const opd1_masked = opd1 & mask;
     auto const opd2_masked = opd2 & mask;
 
-    auto const sum = exact_uint_add(opd1_masked, opd2_masked);
+    auto const sum = add(opd1_masked, opd2_masked);
     return sum;
 }
 
@@ -56,7 +56,7 @@ auto approx_uint_bitmasking_mul(const uinteger<width>& opd1, const uinteger<widt
     for (auto i = 0U; i < width; ++i)
     {
         auto const opd2_masked = opd2_extended & mask;
-        product = ((opd1.bit(i) == 0) ? product : exact_uint_add(product, opd2_masked));
+        product = ((opd1.bit(i) == 0) ? product : add(product, opd2_masked));
         opd2_extended <<= 1;
     }
 
