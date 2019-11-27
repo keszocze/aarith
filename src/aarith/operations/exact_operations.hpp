@@ -18,8 +18,7 @@ namespace aarith {
  * @param b Second summand
  * @return Sum of a and b
  */
-template <class UInteger>
-[[nodiscard]] auto add(const UInteger& a, const UInteger& b) -> UInteger
+template <class UInteger>[[nodiscard]] auto add(const UInteger& a, const UInteger& b) -> UInteger
 {
     static_assert(is_integral<UInteger>::value);
     static_assert(is_unsigned<UInteger>::value);
@@ -45,8 +44,7 @@ template <class UInteger>
  * @param b Subtrahend
  * @return Difference between a and b
  */
-template <class UInteger>
-[[nodiscard]] auto sub(const UInteger& a, const UInteger& b) -> UInteger
+template <class UInteger>[[nodiscard]] auto sub(const UInteger& a, const UInteger& b) -> UInteger
 {
     static_assert(is_integral<UInteger>::value);
     static_assert(is_unsigned<UInteger>::value);
@@ -117,10 +115,22 @@ template <class UInteger>[[nodiscard]] UInteger mul(const UInteger& a, const UIn
     return result;
 }
 
-
+/**
+ * @brief Implements the restoring division algorithm.
+ *
+ * @see https://en.wikipedia.org/wiki/Division_algorithm#Restoring_division
+ *
+ * @param numerator The number that is to be divided
+ * @param denominator The number that devides the other number
+ * @tparam W Width of the numbers used in division.
+ *
+ * @return Pair of (quotient, remainder)
+ *
+ */
 template <std::size_t W>
-auto restoring_division(const uinteger<W>& numerator, const uinteger<W>& denominator)
-    -> std::pair<uinteger<W>, uinteger<W>>
+[[nodiscard]] std::pair<uinteger<W>, uinteger<W>> restoring_division(const uinteger<W>& numerator,
+                                                                     const uinteger<W>& denominator)
+
 {
     using UInteger = uinteger<W>;
     using LargeUInteger = uinteger<2 * W>;
@@ -172,13 +182,13 @@ auto restoring_division(const uinteger<W>& numerator, const uinteger<W>& denomin
 }
 
 template <class UInteger>
-auto remainder(const UInteger& numerator, const UInteger& denominator) -> UInteger
+[[nodiscard]] auto remainder(const UInteger& numerator, const UInteger& denominator) -> UInteger
 {
     return restoring_division(numerator, denominator).second;
 }
 
 template <class UInteger>
-auto div(const UInteger& numerator, const UInteger& denominator) -> UInteger
+[[nodiscard]] auto div(const UInteger& numerator, const UInteger& denominator) -> UInteger
 {
     return restoring_division(numerator, denominator).first;
 }
