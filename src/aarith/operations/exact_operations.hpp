@@ -18,8 +18,7 @@ namespace aarith {
  * @param b Second summand
  * @return Sum of a and b
  */
-template <class UInteger>
-[[nodiscard]] auto exact_uint_add(const UInteger& a, const UInteger& b) -> UInteger
+template <class UInteger>[[nodiscard]] auto add(const UInteger& a, const UInteger& b) -> UInteger
 {
     static_assert(is_integral<UInteger>::value);
     static_assert(is_unsigned<UInteger>::value);
@@ -45,8 +44,7 @@ template <class UInteger>
  * @param b Subtrahend
  * @return Difference between a and b
  */
-template <class UInteger>
-[[nodiscard]] auto exact_uint_sub(const UInteger& a, const UInteger& b) -> UInteger
+template <class UInteger>[[nodiscard]] auto sub(const UInteger& a, const UInteger& b) -> UInteger
 {
     static_assert(is_integral<UInteger>::value);
     static_assert(is_unsigned<UInteger>::value);
@@ -90,7 +88,7 @@ template <class UInteger>
  * @param b Second multiplicant
  * @return Product of a and b
  */
-template <class UInteger>[[nodiscard]] UInteger exact_uint_mul(const UInteger& a, const UInteger& b)
+template <class UInteger>[[nodiscard]] UInteger mul(const UInteger& a, const UInteger& b)
 {
     UInteger result{0U};
     if constexpr (UInteger::width() <= 32)
@@ -104,12 +102,12 @@ template <class UInteger>[[nodiscard]] UInteger exact_uint_mul(const UInteger& a
         static_assert(is_unsigned<UInteger>::value);
 
         const auto leading_zeroes = count_leading_zeroes(b);
-        size_t bit_index{0};
+        auto bit_index = 0U;
         while (bit_index < leading_zeroes)
         {
             if (b.bit(bit_index))
             {
-                result = exact_uint_add(result, a << bit_index);
+                result = add(result, a << bit_index);
             }
             ++bit_index;
         }
@@ -118,34 +116,81 @@ template <class UInteger>[[nodiscard]] UInteger exact_uint_mul(const UInteger& a
 }
 
 /**
- * @brief Multiplies two unsigned integers.
+ * @brief Implements the restoring division algorithm.
  *
- * @note No Type conversion is performed. If the bit widths do not match, the code will not compile!
+ * @see https://en.wikipedia.org/wiki/Division_algorithm#Restoring_division
  *
- * The method implements Karatsuba's Algorithm https://en.wikipedia.org/wiki/Karatsuba_algorithm
+ * @param numerator The number that is to be divided
+ * @param denominator The number that devides the other number
+ * @tparam W Width of the numbers used in division.
  *
- * @todo Actually complete the implementation
+ * @return Pair of (quotient, remainder)
  *
- * @tparam UInteger The unsigned integer instance used for the operation
- * @param a First multiplicant
- * @param b Second multiplicant
- * @return Product of a and b
  */
-template <class UInteger>
-[[nodiscard]] auto karatsuba(const UInteger& a, const UInteger& b) -> UInteger
+template <std::size_t W>
+[[nodiscard]] std::pair<uinteger<W>, uinteger<W>> restoring_division(const uinteger<W>& numerator,
+                                                                     const uinteger<W>& denominator)
+
 {
-    // base case, we can stop recursion now
-    if constexpr (UInteger::width() <= 32)
+    using UInteger = uinteger<W>;
+    using LargeUInteger = uinteger<2 * W>;
+
+    if (denominator.is_zero())
     {
-        uint64_t result_uint64 = a.word(0) * b.word(0);
-        UInteger result;
-        result.set_word(0, result_uint64);
-        return result;
+        throw std::runtime_error("Attempted division by zero");
     }
-    else
+
+    // Cover some special cases in order to speed everything up
+    if (numerator == denominator)
     {
-        throw "currently unsupported";
+        return std::make_pair(UInteger{1U}, UInteger{0U});
     }
+    if (numerator < denominator)
+    {
+        return std::make_pair(UInteger{0U}, numerator);
+    }
+    if (denominator == UInteger{1U})
+    {
+        return std::make_pair(numerator, UInteger{0U});
+    }
+
+    // Perform restoring division in all other cases
+    const auto n = numerator.width();
+    const LargeUInteger D = (width_cast<2 * W>(denominator) << n);
+    LargeUInteger R = width_cast<2 * W>(numerator);
+    UInteger Q{0U};
+
+    for (size_t i = 0; i < n; ++i)
+    {
+        const auto bit = (n - 1) - i;
+        const LargeUInteger TwoR = (R << 1);
+        if (TwoR >= D)
+        {
+            R = sub(TwoR, D);
+            Q.set_bit(bit, true);
+        }
+        else
+        {
+            R = TwoR;
+            Q.set_bit(bit, false);
+        }
+    }
+
+    const uinteger<W> remainder = width_cast<W>(R >> n);
+
+    return std::make_pair(Q, remainder);
+}
+
+template <class UInteger>
+[[nodiscard]] auto remainder(const UInteger& numerator, const UInteger& denominator) -> UInteger
+{
+    return restoring_division(numerator, denominator).second;
+}
+
+template <class UInteger>
+[[nodiscard]] auto div(const UInteger& numerator, const UInteger& denominator) -> UInteger
+{
+    return restoring_division(numerator, denominator).first;
 }
 
 } // namespace aarith
@@ -157,19 +202,31 @@ namespace aarith::exact_operators {
 template <size_t Width>
 auto operator+(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
 {
-    return exact_uint_add(lhs, rhs);
+    return add(lhs, rhs);
 }
 
 template <size_t Width>
 auto operator-(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
 {
-    return exact_uint_sub(lhs, rhs);
+    return sub(lhs, rhs);
 }
 
 template <size_t Width>
 auto operator*(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
 {
-    return exact_uint_mul(lhs, rhs);
+    return mul(lhs, rhs);
+}
+
+template <size_t Width>
+auto operator/(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
+{
+    return div(lhs, rhs);
+}
+
+template <size_t Width>
+auto operator%(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
+{
+    return remainder(lhs, rhs);
 }
 
 } // namespace aarith::exact_operators

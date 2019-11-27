@@ -1,13 +1,10 @@
-#include <iostream>
-#include <bitset>
-#include <aarith/types/integer.hpp>
 #include <aarith/operations/exact_operations.hpp>
+#include <aarith/types/integer.hpp>
+#include <bitset>
+#include <iostream>
 
-
-int main() {
-
+int main()
+{
     using namespace aarith;
-
-
     return 0;
 }

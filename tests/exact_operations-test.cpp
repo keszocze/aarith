@@ -18,7 +18,7 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
             static constexpr uint8_t number_b = 16;
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
-            auto const result = exact_uint_add(a, b);
+            auto const result = add(a, b);
 
             THEN("It should be the correct sum")
             {
@@ -31,7 +31,7 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
             static constexpr uint16_t number_b = 1;
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
-            auto const result = exact_uint_add(a, b);
+            auto const result = add(a, b);
 
             THEN("It should be the masked to fit")
             {
@@ -51,7 +51,7 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
             static constexpr uint64_t number_b = 1ULL << 63;
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
-            auto const result = exact_uint_add(a, b);
+            auto const result = add(a, b);
 
             THEN("It is added to the next word")
             {
@@ -72,7 +72,7 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
                 const uinteger<32> a{15u};
                 const uinteger<32> b{7u};
                 const uinteger<32> expected{static_cast<uint32_t>(15 - 7)};
-                auto const result = exact_uint_sub(a, b);
+                auto const result = sub(a, b);
 
                 THEN("The result is a - b")
                 {
@@ -84,7 +84,7 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
                 const uinteger<32> a{7u};
                 const uinteger<32> b{15u};
                 const uinteger<32> expected{static_cast<uint32_t>(7 - 15)};
-                auto const result = exact_uint_sub(a, b);
+                auto const result = sub(a, b);
 
                 THEN("The result wraps around")
                 {
@@ -102,7 +102,7 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
                 for (const unsigned a_num : {0u, 23u, 1337u})
                 {
                     a = uinteger<150>{a_num};
-                    uinteger<150> result = exact_uint_sub(a, b);
+                    uinteger<150> result = sub(a, b);
                     REQUIRE(result == a);
                 }
 
@@ -121,7 +121,7 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
                     const uinteger<192> a = uinteger<192>::from_words(one, zero, zero);
                     const uinteger<192> b = uinteger<192>::from_words(zero, all_ones, one);
 
-                    const uinteger<192> result = exact_uint_sub(a, b);
+                    const uinteger<192> result = sub(a, b);
                     const uinteger<192> expected = uinteger<192>::from_words(zero, zero, all_ones);
 
                     REQUIRE(expected == result);
@@ -141,7 +141,7 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
                 auto const a = uinteger<128>::from_words(1, 0);
                 auto const b = uinteger<128>::from_words(0, 1);
                 auto const expected = uinteger<128>::from_words(0, static_cast<uint64_t>(-1));
-                auto const result = exact_uint_sub(a, b);
+                auto const result = sub(a, b);
 
                 THEN("The result borrow is subtracted from the next word")
                 {
@@ -153,7 +153,7 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
                 auto const a = uinteger<128>::from_words(1, 1);
                 auto const b = uinteger<128>::from_words(0, 1);
                 auto const expected = uinteger<128>::from_words(1, 0);
-                auto const result = exact_uint_sub(a, b);
+                auto const result = sub(a, b);
 
                 THEN("No borrow is subtracted from the next word")
                 {
@@ -180,24 +180,24 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplica
 
         THEN("Multiplication should be commutative")
         {
-            CHECK(exact_uint_mul(a, b) == exact_uint_mul(b, a));
+            CHECK(mul(a, b) == mul(b, a));
         }
 
         THEN("Multiplication by 1 should not change the other multiplicant")
         {
             const uinteger<32> one{1U};
-            CHECK(exact_uint_mul(a, one) == a);
-            CHECK(exact_uint_mul(one, a) == a);
-            CHECK(exact_uint_mul(b, one) == b);
-            CHECK(exact_uint_mul(one, b) == b);
+            CHECK(mul(a, one) == a);
+            CHECK(mul(one, a) == a);
+            CHECK(mul(b, one) == b);
+            CHECK(mul(one, b) == b);
         }
         THEN("Multiplication by 0 should result in 0")
         {
             const uinteger<32> zero{0U};
-            CHECK(exact_uint_mul(a, zero) == zero);
-            CHECK(exact_uint_mul(zero, a) == zero);
-            CHECK(exact_uint_mul(b, zero) == zero);
-            CHECK(exact_uint_mul(zero, b) == zero);
+            CHECK(mul(a, zero) == zero);
+            CHECK(mul(zero, a) == zero);
+            CHECK(mul(b, zero) == zero);
+            CHECK(mul(zero, b) == zero);
         }
     }
 
@@ -221,7 +221,7 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplica
             {
                 for (const uinteger<128>& num_b : numbers)
                 {
-                    CHECK(exact_uint_mul(num_a, num_b) == exact_uint_mul(num_b, num_a));
+                    CHECK(mul(num_a, num_b) == mul(num_b, num_a));
                 }
             }
         }
@@ -233,8 +233,8 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplica
             {
                 for (const uinteger<128>& num : numbers)
                 {
-                    CHECK(exact_uint_mul(num, zero) == zero);
-                    CHECK(exact_uint_mul(zero, num) == zero);
+                    CHECK(mul(num, zero) == zero);
+                    CHECK(mul(zero, num) == zero);
                 }
             }
         }
@@ -245,8 +245,8 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplica
 
                 for (const uinteger<128>& num : numbers)
                 {
-                    CHECK(exact_uint_mul(num, one) == num);
-                    CHECK(exact_uint_mul(one, num) == num);
+                    CHECK(mul(num, one) == num);
+                    CHECK(mul(one, num) == num);
                 }
             }
         }
@@ -254,7 +254,7 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplica
         {
             THEN("The product is 1")
             {
-                REQUIRE(exact_uint_mul(d, d) == one);
+                REQUIRE(mul(d, d) == one);
             }
         }
     }
@@ -277,7 +277,7 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
             THEN("The multiplication should match its uint64_t counterpart")
             {
                 uint64_t expected = val_a * val_b;
-                uinteger<64> result = exact_uint_mul(a, b);
+                uinteger<64> result = mul(a, b);
 
                 REQUIRE(expected == result.word(0));
                 REQUIRE(uinteger<64>{expected} == result);
@@ -340,5 +340,120 @@ SCENARIO("Bit and Word operations work correctly", "[uinteger][utility]")
             }
         }
     }
+}
 
+SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic]")
+{
+    GIVEN("Two uinteger<N> a and b with N <= 32")
+    {
+        uint32_t val_a =
+            GENERATE(1, 56567, 23, static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
+        uint32_t val_b = GENERATE(1, 56567, 23, 234, 76856, 2342353456,
+            static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
+
+        const uinteger<32> a = uinteger<32>::from_words(val_a);
+        const uinteger<32> b = uinteger<32>::from_words(val_b);
+
+        THEN("Division by zero should throw an exception")
+        {
+            const uinteger<32> zero{ 0U };
+            CHECK_THROWS_AS(div(b, zero), std::runtime_error);
+            CHECK_THROWS_AS(div(a, zero), std::runtime_error);
+        }
+
+        THEN("Division by 1 should not change the other numerator")
+        {
+            const uinteger<32> one{ 1U };
+            CHECK(div(a, one) == a);
+            CHECK(div(b, one) == b);
+        }
+        THEN("Divison of 0 should result in 0")
+        {
+            const uinteger<32> zero{ 0U };
+
+            CHECK(div(zero, a) == zero);
+            CHECK(div(zero, b) == zero);
+        }
+        THEN("The result matches the uint64_t computation")
+        {
+            uint64_t a_large = val_a;
+            uint64_t b_large = val_b;
+
+            uint64_t int_res = a_large / b_large;
+
+            uint32_t small_res = static_cast<uint32_t>(int_res);
+            uinteger<32> result = div(a, b);
+            CHECK(small_res == result.word(0));
+        }
+    }
+}
+
+SCENARIO("Computing the remainder of two uintegers works as expected", "[uinteger][arithmetic]")
+{
+    GIVEN("A fixed test case a=56567 and b=234")
+    {
+        const uint32_t val_a = 56567;
+        const uint32_t val_b = 234;
+
+        const uinteger<32> a{ val_a };
+        const uinteger<32> b{ val_b };
+
+        const uinteger<32> d = div(a, b);
+        const uinteger<32> m = remainder(a, b);
+
+        const uint32_t int_div = val_a / val_b;
+        const uint32_t int_mod = val_a % val_b;
+
+        CHECK(int_div == d.word(0));
+        REQUIRE(int_mod == m.word(0));
+    }
+
+    GIVEN("An uinteger<N> a")
+    {
+
+        const size_t width = 150;
+        auto val_a = GENERATE(take(100, random(1U, 10000000U)));
+
+        uinteger<width> a{ val_a };
+        const uinteger<width> zero{ 0U };
+        const uinteger<width> one{ 1U };
+
+        THEN("Computing the remainder of division by zero should trhow an exception")
+        {
+
+            CHECK_THROWS_AS(remainder(a, zero), std::runtime_error);
+        }
+
+        THEN("A remainder when dividing by 1 should yield zero")
+        {
+            CHECK(remainder(a, one) == zero);
+        }
+        THEN("Computing the remainder of zero should yield 0")
+        {
+
+            CHECK(remainder(zero, a) == zero);
+        }
+    }
+
+    // TODO we can go up to 64 bits here! -> let's do so
+    GIVEN("Two uinteger<N> a and b with N <= 64")
+    {
+
+        uint32_t val_a =
+            GENERATE(1, 56567, 23, static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
+        uint32_t val_b = GENERATE(1, 56567, 23, 234, 76856, 2342353456,
+            static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
+
+        const uinteger<32> a = uinteger<32>::from_words(val_a);
+        const uinteger<32> b = uinteger<32>::from_words(val_b);
+
+        THEN("The result matches the uint64_t computation")
+        {
+
+            uint32_t int_res = val_a % val_b;
+
+            uinteger<32> result = remainder(a, b);
+            CHECK(int_res == result.word(0));
+        }
+    }
 }

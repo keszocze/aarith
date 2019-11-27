@@ -75,7 +75,7 @@ template <size_t BitWidth> void test_uint_add()
         GENERATE(take(4, random_uinteger<BitWidth>(1, uinteger<BitWidth>::word_count())));
     auto const rhs =
         GENERATE(take(4, random_uinteger<BitWidth>(1, uinteger<BitWidth>::word_count())));
-    auto const result = exact_uint_add(lhs, rhs);
+    auto const result = add(lhs, rhs);
     REQUIRE(is_uint_add_correct(lhs, rhs, result));
 }
 
