@@ -7,9 +7,20 @@
 
 namespace aarith {
 
-template <class UInteger> auto generate_bitmask(const size_t bits) -> UInteger
+    /**
+     * @brief Generates an uinteger of given size with the specified number of leading ones.
+     *
+     * Example: generate_bitmask<uinteger<10>(3) = 1110000000
+     *
+     * @tparam UInteger The underlying data type
+     * @param leading_ones The number of leading ones
+     * @return The bit bask consisting of leading_ones ones followed by zeros
+     */
+template <class UInteger> auto generate_bitmask(const size_t leading_ones) -> UInteger
 {
     using word_type = typename UInteger::word_type;
+
+    const size_t bits = UInteger::width() - leading_ones;
 
     constexpr auto full_mask = static_cast<word_type>(-1);
     const auto full_mask_words = bits / static_cast<size_t>(UInteger::word_width());
@@ -37,7 +48,7 @@ approx_operation_post_masking(const UInteger& a, const UInteger b,
                               const size_t bits = UInteger::width())
 {
     const UInteger result = fun(a,b);
-    const UInteger mask = generate_bitmask<UInteger>(UInteger::width() - bits);
+    const UInteger mask = generate_bitmask<UInteger>(bits);
 
     return result & mask;
 }
@@ -81,7 +92,7 @@ template <class UInteger>
 auto approx_add_pre_masking(const UInteger& opd1, const UInteger& opd2,
                             const size_t bits = UInteger::width()) -> UInteger
 {
-    auto const mask = generate_bitmask<UInteger>(UInteger::width() - bits);
+    auto const mask = generate_bitmask<UInteger>(bits);
 
     auto const opd1_masked = opd1 & mask;
     auto const opd2_masked = opd2 & mask;
@@ -96,7 +107,7 @@ auto approx_uint_bitmasking_mul(const uinteger<width>& opd1, const uinteger<widt
 {
     constexpr auto product_width = 2 * width;
 
-    auto const mask = generate_bitmask<uinteger<product_width>>(product_width - bits);
+    auto const mask = generate_bitmask<uinteger<product_width>>(bits);
 
     uinteger<product_width> opd2_extended = width_cast<product_width, width>(opd2);
 
