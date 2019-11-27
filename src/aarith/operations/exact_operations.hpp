@@ -15,10 +15,12 @@ namespace aarith {
  * @tparam V Width of the second summand
  * @param a First summand
  * @param b Second summand
+ * @param initial_carry True if there is an initial carry coming in
  * @return Sum of correct maximal bit width
  */
 template <size_t W, size_t V>
-[[nodiscard]] uinteger<std::max(W, V) + 1> expanding_add(const uinteger<W>& a, const uinteger<V>& b)
+[[nodiscard]] uinteger<std::max(W, V) + 1> expanding_add(const uinteger<W>& a, const uinteger<V>& b,
+                                                         const bool initial_carry = false)
 {
     static_assert(is_integral<uinteger<W>>::value);
     static_assert(is_unsigned<uinteger<W>>::value);
@@ -28,7 +30,11 @@ template <size_t W, size_t V>
     constexpr size_t res_width = std::max(W, V) + 1U;
 
     uinteger<res_width> sum;
-    typename uinteger<res_width>::word_type carry{0};
+    typename uinteger<res_width>::word_type carry{0U};
+    if (initial_carry)
+    {
+        carry = 1U;
+    }
     for (auto i = 0U; i < a.word_count(); ++i)
     {
         auto const partial_sum = a.word(i) + b.word(i) + carry;
@@ -60,34 +66,13 @@ template <size_t W>[[nodiscard]] uinteger<W> add(const uinteger<W>& a, const uin
  * @param b Subtrahend
  * @return Difference between a and b
  */
-template <class UInteger>[[nodiscard]] auto sub(const UInteger& a, const UInteger& b) -> UInteger
+template <size_t W, size_t V>[[nodiscard]] auto sub(const uinteger<W>& a, const uinteger<V>& b) -> uinteger<std::max(W,V)>
 {
-    static_assert(is_integral<UInteger>::value);
-    static_assert(is_unsigned<UInteger>::value);
+    static_assert(is_integral<uinteger<W>>::value);
+    static_assert(is_unsigned<uinteger<W>>::value);
 
-    UInteger sum;
-    typename UInteger::word_type borrow{0};
-    for (auto i = 0U; i < a.word_count(); ++i)
-    {
+    return width_cast<std::max(W,V)>(expanding_add(a, ~b, true));
 
-        auto const a_word = a.word(i);
-        auto const b_word = b.word(i);
-        auto const subtrahend = b_word + borrow;
-        auto const partial_diff = a_word - subtrahend;
-
-        /*
-         * The new borrow originates from either
-         * a) the minuend being smaller than the subtrahend or
-         * b) the subtrahend being smaller than the raw word of the uinteger b
-         *
-         * The case b) arises when the current word of b consists of ones only and there is
-         * an "incoming" borrow.
-         */
-
-        borrow = ((a_word < subtrahend) || (subtrahend < b_word)) ? 1 : 0;
-        sum.set_word(i, partial_diff);
-    }
-    return sum;
 }
 
 /**
