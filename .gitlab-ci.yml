@@ -1,6 +1,7 @@
 stages:
     - compile
     - test
+    - quality
 
 variables:
     GIT_SUBMODULE_STRATEGY: recursive
@@ -23,13 +24,13 @@ try_compiling:
     script:
         - mkdir -p build/bw_output
         - cd build
-        - cmake ..
+        - CC=gcc-8 CXX=g++-8 cmake ..
         - /opt/sonar-build-wrapper/build-wrapper-linux-x86-64 --out-dir bw_output make -j 4 all
 
 
 run_sonarqube:
     extends: .ciconf
-    stage: test # we have to wait for new data to be present in bw_output
+    stage: quality
     script: 
         - echo $CI_COMMIT_REF_NAME
         - sed "s/@@BRANCH_NAME@@/${CI_COMMIT_REF_NAME}/" sonar-project.properties.in >> sonar-project.properties
@@ -38,9 +39,16 @@ run_sonarqube:
 run_tests:
     extends: .ciconf
     stage: test
+    artifacts:
+        paths:
+            - build/tests/coverage
+        expire_in: 30 minutes
     script:
         - cd build/tests
-        #  # the leading dot seems to be necessary
-        - ./uint-test
-        - ./uint-anytime-test
-        
+        - export GCOV_PREFIX_STRIP=10
+        - find -name "*-test" -exec {} \;
+        - ls -l CMakeFiles/uint-test.dir
+        - rm -rf coverage
+        - mkdir -p coverage
+        - /opt/software/usr/local/bin/gcovr --gcov-executable gcov-8 -v --filter '/var/lib/gitlab-runner/builds/.+/0/keszocze/aarith' --object-directory CMakeFiles --sonarqube coverage/coverage.xml 
+        - sed -i -E "s/\/var\/lib\/gitlab-runner\/builds\/[[:alnum:]]+\/[[:digit:]]+\/keszocze\/aarith\///g" coverage/coverage.xml

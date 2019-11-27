@@ -58,6 +58,20 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
                 REQUIRE(result.word(1) == 1);
             }
         }
+        
+        WHEN("There is no carry into the next word")
+        {
+            static constexpr uint64_t number_a = 1ULL << 63;
+            static constexpr uint64_t number_b = 0;
+            const uinteger<TestWidth> a{number_a};
+            const uinteger<TestWidth> b{number_b};
+            auto const result = exact_uint_add(a, b);
+
+            THEN("The next word is unchanged")
+            {
+                REQUIRE(result.word(1) == 0);
+            }
+        }
     }
 }
 
