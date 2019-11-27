@@ -1,8 +1,8 @@
 #pragma once
 
+#include "aarith/types/integer.hpp"
 #include <cstdint>
 #include <iostream>
-#include "aarith/types/integer.hpp"
 
 namespace aarith {
 
@@ -30,7 +30,57 @@ template <class UInteger> auto generate_bitmask(const size_t bits) -> UInteger
 }
 
 template <class UInteger>
-auto approx_uint_bitmasking_add(const UInteger& opd1, const UInteger& opd2, const size_t bits)
+[[nodiscard]] UInteger approx_add_post_masking(const UInteger& a, const UInteger b, const size_t bits=UInteger::width())
+{
+    UInteger result = add(a, b);
+
+    auto const mask = ~generate_bitmask<UInteger>(UInteger::width() - bits);
+
+    return result & mask;
+}
+
+template <class UInteger>
+[[nodiscard]] UInteger approx_mul_post_masking(const UInteger& a, const UInteger b, const size_t bits=UInteger::width())
+{
+    UInteger result = mul(a, b);
+
+    auto const mask = ~generate_bitmask<UInteger>(UInteger::width() - bits);
+
+    return result & mask;
+}
+
+template <class UInteger>
+[[nodiscard]] UInteger approx_sub_post_masking(const UInteger& a, const UInteger b, const size_t bits=UInteger::width())
+{
+    UInteger result = sub(a, b);
+
+    auto const mask = ~generate_bitmask<UInteger>(UInteger::width() - bits);
+
+    return result & mask;
+}
+
+template <class UInteger>
+[[nodiscard]] UInteger approx_div_post_masking(const UInteger& a, const UInteger b, const size_t bits=UInteger::width())
+{
+    UInteger result = div(a, b);
+
+    auto const mask = ~generate_bitmask<UInteger>(UInteger::width() - bits);
+
+    return result & mask;
+}
+
+template <class UInteger>
+[[nodiscard]] UInteger approx_rem_post_masking(const UInteger& a, const UInteger b, const size_t bits=UInteger::width())
+{
+    UInteger result = remainder(a, b);
+
+    auto const mask = ~generate_bitmask<UInteger>(UInteger::width() - bits);
+
+    return result & mask;
+}
+
+template <class UInteger>
+auto approx_add_pre_masking(const UInteger& opd1, const UInteger& opd2, const size_t bits=UInteger::width())
     -> UInteger
 {
     auto const mask = ~generate_bitmask<UInteger>(UInteger::width() - bits);
@@ -43,8 +93,8 @@ auto approx_uint_bitmasking_add(const UInteger& opd1, const UInteger& opd2, cons
 }
 
 template <size_t width>
-auto approx_uint_bitmasking_mul(const uinteger<width>& opd1, const uinteger<width>& opd2, const size_t bits)
-    -> uinteger<2*width>
+auto approx_uint_bitmasking_mul(const uinteger<width>& opd1, const uinteger<width>& opd2,
+                                const size_t bits) -> uinteger<2 * width>
 {
     constexpr auto product_width = 2 * width;
 

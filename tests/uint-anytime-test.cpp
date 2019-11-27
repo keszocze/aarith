@@ -2,7 +2,9 @@
 #include "aarith/operations/exact_operations.hpp"
 #include "aarith/types/integer.hpp"
 #include <aarith/operations/comparisons.hpp>
+#include <aarith/utilities/string_utils.hpp>
 #include <catch.hpp>
+#include <iostream>
 #include <sstream>
 
 using namespace aarith;
@@ -21,6 +23,7 @@ SCENARIO("Generate a bitmask for a certain number of bits", "[uinteger][utlitiy]
 
             THEN("The mask should be 8 bits long")
             {
+                std::cout << to_binary(result) << "\n";
                 REQUIRE(result.word(0) == result_ref);
             }
         }
@@ -61,6 +64,16 @@ SCENARIO("Generate a bitmask for a certain number of bits", "[uinteger][utlitiy]
     }
 }
 
+SCENARIO("Dummy scenario enforcing compilation of newly created methods")
+{
+    const uinteger<32> a{0U};
+    const uinteger<32> b{1U};
+
+    std::cout << approx_add_post_masking(a, b, 10) << approx_sub_post_masking(a, b, 10)
+              << approx_mul_post_masking(a, b, 10) << approx_div_post_masking(a, b, 10)
+              << approx_rem_post_masking(a, b, 10) << "\n";
+}
+
 SCENARIO("Approximate sum of unsigned integers with anytime bitmasking", "[uinteger][arithmetic]")
 {
     GIVEN("Two uintegers with width < word_width")
@@ -74,7 +87,7 @@ SCENARIO("Approximate sum of unsigned integers with anytime bitmasking", "[uinte
             static constexpr uint16_t number_b = 32767U;
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
-            auto const result = approx_uint_bitmasking_add(a, b, 1U);
+            auto const result = approx_add_pre_masking(a, b, 1U);
 
             THEN("It should be number_a")
             {
@@ -87,7 +100,7 @@ SCENARIO("Approximate sum of unsigned integers with anytime bitmasking", "[uinte
             static constexpr uint16_t number_b = 32767U;
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
-            auto const result = approx_uint_bitmasking_add(a, b, 8U);
+            auto const result = approx_add_pre_masking(a, b, 8U);
             auto const result_8bits = 65280U;
 
             THEN("It should be number_a")
@@ -101,7 +114,7 @@ SCENARIO("Approximate sum of unsigned integers with anytime bitmasking", "[uinte
             static constexpr uint16_t number_b = 32767U;
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
-            auto const result = approx_uint_bitmasking_add(a, b, 16U);
+            auto const result = approx_add_pre_masking(a, b, 16U);
             auto const result_16bits = 65535U;
 
             THEN("It should be number_a")
