@@ -11,7 +11,6 @@ add_executable(uint-anytime-test uint-anytime-test.cpp)
 target_link_libraries(uint-anytime-test Catch2::WithMain aarith::Library)
 add_test(NAME uint-anytime-test COMMAND uint-anytime-test)
 
-
 add_executable(bit-operations-test bit_operations-test.cpp)
 target_link_libraries(bit-operations-test Catch2::WithMain aarith::Library)
 add_test(NAME bit-operations-test COMMAND bit-operations-test)
@@ -25,4 +24,23 @@ if(MPIR_FOUND)
   add_test(NAME uint-random-test COMMAND uint-random-test)
 else()
   message(WARNING "Could not find MPIR; not building coverage test")
+endif()
+
+
+## coverage
+
+set(BUILD_COVERAGE_DATA TRUE)
+if(CMAKE_COMPILER_IS_GNUCXX)
+  if("${CMAKE_CXX_COMPILER_ID}" MATCHES "(Apple)?[Cc]lang")
+    if("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS 3)
+      set(BUILD_COVERAGE_DATA FALSE)
+    endif()
+  endif()
+else()
+  set(BUILD_COVERAGE_DATA FALSE)
+endif()
+
+if(BUILD_COVERAGE_DATA)
+  target_compile_options(uint-test PRIVATE --coverage)
+  target_link_options(uint-test PRIVATE --coverage)
 endif()

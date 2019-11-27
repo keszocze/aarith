@@ -7,7 +7,7 @@ sonar.projectVersion=0.1
 sonar.sources=./src
 sonar.cfamily.build-wrapper-output=./build/bw_output
 sonar.sourceEncoding=UTF-8
-
+sonar.coverageReportPaths=./build/tests/coverage/coverage.xml
 
 sonar.branch.name=@@BRANCH_NAME@@
 
