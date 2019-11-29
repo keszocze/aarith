@@ -70,6 +70,12 @@ public:
         return *this = *this + addend;
     }
 
+    auto operator-() const -> sinteger
+    {
+        const sinteger<Width> one(1U);
+        return ~this + one;
+    }
+
     /**
      *
      * @return Whether the number is negative

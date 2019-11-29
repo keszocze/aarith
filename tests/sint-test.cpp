@@ -249,6 +249,12 @@ SCENARIO("Create negative sintegers")
     std::cout << std::bitset<64>{pos_n} << "\n";
     sinteger<64> negative{-1};
     std::cout << negative.word(0) << "\n";
+    std::cout << -negative.word(0) << "\n";
+}
+
+SCENARIO("Test unary negation")
+{
+
 }
 
 // SCENARIO("Right shift operator works as expected", "[sinteger][utility]")
