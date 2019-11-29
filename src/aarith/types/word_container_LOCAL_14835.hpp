@@ -3,7 +3,6 @@
 #include <algorithm>
 
 namespace aarith {
-
 template <size_t Width, class WordType = uint64_t> class word_container
 {
 public:

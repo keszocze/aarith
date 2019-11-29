@@ -66,16 +66,14 @@ template <size_t W>[[nodiscard]] uinteger<W> add(const uinteger<W>& a, const uin
  * @param b Subtrahend
  * @return Difference between a and b
  */
-template <size_t W, size_t V=W>
-[[nodiscard]] auto sub(const uinteger<W>& a, const uinteger<V>& b)
-    -> uinteger<std::max(W, V)>
+template <size_t W, size_t V = W>
+[[nodiscard]] auto sub(const uinteger<W>& a, const uinteger<V>& b) -> uinteger<std::max(W, V)>
 {
     static_assert(is_integral<uinteger<W>>::value);
     static_assert(is_unsigned<uinteger<W>>::value);
 
     return width_cast<std::max(W, V)>(expanding_add(a, ~b, true));
 }
-
 
 /**
  * @brief Multiplies two unsigned integers expanding the bit width so that the result fits.

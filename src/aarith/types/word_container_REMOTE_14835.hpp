@@ -17,19 +17,6 @@ public:
 
     word_container() = default;
 
-    template <class T>
-    explicit word_container(T n)
-        : words{{0}}
-    {
-        static_assert(std::is_integral<T>::value, "Only integral values are supported");
-        static_assert(!std::is_signed<T>::value, "Only unsigned numbers are supported");
-        static_assert(sizeof(T) * 8 <= sizeof(word_type) * 8,
-                      "Only up to 64 bit integers are supported");
-        //        static_assert(sizeof(T) * 8 <= Width, "Data type can not fit provided number");
-
-        words[0] = n;
-    }
-
     template <class... Args> word_container(Args... args)
     {
         set_words(args...);
@@ -55,24 +42,19 @@ public:
     {
         static_assert(V <= Width, "Can not create a word_container from larger container");
 
-        if constexpr (V == Width)
+        if (&other != this)
         {
-            if (&other == this)
+            for (size_t i = 0U; i < other.word_count(); ++i)
             {
-                return *this;
+                set_word(i, other.word(i));
             }
-        }
 
-        for (size_t i = 0U; i < other.word_count(); ++i)
-        {
-            set_word(i, other.word(i));
-        }
-
-        if constexpr (this->word_count() > other.word_count())
-        {
-            for (size_t i = other.word_count(); i < this->word_count(); ++i)
+            if constexpr (this->word_count() > other.word_count())
             {
-                set_word(i, 0U);
+                for (size_t i = other.word_count(); i < this->word_count(); ++i)
+                {
+                    set_word(i, 0U);
+                }
             }
         }
         return *this;
@@ -287,25 +269,4 @@ protected:
     std::array<word_type, word_count()> words{{0}};
 };
 
-template <size_t DestinationWidth, size_t SourceWidth>
-[[nodiscard]] auto width_cast(const word_container<SourceWidth>& source)
-    -> word_container<DestinationWidth>
-{
-    word_container<DestinationWidth> word_container;
-    if constexpr (DestinationWidth >= SourceWidth)
-    {
-        for (auto i = 0U; i < source.word_count(); ++i)
-        {
-            word_container.set_word(i, source.word(i));
-        }
-    }
-    else
-    {
-        for (auto i = 0U; i < word_container.word_count(); ++i)
-        {
-            word_container.set_word(i, source.word(i));
-        }
-    }
-    return word_container;
-}
 } // namespace aarith
