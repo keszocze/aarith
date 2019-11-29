@@ -48,19 +48,24 @@ public:
     {
         static_assert(V <= Width, "Can not create a word_container from larger container");
 
-        if (&other != this)
+        if constexpr (V == Width)
         {
-            for (size_t i = 0U; i < other.word_count(); ++i)
+            if (&other == this)
             {
-                set_word(i, other.word(i));
+                return *this;
             }
+        }
 
-            if constexpr (this->word_count() > other.word_count())
+        for (size_t i = 0U; i < other.word_count(); ++i)
+        {
+            set_word(i, other.word(i));
+        }
+
+        if constexpr (this->word_count() > other.word_count())
+        {
+            for (size_t i = other.word_count(); i < this->word_count(); ++i)
             {
-                for (size_t i = other.word_count(); i < this->word_count(); ++i)
-                {
-                    set_word(i, 0U);
-                }
+                set_word(i, 0U);
             }
         }
         return *this;
@@ -93,8 +98,8 @@ public:
     /**
      * @brief Returns ths most significant bit.
      *
-     * The most significant bit is the Width's one (i.e. the one you can get via bit(Width-1)). This method is simply
-     * there for convenience.
+     * The most significant bit is the Width's one (i.e. the one you can get via bit(Width-1)). This
+     * method is simply there for convenience.
      */
     [[nodiscard]] auto msg() const -> bit_type
     {

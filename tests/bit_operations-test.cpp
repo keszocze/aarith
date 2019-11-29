@@ -138,18 +138,18 @@ SCENARIO("Copy constructor of word_containers with various bit widths", "[word_c
                     CHECK(b.word(0) == val_b);
                     CHECK(b.word(1) == 0U);
                 }
-//                THEN("The assignment operator should work")
-//                {
-//                    word_container<128> b;
-//                    b = tmp;
-//                    CHECK(b.word(0) == val_b);
-//                    CHECK(b.word(1) == 0U);
-//
-//                    a = tmp;
-//                    CHECK(a.word(0) == val_b);
-//                    CHECK(a.word(1) == 0U);
-//                    CHECK(a.word(2) == 0U);
-//                }
+                THEN("The assignment operator should work")
+                {
+                    word_container<128> b;
+                    b = tmp;
+                    CHECK(b.word(0) == val_b);
+                    CHECK(b.word(1) == 0U);
+
+                    a = tmp;
+                    CHECK(a.word(0) == val_b);
+                    CHECK(a.word(1) == 0U);
+                    CHECK(a.word(2) == 0U);
+                }
             }
         }
     }
