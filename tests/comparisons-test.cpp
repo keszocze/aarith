@@ -44,8 +44,8 @@ SCENARIO("Comparing two uintegers", "[uinteger][utility]")
         WHEN("N > word_width")
         {
             const size_t TestWidth = 80;
-            auto const a = uinteger<TestWidth>::from_words(7, 0);
-            auto const b = uinteger<TestWidth>::from_words(23, 0);
+            uinteger<TestWidth> const a{7,0};
+            uinteger<TestWidth> const b{23,0};
 
             THEN("operator< returns true")
             {

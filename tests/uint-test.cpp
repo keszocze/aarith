@@ -53,7 +53,7 @@ SCENARIO("Copy constructor of uintegers with various bit widths", "[uinteger][ut
         //        const uint64_t val_a = GENERATE(take(10, random(0U,
         //        std::numeric_limits<uint64_t>::max()));
         const uint64_t val_a = 24;
-        uinteger<196> a = uinteger<196>::from_words(0U, val_a, 0U);
+        uinteger<196> a(0U,val_a,0U);
 
         THEN("Assignment of individual words is correct")
         {

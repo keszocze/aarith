@@ -58,7 +58,7 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
                 REQUIRE(result.word(1) == 1);
             }
         }
-        
+
         WHEN("There is no carry into the next word")
         {
             static constexpr uint64_t number_a = 1ULL << 63;
@@ -131,11 +131,11 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
                     const uint64_t zero = 0u;
                     const uint64_t one = 1u;
 
-                    const uinteger<192> a = uinteger<192>::from_words(one, zero, zero);
-                    const uinteger<192> b = uinteger<192>::from_words(zero, all_ones, one);
+                    const uinteger<192> a(one, one, zero);
+                    const uinteger<192> b(zero, all_ones, one);
 
                     const uinteger<192> result = sub(a, b);
-                    const uinteger<192> expected = uinteger<192>::from_words(zero, zero, all_ones);
+                    const uinteger<192> expected(zero, zero, all_ones);
 
                     REQUIRE(expected == result);
                 }
@@ -149,10 +149,10 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
         {
             AND_WHEN("There is a borrow between words")
             {
-                auto const a = uinteger<128>::from_words(1, 0);
-                auto const b = uinteger<128>::from_words(0, 1);
-                auto const expected = uinteger<128>::from_words(0, static_cast<uint64_t>(-1));
-                auto const result = sub(a, b);
+                uinteger<128> const a(1, 0);
+                uinteger<128> const b(0, 1);
+                uinteger<128> const expected(0, static_cast<uint64_t>(-1));
+                uinteger<128> const result = sub(a, b);
 
                 THEN("The result borrow is subtracted from the next word")
                 {
@@ -161,9 +161,9 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
             }
             AND_WHEN("There is no borrow between words")
             {
-                auto const a = uinteger<128>::from_words(1, 1);
-                auto const b = uinteger<128>::from_words(0, 1);
-                auto const expected = uinteger<128>::from_words(1, 0);
+                uinteger<128> const a(1, 1);
+                uinteger<128> const b(0, 1);
+                uinteger<128> const expected(1, 0);
                 auto const result = sub(a, b);
 
                 THEN("No borrow is subtracted from the next word")
@@ -186,8 +186,8 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplica
         uint32_t val_b = GENERATE(0, 1, 56567, 23, 234, 76856, 2342353456,
                                   static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
 
-        const uinteger<32> a = uinteger<32>::from_words(val_a);
-        const uinteger<32> b = uinteger<32>::from_words(val_b);
+        const uinteger<32> a(val_a);
+        const uinteger<32> b(val_b);
 
         THEN("Multiplication should be commutative")
         {
@@ -216,13 +216,12 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplica
     {
         uint64_t val = 1;
         val = val << 35;
-        auto const a = uinteger<128>::from_words(1, val);
-        auto const c = uinteger<128>::from_words(13435, 345897);
-        auto const d =
-            uinteger<128>::from_words(static_cast<typename uinteger<128>::word_type>(-1),
-                                      static_cast<typename uinteger<128>::word_type>(-1));
-        auto const zero = uinteger<128>::from_words(0, 0);
-        auto const one = uinteger<128>::from_words(0, 1);
+        uinteger<128> const a(1, val);
+        uinteger<128> const c(13435, 345897);
+        uinteger<128> const d(static_cast<typename uinteger<128>::word_type>(-1),
+                              static_cast<typename uinteger<128>::word_type>(-1));
+        uinteger<128> const zero(0, 0);
+        uinteger<128> const one(0, 1);
 
         const std::vector<uinteger<128>> numbers{a, c, d, one, zero};
 
@@ -330,12 +329,12 @@ SCENARIO("Bit and Word operations work correctly", "[uinteger][utility]")
     }
     WHEN("Two uinteger<N>'s are created")
     {
-        AND_WHEN("One is created via ::from_words and the other uses .set_word")
+        AND_WHEN("One is created via var args constructor and the other uses .set_word")
         {
             THEN("The resulting uinteger<N>'s should be identical")
             {
                 const uint64_t ones = static_cast<uint64_t>(-1);
-                auto const a = uinteger<15>::from_words(ones);
+                uinteger<15> const a(ones);
                 uinteger<15> b;
                 b.set_word(0, ones);
 
@@ -486,7 +485,6 @@ SCENARIO("Computing the remainder of two uintegers works as expected", "[uintege
             uint64_t rem_int = val_a % val_b;
             CHECK(quot_int == quotient.word(0));
             CHECK(rem_int == remainder.word(0));
-
         }
     }
 }

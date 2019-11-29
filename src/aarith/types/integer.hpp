@@ -2,6 +2,7 @@
 
 #include "aarith/utilities/bit_operations.hpp"
 #include "traits.hpp"
+#include <aarith/types/word_container.hpp>
 #include <algorithm>
 #include <array>
 #include <cstdint>
@@ -12,180 +13,33 @@
 
 namespace aarith {
 
-template <size_t Width> class uinteger
+template <size_t Width, class WordType = uint64_t>
+class uinteger : public word_container<Width, WordType>
 {
 public:
-    using word_type = uint64_t;
-    using bit_type = word_type;
-    static_assert(Width > 0, "Width must be at least 1 (bit)");
-
     uinteger() = default;
 
-    template <class T>
-    explicit uinteger(T n)
-        : words{{0}}
+    template <class T> explicit uinteger(T n)
     {
         static_assert(std::is_integral<T>::value, "Only integral values are supported");
         static_assert(!std::is_signed<T>::value, "Only unsigned numbers are supported");
-        static_assert(sizeof(T) * 8 <= sizeof(word_type) * 8,
+        static_assert(sizeof(T) * 8 <= sizeof(typename word_container<Width>::word_type) * 8,
                       "Only up to 64 bit integers are supported");
         //        static_assert(sizeof(T) * 8 <= Width, "Data type can not fit provided number");
 
-        words[0] = n;
+        this->words[0] = n;
     }
 
-    template <size_t V> uinteger(const uinteger<V>& other)
+    template <class... Args>
+    uinteger(Args... args)
+        : word_container<Width>(args...)
     {
-        static_assert(V <= Width, "Can not create an uinteger from larger uinteger");
-
-        for (auto i = 0U; i < other.word_count(); ++i)
-        {
-            set_word(i, other.word(i));
-        }
-    }
-    template <size_t V> uinteger<Width> operator=(const uinteger<V>& other)
-    {
-        static_assert(V <= Width, "Can not create an uinteger from larger uinteger");
-
-        if constexpr (V == Width)
-        {
-            if (&other == this)
-            {
-                return *this;
-            }
-        }
-
-        for (size_t i = 0U; i < other.word_count(); ++i)
-        {
-            set_word(i, other.word(i));
-        }
-
-        if constexpr (this->word_count() > other.word_count())
-        {
-            for (size_t i = other.word_count(); i < this->word_count(); ++i)
-            {
-                set_word(i, 0U);
-            }
-        }
-        return *this;
     }
 
-    template <class... Args> static auto from_words(Args... args) -> uinteger
+    template <size_t V>
+    uinteger<Width, WordType>(const uinteger<V, WordType>& other)
+        : word_container<Width>(static_cast<const word_container<V, WordType>&>(other))
     {
-        uinteger uint;
-        uint.set_words(args...);
-        return uint;
-    }
-
-    [[nodiscard]] static constexpr auto word_width() noexcept -> size_t
-    {
-        return sizeof(word_type) * 8;
-    }
-
-    [[nodiscard]] static constexpr auto word_count() noexcept -> size_t
-    {
-        return size_in_words<word_type>(Width);
-    }
-
-    [[nodiscard]] static constexpr auto word_mask(size_t index) noexcept -> word_type
-    {
-
-        constexpr word_type other_masks = static_cast<word_type>(-1); // all ones, e.g. no masking
-        constexpr word_type last_mask =
-            (width() % word_width() != 0)
-                ? (static_cast<word_type>(1) << (width() % word_width())) - 1
-                : static_cast<word_type>(-1);
-        return (index == word_count() - 1) ? last_mask : other_masks;
-    };
-
-    [[nodiscard]] static constexpr auto width() noexcept -> size_t
-    {
-        return Width;
-    }
-
-    [[nodiscard]] auto word(size_t index) const -> word_type
-    {
-        return words[index];
-    }
-
-    void set_bit(size_t index, bool value = true)
-    {
-        if (index >= width())
-        {
-            std::string msg;
-            msg += "Trying to access bit with index ";
-            msg += std::to_string(index);
-            msg += " for uinteger<";
-            msg += std::to_string(width());
-            msg += "> with max index ";
-            msg += std::to_string(width() - 1);
-            throw std::out_of_range(msg);
-        }
-        const size_t word_index = index / word_width();
-        const size_t inner_word_index = index % word_width();
-        word_type mask = (1ULL << inner_word_index);
-
-        if (value)
-        {
-            words[word_index] |= mask;
-        }
-        else
-        {
-            words[word_index] &= ~mask;
-        }
-    }
-
-    void set_word(size_t index, word_type value)
-    {
-        if (index >= word_count())
-        {
-            std::string msg;
-            msg += "Trying to access word with index ";
-            msg += std::to_string(index);
-            msg += " for uinteger<";
-            msg += std::to_string(width());
-            msg += "> with max index ";
-            msg += std::to_string(word_count() - 1);
-
-            throw std::out_of_range(msg);
-        }
-        words[index] = value & word_mask(index);
-    }
-
-    // Sets the words to the given values, where the rightern-most argument corresponds to word 0.
-    template <class... Args> void set_words(Args... args)
-    {
-        set_word_recursively<0>(args...);
-    }
-
-    static constexpr auto word_index(size_t bit_index) -> size_t
-    {
-        return bit_index / word_width();
-    }
-
-    void set_bit(size_t index, bit_type value)
-    {
-        auto const the_word = word(word_index(index));
-        auto const masked_word = the_word & ~(static_cast<word_type>(1) << (index % word_width()));
-        set_word(word_index(index),
-                 masked_word | (static_cast<word_type>(value & 1) << (index % word_width())));
-    }
-
-    auto bit(size_t index) const -> bit_type
-    {
-        auto const the_word = word(index / word_width());
-        auto const masked_bit = the_word & (static_cast<word_type>(1) << (index % word_width()));
-        return static_cast<bit_type>(masked_bit > 0 ? 1 : 0);
-    }
-
-    template <size_t Count> auto bits(size_t index) const -> uinteger<Count>
-    {
-        uinteger<Count> result;
-        for (auto i = 0U; i < Count; ++i)
-        {
-            result.set_bit(i, bit(index + i));
-        }
-        return result;
     }
 
     auto operator<<=(const size_t shift_by) -> uinteger&
@@ -202,81 +56,6 @@ public:
     {
         return *this = *this + addend;
     }
-
-    [[nodiscard]] bool is_zero() const noexcept
-    {
-        return std::all_of(words.begin(), words.end(), [](const word_type& w) {
-            word_type zero = 0U;
-            return w == zero;
-        });
-    }
-
-    [[nodiscard]] explicit operator bool() const noexcept
-    {
-        return std::any_of(words.begin(), words.end(), [](const word_type& w) {
-            word_type zero = 0U;
-            return w != zero;
-        });
-    }
-
-    constexpr auto begin() const noexcept
-    {
-        return words.begin();
-    }
-
-    constexpr auto end() const noexcept
-    {
-        return words.end();
-    }
-
-    constexpr auto cbegin() const noexcept
-    {
-        return words.cbegin();
-    }
-
-    constexpr auto cend() const noexcept
-    {
-        return words.cend();
-    }
-
-    constexpr auto rbegin() const noexcept
-    {
-        return words.rbegin();
-    }
-
-    constexpr auto rend() const noexcept
-    {
-        return words.rend();
-    }
-
-    constexpr auto crbegin() const noexcept
-    {
-        return words.bcregin();
-    }
-
-    constexpr auto crend() const noexcept
-    {
-        return words.crend();
-    }
-
-private:
-    template <size_t index, class... Args>
-    auto set_word_recursively(word_type value, Args... args) -> size_t
-    {
-        static_assert(index < word_count(), "too many initializer words");
-        auto const count = set_word_recursively<index + 1>(args...);
-        words[count - index] = value & word_mask(index);
-        return count;
-    }
-
-    template <size_t index> auto set_word_recursively(word_type value) -> size_t
-    {
-        static_assert(index < word_count(), "too many initializer words");
-        words[0] = value & word_mask(index);
-        return index;
-    }
-
-    std::array<word_type, word_count()> words{{0}};
 };
 
 template <size_t Width> class is_integral<uinteger<Width>>
