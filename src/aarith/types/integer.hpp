@@ -199,4 +199,14 @@ template <size_t Width> auto count_leading_zeroes(const uinteger<Width>& value) 
     return Width;
 }
 
+    template <size_t DestinationWidth, size_t SourceWidth>
+    [[nodiscard]] auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>
+    {
+        word_container<SourceWidth> in = static_cast<const word_container<SourceWidth>&>(source);
+
+        word_container<DestinationWidth> result = width_cast<DestinationWidth>(in);
+
+        return static_cast<uinteger<DestinationWidth>>(result);
+    }
+
 } // namespace aarith
