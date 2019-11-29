@@ -100,12 +100,7 @@ public:
 
 template <size_t Width> auto abs_two_complement(const sinteger<Width>& value) -> sinteger<Width>
 {
-    if (value.is_negative())
-    {
-        const sinteger<Width> one(1U);
-        return ~value + one;
-    }
-    return value;
+    return value.is_negative() ? -value : value;
 }
 
 template <size_t Width>
