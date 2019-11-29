@@ -380,3 +380,67 @@ SCENARIO("Logical NOT works as expected", "[word_container][bit_logic]")
         }
     }
 }
+
+SCENARIO("Checking whether an word_container is not equal to zero/false")
+{
+    GIVEN("An word_container<N>=0=a for various N")
+    {
+        THEN("a.is_zero() should be true")
+        {
+
+            const uint8_t zero = 0U;
+
+            CHECK(word_container<64>{zero}.is_zero());
+            CHECK(word_container<128>{zero}.is_zero());
+            CHECK(word_container<150>{zero}.is_zero());
+            CHECK(word_container<32>{zero}.is_zero());
+            CHECK(word_container<23>{zero}.is_zero());
+            CHECK(word_container<256>{zero}.is_zero());
+            CHECK(word_container<1337>{zero}.is_zero());
+            CHECK(word_container<8>{zero}.is_zero());
+        }
+        THEN("a should evaluate to false in a Boolean context")
+        {
+
+            const uint8_t zero = 0U;
+
+            CHECK_FALSE(word_container<64>{zero});
+            CHECK_FALSE(word_container<128>{zero});
+            CHECK_FALSE(word_container<150>{zero});
+            CHECK_FALSE(word_container<32>{zero});
+            CHECK_FALSE(word_container<23>{zero});
+            CHECK_FALSE(word_container<256>{zero});
+            CHECK_FALSE(word_container<1337>{zero});
+            CHECK_FALSE(word_container<8>{zero});
+        }
+    }
+
+    GIVEN("A non-zero word_container")
+    {
+
+        uint64_t val = GENERATE(1, 2, 4, 5567868, 234, 21, 45, 56768);
+        word_container<64> a{val};
+        word_container<128> b = word_container<128>::from_words(val, 0U);
+        word_container<128> c = word_container<128>::from_words(val, val);
+
+        word_container<150> d = word_container<150>::from_words(val, 0U, 0U);
+        word_container<256> e = word_container<256>::from_words(val, val, 0U, 0U);
+
+        THEN("is_zero should correctly return this fact")
+        {
+            CHECK_FALSE(a.is_zero());
+            CHECK_FALSE(b.is_zero());
+            CHECK_FALSE(c.is_zero());
+            CHECK_FALSE(d.is_zero());
+            CHECK_FALSE(e.is_zero());
+        }
+        THEN("The integer should evaluate to true in a Boolean context")
+        {
+            CHECK(a);
+            CHECK(b);
+            CHECK(c);
+            CHECK(d);
+            CHECK(e);
+        }
+    }
+}
