@@ -52,7 +52,7 @@ SCENARIO("Counting bits in word_container", "[util]")
 }
 
 
-SCENARIO("Casting uintegers into different width", "[uinteger]")
+SCENARIO("Casting word_containers into different width", "[word_container]")
 {
     GIVEN("width_cast is called")
     {
@@ -86,6 +86,70 @@ SCENARIO("Casting uintegers into different width", "[uinteger]")
             AND_THEN("The result is cut off")
             {
                 REQUIRE(result.word(0) == (test_value & 0xff));
+            }
+        }
+    }
+}
+
+
+
+SCENARIO("Copy constructor of word_containers with various bit widths", "[word_container][utility]")
+{
+    GIVEN("An word_container<N> a")
+    {
+
+        //        const uint64_t val_a = GENERATE(take(10, random(0U,
+        //        std::numeric_limits<uint64_t>::max()));
+        const uint64_t val_a = 24;
+        word_container<196> a(0U,val_a,0U);
+
+        THEN("Assignment of individual words is correct")
+        {
+            CHECK(a.word(0) == 0U);
+            CHECK(a.word(1) == val_a);
+            CHECK(a.word(2) == 0U);
+        }
+
+        AND_GIVEN("An word_container<N> b")
+        {
+            const uint64_t val_b = 1337;
+            const word_container<196> b = word_container<196>::from_words(val_b, 0U, 2 * val_b);
+
+            THEN("Assignment opeator of individual words is correct")
+            {
+
+                a = b;
+                CHECK(a.word(0) == 2 * val_b);
+                CHECK(a.word(1) == 0U);
+                CHECK(a.word(2) == val_b);
+            }
+        }
+        AND_GIVEN("An word_container<M> b")
+        {
+            WHEN("M < N")
+            {
+                const uint64_t val_b = 23;
+                const word_container<64> tmp = word_container<64>::from_words(val_b);
+
+                THEN("The copy constructor should work")
+                {
+                    word_container<128> b{tmp};
+
+                    CHECK(b.word(0) == val_b);
+                    CHECK(b.word(1) == 0U);
+                }
+//                THEN("The assignment operator should work")
+//                {
+//                    word_container<128> b;
+//                    b = tmp;
+//                    CHECK(b.word(0) == val_b);
+//                    CHECK(b.word(1) == 0U);
+//
+//                    a = tmp;
+//                    CHECK(a.word(0) == val_b);
+//                    CHECK(a.word(1) == 0U);
+//                    CHECK(a.word(2) == 0U);
+//                }
             }
         }
     }
