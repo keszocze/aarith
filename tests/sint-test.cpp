@@ -3,6 +3,7 @@
 #include <aarith/utilities/string_utils.hpp>
 #include <catch.hpp>
 #include <sstream>
+#include <bitset>
 
 using namespace aarith;
 
@@ -242,6 +243,12 @@ SCENARIO("Left shift operator works as expected", "[sinteger][bit_logic]")
 
 SCENARIO("Create negative sintegers")
 {
+    int64_t n = -1;
+    uint64_t pos_n = static_cast<uint64_t >(n);
+    std::cout << n << "\t" << pos_n << "\n";
+    std::cout << std::bitset<64>{pos_n} << "\n";
+    sinteger<64> negative{-1};
+    std::cout << negative.word(0) << "\n";
 }
 
 // SCENARIO("Right shift operator works as expected", "[sinteger][utility]")
