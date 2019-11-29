@@ -1,7 +1,7 @@
 #pragma once
 
-#include <algorithm>
 #include <aarith/utilities/bit_operations.hpp>
+#include <algorithm>
 
 namespace aarith {
 
@@ -90,6 +90,25 @@ public:
         return words[index];
     }
 
+    /**
+     * @brief Returns ths most significant bit.
+     *
+     * The most significant bit is the Width's one (i.e. the one you can get via bit(Width-1)). This method is simply
+     * there for convenience.
+     */
+    [[nodiscard]] auto msg() const -> bit_type
+    {
+        return bit(Width - 1);
+    }
+
+    /**
+     * @brief Returns bit at given index.
+     *
+     * @note No bounds checking is performed! If your index is too large bad things will happen!
+     *
+     * @param index The index for which the bit is to be returned
+     * @return  The bit at the indexed position
+     */
     auto bit(size_t index) const -> bit_type
     {
         auto const the_word = word(index / word_width());
@@ -169,7 +188,6 @@ public:
         }
         words[index] = value & word_mask(index);
     }
-    
 
     // Sets the words to the given values, where the right-most argument corresponds to word 0.
     template <class... Args> void set_words(Args... args)
@@ -337,7 +355,7 @@ template <size_t Width> auto count_leading_zeroes(const word_container<Width>& v
     {
         if (value.bit(i - 1))
         {
-            return (Width-i);
+            return (Width - i);
         }
     }
     return Width;
