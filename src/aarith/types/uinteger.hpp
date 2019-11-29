@@ -143,15 +143,7 @@ auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
     return shifted;
 }
 
-template <size_t Width> auto abs_two_complement(const uinteger<Width>& value) -> uinteger<Width>
-{
-    if (value.bit(Width - 1) == 1)
-    {
-        const uinteger<Width> one(1U);
-        return ~value + one;
-    }
-    return value;
-}
+
 
 template <size_t Width>
 [[nodiscard]] auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
