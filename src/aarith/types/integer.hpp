@@ -187,17 +187,7 @@ template <size_t Width> auto abs_two_complement(const uinteger<Width>& value) ->
     return value;
 }
 
-template <size_t Width> auto count_leading_zeroes(const uinteger<Width>& value) -> size_t
-{
-    for (auto i = Width; i > 0; --i)
-    {
-        if (value.bit(i - 1))
-        {
-            return i;
-        }
-    }
-    return Width;
-}
+
 
     template <size_t DestinationWidth, size_t SourceWidth>
     [[nodiscard]] auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>

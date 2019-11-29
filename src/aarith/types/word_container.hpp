@@ -295,4 +295,16 @@ protected:
         return word_container;
     }
 
+    template <size_t Width> auto count_leading_zeroes(const word_container<Width>& value) -> size_t
+    {
+        for (auto i = Width; i > 0; --i)
+        {
+            if (value.bit(i - 1))
+            {
+                return i;
+            }
+        }
+        return Width;
+    }
+
 } // namespace aarith
