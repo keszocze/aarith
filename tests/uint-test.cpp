@@ -505,7 +505,7 @@ SCENARIO("Checking whether an uinteger is not equal to zero/false")
         }
     }
 
-    GIVEN("An non-zero uinteger")
+    GIVEN("A non-zero uinteger")
     {
 
         uint64_t val = GENERATE(1, 2, 4, 5567868, 234, 21, 45, 56768);
