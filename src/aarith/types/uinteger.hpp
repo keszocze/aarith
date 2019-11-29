@@ -70,23 +70,23 @@ public:
     static constexpr bool value = true;
 };
 
-    template <size_t Width>
-    [[nodiscard]] auto operator<<(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
+template <size_t Width>
+[[nodiscard]] auto operator<<(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
+{
+    if (rhs >= Width)
     {
-        if (rhs >= Width)
-        {
-            return uinteger<Width>(0U);
-        }
-        if (rhs == 0)
-        {
-            return lhs;
-        }
-
-        word_container<Width> tmp{lhs};
-        uinteger<Width> shifted{tmp << rhs};
-
-        return shifted;
+        return uinteger<Width>(0U);
     }
+    if (rhs == 0)
+    {
+        return lhs;
+    }
+
+    word_container<Width> tmp{lhs};
+    uinteger<Width> shifted{tmp << rhs};
+
+    return shifted;
+}
 
 template <size_t Width>
 auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
@@ -100,32 +100,11 @@ auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
         return lhs;
     }
 
-    uinteger<Width> shifted;
-    const auto skip_words = rhs / lhs.word_width();
-    const auto shift_word_right = rhs - skip_words * lhs.word_width();
-    const auto shift_word_left = lhs.word_width() - shift_word_right;
-
-    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
-    {
-        if (skip_words <= counter)
-        {
-            typename uinteger<Width>::word_type new_word;
-            new_word = lhs.word(counter) >> shift_word_right;
-            if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
-            {
-                new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
-            }
-            shifted.set_word(counter - skip_words, new_word);
-        }
-    }
-    typename uinteger<Width>::word_type new_word;
-    new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
-    shifted.set_word(lhs.word_count() - skip_words - 1, new_word);
-
+    word_container<Width> tmp{lhs};
+    uinteger<Width> shifted{tmp >> rhs};
     return shifted;
+
 }
-
-
 
 template <size_t Width>
 [[nodiscard]] auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)

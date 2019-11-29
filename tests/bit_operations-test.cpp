@@ -2,6 +2,7 @@
 
 #include <aarith/types/word_container.hpp>
 #include <aarith/utilities/bit_operations.hpp>
+#include <aarith/operations/word_container_comparisons.hpp>
 using namespace aarith;
 
 SCENARIO("Splitting uint64_ts", "[util]")
@@ -322,6 +323,136 @@ SCENARIO("Left shift operator works as expected", "[word_container][bit_logic]")
         }
     }
 }
+
+SCENARIO("Right shift operator works as expected", "[word_container][utility]")
+{
+    GIVEN("One word_container a and a number of shifted bits s")
+    {
+        WHEN("The bits are not shifted")
+        {
+            const size_t Width = 192;
+
+            typename word_container<Width>::word_type number_a = 3;
+            number_a <<= word_container<Width>::word_width() - 2;
+            static constexpr auto s = 0;
+            word_container<Width> a(0U);
+            a.set_word(a.word_count() - 1, number_a);
+
+            const auto result = a >> s;
+            REQUIRE(result.word(a.word_count() - 3) == 0);
+            REQUIRE(result.word(a.word_count() - 2) == 0);
+            REQUIRE(result.word(a.word_count() - 1) == number_a);
+        }
+        WHEN("The bits are shifted exactly one word")
+        {
+            const size_t Width = 192;
+
+            typename word_container<Width>::word_type number_a = 3;
+            number_a <<= word_container<Width>::word_width() - 2;
+            static constexpr auto s = static_cast<size_t>(word_container<Width>::word_width());
+            word_container<Width> a(0U);
+            a.set_word(a.word_count() - 1, number_a);
+
+            const auto result = a >> s;
+            REQUIRE(result.word(a.word_count() - 3) == 0);
+            REQUIRE(result.word(a.word_count() - 2) == number_a);
+            REQUIRE(result.word(a.word_count() - 1) == 0);
+        }
+        WHEN("The bits are shifted exactly two words")
+        {
+            const size_t Width = 192;
+
+            typename word_container<Width>::word_type number_a = 3;
+            number_a <<= word_container<Width>::word_width() - 2;
+            static constexpr auto s = 2 * static_cast<size_t>(word_container<Width>::word_width());
+            word_container<Width> a(0U);
+            a.set_word(a.word_count() - 1, number_a);
+
+            const auto result = a >> s;
+            REQUIRE(result.word(a.word_count() - 3) == number_a);
+            REQUIRE(result.word(a.word_count() - 2) == 0);
+            REQUIRE(result.word(a.word_count() - 1) == 0);
+        }
+        WHEN("The bits are shifted exactly by word_width-1")
+        {
+            const size_t Width = 192;
+
+            typename word_container<Width>::word_type number_a = 3;
+            number_a <<= word_container<Width>::word_width() - 2;
+            static constexpr auto s = static_cast<size_t>(word_container<Width>::word_width()) - 1;
+            word_container<Width> a(0U);
+            a.set_word(a.word_count() - 1, number_a);
+
+            auto ref = number_a << 1;
+
+            const auto result = a >> s;
+            REQUIRE(result.word(a.word_count() - 3) == 0);
+            REQUIRE(result.word(a.word_count() - 2) == ref);
+            REQUIRE(result.word(a.word_count() - 1) == 1);
+        }
+        WHEN("The bits are shifted by 2*word_width-1")
+        {
+            const size_t Width = 192;
+
+            typename word_container<Width>::word_type number_a = 3;
+            number_a <<= word_container<Width>::word_width() - 2;
+            static constexpr auto s = 2 * static_cast<size_t>(word_container<Width>::word_width()) - 1;
+            word_container<Width> a(0U);
+            a.set_word(a.word_count() - 1, number_a);
+
+            auto ref = number_a << 1;
+
+            const auto result = a >> s;
+            REQUIRE(result.word(a.word_count() - 3) == ref);
+            REQUIRE(result.word(a.word_count() - 2) == 1);
+            REQUIRE(result.word(a.word_count() - 1) == 0);
+        }
+        WHEN("The shift amount is a multiple of the word width")
+        {
+
+            THEN("The result should still be correct")
+            {
+                static constexpr size_t width = 256;
+                static constexpr size_t word_width = word_container<width>::word_width();
+
+                static const word_container<width> a{1U};
+                static const word_container<width> expected0 =
+                        word_container<width>::from_words(0U, 0U, 0U, 1U);
+                static const word_container<width> expected1 =
+                        word_container<width>::from_words(0U, 0U, 1U, 0U);
+                static const word_container<width> expected2 =
+                        word_container<width>::from_words(0U, 1U, 0U, 0U);
+                static const word_container<width> expected3 =
+                        word_container<width>::from_words(1U, 0U, 0U, 0U);
+                static const word_container<width> expected4 =
+                        word_container<width>::from_words(0U, 0U, 0U, 0U);
+
+                std::vector<word_container<width>> expecteds{expected0, expected1, expected2, expected3,
+                                                       expected4};
+
+                for (auto i = 0U; i < expecteds.size(); ++i)
+                {
+                    word_container<width> result = a << (word_width * i);
+                    CHECK(result == expecteds[i]);
+                }
+            }
+        }
+
+        AND_WHEN("The shift amount is the integer width")
+        {
+            THEN("The result should still be correct")
+            {
+                const size_t w = 128;
+                const word_container<w> a{1U};
+                const word_container<w> expected;
+                const word_container<w> result = a << w;
+
+                CHECK(expected == result);
+            }
+        }
+    }
+}
+
 
 SCENARIO("Logical AND works as expected", "[word_container][bit_logic]")
 {

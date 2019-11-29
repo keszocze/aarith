@@ -367,7 +367,8 @@ template <size_t Width> auto count_leading_zeroes(const word_container<Width>& v
 }
 
 template <size_t Width>
-[[nodiscard]] auto operator<<(const word_container<Width>& lhs, const size_t rhs) -> word_container<Width>
+[[nodiscard]] auto operator<<(const word_container<Width>& lhs, const size_t rhs)
+    -> word_container<Width>
 {
     if (rhs >= Width)
     {
@@ -398,6 +399,43 @@ template <size_t Width>
     typename word_container<Width>::word_type new_word;
     new_word = lhs.word(0) << shift_word_left;
     shifted.set_word(skip_words, new_word);
+
+    return shifted;
+}
+
+template <size_t Width>
+auto operator>>(const word_container<Width>& lhs, const size_t rhs) -> word_container<Width>
+{
+    if (rhs >= Width)
+    {
+        return word_container<Width>(0U);
+    }
+    if (rhs == 0)
+    {
+        return lhs;
+    }
+
+    word_container<Width> shifted;
+    const auto skip_words = rhs / lhs.word_width();
+    const auto shift_word_right = rhs - skip_words * lhs.word_width();
+    const auto shift_word_left = lhs.word_width() - shift_word_right;
+
+    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
+    {
+        if (skip_words <= counter)
+        {
+            typename word_container<Width>::word_type new_word;
+            new_word = lhs.word(counter) >> shift_word_right;
+            if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
+            {
+                new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
+            }
+            shifted.set_word(counter - skip_words, new_word);
+        }
+    }
+    typename word_container<Width>::word_type new_word;
+    new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
+    shifted.set_word(lhs.word_count() - skip_words - 1, new_word);
 
     return shifted;
 }
