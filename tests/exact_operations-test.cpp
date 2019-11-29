@@ -136,7 +136,7 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
                     const uinteger<192> b(zero, all_ones, one);
 
                     const uinteger<192> result = sub(a, b);
-                    const uinteger<192> expected(zero, zero, all_ones);
+                    const uinteger<192> expected(zero, one, all_ones);
 
                     REQUIRE(expected == result);
                 }
