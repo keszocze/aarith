@@ -110,41 +110,41 @@ template <size_t Width>
 [[nodiscard]] auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
     -> uinteger<Width>
 {
-    word_container<Width> lhs_w = static_cast<const word_container<Width>&>(lhs);
-    word_container<Width> rhs_w = static_cast<const word_container<Width>&>(rhs);
+    word_container<Width> lhs_w{lhs};
+    word_container<Width> rhs_w{rhs};
 
     word_container<Width> result = lhs_w & rhs_w;
 
-    return static_cast<uinteger<Width>>(result);
+    return uinteger<Width>{result};
 }
 
 template <size_t Width>
 [[nodiscard]] auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
     -> uinteger<Width>
 {
-    word_container<Width> lhs_w = static_cast<const word_container<Width>&>(lhs);
-    word_container<Width> rhs_w = static_cast<const word_container<Width>&>(rhs);
+    word_container<Width> lhs_w{lhs};
+    word_container<Width> rhs_w{rhs};
 
     word_container<Width> result = lhs_w | rhs_w;
 
-    return static_cast<uinteger<Width>>(result);
+    return uinteger<Width>{result};
 }
 
 template <size_t Width>[[nodiscard]] auto operator~(const uinteger<Width>& rhs) -> uinteger<Width>
 {
-    word_container<Width> rhs_w = static_cast<const word_container<Width>&>(rhs);
+    word_container<Width> rhs_w{rhs};
     word_container<Width> result = ~rhs_w;
-    return static_cast<uinteger<Width>>(result);
+    return uinteger<Width>{result};
 }
 
 template <size_t DestinationWidth, size_t SourceWidth>
 [[nodiscard]] auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>
 {
-    word_container<SourceWidth> in = static_cast<const word_container<SourceWidth>&>(source);
+    word_container<SourceWidth> in{source};
 
     word_container<DestinationWidth> result = width_cast<DestinationWidth>(in);
 
-    return static_cast<uinteger<DestinationWidth>>(result);
+    return uinteger<DestinationWidth>{result};
 }
 
 } // namespace aarith

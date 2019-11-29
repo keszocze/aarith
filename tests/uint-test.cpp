@@ -507,6 +507,62 @@ SCENARIO("Using the for loop operation feature from ")
 }
 
 
+SCENARIO("Logical AND works as expected", "[uinteger][bit_logic]")
+{
+    GIVEN("Two uintegers")
+    {
+        WHEN("The uintegers consists of only one word")
+        {
+            const size_t Width = 70;
 
+            static constexpr uint16_t number_a = 7;
+            static constexpr uint16_t number_b = 14;
+            const uinteger<Width> a{number_a};
+            const uinteger<Width> b{number_b};
+
+            const auto result = a & b;
+            const auto result_ref = number_a & number_b;
+            REQUIRE(result.word(0) == result_ref);
+        }
+    }
+}
+
+SCENARIO("Logical OR works as expected", "[uinteger][bit_logic]")
+{
+    GIVEN("Two uintegers")
+    {
+        WHEN("The uintegers consists of only one word")
+        {
+            const size_t Width = 70;
+
+            static constexpr uint16_t number_a = 7;
+            static constexpr uint16_t number_b = 14;
+            const uinteger<Width> a{number_a};
+            const uinteger<Width> b{number_b};
+
+            const auto result = a | b;
+            const auto result_ref = number_a | number_b;
+            REQUIRE(result.word(0) == result_ref);
+        }
+    }
+}
+
+SCENARIO("Logical NOT works as expected", "[uinteger][bit_logic]")
+{
+    GIVEN("One uintegers")
+    {
+        WHEN("The uinteger consists of only one word")
+        {
+            const size_t Width = 70;
+
+            static constexpr uint16_t number_a = 7;
+            const uinteger<Width> a{number_a};
+
+            const auto result = ~a;
+            const auto result_ref = ~number_a;
+            REQUIRE(result.word(0) == result_ref);
+        }
+    }
+}
 // for static_assert tests:
 // https://stackoverflow.com/questions/30155619/expected-build-failure-tests-in-cmake
