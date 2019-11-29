@@ -19,12 +19,12 @@ public:
 
     word_container(WordType w)
     {
-        this->words[0]=w & word_mask(0);
+        this->words[0] = w & word_mask(0);
     }
 
     template <class... Args> word_container(WordType w, Args... args)
     {
-        set_words(w,args...);
+        set_words(w, args...);
     }
 
     template <class... Args> static auto from_words(Args... args) -> word_container
@@ -274,37 +274,71 @@ protected:
     std::array<word_type, word_count()> words{{0}};
 };
 
-    template <size_t DestinationWidth, size_t SourceWidth>
-    [[nodiscard]] auto width_cast(const word_container<SourceWidth>& source) -> word_container<DestinationWidth>
+template <size_t DestinationWidth, size_t SourceWidth>
+[[nodiscard]] auto width_cast(const word_container<SourceWidth>& source)
+    -> word_container<DestinationWidth>
+{
+    word_container<DestinationWidth> word_container;
+    if constexpr (DestinationWidth >= SourceWidth)
     {
-        word_container<DestinationWidth> word_container;
-        if constexpr (DestinationWidth >= SourceWidth)
+        for (auto i = 0U; i < source.word_count(); ++i)
         {
-            for (auto i = 0U; i < source.word_count(); ++i)
-            {
-                word_container.set_word(i, source.word(i));
-            }
+            word_container.set_word(i, source.word(i));
         }
-        else
-        {
-            for (auto i = 0U; i < word_container.word_count(); ++i)
-            {
-                word_container.set_word(i, source.word(i));
-            }
-        }
-        return word_container;
     }
+    else
+    {
+        for (auto i = 0U; i < word_container.word_count(); ++i)
+        {
+            word_container.set_word(i, source.word(i));
+        }
+    }
+    return word_container;
+}
 
-    template <size_t Width> auto count_leading_zeroes(const word_container<Width>& value) -> size_t
+template <size_t Width>
+[[nodiscard]] auto operator&(const word_container<Width>& lhs, const word_container<Width>& rhs)
+    -> word_container<Width>
+{
+    word_container<Width> logical_and;
+    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
-        for (auto i = Width; i > 0; --i)
-        {
-            if (value.bit(i - 1))
-            {
-                return i;
-            }
-        }
-        return Width;
+        logical_and.set_word(counter, lhs.word(counter) & rhs.word(counter));
     }
+    return logical_and;
+}
+
+template <size_t Width>
+auto operator|(const word_container<Width>& lhs, const word_container<Width>& rhs) -> word_container<Width>
+{
+    word_container<Width> logical_or;
+    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
+    {
+        logical_or.set_word(counter, lhs.word(counter) | rhs.word(counter));
+    }
+    return logical_or;
+}
+
+template <size_t Width>[[nodiscard]] auto operator~(const word_container<Width>& rhs) -> word_container<Width>
+{
+    word_container<Width> logical_not;
+    for (auto counter = 0U; counter < rhs.word_count(); ++counter)
+    {
+        logical_not.set_word(counter, ~rhs.word(counter));
+    }
+    return logical_not;
+}
+
+template <size_t Width> auto count_leading_zeroes(const word_container<Width>& value) -> size_t
+{
+    for (auto i = Width; i > 0; --i)
+    {
+        if (value.bit(i - 1))
+        {
+            return i;
+        }
+    }
+    return Width;
+}
 
 } // namespace aarith

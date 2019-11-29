@@ -19,14 +19,14 @@ class uinteger : public word_container<Width, WordType>
 public:
     uinteger() = default;
 
-
-    explicit uinteger(WordType n): word_container<Width,WordType>(n)
+    explicit uinteger(WordType n)
+        : word_container<Width, WordType>(n)
     {
     }
 
     template <class... Args>
     uinteger(WordType fst, Args... args)
-        : word_container<Width>(fst,args...)
+        : word_container<Width>(fst, args...)
     {
     }
 
@@ -143,40 +143,6 @@ auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
     return shifted;
 }
 
-
-template <size_t Width>
-[[nodiscard]] auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
-    -> uinteger<Width>
-{
-    uinteger<Width> logical_and;
-    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
-    {
-        logical_and.set_word(counter, lhs.word(counter) & rhs.word(counter));
-    }
-    return logical_and;
-}
-
-template <size_t Width>
-auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
-{
-    uinteger<Width> logical_or;
-    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
-    {
-        logical_or.set_word(counter, lhs.word(counter) | rhs.word(counter));
-    }
-    return logical_or;
-}
-
-template <size_t Width>[[nodiscard]] auto operator~(const uinteger<Width>& rhs) -> uinteger<Width>
-{
-    uinteger<Width> logical_not;
-    for (auto counter = 0U; counter < rhs.word_count(); ++counter)
-    {
-        logical_not.set_word(counter, ~rhs.word(counter));
-    }
-    return logical_not;
-}
-
 template <size_t Width> auto abs_two_complement(const uinteger<Width>& value) -> uinteger<Width>
 {
     if (value.bit(Width - 1) == 1)
@@ -187,16 +153,45 @@ template <size_t Width> auto abs_two_complement(const uinteger<Width>& value) ->
     return value;
 }
 
+template <size_t Width>
+[[nodiscard]] auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
+    -> uinteger<Width>
+{
+    word_container<Width> lhs_w = static_cast<const word_container<Width>&>(lhs);
+    word_container<Width> rhs_w = static_cast<const word_container<Width>&>(rhs);
 
+    word_container<Width> result = lhs_w & rhs_w;
 
-    template <size_t DestinationWidth, size_t SourceWidth>
-    [[nodiscard]] auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>
+    return static_cast<uinteger<Width>>(result);
+}
+
+template <size_t Width>
+[[nodiscard]] auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
+    -> uinteger<Width>
+{
+    word_container<Width> lhs_w = static_cast<const word_container<Width>&>(lhs);
+    word_container<Width> rhs_w = static_cast<const word_container<Width>&>(rhs);
+
+    word_container<Width> result = lhs_w | rhs_w;
+
+    return static_cast<uinteger<Width>>(result);
+}
+
+    template <size_t Width>[[nodiscard]] auto operator~(const uinteger<Width>& rhs) -> uinteger<Width>
     {
-        word_container<SourceWidth> in = static_cast<const word_container<SourceWidth>&>(source);
-
-        word_container<DestinationWidth> result = width_cast<DestinationWidth>(in);
-
-        return static_cast<uinteger<DestinationWidth>>(result);
+        word_container<Width> rhs_w = static_cast<const word_container<Width>&>(rhs);
+        word_container<Width> result = ~rhs_w;
+        return static_cast<uinteger<Width>>(result);
     }
+
+template <size_t DestinationWidth, size_t SourceWidth>
+[[nodiscard]] auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>
+{
+    word_container<SourceWidth> in = static_cast<const word_container<SourceWidth>&>(source);
+
+    word_container<DestinationWidth> result = width_cast<DestinationWidth>(in);
+
+    return static_cast<uinteger<DestinationWidth>>(result);
+}
 
 } // namespace aarith
