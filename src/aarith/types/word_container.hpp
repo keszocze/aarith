@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <aarith/utilities/bit_operations.hpp>
 
 namespace aarith {
 
@@ -331,13 +332,19 @@ template <size_t Width>
     return logical_not;
 }
 
+/**
+ * @brief  Counts the number of bits set to zero before the first one appears (from MSB to LSB)
+ * @tparam Width Width of the word_container
+ * @param value The word to count the leading zeroes in
+ * @return
+ */
 template <size_t Width> auto count_leading_zeroes(const word_container<Width>& value) -> size_t
 {
     for (auto i = Width; i > 0; --i)
     {
         if (value.bit(i - 1))
         {
-            return i;
+            return (Width-i);
         }
     }
     return Width;

@@ -28,7 +28,7 @@ SCENARIO("Counting bits in word_container", "[util]")
 {
     WHEN("Multiple word_containers are given")
     {
-        THEN("The leading zeroes should be counted correctly")
+        THEN("The leading zeroe index should be computed correctly")
         {
             word_container<64> a_zero{0U};
             word_container<64> a_one{1U};
@@ -40,6 +40,13 @@ SCENARIO("Counting bits in word_container", "[util]")
             word_container<150> d_one{1U};
             
             CHECK(count_leading_zeroes(a_zero) == 64);
+            CHECK(count_leading_zeroes(b_zero) == 32);
+            CHECK(count_leading_zeroes(c_zero) == 15);
+            CHECK(count_leading_zeroes(d_zero) == 150);
+            CHECK(count_leading_zeroes(a_one) == 64-1);
+            CHECK(count_leading_zeroes(b_one) == 32-1);
+            CHECK(count_leading_zeroes(c_one) == 15-1);
+            CHECK(count_leading_zeroes(d_one) == 150-1);
         }
     }
 }
