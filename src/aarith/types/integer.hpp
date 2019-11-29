@@ -19,19 +19,14 @@ class uinteger : public word_container<Width, WordType>
 public:
     uinteger() = default;
 
-    template <class T,
-              class = std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value>::type>
-    explicit uinteger(T n)
-    {
-        static_assert(sizeof(T) * 8 <= sizeof(typename word_container<Width>::word_type) * 8,
-                      "Only up to 64 bit integers are supported");
 
-        this->words[0] = n;
+    explicit uinteger(WordType n): word_container<Width,WordType>(n)
+    {
     }
 
     template <class... Args>
-    uinteger(Args... args)
-        : word_container<Width>(args...)
+    uinteger(WordType fst, Args... args)
+        : word_container<Width>(fst,args...)
     {
     }
 
@@ -148,16 +143,6 @@ auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
     return shifted;
 }
 
-template <size_t DestinationWidth, size_t SourceWidth, class WordType = uint64_t>
-[[nodiscard]] auto width_cast(const uinteger<SourceWidth, WordType>& source)
-    -> uinteger<DestinationWidth, WordType>
-{
-
-    word_container<SourceWidth, WordType> in =
-        static_cast<const word_container<SourceWidth, WordType>&>(source);
-
-    return uinteger<DestinationWidth, WordType>{width_cast<DestinationWidth>(in)};
-}
 
 template <size_t Width>
 [[nodiscard]] auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)

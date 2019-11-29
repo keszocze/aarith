@@ -12,14 +12,19 @@ public:
     static_assert(Width > 0, " Width must be at least 1 (bit)");
 
     /*
-     * Constructrs etc.
+     * Constructors etc.
      */
 
     word_container() = default;
 
-    template <class... Args> word_container(Args... args)
+    word_container(WordType w)
     {
-        set_words(args...);
+        this->words[0]=w & word_mask(0);
+    }
+
+    template <class... Args> word_container(WordType w, Args... args)
+    {
+        set_words(w,args...);
     }
 
     template <class... Args> static auto from_words(Args... args) -> word_container
