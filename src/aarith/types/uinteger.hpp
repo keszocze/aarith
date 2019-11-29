@@ -73,19 +73,11 @@ public:
 template <size_t Width>
 [[nodiscard]] auto operator<<(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
 {
-    if (rhs >= Width)
-    {
-        return uinteger<Width>(0U);
-    }
-    if (rhs == 0)
-    {
-        return lhs;
-    }
 
     word_container<Width> tmp{lhs};
-    uinteger<Width> shifted{tmp << rhs};
+//    uinteger<Width> shifted{tmp << rhs};
 
-    return shifted;
+    return uinteger<Width>{tmp << rhs};
 }
 
 template <size_t Width>
