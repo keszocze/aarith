@@ -309,7 +309,8 @@ template <size_t Width>
 }
 
 template <size_t Width>
-auto operator|(const word_container<Width>& lhs, const word_container<Width>& rhs) -> word_container<Width>
+auto operator|(const word_container<Width>& lhs, const word_container<Width>& rhs)
+    -> word_container<Width>
 {
     word_container<Width> logical_or;
     for (auto counter = 0U; counter < lhs.word_count(); ++counter)
@@ -319,7 +320,8 @@ auto operator|(const word_container<Width>& lhs, const word_container<Width>& rh
     return logical_or;
 }
 
-template <size_t Width>[[nodiscard]] auto operator~(const word_container<Width>& rhs) -> word_container<Width>
+template <size_t Width>
+[[nodiscard]] auto operator~(const word_container<Width>& rhs) -> word_container<Width>
 {
     word_container<Width> logical_not;
     for (auto counter = 0U; counter < rhs.word_count(); ++counter)

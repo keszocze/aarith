@@ -177,12 +177,12 @@ template <size_t Width>
     return static_cast<uinteger<Width>>(result);
 }
 
-    template <size_t Width>[[nodiscard]] auto operator~(const uinteger<Width>& rhs) -> uinteger<Width>
-    {
-        word_container<Width> rhs_w = static_cast<const word_container<Width>&>(rhs);
-        word_container<Width> result = ~rhs_w;
-        return static_cast<uinteger<Width>>(result);
-    }
+template <size_t Width>[[nodiscard]] auto operator~(const uinteger<Width>& rhs) -> uinteger<Width>
+{
+    word_container<Width> rhs_w = static_cast<const word_container<Width>&>(rhs);
+    word_container<Width> result = ~rhs_w;
+    return static_cast<uinteger<Width>>(result);
+}
 
 template <size_t DestinationWidth, size_t SourceWidth>
 [[nodiscard]] auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>
