@@ -299,4 +299,27 @@ namespace aarith
 
         std::array<word_type, word_count()> words{{0}};
     };
+
+
+
+    template <size_t DestinationWidth, size_t SourceWidth>
+    [[nodiscard]] auto width_cast(const word_container<SourceWidth>& source) -> word_container<DestinationWidth>
+    {
+        word_container<DestinationWidth> word_container;
+        if constexpr (DestinationWidth >= SourceWidth)
+        {
+            for (auto i = 0U; i < source.word_count(); ++i)
+            {
+                word_container.set_word(i, source.word(i));
+            }
+        }
+        else
+        {
+            for (auto i = 0U; i < word_container.word_count(); ++i)
+            {
+                word_container.set_word(i, source.word(i));
+            }
+        }
+        return word_container;
+    }
 }

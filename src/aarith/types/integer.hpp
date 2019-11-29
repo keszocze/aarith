@@ -42,6 +42,12 @@ public:
     {
     }
 
+    template <size_t V>
+    uinteger<Width, WordType>(const word_container<V, WordType>& other)
+        : word_container<Width>(other)
+    {
+    }
+
     auto operator<<=(const size_t shift_by) -> uinteger&
     {
         return *this = *this << shift_by;
@@ -69,27 +75,6 @@ template <size_t Width> class is_unsigned<uinteger<Width>>
 public:
     static constexpr bool value = true;
 };
-
-template <size_t DestinationWidth, size_t SourceWidth>
-[[nodiscard]] auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>
-{
-    uinteger<DestinationWidth> destination;
-    if constexpr (DestinationWidth >= SourceWidth)
-    {
-        for (auto i = 0U; i < source.word_count(); ++i)
-        {
-            destination.set_word(i, source.word(i));
-        }
-    }
-    else
-    {
-        for (auto i = 0U; i < destination.word_count(); ++i)
-        {
-            destination.set_word(i, source.word(i));
-        }
-    }
-    return destination;
-}
 
 template <size_t Width>
 [[nodiscard]] auto operator<<(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
@@ -162,6 +147,17 @@ auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
     shifted.set_word(lhs.word_count() - skip_words - 1, new_word);
 
     return shifted;
+}
+
+template <size_t DestinationWidth, size_t SourceWidth, class WordType = uint64_t>
+[[nodiscard]] auto width_cast(const uinteger<SourceWidth, WordType>& source)
+    -> uinteger<DestinationWidth, WordType>
+{
+
+    word_container<SourceWidth, WordType> in =
+        static_cast<const word_container<SourceWidth, WordType>&>(source);
+
+    return uinteger<DestinationWidth, WordType>{width_cast<DestinationWidth>(in)};
 }
 
 template <size_t Width>

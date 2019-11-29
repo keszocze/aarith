@@ -1,5 +1,6 @@
 #include "aarith/operations/comparisons.hpp"
 #include "aarith/operations/exact_operations.hpp"
+#include "aarith/utilities/string_utils.hpp"
 #include "aarith/types/integer.hpp"
 #include <catch.hpp>
 
@@ -344,6 +345,7 @@ SCENARIO("Bit and Word operations work correctly", "[uinteger][utility]")
                 // If this check fails, the generated expansion might not be helpful as only the
                 // lowest 15 bits are sent to std::cout. These are the bits, were the two functions
                 // aren't differing in the first place.
+                std::cout << "a=" << to_binary(a) << "\tb=" << to_binary(b) << "\tc=" << to_binary(c) << "\n";
                 CHECK(a == b);
                 CHECK(a == c);
                 CHECK(b == c);
