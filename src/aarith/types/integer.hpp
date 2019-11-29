@@ -19,13 +19,12 @@ class uinteger : public word_container<Width, WordType>
 public:
     uinteger() = default;
 
-    template <class T> explicit uinteger(T n)
+    template <class T,
+              class = std::enable_if<std::is_integral<T>::value && !std::is_signed<T>::value>::type>
+    explicit uinteger(T n)
     {
-        static_assert(std::is_integral<T>::value, "Only integral values are supported");
-        static_assert(!std::is_signed<T>::value, "Only unsigned numbers are supported");
         static_assert(sizeof(T) * 8 <= sizeof(typename word_container<Width>::word_type) * 8,
                       "Only up to 64 bit integers are supported");
-        //        static_assert(sizeof(T) * 8 <= Width, "Data type can not fit provided number");
 
         this->words[0] = n;
     }
