@@ -1,6 +1,7 @@
 add_library(aarith INTERFACE)
 target_sources(aarith INTERFACE
         aarith/types/uinteger.hpp
+        aarith/types/sinteger.hpp
   aarith/types/word_container.hpp
   aarith/types/traits.hpp
   aarith/operations/exact_operations.hpp
