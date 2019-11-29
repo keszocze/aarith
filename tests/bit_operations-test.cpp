@@ -24,7 +24,7 @@ SCENARIO("Splitting uint64_ts", "[util]")
     }
 }
 
-SCENARIO("Counting bits in word_container", "[util]")
+SCENARIO("Counting bits in word_container", "[word_container][util]")
 {
     WHEN("Multiple word_containers are given")
     {
@@ -93,7 +93,7 @@ SCENARIO("Casting word_containers into different width", "[word_container]")
 
 
 
-SCENARIO("Copy constructor of word_containers with various bit widths", "[word_container][utility]")
+SCENARIO("Copy constructor of word_containers with various bit widths", "[word_container]")
 {
     GIVEN("An word_container<N> a")
     {
@@ -156,7 +156,7 @@ SCENARIO("Copy constructor of word_containers with various bit widths", "[word_c
 }
 
 
-SCENARIO("Calculating the word_masks of word_containers", "[word_container][utility]")
+SCENARIO("Calculating the word_masks of word_containers", "[word_container][bit_logic]")
 {
     // The tests all assume that word_container uses 64-bit words.
     static_assert(word_container<64>::word_width() == 64);
@@ -200,7 +200,7 @@ SCENARIO("Calculating the word_masks of word_containers", "[word_container][util
     }
 }
 
-SCENARIO("Left shift operator works as expected", "[word_container][utility]")
+SCENARIO("Left shift operator works as expected", "[word_container][bit_logic]")
 {
     GIVEN("One word_container a and a number of shifted bits s")
     {
@@ -319,6 +319,64 @@ SCENARIO("Left shift operator works as expected", "[word_container][utility]")
             REQUIRE(result.word(0) == 0);
             REQUIRE(result.word(1) == reference);
             REQUIRE(result.word(2) == 1);
+        }
+    }
+}
+
+SCENARIO("Logical AND works as expected", "[word_container][bit_logic]")
+{
+    GIVEN("Two word_containers")
+    {
+        WHEN("The word_containers consists of only one word")
+        {
+            const size_t Width = 70;
+
+            static constexpr uint16_t number_a = 7;
+            static constexpr uint16_t number_b = 14;
+            const word_container<Width> a{number_a};
+            const word_container<Width> b{number_b};
+
+            const auto result = a & b;
+            const auto result_ref = number_a & number_b;
+            REQUIRE(result.word(0) == result_ref);
+        }
+    }
+}
+
+SCENARIO("Logical OR works as expected", "[word_container][bit_logic]")
+{
+    GIVEN("Two word_containers")
+    {
+        WHEN("The word_containers consists of only one word")
+        {
+            const size_t Width = 70;
+
+            static constexpr uint16_t number_a = 7;
+            static constexpr uint16_t number_b = 14;
+            const word_container<Width> a{number_a};
+            const word_container<Width> b{number_b};
+
+            const auto result = a | b;
+            const auto result_ref = number_a | number_b;
+            REQUIRE(result.word(0) == result_ref);
+        }
+    }
+}
+
+SCENARIO("Logical NOT works as expected", "[word_container][bit_logic]")
+{
+    GIVEN("One word_containers")
+    {
+        WHEN("The word_container consists of only one word")
+        {
+            const size_t Width = 70;
+
+            static constexpr uint16_t number_a = 7;
+            const word_container<Width> a{number_a};
+
+            const auto result = ~a;
+            const auto result_ref = ~number_a;
+            REQUIRE(result.word(0) == result_ref);
         }
     }
 }

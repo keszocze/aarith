@@ -413,63 +413,7 @@ SCENARIO("Right shift operator works as expected", "[uinteger][utility]")
     }
 }
 
-SCENARIO("Logical AND works as expected", "[uinteger][arithmetic]")
-{
-    GIVEN("Two uintegers")
-    {
-        WHEN("The uintegers consists of only one word")
-        {
-            const size_t Width = 70;
 
-            static constexpr uint16_t number_a = 7;
-            static constexpr uint16_t number_b = 14;
-            const uinteger<Width> a{number_a};
-            const uinteger<Width> b{number_b};
-
-            const auto result = a & b;
-            const auto result_ref = number_a & number_b;
-            REQUIRE(result.word(0) == result_ref);
-        }
-    }
-}
-
-SCENARIO("Logical OR works as expected", "[uinteger][arithmetic]")
-{
-    GIVEN("Two uintegers")
-    {
-        WHEN("The uintegers consists of only one word")
-        {
-            const size_t Width = 70;
-
-            static constexpr uint16_t number_a = 7;
-            static constexpr uint16_t number_b = 14;
-            const uinteger<Width> a{number_a};
-            const uinteger<Width> b{number_b};
-
-            const auto result = a | b;
-            const auto result_ref = number_a | number_b;
-            REQUIRE(result.word(0) == result_ref);
-        }
-    }
-}
-
-SCENARIO("Logical NOT works as expected", "[uinteger][arithmetic]")
-{
-    GIVEN("One uintegers")
-    {
-        WHEN("The uinteger consists of only one word")
-        {
-            const size_t Width = 70;
-
-            static constexpr uint16_t number_a = 7;
-            const uinteger<Width> a{number_a};
-
-            const auto result = ~a;
-            const auto result_ref = ~number_a;
-            REQUIRE(result.word(0) == result_ref);
-        }
-    }
-}
 
 SCENARIO("Checking whether an uinteger is not equal to zero/false")
 {
