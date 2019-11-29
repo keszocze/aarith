@@ -70,41 +70,23 @@ public:
     static constexpr bool value = true;
 };
 
-template <size_t Width>
-[[nodiscard]] auto operator<<(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
-{
-    if (rhs >= Width)
+    template <size_t Width>
+    [[nodiscard]] auto operator<<(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
     {
-        return uinteger<Width>(0U);
-    }
-    if (rhs == 0)
-    {
-        return lhs;
-    }
-    uinteger<Width> shifted;
-    const auto skip_words = rhs / lhs.word_width();
-    const auto shift_word_left = rhs - skip_words * lhs.word_width();
-    const auto shift_word_right = lhs.word_width() - shift_word_left;
-
-    for (auto counter = lhs.word_count(); counter > 0; --counter)
-    {
-        if (counter + skip_words < lhs.word_count())
+        if (rhs >= Width)
         {
-            typename uinteger<Width>::word_type new_word;
-            new_word = lhs.word(counter) << shift_word_left;
-            if (shift_word_right < lhs.word_width())
-            {
-                new_word = new_word | (lhs.word(counter - 1) >> shift_word_right);
-            }
-            shifted.set_word(counter + skip_words, new_word);
+            return uinteger<Width>(0U);
         }
-    }
-    typename uinteger<Width>::word_type new_word;
-    new_word = lhs.word(0) << shift_word_left;
-    shifted.set_word(skip_words, new_word);
+        if (rhs == 0)
+        {
+            return lhs;
+        }
 
-    return shifted;
-}
+        word_container<Width> tmp{lhs};
+        uinteger<Width> shifted{tmp << rhs};
+
+        return shifted;
+    }
 
 template <size_t Width>
 auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>

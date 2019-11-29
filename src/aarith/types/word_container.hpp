@@ -143,7 +143,7 @@ public:
             std::string msg;
             msg += "Trying to access bit with index ";
             msg += std::to_string(index);
-            msg += " for uinteger<";
+            msg += " for word_container<";
             msg += std::to_string(width());
             msg += "> with max index ";
             msg += std::to_string(width() - 1);
@@ -184,7 +184,7 @@ public:
             std::string msg;
             msg += "Trying to access word with index ";
             msg += std::to_string(index);
-            msg += " for uinteger<";
+            msg += " for word_container<";
             msg += std::to_string(width());
             msg += "> with max index ";
             msg += std::to_string(word_count() - 1);
@@ -364,6 +364,42 @@ template <size_t Width> auto count_leading_zeroes(const word_container<Width>& v
         }
     }
     return Width;
+}
+
+template <size_t Width>
+[[nodiscard]] auto operator<<(const word_container<Width>& lhs, const size_t rhs) -> word_container<Width>
+{
+    if (rhs >= Width)
+    {
+        return word_container<Width>(0U);
+    }
+    if (rhs == 0)
+    {
+        return lhs;
+    }
+    word_container<Width> shifted;
+    const auto skip_words = rhs / lhs.word_width();
+    const auto shift_word_left = rhs - skip_words * lhs.word_width();
+    const auto shift_word_right = lhs.word_width() - shift_word_left;
+
+    for (auto counter = lhs.word_count(); counter > 0; --counter)
+    {
+        if (counter + skip_words < lhs.word_count())
+        {
+            typename word_container<Width>::word_type new_word;
+            new_word = lhs.word(counter) << shift_word_left;
+            if (shift_word_right < lhs.word_width())
+            {
+                new_word = new_word | (lhs.word(counter - 1) >> shift_word_right);
+            }
+            shifted.set_word(counter + skip_words, new_word);
+        }
+    }
+    typename word_container<Width>::word_type new_word;
+    new_word = lhs.word(0) << shift_word_left;
+    shifted.set_word(skip_words, new_word);
+
+    return shifted;
 }
 
 } // namespace aarith

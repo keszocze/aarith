@@ -199,3 +199,126 @@ SCENARIO("Calculating the word_masks of word_containers", "[word_container][util
         }
     }
 }
+
+SCENARIO("Left shift operator works as expected", "[word_container][utility]")
+{
+    GIVEN("One word_container a and a number of shifted bits s")
+    {
+
+        const size_t TestWidth = 16;
+
+        WHEN("The result still fits the width")
+        {
+            static constexpr uint16_t number_a = 7;
+            static constexpr auto s = 4U;
+            const word_container<TestWidth> a{number_a};
+
+            const auto result = a << s;
+            REQUIRE(result.word(0) == 112);
+        }
+        WHEN("The result does not fit the width anymore")
+        {
+            static constexpr uint16_t number_a = 7;
+            static constexpr auto s = 14U;
+            const word_container<TestWidth> a{number_a};
+
+            const auto result = a << s;
+            REQUIRE(result.word(0) == 49152);
+        }
+
+        WHEN("Some bits are shifted to the next word")
+        {
+            const size_t Width = 70;
+
+            static constexpr uint16_t number_a = 7;
+            static constexpr auto s = 63U;
+            const word_container<Width> a{number_a};
+
+            const auto result = a << s;
+            REQUIRE(result.word(0) == 0x8000000000000000);
+            REQUIRE(result.word(1) == 3);
+        }
+        WHEN("The bits are shifted to the second next word")
+        {
+            const size_t Width = 130;
+
+            static constexpr uint16_t number_a = 7;
+            static constexpr auto s = 127U;
+            const word_container<Width> a{number_a};
+
+            const auto result = a << s;
+            REQUIRE(result.word(0) == 0);
+            REQUIRE(result.word(1) == 0x8000000000000000);
+            REQUIRE(result.word(2) == 3);
+        }
+        WHEN("The bits are not shifted")
+        {
+            const size_t Width = 192;
+
+            static constexpr uint16_t number_a = 3;
+            static constexpr auto s = 0;
+            const word_container<Width> a{number_a};
+
+            const auto result = a << s;
+            REQUIRE(result.word(0) == 3);
+            REQUIRE(result.word(1) == 0);
+            REQUIRE(result.word(2) == 0);
+        }
+        WHEN("The bits are shifted exactly one word")
+        {
+            const size_t Width = 192;
+
+            static constexpr uint16_t number_a = 3;
+            static constexpr auto s = static_cast<size_t>(word_container<Width>::word_width());
+            const word_container<Width> a{number_a};
+
+            const auto result = a << s;
+            REQUIRE(result.word(0) == 0);
+            REQUIRE(result.word(1) == 3);
+            REQUIRE(result.word(2) == 0);
+        }
+        WHEN("The bits are shifted exactly two words")
+        {
+            const size_t Width = 192;
+
+            static constexpr uint16_t number_a = 3;
+            static constexpr auto s = 2 * static_cast<size_t>(word_container<Width>::word_width());
+            const word_container<Width> a{number_a};
+
+            const auto result = a << s;
+            REQUIRE(result.word(0) == 0);
+            REQUIRE(result.word(1) == 0);
+            REQUIRE(result.word(2) == 3);
+        }
+        WHEN("The bits are shifted exactly by word_width-1")
+        {
+            const size_t Width = 192;
+
+            static constexpr uint16_t number_a = 3;
+            static constexpr auto s = static_cast<size_t>(word_container<Width>::word_width()) - 1U;
+            const word_container<Width> a{number_a};
+
+            auto reference = a.word(0) << s;
+
+            const auto result = a << s;
+            REQUIRE(result.word(0) == reference);
+            REQUIRE(result.word(1) == 1);
+            REQUIRE(result.word(2) == 0);
+        }
+        WHEN("The bits are shifted by 2*word_width-1")
+        {
+            const size_t Width = 192;
+
+            static constexpr uint16_t number_a = 3;
+            static constexpr auto s = 2U * static_cast<size_t>(word_container<Width>::word_width()) - 1U;
+            const word_container<Width> a{number_a};
+
+            auto reference = a.word(0) << (s % (sizeof(word_container<Width>::word_width()) * 8));
+
+            const auto result = a << s;
+            REQUIRE(result.word(0) == 0);
+            REQUIRE(result.word(1) == reference);
+            REQUIRE(result.word(2) == 1);
+        }
+    }
+}
