@@ -1,6 +1,6 @@
 #include "aarith/operations/approx_operations.hpp"
 #include "aarith/operations/exact_operations.hpp"
-#include "aarith/types/integer.hpp"
+#include "aarith/types/uinteger.hpp"
 #include <aarith/operations/comparisons.hpp>
 #include <catch.hpp>
 #include <sstream>

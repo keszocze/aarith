@@ -1,4 +1,4 @@
-#include "aarith/types/integer.hpp"
+#include "aarith/types/uinteger.hpp"
 #include <aarith/operations/comparisons.hpp>
 #include <catch.hpp>
 

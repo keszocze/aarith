@@ -1,5 +1,5 @@
 #include <aarith/operations/comparisons.hpp>
-#include <aarith/types/integer.hpp>
+#include <aarith/types/uinteger.hpp>
 #include <aarith/utilities/string_utils.hpp>
 #include <catch.hpp>
 #include <sstream>

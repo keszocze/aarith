@@ -2,7 +2,7 @@
 
 #include <cstdint>
 #include <iostream>
-#include "aarith/types/integer.hpp"
+#include "aarith/types/uinteger.hpp"
 
 namespace aarith {
 

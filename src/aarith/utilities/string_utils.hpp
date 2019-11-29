@@ -2,7 +2,7 @@
 
 #include "aarith/operations/comparisons.hpp"
 #include "aarith/operations/exact_operations.hpp"
-#include "aarith/types/integer.hpp"
+#include "aarith/types/uinteger.hpp"
 #include "aarith/utilities/bit_operations.hpp"
 #include <iostream>
 #include <string>

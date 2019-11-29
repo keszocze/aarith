@@ -1,6 +1,6 @@
 #pragma once
 
-#include <aarith/types/integer.hpp>
+#include <aarith/types/uinteger.hpp>
 #include <aarith/types/traits.hpp>
 #include <aarith/utilities/bit_operations.hpp>
 
@@ -214,7 +214,7 @@ template <class UInteger>
 
 } // namespace aarith
 
-#include "aarith/types/integer.hpp"
+#include "aarith/types/uinteger.hpp"
 
 namespace aarith::exact_operators {
 
