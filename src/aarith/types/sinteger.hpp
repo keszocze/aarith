@@ -71,41 +71,6 @@ namespace aarith {
         static constexpr bool value = false;
     };
 
-    template <size_t Width>
-    [[nodiscard]] auto operator<<(const sinteger<Width>& lhs, const size_t rhs) -> sinteger<Width>
-    {
-        if (rhs >= Width)
-        {
-            return sinteger<Width>(0U);
-        }
-        if (rhs == 0)
-        {
-            return lhs;
-        }
-        sinteger<Width> shifted;
-        const auto skip_words = rhs / lhs.word_width();
-        const auto shift_word_left = rhs - skip_words * lhs.word_width();
-        const auto shift_word_right = lhs.word_width() - shift_word_left;
-
-        for (auto counter = lhs.word_count(); counter > 0; --counter)
-        {
-            if (counter + skip_words < lhs.word_count())
-            {
-                typename sinteger<Width>::word_type new_word;
-                new_word = lhs.word(counter) << shift_word_left;
-                if (shift_word_right < lhs.word_width())
-                {
-                    new_word = new_word | (lhs.word(counter - 1) >> shift_word_right);
-                }
-                shifted.set_word(counter + skip_words, new_word);
-            }
-        }
-        typename sinteger<Width>::word_type new_word;
-        new_word = lhs.word(0) << shift_word_left;
-        shifted.set_word(skip_words, new_word);
-
-        return shifted;
-    }
 
     template <size_t Width>
     auto operator>>(const sinteger<Width>& lhs, const size_t rhs) -> sinteger<Width>
@@ -158,41 +123,42 @@ namespace aarith {
     [[nodiscard]] auto operator&(const sinteger<Width>& lhs, const sinteger<Width>& rhs)
     -> sinteger<Width>
     {
-        word_container<Width> lhs_w = static_cast<const word_container<Width>&>(lhs);
-        word_container<Width> rhs_w = static_cast<const word_container<Width>&>(rhs);
+        word_container<Width> lhs_w{lhs};
+        word_container<Width> rhs_w{rhs};
 
         word_container<Width> result = lhs_w & rhs_w;
 
-        return static_cast<sinteger<Width>>(result);
+        return sinteger<Width>{result};
     }
 
     template <size_t Width>
     [[nodiscard]] auto operator|(const sinteger<Width>& lhs, const sinteger<Width>& rhs)
     -> sinteger<Width>
     {
-        word_container<Width> lhs_w = static_cast<const word_container<Width>&>(lhs);
-        word_container<Width> rhs_w = static_cast<const word_container<Width>&>(rhs);
+        word_container<Width> lhs_w{lhs};
+        word_container<Width> rhs_w{rhs};
 
         word_container<Width> result = lhs_w | rhs_w;
 
-        return static_cast<sinteger<Width>>(result);
+
+        return sinteger<Width>{result};
     }
 
     template <size_t Width>[[nodiscard]] auto operator~(const sinteger<Width>& rhs) -> sinteger<Width>
     {
-        word_container<Width> rhs_w = static_cast<const word_container<Width>&>(rhs);
+        word_container<Width> rhs_w{rhs};
         word_container<Width> result = ~rhs_w;
-        return static_cast<sinteger<Width>>(result);
+        return sinteger<Width>{result};
     }
 
     template <size_t DestinationWidth, size_t SourceWidth>
     [[nodiscard]] auto width_cast(const sinteger<SourceWidth>& source) -> sinteger<DestinationWidth>
     {
-        word_container<SourceWidth> in = static_cast<const word_container<SourceWidth>&>(source);
+        word_container<SourceWidth> in{source};
 
         word_container<DestinationWidth> result = width_cast<DestinationWidth>(in);
 
-        return static_cast<sinteger<DestinationWidth>>(result);
+        return sinteger<DestinationWidth>{result};
     }
 
 } // namespace aarith

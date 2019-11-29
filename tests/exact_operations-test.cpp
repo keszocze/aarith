@@ -320,9 +320,6 @@ SCENARIO("Bit and Word operations work correctly", "[uinteger][utility]")
                 }
                 else
                 {
-                    //                                    std::cout << uinteger<64>{mask} << "\t" <<
-                    //                                    a << "\t" << uinteger<64>{a.word(0)} <<
-                    //                                    "\n";
                     CHECK(!is_one);
                 }
             }
