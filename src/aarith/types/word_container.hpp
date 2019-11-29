@@ -169,14 +169,7 @@ public:
         }
         words[index] = value & word_mask(index);
     }
-
-    void set_wordss(const word_container& other)
-    {
-        for (size_t i = 0U; i < word_count(); ++i)
-        {
-            words[i] = other.word(i);
-        }
-    }
+    
 
     // Sets the words to the given values, where the right-most argument corresponds to word 0.
     template <class... Args> void set_words(Args... args)
