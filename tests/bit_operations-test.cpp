@@ -154,3 +154,48 @@ SCENARIO("Copy constructor of word_containers with various bit widths", "[word_c
         }
     }
 }
+
+
+SCENARIO("Calculating the word_masks of word_containers", "[word_container][utility]")
+{
+    // The tests all assume that word_container uses 64-bit words.
+    static_assert(word_container<64>::word_width() == 64);
+
+    GIVEN("A word_container<N> where N < word_width")
+    {
+        word_container<32> uint;
+        THEN("The mask is correct")
+        {
+            REQUIRE(uint.word_mask(0) == 0xffffffff);
+        }
+    }
+    GIVEN("A word_container<N> where N == word_width")
+    {
+        word_container<64> uint;
+        THEN("The mask is all 1s")
+        {
+            REQUIRE(uint.word_mask(0) == 0xffffffffffffffff);
+        }
+    }
+    GIVEN("A word_container<N> where N > word_width and N % word_width != 0")
+    {
+        word_container<96> uint;
+        THEN("All masks except the last are all 1s")
+        {
+            REQUIRE(uint.word_mask(0) == 0xffffffffffffffff);
+        }
+        THEN("The last mask is all ones up to the correct bit")
+        {
+            REQUIRE(uint.word_mask(1) == 0xffffffff);
+        }
+    }
+    GIVEN("A word_container<N> where N > word_width and N % word_width == 0")
+    {
+        word_container<128> uint;
+        THEN("All masks are all 1s")
+        {
+            REQUIRE(uint.word_mask(0) == 0xffffffffffffffff);
+            REQUIRE(uint.word_mask(1) == 0xffffffffffffffff);
+        }
+    }
+}
