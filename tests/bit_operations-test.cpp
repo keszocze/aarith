@@ -50,3 +50,43 @@ SCENARIO("Counting bits in word_container", "[util]")
         }
     }
 }
+
+
+SCENARIO("Casting uintegers into different width", "[uinteger]")
+{
+    GIVEN("width_cast is called")
+    {
+        static constexpr uint16_t test_value = 123;
+        static constexpr size_t SourceWidth = 16;
+        const word_container<SourceWidth> uint{test_value};
+
+        WHEN("The source width <= destination width")
+        {
+            static constexpr size_t DestinationWidth = 32;
+            auto const result = width_cast<DestinationWidth>(uint);
+
+            THEN("The result has the destination width")
+            {
+                REQUIRE(result.width() == DestinationWidth);
+            }
+            AND_THEN("The result is not cut off")
+            {
+                REQUIRE(result.word(0) == test_value);
+            }
+        }
+        WHEN("The source width > destination width")
+        {
+            static constexpr size_t DestinationWidth = 8;
+            auto const result = width_cast<DestinationWidth>(uint);
+
+            THEN("The result has the destination width")
+            {
+                REQUIRE(result.width() == DestinationWidth);
+            }
+            AND_THEN("The result is cut off")
+            {
+                REQUIRE(result.word(0) == (test_value & 0xff));
+            }
+        }
+    }
+}
