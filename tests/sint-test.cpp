@@ -53,7 +53,7 @@ SCENARIO("Copy constructor of sintegers with various bit widths", "[sinteger][ut
         //        const uint64_t val_a = GENERATE(take(10, random(0U,
         //        std::numeric_limits<uint64_t>::max()));
         const uint64_t val_a = 24;
-        sinteger<196> a(0U,val_a,0U);
+        sinteger<196> a(0U, val_a, 0U);
 
         THEN("Assignment of individual words is correct")
         {
@@ -116,7 +116,6 @@ SCENARIO("Copy constructor of sintegers with various bit widths", "[sinteger][ut
         }
     }
 }
-
 
 SCENARIO("Left shift operator works as expected", "[sinteger][bit_logic]")
 {
@@ -241,8 +240,11 @@ SCENARIO("Left shift operator works as expected", "[sinteger][bit_logic]")
     }
 }
 
+SCENARIO("Create negative sintegers")
+{
+}
 
-//SCENARIO("Right shift operator works as expected", "[sinteger][utility]")
+// SCENARIO("Right shift operator works as expected", "[sinteger][utility]")
 //{
 //    GIVEN("One sinteger a and a number of shifted bits s")
 //    {

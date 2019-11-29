@@ -6,6 +6,7 @@ target_sources(aarith INTERFACE
   aarith/types/traits.hpp
   aarith/operations/exact_operations.hpp
   aarith/operations/approx_operations.hpp
+        aarith/operations/sinteger_operations.hpp
   aarith/operations/comparisons.hpp
   aarith/utilities/bit_operations.hpp
   aarith/utilities/string_utils.hpp
