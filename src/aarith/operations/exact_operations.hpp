@@ -9,22 +9,32 @@
 namespace aarith {
 
 /**
- * @brief Adds two unsigned integers
+ * @brief Adds two unsigned integers of, possibly, different bit widths.
  *
- * @note No Type conversion is performed. If the bit widths do not match, the code will not compile!
- *
- * @tparam UInteger The unsigned integer instance used for the operation
+ * @tparam W Width of the first summand
+ * @tparam V Width of the second summand
  * @param a First summand
  * @param b Second summand
- * @return Sum of a and b
+ * @param initial_carry True if there is an initial carry coming in
+ * @return Sum of correct maximal bit width
  */
-template <class UInteger>[[nodiscard]] auto add(const UInteger& a, const UInteger& b) -> UInteger
+template <size_t W, size_t V>
+[[nodiscard]] uinteger<std::max(W, V) + 1> expanding_add(const uinteger<W>& a, const uinteger<V>& b,
+                                                         const bool initial_carry = false)
 {
-    static_assert(is_integral<UInteger>::value);
-    static_assert(is_unsigned<UInteger>::value);
+    static_assert(is_integral<uinteger<W>>::value);
+    static_assert(is_unsigned<uinteger<W>>::value);
+    static_assert(is_integral<uinteger<V>>::value);
+    static_assert(is_unsigned<uinteger<V>>::value);
 
-    UInteger sum;
-    typename UInteger::word_type carry{0};
+    constexpr size_t res_width = std::max(W, V) + 1U;
+
+    uinteger<res_width> sum;
+    typename uinteger<res_width>::word_type carry{0U};
+    if (initial_carry)
+    {
+        carry = 1U;
+    }
     for (auto i = 0U; i < a.word_count(); ++i)
     {
         auto const partial_sum = a.word(i) + b.word(i) + carry;
@@ -35,43 +45,76 @@ template <class UInteger>[[nodiscard]] auto add(const UInteger& a, const UIntege
 }
 
 /**
- * @brief Computes the difference of two unsigned integers.
+ * @brief Adds two unsigned integers
  *
- * @note No Type conversion is performed. If the bit widths do not match, the code will not compile!
+ * @tparam UInteger The unsigned integer instance used for the addition
+ * @param a First summand
+ * @param b Second summand
+ * @return Sum of a and b
+ */
+template <size_t W>[[nodiscard]] uinteger<W> add(const uinteger<W>& a, const uinteger<W>& b)
+{
+    uinteger<W + 1> result = expanding_add<W, W>(a, b);
+    return width_cast<W>(result);
+}
+
+/**
+ * @brief Computes the difference of two unsigned integers.
  *
  * @tparam UInteger The unsigned integer instance used for the operation
  * @param a Minuend
  * @param b Subtrahend
  * @return Difference between a and b
  */
-template <class UInteger>[[nodiscard]] auto sub(const UInteger& a, const UInteger& b) -> UInteger
+template <size_t W, size_t V=W>
+[[nodiscard]] auto sub(const uinteger<W>& a, const uinteger<V>& b)
+    -> uinteger<std::max(W, V)>
 {
-    static_assert(is_integral<UInteger>::value);
-    static_assert(is_unsigned<UInteger>::value);
+    static_assert(is_integral<uinteger<W>>::value);
+    static_assert(is_unsigned<uinteger<W>>::value);
 
-    UInteger sum;
-    typename UInteger::word_type borrow{0};
-    for (auto i = 0U; i < a.word_count(); ++i)
+    return width_cast<W>(expanding_add(a, ~b, true));
+}
+
+
+/**
+ * @brief Multiplies two unsigned integers expanding the bit width so that the result fits.
+ *
+ *
+ * @tparam UInteger The unsigned integer instance used for the operation
+ * @param a First multiplicant
+ * @param b Second multiplicant
+ * @return Product of a and b
+ */
+template <std::size_t W, std::size_t V>
+[[nodiscard]] uinteger<W + V> expanding_mul(const uinteger<W>& a, const uinteger<V>& b)
+{
+    constexpr std::size_t res_width = W + V;
+    uinteger<res_width> result{0U};
+    if constexpr (res_width <= 64)
     {
-
-        auto const a_word = a.word(i);
-        auto const b_word = b.word(i);
-        auto const subtrahend = b_word + borrow;
-        auto const partial_diff = a_word - subtrahend;
-
-        /*
-         * The new borrow originates from either
-         * a) the minuend being smaller than the subtrahend or
-         * b) the subtrahend being smaller than the raw word of the uinteger b
-         *
-         * The case b) arises when the current word of b consists of ones only and there is
-         * an "incoming" borrow.
-         */
-
-        borrow = ((a_word < subtrahend) || (subtrahend < b_word)) ? 1 : 0;
-        sum.set_word(i, partial_diff);
+        uint64_t result_uint64 = a.word(0) * b.word(0);
+        result.set_word(0, result_uint64);
     }
-    return sum;
+    else
+    {
+        static_assert(is_integral<uinteger<res_width>>::value);
+        static_assert(is_unsigned<uinteger<res_width>>::value);
+
+        const auto leading_zeroes = count_leading_zeroes(b);
+        uinteger<res_width> a_ = width_cast<res_width>(a);
+
+        auto bit_index = 0U;
+        while (bit_index < leading_zeroes)
+        {
+            if (b.bit(bit_index))
+            {
+                result = add(result, a_ << bit_index);
+            }
+            ++bit_index;
+        }
+    }
+    return result;
 }
 
 /**
@@ -88,31 +131,9 @@ template <class UInteger>[[nodiscard]] auto sub(const UInteger& a, const UIntege
  * @param b Second multiplicant
  * @return Product of a and b
  */
-template <class UInteger>[[nodiscard]] UInteger mul(const UInteger& a, const UInteger& b)
+template <size_t W>[[nodiscard]] uinteger<W> mul(const uinteger<W>& a, const uinteger<W>& b)
 {
-    UInteger result{0U};
-    if constexpr (UInteger::width() <= 32)
-    {
-        uint64_t result_uint64 = a.word(0) * b.word(0);
-        result.set_word(0, result_uint64);
-    }
-    else
-    {
-        static_assert(is_integral<UInteger>::value);
-        static_assert(is_unsigned<UInteger>::value);
-
-        const auto leading_zeroes = count_leading_zeroes(b);
-        auto bit_index = 0U;
-        while (bit_index < leading_zeroes)
-        {
-            if (b.bit(bit_index))
-            {
-                result = add(result, a << bit_index);
-            }
-            ++bit_index;
-        }
-    }
-    return result;
+    return width_cast<W>(expanding_mul(a, b));
 }
 
 /**
@@ -127,9 +148,9 @@ template <class UInteger>[[nodiscard]] UInteger mul(const UInteger& a, const UIn
  * @return Pair of (quotient, remainder)
  *
  */
-template <std::size_t W>
+template <std::size_t W, std::size_t V>
 [[nodiscard]] std::pair<uinteger<W>, uinteger<W>> restoring_division(const uinteger<W>& numerator,
-                                                                     const uinteger<W>& denominator)
+                                                                     const uinteger<V>& denominator)
 
 {
     using UInteger = uinteger<W>;

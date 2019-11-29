@@ -29,9 +29,45 @@ public:
         static_assert(!std::is_signed<T>::value, "Only unsigned numbers are supported");
         static_assert(sizeof(T) * 8 <= sizeof(word_type) * 8,
                       "Only up to 64 bit integers are supported");
-//        static_assert(sizeof(T) * 8 <= Width, "Data type can not fit provided number");
+        //        static_assert(sizeof(T) * 8 <= Width, "Data type can not fit provided number");
 
         words[0] = n;
+    }
+
+    template <size_t V> uinteger(const uinteger<V>& other)
+    {
+        static_assert(V <= Width, "Can not create an uinteger from larger uinteger");
+
+        for (auto i = 0U; i < other.word_count(); ++i)
+        {
+            set_word(i, other.word(i));
+        }
+    }
+    template <size_t V> uinteger<Width> operator=(const uinteger<V>& other)
+    {
+        static_assert(V <= Width, "Can not create an uinteger from larger uinteger");
+
+        if constexpr (V == Width)
+        {
+            if (&other == this)
+            {
+                return *this;
+            }
+        }
+
+        for (size_t i = 0U; i < other.word_count(); ++i)
+        {
+            set_word(i, other.word(i));
+        }
+
+        if constexpr (this->word_count() > other.word_count())
+        {
+            for (size_t i = other.word_count(); i < this->word_count(); ++i)
+            {
+                set_word(i, 0U);
+            }
+        }
+        return *this;
     }
 
     template <class... Args> static auto from_words(Args... args) -> uinteger
@@ -74,14 +110,15 @@ public:
 
     void set_bit(size_t index, bool value = true)
     {
-        if (index >= width()) {
+        if (index >= width())
+        {
             std::string msg;
             msg += "Trying to access bit with index ";
             msg += std::to_string(index);
-            msg +=" for uinteger<";
+            msg += " for uinteger<";
             msg += std::to_string(width());
-            msg +="> with max index ";
-            msg += std::to_string(width()-1);
+            msg += "> with max index ";
+            msg += std::to_string(width() - 1);
             throw std::out_of_range(msg);
         }
         const size_t word_index = index / word_width();
@@ -96,7 +133,6 @@ public:
         {
             words[word_index] &= ~mask;
         }
-
     }
 
     void set_word(size_t index, word_type value)
