@@ -101,7 +101,7 @@ public:
      * The most significant bit is the Width's one (i.e. the one you can get via bit(Width-1)). This
      * method is simply there for convenience.
      */
-    [[nodiscard]] auto msg() const -> bit_type
+    [[nodiscard]] auto msb() const -> bit_type
     {
         return bit(Width - 1);
     }

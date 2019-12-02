@@ -1,4 +1,5 @@
-#include <aarith/operations/comparisons.hpp>
+#include <aarith/operations/sinteger_operations.hpp>
+#include <aarith/operations/word_container_comparisons.hpp>
 #include <aarith/types/sinteger.hpp>
 #include <aarith/utilities/string_utils.hpp>
 #include <catch.hpp>
@@ -241,16 +242,18 @@ SCENARIO("Left shift operator works as expected", "[sinteger][bit_logic]")
     }
 }
 
-SCENARIO("Create negative sintegers")
-{
-    int64_t n = -1;
-    uint64_t pos_n = static_cast<uint64_t >(n);
-    std::cout << n << "\t" << pos_n << "\n";
-    std::cout << std::bitset<64>{pos_n} << "\n";
-    sinteger<64> negative{-1};
-    std::cout << negative.word(0) << "\n";
-    std::cout << -negative.word(0) << "\n";
-}
+//SCENARIO("Create negative sintegers")
+//{
+//    int64_t n = -1;
+//    uint64_t pos_n = static_cast<uint64_t >(n);
+//    std::cout << n << "\t" << pos_n << "\n";
+//    std::cout << std::bitset<64>{pos_n} << "\n";
+//    sinteger<64> negative{-1};
+//    std::cout << negative.word(0) << "\n";
+//    std::cout << -negative.word(0) << "\n";
+//
+//    CHECK(abs(negative) == sinteger<64>{1U});
+//}
 
 SCENARIO("Test unary negation")
 {
