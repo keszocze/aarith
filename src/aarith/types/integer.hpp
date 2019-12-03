@@ -103,6 +103,21 @@ public:
         return Width;
     }
 
+    [[nodiscard]] static constexpr auto zero() noexcept -> uinteger
+    {
+        return uinteger{};
+    }
+
+    [[nodiscard]] static constexpr auto max() noexcept -> uinteger
+    {
+        uinteger uint;
+        for (auto i = 0U; i < word_count(); ++i)
+        {
+            uint.set_word(i, std::numeric_limits<word_type>::max());
+        }
+        return uint;
+    }
+
     [[nodiscard]] auto word(size_t index) const -> word_type
     {
         return words[index];
