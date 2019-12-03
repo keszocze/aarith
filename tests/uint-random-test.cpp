@@ -1,10 +1,10 @@
 #include "aarith/operations/exact_operations.hpp"
 #include "aarith/types/integer.hpp"
+#include "aarith/types/random.hpp"
 #include "aarith/utilities/string_utils.hpp"
 #include <catch.hpp>
 #include <iostream>
 #include <mpir.h>
-#include <random>
 
 using namespace aarith;
 
@@ -12,9 +12,8 @@ template <size_t BitWidth>
 class UIntegerGenerator : public Catch::Generators::IGenerator<uinteger<BitWidth>>
 {
 public:
-    explicit UIntegerGenerator(size_t min_length, size_t max_length)
+    explicit UIntegerGenerator(size_t, size_t)
         : rng{std::random_device{}()}
-        , random_word_count{min_length, max_length}
     {
     }
 
@@ -25,20 +24,14 @@ public:
 
     bool next() override
     {
-        auto const word_count = random_word_count(rng);
-        for (auto i = 0U; i < word_count; ++i)
-        {
-            current_number.set_word(i, random_word(rng));
-        }
+        current_number = random_number(rng);
         return true;
     }
 
 private:
     std::minstd_rand rng;
-    std::uniform_int_distribution<size_t> random_word_count;
-    std::uniform_int_distribution<typename uinteger<BitWidth>::word_type> random_word{
-        1, std::numeric_limits<uint64_t>::max()};
     uinteger<BitWidth> current_number;
+    uniform_uinteger_distribution<BitWidth> random_number;
 };
 
 template <size_t BitWidth>
