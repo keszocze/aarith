@@ -2,9 +2,9 @@
 #include <aarith/operations/word_container_comparisons.hpp>
 #include <aarith/types/sinteger.hpp>
 #include <aarith/utilities/string_utils.hpp>
+#include <bitset>
 #include <catch.hpp>
 #include <sstream>
-#include <bitset>
 
 using namespace aarith;
 
@@ -242,25 +242,43 @@ SCENARIO("Left shift operator works as expected", "[sinteger][bit_logic]")
     }
 }
 
-//SCENARIO("Create negative sintegers")
-//{
-//    int64_t n = -1;
-//    uint64_t pos_n = static_cast<uint64_t >(n);
-//    std::cout << n << "\t" << pos_n << "\n";
-//    std::cout << std::bitset<64>{pos_n} << "\n";
-//    sinteger<64> negative{-1};
-//    std::cout << negative.word(0) << "\n";
-//    std::cout << -negative.word(0) << "\n";
-//
-//    CHECK(abs(negative) == sinteger<64>{1U});
-//}
-
-SCENARIO("Test unary negation")
+SCENARIO("Create negative sintegers","[sinteger][bit_logic]")
 {
+    GIVEN("A int64_t negative number")
+    {
+        int64_t n = GENERATE(take(100,random(-922337236854775808,-1L)));
+        int64_t pos_n = -n;
 
+        sinteger<64> zero;
+
+        WHEN("We create a signed integer from it")
+        {
+
+            sinteger<64> negative{n};
+            sinteger<64> positive{pos_n};
+
+            THEN("Then it behaves as expected")
+            {
+                CHECK(add(negative, positive) == zero);
+            }
+
+            THEN("Negation works as expected")
+            {
+                CHECK(-negative == positive);
+                CHECK(-(-negative) == negative);
+                CHECK(-(-positive) == positive);
+            }
+            THEN ("Computing absolute value works as expected") {
+                CHECK(abs(negative) == positive);
+                CHECK(abs(negative) == -negative);
+                CHECK(abs(abs(negative)) == positive);
+                CHECK(abs(positive) == positive);
+            }
+        }
+    }
 }
 
-// SCENARIO("Right shift operator works as expected", "[sinteger][utility]")
+// SCENARIO("Right shift operator works as expected", "[sinteger][bit-logic]")
 //{
 //    GIVEN("One sinteger a and a number of shifted bits s")
 //    {

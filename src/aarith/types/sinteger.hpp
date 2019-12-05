@@ -70,14 +70,8 @@ public:
         return *this = *this + addend;
     }
 
-//    auto operator-() const -> sinteger
-//    {
-//        const sinteger<Width> one(1U);
-//        return ~(*this) + one;
-//    }
-
     /**
-     *
+     * @brief Returns whether the number is negative.
      * @return Whether the number is negative
      */
     [[nodiscard]] bool is_negative() const
@@ -98,10 +92,6 @@ public:
     static constexpr bool value = false;
 };
 
-//template <size_t Width> auto abs(const sinteger<Width>& value) -> sinteger<Width>
-//{
-//    return value.is_negative() ? -value : value;
-//}
 
 template <size_t Width>
 [[nodiscard]] auto operator&(const sinteger<Width>& lhs, const sinteger<Width>& rhs)

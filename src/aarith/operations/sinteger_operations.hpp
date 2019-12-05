@@ -41,7 +41,7 @@ template <size_t W, size_t V>
 /**
  * @brief Adds two signed integers
  *
- * @tparam UInteger The unsigned integer instance used for the addition
+ * @tparam W The width of the signed integer
  * @param a First summand
  * @param b Second summand
  * @return Sum of a and b
@@ -50,6 +50,23 @@ template <size_t W>[[nodiscard]] sinteger<W> add(const sinteger<W>& a, const sin
 {
     sinteger<W + 1> result = expanding_add<W, W>(a, b);
     return width_cast<W>(result);
+}
+
+/**
+ * @brief Computes the absolute value of a given signed integer.
+ * @tparam Width The width of the signed integer
+ * @param n The signed inter to be "absolute valued"
+ * @return The absolute value of the signed integer provided
+ */
+template <size_t Width> auto abs(const sinteger<Width>& n) -> sinteger<Width>
+{
+    return n.is_negative() ? -n : n;
+}
+
+template <size_t W> auto operator-(const sinteger<W>& n) -> sinteger<W>
+{
+    const sinteger<W> one(1U);
+    return add(~n, one);
 }
 
 } // namespace aarith
