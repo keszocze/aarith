@@ -76,6 +76,49 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
     }
 }
 
+SCENARIO("Adding tow uintgers of different bit width","[uinteger][arithmetic][addition]")
+{
+    GIVEN("An uinteger of bit width 128") {
+
+        static const uinteger<128> large=uinteger<128>::from_words(1U,0U);
+        static const uint32_t m_ = GENERATE(take(100,random(static_cast<uint32_t>(0U),std::numeric_limits<uint32_t>::max())));
+
+        static const uinteger<32>m{m_};
+
+        THEN("Adding a small number of bit width 32 should not change the second word") {
+            uinteger<129> result=expanding_add(large,m);
+            CHECK(result.word(2) == 0U);
+            CHECK(result.word(1) == 1U);
+            REQUIRE(result.word(0) == m_);
+        }
+
+        THEN("The addition with 32 bits should still be commutative")
+        {
+            uinteger<129> result1=expanding_add(large,m);
+            uinteger<129> result2=expanding_add(m,large);
+            REQUIRE(result1 == result2);
+        }
+
+
+    }
+    GIVEN ("An uinteger consisting of zeros only") {
+        static constexpr uint64_t ones = static_cast<uint64_t>(-1);
+        static const uinteger<128> large=uinteger<128>::from_words(ones,ones);
+
+        THEN("Adding a one with few bits should create a correct overflow")
+        {
+
+            static const uinteger<32> one{1U};
+
+            const uinteger<129> result = expanding_add(large,one);
+            CHECK(result.word(2) == 1U);
+            CHECK(result.word(1) == 0U);
+            REQUIRE(result.word(0) == 0U);
+
+        }
+    }
+}
+
 SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtraction]")
 {
     GIVEN("Two uinteger<N> a and b are subtracted")
