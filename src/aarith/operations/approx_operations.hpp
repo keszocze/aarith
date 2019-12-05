@@ -1,14 +1,26 @@
 #pragma once
 
+#include "aarith/types/integer.hpp"
+#include <aarith/operations/exact_operations.hpp>
 #include <cstdint>
 #include <iostream>
-#include "aarith/types/integer.hpp"
 
 namespace aarith {
 
-template <class UInteger> auto generate_bitmask(const size_t bits) -> UInteger
+/**
+ * @brief Generates an uinteger of given size with the specified number of leading ones.
+ *
+ * Example: generate_bitmask<uinteger<10>(3) = 1110000000
+ *
+ * @tparam UInteger The underlying data type
+ * @param leading_ones The number of leading ones
+ * @return The bit bask consisting of leading_ones ones followed by zeros
+ */
+template <class UInteger> auto generate_bitmask(const size_t leading_ones) -> UInteger
 {
     using word_type = typename UInteger::word_type;
+
+    const size_t bits = UInteger::width() - leading_ones;
 
     constexpr auto full_mask = static_cast<word_type>(-1);
     const auto full_mask_words = bits / static_cast<size_t>(UInteger::word_width());
@@ -26,29 +38,121 @@ template <class UInteger> auto generate_bitmask(const size_t bits) -> UInteger
     {
         mask.set_word(counter, last_word_mask);
     }
-    return mask;
+    return ~mask;
+}
+
+template <class UInteger, class Function>
+[[nodiscard]] UInteger
+approx_operation_post_masking(const UInteger& a, const UInteger b,
+                              Function fun,
+                              const size_t bits = UInteger::width())
+{
+    const UInteger result = fun(a,b);
+    const UInteger mask = generate_bitmask<UInteger>(bits);
+
+    return result & mask;
 }
 
 template <class UInteger>
-auto approx_uint_bitmasking_add(const UInteger& opd1, const UInteger& opd2, const size_t bits)
-    -> UInteger
+[[nodiscard]] UInteger approx_add_post_masking(const UInteger& a, const UInteger b,
+                                               const size_t bits = UInteger::width())
 {
-    auto const mask = ~generate_bitmask<UInteger>(UInteger::width() - bits);
-
-    auto const opd1_masked = opd1 & mask;
-    auto const opd2_masked = opd2 & mask;
-
-    auto const sum = add(opd1_masked, opd2_masked);
-    return sum;
+    return approx_operation_post_masking(a,b,&aarith::add<UInteger::width()>,bits);
 }
 
+template <class UInteger>
+[[nodiscard]] UInteger approx_mul_post_masking(const UInteger& a, const UInteger b,
+                                               const size_t bits = UInteger::width())
+{
+    return approx_operation_post_masking(a,b,&aarith::mul<UInteger::width()>,bits);
+}
+
+template <class UInteger>
+[[nodiscard]] UInteger approx_sub_post_masking(const UInteger& a, const UInteger b,
+                                               const size_t bits = UInteger::width())
+{
+    return approx_operation_post_masking(a,b,&aarith::sub<UInteger::width()>,bits);
+}
+
+template <class UInteger>
+[[nodiscard]] UInteger approx_div_post_masking(const UInteger& a, const UInteger b,
+                                               const size_t bits = UInteger::width())
+{
+    return approx_operation_post_masking(a,b,&aarith::div<UInteger>,bits);
+}
+
+template <class UInteger>
+[[nodiscard]] UInteger approx_rem_post_masking(const UInteger& a, const UInteger b,
+                                               const size_t bits = UInteger::width())
+{
+    return approx_operation_post_masking(a,b,&aarith::remainder<UInteger>,bits);
+}
+
+template <class UInteger, class Function>
+[[nodiscard]] UInteger
+approx_operation_pre_masking(const UInteger& a, const UInteger b,
+                              Function fun,
+                              const size_t bits = UInteger::width())
+{
+    const UInteger mask = generate_bitmask<UInteger>(bits);
+    auto const a_masked = a & mask;
+    auto const b_masked = b & mask;
+
+
+    return fun(a_masked, b_masked);
+}
+
+template <class UInteger>
+[[nodiscard]] UInteger approx_add_pre_masking(const UInteger& a, const UInteger b,
+                                               const size_t bits = UInteger::width())
+{
+    return approx_operation_pre_masking(a,b,&aarith::add<UInteger::width()>,bits);
+}
+
+template <class UInteger>
+[[nodiscard]] UInteger approx_mul_pre_masking(const UInteger& a, const UInteger b,
+                                               const size_t bits = UInteger::width())
+{
+    return approx_operation_pre_masking(a,b,&aarith::mul<UInteger::width()>,bits);
+}
+
+template <class UInteger>
+[[nodiscard]] UInteger approx_sub_pre_masking(const UInteger& a, const UInteger b,
+                                               const size_t bits = UInteger::width())
+{
+    return approx_operation_pre_masking(a,b,&aarith::sub<UInteger::width()>,bits);
+}
+
+template <class UInteger>
+[[nodiscard]] UInteger approx_div_pre_masking(const UInteger& a, const UInteger b,
+                                               const size_t bits = UInteger::width())
+{
+    return approx_operation_pre_masking(a,b,&aarith::div<UInteger>,bits);
+}
+
+template <class UInteger>
+[[nodiscard]] UInteger approx_rem_pre_masking(const UInteger& a, const UInteger b,
+                                               const size_t bits = UInteger::width())
+{
+    return approx_operation_pre_masking(a,b,&aarith::remainder<UInteger>,bits);
+}
+
+/**
+ * @brief Multiplies the given most-significand portion of two uintegers by masking the partial products used in the multiplication
+ *
+ * @tparam Width The width of the used uintegers
+ * @param opd1 Multiplier
+ * @param opd2 Multiplicand
+ * @param bits Number of most-significand bits to be calculated
+ * @return The result of the multiplication with double the size of the inputs
+ */
 template <size_t width>
-auto approx_uint_bitmasking_mul(const uinteger<width>& opd1, const uinteger<width>& opd2, const size_t bits)
-    -> uinteger<2*width>
+auto approx_uint_bitmasking_mul(const uinteger<width>& opd1, const uinteger<width>& opd2,
+                                const size_t bits) -> uinteger<2 * width>
 {
     constexpr auto product_width = 2 * width;
 
-    auto const mask = ~generate_bitmask<uinteger<product_width>>(product_width - bits);
+    auto const mask = generate_bitmask<uinteger<product_width>>(bits);
 
     uinteger<product_width> opd2_extended = width_cast<product_width, width>(opd2);
 

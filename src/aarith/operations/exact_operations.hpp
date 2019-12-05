@@ -73,7 +73,7 @@ template <size_t W, size_t V=W>
     static_assert(is_integral<uinteger<W>>::value);
     static_assert(is_unsigned<uinteger<W>>::value);
 
-    return width_cast<W>(expanding_add(a, ~b, true));
+    return width_cast<std::max(W, V)>(expanding_add(a, ~b, true));
 }
 
 
