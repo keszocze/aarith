@@ -38,7 +38,7 @@ template <size_t W, size_t V>
     for (auto i = 0U; i < a.word_count(); ++i)
     {
         auto const partial_sum = a.word(i) + b.word(i) + carry;
-        carry = (partial_sum < a.word(i) || partial_sum < b.word(i)) ? 1 : 0;
+        carry = (partial_sum < a.word(i) || partial_sum < b.word(i)) ? 1U : 0U;
         sum.set_word(i, partial_sum);
     }
     return sum;
