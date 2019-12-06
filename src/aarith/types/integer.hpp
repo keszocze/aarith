@@ -220,6 +220,22 @@ public:
         });
     }
 
+
+    [[nodiscard]] static constexpr uinteger min() {
+        uinteger n;
+        return n;
+    }
+
+    [[nodiscard]] static constexpr uinteger zero() {
+        return min();
+    }
+
+    [[nodiscard]] static constexpr uinteger one() {
+        uinteger n;
+        n.set_bit(0);
+        return n;
+    }
+
     [[nodiscard]] static constexpr uinteger max()
     {
         uinteger n;
@@ -508,5 +524,5 @@ public:
         return aarith::uinteger<W>::max();
     }
 
-    
+
 };
