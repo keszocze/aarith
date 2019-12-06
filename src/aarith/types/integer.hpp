@@ -4,12 +4,12 @@
 #include "traits.hpp"
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstdint>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
-#include <cmath>
 
 namespace aarith {
 
@@ -218,6 +218,17 @@ public:
             word_type zero = 0U;
             return w != zero;
         });
+    }
+
+    [[nodiscard]] static constexpr uinteger max()
+    {
+        uinteger n;
+        word_type ones = ~(static_cast<word_type>(0U));
+        for (size_t i = 0; i < n.word_count(); ++i)
+        {
+            n.set_word(i, ones);
+        }
+        return n;
     }
 
     constexpr auto begin() const noexcept
@@ -458,15 +469,17 @@ public:
     static constexpr bool is_bounded = true;
     static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
     static constexpr bool has_denorm_loss = false;
-    static constexpr std::float_round_style round_style = std::round_toward_zero; // TODO do we need to takte that into account somewhere?
+    static constexpr std::float_round_style round_style =
+        std::round_toward_zero; // TODO do we need to takte that into account somewhere?
     static constexpr bool is_iec559 = false;
     static constexpr bool is_module = true;
     static constexpr int radix = 2;
     static constexpr int digits = W; // TODO what happens if W > max_int?
-    static constexpr int digits10 = std::numeric_limits<aarith::uinteger<W>>::digits * std::log10(std::numeric_limits<aarith::uinteger<W>>::radix);
+    static constexpr int digits10 = std::numeric_limits<aarith::uinteger<W>>::digits *
+                                    std::log10(std::numeric_limits<aarith::uinteger<W>>::radix);
 
-
-    // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says so
+    // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says
+    // so
     static constexpr int max_digits10 = 0;
 
     static constexpr int min_exponent = 0;
@@ -474,19 +487,26 @@ public:
     static constexpr int max_exponent = 0;
     static constexpr int max_exponent10 = 0;
 
-    // Is this correct? At least division by zero throws an exception, so this value is, most likely, correct.
+    // Is this correct? At least division by zero throws an exception, so this value is, most
+    // likely, correct.
     static constexpr bool traps = true;
 
     static constexpr bool tinyness_before = false;
 
-
-    static constexpr aarith::uinteger<W> min() noexcept {
+    static constexpr aarith::uinteger<W> min() noexcept
+    {
         return aarith::uinteger<W>{0U};
     }
 
-    static constexpr aarith::uinteger<W> lowest() noexcept {
+    static constexpr aarith::uinteger<W> lowest() noexcept
+    {
         return aarith::uinteger<W>{0U};
     }
 
+    static constexpr aarith::uinteger<W> max() noexcept
+    {
+        return aarith::uinteger<W>::max();
+    }
 
+    
 };

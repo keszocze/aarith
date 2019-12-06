@@ -1,6 +1,7 @@
 #include "aarith/operations/comparisons.hpp"
 #include "aarith/operations/exact_operations.hpp"
 #include "aarith/types/integer.hpp"
+#include "aarith/utilities/string_utils.hpp"
 #include <catch.hpp>
 
 using namespace aarith;
@@ -140,6 +141,21 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
                     REQUIRE(expected == result);
                 }
             }
+        }
+    }
+
+    GIVEN("The uintegers zero and one")
+    {
+        THEN("Subtracting one from zero yields the maximal value") {
+
+            // completely randomly chosen bit width
+            static const uinteger<72> zero;
+            static const uinteger<72> one{1U};
+
+            static const uinteger<72> result = sub(zero,one);
+            static const uinteger<72> expected = uinteger<72>::max();
+
+            REQUIRE(result == expected);
         }
     }
 
