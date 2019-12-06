@@ -58,7 +58,7 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
                 REQUIRE(result.word(1) == 1);
             }
         }
-        
+
         WHEN("There is no carry into the next word")
         {
             static constexpr uint64_t number_a = 1ULL << 63;
