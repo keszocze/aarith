@@ -3,10 +3,37 @@
 #include <aarith/utilities/string_utils.hpp>
 #include <catch.hpp>
 #include <sstream>
+#include <iostream>
 
 using namespace aarith;
 
-SCENARIO("Casting uintegers into different width", "[uinteger]")
+SCENARIO("Creating uintegers using the from_words method")
+{
+    WHEN("The uinteger does not have a bit width as a multiple of the word width")
+    {
+        THEN("The constructed uinteger should be correct")
+        {
+            const uint64_t uzero = 0U;
+            const uint64_t uones = ~uzero;
+
+
+
+
+            const uinteger<89> from_word=uinteger<89>::from_words(uzero,uones);
+            uinteger<89> manually;
+            manually.set_word(0,uones);
+            manually.set_word(1,uzero);
+
+            CHECK(from_word == manually);
+            CHECK(from_word.word(0) == uones);
+            CHECK(from_word.word(1) == uzero);
+            CHECK(manually.word(0) == uones);
+            REQUIRE(manually.word(1) == uzero);
+        }
+    }
+}
+
+ SCENARIO("Casting uintegers into different width", "[uinteger]")
 {
     GIVEN("width_cast is called")
     {
@@ -45,7 +72,7 @@ SCENARIO("Casting uintegers into different width", "[uinteger]")
     }
 }
 
-SCENARIO("Copy constructor of uintegers with various bit widths", "[uinteger][utility]")
+ SCENARIO("Copy constructor of uintegers with various bit widths", "[uinteger][utility]")
 {
     GIVEN("An uinteger<N> a")
     {
@@ -117,7 +144,7 @@ SCENARIO("Copy constructor of uintegers with various bit widths", "[uinteger][ut
     }
 }
 
-SCENARIO("Calculating the word_masks of uintegers", "[uinteger][utility]")
+ SCENARIO("Calculating the word_masks of uintegers", "[uinteger][utility]")
 {
     // The tests all assume that uinteger uses 64-bit words.
     static_assert(uinteger<64>::word_width() == 64);
@@ -161,7 +188,7 @@ SCENARIO("Calculating the word_masks of uintegers", "[uinteger][utility]")
     }
 }
 
-SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
+ SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
 {
     GIVEN("One uinteger a and a number of shifted bits s")
     {
@@ -271,8 +298,8 @@ SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
             const size_t Width = 192;
 
             static constexpr uint16_t number_a = 3;
-            static constexpr auto s = 2U * static_cast<size_t>(uinteger<Width>::word_width()) - 1U;
-            const uinteger<Width> a{number_a};
+            static constexpr auto s = 2U * static_cast<size_t>(uinteger<Width>::word_width()) -
+            1U; const uinteger<Width> a{number_a};
 
             auto reference = a.word(0) << (s % (sizeof(uinteger<Width>::word_width()) * 8));
 
@@ -284,7 +311,7 @@ SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
     }
 }
 
-SCENARIO("Right shift operator works as expected", "[uinteger][utility]")
+ SCENARIO("Right shift operator works as expected", "[uinteger][utility]")
 {
     GIVEN("One uinteger a and a number of shifted bits s")
     {
@@ -413,7 +440,7 @@ SCENARIO("Right shift operator works as expected", "[uinteger][utility]")
     }
 }
 
-SCENARIO("Logical AND works as expected", "[uinteger][arithmetic]")
+ SCENARIO("Logical AND works as expected", "[uinteger][arithmetic]")
 {
     GIVEN("Two uintegers")
     {
@@ -433,7 +460,7 @@ SCENARIO("Logical AND works as expected", "[uinteger][arithmetic]")
     }
 }
 
-SCENARIO("Logical OR works as expected", "[uinteger][arithmetic]")
+ SCENARIO("Logical OR works as expected", "[uinteger][arithmetic]")
 {
     GIVEN("Two uintegers")
     {
@@ -453,7 +480,7 @@ SCENARIO("Logical OR works as expected", "[uinteger][arithmetic]")
     }
 }
 
-SCENARIO("Logical NOT works as expected", "[uinteger][arithmetic]")
+ SCENARIO("Logical NOT works as expected", "[uinteger][arithmetic]")
 {
     GIVEN("One uintegers")
     {
@@ -471,7 +498,7 @@ SCENARIO("Logical NOT works as expected", "[uinteger][arithmetic]")
     }
 }
 
-SCENARIO("Checking whether an uinteger is not equal to zero/false")
+ SCENARIO("Checking whether an uinteger is not equal to zero/false")
 {
     GIVEN("An uinteger<N>=0=a for various N")
     {
@@ -535,7 +562,7 @@ SCENARIO("Checking whether an uinteger is not equal to zero/false")
     }
 }
 
-SCENARIO("Using the for loop operation feature from ")
+ SCENARIO("Using the for loop operation feature from ")
 {
     GIVEN("An unsigned integer")
     {
@@ -624,7 +651,7 @@ SCENARIO("Using the for loop operation feature from ")
     }
 }
 
-SCENARIO("Bit operations are performed correctly", "[uinteger][bit]")
+ SCENARIO("Bit operations are performed correctly", "[uinteger][bit]")
 {
     GIVEN("An uinteger<N> n")
     {
@@ -683,5 +710,5 @@ SCENARIO("Bit operations are performed correctly", "[uinteger][bit]")
     }
 }
 
-// for static_assert tests:
-// https://stackoverflow.com/questions/30155619/expected-build-failure-tests-in-cmake
+//// for static_assert tests:
+//// https://stackoverflow.com/questions/30155619/expected-build-failure-tests-in-cmake
