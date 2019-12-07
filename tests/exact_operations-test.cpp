@@ -184,19 +184,6 @@ SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
         static const uinteger<89> min = uinteger<89>::min();
         static const uinteger<89> max = uinteger<89>::max();
 
-        THEN("FASD")
-        {
-            const uinteger<89> a = uinteger<89>::from_words(0U, static_cast<uint64_t>(-1));
-            const uinteger<128> b = uinteger<128>::from_words(0U, static_cast<uint64_t>(-1));
-
-            std::cout << group_digits(to_binary(a), 64) << " (a)\n"
-                      << group_digits(to_binary(add(a, a)), 64) << " (a+a)\n";
-            std::cout << group_digits(to_binary(b), 64) << " (b)\n";
-            std::cout << group_digits(
-                             to_binary(uinteger<89>::from_words(0U, static_cast<uint64_t>(-1))), 64)
-                      << " (from_words)\n";
-        }
-
         THEN("Bit-wise complement should yield the other one")
         {
             CHECK(~min == max);
@@ -207,17 +194,14 @@ SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
         {
             static const uinteger<89> n{23543785U}; // randomly chosen
 
-            //            CHECK(add(max,min) == max);
-            //            CHECK(add(n,min) == n);
+            CHECK(add(max,min) == max);
+            CHECK(add(n,min) == n);
 
-            CHECK(sub(max, min) == max);
-            std::cout << group_digits(to_binary(max), 64) << "\n";
-            std::cout << group_digits(to_binary(min), 64) << "\n";
-            std::cout << group_digits(to_binary(~min), 64) << "\n";
-            std::cout << group_digits(to_binary(add(~min, uinteger<89>::one())), 64) << "\n";
-            std::cout << group_digits(to_binary(sub(max, min)), 64) << "\n";
+            uinteger<89> result;
+            result = sub(max,min);
+            CHECK(result == max);
 
-            //            REQUIRE(sub(n,min) == n);
+            REQUIRE(sub(n,min) == n);
         }
 
         AND_GIVEN("The uintegers zero and one")
@@ -392,8 +376,8 @@ SCENARIO("Bit and Word operations work correctly", "[uinteger][utility]")
                 }
                 else
                 {
-                    std::cout << uinteger<64>{mask} << "\t" << a << "\t" << uinteger<64>{a.word(0)}
-                              << "\n";
+//                    std::cout << uinteger<64>{mask} << "\t" << a << "\t" << uinteger<64>{a.word(0)}
+//                              << "\n";
                     CHECK(!is_one);
                 }
             }

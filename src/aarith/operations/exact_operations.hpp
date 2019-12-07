@@ -3,6 +3,7 @@
 #include <aarith/types/integer.hpp>
 #include <aarith/types/traits.hpp>
 #include <aarith/utilities/bit_operations.hpp>
+#include <aarith/operations/comparisons.hpp>
 
 #include <iostream>
 
@@ -38,7 +39,8 @@ template <size_t W, size_t V>
     for (auto i = 0U; i < a.word_count(); ++i)
     {
         auto const partial_sum = a.word(i) + b.word(i) + carry;
-        carry = (partial_sum < a.word(i) || partial_sum < b.word(i)) ? 1U : 0U;
+        carry =
+            (partial_sum < a.word(i) || partial_sum < b.word(i)) ? 1U : 0U;
         sum.set_word(i, partial_sum);
     }
     return sum;
@@ -61,21 +63,22 @@ template <size_t W>[[nodiscard]] uinteger<W> add(const uinteger<W>& a, const uin
 /**
  * @brief Computes the difference of two unsigned integers.
  *
- * @tparam UInteger The unsigned integer instance used for the operation
+ * @tparam W The bit width of the operands
  * @param a Minuend
  * @param b Subtrahend
  * @return Difference between a and b
  */
-template <size_t W, size_t V=W>
-[[nodiscard]] auto sub(const uinteger<W>& a, const uinteger<V>& b)
-    -> uinteger<std::max(W, V)>
+template <size_t W>
+[[nodiscard]] auto sub(const uinteger<W>& a, const uinteger<W>& b) -> uinteger<W>
 {
     static_assert(is_integral<uinteger<W>>::value);
     static_assert(is_unsigned<uinteger<W>>::value);
 
-    return width_cast<std::max(W, V)>(expanding_add(a, ~b, true));
+    uinteger<W> result;
+    uinteger<W> minus_b = add(~b, uinteger<W>::one());
+    result = add(a, minus_b);
+    return result;
 }
-
 
 /**
  * @brief Multiplies two unsigned integers expanding the bit width so that the result fits.
