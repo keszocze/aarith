@@ -5,6 +5,7 @@
 #include <aarith/types/word_container.hpp>
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstdint>
 #include <iostream>
 #include <stdexcept>
@@ -42,6 +43,32 @@ public:
     {
     }
 
+    /*
+     * Constants
+     */
+
+    [[nodiscard]] static constexpr uinteger min()
+    {
+        return uinteger::all_zeroes();
+    }
+
+    [[nodiscard]] static constexpr uinteger max()
+    {
+        return uinteger::all_ones();
+    }
+
+    [[nodiscard]] static constexpr uinteger zero()
+    {
+        return uinteger::all_zeroes();
+    }
+
+    [[nodiscard]] static constexpr uinteger one()
+    {
+        uinteger n=uinteger::all_zeroes();
+        n.set_bit(0);
+        return n;
+    }
+
     auto operator<<=(const size_t shift_by) -> uinteger&
     {
         return *this = *this << shift_by;
@@ -58,8 +85,6 @@ public:
     }
 };
 
-
-
 template <size_t Width>
 [[nodiscard]] auto operator<<(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
 {
@@ -73,10 +98,8 @@ template <size_t Width>
 auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
 {
 
-
     word_container<Width> tmp{lhs};
     return uinteger<Width>{tmp >> rhs};
-
 }
 
 template <size_t Width>
@@ -122,21 +145,19 @@ template <size_t DestinationWidth, size_t SourceWidth>
 /*
  * Traits
  */
-    template <size_t Width> class is_integral<uinteger<Width>>
-    {
-    public:
-        static constexpr bool value = true;
-    };
+template <size_t Width> class is_integral<uinteger<Width>>
+{
+public:
+    static constexpr bool value = true;
+};
 
-    template <size_t Width> class is_unsigned<uinteger<Width>>
-    {
-    public:
-        static constexpr bool value = true;
-    };
+template <size_t Width> class is_unsigned<uinteger<Width>>
+{
+public:
+    static constexpr bool value = true;
+};
 
 } // namespace aarith
-
-
 
 // We are only allowed to extend std with specializations
 // https://en.cppreference.com/w/cpp/language/extending_std
@@ -154,7 +175,7 @@ public:
     static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
     static constexpr bool has_denorm_loss = false;
     static constexpr std::float_round_style round_style =
-            std::round_toward_zero; // TODO do we need to takte that into account somewhere?
+        std::round_toward_zero; // TODO do we need to takte that into account somewhere?
     static constexpr bool is_iec559 = false;
     static constexpr bool is_module = true;
     static constexpr int radix = 2;
@@ -184,7 +205,8 @@ public:
 
     static constexpr aarith::uinteger<W> lowest() noexcept
     {
-        return aarith::uinteger<W>::zero();;
+        return aarith::uinteger<W>::zero();
+        ;
     }
 
     static constexpr aarith::uinteger<W> max() noexcept
@@ -221,6 +243,4 @@ public:
     {
         return aarith::uinteger<W>::min();
     }
-
-
 };

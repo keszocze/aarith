@@ -219,6 +219,26 @@ public:
     }
 
     /*
+     * Constants
+     */
+
+    [[nodiscard]] static constexpr word_container all_ones()
+    {
+        word_container n;
+        word_type ones = ~(static_cast<word_type>(0U));
+        for (size_t i = 0; i < n.word_count(); ++i)
+        {
+            n.set_word(i, ones);
+        }
+        return n;
+    }
+
+    [[nodiscard]] static constexpr word_container all_zeroes()
+    {
+        return word_container{0U};
+    }
+
+    /*
      * Utility stuff
      */
 
@@ -237,7 +257,6 @@ public:
             return w != zero;
         });
     }
-
 
     constexpr auto begin() const noexcept
     {
@@ -298,8 +317,6 @@ private:
 
     std::array<word_type, word_count()> words{{0}};
 };
-
-
 
 template <size_t DestinationWidth, size_t SourceWidth>
 [[nodiscard]] auto width_cast(const word_container<SourceWidth>& source)
@@ -450,6 +467,4 @@ auto operator>>(const word_container<Width>& lhs, const size_t rhs) -> word_cont
     return shifted;
 }
 
-
 } // namespace aarith
-
