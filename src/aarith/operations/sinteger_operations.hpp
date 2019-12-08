@@ -15,8 +15,7 @@ namespace aarith {
  * @return Sum of correct maximal bit width
  */
 template <size_t W, size_t V>
-[[nodiscard]] sinteger<std::max(W, V) + 1> expanding_add(const sinteger<W>& a, const sinteger<V>& b,
-                                                         const bool initial_carry = false)
+[[nodiscard]] sinteger<std::max(W, V) + 1> expanding_add(const sinteger<W>& a, const sinteger<V>& b)
 {
     static_assert(is_integral<sinteger<W>>::value);
     static_assert(is_integral<sinteger<V>>::value);
@@ -25,10 +24,6 @@ template <size_t W, size_t V>
 
     sinteger<res_width> sum;
     typename sinteger<res_width>::word_type carry{0U};
-    if (initial_carry)
-    {
-        carry = 1U;
-    }
     for (auto i = 0U; i < a.word_count(); ++i)
     {
         auto const partial_sum = a.word(i) + b.word(i) + carry;
