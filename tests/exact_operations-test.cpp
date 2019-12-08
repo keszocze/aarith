@@ -190,18 +190,52 @@ SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
             REQUIRE(~max == min);
         }
 
+        WHEN("Adding to max value")
+        {
+            const uint64_t a_ = GENERATE(
+                take(100, random(static_cast<uint64_t>(1), std::numeric_limits<uint64_t>::max())));
+            const uinteger<89> a{a_};
+            const uinteger<89> expected_trunc{a_ - 1};
+
+            THEN("Truncating addition is overflow modulo 2")
+            {
+                uinteger<89> result = add(max, a);
+                REQUIRE(result == expected_trunc);
+            }
+
+            THEN("Expanding addition has the highest bet set and is modulo 2 otherwise")
+            {
+                uinteger<90> result = expanding_add(max,a);
+                CHECK(result.bit(89));
+                REQUIRE(width_cast<89>(result) == expected_trunc);
+            }
+        }
+
+        WHEN("Subracting from min value")
+        {
+            const uint64_t a_ = GENERATE(
+                    take(100, random(static_cast<uint64_t>(0), std::numeric_limits<uint64_t>::max())));
+            const uinteger<89> a{a_};
+
+
+            THEN("Truncating subtraction is underflow modulo 2")
+            {
+                const uinteger<89> expected = sub(uinteger<89>::max(), uinteger<89>{a_ - 1});
+                uinteger<89> result = sub(min, a);
+                REQUIRE(result == expected);
+            }
+
+
+        }
+
         THEN("Adding or subtracting min should not change the other value")
         {
             static const uinteger<89> n{23543785U}; // randomly chosen
 
-            CHECK(add(max,min) == max);
-            CHECK(add(n,min) == n);
-
-            uinteger<89> result;
-            result = sub(max,min);
-            CHECK(result == max);
-
-            REQUIRE(sub(n,min) == n);
+            CHECK(add(max, min) == max);
+            CHECK(add(n, min) == n);
+            CHECK(sub(max, min) == max);
+            REQUIRE(sub(n, min) == n);
         }
 
         AND_GIVEN("The uintegers zero and one")
@@ -376,8 +410,9 @@ SCENARIO("Bit and Word operations work correctly", "[uinteger][utility]")
                 }
                 else
                 {
-//                    std::cout << uinteger<64>{mask} << "\t" << a << "\t" << uinteger<64>{a.word(0)}
-//                              << "\n";
+                    //                    std::cout << uinteger<64>{mask} << "\t" << a << "\t" <<
+                    //                    uinteger<64>{a.word(0)}
+                    //                              << "\n";
                     CHECK(!is_one);
                 }
             }
