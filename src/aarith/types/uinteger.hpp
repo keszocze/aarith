@@ -192,8 +192,7 @@ public:
     static constexpr int digits10 = std::numeric_limits<aarith::uinteger<W>>::digits *
                                     std::log10(std::numeric_limits<aarith::uinteger<W>>::radix);
 
-    // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says
-    // so
+    // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says so
     static constexpr int max_digits10 = 0;
 
     static constexpr int min_exponent = 0;

@@ -157,14 +157,8 @@ public:
     {
         if (index >= width())
         {
-            // TODO generate the string elsewhere
-            std::string msg;
-            msg += "Trying to access bit with index ";
-            msg += std::to_string(index);
-            msg += " for word_container<";
-            msg += std::to_string(width());
-            msg += "> with max index ";
-            msg += std::to_string(width() - 1);
+
+            std::string msg = gen_oob_msg(index, true);
             throw std::out_of_range(msg);
         }
         const size_t word_index = index / word_width();
@@ -198,15 +192,7 @@ public:
     {
         if (index >= word_count())
         {
-            // TODO generate the string elsewhere
-            std::string msg;
-            msg += "Trying to access word with index ";
-            msg += std::to_string(index);
-            msg += " for word_container<";
-            msg += std::to_string(width());
-            msg += "> with max index ";
-            msg += std::to_string(word_count() - 1);
-
+            std::string msg = gen_oob_msg(index, false);
             throw std::out_of_range(msg);
         }
         words[index] = value & word_mask(index);
@@ -313,6 +299,31 @@ private:
         static_assert(index < word_count(), "too many initializer words");
         words[0] = value & word_mask(0);
         return index;
+    }
+
+    std::string gen_oob_msg(size_t index, bool accessed_bit = true)
+    {
+
+        std::string msg, head, foot;
+        if (accessed_bit)
+        {
+            head = "Trying to access bit with index ";
+            foot = std::to_string(width() - 1);
+        }
+        else
+        {
+            head = "Trying to access word with index ";
+            foot = std::to_string(word_count() - 1);
+        }
+
+        msg += head;
+        msg += std::to_string(index);
+        msg += " for word_container<";
+        msg += std::to_string(width());
+        msg += "> with max index ";
+        msg += foot;
+
+        return msg;
     }
 
     std::array<word_type, word_count()> words{{0}};
