@@ -105,11 +105,11 @@ template <std::size_t W, std::size_t V>
         static_assert(is_integral<uinteger<res_width>>::value);
         static_assert(is_unsigned<uinteger<res_width>>::value);
 
-        const auto leading_zeroes = count_leading_zeroes(b);
+        const auto first_one_index = V - count_leading_zeroes(b);
         uinteger<res_width> a_ = width_cast<res_width>(a);
 
         auto bit_index = 0U;
-        while (bit_index < leading_zeroes)
+        while (bit_index < first_one_index)
         {
             if (b.bit(bit_index))
             {
