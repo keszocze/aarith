@@ -43,6 +43,13 @@ public:
     {
     }
 
+    template <class... Args> static auto from_words(Args... args) -> uinteger
+    {
+        uinteger n;
+        n.set_words(args...);
+        return n;
+    }
+
     /*
      * Constants
      */
