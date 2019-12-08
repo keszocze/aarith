@@ -1,7 +1,5 @@
 #pragma once
 
-#include "aarith/types/uinteger.hpp"
-
 #include <limits>
 
 namespace aarith {
