@@ -59,7 +59,7 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
                 REQUIRE(result.word(1) == 1);
             }
         }
-        
+
         WHEN("There is no carry into the next word")
         {
             static constexpr uint64_t number_a = 1ULL << 63;
@@ -381,7 +381,7 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
         AND_GIVEN("A random number b")
         {
             uint64_t val_b = GENERATE(take(
-                1000, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
+                100, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
             uinteger<64> b{val_b};
 
             THEN("The multiplication should match its uint64_t counterpart")
