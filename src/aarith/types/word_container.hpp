@@ -238,46 +238,7 @@ public:
         });
     }
 
-    [[nodiscard]] static constexpr auto word_mask(size_t index) noexcept -> word_type
-    {
 
-        constexpr word_type other_masks = static_cast<word_type>(-1); // all ones, e.g. no masking
-        constexpr word_type last_mask =
-            (width() % word_width() != 0)
-                ? (static_cast<word_type>(1) << (width() % word_width())) - 1
-                : static_cast<word_type>(-1);
-        return (index == word_count() - 1) ? last_mask : other_masks;
-    };
-
-
-    [[nodiscard]] static constexpr uinteger min()
-    {
-        uinteger n;
-        return n;
-    }
-
-    [[nodiscard]] static constexpr uinteger zero()
-    {
-        return min();
-    }
-
-    [[nodiscard]] static constexpr uinteger one()
-    {
-        uinteger n;
-        n.set_bit(0);
-        return n;
-    }
-
-    [[nodiscard]] static constexpr uinteger max()
-    {
-        uinteger n;
-        word_type ones = ~(static_cast<word_type>(0U));
-        for (size_t i = 0; i < n.word_count(); ++i)
-        {
-            n.set_word(i, ones);
-        }
-        return n;
-    }
     constexpr auto begin() const noexcept
     {
         return words.begin();
