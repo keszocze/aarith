@@ -220,17 +220,19 @@ public:
         });
     }
 
-
-    [[nodiscard]] static constexpr uinteger min() {
+    [[nodiscard]] static constexpr uinteger min()
+    {
         uinteger n;
         return n;
     }
 
-    [[nodiscard]] static constexpr uinteger zero() {
+    [[nodiscard]] static constexpr uinteger zero()
+    {
         return min();
     }
 
-    [[nodiscard]] static constexpr uinteger one() {
+    [[nodiscard]] static constexpr uinteger one()
+    {
         uinteger n;
         n.set_bit(0);
         return n;
@@ -503,25 +505,55 @@ public:
     static constexpr int max_exponent = 0;
     static constexpr int max_exponent10 = 0;
 
-    // Is this correct? At least division by zero throws an exception, so this value is, most
-    // likely, correct.
+    // Is this value set how it is supposed to? At least division by zero throws an exception, so
+    // this value is, most likely, correct.
     static constexpr bool traps = true;
 
     static constexpr bool tinyness_before = false;
 
     static constexpr aarith::uinteger<W> min() noexcept
     {
-        return aarith::uinteger<W>{0U};
+        return aarith::uinteger<W>::zero();
     }
 
     static constexpr aarith::uinteger<W> lowest() noexcept
     {
-        return aarith::uinteger<W>{0U};
+        return aarith::uinteger<W>::zero();;
     }
 
     static constexpr aarith::uinteger<W> max() noexcept
     {
         return aarith::uinteger<W>::max();
+    }
+
+    static constexpr aarith::uinteger<W> epsilon() noexcept
+    {
+        return aarith::uinteger<W>::zero();
+    }
+
+    static constexpr aarith::uinteger<W> round_error() noexcept
+    {
+        return aarith::uinteger<W>::zero();
+    }
+
+    static constexpr aarith::uinteger<W> infinity() noexcept
+    {
+        return aarith::uinteger<W>::zero();
+    }
+
+    static constexpr aarith::uinteger<W> quiet_NaN() noexcept
+    {
+        return aarith::uinteger<W>::zero();
+    }
+
+    static constexpr aarith::uinteger<W> signaling_NaN() noexcept
+    {
+        return aarith::uinteger<W>::zero();
+    }
+
+    static constexpr aarith::uinteger<W> denorm_min() noexcept
+    {
+        return aarith::uinteger<W>::min();
     }
 
 
