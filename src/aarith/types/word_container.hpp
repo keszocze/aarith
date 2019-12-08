@@ -299,17 +299,7 @@ private:
     std::array<word_type, word_count()> words{{0}};
 };
 
-template <size_t Width> class is_integral<uinteger<Width>>
-{
-public:
-    static constexpr bool value = true;
-};
 
-template <size_t Width> class is_unsigned<uinteger<Width>>
-{
-public:
-    static constexpr bool value = true;
-};
 
 template <size_t DestinationWidth, size_t SourceWidth>
 [[nodiscard]] auto width_cast(const word_container<SourceWidth>& source)
@@ -463,89 +453,3 @@ auto operator>>(const word_container<Width>& lhs, const size_t rhs) -> word_cont
 
 } // namespace aarith
 
-// We are only allowed to extend std with specializations
-// https://en.cppreference.com/w/cpp/language/extending_std
-template <size_t W> class std::numeric_limits<aarith::uinteger<W>>
-{
-public:
-    static constexpr bool is_specialized = true;
-    static constexpr bool is_signed = false;
-    static constexpr bool is_integer = true;
-    static constexpr bool is_exact = true;
-    static constexpr bool has_infinity = false;
-    static constexpr bool has_quiet_NaN = false;
-    static constexpr bool has_signaling_NaN = false;
-    static constexpr bool is_bounded = true;
-    static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
-    static constexpr bool has_denorm_loss = false;
-    static constexpr std::float_round_style round_style =
-        std::round_toward_zero; // TODO do we need to takte that into account somewhere?
-    static constexpr bool is_iec559 = false;
-    static constexpr bool is_module = true;
-    static constexpr int radix = 2;
-    static constexpr int digits = W; // TODO what happens if W > max_int?
-    static constexpr int digits10 = std::numeric_limits<aarith::uinteger<W>>::digits *
-                                    std::log10(std::numeric_limits<aarith::uinteger<W>>::radix);
-
-    // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says
-    // so
-    static constexpr int max_digits10 = 0;
-
-    static constexpr int min_exponent = 0;
-    static constexpr int min_exponent10 = 0;
-    static constexpr int max_exponent = 0;
-    static constexpr int max_exponent10 = 0;
-
-    // Is this value set how it is supposed to? At least division by zero throws an exception, so
-    // this value is, most likely, correct.
-    static constexpr bool traps = true;
-
-    static constexpr bool tinyness_before = false;
-
-    static constexpr aarith::uinteger<W> min() noexcept
-    {
-        return aarith::uinteger<W>::zero();
-    }
-
-    static constexpr aarith::uinteger<W> lowest() noexcept
-    {
-        return aarith::uinteger<W>::zero();;
-    }
-
-    static constexpr aarith::uinteger<W> max() noexcept
-    {
-        return aarith::uinteger<W>::max();
-    }
-
-    static constexpr aarith::uinteger<W> epsilon() noexcept
-    {
-        return aarith::uinteger<W>::zero();
-    }
-
-    static constexpr aarith::uinteger<W> round_error() noexcept
-    {
-        return aarith::uinteger<W>::zero();
-    }
-
-    static constexpr aarith::uinteger<W> infinity() noexcept
-    {
-        return aarith::uinteger<W>::zero();
-    }
-
-    static constexpr aarith::uinteger<W> quiet_NaN() noexcept
-    {
-        return aarith::uinteger<W>::zero();
-    }
-
-    static constexpr aarith::uinteger<W> signaling_NaN() noexcept
-    {
-        return aarith::uinteger<W>::zero();
-    }
-
-    static constexpr aarith::uinteger<W> denorm_min() noexcept
-    {
-        return aarith::uinteger<W>::min();
-    }
-
-
-};
