@@ -1,7 +1,14 @@
 #pragma once
 
-#include <aarith/utilities/bit_operations.hpp>
+#include "aarith/utilities/bit_operations.hpp"
+#include "traits.hpp"
 #include <algorithm>
+#include <array>
+#include <cstdint>
+#include <iostream>
+#include <stdexcept>
+#include <string>
+#include <type_traits>
 
 namespace aarith {
 
@@ -84,6 +91,17 @@ public:
     {
         return size_in_words<word_type>(Width);
     }
+
+    [[nodiscard]] static constexpr auto word_mask(size_t index) noexcept -> word_type
+    {
+
+        constexpr word_type other_masks = static_cast<word_type>(-1); // all ones, e.g. no masking
+        constexpr word_type last_mask =
+            (width() % word_width() != 0)
+                ? (static_cast<word_type>(1) << (width() % word_width())) - 1
+                : static_cast<word_type>(-1);
+        return (index == word_count() - 1) ? last_mask : other_masks;
+    };
 
     [[nodiscard]] static constexpr auto width() noexcept -> size_t
     {
@@ -231,6 +249,35 @@ public:
         return (index == word_count() - 1) ? last_mask : other_masks;
     };
 
+
+    [[nodiscard]] static constexpr uinteger min()
+    {
+        uinteger n;
+        return n;
+    }
+
+    [[nodiscard]] static constexpr uinteger zero()
+    {
+        return min();
+    }
+
+    [[nodiscard]] static constexpr uinteger one()
+    {
+        uinteger n;
+        n.set_bit(0);
+        return n;
+    }
+
+    [[nodiscard]] static constexpr uinteger max()
+    {
+        uinteger n;
+        word_type ones = ~(static_cast<word_type>(0U));
+        for (size_t i = 0; i < n.word_count(); ++i)
+        {
+            n.set_word(i, ones);
+        }
+        return n;
+    }
     constexpr auto begin() const noexcept
     {
         return words.begin();
@@ -271,24 +318,36 @@ public:
         return words.crend();
     }
 
-protected:
+private:
     template <size_t index, class... Args>
     auto set_word_recursively(word_type value, Args... args) -> size_t
     {
         static_assert(index < word_count(), "too many initializer words");
         auto const count = set_word_recursively<index + 1>(args...);
-        words[count - index] = value & word_mask(index);
+        words[count - index] = value & word_mask(count - index);
         return count;
     }
 
     template <size_t index> auto set_word_recursively(word_type value) -> size_t
     {
         static_assert(index < word_count(), "too many initializer words");
-        words[0] = value & word_mask(index);
+        words[0] = value & word_mask(0);
         return index;
     }
 
     std::array<word_type, word_count()> words{{0}};
+};
+
+template <size_t Width> class is_integral<uinteger<Width>>
+{
+public:
+    static constexpr bool value = true;
+};
+
+template <size_t Width> class is_unsigned<uinteger<Width>>
+{
+public:
+    static constexpr bool value = true;
 };
 
 template <size_t DestinationWidth, size_t SourceWidth>
@@ -440,4 +499,92 @@ auto operator>>(const word_container<Width>& lhs, const size_t rhs) -> word_cont
     return shifted;
 }
 
+
 } // namespace aarith
+
+// We are only allowed to extend std with specializations
+// https://en.cppreference.com/w/cpp/language/extending_std
+template <size_t W> class std::numeric_limits<aarith::uinteger<W>>
+{
+public:
+    static constexpr bool is_specialized = true;
+    static constexpr bool is_signed = false;
+    static constexpr bool is_integer = true;
+    static constexpr bool is_exact = true;
+    static constexpr bool has_infinity = false;
+    static constexpr bool has_quiet_NaN = false;
+    static constexpr bool has_signaling_NaN = false;
+    static constexpr bool is_bounded = true;
+    static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+    static constexpr bool has_denorm_loss = false;
+    static constexpr std::float_round_style round_style =
+        std::round_toward_zero; // TODO do we need to takte that into account somewhere?
+    static constexpr bool is_iec559 = false;
+    static constexpr bool is_module = true;
+    static constexpr int radix = 2;
+    static constexpr int digits = W; // TODO what happens if W > max_int?
+    static constexpr int digits10 = std::numeric_limits<aarith::uinteger<W>>::digits *
+                                    std::log10(std::numeric_limits<aarith::uinteger<W>>::radix);
+
+    // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says
+    // so
+    static constexpr int max_digits10 = 0;
+
+    static constexpr int min_exponent = 0;
+    static constexpr int min_exponent10 = 0;
+    static constexpr int max_exponent = 0;
+    static constexpr int max_exponent10 = 0;
+
+    // Is this value set how it is supposed to? At least division by zero throws an exception, so
+    // this value is, most likely, correct.
+    static constexpr bool traps = true;
+
+    static constexpr bool tinyness_before = false;
+
+    static constexpr aarith::uinteger<W> min() noexcept
+    {
+        return aarith::uinteger<W>::zero();
+    }
+
+    static constexpr aarith::uinteger<W> lowest() noexcept
+    {
+        return aarith::uinteger<W>::zero();;
+    }
+
+    static constexpr aarith::uinteger<W> max() noexcept
+    {
+        return aarith::uinteger<W>::max();
+    }
+
+    static constexpr aarith::uinteger<W> epsilon() noexcept
+    {
+        return aarith::uinteger<W>::zero();
+    }
+
+    static constexpr aarith::uinteger<W> round_error() noexcept
+    {
+        return aarith::uinteger<W>::zero();
+    }
+
+    static constexpr aarith::uinteger<W> infinity() noexcept
+    {
+        return aarith::uinteger<W>::zero();
+    }
+
+    static constexpr aarith::uinteger<W> quiet_NaN() noexcept
+    {
+        return aarith::uinteger<W>::zero();
+    }
+
+    static constexpr aarith::uinteger<W> signaling_NaN() noexcept
+    {
+        return aarith::uinteger<W>::zero();
+    }
+
+    static constexpr aarith::uinteger<W> denorm_min() noexcept
+    {
+        return aarith::uinteger<W>::min();
+    }
+
+
+};

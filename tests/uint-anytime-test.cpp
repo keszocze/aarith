@@ -2,7 +2,9 @@
 #include "aarith/operations/exact_operations.hpp"
 #include "aarith/types/uinteger.hpp"
 #include <aarith/operations/comparisons.hpp>
+#include <aarith/utilities/string_utils.hpp>
 #include <catch.hpp>
+#include <iostream>
 #include <sstream>
 
 using namespace aarith;
@@ -17,11 +19,10 @@ SCENARIO("Generate a bitmask for a certain number of bits", "[uinteger][utlitiy]
             static constexpr auto mask_width = 8;
 
             const auto result = generate_bitmask<uinteger<uinteger_width>>(mask_width);
-            const auto result_ref = 0xFF;
 
             THEN("The mask should be 8 bits long")
             {
-                REQUIRE(result.word(0) == result_ref);
+                REQUIRE(to_binary(result) == "1111111100000000");
             }
         }
         WHEN("The bitmask spans over several words")
@@ -30,15 +31,15 @@ SCENARIO("Generate a bitmask for a certain number of bits", "[uinteger][utlitiy]
             static constexpr auto mask_width = 190;
 
             const auto result = generate_bitmask<uinteger<uinteger_width>>(mask_width);
-            const auto result_ref_0 = 0xFFFFFFFFFFFFFFFF;
+            const auto result_ref_0 = 0xFFFFFFFFFFFFFFFC;
             const auto result_ref_1 = 0xFFFFFFFFFFFFFFFF;
-            const auto result_ref_2 = 0x3FFFFFFFFFFFFFFF;
+            const auto result_ref_2 = 0xFFFFFFFFFFFFFFFF;
 
             THEN("The mask should be 190 bits long")
             {
-                REQUIRE(result.word(0) == result_ref_0);
-                REQUIRE(result.word(1) == result_ref_1);
-                REQUIRE(result.word(2) == result_ref_2);
+                CHECK(result.word(0) == result_ref_0);
+                CHECK(result.word(1) == result_ref_1);
+                CHECK(result.word(2) == result_ref_2);
             }
         }
         WHEN("The bitmask is as long as the complete uinteger and fills all words completely")
@@ -53,13 +54,24 @@ SCENARIO("Generate a bitmask for a certain number of bits", "[uinteger][utlitiy]
 
             THEN("The mask should be 192 bits long")
             {
-                REQUIRE(result.word(0) == result_ref_0);
-                REQUIRE(result.word(1) == result_ref_1);
-                REQUIRE(result.word(2) == result_ref_2);
+
+                CHECK(result.word(0) == result_ref_0);
+                CHECK(result.word(1) == result_ref_1);
+                CHECK(result.word(2) == result_ref_2);
             }
         }
     }
 }
+
+//SCENARIO("Dummy scenario enforcing compilation of newly created methods")
+//{
+//    const uinteger<32> a{0U};
+//    const uinteger<32> b{1U};
+//
+//    std::cout << approx_add_post_masking(a, b, 10) << approx_sub_post_masking(a, b, 10)
+//              << approx_mul_post_masking(a, b, 10) << approx_div_post_masking(a, b, 10)
+//              << approx_rem_post_masking(a, b, 10) << "\n";
+//}
 
 SCENARIO("Approximate sum of unsigned integers with anytime bitmasking", "[uinteger][arithmetic]")
 {
@@ -74,7 +86,7 @@ SCENARIO("Approximate sum of unsigned integers with anytime bitmasking", "[uinte
             static constexpr uint16_t number_b = 32767U;
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
-            auto const result = approx_uint_bitmasking_add(a, b, 1U);
+            auto const result = approx_add_pre_masking(a, b, 1U);
 
             THEN("It should be number_a")
             {
@@ -87,7 +99,7 @@ SCENARIO("Approximate sum of unsigned integers with anytime bitmasking", "[uinte
             static constexpr uint16_t number_b = 32767U;
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
-            auto const result = approx_uint_bitmasking_add(a, b, 8U);
+            auto const result = approx_add_pre_masking(a, b, 8U);
             auto const result_8bits = 65280U;
 
             THEN("It should be number_a")
@@ -101,7 +113,7 @@ SCENARIO("Approximate sum of unsigned integers with anytime bitmasking", "[uinte
             static constexpr uint16_t number_b = 32767U;
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
-            auto const result = approx_uint_bitmasking_add(a, b, 16U);
+            auto const result = approx_add_pre_masking(a, b, 16U);
             auto const result_16bits = 65535U;
 
             THEN("It should be number_a")

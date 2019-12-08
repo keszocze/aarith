@@ -59,7 +59,7 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
                 REQUIRE(result.word(1) == 1);
             }
         }
-
+        
         WHEN("There is no carry into the next word")
         {
             static constexpr uint64_t number_a = 1ULL << 63;
@@ -176,6 +176,104 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
     }
 }
 
+SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
+{
+    GIVEN("The maximal and minimal values of uinteger<V>")
+    {
+
+        static const uinteger<89> min = uinteger<89>::min();
+        static const uinteger<89> max = uinteger<89>::max();
+
+        THEN("Bit-wise complement should yield the other one")
+        {
+            CHECK(~min == max);
+            REQUIRE(~max == min);
+        }
+
+        // FIXME why doesn't this compile??
+
+//       .../aarith/tests/exact_operations-test.cpp:194:58: error: ‘lowest’ is not a member of ‘aarith::uinteger<89>’
+//  194 |             REQUIRE(uinteger<89>::min() == uinteger<89>::lowest());
+
+//        THEN ("uinteger::min and uinteger::lowest are the same") {
+//            REQUIRE(uinteger<89>::min() == uinteger<89>::lowest());
+//        }
+
+        WHEN("Adding to max value")
+        {
+            const uint64_t a_ = GENERATE(
+                take(100, random(static_cast<uint64_t>(1), std::numeric_limits<uint64_t>::max())));
+            const uinteger<89> a{a_};
+            const uinteger<89> expected_trunc{a_ - 1};
+
+            THEN("Truncating addition is overflow modulo 2")
+            {
+                uinteger<89> result = add(max, a);
+                REQUIRE(result == expected_trunc);
+            }
+
+            THEN("Expanding addition has the highest bet set and is modulo 2 otherwise")
+            {
+                uinteger<90> result = expanding_add(max,a);
+                CHECK(result.bit(89));
+                REQUIRE(width_cast<89>(result) == expected_trunc);
+            }
+        }
+
+        WHEN("Subracting from min value")
+        {
+            const uint64_t a_ = GENERATE(
+                    take(100, random(static_cast<uint64_t>(0), std::numeric_limits<uint64_t>::max())));
+            const uinteger<89> a{a_};
+
+
+            THEN("Truncating subtraction is underflow modulo 2")
+            {
+                const uinteger<89> expected = sub(uinteger<89>::max(), uinteger<89>{a_ - 1});
+                uinteger<89> result = sub(min, a);
+                REQUIRE(result == expected);
+            }
+
+
+        }
+
+        THEN("Adding or subtracting min should not change the other value")
+        {
+            static const uinteger<89> n{23543785U}; // randomly chosen
+
+            CHECK(add(max, min) == max);
+            CHECK(add(n, min) == n);
+            CHECK(sub(max, min) == max);
+            REQUIRE(sub(n, min) == n);
+        }
+
+        AND_GIVEN("The uintegers zero and one")
+        {
+
+            static const uinteger<89> zero = uinteger<89>::zero();
+            static const uinteger<89> one = uinteger<89>::one();
+
+            THEN("min and zero should be identical")
+            {
+                REQUIRE(zero == min);
+            }
+
+            THEN("Subtracting one from zero/min yields the maximal value")
+            {
+
+                // completely randomly chosen bit width
+
+                static const uinteger<89> result_zero = sub(zero, one);
+                static const uinteger<89> result_min = sub(min, one);
+                static const uinteger<89> expected = uinteger<89>::max();
+
+                CHECK(result_min == expected);
+                REQUIRE(result_zero == expected);
+            }
+        }
+    }
+}
+
 SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplication]")
 {
 
@@ -217,12 +315,13 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplica
     {
         uint64_t val = 1;
         val = val << 35;
-        uinteger<128> const a(1, val);
-        uinteger<128> const c(13435, 345897);
-        uinteger<128> const d(static_cast<typename uinteger<128>::word_type>(-1),
-                              static_cast<typename uinteger<128>::word_type>(-1));
-        uinteger<128> const zero(0, 0);
-        uinteger<128> const one(0, 1);
+        auto const a = uinteger<128>::from_words(1, val);
+        auto const c = uinteger<128>::from_words(13435, 345897);
+        auto const d =
+            uinteger<128>::from_words(static_cast<typename uinteger<128>::word_type>(-1),
+                                      static_cast<typename uinteger<128>::word_type>(-1));
+        auto const zero = uinteger<128>::from_words(0, 0);
+        auto const one = uinteger<128>::from_words(0, 1);
 
         const std::vector<uinteger<128>> numbers{a, c, d, one, zero};
 
@@ -327,18 +426,21 @@ SCENARIO("Bit and Word operations work correctly", "[uinteger][utility]")
     }
     WHEN("Two uinteger<N>'s are created")
     {
-        AND_WHEN("One is created via var args constructor and the other uses .set_word")
+        AND_WHEN("One is created via ::from_words and the other uses .set_word")
         {
             THEN("The resulting uinteger<N>'s should be identical")
             {
                 const uint64_t ones = static_cast<uint64_t>(-1);
-                uinteger<15> const a(ones);
+                auto const a = uinteger<15>::from_words(ones);
                 uinteger<15> b;
                 b.set_word(0, ones);
 
                 uinteger<15> c;
                 c.set_words(ones);
 
+                // If this check fails, the generated expansion might not be helpful as only the
+                // lowest 15 bits are sent to std::cout. These are the bits, were the two functions
+                // aren't differing in the first place.
                 CHECK(a == b);
                 CHECK(a == c);
                 CHECK(b == c);
@@ -480,6 +582,7 @@ SCENARIO("Computing the remainder of two uintegers works as expected", "[uintege
             uint64_t rem_int = val_a % val_b;
             CHECK(quot_int == quotient.word(0));
             CHECK(rem_int == remainder.word(0));
+
         }
     }
 }
