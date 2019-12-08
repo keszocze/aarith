@@ -28,7 +28,7 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
         }
         WHEN("The result a+b does not fit into N bits")
         {
-            static constexpr uint16_t number_a = (1 << TestWidth) - 1;
+            static constexpr uint16_t number_a = (1U << TestWidth) - 1U;
             static constexpr uint16_t number_b = 1;
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
@@ -48,8 +48,8 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
 
         WHEN("There is a carry into the next word")
         {
-            static constexpr uint64_t number_a = 1ULL << 63;
-            static constexpr uint64_t number_b = 1ULL << 63;
+            static constexpr uint64_t number_a = 1ULL << 63U;
+            static constexpr uint64_t number_b = 1ULL << 63U;
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
             auto const result = add(a, b);
@@ -62,7 +62,7 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
 
         WHEN("There is no carry into the next word")
         {
-            static constexpr uint64_t number_a = 1ULL << 63;
+            static constexpr uint64_t number_a = 1ULL << 63U;
             static constexpr uint64_t number_b = 0;
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
@@ -314,7 +314,7 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplica
     GIVEN("Two uinteger<N> a and b to be multiplied")
     {
         uint64_t val = 1;
-        val = val << 35;
+        val = val << 35U;
         auto const a = uinteger<128>::from_words(1, val);
         auto const c = uinteger<128>::from_words(13435, 345897);
         auto const d =
