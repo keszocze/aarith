@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <cmath>
 
 namespace aarith {
 
@@ -135,3 +136,90 @@ template <size_t DestinationWidth, size_t SourceWidth>
 }
 
 } // namespace aarith
+
+
+// We are only allowed to extend std with specializations
+// https://en.cppreference.com/w/cpp/language/extending_std
+template <size_t W> class std::numeric_limits<aarith::sinteger<W>>
+{
+public:
+    static constexpr bool is_specialized = true;
+    static constexpr bool is_signed = true;
+    static constexpr bool is_integer = true;
+    static constexpr bool is_exact = true;
+    static constexpr bool has_infinity = false;
+    static constexpr bool has_quiet_NaN = false;
+    static constexpr bool has_signaling_NaN = false;
+    static constexpr bool is_bounded = true;
+    static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
+    static constexpr bool has_denorm_loss = false;
+
+    // TODO do we need to take that into account somewhere?
+    static constexpr std::float_round_style round_style = std::round_toward_zero;
+    static constexpr bool is_iec559 = false;
+    static constexpr bool is_module = true;
+    static constexpr int radix = 2;
+    static constexpr int digits = W; // TODO what happens if W > max_int?
+    static constexpr int digits10 = std::numeric_limits<aarith::sinteger<W>>::digits *
+                                    std::log10(std::numeric_limits<aarith::sinteger<W>>::radix);
+
+    // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says so
+    static constexpr int max_digits10 = 0;
+
+    static constexpr int min_exponent = 0;
+    static constexpr int min_exponent10 = 0;
+    static constexpr int max_exponent = 0;
+    static constexpr int max_exponent10 = 0;
+
+    // Is this value set how it is supposed to? At least division by zero throws an exception, so
+    // this value is, most likely, correct.
+    static constexpr bool traps = true;
+
+    static constexpr bool tinyness_before = false;
+
+    static constexpr aarith::sinteger<W> min() noexcept
+    {
+        return aarith::sinteger<W>::zero();
+    }
+
+    static constexpr aarith::sinteger<W> lowest() noexcept
+    {
+        return aarith::sinteger<W>::zero();
+        ;
+    }
+
+    static constexpr aarith::sinteger<W> max() noexcept
+    {
+        return aarith::sinteger<W>::max();
+    }
+
+    static constexpr aarith::sinteger<W> epsilon() noexcept
+    {
+        return aarith::sinteger<W>::zero();
+    }
+
+    static constexpr aarith::sinteger<W> round_error() noexcept
+    {
+        return aarith::sinteger<W>::zero();
+    }
+
+    static constexpr aarith::sinteger<W> infinity() noexcept
+    {
+        return aarith::sinteger<W>::zero();
+    }
+
+    static constexpr aarith::sinteger<W> quiet_NaN() noexcept
+    {
+        return aarith::sinteger<W>::zero();
+    }
+
+    static constexpr aarith::sinteger<W> signaling_NaN() noexcept
+    {
+        return aarith::sinteger<W>::zero();
+    }
+
+    static constexpr aarith::sinteger<W> denorm_min() noexcept
+    {
+        return aarith::sinteger<W>::min();
+    }
+};
