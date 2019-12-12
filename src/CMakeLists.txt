@@ -2,6 +2,7 @@ add_library(aarith INTERFACE)
 target_sources(aarith INTERFACE
   aarith/types/integer.hpp
   aarith/types/traits.hpp
+  aarith/types/random.hpp
   aarith/operations/exact_operations.hpp
   aarith/operations/approx_operations.hpp
   aarith/operations/comparisons.hpp
