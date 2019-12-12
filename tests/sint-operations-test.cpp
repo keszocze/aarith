@@ -6,7 +6,6 @@
 
 using namespace aarith;
 
-
 SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][addition]")
 {
     GIVEN("Two sinteger<N> a and b with N <= word_width")
@@ -76,3 +75,16 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
         }
     }
 }
+
+// TODO finish this
+//SCENARIO("MIN/MAX Values behave as expected", "[sinteger][utility]")
+//{
+//    GIVEN("The min and max value")
+//    {
+//        constexpr w = 50;
+//        sinteger<w> min=sinteger<w>::ma
+//        THEN("Adding/subtracting one should wrap araound")
+//        {
+//        }
+//    }
+//}

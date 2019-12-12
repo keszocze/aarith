@@ -52,9 +52,8 @@ SCENARIO("Copy constructor of sintegers with various bit widths", "[sinteger][ut
     GIVEN("An sinteger<N> a")
     {
 
-        //        const uint64_t val_a = GENERATE(take(10, random(0U,
-        //        std::numeric_limits<uint64_t>::max()));
-        const uint64_t val_a = 24;
+                const uint64_t val_a = GENERATE(take(10, random(0U,
+                std::numeric_limits<uint64_t>::max()));
         sinteger<196> a(0U, val_a, 0U);
 
         THEN("Assignment of individual words is correct")
