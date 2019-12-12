@@ -167,7 +167,7 @@ public:
         words[index] = value & word_mask(index);
     }
 
-    // Sets the words to the given values, where the rightern-most argument corresponds to word 0.
+    // Sets the words to the given values, where the right-most argument corresponds to word 0.
     template <class... Args> void set_words(Args... args)
     {
         set_word_recursively<0>(args...);
@@ -280,14 +280,14 @@ private:
     {
         static_assert(index < word_count(), "too many initializer words");
         auto const count = set_word_recursively<index + 1>(args...);
-        words[count - index] = value & word_mask(index);
+        words[count - index] = value & word_mask(count - index);
         return count;
     }
 
     template <size_t index> auto set_word_recursively(word_type value) -> size_t
     {
         static_assert(index < word_count(), "too many initializer words");
-        words[0] = value & word_mask(index);
+        words[0] = value & word_mask(0);
         return index;
     }
 
