@@ -1,4 +1,5 @@
 #include <aarith/operations/sinteger_operations.hpp>
+#include <aarith/operations/sinteger_comparisons.hpp>
 #include <aarith/operations/word_container_comparisons.hpp>
 #include <aarith/types/sinteger.hpp>
 #include <aarith/utilities/string_utils.hpp>
@@ -51,9 +52,7 @@ SCENARIO("Copy constructor of sintegers with various bit widths", "[sinteger][ut
 {
     GIVEN("An sinteger<N> a")
     {
-
-                const uint64_t val_a = GENERATE(take(10, random(0U,
-                std::numeric_limits<uint64_t>::max()));
+        const uint64_t val_a = GENERATE(take(10, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
         sinteger<196> a(0U, val_a, 0U);
 
         THEN("Assignment of individual words is correct")
@@ -241,11 +240,11 @@ SCENARIO("Left shift operator works as expected", "[sinteger][bit_logic]")
     }
 }
 
-SCENARIO("Create negative sintegers","[sinteger][bit_logic]")
+SCENARIO("Create negative sintegers", "[sinteger][bit_logic]")
 {
     GIVEN("A int64_t negative number")
     {
-        int64_t n = GENERATE(take(100,random(-922337236854775808,-1L)));
+        int64_t n = GENERATE(take(100, random(-922337236854775808, -1L)));
         int64_t pos_n = -n;
 
         sinteger<64> zero;
@@ -267,7 +266,8 @@ SCENARIO("Create negative sintegers","[sinteger][bit_logic]")
                 CHECK(-(-negative) == negative);
                 CHECK(-(-positive) == positive);
             }
-            THEN ("Computing absolute value works as expected") {
+            THEN("Computing absolute value works as expected")
+            {
                 CHECK(abs(negative) == positive);
                 CHECK(abs(negative) == -negative);
                 CHECK(abs(abs(negative)) == positive);
@@ -676,5 +676,88 @@ SCENARIO("Bit operations are performed correctly", "[sinteger][bit]")
     }
 }
 
-// for static_assert tests:
-// https://stackoverflow.com/questions/30155619/expected-build-failure-tests-in-cmake
+
+SCENARIO("std::numeric_limits gets instantiated correctly", "[sinteger][utility]") {
+    GIVEN("The bit width of 32") {
+        THEN("The values should match the int32_t ones") {
+            using sint = sinteger<32>;
+            using nl = std::numeric_limits<sint>;
+            using il = std::numeric_limits<int32_t>;
+
+
+            CHECK(nl::is_specialized == il::is_specialized);
+            CHECK(nl::is_signed == il::is_signed);
+            CHECK(nl::is_integer == il::is_integer);
+            CHECK(nl::is_exact == il::is_exact);
+            CHECK(nl::has_infinity == il::has_infinity);
+            CHECK(nl::has_quiet_NaN == il::has_quiet_NaN);
+            CHECK(nl::has_signaling_NaN == il::has_signaling_NaN);
+            CHECK(nl::is_bounded == il::is_bounded);
+            CHECK(nl::has_denorm == il::has_denorm);
+            CHECK(nl::has_denorm_loss == il::has_denorm_loss);
+            CHECK(nl::round_style == il::round_style);
+            CHECK(nl::is_iec559 == il::is_iec559);
+            CHECK(nl::is_modulo == il::is_modulo);
+            CHECK(nl::radix == il::radix);
+            CHECK(nl::digits == il::digits);
+            CHECK(nl::digits10 == il::digits10);
+            CHECK(nl::max_digits10 == il::max_digits10);
+            CHECK(nl::min_exponent10 == il::min_exponent10);
+            CHECK(nl::min_exponent == il::min_exponent);
+            CHECK(nl::max_exponent == il::max_exponent);
+            CHECK(nl::max_digits10 == il::max_exponent10);
+            CHECK(nl::traps == il::traps);
+            CHECK(nl::tinyness_before == il::tinyness_before);
+            CHECK(static_cast<int32_t>(nl::min().word(0)) == il::min());
+            CHECK(static_cast<int32_t>(nl::lowest().word(0)) == il::lowest());
+            CHECK(nl::max().word(0) == il::max());
+            CHECK(nl::epsilon().word(0) == il::epsilon());
+            CHECK(nl::round_error().word(0) == il::round_error());
+            CHECK(nl::infinity().word(0) == il::infinity());
+            CHECK(nl::quiet_NaN().word(0) == il::quiet_NaN());
+            CHECK(nl::signaling_NaN().word(0) == il::signaling_NaN());
+            CHECK(nl::denorm_min().word(0) == il::denorm_min());
+        }
+
+        THEN("The values should match the int64_t ones") {
+            using sint = sinteger<64>;
+            using nl = std::numeric_limits<sint>;
+            using il = std::numeric_limits<int64_t>;
+
+
+            CHECK(nl::is_specialized == il::is_specialized);
+            CHECK(nl::is_signed == il::is_signed);
+            CHECK(nl::is_integer == il::is_integer);
+            CHECK(nl::is_exact == il::is_exact);
+            CHECK(nl::has_infinity == il::has_infinity);
+            CHECK(nl::has_quiet_NaN == il::has_quiet_NaN);
+            CHECK(nl::has_signaling_NaN == il::has_signaling_NaN);
+            CHECK(nl::is_bounded == il::is_bounded);
+            CHECK(nl::has_denorm == il::has_denorm);
+            CHECK(nl::has_denorm_loss == il::has_denorm_loss);
+            CHECK(nl::round_style == il::round_style);
+            CHECK(nl::is_iec559 == il::is_iec559);
+            CHECK(nl::is_modulo == il::is_modulo);
+            CHECK(nl::radix == il::radix);
+            CHECK(nl::digits == il::digits);
+            CHECK(nl::digits10 == il::digits10);
+            CHECK(nl::max_digits10 == il::max_digits10);
+            CHECK(nl::min_exponent10 == il::min_exponent10);
+            CHECK(nl::min_exponent == il::min_exponent);
+            CHECK(nl::max_exponent == il::max_exponent);
+            CHECK(nl::max_digits10 == il::max_exponent10);
+            CHECK(nl::traps == il::traps);
+            CHECK(nl::tinyness_before == il::tinyness_before);
+            CHECK(static_cast<int64_t>(nl::min().word(0)) == il::min());
+            CHECK(static_cast<int64_t>(nl::lowest().word(0)) == il::lowest());
+            CHECK(nl::max().word(0) == il::max());
+            CHECK(nl::epsilon().word(0) == il::epsilon());
+            CHECK(nl::round_error().word(0) == il::round_error());
+            CHECK(nl::infinity().word(0) == il::infinity());
+            CHECK(nl::quiet_NaN().word(0) == il::quiet_NaN());
+            CHECK(nl::signaling_NaN().word(0) == il::signaling_NaN());
+            CHECK(nl::denorm_min().word(0) == il::denorm_min());
+        }
+
+    }
+}

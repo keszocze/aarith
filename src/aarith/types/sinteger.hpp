@@ -83,6 +83,11 @@ public:
         return max;
     }
 
+        [[nodiscard]] static constexpr sinteger zero() {
+        sinteger zero = sinteger::all_zeroes();
+        return zero;
+    }
+
     /**
      * @brief Returns whether the number is negative.
      * @return Whether the number is negative
@@ -169,9 +174,9 @@ public:
     // TODO do we need to take that into account somewhere?
     static constexpr std::float_round_style round_style = std::round_toward_zero;
     static constexpr bool is_iec559 = false;
-    static constexpr bool is_module = true;
+    static constexpr bool is_modulo = false;
     static constexpr int radix = 2;
-    static constexpr int digits = W; // TODO what happens if W > max_int?
+    static constexpr int digits = W-1; // TODO what happens if W > max_int?
     static constexpr int digits10 = std::numeric_limits<aarith::sinteger<W>>::digits *
                                     std::log10(std::numeric_limits<aarith::sinteger<W>>::radix);
 
@@ -232,6 +237,6 @@ public:
 
     static constexpr aarith::sinteger<W> denorm_min() noexcept
     {
-        return aarith::sinteger<W>::min();
+        return aarith::sinteger<W>::zero();
     }
 };

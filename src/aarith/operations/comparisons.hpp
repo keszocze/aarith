@@ -6,6 +6,10 @@
 
 namespace aarith {
 
+/**
+ * 
+ * @note Two numbers can be equal even though they have different bit widths!
+ */
 template <size_t W, size_t V> bool operator==(const uinteger<W>& a, const uinteger<V>& b)
 {
     const auto min_count = std::min(a.word_count(), b.word_count());
