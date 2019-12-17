@@ -71,6 +71,18 @@ public:
         return *this = *this + addend;
     }
 
+    [[nodiscard]] static constexpr sinteger min() {
+        sinteger min;
+        min.set_bit(Width-1,true);
+        return min;
+    }
+
+    [[nodiscard]] static constexpr sinteger max() {
+        sinteger max = sinteger::all_ones();
+        max.set_bit(Width-1, false);
+        return max;
+    }
+
     /**
      * @brief Returns whether the number is negative.
      * @return Whether the number is negative
@@ -179,13 +191,13 @@ public:
 
     static constexpr aarith::sinteger<W> min() noexcept
     {
-        return aarith::sinteger<W>::zero();
+        return aarith::sinteger<W>::min();
     }
 
     static constexpr aarith::sinteger<W> lowest() noexcept
     {
-        return aarith::sinteger<W>::zero();
-        ;
+        return aarith::sinteger<W>::min();
+
     }
 
     static constexpr aarith::sinteger<W> max() noexcept
