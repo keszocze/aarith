@@ -5,12 +5,12 @@
 #include <aarith/types/word_container.hpp>
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <cstdint>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
-#include <cmath>
 
 namespace aarith {
 
@@ -71,19 +71,22 @@ public:
         return *this = *this + addend;
     }
 
-    [[nodiscard]] static constexpr sinteger min() {
+    [[nodiscard]] static constexpr sinteger min()
+    {
         sinteger min;
-        min.set_bit(Width-1,true);
+        min.set_bit(Width - 1, true);
         return min;
     }
 
-    [[nodiscard]] static constexpr sinteger max() {
+    [[nodiscard]] static constexpr sinteger max()
+    {
         sinteger max = sinteger::all_ones();
-        max.set_bit(Width-1, false);
+        max.set_bit(Width - 1, false);
         return max;
     }
 
-        [[nodiscard]] static constexpr sinteger zero() {
+    [[nodiscard]] static constexpr sinteger zero()
+    {
         sinteger zero = sinteger::all_zeroes();
         return zero;
     }
@@ -109,7 +112,6 @@ template <size_t Width> class is_unsigned<sinteger<Width>>
 public:
     static constexpr bool value = false;
 };
-
 
 template <size_t Width>
 [[nodiscard]] auto operator&(const sinteger<Width>& lhs, const sinteger<Width>& rhs)
@@ -154,7 +156,6 @@ template <size_t DestinationWidth, size_t SourceWidth>
 
 } // namespace aarith
 
-
 // We are only allowed to extend std with specializations
 // https://en.cppreference.com/w/cpp/language/extending_std
 template <size_t W> class std::numeric_limits<aarith::sinteger<W>>
@@ -176,11 +177,12 @@ public:
     static constexpr bool is_iec559 = false;
     static constexpr bool is_modulo = false;
     static constexpr int radix = 2;
-    static constexpr int digits = W-1; // TODO what happens if W > max_int?
+    static constexpr int digits = W - 1; // TODO what happens if W > max_int?
     static constexpr int digits10 = std::numeric_limits<aarith::sinteger<W>>::digits *
                                     std::log10(std::numeric_limits<aarith::sinteger<W>>::radix);
 
-    // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says so
+    // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says
+    // so
     static constexpr int max_digits10 = 0;
 
     static constexpr int min_exponent = 0;
@@ -202,7 +204,6 @@ public:
     static constexpr aarith::sinteger<W> lowest() noexcept
     {
         return aarith::sinteger<W>::min();
-
     }
 
     static constexpr aarith::sinteger<W> max() noexcept

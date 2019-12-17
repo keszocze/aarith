@@ -1,5 +1,5 @@
-#include <aarith/operations/sinteger_operations.hpp>
 #include <aarith/operations/sinteger_comparisons.hpp>
+#include <aarith/operations/sinteger_operations.hpp>
 #include <aarith/operations/word_container_comparisons.hpp>
 #include <aarith/types/sinteger.hpp>
 #include <aarith/utilities/string_utils.hpp>
@@ -52,7 +52,8 @@ SCENARIO("Copy constructor of sintegers with various bit widths", "[sinteger][ut
 {
     GIVEN("An sinteger<N> a")
     {
-        const uint64_t val_a = GENERATE(take(10, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
+        const uint64_t val_a = GENERATE(
+            take(10, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
         sinteger<196> a(0U, val_a, 0U);
 
         THEN("Assignment of individual words is correct")
@@ -676,14 +677,15 @@ SCENARIO("Bit operations are performed correctly", "[sinteger][bit]")
     }
 }
 
-
-SCENARIO("std::numeric_limits gets instantiated correctly", "[sinteger][utility]") {
-    GIVEN("The bit width of 32") {
-        THEN("The values should match the int32_t ones") {
+SCENARIO("std::numeric_limits gets instantiated correctly", "[sinteger][utility]")
+{
+    GIVEN("The bit width of 32")
+    {
+        THEN("The values should match the int32_t ones")
+        {
             using sint = sinteger<32>;
             using nl = std::numeric_limits<sint>;
             using il = std::numeric_limits<int32_t>;
-
 
             CHECK(nl::is_specialized == il::is_specialized);
             CHECK(nl::is_signed == il::is_signed);
@@ -719,11 +721,11 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[sinteger][utility]
             CHECK(nl::denorm_min().word(0) == il::denorm_min());
         }
 
-        THEN("The values should match the int64_t ones") {
+        THEN("The values should match the int64_t ones")
+        {
             using sint = sinteger<64>;
             using nl = std::numeric_limits<sint>;
             using il = std::numeric_limits<int64_t>;
-
 
             CHECK(nl::is_specialized == il::is_specialized);
             CHECK(nl::is_signed == il::is_signed);
@@ -758,6 +760,5 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[sinteger][utility]
             CHECK(nl::signaling_NaN().word(0) == il::signaling_NaN());
             CHECK(nl::denorm_min().word(0) == il::denorm_min());
         }
-
     }
 }

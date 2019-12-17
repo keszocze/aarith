@@ -1,8 +1,8 @@
 #include "aarith/operations/comparisons.hpp"
 #include "aarith/operations/sinteger_operations.hpp"
-#include <aarith/operations/sinteger_comparisons.hpp>
 #include "aarith/types/sinteger.hpp"
 #include "aarith/utilities/string_utils.hpp"
+#include <aarith/operations/sinteger_comparisons.hpp>
 #include <catch.hpp>
 
 using namespace aarith;
@@ -77,24 +77,29 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
     }
 }
 
-SCENARIO("Absolute value computation","[sinteger][utility]")
+SCENARIO("Absolute value computation", "[sinteger][utility]")
 {
     GIVEN("The smallest possible value")
     {
         const sinteger<150> min = std::numeric_limits<sinteger<150>>::min();
-        THEN ("The absolute value of that value is the value again") {
-           REQUIRE(abs(min) == min);
+        THEN("The absolute value of that value is the value again")
+        {
+            REQUIRE(abs(min) == min);
         }
     }
 
-    GIVEN("Any non-smallest value") {
+    GIVEN("Any non-smallest value")
+    {
         using sint = sinteger<64>;
-        const int32_t val_32 = GENERATE(take(50, random(std::numeric_limits<int32_t>::min()+1, -1)));
-        const int64_t val_64 = GENERATE(take(50, random(std::numeric_limits<int64_t>::min()+1, static_cast<int64_t>(-1))));
+        const int32_t val_32 =
+            GENERATE(take(50, random(std::numeric_limits<int32_t>::min() + 1, -1)));
+        const int64_t val_64 = GENERATE(
+            take(50, random(std::numeric_limits<int64_t>::min() + 1, static_cast<int64_t>(-1))));
         const sint a{val_32};
         const sint b{val_64};
 
-        THEN("Computing abs is idempotent") {
+        THEN("Computing abs is idempotent")
+        {
             REQUIRE(abs(abs(a)) == abs(a));
             REQUIRE(abs(abs(b)) == abs(b));
         }
@@ -104,12 +109,11 @@ SCENARIO("Absolute value computation","[sinteger][utility]")
         {
             REQUIRE(abs(a).word(0) == abs(val_32));
         }
-
     }
 }
 
 // TODO finish this
-//SCENARIO("MIN/MAX Values behave as expected", "[sinteger][utility]")
+// SCENARIO("MIN/MAX Values behave as expected", "[sinteger][utility]")
 //{
 //    GIVEN("The min and max value")
 //    {
