@@ -186,7 +186,7 @@ public:
     static constexpr std::float_round_style round_style =
         std::round_toward_zero;
     static constexpr bool is_iec559 = false;
-    static constexpr bool is_module = true;
+    static constexpr bool is_modulo = true;
     static constexpr int radix = 2;
     static constexpr int digits = W; // TODO what happens if W > max_int?
     static constexpr int digits10 = std::numeric_limits<aarith::uinteger<W>>::digits *

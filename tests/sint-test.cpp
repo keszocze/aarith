@@ -720,7 +720,9 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[sinteger][utility]
             CHECK(nl::signaling_NaN().word(0) == il::signaling_NaN());
             CHECK(nl::denorm_min().word(0) == il::denorm_min());
         }
-
+    }
+    GIVEN("The bit width of 64")
+    {
         THEN("The values should match the int64_t ones")
         {
             using sint = sinteger<64>;
