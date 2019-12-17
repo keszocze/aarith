@@ -622,7 +622,6 @@ SCENARIO("Bit operations are performed correctly", "[sinteger][bit]")
 {
     GIVEN("An sinteger<N> n")
     {
-        // TODO Understand how to generate various bit widths
         auto val =
             GENERATE(0, 56567, 23, static_cast<uint64_t>(-4354566), static_cast<uint64_t>(-1));
         const sinteger<150> n = sinteger<150>::from_words(2 * val, val);
@@ -676,6 +675,7 @@ SCENARIO("Bit operations are performed correctly", "[sinteger][bit]")
         }
     }
 }
+
 
 SCENARIO("std::numeric_limits gets instantiated correctly", "[sinteger][utility]")
 {

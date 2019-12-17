@@ -112,6 +112,41 @@ SCENARIO("Absolute value computation", "[sinteger][utility]")
     }
 }
 
+SCENARIO("Unary minus operation", "[sinteger][utility]")
+{
+    GIVEN("The smallest possible value")
+    {
+        const sinteger<150> min = std::numeric_limits<sinteger<150>>::min();
+        THEN("The unary minus value of that value is the value again")
+        {
+            REQUIRE(-min == min);
+        }
+    }
+
+    GIVEN("Any non-smallest value")
+    {
+        using sint = sinteger<64>;
+        const int32_t val_32 =
+            GENERATE(take(50, random(std::numeric_limits<int32_t>::min() + 1, -1)));
+        const int64_t val_64 = GENERATE(
+            take(50, random(std::numeric_limits<int64_t>::min() + 1, static_cast<int64_t>(-1))));
+        const sint a{val_32};
+        const sint b{val_64};
+
+        THEN("Unary minus is self-inverse")
+        {
+            REQUIRE(-(-a) == a);
+            REQUIRE(-(-b) == b);
+        }
+
+        // does not work for int64 as, for some reason, there is no matching abs function for that
+        THEN("Computing abs should match its int32 type counterpart")
+        {
+            REQUIRE((-a).word(0) == -val_32);
+        }
+    }
+}
+
 // TODO finish this
 // SCENARIO("MIN/MAX Values behave as expected", "[sinteger][utility]")
 //{
