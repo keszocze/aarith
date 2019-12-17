@@ -1,5 +1,6 @@
 #include "aarith/operations/comparisons.hpp"
 #include "aarith/operations/sinteger_operations.hpp"
+#include <aarith/operations/sinteger_comparisons.hpp>
 #include "aarith/types/sinteger.hpp"
 #include "aarith/utilities/string_utils.hpp"
 #include <catch.hpp>
@@ -73,6 +74,37 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
                 REQUIRE(result.word(1) == 0);
             }
         }
+    }
+}
+
+SCENARIO("Absolute value computation","[sinteger][utility]")
+{
+    GIVEN("The smallest possible value")
+    {
+        const sinteger<150> min = std::numeric_limits<sinteger<150>>::min();
+        THEN ("The absolute value of that value is the value again") {
+           REQUIRE(abs(min) == min);
+        }
+    }
+
+    GIVEN("Any non-smallest value") {
+        using sint = sinteger<64>;
+        const int32_t val_32 = GENERATE(take(50, random(std::numeric_limits<int32_t>::min()+1, -1)));
+        const int64_t val_64 = GENERATE(take(50, random(std::numeric_limits<int64_t>::min()+1, static_cast<int64_t>(-1))));
+        const sint a{val_32};
+        const sint b{val_64};
+
+        THEN("Computing abs is idempotent") {
+            REQUIRE(abs(abs(a)) == abs(a));
+            REQUIRE(abs(abs(b)) == abs(b));
+        }
+
+        // does not work for int64 as, for some reason, there is no matching abs function for that
+        THEN("Computing abs should match its int32 type counterpart")
+        {
+            REQUIRE(abs(a).word(0) == abs(val_32));
+        }
+
     }
 }
 
