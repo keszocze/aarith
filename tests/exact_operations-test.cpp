@@ -76,17 +76,20 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
     }
 }
 
-SCENARIO("Adding tow uintgers of different bit width","[uinteger][arithmetic][addition]")
+SCENARIO("Adding tow uintgers of different bit width", "[uinteger][arithmetic][addition]")
 {
-    GIVEN("An uinteger of bit width 128") {
+    GIVEN("An uinteger of bit width 128")
+    {
 
-        static const uinteger<128> large=uinteger<128>::from_words(1U,0U);
-        static const uint32_t m_ = GENERATE(take(100,random(static_cast<uint32_t>(0U),std::numeric_limits<uint32_t>::max())));
+        static const uinteger<128> large = uinteger<128>::from_words(1U, 0U);
+        static const uint32_t m_ = GENERATE(
+            take(100, random(static_cast<uint32_t>(0U), std::numeric_limits<uint32_t>::max())));
 
-        static const uinteger<32>m{m_};
+        static const uinteger<32> m{m_};
 
-        THEN("Adding a small number of bit width 32 should not change the second word") {
-            uinteger<129> result=expanding_add(large,m);
+        THEN("Adding a small number of bit width 32 should not change the second word")
+        {
+            uinteger<129> result = expanding_add(large, m);
             CHECK(result.word(2) == 0U);
             CHECK(result.word(1) == 1U);
             REQUIRE(result.word(0) == m_);
@@ -94,23 +97,24 @@ SCENARIO("Adding tow uintgers of different bit width","[uinteger][arithmetic][ad
 
         THEN("The addition with 32 bits should still be commutative")
         {
-            uinteger<129> result1=expanding_add(large,m);
-            uinteger<129> result2=expanding_add(m,large);
+            uinteger<129> result1 = expanding_add(large, m);
+            uinteger<129> result2 = expanding_add(m, large);
             REQUIRE(result1 == result2);
         }
 
 
     }
-    GIVEN ("An uinteger consisting of zeros only") {
+    GIVEN("An uinteger consisting of zeros only")
+    {
         static constexpr uint64_t ones = static_cast<uint64_t>(-1);
-        static const uinteger<128> large=uinteger<128>::from_words(ones,ones);
+        static const uinteger<128> large = uinteger<128>::from_words(ones, ones);
 
         THEN("Adding a one with few bits should create a correct overflow")
         {
 
             static const uinteger<32> one{1U};
 
-            const uinteger<129> result = expanding_add(large,one);
+            const uinteger<129> result = expanding_add(large, one);
             CHECK(result.word(2) == 1U);
             CHECK(result.word(1) == 0U);
             REQUIRE(result.word(0) == 0U);
@@ -152,11 +156,15 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
         }
         WHEN("b equals zero")
         {
-            const uinteger<150> b{0u};
-            THEN("Subtracting b (i.e. zero) should not change a")
+
+
+            uinteger<150> a;
+
+            THEN("Subtracting b (i.e. zero) should not change a)")
             {
                 uinteger<150> a;
 
+                const uinteger<150> b{0u};
                 for (const unsigned a_num : {0u, 23u, 1337u})
                 {
                     a = uinteger<150>{a_num};
@@ -175,11 +183,11 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
                     const uint64_t zero = 0u;
                     const uint64_t one = 1u;
 
-                    const uinteger<192> a(one, one, zero);
-                    const uinteger<192> b(zero, all_ones, one);
+                    const uinteger<192> a = uinteger<192>::from_words(one, zero, zero);
+                    const uinteger<192> b = uinteger<192>::from_words(zero, all_ones, one);
 
                     const uinteger<192> result = sub(a, b);
-                    const uinteger<192> expected(zero, one, all_ones);
+                    const uinteger<192> expected = uinteger<192>::from_words(zero, zero, all_ones);
 
                     REQUIRE(expected == result);
                 }
@@ -328,8 +336,8 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplica
         uint32_t val_b = GENERATE(0, 1, 56567, 23, 234, 76856, 2342353456,
                                   static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
 
-        const uinteger<32> a(val_a);
-        const uinteger<32> b(val_b);
+        const uinteger<32> a = uinteger<32>::from_words(val_a);
+        const uinteger<32> b = uinteger<32>::from_words(val_b);
 
         THEN("Multiplication should be commutative")
         {
@@ -405,7 +413,7 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplica
         }
         WHEN("Both multiplicands are maximum")
         {
-            THEN("The product is 1")
+            THEN("The product is 1 for the truncating multiplication")
             {
                 REQUIRE(mul(d, d) == one);
             }
@@ -419,12 +427,12 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
     GIVEN("A random number a")
     {
         uint64_t val_a = GENERATE(
-            take(1, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
+            take(100, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
         uinteger<64> a{val_a};
         AND_GIVEN("A random number b")
         {
             uint64_t val_b = GENERATE(take(
-                1, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
+                100, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
             uinteger<64> b{val_b};
 
             THEN("The multiplication should match its uint64_t counterpart")

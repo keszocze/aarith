@@ -39,8 +39,8 @@ template <size_t W, size_t V>
     }
 
     /*
-     * If the bit widths are not the same we actually have to check that we don't access values outside the underlying
-     * word container.
+     * If the bit widths are not the same we actually have to check that we don't access values
+     * outside the underlying word container.
      */
     if constexpr (uinteger<W>::word_count() != uinteger<V>::word_count())
     {
@@ -64,17 +64,20 @@ template <size_t W, size_t V>
         }
     }
     // Here we can simple iterate until we reached the end of either of the two uintegers
-    else {
-        for (auto i = 0U; i < a.word_count(); ++i) {
+    else
+    {
+        for (auto i = 0U; i < a.word_count(); ++i)
+        {
             auto const partial_sum = a.word(i) + b.word(i) + carry;
             carry = (partial_sum < a.word(i) || partial_sum < b.word(i)) ? 1U : 0U;
             sum.set_word(i, partial_sum);
         }
 
-        // we check whether an the additional bit results in an additional word and only propagate the carry
-        // if this word exists
-        if constexpr (uinteger<W>::word_count() < uinteger<res_width>::word_count()) {
-            sum.set_word(sum.word_count()-1,carry);
+        // we check whether an the additional bit results in an additional word and only propagate
+        // the carry if this word exists
+        if constexpr (uinteger<W>::word_count() < uinteger<res_width>::word_count())
+        {
+            sum.set_word(sum.word_count() - 1, carry);
         }
     }
 
@@ -98,14 +101,12 @@ template <size_t W>[[nodiscard]] uinteger<W> add(const uinteger<W>& a, const uin
 /**
  * @brief Computes the difference of two unsigned integers.
  *
- * @tparam UInteger The unsigned integer instance used for the operation
+ * @tparam W the bit width of the operands
  * @param a Minuend
  * @param b Subtrahend
  * @return Difference between a and b
  */
-template <size_t W, size_t V=W>
-[[nodiscard]] auto sub(const uinteger<W>& a, const uinteger<V>& b)
-    -> uinteger<std::max(W, V)>
+template <size_t W>[[nodiscard]] auto sub(const uinteger<W>& a, const uinteger<W>& b) -> uinteger<W>
 {
     static_assert(is_integral<uinteger<W>>::value);
     static_assert(is_unsigned<uinteger<W>>::value);
@@ -115,7 +116,6 @@ template <size_t W, size_t V=W>
     result = add(a, minus_b);
     return result;
 }
-
 
 /**
  * @brief Multiplies two unsigned integers expanding the bit width so that the result fits.
