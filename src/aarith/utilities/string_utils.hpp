@@ -80,7 +80,7 @@ template <size_t Width> auto to_binary(const word_container<Width>& value) -> st
     std::string result;
     for (auto i = Width; i > 0; --i)
     {
-        result += std::to_string(value.bit(i - 1));
+        result += value.bit(i - 1) ? '1' : '0';
     }
     return result;
 }
