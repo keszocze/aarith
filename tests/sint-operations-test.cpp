@@ -86,6 +86,14 @@ SCENARIO("Absolute value computation", "[sinteger][utility]")
         {
             REQUIRE(abs(min) == min);
         }
+
+        THEN("The the 'real' absolute value is 2^(W-1)") 
+        {
+            uinteger<150> abs = expanding_abs(min);
+            CHECK(abs.word(0) == 0U);
+            CHECK(abs.word(1) == 0U);
+            REQUIRE(abs.word(2) == (1U << 21U));
+        }
     }
 
     GIVEN("Any non-smallest value")
@@ -102,12 +110,17 @@ SCENARIO("Absolute value computation", "[sinteger][utility]")
         {
             REQUIRE(abs(abs(a)) == abs(a));
             REQUIRE(abs(abs(b)) == abs(b));
+
+            // not "really" applying it twice but close enough
+            REQUIRE(abs(sint(expanding_abs(a))) == sint(expanding_abs(a)));
+            REQUIRE(abs(sint(expanding_abs(b))) == sint(expanding_abs(b)));
         }
 
         // does not work for int64 as, for some reason, there is no matching abs function for that
         THEN("Computing abs should match its int32 type counterpart")
         {
             REQUIRE(abs(a).word(0) == abs(val_32));
+            REQUIRE(expanding_abs(a).word(0) == abs(val_32));
         }
     }
 }

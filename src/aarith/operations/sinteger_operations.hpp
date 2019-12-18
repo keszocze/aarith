@@ -1,6 +1,7 @@
 #pragma once
 
 #include <aarith/types/sinteger.hpp>
+#include <aarith/types/uinteger.hpp>
 
 namespace aarith {
 
@@ -51,11 +52,28 @@ template <size_t W>[[nodiscard]] sinteger<W> add(const sinteger<W>& a, const sin
  * @brief Computes the absolute value of a given signed integer.
  * @tparam Width The width of the signed integer
  * @param n The signed inter to be "absolute valued"
- * @return The absolute value of the signed integer provided
+ * @return The absolute value of the signed integer 
  */
-template <size_t Width> auto abs(const sinteger<Width>& n) -> sinteger<Width>
+template <size_t Width> [[nodiscard]] auto abs(const sinteger<Width>& n) -> sinteger<Width>
 {
     return n.is_negative() ? -n : n;
+}
+
+
+/**
+ * @brief Computes the absolute value of a given signed integer.
+ * 
+ * This method returns an unsigned integer. This means that the absolute value 
+ * will fit and no overflow will happen.
+ * 
+ * @tparam Width The width of the signed integer
+ * @param n The signed inter to be "absolute valued"
+ * @return The absolute value of the signed integer 
+ */
+template <size_t Width> [[nodiscard]] auto expanding_abs(const sinteger<Width>& n) -> uinteger<Width>
+{
+    uinteger<Width> abs = n.is_negative() ? -n : n;
+    return abs;
 }
 
 template <size_t W> auto operator-(const sinteger<W>& n) -> sinteger<W>
