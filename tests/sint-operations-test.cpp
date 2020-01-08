@@ -230,7 +230,25 @@ SCENARIO("Unary minus operation", "[sinteger][utility]")
     }
 }
 
-// TODO finish this
-//        }
-//    }
-//}
+
+SCENARIO("MIN/MAX Values behave as expected", "[sinteger][utility]")
+{
+    GIVEN("The min and max value")
+    {
+        constexpr size_t w = 50;
+        sinteger<w> min = sinteger<w>::min();
+        sinteger<w> max = sinteger<w>::max();
+        sinteger<w> one = sinteger<w>(1U);
+        [[maybe_unused]] sinteger<w> zero = sinteger<w>(0U);
+        THEN("Adding/subtracting one should wrap around")
+        {
+            REQUIRE(add(max,one) == min);
+            REQUIRE(sub(min,one) == max);
+        }
+
+        THEN("Taking the absolute value of the min value yields the same value")
+        {
+            REQUIRE(abs(min) == min);
+        }
+    }
+}
