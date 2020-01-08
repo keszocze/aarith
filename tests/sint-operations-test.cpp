@@ -9,7 +9,7 @@ using namespace aarith;
 
 SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][addition]")
 {
-    GIVEN("Two sinteger<N> a and b with N <= word_width")
+    GIVEN("Two positive sinteger<N> a and b with N <= word_width")
     {
         static constexpr size_t TestWidth = 16;
         static_assert(sinteger<TestWidth>::word_count() == 1);
@@ -42,7 +42,7 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
         }
     }
 
-    GIVEN("Two sinteger<N> a and b with N > word_width")
+    GIVEN("Two positive sinteger<N> a and b with N > word_width")
     {
         static constexpr size_t TestWidth = 128;
         static_assert(sinteger<TestWidth>::word_count() > 1);
@@ -73,6 +73,32 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
             {
                 REQUIRE(result.word(1) == 0);
             }
+        }
+    }
+    GIVEN("A sinteger and its negative") {
+        const sinteger<16> a(15);
+        const sinteger<16> a_(-15);
+        const sinteger<16> zero16(0);
+
+        const sinteger<64> b(150);
+        const sinteger<64> b_(-150);
+        const sinteger<64> zero64(0);
+
+
+        const sinteger<150> c(1337);
+        const sinteger<150> c_(-1337);
+        const sinteger<150> zero150(0);
+
+        THEN ("The sum should be  zero")
+        {
+            REQUIRE(add(a,a_) == zero16);
+            REQUIRE(add(a,a_) == add(a_,a));
+
+            REQUIRE(add(b,b_) == zero64);
+            REQUIRE(add(b,b_) == add(b_,b));
+
+            REQUIRE(add(c,c_) == zero150);
+            REQUIRE(add(c,c_) == add(c_,c));
         }
     }
 }
