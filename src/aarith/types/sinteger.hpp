@@ -29,6 +29,13 @@ public:
     explicit sinteger(T t)
         : word_container<Width, WordType>(static_cast<WordType>(t))
     {
+        if (t < 0) {
+            const WordType ones(-1);
+            for (size_t i = 1; i < sinteger<Width>::word_count(); i++)
+            {
+                this->set_word(i,ones);
+            }
+        }
     }
 
     template <typename T, class... Args,
