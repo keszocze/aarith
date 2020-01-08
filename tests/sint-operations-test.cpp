@@ -79,31 +79,71 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
         const sinteger<16> a(15);
         const sinteger<16> a_(-15);
         const sinteger<16> zero16(0);
+        const sinteger<16> sum16 = add(a,a_);
 
         const sinteger<64> b(150);
         const sinteger<64> b_(-150);
         const sinteger<64> zero64(0);
+        const sinteger<64> sum64 = add(b,b_);
 
 
         const sinteger<150> c(1337);
         const sinteger<150> c_(-1337);
         const sinteger<150> zero150(0);
+        const sinteger<150> sum150 = add(c,c_);
 
-        THEN ("The sum should be  zero")
+        THEN ("The sum should be zero")
         {
-            REQUIRE(add(a,a_) == zero16);
-            REQUIRE(add(a,a_) == add(a_,a));
+            REQUIRE(sum16 == zero16);
+            REQUIRE(sum16.is_zero());
+            REQUIRE(sum16 == add(a_,a));
 
-            REQUIRE(add(b,b_) == zero64);
-            REQUIRE(add(b,b_) == add(b_,b));
+            REQUIRE(sum64 == zero64);
+            REQUIRE(sum64.is_zero());
+            REQUIRE(sum64 == add(b_,b));
 
-            std::cout << to_binary(a) << "\n" << to_binary(a_) << "\n" << to_binary(add(a,a_)) << "\n";
-            std::cout << to_binary(b) << "\n" << to_binary(b_) << "\n" << to_binary(add(b,b_)) << "\n";
-            std::cout << group_digits(to_binary(c),64) << "\n" << group_digits(to_binary(c_),64) << "\n" << group_digits(to_binary(add(c,c_)),64) << "\n";
+//            std::cout << to_binary(a) << "\n" << to_binary(a_) << "\n" << to_binary(add(a,a_)) << "\n";
+//            std::cout << to_binary(b) << "\n" << to_binary(b_) << "\n" << to_binary(add(b,b_)) << "\n";
+//            std::cout << group_digits(to_binary(c),64) << "\n" << group_digits(to_binary(c_),64) << "\n" << group_digits(to_binary(add(c,c_)),64) << "\n";
 
-            REQUIRE(add(c,c_) == zero150);
-            REQUIRE(add(c,c_) == add(c_,c));
+            REQUIRE(sum150 == zero150);
+            REQUIRE(sum150.is_zero());
+            REQUIRE(sum150 == add(c_,c));
         }
+
+        THEN ("The sum should be negative")
+        {
+            REQUIRE_FALSE(sum16.is_negative());
+            REQUIRE_FALSE(sum64.is_negative());
+            REQUIRE_FALSE(sum150.is_negative());
+        }
+    }
+
+    GIVEN("A positive sinteger and a negative sinteger with larger absolute value")
+    {
+        const sinteger<16> a(15);
+        const sinteger<16> a_(-16);
+        const sinteger<16> zero16(0);
+        const sinteger<16> sum16 = add(a,a_);
+
+        const sinteger<64> b(150);
+        const sinteger<64> b_(-235);
+        const sinteger<64> zero64(0);
+        const sinteger<64> sum64 = add(b,b_);
+
+
+        const sinteger<150> c(1337);
+        const sinteger<150> c_(-5000);
+        const sinteger<150> zero150(0);
+        const sinteger<150> sum150 = add(c,c_);
+
+        THEN("The sum should be negative")
+        {
+            REQUIRE(sum16.is_negative());
+            REQUIRE(sum64.is_negative());
+            REQUIRE(sum150.is_negative());
+        }
+
     }
 }
 
