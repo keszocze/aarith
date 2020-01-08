@@ -458,18 +458,15 @@ auto operator>>(const word_container<Width>& lhs, const size_t rhs) -> word_cont
     const auto shift_word_right = rhs - skip_words * lhs.word_width();
     const auto shift_word_left = lhs.word_width() - shift_word_right;
 
-    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
+    for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
     {
-        if (skip_words <= counter)
+        typename word_container<Width>::word_type new_word;
+        new_word = lhs.word(counter) >> shift_word_right;
+        if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
         {
-            typename word_container<Width>::word_type new_word;
-            new_word = lhs.word(counter) >> shift_word_right;
-            if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
-            {
-                new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
-            }
-            shifted.set_word(counter - skip_words, new_word);
+            new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
         }
+        shifted.set_word(counter - skip_words, new_word);
     }
     typename word_container<Width>::word_type new_word;
     new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
