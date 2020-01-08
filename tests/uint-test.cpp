@@ -1,4 +1,4 @@
-#include <aarith/operations/comparisons.hpp>
+#include <aarith/operations/uinteger_comparisons.hpp>
 #include <aarith/types/uinteger.hpp>
 #include <aarith/utilities/string_utils.hpp>
 #include <catch.hpp>
@@ -222,7 +222,7 @@ SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
             static constexpr auto s = 63U;
             const uinteger<Width> a{number_a};
 
-            const auto result = a << s;
+            const uinteger<Width> result = a << s;
             REQUIRE(result.word(0) == 0x8000000000000000);
             REQUIRE(result.word(1) == 3);
         }

@@ -5,10 +5,10 @@ target_sources(aarith INTERFACE
   aarith/types/word_container.hpp
   aarith/types/traits.hpp
   aarith/types/random.hpp
-  aarith/operations/exact_operations.hpp
+        aarith/operations/uinteger_operations.hpp
   aarith/operations/approx_operations.hpp
         aarith/operations/sinteger_operations.hpp
-  aarith/operations/comparisons.hpp
+        aarith/operations/uinteger_comparisons.hpp
   aarith/utilities/bit_operations.hpp
   aarith/utilities/string_utils.hpp
 

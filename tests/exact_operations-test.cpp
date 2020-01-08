@@ -1,5 +1,5 @@
-#include "aarith/operations/comparisons.hpp"
-#include "aarith/operations/exact_operations.hpp"
+#include "aarith/operations/uinteger_comparisons.hpp"
+#include "aarith/operations/uinteger_operations.hpp"
 #include "aarith/types/uinteger.hpp"
 #include "aarith/utilities/string_utils.hpp"
 #include <catch.hpp>

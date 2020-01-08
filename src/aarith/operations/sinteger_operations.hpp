@@ -48,6 +48,25 @@ template <size_t W>[[nodiscard]] sinteger<W> add(const sinteger<W>& a, const sin
     return width_cast<W>(result);
 }
 
+
+/**
+ * @brief Computes the difference of two signed integers.
+ *
+ * @tparam W the bit width of the operands
+ * @param a Minuend
+ * @param b Subtrahend
+ * @return Difference between a and b
+ */
+template <size_t W>[[nodiscard]] auto sub(const sinteger<W>& a, const sinteger<W>& b) -> sinteger<W>
+    {
+        static_assert(is_integral<sinteger<W>>::value);
+
+        sinteger<W> result;
+        sinteger<W> minus_b = add(~b, sinteger<W>(1U));
+        result = add(a, minus_b);
+        return result;
+    }
+
 /**
  * @brief Computes the absolute value of a given signed integer.
  * @tparam Width The width of the signed integer
@@ -76,6 +95,12 @@ template <size_t Width> [[nodiscard]] auto expanding_abs(const sinteger<Width>& 
     return abs;
 }
 
+/**
+ *
+ * @tparam W The widths of the signed integer
+ * @param n  The signed integer whose sign is to be changed
+ * @return  The negative value of the signed integer
+ */
 template <size_t W> auto operator-(const sinteger<W>& n) -> sinteger<W>
 {
     const sinteger<W> one(1U);
