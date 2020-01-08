@@ -97,6 +97,8 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
             REQUIRE(add(b,b_) == zero64);
             REQUIRE(add(b,b_) == add(b_,b));
 
+            std::cout << to_binary(c) << "\n" << to_binary(c_) << "\n" << add(c,c_) << "\n";
+
             REQUIRE(add(c,c_) == zero150);
             REQUIRE(add(c,c_) == add(c_,c));
         }
