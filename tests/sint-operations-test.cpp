@@ -97,7 +97,9 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
             REQUIRE(add(b,b_) == zero64);
             REQUIRE(add(b,b_) == add(b_,b));
 
-            std::cout << to_binary(c) << "\n" << to_binary(c_) << "\n" << add(c,c_) << "\n";
+            std::cout << to_binary(a) << "\n" << to_binary(a_) << "\n" << to_binary(add(a,a_)) << "\n";
+            std::cout << to_binary(b) << "\n" << to_binary(b_) << "\n" << to_binary(add(b,b_)) << "\n";
+            std::cout << group_digits(to_binary(c),64) << "\n" << group_digits(to_binary(c_),64) << "\n" << group_digits(to_binary(add(c,c_)),64) << "\n";
 
             REQUIRE(add(c,c_) == zero150);
             REQUIRE(add(c,c_) == add(c_,c));
