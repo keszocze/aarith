@@ -234,10 +234,10 @@ auto exact_nfloat_add(const nfloat lhs, const nfloat rhs)
     }
 
     std::cout << "add " << lhs << " + " << rhs << std::endl;
-    const auto exponent_delta = lhs.get_exponent() - rhs.get_exponent();
+    const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
     const auto new_mantissa = rhs.get_mantissa() << exponent_delta.word(0);
     std::cout << "add " << lhs.get_mantissa() << " + " << new_mantissa << std::endl;
-    const auto mantissa_sum = width_cast<M+1, M>(lhs.get_mantissa()) + width_cast<M+1, M>(new_mantissa);
+    const auto mantissa_sum = width_cast<M>(add(width_cast<M+1, M>(lhs.get_mantissa()),  width_cast<M+1, M>(new_mantissa)));
 
     nfloat sum(0.f);
     sum.set_sign(lhs.get_sign());
@@ -267,9 +267,9 @@ auto exact_nfloat_sub(const nfloat lhs, const nfloat rhs)
     }
 
 
-    const auto exponent_delta = lhs.get_exponent() - rhs.get_exponent();
+    const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
     const auto new_mantissa = rhs.get_mantissa() << exponent_delta.word(0);
-    const auto mantissa_sum = width_cast<M+1, M>(lhs.get_mantissa()) - width_cast<M+1, M>(new_mantissa);
+    const auto mantissa_sum = width_cast<M>(sub(width_cast<M+1, M>(lhs.get_mantissa()), width_cast<M+1, M>(new_mantissa)));
 
     nfloat sum(0.f);
     sum.set_sign(lhs.get_sign());

@@ -247,7 +247,7 @@ auto to_sci_string(const normfloat<E, M> nf)
     uint32_t ui_mantissa = static_cast<uint32_t>(flc_mantissa.word(0)) & 0x7fffff | 0x3f800000;
     float *mantissa = reinterpret_cast<float*>(&ui_mantissa);
 
-    auto const exponent = nf.get_exponent() - nf.get_bias();
+    auto const exponent = sub(nf.get_exponent(), nf.get_bias());
     auto const abs_exponent = abs_two_complement(exponent);
 
     std::stringstream str;

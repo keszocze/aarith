@@ -12,6 +12,11 @@
 
 namespace aarith {
 
+template <size_t Width> class uinteger;
+
+template <size_t DestinationWidth, size_t SourceWidth>
+[[nodiscard]] auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>;
+
 template <size_t Width> class uinteger
 {
 public:
@@ -215,7 +220,7 @@ public:
 
     auto operator+=(const uinteger<Width> addend) -> uinteger&
     {
-        return *this = *this + addend;
+        return *this = width_cast<Width>(add(*this, addend));
     }
 
     [[nodiscard]] bool is_zero() const noexcept
@@ -438,7 +443,7 @@ template <size_t Width> auto abs_two_complement(const uinteger<Width>& value) ->
     if (value.bit(Width - 1) == 1)
     {
         const uinteger<Width> one(1U);
-        return ~value + one;
+        return add(~value, one);
     }
     return value;
 }

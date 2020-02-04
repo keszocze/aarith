@@ -51,8 +51,8 @@ public:
         {
             exponent = uinteger<E>(f_exponent);
             const uinteger<E> f_bias((1U << (f_exponent_width-1))-1UL);
-            const auto exponent_delta = get_bias() - f_bias;
-            exponent = exponent + exponent_delta;
+            const auto exponent_delta = sub(get_bias(), f_bias);
+            exponent = add(exponent, exponent_delta);
 
         }
         else
@@ -81,7 +81,7 @@ public:
     {
         const uinteger<E> one(1U);
         const uinteger<E> shifted = one << (E - 1);
-        return shifted - one;
+        return sub(shifted, one);
     }
 
     auto get_sign() const
