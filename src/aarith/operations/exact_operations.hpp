@@ -214,6 +214,75 @@ template <class UInteger>
     return restoring_division(numerator, denominator).first;
 }
 
+template<class nfloat>
+auto exact_nfloat_add(const nfloat lhs, const nfloat rhs)
+-> nfloat
+{
+    static_assert(is_float<nfloat>::value);
+
+    constexpr auto E = nfloat::exponent_width();
+    constexpr auto M = nfloat::mantissa_width();
+
+    if(abs(lhs) < abs(rhs))
+    {
+        return exact_nfloat_add(rhs, lhs);
+    }
+
+    if(lhs.get_sign() != rhs.get_sign())
+    {
+        return exact_nfloat_sub(lhs, rhs);
+    }
+
+    std::cout << "add " << lhs << " + " << rhs << std::endl;
+    const auto exponent_delta = lhs.get_exponent() - rhs.get_exponent();
+    const auto new_mantissa = rhs.get_mantissa() << exponent_delta.word(0);
+    std::cout << "add " << lhs.get_mantissa() << " + " << new_mantissa << std::endl;
+    const auto mantissa_sum = width_cast<M+1, M>(lhs.get_mantissa()) + width_cast<M+1, M>(new_mantissa);
+
+    nfloat sum(0.f);
+    sum.set_sign(lhs.get_sign());
+    sum.set_exponent(lhs.get_exponent());
+    sum.set_mantissa(mantissa_sum);
+
+    return normalize(sum);
+}
+
+template<class nfloat>
+auto exact_nfloat_sub(const nfloat lhs, const nfloat rhs)
+-> nfloat
+{
+    static_assert(is_float<nfloat>::value);
+
+    constexpr auto E = nfloat::exponent_width();
+    constexpr auto M = nfloat::mantissa_width();
+
+    if(abs(lhs) < abs(rhs))
+    {
+        return exact_nfloat_sub(rhs, lhs);
+    }
+
+    if(lhs.get_sign() != rhs.get_sign())
+    {
+        return exact_nfloat_add(lhs, rhs);
+    }
+
+
+    const auto exponent_delta = lhs.get_exponent() - rhs.get_exponent();
+    const auto new_mantissa = rhs.get_mantissa() << exponent_delta.word(0);
+    const auto mantissa_sum = width_cast<M+1, M>(lhs.get_mantissa()) - width_cast<M+1, M>(new_mantissa);
+
+    nfloat sum(0.f);
+    sum.set_sign(lhs.get_sign());
+    sum.set_exponent(lhs.get_exponent());
+    sum.set_mantissa(mantissa_sum);
+
+    if(sum.is_normalized())
+    {
+        return sum;
+    }
+    return normalize(sum);
+}
+
 } // namespace aarith
 
 #include "aarith/types/integer.hpp"
