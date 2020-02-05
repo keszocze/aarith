@@ -215,10 +215,33 @@ template <class UInteger>
     return restoring_division(numerator, denominator).first;
 }
 
+/**
+ * @brief Adds to normfloats.
+ *
+ * @param lhs The first number that is to be summed up
+ * @param rhs The second number that is to be summed up
+ * @tparam E Width of exponent
+ * @tparam M Width of mantissa including the leading 1
+ *
+ * @return The sum
+ *
+ */
 template<size_t E, size_t M>
-auto add_no_checks(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
+[[nodiscard]] auto add(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
 -> normfloat<E, M>
 {
+    if(abs(lhs) < abs(rhs))
+    {
+        return add(rhs, lhs);
+    }
+
+    if(lhs.get_sign() != rhs.get_sign())
+    {
+        auto swap_sign = rhs;
+        swap_sign.set_sign(~swap_sign.get_sign());
+        return sub(lhs, swap_sign);
+    }
+
     const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
     const auto new_mantissa = rhs.get_mantissa() >> exponent_delta.word(0);
     const auto mantissa_sum = expanding_add(lhs.get_mantissa(),  new_mantissa);
@@ -231,41 +254,19 @@ auto add_no_checks(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
     return normalize<E, mantissa_sum.width(), M>(sum);
 }
 
+/**
+ * @brief Subtraction with normfloats: lhs-rhs.
+ *
+ * @param lhs The minuend
+ * @param rhs The subtrahend
+ * @tparam E Width of exponent
+ * @tparam M Width of mantissa including the leading 1
+ *
+ * @return The difference lhs-rhs
+ *
+ */
 template<size_t E, size_t M>
-auto sub_no_checks(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
--> normfloat<E, M>
-{
-    const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
-    const auto new_mantissa = rhs.get_mantissa() >> exponent_delta.word(0);
-    const auto mantissa_sum = sub(lhs.get_mantissa(), new_mantissa);
-
-    normfloat<E, mantissa_sum.width()> sum(0.f);
-    sum.set_sign(lhs.get_sign());
-    sum.set_exponent(lhs.get_exponent());
-    sum.set_mantissa(mantissa_sum);
-
-    return normalize<E, mantissa_sum.width(), M>(sum);
-}
-
-template<size_t E, size_t M>
-auto add(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
--> normfloat<E, M>
-{
-    if(abs(lhs) < abs(rhs))
-    {
-        return add(rhs, lhs);
-    }
-
-    if(lhs.get_sign() != rhs.get_sign())
-    {
-        return sub_no_checks(lhs, rhs);
-    }
-
-    return add_no_checks(lhs, rhs);
-}
-
-template<size_t E, size_t M>
-auto sub(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
+[[nodiscard]] auto sub(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
 -> normfloat<E, M>
 {
     if(abs(lhs) < abs(rhs))
@@ -277,10 +278,21 @@ auto sub(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
 
     if(lhs.get_sign() != rhs.get_sign())
     {
-        return add_no_checks(lhs, rhs);
+        auto swap_sign = rhs;
+        swap_sign.set_sign(~swap_sign.get_sign());
+        return add(lhs, swap_sign);
     }
 
-    return sub_no_checks(lhs, rhs);
+    const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
+    const auto new_mantissa = rhs.get_mantissa() >> exponent_delta.word(0);
+    const auto mantissa_sum = sub(lhs.get_mantissa(), new_mantissa);
+
+    normfloat<E, mantissa_sum.width()> sum(0.f);
+    sum.set_sign(lhs.get_sign());
+    sum.set_exponent(lhs.get_exponent());
+    sum.set_mantissa(mantissa_sum);
+
+    return normalize<E, mantissa_sum.width(), M>(sum);
 }
 
 } // namespace aarith
