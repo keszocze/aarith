@@ -8,6 +8,7 @@
 #include <iostream>
 #include <type_traits>
 #include <string>
+#include <time.h>
 
 
 namespace aarith {
@@ -19,6 +20,13 @@ public:
     static_assert(M > 0, "Mantissa width has to be greater zero.");
     static_assert(E > 1, "Exponent width has to be greater one.");
     
+    explicit normfloat()
+    {
+        exponent = uinteger<E>(0U);
+        mantissa = uinteger<M>(0U);
+        sign_neg = false;
+    }
+
     template<class F>
     explicit normfloat(F f)
     {
@@ -62,6 +70,11 @@ public:
             f_exponent -= exponent_delta;
             exponent = uinteger<E>(f_exponent);
         }
+
+        if (f_exponent == 0)
+        {
+            mantissa.set_bit(M-1, false);
+        }
     }
 
     static constexpr auto exponent_width()
@@ -85,14 +98,14 @@ public:
     }
 
     auto get_sign() const
-    -> unsigned
+    -> unsigned int
     {
         return (sign_neg)?1U:0U;
     }
 
     void set_sign(uint8_t sign)
     {
-        sign_neg = sign > 0;
+        sign_neg = (sign&1U) > 0;
     }
 
     auto get_exponent() const
@@ -202,7 +215,7 @@ template<size_t E, size_t M>
 auto operator==(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
 -> bool
 {
-    return lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent() && lhs.get_mantissa == rhs.get_mantissa();
+    return lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent() && lhs.get_mantissa() == rhs.get_mantissa();
 }
 
 template<size_t E, size_t M>
@@ -237,24 +250,83 @@ auto abs(const normfloat<E, M> nf)
     return absolute;
 }
 
-template<size_t E, size_t M>
-auto normalize(const normfloat<E, M> &nf)
--> normfloat<E, M>
+template<size_t M>
+auto rshift_and_round(const uinteger <M> &m, const size_t shift_by)
+-> uinteger<M>
 {
-    auto normalized = nf;
+    if (shift_by == 0)
+    {
+        return m;
+    }
 
-    auto exponent = normalized.get_exponent();
-    auto mantissa = normalized.get_mantissa();
+    if (shift_by > M)
+    {
+        return uinteger<M>(0U);
+    }
 
-    auto shift_by = find_leading_one(mantissa);
+    auto round = 0U;
 
-    mantissa <<= shift_by;
-    exponent += uinteger<E>(shift_by);
+    if(m.bit(shift_by-1) == 1)
+    {
+        bool on_border = true;
+        for(auto c = shift_by-1; c > 0; --c)
+        {
+            if(m.bit(c-1) == 1)
+            {
+                on_border = false;
+                break;
+            }
+        }
+        if(on_border)
+        {
+            srand (time(NULL));
+            round = rand() % 2;
+        }
+        else
+        {
+            round = 1U;
+        }
+    }
 
-    normalized.set_exponent(exponent);
-    normalized.set_mantissa(mantissa);
+    return add((m >> shift_by), uinteger<M>(round));
+}
 
-    return normalized;
+template<size_t E, size_t M1, size_t M2=M1>
+auto normalize(const normfloat<E, M1> &nf)
+-> normfloat<E, M2>
+{
+    auto denormalized = nf;
+
+    auto exponent = denormalized.get_exponent();
+    auto mantissa = denormalized.get_mantissa();
+
+    auto one_at = find_leading_one(mantissa);
+
+    if(one_at == M1)
+    {
+        exponent = uinteger<E>(0U);
+        denormalized.set_sign(0);
+    }
+    else if(one_at >= M2)
+    {
+        auto shift_by = one_at + 1 - M2;
+        mantissa = rshift_and_round(mantissa, shift_by);
+        exponent = add(exponent, uinteger<E>(shift_by));
+    }
+    else
+    {
+        auto shift_by = M2 - one_at - 1;
+        mantissa <<= shift_by;
+        exponent = sub(exponent, uinteger<E>(shift_by));
+    }
+
+    normfloat<E, M2> normalized_float;
+
+    normalized_float.set_sign(denormalized.get_sign());
+    normalized_float.set_exponent(exponent);
+    normalized_float.set_mantissa(width_cast<M2>(mantissa));
+
+    return normalized_float;
 }
 
 template<class uint>
@@ -265,7 +337,7 @@ auto find_leading_one(const uint mantissa)
     static_assert(is_unsigned<uint>::value);
 
     const auto width = uint::width();
-    auto zero_at = width;
+    auto one_at = width;
     
     for(auto i = uint::word_count(); i > 0; --i)
     {
@@ -274,11 +346,11 @@ auto find_leading_one(const uint mantissa)
             if(i == uint::word_count())
             {
                 auto const modulo = width % (sizeof(typename uint::word_type)*8);
-                zero_at -= modulo == 0 ? sizeof(typename uint::word_type)*8 : modulo;
+                one_at -= modulo == 0 ? sizeof(typename uint::word_type)*8 : modulo;
             }
             else
             {
-                zero_at -= sizeof(typename uint::word_type)*8;
+                one_at -= sizeof(typename uint::word_type)*8;
             }
         }
         else
@@ -287,19 +359,21 @@ auto find_leading_one(const uint mantissa)
         }
     }
 
-    while(zero_at > 0)
+    while(one_at > 0)
     {
-        --zero_at;
-        if(mantissa.bit(zero_at) == 1)
+        --one_at;
+        if(mantissa.bit(one_at) == 1)
         {
             break;
         }
     }
 
-    std::cout << "mantissa: " << mantissa << std::endl;
-    std::cout << "zero at: " << zero_at << std::endl;
-    
-    return zero_at;
+    if(one_at == 0 && mantissa.bit(0) == 0)
+    {
+        one_at = width;
+    }
+
+    return one_at;
 }
 
 } // namespace aarith

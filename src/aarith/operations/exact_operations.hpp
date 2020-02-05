@@ -1,6 +1,7 @@
 #pragma once
 
 #include <aarith/types/integer.hpp>
+#include <aarith/types/normfloat.hpp>
 #include <aarith/types/traits.hpp>
 #include <aarith/utilities/bit_operations.hpp>
 
@@ -215,6 +216,48 @@ template <class UInteger>
 }
 
 template<class nfloat>
+auto nfloat_add(const nfloat lhs, const nfloat rhs)
+-> nfloat
+{
+    static_assert(is_float<nfloat>::value);
+
+    constexpr auto E = nfloat::exponent_width();
+    constexpr auto M = nfloat::mantissa_width();
+
+    const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
+    const auto new_mantissa = rhs.get_mantissa() >> exponent_delta.word(0);
+    const auto mantissa_sum = expanding_add(lhs.get_mantissa(),  new_mantissa);
+
+    normfloat<E, mantissa_sum.width()> sum(0.f);
+    sum.set_sign(lhs.get_sign());
+    sum.set_exponent(lhs.get_exponent());
+    sum.set_mantissa(mantissa_sum);
+
+    return normalize<E, mantissa_sum.width(), M>(sum);
+}
+
+template<class nfloat>
+auto nfloat_sub(const nfloat lhs, const nfloat rhs)
+-> nfloat
+{
+    static_assert(is_float<nfloat>::value);
+
+    constexpr auto E = nfloat::exponent_width();
+    constexpr auto M = nfloat::mantissa_width();
+
+    const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
+    const auto new_mantissa = rhs.get_mantissa() >> exponent_delta.word(0);
+    const auto mantissa_sum = sub(lhs.get_mantissa(), new_mantissa);
+
+    normfloat<E, mantissa_sum.width()> sum(0.f);
+    sum.set_sign(lhs.get_sign());
+    sum.set_exponent(lhs.get_exponent());
+    sum.set_mantissa(mantissa_sum);
+
+    return normalize<E, mantissa_sum.width(), M>(sum);
+}
+
+template<class nfloat>
 auto exact_nfloat_add(const nfloat lhs, const nfloat rhs)
 -> nfloat
 {
@@ -230,21 +273,10 @@ auto exact_nfloat_add(const nfloat lhs, const nfloat rhs)
 
     if(lhs.get_sign() != rhs.get_sign())
     {
-        return exact_nfloat_sub(lhs, rhs);
+        return nfloat_sub(lhs, rhs);
     }
 
-    std::cout << "add " << lhs << " + " << rhs << std::endl;
-    const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
-    const auto new_mantissa = rhs.get_mantissa() << exponent_delta.word(0);
-    std::cout << "add " << lhs.get_mantissa() << " + " << new_mantissa << std::endl;
-    const auto mantissa_sum = width_cast<M>(add(width_cast<M+1, M>(lhs.get_mantissa()),  width_cast<M+1, M>(new_mantissa)));
-
-    nfloat sum(0.f);
-    sum.set_sign(lhs.get_sign());
-    sum.set_exponent(lhs.get_exponent());
-    sum.set_mantissa(mantissa_sum);
-
-    return normalize(sum);
+    return nfloat_add(lhs, rhs);
 }
 
 template<class nfloat>
@@ -258,29 +290,17 @@ auto exact_nfloat_sub(const nfloat lhs, const nfloat rhs)
 
     if(abs(lhs) < abs(rhs))
     {
-        return exact_nfloat_sub(rhs, lhs);
+        auto swap = rhs;
+        swap.set_sign(~swap.get_sign());
+        return exact_nfloat_add(swap, lhs);
     }
 
     if(lhs.get_sign() != rhs.get_sign())
     {
-        return exact_nfloat_add(lhs, rhs);
+        return nfloat_add(lhs, rhs);
     }
 
-
-    const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
-    const auto new_mantissa = rhs.get_mantissa() << exponent_delta.word(0);
-    const auto mantissa_sum = width_cast<M>(sub(width_cast<M+1, M>(lhs.get_mantissa()), width_cast<M+1, M>(new_mantissa)));
-
-    nfloat sum(0.f);
-    sum.set_sign(lhs.get_sign());
-    sum.set_exponent(lhs.get_exponent());
-    sum.set_mantissa(mantissa_sum);
-
-    if(sum.is_normalized())
-    {
-        return sum;
-    }
-    return normalize(sum);
+    return nfloat_sub(lhs, rhs);
 }
 
 } // namespace aarith

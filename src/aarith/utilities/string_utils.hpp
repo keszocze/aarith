@@ -141,7 +141,7 @@ auto to_base_2n(const normfloat<E, M> nf)
 {
     std::string str;
     
-    str = nf.get_sign() 
+    str = std::to_string(nf.get_sign())
         + " "
         + to_base_2n<N>(nf.get_exponent())
         +  " "
