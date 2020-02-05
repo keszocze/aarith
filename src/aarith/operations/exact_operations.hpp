@@ -295,6 +295,34 @@ template<size_t E, size_t M>
     return normalize<E, mantissa_sum.width(), M>(sum);
 }
 
+/**
+ * @brief Multiplication with normfloats: lhs*rhs.
+ *
+ * @param lhs The multiplicand
+ * @param rhs The multiplicator
+ * @tparam E Width of exponent
+ * @tparam M Width of mantissa including the leading 1
+ *
+ * @return The product lhs*rhs
+ *
+ */
+template<size_t E, size_t M>
+[[nodiscard]] auto mul(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
+-> normfloat<E, M>
+{
+    auto mproduct = expanding_mul(lhs.get_mantissa(), rhs.get_mantissa());
+    mproduct = mproduct >> (M-1);
+    auto esum = width_cast<E>(sub(expanding_add(lhs.get_exponent(), rhs.get_exponent()), lhs.get_bias()));
+    auto sign = lhs.get_sign() ^ rhs.get_sign();
+
+    normfloat<E, mproduct.width()> product;
+    product.set_mantissa(mproduct);
+    product.set_exponent(esum);
+    product.set_sign(sign);
+
+    return normalize<E, mproduct.width(), M>(product);
+}
+
 } // namespace aarith
 
 #include "aarith/types/integer.hpp"
