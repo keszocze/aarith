@@ -219,6 +219,63 @@ auto operator==(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
 }
 
 template<size_t E, size_t M>
+auto equal_except_rounding(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
+-> bool
+{   
+    if(lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent())
+    {
+        if(lhs.get_mantissa() == rhs.get_mantissa())
+        {
+            return true;
+        }
+        else
+        {
+            const auto m1 = lhs.get_mantissa();
+            const auto m2 = rhs.get_mantissa();
+            
+            const auto bit1 = m1.bit(0);
+            const auto bit2 = m2.bit(0);
+
+            bool rounding_error = true;
+            bool has_to_be_equal = false;
+            for(auto i = 0U; i < M; ++i)
+            {
+                if(has_to_be_equal)
+                {
+                    if(m1.bit(i) != m2.bit(i))
+                    {
+                        rounding_error = false;
+                        break;
+                    }
+                }
+                else
+                {
+                    if(m1.bit(i) != m2.bit(i))
+                    {
+                        if(m1.bit(i) == bit1 && m2.bit(i) == bit2)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            has_to_be_equal = true;
+                        }
+                    }
+                    else
+                    {
+                        rounding_error = false;
+                        break;
+                    }
+                }
+            }
+
+            return rounding_error;
+        }
+    }
+    return false;
+}
+
+template<size_t E, size_t M>
 auto operator>(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
 -> bool
 {

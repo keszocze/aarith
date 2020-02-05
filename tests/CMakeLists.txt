@@ -10,6 +10,12 @@ add_executable(exact_operations-test
 target_link_libraries(exact_operations-test Catch2::WithMain aarith::Library)
 add_test(NAME exact_operations-test COMMAND exact_operations-test)
 
+add_executable(exact_operations-float-test
+  exact_operations-float-test.cpp
+)
+target_link_libraries(exact_operations-float-test Catch2::WithMain aarith::Library)
+add_test(NAME exact_operations-float-test COMMAND exact_operations-float-test)
+
 add_executable(comparisons-test
   comparisons-test.cpp
 )

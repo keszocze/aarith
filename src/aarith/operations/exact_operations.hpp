@@ -215,15 +215,10 @@ template <class UInteger>
     return restoring_division(numerator, denominator).first;
 }
 
-template<class nfloat>
-auto nfloat_add(const nfloat lhs, const nfloat rhs)
--> nfloat
+template<size_t E, size_t M>
+auto add_no_checks(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
+-> normfloat<E, M>
 {
-    static_assert(is_float<nfloat>::value);
-
-    constexpr auto E = nfloat::exponent_width();
-    constexpr auto M = nfloat::mantissa_width();
-
     const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
     const auto new_mantissa = rhs.get_mantissa() >> exponent_delta.word(0);
     const auto mantissa_sum = expanding_add(lhs.get_mantissa(),  new_mantissa);
@@ -236,15 +231,10 @@ auto nfloat_add(const nfloat lhs, const nfloat rhs)
     return normalize<E, mantissa_sum.width(), M>(sum);
 }
 
-template<class nfloat>
-auto nfloat_sub(const nfloat lhs, const nfloat rhs)
--> nfloat
+template<size_t E, size_t M>
+auto sub_no_checks(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
+-> normfloat<E, M>
 {
-    static_assert(is_float<nfloat>::value);
-
-    constexpr auto E = nfloat::exponent_width();
-    constexpr auto M = nfloat::mantissa_width();
-
     const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
     const auto new_mantissa = rhs.get_mantissa() >> exponent_delta.word(0);
     const auto mantissa_sum = sub(lhs.get_mantissa(), new_mantissa);
@@ -257,50 +247,40 @@ auto nfloat_sub(const nfloat lhs, const nfloat rhs)
     return normalize<E, mantissa_sum.width(), M>(sum);
 }
 
-template<class nfloat>
-auto exact_nfloat_add(const nfloat lhs, const nfloat rhs)
--> nfloat
+template<size_t E, size_t M>
+auto add(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
+-> normfloat<E, M>
 {
-    static_assert(is_float<nfloat>::value);
-
-    constexpr auto E = nfloat::exponent_width();
-    constexpr auto M = nfloat::mantissa_width();
-
     if(abs(lhs) < abs(rhs))
     {
-        return exact_nfloat_add(rhs, lhs);
+        return add(rhs, lhs);
     }
 
     if(lhs.get_sign() != rhs.get_sign())
     {
-        return nfloat_sub(lhs, rhs);
+        return sub_no_checks(lhs, rhs);
     }
 
-    return nfloat_add(lhs, rhs);
+    return add_no_checks(lhs, rhs);
 }
 
-template<class nfloat>
-auto exact_nfloat_sub(const nfloat lhs, const nfloat rhs)
--> nfloat
+template<size_t E, size_t M>
+auto sub(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
+-> normfloat<E, M>
 {
-    static_assert(is_float<nfloat>::value);
-
-    constexpr auto E = nfloat::exponent_width();
-    constexpr auto M = nfloat::mantissa_width();
-
     if(abs(lhs) < abs(rhs))
     {
         auto swap = rhs;
         swap.set_sign(~swap.get_sign());
-        return exact_nfloat_add(swap, lhs);
+        return add(swap, lhs);
     }
 
     if(lhs.get_sign() != rhs.get_sign())
     {
-        return nfloat_add(lhs, rhs);
+        return add_no_checks(lhs, rhs);
     }
 
-    return nfloat_sub(lhs, rhs);
+    return sub_no_checks(lhs, rhs);
 }
 
 } // namespace aarith
