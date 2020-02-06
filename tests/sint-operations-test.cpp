@@ -230,7 +230,6 @@ SCENARIO("Unary minus operation", "[sinteger][utility]")
     }
 }
 
-
 SCENARIO("MIN/MAX Values behave as expected", "[sinteger][utility]")
 {
     GIVEN("The min and max value")
@@ -238,17 +237,98 @@ SCENARIO("MIN/MAX Values behave as expected", "[sinteger][utility]")
         constexpr size_t w = 50;
         sinteger<w> min = sinteger<w>::min();
         sinteger<w> max = sinteger<w>::max();
-        sinteger<w> one = sinteger<w>(1U);
-        [[maybe_unused]] sinteger<w> zero = sinteger<w>(0U);
+        sinteger<w> one(1U);
+        [[maybe_unused]] sinteger<w> zero(0U);
         THEN("Adding/subtracting one should wrap around")
         {
-            REQUIRE(add(max,one) == min);
-            REQUIRE(sub(min,one) == max);
+            REQUIRE(add(max, one) == min);
+            REQUIRE(sub(min, one) == max);
         }
 
         THEN("Taking the absolute value of the min value yields the same value")
         {
             REQUIRE(abs(min) == min);
+        }
+    }
+}
+
+SCENARIO("Left/right shifting sintegers")
+{
+    GIVEN("A positive sinteger")
+    {
+        const sinteger<150> a{0U, 1U, 0U};
+        const sinteger<150> b{8, 8, 8};
+        const sinteger<150> b_{4, 4, 4};
+        const sinteger<150> b__{2, 2, 2};
+        const sinteger<150> b___{1, 1, 1};
+        WHEN("Right Shfiting")
+        {
+            THEN("It should behave like division by a power of two")
+            {
+                //                std::cout << group_digits(to_binary(a),64) << "\n";
+                //                std::cout << group_digits(to_binary(b), 64) << "\n";
+                //                std::cout << group_digits(to_binary(b >> 1), 64) << "\n";
+                //                std::cout << group_digits(to_binary(b >> 2), 64) << "\n";
+                //                std::cout << group_digits(to_binary(b >> 4), 64) << "\n";
+
+                REQUIRE((b >> 1) == b_);
+                REQUIRE((b >> 2) == b__);
+                REQUIRE((b_ >> 1) == b__);
+                REQUIRE((b >> 3) == b___);
+                REQUIRE((b__ >> 1) == b___);
+            }
+            THEN("It should move correctly over word boundaries")
+            {
+                const auto k = (a >> 1);
+                const auto b = sinteger<150>(0U, 0U, (uint64_t(1) << 63U));
+                //                std::cout << group_digits(to_binary(k), 64) << "\n";
+                //                std::cout << group_digits(to_binary(b), 64) << "\n";
+                REQUIRE(k == b);
+            }
+
+            THEN("The it should also work when moving farther than the word width")
+            {
+                const sinteger<150> c{12U, 0U, 0U};
+                const sinteger c_shifted = c >> 68;
+                const auto b = sinteger<150>(0U, 0U, (uint64_t(11) << 62U));
+                REQUIRE(c_shifted == b);
+                //                std::cout << group_digits(to_binary(c), 64) << "\n";
+                //                std::cout << group_digits(to_binary(c_shifted), 64) << "\n";
+            }
+        }
+        WHEN("Left Shifting")
+        {
+            THEN("It should behave like multiplication by a power of two")
+            {
+
+                sinteger<150> _b___ = b___ << 1;
+                sinteger<150> __b___ = b___ << 2;
+                sinteger<150> ___b___ = b___ << 3;
+                REQUIRE(_b___ == b__);
+                REQUIRE(__b___ == b_);
+                REQUIRE(___b___ == b);
+                //                        REQUIRE((b___<<2) == b_);
+                //                        REQUIRE((b___<<3) == b);
+            }
+        }
+    }
+    GIVEN ("A negative sinteger")
+    {
+        WHEN("Right shifting")
+        {
+            THEN ("-1 should not be affected")
+            {
+                const sinteger<150> minus_one(-1);
+                const sinteger<150> shifted = minus_one >> 1;
+                const sinteger<150> shifted2 = minus_one >> 22;
+                const sinteger<150> shifted3 = minus_one >> 23;
+                std::cout << group_digits(to_binary(minus_one), 64) << "\n";
+                std::cout << group_digits(to_binary(shifted), 64) << "\n";
+                std::cout << group_digits(to_binary(shifted2), 64) << "\n";
+                std::cout << group_digits(to_binary(shifted3), 64) << "\n";
+
+                REQUIRE(shifted == minus_one);
+            }
         }
     }
 }
