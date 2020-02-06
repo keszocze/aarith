@@ -68,6 +68,9 @@ template <size_t W>[[nodiscard]] auto sub(const sinteger<W>& a, const sinteger<W
 
 /**
  * @brief Computes the absolute value of a given signed integer.
+ *
+ * @warn There is a potential loss of precision as abs(sinteger::min) > sinteger::max
+ *
  * @tparam Width The width of the signed integer
  * @param n The signed inter to be "absolute valued"
  * @return The absolute value of the signed integer
