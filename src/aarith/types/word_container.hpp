@@ -124,7 +124,6 @@ public:
         return bit(Width - 1);
     }
 
-
     /**
      * @brief Sets the value of the most significant bit (MSB)
      * @param b The value the MSB is set to
@@ -198,14 +197,14 @@ public:
                  masked_word | (static_cast<word_type>(value & 1) << (index % word_width())));
     }
 
-    void set_word(size_t index, word_type value)
+    void set_word(const size_t index, const word_type value)
     {
         if (index >= word_count())
         {
             std::string msg = gen_oob_msg(index, false);
             throw std::out_of_range(msg);
         }
-        words[index] = value & word_mask(index);
+            words[index] = value & word_mask(index);
     }
 
     // Sets the words to the given values, where the right-most argument corresponds to word 0.

@@ -121,7 +121,7 @@ SCENARIO("Comparing two positive sintegers with different bit widths", "[uintege
            }
        }
    }
-    GIVEN("Two uinteger<N> a and b with a < b with different bit widths")
+    GIVEN("Two sinteger<N> a and b with a < b with different bit widths")
     {
         const size_t small = 32;
         const size_t big = 150;
