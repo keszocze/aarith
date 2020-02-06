@@ -59,7 +59,7 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
                 REQUIRE(result.word(1) == 1);
             }
         }
-        
+
         WHEN("There is no carry into the next word")
         {
             static constexpr uint64_t number_a = 1ULL << 63U;
@@ -101,8 +101,6 @@ SCENARIO("Adding tow uintgers of different bit width", "[uinteger][arithmetic][a
             uinteger<129> result2 = expanding_add(m, large);
             REQUIRE(result1 == result2);
         }
-
-
     }
     GIVEN("An uinteger consisting of zeros only")
     {
@@ -118,7 +116,6 @@ SCENARIO("Adding tow uintgers of different bit width", "[uinteger][arithmetic][a
             CHECK(result.word(2) == 1U);
             CHECK(result.word(1) == 0U);
             REQUIRE(result.word(0) == 0U);
-
         }
     }
 }
@@ -156,7 +153,6 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
         }
         WHEN("b equals zero")
         {
-
 
             uinteger<150> a;
 
@@ -227,6 +223,35 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
     }
 }
 
+SCENARIO("Expanding subtraction works correctly", "[uinteger][arithmetic]")
+{
+    GIVEN("A n-bit zero and a m-bit (m>n)  max")
+    {
+        static const uinteger<4> zero = uinteger<4>::min();
+        static const uinteger<8> large = uinteger<8>::max();
+        static const uinteger<8> expected = uinteger<8>{1U};
+
+        THEN("Subtraction fooooo")
+        {
+            auto const result = expanding_sub(zero,large);
+            REQUIRE(result == expected);
+        }
+    }
+
+    GIVEN("A n-bit zero and a m-bit (m<n) max")
+    {
+        static const uinteger<8> zero = uinteger<8>::min();
+        static const uinteger<4> large = uinteger<4>::max();
+        static const uinteger<8> expected = sub(uinteger<8>{1U},add(uinteger<8>{uinteger<4>::max()}, uinteger<8>{1U}));
+
+        THEN("Subtraction fooooo")
+        {
+            auto const result = expanding_sub(zero,large);
+            REQUIRE(result == expected);
+        }
+    }
+}
+
 SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
 {
     GIVEN("The maximal and minimal values of uinteger<V>")
@@ -243,12 +268,13 @@ SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
 
         // FIXME why doesn't this compile??
 
-//       .../aarith/tests/exact_operations-test.cpp:194:58: error: ‘lowest’ is not a member of ‘aarith::uinteger<89>’
-//  194 |             REQUIRE(uinteger<89>::min() == uinteger<89>::lowest());
+        //       .../aarith/tests/exact_operations-test.cpp:194:58: error: ‘lowest’ is not a member
+        //       of ‘aarith::uinteger<89>’
+        //  194 |             REQUIRE(uinteger<89>::min() == uinteger<89>::lowest());
 
-//        THEN ("uinteger::min and uinteger::lowest are the same") {
-//            REQUIRE(uinteger<89>::min() == uinteger<89>::lowest());
-//        }
+        //        THEN ("uinteger::min and uinteger::lowest are the same") {
+        //            REQUIRE(uinteger<89>::min() == uinteger<89>::lowest());
+        //        }
 
         WHEN("Adding to max value")
         {
@@ -265,7 +291,7 @@ SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
 
             THEN("Expanding addition has the highest bet set and is modulo 2 otherwise")
             {
-                uinteger<90> result = expanding_add(max,a);
+                uinteger<90> result = expanding_add(max, a);
                 CHECK(result.bit(89));
                 REQUIRE(width_cast<89>(result) == expected_trunc);
             }
@@ -274,9 +300,8 @@ SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
         WHEN("Subracting from min value")
         {
             const uint64_t a_ = GENERATE(
-                    take(100, random(static_cast<uint64_t>(0), std::numeric_limits<uint64_t>::max())));
+                take(100, random(static_cast<uint64_t>(0), std::numeric_limits<uint64_t>::max())));
             const uinteger<89> a{a_};
-
 
             THEN("Truncating subtraction is underflow modulo 2")
             {
@@ -284,8 +309,6 @@ SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
                 uinteger<89> result = sub(min, a);
                 REQUIRE(result == expected);
             }
-
-
         }
 
         THEN("Adding or subtracting min should not change the other value")
@@ -431,8 +454,8 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
         uinteger<64> a{val_a};
         AND_GIVEN("A random number b")
         {
-            uint64_t val_b = GENERATE(take(
-                100, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
+            uint64_t val_b = GENERATE(
+                take(100, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
             uinteger<64> b{val_b};
 
             THEN("The multiplication should match its uint64_t counterpart")
@@ -636,7 +659,6 @@ SCENARIO("Computing the remainder of two uintegers works as expected", "[uintege
             uint64_t rem_int = val_a % val_b;
             CHECK(quot_int == quotient.word(0));
             CHECK(rem_int == remainder.word(0));
-
         }
     }
 }
