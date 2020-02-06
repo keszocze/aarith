@@ -323,6 +323,39 @@ template<size_t E, size_t M>
     return normalize<E, mproduct.width(), M>(product);
 }
 
+/**
+ * @brief Division with normfloats: lhs/rhs.
+ *
+ * @param lhs The dividend
+ * @param rhs The divisor
+ * @tparam E Width of exponent
+ * @tparam M Width of mantissa including the leading 1
+ *
+ * @return The quotient lhs/rhs
+ *
+ */
+template<size_t E, size_t M>
+[[nodiscard]] auto div(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
+-> normfloat<E, M>
+{
+    auto dividend = width_cast<2*M+3>(lhs.get_mantissa());
+    auto divisor = width_cast<2*M+3>(rhs.get_mantissa());
+    dividend <<= M+3;
+    auto mquotient = div(dividend, divisor);
+    //mquotient >>= 1;
+    auto rdmquotient = rshift_and_round(mquotient, 4);
+
+    auto esum = width_cast<E>(sub(expanding_add(lhs.get_exponent(), lhs.get_bias()), rhs.get_exponent()));
+    auto sign = lhs.get_sign() ^ rhs.get_sign();
+
+    normfloat<E, rdmquotient.width()> quotient;
+    quotient.set_mantissa(rdmquotient);
+    quotient.set_exponent(esum);
+    quotient.set_sign(sign);
+
+    return normalize<E, rdmquotient.width(), M>(quotient);
+}
+
 } // namespace aarith
 
 #include "aarith/types/integer.hpp"

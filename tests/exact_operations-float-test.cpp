@@ -479,3 +479,116 @@ SCENARIO("Exact multiplication of two floating-point numbers", "[normfloat][arit
     }
 }
 
+SCENARIO("Exact division of two floating-point numbers", "[normfloat][arithmetic][division]")
+{
+    GIVEN("Single precision floats (E = 8, M = 23+1)")
+    {
+        static constexpr size_t E = 8;
+        static constexpr size_t M = 24;
+
+        WHEN("The absolute of the first operand is higher than the abolute of the first operand, both operands are positive and the result is smaller infinity.")
+        {
+            static constexpr float number_a = 213.22154f;
+            static constexpr float number_b = 93.211546f;
+            const normfloat<E, M> a{number_a};
+            const normfloat<E, M> b{number_b};
+            const normfloat<E, M> result = div(a, b);
+
+            THEN("It should be the correct product.")
+            {
+                REQUIRE(equal_except_rounding(result, normfloat<E, M>(number_a / number_b)));
+            }
+        }
+        WHEN("The absolute of the first operand is higher than the abolute of the first operand, operand 1 is negative, and the result is not infinity.")
+        {
+            static constexpr float number_a = -213.22154f;
+            static constexpr float number_b = 93.211546f;
+            const normfloat<E, M> a{number_a};
+            const normfloat<E, M> b{number_b};
+            const normfloat<E, M> result = div(a, b);
+
+            THEN("It should be the correct product.")
+            {
+                REQUIRE(equal_except_rounding(result, normfloat<E, M>(number_a / number_b)));
+            }
+        }
+        WHEN("The absolute of the first operand is higher than the abolute of the first operand, operand 2 is negative, and the result is not infinity.")
+        {
+            static constexpr float number_a = 213.22154f;
+            static constexpr float number_b = -93.211546f;
+            const normfloat<E, M> a{number_a};
+            const normfloat<E, M> b{number_b};
+            const normfloat<E, M> result = div(a, b);
+
+            THEN("It should be the correct product.")
+            {
+                REQUIRE(equal_except_rounding(result, normfloat<E, M>(number_a / number_b)));
+            }
+        }
+        WHEN("The absolute of the first operand is higher than the abolute of the first operand, both operands are negative, and the result is not infinity.")
+        {
+            static constexpr float number_a = -213.22154f;
+            static constexpr float number_b = -93.211546f;
+            const normfloat<E, M> a{number_a};
+            const normfloat<E, M> b{number_b};
+            const normfloat<E, M> result = div(a, b);
+
+            THEN("It should be the correct product.")
+            {
+                REQUIRE(equal_except_rounding(result, normfloat<E, M>(number_a / number_b)));
+            }
+        }
+        WHEN("The absolute of the second operand is higher than the abolute of the first operand, both operands are positive and the result is smaller infinity.")
+        {
+            static constexpr float number_a = 93.211546f;
+            static constexpr float number_b = 213.22154f;
+            const normfloat<E, M> a{number_a};
+            const normfloat<E, M> b{number_b};
+            const normfloat<E, M> result = div(a, b);
+
+            THEN("It should be the correct product.")
+            {
+                REQUIRE(equal_except_rounding(result, normfloat<E, M>(number_a / number_b)));
+            }
+        }
+        WHEN("The absolute of the second operand is higher than the abolute of the first operand, operand 1 is negative, and the result is not infinity.")
+        {
+            static constexpr float number_a = -93.211546f;
+            static constexpr float number_b = 213.22154f;
+            const normfloat<E, M> a{number_a};
+            const normfloat<E, M> b{number_b};
+            const normfloat<E, M> result = div(a, b);
+
+            THEN("It should be the correct product.")
+            {
+                REQUIRE(equal_except_rounding(result, normfloat<E, M>(number_a / number_b)));
+            }
+        }
+        WHEN("The absolute of the second operand is higher than the abolute of the first operand, operand 2 is negative, and the result is not infinity.")
+        {
+            static constexpr float number_a = 93.211546f;
+            static constexpr float number_b = -213.22154f;
+            const normfloat<E, M> a{number_a};
+            const normfloat<E, M> b{number_b};
+            const normfloat<E, M> result = div(a, b);
+
+            THEN("It should be the correct product.")
+            {
+                REQUIRE(equal_except_rounding(result, normfloat<E, M>(number_a / number_b)));
+            }
+        }
+        WHEN("The absolute of the second operand is higher than the abolute of the first operand, both operands are negative, and the result is not infinity.")
+        {
+            static constexpr float number_a = -93.211546f;
+            static constexpr float number_b = -213.22154f;
+            const normfloat<E, M> a{number_a};
+            const normfloat<E, M> b{number_b};
+            const normfloat<E, M> result = div(a, b);
+
+            THEN("It should be the correct product.")
+            {
+                REQUIRE(equal_except_rounding(result, normfloat<E, M>(number_a / number_b)));
+            }
+        }
+    }
+}
