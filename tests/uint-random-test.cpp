@@ -1,6 +1,5 @@
 #include "aarith/operations/exact_operations.hpp"
-#include "aarith/types/integer.hpp"
-
+#include "aarith/types/uinteger.hpp"
 #include "aarith/utilities/string_utils.hpp"
 #include "gen_uinteger.hpp"
 
@@ -9,6 +8,7 @@
 #include <mpir.h>
 
 using namespace aarith;
+
 
 template <size_t BitWidth>
 bool is_uint_add_correct(const uinteger<BitWidth>& lhs, const uinteger<BitWidth>& rhs,

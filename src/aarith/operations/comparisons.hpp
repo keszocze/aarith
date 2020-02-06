@@ -1,11 +1,15 @@
 #pragma once
 
-#include "aarith/types/integer.hpp"
+#include "aarith/types/uinteger.hpp"
 #include "aarith/types/traits.hpp"
 #include <cstdint>
 
 namespace aarith {
 
+/**
+ * 
+ * @note Two numbers can be equal even though they have different bit widths!
+ */
 template <size_t W, size_t V> bool operator==(const uinteger<W>& a, const uinteger<V>& b)
 {
     const auto min_count = std::min(a.word_count(), b.word_count());
@@ -49,25 +53,11 @@ template <size_t W, size_t V> bool operator<(const uinteger<W>& a, const uintege
     const auto min_count = std::min(a.word_count(), b.word_count());
     const auto max_count = std::max(a.word_count(), b.word_count());
 
-    for (auto i = 0U; i < min_count; ++i)
-    {
-        auto const word_a = a.word(a.word_count() - i - 1);
-        auto const word_b = b.word(b.word_count() - i - 1);
-        if (word_a < word_b)
-        {
-            return true;
-        }
-        else if (word_a > word_b)
-        {
-            return false;
-        }
-    }
-
     if constexpr (W > V)
     {
-        for (size_t i = min_count; i < max_count; ++i)
+        for (size_t i = max_count - 1 ; i >= min_count; --i)
         {
-            auto const word_a = a.word(a.word_count()- i - 1);
+            auto const word_a = a.word(i);
             if (word_a > 0U) {
                 return false;
             }
@@ -75,12 +65,27 @@ template <size_t W, size_t V> bool operator<(const uinteger<W>& a, const uintege
     }
     else
     {
-        for (size_t i = min_count; i < max_count; ++i)
+        for (size_t i = max_count - 1; i >= min_count; --i)
         {
-            auto const word_b = b.word(b.word_count()- i - 1);
+            auto const word_b = b.word(i);
             if (word_b > 0U) {
                 return true;
             }
+        }
+    }
+
+
+    for (auto i = min_count - 1 ; i >= 0; --i)
+    {
+        auto const word_a = a.word(i);
+        auto const word_b = b.word(i);
+        if (word_a < word_b)
+        {
+            return true;
+        }
+        else if (word_a > word_b)
+        {
+            return false;
         }
     }
 

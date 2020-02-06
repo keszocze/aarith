@@ -1,6 +1,7 @@
 #include "aarith/operations/comparisons.hpp"
 #include "aarith/operations/exact_operations.hpp"
-#include "aarith/types/integer.hpp"
+#include "aarith/types/uinteger.hpp"
+#include "aarith/utilities/string_utils.hpp"
 #include <catch.hpp>
 
 using namespace aarith;
@@ -27,7 +28,7 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
         }
         WHEN("The result a+b does not fit into N bits")
         {
-            static constexpr uint16_t number_a = (1 << TestWidth) - 1;
+            static constexpr uint16_t number_a = (1U << TestWidth) - 1U;
             static constexpr uint16_t number_b = 1;
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
@@ -47,8 +48,8 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
 
         WHEN("There is a carry into the next word")
         {
-            static constexpr uint64_t number_a = 1ULL << 63;
-            static constexpr uint64_t number_b = 1ULL << 63;
+            static constexpr uint64_t number_a = 1ULL << 63U;
+            static constexpr uint64_t number_b = 1ULL << 63U;
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
             auto const result = add(a, b);
@@ -58,10 +59,10 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
                 REQUIRE(result.word(1) == 1);
             }
         }
-
+        
         WHEN("There is no carry into the next word")
         {
-            static constexpr uint64_t number_a = 1ULL << 63;
+            static constexpr uint64_t number_a = 1ULL << 63U;
             static constexpr uint64_t number_b = 0;
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
@@ -71,6 +72,53 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
             {
                 REQUIRE(result.word(1) == 0);
             }
+        }
+    }
+}
+
+SCENARIO("Adding tow uintgers of different bit width", "[uinteger][arithmetic][addition]")
+{
+    GIVEN("An uinteger of bit width 128")
+    {
+
+        static const uinteger<128> large = uinteger<128>::from_words(1U, 0U);
+        static const uint32_t m_ = GENERATE(
+            take(100, random(static_cast<uint32_t>(0U), std::numeric_limits<uint32_t>::max())));
+
+        static const uinteger<32> m{m_};
+
+        THEN("Adding a small number of bit width 32 should not change the second word")
+        {
+            uinteger<129> result = expanding_add(large, m);
+            CHECK(result.word(2) == 0U);
+            CHECK(result.word(1) == 1U);
+            REQUIRE(result.word(0) == m_);
+        }
+
+        THEN("The addition with 32 bits should still be commutative")
+        {
+            uinteger<129> result1 = expanding_add(large, m);
+            uinteger<129> result2 = expanding_add(m, large);
+            REQUIRE(result1 == result2);
+        }
+
+
+    }
+    GIVEN("An uinteger consisting of zeros only")
+    {
+        static constexpr uint64_t ones = static_cast<uint64_t>(-1);
+        static const uinteger<128> large = uinteger<128>::from_words(ones, ones);
+
+        THEN("Adding a one with few bits should create a correct overflow")
+        {
+
+            static const uinteger<32> one{1U};
+
+            const uinteger<129> result = expanding_add(large, one);
+            CHECK(result.word(2) == 1U);
+            CHECK(result.word(1) == 0U);
+            REQUIRE(result.word(0) == 0U);
+
         }
     }
 }
@@ -108,11 +156,15 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
         }
         WHEN("b equals zero")
         {
-            const uinteger<150> b{0u};
-            THEN("Subtracting b (i.e. zero) should not change a")
+
+
+            uinteger<150> a;
+
+            THEN("Subtracting b (i.e. zero) should not change a)")
             {
                 uinteger<150> a;
 
+                const uinteger<150> b{0u};
                 for (const unsigned a_num : {0u, 23u, 1337u})
                 {
                     a = uinteger<150>{a_num};
@@ -175,6 +227,104 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
     }
 }
 
+SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
+{
+    GIVEN("The maximal and minimal values of uinteger<V>")
+    {
+
+        static const uinteger<89> min = uinteger<89>::min();
+        static const uinteger<89> max = uinteger<89>::max();
+
+        THEN("Bit-wise complement should yield the other one")
+        {
+            CHECK(~min == max);
+            REQUIRE(~max == min);
+        }
+
+        // FIXME why doesn't this compile??
+
+//       .../aarith/tests/exact_operations-test.cpp:194:58: error: ‘lowest’ is not a member of ‘aarith::uinteger<89>’
+//  194 |             REQUIRE(uinteger<89>::min() == uinteger<89>::lowest());
+
+//        THEN ("uinteger::min and uinteger::lowest are the same") {
+//            REQUIRE(uinteger<89>::min() == uinteger<89>::lowest());
+//        }
+
+        WHEN("Adding to max value")
+        {
+            const uint64_t a_ = GENERATE(
+                take(100, random(static_cast<uint64_t>(1), std::numeric_limits<uint64_t>::max())));
+            const uinteger<89> a{a_};
+            const uinteger<89> expected_trunc{a_ - 1};
+
+            THEN("Truncating addition is overflow modulo 2")
+            {
+                uinteger<89> result = add(max, a);
+                REQUIRE(result == expected_trunc);
+            }
+
+            THEN("Expanding addition has the highest bet set and is modulo 2 otherwise")
+            {
+                uinteger<90> result = expanding_add(max,a);
+                CHECK(result.bit(89));
+                REQUIRE(width_cast<89>(result) == expected_trunc);
+            }
+        }
+
+        WHEN("Subracting from min value")
+        {
+            const uint64_t a_ = GENERATE(
+                    take(100, random(static_cast<uint64_t>(0), std::numeric_limits<uint64_t>::max())));
+            const uinteger<89> a{a_};
+
+
+            THEN("Truncating subtraction is underflow modulo 2")
+            {
+                const uinteger<89> expected = sub(uinteger<89>::max(), uinteger<89>{a_ - 1});
+                uinteger<89> result = sub(min, a);
+                REQUIRE(result == expected);
+            }
+
+
+        }
+
+        THEN("Adding or subtracting min should not change the other value")
+        {
+            static const uinteger<89> n{23543785U}; // randomly chosen
+
+            CHECK(add(max, min) == max);
+            CHECK(add(n, min) == n);
+            CHECK(sub(max, min) == max);
+            REQUIRE(sub(n, min) == n);
+        }
+
+        AND_GIVEN("The uintegers zero and one")
+        {
+
+            static const uinteger<89> zero = uinteger<89>::zero();
+            static const uinteger<89> one = uinteger<89>::one();
+
+            THEN("min and zero should be identical")
+            {
+                REQUIRE(zero == min);
+            }
+
+            THEN("Subtracting one from zero/min yields the maximal value")
+            {
+
+                // completely randomly chosen bit width
+
+                static const uinteger<89> result_zero = sub(zero, one);
+                static const uinteger<89> result_min = sub(min, one);
+                static const uinteger<89> expected = uinteger<89>::max();
+
+                CHECK(result_min == expected);
+                REQUIRE(result_zero == expected);
+            }
+        }
+    }
+}
+
 SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplication]")
 {
 
@@ -215,7 +365,7 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplica
     GIVEN("Two uinteger<N> a and b to be multiplied")
     {
         uint64_t val = 1;
-        val = val << 35;
+        val = val << 35U;
         auto const a = uinteger<128>::from_words(1, val);
         auto const c = uinteger<128>::from_words(13435, 345897);
         auto const d =
@@ -263,7 +413,7 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplica
         }
         WHEN("Both multiplicands are maximum")
         {
-            THEN("The product is 1")
+            THEN("The product is 1 for the truncating multiplication")
             {
                 REQUIRE(mul(d, d) == one);
             }
@@ -282,7 +432,7 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
         AND_GIVEN("A random number b")
         {
             uint64_t val_b = GENERATE(take(
-                1000, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
+                100, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
             uinteger<64> b{val_b};
 
             THEN("The multiplication should match its uint64_t counterpart")
@@ -290,7 +440,7 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
                 uint64_t expected = val_a * val_b;
                 uinteger<64> result = mul(a, b);
 
-                REQUIRE(expected == result.word(0));
+                CHECK(expected == result.word(0));
                 REQUIRE(uinteger<64>{expected} == result);
             }
         }

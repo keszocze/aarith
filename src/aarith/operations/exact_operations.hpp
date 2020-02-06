@@ -1,8 +1,9 @@
 #pragma once
 
-#include <aarith/types/integer.hpp>
+#include <aarith/types/uinteger.hpp>
 #include <aarith/types/traits.hpp>
 #include <aarith/utilities/bit_operations.hpp>
+#include <aarith/operations/comparisons.hpp>
 
 #include <iostream>
 
@@ -30,17 +31,56 @@ template <size_t W, size_t V>
     constexpr size_t res_width = std::max(W, V) + 1U;
 
     uinteger<res_width> sum;
-    typename uinteger<res_width>::word_type carry{0U};
+    using word_type = typename uinteger<res_width>::word_type;
+    word_type carry{0U};
     if (initial_carry)
     {
         carry = 1U;
     }
-    for (auto i = 0U; i < a.word_count(); ++i)
+
+    /*
+     * If the bit widths are not the same we actually have to check that we don't access values
+     * outside the underlying word container.
+     */
+    if constexpr (uinteger<W>::word_count() != uinteger<V>::word_count())
     {
-        auto const partial_sum = a.word(i) + b.word(i) + carry;
-        carry = (partial_sum < a.word(i) || partial_sum < b.word(i)) ? 1 : 0;
-        sum.set_word(i, partial_sum);
+        for (auto i = 0U; i < sum.word_count(); ++i)
+        {
+
+            word_type a_{0U};
+            word_type b_{0U};
+            if (i < a.word_count())
+            {
+                a_ = a.word(i);
+            }
+            if (i < b.word_count())
+            {
+                b_ = b.word(i);
+            }
+
+            auto const partial_sum = a_ + b_ + carry;
+            carry = (partial_sum < a_ || partial_sum < b_) ? 1U : 0U;
+            sum.set_word(i, partial_sum);
+        }
     }
+    // Here we can simple iterate until we reached the end of either of the two uintegers
+    else
+    {
+        for (auto i = 0U; i < a.word_count(); ++i)
+        {
+            auto const partial_sum = a.word(i) + b.word(i) + carry;
+            carry = (partial_sum < a.word(i) || partial_sum < b.word(i)) ? 1U : 0U;
+            sum.set_word(i, partial_sum);
+        }
+
+        // we check whether an the additional bit results in an additional word and only propagate
+        // the carry if this word exists
+        if constexpr (uinteger<W>::word_count() < uinteger<res_width>::word_count())
+        {
+            sum.set_word(sum.word_count() - 1, carry);
+        }
+    }
+
     return sum;
 }
 
@@ -61,21 +101,21 @@ template <size_t W>[[nodiscard]] uinteger<W> add(const uinteger<W>& a, const uin
 /**
  * @brief Computes the difference of two unsigned integers.
  *
- * @tparam UInteger The unsigned integer instance used for the operation
+ * @tparam W the bit width of the operands
  * @param a Minuend
  * @param b Subtrahend
  * @return Difference between a and b
  */
-template <size_t W, size_t V=W>
-[[nodiscard]] auto sub(const uinteger<W>& a, const uinteger<V>& b)
-    -> uinteger<std::max(W, V)>
+template <size_t W>[[nodiscard]] auto sub(const uinteger<W>& a, const uinteger<W>& b) -> uinteger<W>
 {
     static_assert(is_integral<uinteger<W>>::value);
     static_assert(is_unsigned<uinteger<W>>::value);
 
-    return width_cast<std::max(W, V)>(expanding_add(a, ~b, true));
+    uinteger<W> result;
+    uinteger<W> minus_b = add(~b, uinteger<W>::one());
+    result = add(a, minus_b);
+    return result;
 }
-
 
 /**
  * @brief Multiplies two unsigned integers expanding the bit width so that the result fits.
@@ -101,7 +141,7 @@ template <std::size_t W, std::size_t V>
         static_assert(is_integral<uinteger<res_width>>::value);
         static_assert(is_unsigned<uinteger<res_width>>::value);
 
-        const auto leading_zeroes = count_leading_zeroes(b);
+        const auto leading_zeroes = V - count_leading_zeroes(b);
         uinteger<res_width> a_ = width_cast<res_width>(a);
 
         auto bit_index = 0U;
@@ -216,7 +256,7 @@ template <class UInteger>
 
 } // namespace aarith
 
-#include "aarith/types/integer.hpp"
+#include "aarith/types/uinteger.hpp"
 
 namespace aarith::exact_operators {
 

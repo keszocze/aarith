@@ -3,11 +3,6 @@ stages:
     - test
     - quality
 
-variables:
-    GIT_SUBMODULE_STRATEGY: recursive
-    GIT_STRATEGY: fetch
-
-
 .ciconf:
     only:
         variables:

@@ -1,6 +1,6 @@
 #include "aarith/operations/approx_operations.hpp"
 #include "aarith/operations/exact_operations.hpp"
-#include "aarith/types/integer.hpp"
+#include "aarith/types/uinteger.hpp"
 #include <aarith/operations/comparisons.hpp>
 #include <aarith/utilities/string_utils.hpp>
 #include <catch.hpp>
@@ -63,15 +63,15 @@ SCENARIO("Generate a bitmask for a certain number of bits", "[uinteger][utlitiy]
     }
 }
 
-SCENARIO("Dummy scenario enforcing compilation of newly created methods")
-{
-    const uinteger<32> a{0U};
-    const uinteger<32> b{1U};
-
-    std::cout << approx_add_post_masking(a, b, 10) << approx_sub_post_masking(a, b, 10)
-              << approx_mul_post_masking(a, b, 10) << approx_div_post_masking(a, b, 10)
-              << approx_rem_post_masking(a, b, 10) << "\n";
-}
+//SCENARIO("Dummy scenario enforcing compilation of newly created methods")
+//{
+//    const uinteger<32> a{0U};
+//    const uinteger<32> b{1U};
+//
+//    std::cout << approx_add_post_masking(a, b, 10) << approx_sub_post_masking(a, b, 10)
+//              << approx_mul_post_masking(a, b, 10) << approx_div_post_masking(a, b, 10)
+//              << approx_rem_post_masking(a, b, 10) << "\n";
+//}
 
 SCENARIO("Approximate sum of unsigned integers with anytime bitmasking", "[uinteger][arithmetic]")
 {

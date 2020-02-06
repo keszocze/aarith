@@ -1,9 +1,9 @@
 #pragma once
 
-#include "aarith/types/integer.hpp"
 #include <aarith/operations/exact_operations.hpp>
 #include <cstdint>
 #include <iostream>
+#include "aarith/types/uinteger.hpp"
 
 namespace aarith {
 
