@@ -278,25 +278,27 @@ SCENARIO("Create negative sintegers", "[sinteger][bit_logic]")
     }
 }
 
-// SCENARIO("Right shift operator works as expected", "[sinteger][bit-logic]")
-//{
-//    GIVEN("One sinteger a and a number of shifted bits s")
-//    {
-//        WHEN("The bits are not shifted")
-//        {
-//            const size_t Width = 192;
-//
-//            typename sinteger<Width>::word_type number_a = 3;
-//            number_a <<= sinteger<Width>::word_width() - 2;
-//            static constexpr auto s = 0;
-//            sinteger<Width> a(0U);
-//            a.set_word(a.word_count() - 1, number_a);
-//
-//            const auto result = a >> s;
-//            REQUIRE(result.word(a.word_count() - 3) == 0);
-//            REQUIRE(result.word(a.word_count() - 2) == 0);
-//            REQUIRE(result.word(a.word_count() - 1) == number_a);
-//        }
+ SCENARIO("Right shift operator works as expected", "[sinteger][bit-logic]")
+{
+    GIVEN("One positive sinteger a and a number of shifted bits s")
+    {
+        WHEN("The bits are not shifted")
+        {
+            const size_t Width = 192;
+
+            typename sinteger<Width>::word_type number_a = 3;
+            number_a <<= sinteger<Width>::word_width() - 2;
+            static constexpr auto s = 0;
+            sinteger<Width> a(0U);
+            a.set_word(a.word_count() - 1, number_a);
+
+            const auto result = a >> s;
+            REQUIRE(result.word(a.word_count() - 3) == 0);
+            REQUIRE(result.word(a.word_count() - 2) == 0);
+            REQUIRE(result.word(a.word_count() - 1) == number_a);
+        }
+
+        // FIXME this fails
 //        WHEN("The bits are shifted exactly one word")
 //        {
 //            const size_t Width = 192;
@@ -312,6 +314,8 @@ SCENARIO("Create negative sintegers", "[sinteger][bit_logic]")
 //            REQUIRE(result.word(a.word_count() - 2) == number_a);
 //            REQUIRE(result.word(a.word_count() - 1) == 0);
 //        }
+
+        // FIXME this fails
 //        WHEN("The bits are shifted exactly two words")
 //        {
 //            const size_t Width = 192;
@@ -327,6 +331,9 @@ SCENARIO("Create negative sintegers", "[sinteger][bit_logic]")
 //            REQUIRE(result.word(a.word_count() - 2) == 0);
 //            REQUIRE(result.word(a.word_count() - 1) == 0);
 //        }
+
+
+        // FIXME this fails
 //        WHEN("The bits are shifted exactly by word_width-1")
 //        {
 //            const size_t Width = 192;
@@ -344,6 +351,9 @@ SCENARIO("Create negative sintegers", "[sinteger][bit_logic]")
 //            REQUIRE(result.word(a.word_count() - 2) == ref);
 //            REQUIRE(result.word(a.word_count() - 1) == 1);
 //        }
+
+
+        // FIXME this fails
 //        WHEN("The bits are shifted by 2*word_width-1")
 //        {
 //            const size_t Width = 192;
@@ -361,51 +371,53 @@ SCENARIO("Create negative sintegers", "[sinteger][bit_logic]")
 //            REQUIRE(result.word(a.word_count() - 2) == 1);
 //            REQUIRE(result.word(a.word_count() - 1) == 0);
 //        }
-//        WHEN("The shift amount is a multiple of the word width")
-//        {
-//
-//            THEN("The result should still be correct")
-//            {
-//                static constexpr size_t width = 256;
-//                static constexpr size_t word_width = sinteger<width>::word_width();
-//
-//                static const sinteger<width> a{1U};
-//                static const sinteger<width> expected0 =
-//                    sinteger<width>::from_words(0U, 0U, 0U, 1U);
-//                static const sinteger<width> expected1 =
-//                    sinteger<width>::from_words(0U, 0U, 1U, 0U);
-//                static const sinteger<width> expected2 =
-//                    sinteger<width>::from_words(0U, 1U, 0U, 0U);
-//                static const sinteger<width> expected3 =
-//                    sinteger<width>::from_words(1U, 0U, 0U, 0U);
-//                static const sinteger<width> expected4 =
-//                    sinteger<width>::from_words(0U, 0U, 0U, 0U);
-//
-//                std::vector<sinteger<width>> expecteds{expected0, expected1, expected2, expected3,
-//                                                       expected4};
-//
-//                for (auto i = 0U; i < expecteds.size(); ++i)
-//                {
-//                    sinteger<width> result = a << (word_width * i);
-//                    CHECK(result == expecteds[i]);
-//                }
-//            }
-//        }
 
-//        AND_WHEN("The shift amount is the integer width")
-//        {
-//            THEN("The result should still be correct")
-//            {
-//                const size_t w = 128;
-//                const sinteger<w> a{1U};
-//                const sinteger<w> expected;
-//                const sinteger<w> result = a << w;
-//
-//                CHECK(expected == result);
-//            }
-//        }
-//    }
-//}
+
+        WHEN("The shift amount is a multiple of the word width")
+        {
+
+            THEN("The result should still be correct")
+            {
+                static constexpr size_t width = 256;
+                static constexpr size_t word_width = sinteger<width>::word_width();
+
+                static const sinteger<width> a{1U};
+                static const sinteger<width> expected0 =
+                    sinteger<width>::from_words(0U, 0U, 0U, 1U);
+                static const sinteger<width> expected1 =
+                    sinteger<width>::from_words(0U, 0U, 1U, 0U);
+                static const sinteger<width> expected2 =
+                    sinteger<width>::from_words(0U, 1U, 0U, 0U);
+                static const sinteger<width> expected3 =
+                    sinteger<width>::from_words(1U, 0U, 0U, 0U);
+                static const sinteger<width> expected4 =
+                    sinteger<width>::from_words(0U, 0U, 0U, 0U);
+
+                std::vector<sinteger<width>> expecteds{expected0, expected1, expected2, expected3,
+                                                       expected4};
+
+                for (auto i = 0U; i < expecteds.size(); ++i)
+                {
+                    sinteger<width> result = a << (word_width * i);
+                    CHECK(result == expecteds[i]);
+                }
+            }
+        }
+
+        AND_WHEN("The shift amount is the integer width")
+        {
+            THEN("The result should still be correct")
+            {
+                const size_t w = 128;
+                const sinteger<w> a{1U};
+                const sinteger<w> expected;
+                const sinteger<w> result = a >> w;
+
+                CHECK(expected == result);
+            }
+        }
+    }
+}
 
 SCENARIO("Logical AND works as expected", "[sinteger][arithmetic]")
 {

@@ -235,7 +235,7 @@ SCENARIO("Expanding subtraction works correctly", "[uinteger][arithmetic]")
         static const uinteger<8> large = uinteger<8>::max();
         static const uinteger<8> expected = uinteger<8>{1U};
 
-        THEN("Subtraction fooooo")
+        THEN("Subtracting max from zero should give one")
         {
             auto const result = expanding_sub(zero,large);
             REQUIRE(result == expected);
@@ -248,7 +248,7 @@ SCENARIO("Expanding subtraction works correctly", "[uinteger][arithmetic]")
         static const uinteger<4> large = uinteger<4>::max();
         static const uinteger<8> expected = sub(uinteger<8>{1U},add(uinteger<8>{uinteger<4>::max()}, uinteger<8>{1U}));
 
-        THEN("Subtraction fooooo")
+        THEN("Subtracting max from zero should give 1-(small::max+1)")
         {
             auto const result = expanding_sub(zero,large);
             REQUIRE(result == expected);
