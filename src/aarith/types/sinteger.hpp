@@ -160,12 +160,15 @@ template <size_t DestinationWidth, size_t SourceWidth>
     {
         const bool is_negative = source.is_negative();
 
-        in.set_msb(false);
         word_container<DestinationWidth> result = width_cast<DestinationWidth>(in);
 
+        // TODO find a quicker way to correctly expand the width
         if (is_negative)
         {
-            result.set_msb(true);
+            for (size_t i= SourceWidth; i < DestinationWidth; ++i) {
+                result.set_bit(i);
+            }
+
         }
         return sinteger<DestinationWidth>{result};
     }

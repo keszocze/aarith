@@ -241,22 +241,16 @@ SCENARIO("Width casting of signed integers", "[sinteger][utility]")
         WHEN("Expanding the width")
         {
 
-            //            sinteger<24> i16e = width_cast<24>(i16);
-            //            sinteger<50> i32e = width_cast<50>(i32);
-            //            sinteger<200> i150e = width_cast<200>(i150);
+            sinteger<24> i16e = width_cast<24>(i16);
+            sinteger<50> i32e = width_cast<50>(i32);
+            sinteger<200> i150e = width_cast<200>(i150);
 
-            //            std::cout << group_digits(to_binary(i16),8) << "\n";
-            //            std::cout << group_digits(to_binary(i16e),8) << "\n";
-            //            std::cout << group_digits(to_binary(i32),8) << "\n";
-            //            std::cout << group_digits(to_binary(i32e),8) << "\n";
-            //            std::cout << group_digits(to_binary(i150),8) << "\n";
-            //            std::cout << group_digits(to_binary(i150e),8) << "\n";
-
-            //            THEN("The numerical value should not have changed") {
-            //                CHECK(i16 == i16e);
-            //                CHECK(i32 == i32e);
-            //                REQUIRE(i150 == i150e);
-            //            }
+            THEN("The numerical value should not have changed")
+            {
+                CHECK(i16 == i16e);
+                CHECK(i32 == i32e);
+                REQUIRE(i150 == i150e);
+            }
         }
         WHEN("Reducing the width")
         {
