@@ -67,6 +67,22 @@ template <size_t W>[[nodiscard]] auto sub(const sinteger<W>& a, const sinteger<W
 }
 
 /**
+ * @brief Subtracts two unsigned integers of, possibly, different bit widths.
+ *
+ * @tparam W Width of the minuend
+ * @tparam V Width of the subtrahend
+ * @param a Minuend
+ * @param b Subtrahend
+ * @return Difference of correct bit width
+ */
+template <size_t W, size_t V> [[nodiscard]]  auto expanding_sub(const sinteger<W> & a, const sinteger<V> & b) ->  sinteger<std::max(W, V)> {
+    constexpr size_t res_width = std::max(W, V);
+    uinteger<res_width> result{sub(width_cast<res_width>(a), width_cast<res_width>(b))};
+
+    return result;
+}
+
+/**
  * @brief Computes the absolute value of a given signed integer.
  *
  * @warn There is a potential loss of precision as abs(sinteger::min) > sinteger::max

@@ -195,6 +195,36 @@ SCENARIO("Absolute value computation", "[sinteger][utility]")
     }
 }
 
+SCENARIO("Expanding subtraction works correctly", "[sinteger][arithmetic]")
+{
+    GIVEN("A n-bit min and a m-bit (m>n)  max")
+    {
+        static const sinteger<4> min4 = sinteger<4>::min();
+        static const sinteger<8> max8 = sinteger<8>::max();
+        static const sinteger<8> expected = sinteger<8>{-135};
+
+        THEN("Subtracting max from min should correctly yield (min-max) as it now fits the width")
+        {
+            auto result = expanding_sub(min4, max8);
+            REQUIRE(result == expected);
+        }
+    }
+
+    GIVEN("A n-bit min and a m-bit (m<n) max")
+    {
+        static const sinteger<8> min8 = sinteger<8>::min();
+        static const sinteger<4> max4 = sinteger<4>::max();
+        static const sinteger<8> expected =
+            add(sub(sinteger<8>::max(), sinteger<8>(sinteger<4>::max())), sinteger<8>{1U});
+
+        THEN("Subtracting max from min should give (max-min)+1")
+        {
+            auto const result = expanding_sub(min8, max4);
+            REQUIRE(result == expected);
+        }
+    }
+}
+
 SCENARIO("Width casting of signed integers", "[sinteger][utility]")
 {
     GIVEN("A positive sinteger")

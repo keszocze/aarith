@@ -80,7 +80,7 @@ template <size_t W, size_t V>
 }
 
 /**
- * @brief Adds two unsigned integers of, possibly, different bit widths.
+ * @brief Subtracts two unsigned integers of, possibly, different bit widths.
  *
  * @tparam W Width of the minuend
  * @tparam V Width of the subtrahend
@@ -91,11 +91,6 @@ template <size_t W, size_t V>
 template <size_t W, size_t V>
 [[nodiscard]] uinteger<std::max(W, V)> expanding_sub(const uinteger<W>& a, const uinteger<V>& b)
 {
-    static_assert(is_integral<uinteger<W>>::value);
-    static_assert(is_unsigned<uinteger<W>>::value);
-    static_assert(is_integral<uinteger<V>>::value);
-    static_assert(is_unsigned<uinteger<V>>::value);
-
     constexpr size_t res_width = std::max(W, V);
     uinteger<res_width> result{sub(width_cast<res_width>(a), width_cast<res_width>(b))};
 
