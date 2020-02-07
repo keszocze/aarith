@@ -44,34 +44,36 @@ public:
         if(wider_mantissa)
         {
             mantissa = uinteger<M>(f_mantissa);
-            const auto mantissa_shift = M - f_mantissa_width;
-            mantissa = mantissa << (mantissa_shift);
+            constexpr auto mantissa_shift = M - f_mantissa_width;
+            mantissa = mantissa << mantissa_shift;
         }
         else
         {
-            const auto mantissa_shift = f_mantissa_width - M;
+            constexpr auto mantissa_shift = f_mantissa_width - M;
             f_mantissa >>= mantissa_shift;
             mantissa = uinteger<M>(f_mantissa);
         }
 
-        constexpr auto wider_exponent = E >= f_exponent_width;
-        if(wider_exponent)
+        if(f_exponent > 0)
         {
-            exponent = uinteger<E>(f_exponent);
-            const uinteger<E> f_bias((1U << (f_exponent_width-1))-1UL);
-            const auto exponent_delta = sub(get_bias(), f_bias);
-            exponent = add(exponent, exponent_delta);
+            constexpr auto wider_exponent = E >= f_exponent_width;
+            if(wider_exponent)
+            {
+                exponent = uinteger<E>(f_exponent);
+                const auto f_bias = width_cast<E>(normfloat<f_exponent_width, f_mantissa_width>::get_bias());
+                const auto exponent_delta = sub(get_bias(), f_bias);
+                exponent = add(exponent, exponent_delta);
 
+            }
+            else
+            {
+                const auto bias = get_bias();
+                const auto exponent_delta = normfloat<f_exponent_width, f_mantissa_width>::get_bias().word(0) - bias.word(0);
+                f_exponent -= exponent_delta;
+                exponent = uinteger<E>(f_exponent);
+            }
         }
         else
-        {
-            const auto bias = get_bias();
-            const auto exponent_delta = ((1U << (f_exponent_width-1))-1U) - bias.word(0);
-            f_exponent -= exponent_delta;
-            exponent = uinteger<E>(f_exponent);
-        }
-
-        if (f_exponent == 0)
         {
             mantissa.set_bit(M-1, false);
         }
@@ -178,8 +180,8 @@ public:
     static constexpr bool value = false;
 };
 
-template<size_t E, size_t M>
-auto equal_except_rounding(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
+template<size_t E, size_t M1, size_t M2>
+auto equal_except_rounding(const normfloat<E, M1> lhs, const normfloat<E, M2> rhs)
 -> bool
 {   
     if(lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent())
@@ -190,19 +192,23 @@ auto equal_except_rounding(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
         }
         else
         {
+            constexpr auto Min = std::min(M1, M2);
+            constexpr auto offset_M1 = M1 - Min;
+            constexpr auto offset_M2 = M2 - Min;
+
             const auto m1 = lhs.get_mantissa();
             const auto m2 = rhs.get_mantissa();
             
-            const auto bit1 = m1.bit(0);
-            const auto bit2 = m2.bit(0);
+            const auto bit1 = m1.bit(offset_M1);
+            const auto bit2 = m2.bit(offset_M2);
 
             bool rounding_error = true;
-            bool has_to_be_equal = false;
-            for(auto i = 0U; i < M; ++i)
+            bool has_to_be_equal = bit1 == bit2;
+            for(auto i = 0U; i < Min; ++i)
             {
                 if(has_to_be_equal)
                 {
-                    if(m1.bit(i) != m2.bit(i))
+                    if(m1.bit(i+offset_M1) != m2.bit(i+offset_M2))
                     {
                         rounding_error = false;
                         break;
@@ -210,9 +216,9 @@ auto equal_except_rounding(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
                 }
                 else
                 {
-                    if(m1.bit(i) != m2.bit(i))
+                    if(m1.bit(i+offset_M1) != m2.bit(i+offset_M2))
                     {
-                        if(m1.bit(i) == bit1 && m2.bit(i) == bit2)
+                        if(m1.bit(i+offset_M1) == bit1 && m2.bit(i+offset_M2) == bit2)
                         {
                             continue;
                         }

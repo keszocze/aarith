@@ -2,7 +2,9 @@
 
 #include "aarith/operations/comparisons.hpp"
 #include "aarith/operations/exact_operations.hpp"
+#include "aarith/operations/sinteger_operations.hpp"
 #include "aarith/types/uinteger.hpp"
+#include "aarith/types/sinteger.hpp"
 #include "aarith/types/normfloat.hpp"
 #include "aarith/types/uinteger.hpp"
 #include "aarith/utilities/bit_operations.hpp"
@@ -249,7 +251,10 @@ auto to_sci_string(const normfloat<E, M> nf)
     float *mantissa = reinterpret_cast<float*>(&ui_mantissa);
 
     auto const exponent = sub(nf.get_exponent(), nf.get_bias());
-    auto const abs_exponent = abs_two_complement(exponent);
+    
+    const sinteger<E> s_exponent(exponent);
+    auto const s_abs_exponent = abs(s_exponent);
+    const uinteger<E> abs_exponent(abs_exponent);
 
     std::stringstream str;
     str << ((nf.get_sign() == 1)?"-":"")
