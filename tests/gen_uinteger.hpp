@@ -1,6 +1,6 @@
 #pragma once
 
-#include "aarith/types/integer.hpp"
+#include "aarith/types/uinteger.hpp"
 #include "aarith/types/random.hpp"
 
 #include <catch.hpp>

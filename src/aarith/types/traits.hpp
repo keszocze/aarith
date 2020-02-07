@@ -1,5 +1,7 @@
 #pragma once
 
+#include <limits>
+
 namespace aarith {
 
 template <class Type> class is_integral

@@ -12,45 +12,48 @@
 
 namespace aarith {
 
-template <size_t Width> class uinteger;
-
-template <size_t DestinationWidth, size_t SourceWidth>
-[[nodiscard]] auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>;
-
-template <size_t Width> class uinteger
+template <size_t Width, class WordType = uint64_t> class word_container
 {
 public:
-    using word_type = uint64_t;
-    using bit_type = word_type;
-    static_assert(Width > 0, "Width must be at least 1 (bit)");
+    using word_type = WordType;
+    using bit_type = WordType;
+    static_assert(Width > 0, " Width must be at least 1 (bit)");
 
-    uinteger() = default;
+    /*
+     * Constructors etc.
+     */
 
-    template <class T>
-    explicit uinteger(T n)
-        : words{{0}}
+    word_container() = default;
+
+    word_container(WordType w)
     {
-        static_assert(std::is_integral<T>::value, "Only integral values are supported");
-        static_assert(!std::is_signed<T>::value, "Only unsigned numbers are supported");
-        static_assert(sizeof(T) * 8 <= sizeof(word_type) * 8,
-                      "Only up to 64 bit integers are supported");
-        //        static_assert(sizeof(T) * 8 <= Width, "Data type can not fit provided number");
-
-        words[0] = n;
+        this->words[0] = w & word_mask(0);
     }
 
-    template <size_t V> uinteger(const uinteger<V>& other)
+    template <class... Args> word_container(WordType w, Args... args)
     {
-        static_assert(V <= Width, "Can not create an uinteger from larger uinteger");
+        set_words(w, args...);
+    }
+
+    template <class... Args> static auto from_words(Args... args) -> word_container
+    {
+        word_container wc;
+        wc.set_words(args...);
+        return wc;
+    }
+
+    template <size_t V> word_container(const word_container<V>& other)
+    {
+        static_assert(V <= Width, "Can not create a word_container from larger container");
 
         for (auto i = 0U; i < other.word_count(); ++i)
         {
             set_word(i, other.word(i));
         }
     }
-    template <size_t V> uinteger<Width> operator=(const uinteger<V>& other)
+    template <size_t V> word_container<Width> operator=(const word_container<V>& other)
     {
-        static_assert(V <= Width, "Can not create an uinteger from larger uinteger");
+        static_assert(V <= Width, "Can not create a word_container from larger container");
 
         if constexpr (V == Width)
         {
@@ -75,12 +78,9 @@ public:
         return *this;
     }
 
-    template <class... Args> static auto from_words(Args... args) -> uinteger
-    {
-        uinteger uint;
-        uint.set_words(args...);
-        return uint;
-    }
+    /*
+     * Getters
+     */
 
     [[nodiscard]] static constexpr auto word_width() noexcept -> size_t
     {
@@ -108,37 +108,57 @@ public:
         return Width;
     }
 
-    [[nodiscard]] static constexpr auto zero() noexcept -> uinteger
-    {
-        return uinteger{};
-    }
-
-    [[nodiscard]] static constexpr auto max() noexcept -> uinteger
-    {
-        uinteger uint;
-        for (auto i = 0U; i < word_count(); ++i)
-        {
-            uint.set_word(i, std::numeric_limits<word_type>::max());
-        }
-        return uint;
-    }
-
     [[nodiscard]] auto word(size_t index) const -> word_type
     {
         return words[index];
     }
 
+    /**
+     * @brief Returns ths most significant bit.
+     *
+     * The most significant bit is the Width's one (i.e. the one you can get via bit(Width-1)). This
+     * method is simply there for convenience.
+     */
+    [[nodiscard]] auto msb() const -> bit_type
+    {
+        return bit(Width - 1);
+    }
+
+    /**
+     * @brief Returns bit at given index.
+     *
+     * @note No bounds checking is performed! If your index is too large bad things will happen!
+     *
+     * @param index The index for which the bit is to be returned
+     * @return  The bit at the indexed position
+     */
+    auto bit(size_t index) const -> bit_type
+    {
+        auto const the_word = word(index / word_width());
+        auto const masked_bit = the_word & (static_cast<word_type>(1) << (index % word_width()));
+        return static_cast<bit_type>(masked_bit > 0 ? 1 : 0);
+    }
+
+    template <size_t Count> auto bits(size_t index) const -> word_container<Count>
+    {
+        word_container<Count> result;
+        for (auto i = 0U; i < Count; ++i)
+        {
+            result.set_bit(i, bit(index + i));
+        }
+        return result;
+    }
+
+    /*
+     * Setters
+     */
+
     void set_bit(size_t index, bool value = true)
     {
         if (index >= width())
         {
-            std::string msg;
-            msg += "Trying to access bit with index ";
-            msg += std::to_string(index);
-            msg += " for uinteger<";
-            msg += std::to_string(width());
-            msg += "> with max index ";
-            msg += std::to_string(width() - 1);
+
+            std::string msg = gen_oob_msg(index, true);
             throw std::out_of_range(msg);
         }
         const size_t word_index = index / word_width();
@@ -155,29 +175,6 @@ public:
         }
     }
 
-    void set_word(size_t index, word_type value)
-    {
-        if (index >= word_count())
-        {
-            std::string msg;
-            msg += "Trying to access word with index ";
-            msg += std::to_string(index);
-            msg += " for uinteger<";
-            msg += std::to_string(width());
-            msg += "> with max index ";
-            msg += std::to_string(word_count() - 1);
-
-            throw std::out_of_range(msg);
-        }
-        words[index] = value & word_mask(index);
-    }
-
-    // Sets the words to the given values, where the right-most argument corresponds to word 0.
-    template <class... Args> void set_words(Args... args)
-    {
-        set_word_recursively<0>(args...);
-    }
-
     static constexpr auto word_index(size_t bit_index) -> size_t
     {
         return bit_index / word_width();
@@ -191,37 +188,45 @@ public:
                  masked_word | (static_cast<word_type>(value & 1) << (index % word_width())));
     }
 
-    auto bit(size_t index) const -> bit_type
+    void set_word(size_t index, word_type value)
     {
-        auto const the_word = word(index / word_width());
-        auto const masked_bit = the_word & (static_cast<word_type>(1) << (index % word_width()));
-        return static_cast<bit_type>(masked_bit > 0 ? 1 : 0);
-    }
-
-    template <size_t Count> auto bits(size_t index) const -> uinteger<Count>
-    {
-        uinteger<Count> result;
-        for (auto i = 0U; i < Count; ++i)
+        if (index >= word_count())
         {
-            result.set_bit(i, bit(index + i));
+            std::string msg = gen_oob_msg(index, false);
+            throw std::out_of_range(msg);
         }
-        return result;
+        words[index] = value & word_mask(index);
     }
 
-    auto operator<<=(const size_t shift_by) -> uinteger&
+    // Sets the words to the given values, where the right-most argument corresponds to word 0.
+    template <class... Args> void set_words(Args... args)
     {
-        return *this = *this << shift_by;
+        set_word_recursively<0>(args...);
     }
 
-    auto operator>>=(const size_t shift_by) -> uinteger&
+    /*
+     * Constants
+     */
+
+    [[nodiscard]] static constexpr word_container all_ones()
     {
-        return *this = *this >> shift_by;
+        word_container n;
+        word_type ones = ~(static_cast<word_type>(0U));
+        for (size_t i = 0; i < n.word_count(); ++i)
+        {
+            n.set_word(i, ones);
+        }
+        return n;
     }
 
-    auto operator+=(const uinteger<Width> addend) -> uinteger&
+    [[nodiscard]] static constexpr word_container all_zeroes()
     {
-        return *this = width_cast<Width>(add(*this, addend));
+        return word_container{0U};
     }
+
+    /*
+     * Utility stuff
+     */
 
     [[nodiscard]] bool is_zero() const noexcept
     {
@@ -296,120 +301,61 @@ private:
         return index;
     }
 
+    std::string gen_oob_msg(size_t index, bool accessed_bit = true)
+    {
+
+        std::string msg, head, foot;
+        if (accessed_bit)
+        {
+            head = "Trying to access bit with index ";
+            foot = std::to_string(width() - 1);
+        }
+        else
+        {
+            head = "Trying to access word with index ";
+            foot = std::to_string(word_count() - 1);
+        }
+
+        msg += head;
+        msg += std::to_string(index);
+        msg += " for word_container<";
+        msg += std::to_string(width());
+        msg += "> with max index ";
+        msg += foot;
+
+        return msg;
+    }
+
     std::array<word_type, word_count()> words{{0}};
 };
 
-template <size_t Width> class is_integral<uinteger<Width>>
-{
-public:
-    static constexpr bool value = true;
-};
-
-template <size_t Width> class is_unsigned<uinteger<Width>>
-{
-public:
-    static constexpr bool value = true;
-};
-
 template <size_t DestinationWidth, size_t SourceWidth>
-[[nodiscard]] auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>
+[[nodiscard]] auto width_cast(const word_container<SourceWidth>& source)
+    -> word_container<DestinationWidth>
 {
-    uinteger<DestinationWidth> destination;
+    word_container<DestinationWidth> word_container;
     if constexpr (DestinationWidth >= SourceWidth)
     {
         for (auto i = 0U; i < source.word_count(); ++i)
         {
-            destination.set_word(i, source.word(i));
+            word_container.set_word(i, source.word(i));
         }
     }
     else
     {
-        for (auto i = 0U; i < destination.word_count(); ++i)
+        for (auto i = 0U; i < word_container.word_count(); ++i)
         {
-            destination.set_word(i, source.word(i));
+            word_container.set_word(i, source.word(i));
         }
     }
-    return destination;
+    return word_container;
 }
 
 template <size_t Width>
-[[nodiscard]] auto operator<<(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
+[[nodiscard]] auto operator&(const word_container<Width>& lhs, const word_container<Width>& rhs)
+    -> word_container<Width>
 {
-    if (rhs >= Width)
-    {
-        return uinteger<Width>(0U);
-    }
-    if (rhs == 0)
-    {
-        return lhs;
-    }
-    uinteger<Width> shifted;
-    const auto skip_words = rhs / lhs.word_width();
-    const auto shift_word_left = rhs - skip_words * lhs.word_width();
-    const auto shift_word_right = lhs.word_width() - shift_word_left;
-
-    for (auto counter = lhs.word_count(); counter > 0; --counter)
-    {
-        if (counter + skip_words < lhs.word_count())
-        {
-            typename uinteger<Width>::word_type new_word;
-            new_word = lhs.word(counter) << shift_word_left;
-            if (shift_word_right < lhs.word_width())
-            {
-                new_word = new_word | (lhs.word(counter - 1) >> shift_word_right);
-            }
-            shifted.set_word(counter + skip_words, new_word);
-        }
-    }
-    typename uinteger<Width>::word_type new_word;
-    new_word = lhs.word(0) << shift_word_left;
-    shifted.set_word(skip_words, new_word);
-
-    return shifted;
-}
-
-template <size_t Width>
-auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
-{
-    if (rhs >= Width)
-    {
-        return uinteger<Width>(0U);
-    }
-    if (rhs == 0)
-    {
-        return lhs;
-    }
-
-    uinteger<Width> shifted;
-    const auto skip_words = rhs / lhs.word_width();
-    const auto shift_word_right = rhs - skip_words * lhs.word_width();
-    const auto shift_word_left = lhs.word_width() - shift_word_right;
-
-    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
-    {
-        if (skip_words <= counter)
-        {
-            typename uinteger<Width>::word_type new_word;
-            new_word = lhs.word(counter) >> shift_word_right;
-            if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
-            {
-                new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
-            }
-            shifted.set_word(counter - skip_words, new_word);
-        }
-    }
-    typename uinteger<Width>::word_type new_word;
-    new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
-    shifted.set_word(lhs.word_count() - skip_words - 1, new_word);
-
-    return shifted;
-}
-
-template <size_t Width>
-[[nodiscard]] auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
-    -> uinteger<Width>
-{
-    uinteger<Width> logical_and;
+    word_container<Width> logical_and;
     for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
         logical_and.set_word(counter, lhs.word(counter) & rhs.word(counter));
@@ -418,9 +364,10 @@ template <size_t Width>
 }
 
 template <size_t Width>
-auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
+auto operator|(const word_container<Width>& lhs, const word_container<Width>& rhs)
+    -> word_container<Width>
 {
-    uinteger<Width> logical_or;
+    word_container<Width> logical_or;
     for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
         logical_or.set_word(counter, lhs.word(counter) | rhs.word(counter));
@@ -428,9 +375,10 @@ auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteg
     return logical_or;
 }
 
-template <size_t Width>[[nodiscard]] auto operator~(const uinteger<Width>& rhs) -> uinteger<Width>
+template <size_t Width>
+[[nodiscard]] auto operator~(const word_container<Width>& rhs) -> word_container<Width>
 {
-    uinteger<Width> logical_not;
+    word_container<Width> logical_not;
     for (auto counter = 0U; counter < rhs.word_count(); ++counter)
     {
         logical_not.set_word(counter, ~rhs.word(counter));
@@ -438,26 +386,96 @@ template <size_t Width>[[nodiscard]] auto operator~(const uinteger<Width>& rhs) 
     return logical_not;
 }
 
-template <size_t Width> auto abs_two_complement(const uinteger<Width>& value) -> uinteger<Width>
-{
-    if (value.bit(Width - 1) == 1)
-    {
-        const uinteger<Width> one(1U);
-        return add(~value, one);
-    }
-    return value;
-}
-
-template <size_t Width> auto count_leading_zeroes(const uinteger<Width>& value) -> size_t
+/**
+ * @brief  Counts the number of bits set to zero before the first one appears (from MSB to LSB)
+ * @tparam Width Width of the word_container
+ * @param value The word to count the leading zeroes in
+ * @return
+ */
+template <size_t Width> auto count_leading_zeroes(const word_container<Width>& value) -> size_t
 {
     for (auto i = Width; i > 0; --i)
     {
         if (value.bit(i - 1))
         {
-            return i;
+            return (Width - i);
         }
     }
     return Width;
+}
+
+template <size_t Width>
+[[nodiscard]] auto operator<<(const word_container<Width>& lhs, const size_t rhs)
+    -> word_container<Width>
+{
+    if (rhs >= Width)
+    {
+        return word_container<Width>(0U);
+    }
+    if (rhs == 0)
+    {
+        return lhs;
+    }
+    word_container<Width> shifted;
+    const auto skip_words = rhs / lhs.word_width();
+    const auto shift_word_left = rhs - skip_words * lhs.word_width();
+    const auto shift_word_right = lhs.word_width() - shift_word_left;
+
+    for (auto counter = lhs.word_count(); counter > 0; --counter)
+    {
+        if (counter + skip_words < lhs.word_count())
+        {
+            typename word_container<Width>::word_type new_word;
+            new_word = lhs.word(counter) << shift_word_left;
+            if (shift_word_right < lhs.word_width())
+            {
+                new_word = new_word | (lhs.word(counter - 1) >> shift_word_right);
+            }
+            shifted.set_word(counter + skip_words, new_word);
+        }
+    }
+    typename word_container<Width>::word_type new_word;
+    new_word = lhs.word(0) << shift_word_left;
+    shifted.set_word(skip_words, new_word);
+
+    return shifted;
+}
+
+template <size_t Width>
+auto operator>>(const word_container<Width>& lhs, const size_t rhs) -> word_container<Width>
+{
+    if (rhs >= Width)
+    {
+        return word_container<Width>(0U);
+    }
+    if (rhs == 0)
+    {
+        return lhs;
+    }
+
+    word_container<Width> shifted;
+    const auto skip_words = rhs / lhs.word_width();
+    const auto shift_word_right = rhs - skip_words * lhs.word_width();
+    const auto shift_word_left = lhs.word_width() - shift_word_right;
+
+    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
+    {
+        if (skip_words <= counter)
+        {
+            typename word_container<Width>::word_type new_word;
+            new_word = lhs.word(counter) >> shift_word_right;
+            if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
+            {
+                new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
+            }
+            shifted.set_word(counter - skip_words, new_word);
+        }
+    }
+    typename word_container<Width>::word_type new_word;
+    new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
+    shifted.set_word(lhs.word_count() - skip_words - 1, new_word);
+
+    return shifted;
 }
 
 } // namespace aarith

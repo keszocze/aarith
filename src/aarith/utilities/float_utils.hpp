@@ -30,7 +30,7 @@ constexpr auto get_exponent_width()
     }
 }
 
-auto extract_sign(float num)
+inline auto extract_sign(float num)
 -> uint8_t
 {
     const auto exponent_width = get_exponent_width<float>();
@@ -41,7 +41,7 @@ auto extract_sign(float num)
     return static_cast<uint8_t>(sign);
 }
 
-auto extract_sign(double num)
+inline auto extract_sign(double num)
 -> uint8_t
 {
     const auto exponent_width = get_exponent_width<double>();
@@ -52,7 +52,7 @@ auto extract_sign(double num)
     return static_cast<uint8_t>(sign);
 }
 
-auto extract_exponent(float num)
+inline auto extract_exponent(float num)
 -> uint8_t
 {
     const auto exponent_width = get_exponent_width<float>();
@@ -64,7 +64,7 @@ auto extract_exponent(float num)
     return static_cast<uint8_t>(exponent);
 }
 
-auto extract_exponent(double num)
+inline auto extract_exponent(double num)
 -> uint16_t
 {
     const auto exponent_width = get_exponent_width<double>();
@@ -76,7 +76,7 @@ auto extract_exponent(double num)
     return static_cast<uint16_t>(exponent);
 }
 
-auto extract_mantissa(float num)
+inline auto extract_mantissa(float num)
 -> uint32_t
 {
     const auto mantissa_width = get_mantissa_width<float>();
@@ -87,7 +87,7 @@ auto extract_mantissa(float num)
     return static_cast<uint32_t>(mantissa);
 }
 
-auto extract_mantissa(double num)
+inline auto extract_mantissa(double num)
 -> uint64_t
 {
     constexpr auto mantissa_width = get_mantissa_width<double>();

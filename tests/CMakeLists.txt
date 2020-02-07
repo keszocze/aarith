@@ -36,6 +36,11 @@ add_executable(bit-operations-test bit_operations-test.cpp)
 target_link_libraries(bit-operations-test Catch2::WithMain aarith::Library)
 add_test(NAME bit-operations-test COMMAND bit-operations-test)
 
+
+add_executable(sint-test sint-test.cpp sint-operations-test.cpp sint-comparisons-test.cpp)
+target_link_libraries(sint-test Catch2::WithMain aarith::Library)
+add_test(NAME sint-test COMMAND sint-test)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/")
 find_package(MPIR)
 if(MPIR_FOUND)
