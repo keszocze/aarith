@@ -214,7 +214,6 @@ public:
     static constexpr aarith::uinteger<W> lowest() noexcept
     {
         return aarith::uinteger<W>::zero();
-        ;
     }
 
     static constexpr aarith::uinteger<W> max() noexcept
