@@ -182,20 +182,26 @@ auto operator>>(const sinteger<Width>& lhs, const size_t rhs) -> sinteger<Width>
     typename sinteger<Width>::word_type new_word;
     new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
 
-    if (lhs.is_negative())
-    {
-        typename sinteger<Width>::word_type ones(-1);
-        typename sinteger<Width>::word_type mask;
-
-        for (size_t i = lhs.word_count() - skip_words; i < lhs.word_count(); ++i) {
-            shifted.set_word(i, ones);
-        }
-
-        mask = ones << shift_word_left;
-        new_word = new_word | mask;
-    }
+//    if (lhs.is_negative())
+//    {
+//        typename sinteger<Width>::word_type ones(-1);
+//        typename sinteger<Width>::word_type mask;
+//
+//        for (size_t i = lhs.word_count() - skip_words; i < lhs.word_count(); ++i) {
+//            shifted.set_word(i, ones);
+//        }
+//
+//        mask = ones << shift_word_left;
+//        new_word = new_word | mask;
+//    }
 
     shifted.set_word(lhs.word_count() - skip_words - 1, new_word);
+
+    if (lhs.is_negative()) {
+        for (size_t i = (Width-1); i >= (Width-rhs); --i) {
+            shifted.set_bit(i);
+        }
+    }
 
     return shifted;
 }

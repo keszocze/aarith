@@ -416,26 +416,27 @@ SCENARIO("Left/right shifting sintegers")
         }
     }
 
-    // FIXME this test is not supposed to fail... (issue #29 has been filed though)
-    //    GIVEN ("A negative sinteger")
-    //    {
-    //        WHEN("Right shifting")
-    //        {
-    //            THEN ("-1 should not be affected")
-    //            {
-    //                const sinteger<150> minus_one(-1);
-    //                const sinteger<150> shifted1 = minus_one >> 1;
-    //                const sinteger<150> shifted2 = minus_one >> 22;
-    //                const sinteger<150> shifted3 = minus_one >> 23;
-    //                std::cout << group_digits(to_binary(minus_one), 64) << "\n";
-    //                std::cout << group_digits(to_binary(shifted1), 64) << "\n";
-    //                std::cout << group_digits(to_binary(shifted2), 64) << "\n";
-    //                std::cout << group_digits(to_binary(shifted3), 64) << "\n";
-    //
-    //                CHECK(shifted1 == minus_one);
-    //                CHECK(shifted2 == minus_one);
-    //                REQUIRE(shifted3 == minus_one);
-    //            }
-    //        }
-    //    }
+    GIVEN("The sinteger -1")
+    {
+        WHEN("Right shifting")
+        {
+            THEN("-1 should not be affected")
+            {
+                const sinteger<150> minus_one(-1);
+                const sinteger<150> shifted1 = minus_one >> 1;
+                const sinteger<150> shifted2 = minus_one >> 22;
+                const sinteger<150> shifted3 = minus_one >> 23;
+                const sinteger<150> shifted4 = minus_one >> 149;
+                const sinteger<150> shifted5 = minus_one >> 150;
+                const sinteger<150> shifted6 = minus_one >> 1151;
+
+                CHECK(shifted1 == minus_one);
+                CHECK(shifted2 == minus_one);
+                REQUIRE(shifted3 == minus_one);
+                REQUIRE(shifted4 == minus_one);
+                REQUIRE(shifted5 == minus_one);
+                REQUIRE(shifted6 == minus_one);
+            }
+        }
+    }
 }

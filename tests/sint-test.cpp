@@ -287,7 +287,7 @@ SCENARIO("Create negative sintegers", "[sinteger][bit_logic]")
             const size_t Width = 192;
 
             typename sinteger<Width>::word_type number_a = 3;
-            number_a <<= sinteger<Width>::word_width() - 2;
+            number_a <<= (sinteger<Width>::word_width() - 2);
             static constexpr auto s = 0;
             sinteger<Width> a(0U);
             a.set_word(a.word_count() - 1, number_a);
@@ -298,79 +298,84 @@ SCENARIO("Create negative sintegers", "[sinteger][bit_logic]")
             REQUIRE(result.word(a.word_count() - 1) == number_a);
         }
 
-        // FIXME this fails
-//        WHEN("The bits are shifted exactly one word")
-//        {
-//            const size_t Width = 192;
-//
-//            typename sinteger<Width>::word_type number_a = 3;
-//            number_a <<= sinteger<Width>::word_width() - 2;
-//            static constexpr auto s = static_cast<size_t>(sinteger<Width>::word_width());
-//            sinteger<Width> a(0U);
-//            a.set_word(a.word_count() - 1, number_a);
-//
-//            const auto result = a >> s;
-//            REQUIRE(result.word(a.word_count() - 3) == 0);
-//            REQUIRE(result.word(a.word_count() - 2) == number_a);
-//            REQUIRE(result.word(a.word_count() - 1) == 0);
-//        }
+        // This test will fail spectacularly for negative numbers!
+        WHEN("The bits are shifted exactly one word")
+        {
+            const size_t Width = 192;
 
-        // FIXME this fails
-//        WHEN("The bits are shifted exactly two words")
-//        {
-//            const size_t Width = 192;
-//
-//            typename sinteger<Width>::word_type number_a = 3;
-//            number_a <<= sinteger<Width>::word_width() - 2;
-//            static constexpr auto s = 2 * static_cast<size_t>(sinteger<Width>::word_width());
-//            sinteger<Width> a(0U);
-//            a.set_word(a.word_count() - 1, number_a);
-//
-//            const auto result = a >> s;
-//            REQUIRE(result.word(a.word_count() - 3) == number_a);
-//            REQUIRE(result.word(a.word_count() - 2) == 0);
-//            REQUIRE(result.word(a.word_count() - 1) == 0);
-//        }
+            typename sinteger<Width>::word_type number_a = 3;
+            number_a <<= (sinteger<Width>::word_width() - 4);
 
 
-        // FIXME this fails
-//        WHEN("The bits are shifted exactly by word_width-1")
-//        {
-//            const size_t Width = 192;
-//
-//            typename sinteger<Width>::word_type number_a = 3;
-//            number_a <<= sinteger<Width>::word_width() - 2;
-//            static constexpr auto s = static_cast<size_t>(sinteger<Width>::word_width()) - 1;
-//            sinteger<Width> a(0U);
-//            a.set_word(a.word_count() - 1, number_a);
-//
-//            auto ref = number_a << 1;
-//
-//            const auto result = a >> s;
-//            REQUIRE(result.word(a.word_count() - 3) == 0);
-//            REQUIRE(result.word(a.word_count() - 2) == ref);
-//            REQUIRE(result.word(a.word_count() - 1) == 1);
-//        }
+            static constexpr auto s = static_cast<size_t>(sinteger<Width>::word_width());
+            sinteger<Width> a(0U);
+            a.set_word(a.word_count() - 1, number_a);
 
 
-        // FIXME this fails
-//        WHEN("The bits are shifted by 2*word_width-1")
-//        {
-//            const size_t Width = 192;
-//
-//            typename sinteger<Width>::word_type number_a = 3;
-//            number_a <<= sinteger<Width>::word_width() - 2;
-//            static constexpr auto s = 2 * static_cast<size_t>(sinteger<Width>::word_width()) - 1;
-//            sinteger<Width> a(0U);
-//            a.set_word(a.word_count() - 1, number_a);
-//
-//            auto ref = number_a << 1;
-//
-//            const auto result = a >> s;
-//            REQUIRE(result.word(a.word_count() - 3) == ref);
-//            REQUIRE(result.word(a.word_count() - 2) == 1);
-//            REQUIRE(result.word(a.word_count() - 1) == 0);
-//        }
+            const auto result = a >> s;
+
+
+            CHECK(result.word(a.word_count() - 3) == 0);
+            CHECK(result.word(a.word_count() - 2) == number_a);
+            REQUIRE(result.word(a.word_count() - 1) == 0);
+        }
+
+        WHEN("The bits are shifted exactly two words")
+        {
+            const size_t Width = 192;
+
+            typename sinteger<Width>::word_type number_a = 3;
+            number_a <<= sinteger<Width>::word_width() - 4;
+            static constexpr auto s = 2 * static_cast<size_t>(sinteger<Width>::word_width());
+            sinteger<Width> a(0U);
+            a.set_word(a.word_count() - 1, number_a);
+
+            const auto result = a >> s;
+            REQUIRE(result.word(a.word_count() - 3) == number_a);
+            REQUIRE(result.word(a.word_count() - 2) == 0);
+            REQUIRE(result.word(a.word_count() - 1) == 0);
+        }
+
+
+        WHEN("The bits are shifted exactly by word_width-2 over word boundaries")
+        {
+            const size_t Width = 192;
+
+            typename sinteger<Width>::word_type number_a = 3;
+            number_a <<= sinteger<Width>::word_width() - 3;
+            static constexpr auto s = static_cast<size_t>(sinteger<Width>::word_width()) - 2;
+            sinteger<Width> a(0U);
+            a.set_word(a.word_count() - 1, number_a);
+
+            typename sinteger<Width>::word_type ref = uint64_t(1) << 63U;
+
+            const auto result = a >> s;
+
+            REQUIRE(result.word(a.word_count() - 3) == 0);
+            REQUIRE(result.word(a.word_count() - 2) == ref);
+            REQUIRE(result.word(a.word_count() - 1) == 1);
+        }
+
+
+        WHEN("The bits are shifted by 2*word_width-1")
+        {
+            const size_t Width = 192;
+
+            typename sinteger<Width>::word_type number_a = 3;
+            number_a <<= sinteger<Width>::word_width() - 3;
+
+            static constexpr auto s = 2 * static_cast<size_t>(sinteger<Width>::word_width()) - 1;
+            sinteger<Width> a(0U);
+            a.set_word(a.word_count() - 1, number_a);
+
+            auto ref = number_a << 1;
+
+            const auto result = a >> s;
+
+            REQUIRE(result.word(a.word_count() - 3) == ref);
+            REQUIRE(result.word(a.word_count() - 2) == 0);
+            REQUIRE(result.word(a.word_count() - 1) == 0);
+        }
 
 
         WHEN("The shift amount is a multiple of the word width")
