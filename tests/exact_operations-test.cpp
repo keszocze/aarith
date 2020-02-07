@@ -241,14 +241,9 @@ SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
             REQUIRE(~max == min);
         }
 
-        // FIXME why doesn't this compile??
-
-//       .../aarith/tests/exact_operations-test.cpp:194:58: error: ‘lowest’ is not a member of ‘aarith::uinteger<89>’
-//  194 |             REQUIRE(uinteger<89>::min() == uinteger<89>::lowest());
-
-//        THEN ("uinteger::min and uinteger::lowest are the same") {
-//            REQUIRE(uinteger<89>::min() == uinteger<89>::lowest());
-//        }
+        THEN ("uinteger::min and uinteger::lowest are the same") {
+            REQUIRE(uinteger<89>::min() == std::numeric_limits<uinteger<89>>::lowest());
+        }
 
         WHEN("Adding to max value")
         {
