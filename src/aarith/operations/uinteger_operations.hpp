@@ -197,7 +197,7 @@ template <size_t W>[[nodiscard]] uinteger<W> mul(const uinteger<W>& a, const uin
  * @see https://en.wikipedia.org/wiki/Division_algorithm#Restoring_division
  *
  * @param numerator The number that is to be divided
- * @param denominator The number that devides the other number
+ * @param denominator The number that divides the other number
  * @tparam W Width of the numbers used in division.
  *
  * @return Pair of (quotient, remainder)
