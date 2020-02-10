@@ -165,11 +165,13 @@ auto approx_uint_bitmasking_mul(const uinteger<width>& opd1, const uinteger<widt
     return product;
 }
 
-template <size_t width, size_t splitting_point>
+template <size_t width, size_t splitting_point, size_t shared_bits=0>
 uinteger<width> FAUadder(const uinteger<width>& a, const uinteger<width>& b)
 {
     const uinteger<splitting_point> a_lsp{width_cast<splitting_point>(a)};
     const uinteger<splitting_point> b_lsp{width_cast<splitting_point>(b)};
+
+    static_assert(shared_bits < splitting_point);
 
     std::cout << group_digits(to_binary(a),splitting_point) << "\n";
     std::cout << group_digits(to_binary(b),splitting_point) << "\n";
