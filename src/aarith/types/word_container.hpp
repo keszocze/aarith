@@ -68,13 +68,28 @@ public:
             set_word(i, other.word(i));
         }
 
+// TODO remove this when clang detects the else branch as constexpr
+// currently this leads to potentially slower code when using clang; the functionality is the same, though
+#ifndef __clang__
         if constexpr (this->word_count() > other.word_count())
+
         {
             for (size_t i = other.word_count(); i < this->word_count(); ++i)
             {
                 set_word(i, 0U);
             }
         }
+
+#else
+        if (this->word_count() > other.word_count())
+
+        {
+            for (size_t i = other.word_count(); i < this->word_count(); ++i)
+            {
+                set_word(i, 0U);
+            }
+        }
+#endif
         return *this;
     }
 
@@ -204,7 +219,7 @@ public:
             std::string msg = gen_oob_msg(index, false);
             throw std::out_of_range(msg);
         }
-            words[index] = value & word_mask(index);
+        words[index] = value & word_mask(index);
     }
 
     // Sets the words to the given values, where the right-most argument corresponds to word 0.

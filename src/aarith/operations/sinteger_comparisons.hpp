@@ -11,8 +11,14 @@ namespace aarith {
 
 template <size_t W, size_t V> bool operator==(const sinteger<W>& a, const sinteger<V>& b)
 {
+
+#ifndef __clang__
     constexpr auto min_count = std::min(a.word_count(), b.word_count());
     constexpr auto max_count = std::max(a.word_count(), b.word_count());
+#else
+    const auto min_count = std::min(a.word_count(), b.word_count());
+    const auto max_count = std::max(a.word_count(), b.word_count());
+#endif
 
     if (a.is_negative() != b.is_negative())
     {

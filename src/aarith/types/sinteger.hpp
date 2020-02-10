@@ -203,8 +203,13 @@ public:
     static constexpr bool is_modulo = false;
     static constexpr int radix = 2;
     static constexpr int digits = W - 1; // TODO what happens if W > max_int?
+
+
+    // TODO remove this when log10 becomes constexpr in clang's stdlibc
+    #ifndef __clang__
     static constexpr int digits10 = std::numeric_limits<aarith::sinteger<W>>::digits *
                                     std::log10(std::numeric_limits<aarith::sinteger<W>>::radix);
+    #endif
 
     // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says
     // so
