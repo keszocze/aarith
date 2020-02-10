@@ -67,7 +67,7 @@ template <size_t W>[[nodiscard]] auto sub(const sinteger<W>& a, const sinteger<W
 }
 
 /**
- * @brief Subtracts two unsigned integers of, possibly, different bit widths.
+ * @brief Subtracts two signed integers of, possibly, different bit widths.
  *
  * @tparam W Width of the minuend
  * @tparam V Width of the subtrahend
@@ -75,12 +75,100 @@ template <size_t W>[[nodiscard]] auto sub(const sinteger<W>& a, const sinteger<W
  * @param b Subtrahend
  * @return Difference of correct bit width
  */
-template <size_t W, size_t V> [[nodiscard]]  auto expanding_sub(const sinteger<W> & a, const sinteger<V> & b) ->  sinteger<std::max(W, V)> {
+template <size_t W, size_t V>
+[[nodiscard]] auto expanding_sub(const sinteger<W>& a, const sinteger<V>& b)
+    -> sinteger<std::max(W, V)>
+{
     constexpr size_t res_width = std::max(W, V);
     uinteger<res_width> result{sub(width_cast<res_width>(a), width_cast<res_width>(b))};
 
     return result;
 }
+
+/**
+ * @brief Multiplies two signed integers.
+ *
+ *
+ * This implements the Booth multiplication algorithm with extension to correctly handle the most
+ * negative number. See https://en.wikipedia.org/wiki/Booth%27s_multiplication_algorithm for
+ * details.
+ *
+ * @tparam W The bit width of the first multiplicant
+ * @tparam V The bit width of the second multiplicant
+ * @param a First multiplicant
+ * @param b Second multiplicant
+ * @return Product of a and b
+ */
+template <size_t W, size_t V>
+[[nodiscard]] auto expanding_mul(const sinteger<W>& m, const sinteger<V>& r) -> sinteger<V + W>
+{
+
+//    std::cout << "m\t" << to_binary(m) << "\n";
+//    std::cout << "r\t" << to_binary(r) << "\n";
+
+    constexpr size_t K = W + V + 2;
+
+    sinteger<K> A{width_cast<W + 1>(m)};
+    sinteger<K> S = -A;
+
+    A = A << V + 1;
+    S = S << V + 1;
+
+    sinteger<K> P{r};
+    P = P << 1;
+
+//    std::cout << "A\t" << to_binary(A) << "\n";
+//    std::cout << "S\t" << to_binary(S) << "\n";
+//    std::cout << "P\t" << to_binary(P) << "\n\n";
+
+    for (size_t i = 0; i < V; ++i)
+    {
+
+        bool last_bit = P.bit(0);
+        bool snd_last_bit = P.bit(1);
+
+//        std::cout << "P" << i << "\t" << to_binary(P) << "\n";
+
+        if (snd_last_bit && !last_bit)
+        {
+//            std::cout << "P = P + S\n";
+            P = add(P, S);
+//            std::cout << "P" << i << "\t" << to_binary(P) << "\n";
+        }
+        if (!snd_last_bit && last_bit)
+        {
+//            std::cout << "P = P + A\n";
+            P = add(P, A);
+//            std::cout << "P" << i << "\t" << to_binary(P) << "\n";
+        }
+
+        P = P >> 1;
+
+//        std::cout << "P" << i << "\t" << to_binary(P) << "\n\n";
+    }
+
+    return width_cast<W + V>(P >> 1);
+}
+
+
+/**
+ * @brief Multiplies two signed integers.
+ *
+ * @note No Type conversion is performed. If the bit widths do not match, the code will not compile!
+ *
+ * This implements the Booth multiplication algorithm with extension to correctly handle the most
+ * negative number. See https://en.wikipedia.org/wiki/Booth%27s_multiplication_algorithm for
+ * details. The result is then cropped to fit the initial bit width
+ *
+ * @tparam W The bit width of the multiplicants
+ * @param a First multiplicant
+ * @param b Second multiplicant
+ * @return Product of a and b
+ */
+    template <size_t W>[[nodiscard]] sinteger<W> mul(const sinteger<W>& a, const sinteger<W>& b)
+    {
+        return width_cast<W>(expanding_mul(a, b));
+    }
 
 /**
  * @brief Computes the absolute value of a given signed integer.
@@ -163,42 +251,24 @@ auto operator>>(const sinteger<Width>& lhs, const size_t rhs) -> sinteger<Width>
 
     for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
     {
-            typename sinteger<Width>::word_type new_word;
-            new_word = lhs.word(counter) >> shift_word_right;
-            if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
-            {
-                new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
-            }
+        typename sinteger<Width>::word_type new_word;
+        new_word = lhs.word(counter) >> shift_word_right;
+        if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
+        {
+            new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
+        }
 
-//            if (skip_words == counter && lhs.is_negative())
-//            {
-//                typename sinteger<Width>::word_type mask(-1);
-//                mask = mask << shift_word_left;
-//                new_word = new_word | mask;
-//            }
-
-            shifted.set_word(counter - skip_words, new_word);
+        shifted.set_word(counter - skip_words, new_word);
     }
     typename sinteger<Width>::word_type new_word;
     new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
 
-//    if (lhs.is_negative())
-//    {
-//        typename sinteger<Width>::word_type ones(-1);
-//        typename sinteger<Width>::word_type mask;
-//
-//        for (size_t i = lhs.word_count() - skip_words; i < lhs.word_count(); ++i) {
-//            shifted.set_word(i, ones);
-//        }
-//
-//        mask = ones << shift_word_left;
-//        new_word = new_word | mask;
-//    }
-
     shifted.set_word(lhs.word_count() - skip_words - 1, new_word);
 
-    if (lhs.is_negative()) {
-        for (size_t i = (Width-1); i >= (Width-rhs); --i) {
+    if (lhs.is_negative())
+    {
+        for (size_t i = (Width - 1); i >= (Width - rhs); --i)
+        {
             shifted.set_bit(i);
         }
     }

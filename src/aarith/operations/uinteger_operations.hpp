@@ -135,7 +135,8 @@ template <size_t W>[[nodiscard]] auto sub(const uinteger<W>& a, const uinteger<W
  * @brief Multiplies two unsigned integers expanding the bit width so that the result fits.
  *
  *
- * @tparam UInteger The unsigned integer instance used for the operation
+ * @tparam W The bit width of the first multiplicant
+ * @tparam V The bit width of the second multiplicant
  * @param a First multiplicant
  * @param b Second multiplicant
  * @return Product of a and b
@@ -180,7 +181,7 @@ template <std::size_t W, std::size_t V>
  * the partial products everywhere where the first multiplicand has a 1 bit. The simplicity, of
  * course, comes at the cost of performance.
  *
- * @tparam UInteger The unsigned integer instance used for the operation
+ * @tparam W The bit width of the multiplicants
  * @param a First multiplicant
  * @param b Second multiplicant
  * @return Product of a and b

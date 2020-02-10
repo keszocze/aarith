@@ -147,6 +147,35 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
     }
 }
 
+
+SCENARIO("Multiplying signed integers", "[sinteger][arithmetic]")
+{
+    GIVEN("Two signed integers m and r"){
+        THEN("Then the multiplication should be donce correctly")
+        {
+
+        }
+
+        WHEN("m is the most negative number") {
+            THEN("The algorithm should still work")
+            {
+                const sinteger<8> m{-16};
+                const sinteger<8> r{2};
+
+                const sinteger<8> res = mul(m,r);
+
+
+
+                int8_t mi = -16;
+                int8_t ri = 2;
+
+                int8_t resi = mi*ri;
+                CHECK((uint8_t)res.word(0) == (uint8_t)resi);
+            }
+        }
+    }
+}
+
 SCENARIO("Absolute value computation", "[sinteger][utility]")
 {
     GIVEN("The smallest possible value")
