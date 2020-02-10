@@ -28,7 +28,8 @@ compile_clang:
     script:
         - mkdir build
         - cd build
-        - clang --version
+        - clang-9 --version
+        - clang++-9 --version
 
 run_sonarqube:
     extends: .ciconf
