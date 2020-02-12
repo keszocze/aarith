@@ -286,7 +286,7 @@ template<size_t E, size_t M>
     const auto new_mantissa = rhs.get_mantissa() >> exponent_delta.word(0);
     const auto mantissa_sum = expanding_add(lhs.get_mantissa(),  new_mantissa);
 
-    normfloat<E, mantissa_sum.width()> sum(0.f);
+    normfloat<E, mantissa_sum.width()> sum;
     sum.set_sign(lhs.get_sign());
     sum.set_exponent(lhs.get_exponent());
     sum.set_mantissa(mantissa_sum);
@@ -327,7 +327,7 @@ template<size_t E, size_t M>
     const auto new_mantissa = rhs.get_mantissa() >> exponent_delta.word(0);
     const auto mantissa_sum = sub(lhs.get_mantissa(), new_mantissa);
 
-    normfloat<E, mantissa_sum.width()> sum(0.f);
+    normfloat<E, mantissa_sum.width()> sum;
     sum.set_sign(lhs.get_sign());
     sum.set_exponent(lhs.get_exponent());
     sum.set_mantissa(mantissa_sum);
