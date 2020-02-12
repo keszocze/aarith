@@ -74,6 +74,38 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
             }
         }
     }
+
+    GIVEN("Two uinteger<N> a and b with N > 2*word_width")
+    {
+        using uint = uinteger<129>;
+        static_assert(uint::word_count() > 2);
+
+        WHEN("There should be a carry into the third word")
+        {
+            const auto a = uint::from_words(0, 0xffffffffffffffff, 0xffffffffffffffff);
+            const auto b = a;
+            auto const result = add(a, b);
+            const auto ref = uint::from_words(1, 0xffffffffffffffff, 0xfffffffffffffffe);
+
+            THEN("There is a carry in the third word")
+            {
+                REQUIRE(result == ref);
+            }
+        }
+        
+        WHEN("There should be no carry into the third word")
+        {
+            const auto a = uint::from_words(0, 0xfffffffffffffffe, 0xffffffffffffffff);
+            const auto b = uint(1U);
+            auto const result = add(a, b);
+            const auto ref = uint::from_words(0, 0xffffffffffffffff, 0);
+
+            THEN("There is no carry in the third word")
+            {
+                REQUIRE(result == ref);
+            }
+        }
+    }
 }
 
 SCENARIO("Adding tow uintgers of different bit width", "[uinteger][arithmetic][addition]")
@@ -191,6 +223,21 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
 
                     REQUIRE(expected == result);
                 }
+            }
+        }
+        WHEN("The size is 129 bits (three words and the third word uses only one bit) and max-1 is calculated")
+        {
+            THEN("The MSB should remain 1")
+            {
+                using uint = uinteger<129>;
+                
+                uint opd1 = ~uint(0U);
+                uint one = uint(1U);
+
+                auto res = sub(opd1, one);
+                auto ref = uint::from_words(0x1, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFE);
+
+                REQUIRE(res == ref);
             }
         }
     }
