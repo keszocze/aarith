@@ -68,11 +68,8 @@ public:
             set_word(i, other.word(i));
         }
 
-// TODO remove this when clang detects the else branch as constexpr
-// currently this leads to potentially slower code when using clang; the functionality is the same, though
-#ifndef __clang__
-        if constexpr (this->word_count() > other.word_count())
-
+        if constexpr (word_container<Width, WordType>::word_count() >
+                      word_container<V>::word_count())
         {
             for (size_t i = other.word_count(); i < this->word_count(); ++i)
             {
@@ -80,16 +77,6 @@ public:
             }
         }
 
-#else
-        if (this->word_count() > other.word_count())
-
-        {
-            for (size_t i = other.word_count(); i < this->word_count(); ++i)
-            {
-                set_word(i, 0U);
-            }
-        }
-#endif
         return *this;
     }
 
