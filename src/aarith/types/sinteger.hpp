@@ -29,11 +29,12 @@ public:
     explicit sinteger(T t)
         : word_container<Width, WordType>(static_cast<WordType>(t))
     {
-        if (t < 0) {
+        if (t < 0)
+        {
             const WordType ones(-1);
             for (size_t i = 1; i < sinteger<Width>::word_count(); i++)
             {
-                this->set_word(i,ones);
+                this->set_word(i, ones);
             }
         }
     }
@@ -155,10 +156,27 @@ template <size_t DestinationWidth, size_t SourceWidth>
 [[nodiscard]] auto width_cast(const sinteger<SourceWidth>& source) -> sinteger<DestinationWidth>
 {
     word_container<SourceWidth> in{source};
+    if constexpr (DestinationWidth > SourceWidth)
+    {
+        const bool is_negative = source.is_negative();
 
-    word_container<DestinationWidth> result = width_cast<DestinationWidth>(in);
+        word_container<DestinationWidth> result = width_cast<DestinationWidth>(in);
 
-    return sinteger<DestinationWidth>{result};
+        // TODO find a quicker way to correctly expand the width
+        if (is_negative)
+        {
+            for (size_t i= SourceWidth; i < DestinationWidth; ++i) {
+                result.set_bit(i);
+            }
+
+        }
+        return sinteger<DestinationWidth>{result};
+    }
+    else
+    {
+        word_container<DestinationWidth> result = width_cast<DestinationWidth>(in);
+        return sinteger<DestinationWidth>{result};
+    }
 }
 
 } // namespace aarith
@@ -185,8 +203,13 @@ public:
     static constexpr bool is_modulo = false;
     static constexpr int radix = 2;
     static constexpr int digits = W - 1; // TODO what happens if W > max_int?
+
+
+    // TODO remove this when log10 becomes constexpr in clang's stdlibc
+    #ifndef __clang__
     static constexpr int digits10 = std::numeric_limits<aarith::sinteger<W>>::digits *
                                     std::log10(std::numeric_limits<aarith::sinteger<W>>::radix);
+    #endif
 
     // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says
     // so

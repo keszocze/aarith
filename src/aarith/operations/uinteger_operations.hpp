@@ -1,9 +1,9 @@
 #pragma once
 
-#include <aarith/types/uinteger.hpp>
+#include <aarith/operations/uinteger_comparisons.hpp>
 #include <aarith/types/traits.hpp>
+#include <aarith/types/uinteger.hpp>
 #include <aarith/utilities/bit_operations.hpp>
-#include <aarith/operations/comparisons.hpp>
 
 #include <iostream>
 
@@ -33,6 +33,7 @@ template <size_t W, size_t V>
     uinteger<res_width> sum;
     using word_type = typename uinteger<res_width>::word_type;
     word_type carry{0U};
+
     if (initial_carry)
     {
         carry = 1U;
@@ -89,6 +90,24 @@ template <size_t W, size_t V>
 }
 
 /**
+ * @brief Subtracts two unsigned integers of, possibly, different bit widths.
+ *
+ * @tparam W Width of the minuend
+ * @tparam V Width of the subtrahend
+ * @param a Minuend
+ * @param b Subtrahend
+ * @return Difference of correct bit width
+ */
+template <size_t W, size_t V>
+[[nodiscard]] uinteger<std::max(W, V)> expanding_sub(const uinteger<W>& a, const uinteger<V>& b)
+{
+    constexpr size_t res_width = std::max(W, V);
+    uinteger<res_width> result{sub(width_cast<res_width>(a), width_cast<res_width>(b))};
+
+    return result;
+}
+
+/**
  * @brief Adds two unsigned integers
  *
  * @tparam UInteger The unsigned integer instance used for the addition
@@ -123,7 +142,8 @@ template <size_t W>[[nodiscard]] auto sub(const uinteger<W>& a, const uinteger<W
  * @brief Multiplies two unsigned integers expanding the bit width so that the result fits.
  *
  *
- * @tparam UInteger The unsigned integer instance used for the operation
+ * @tparam W The bit width of the first multiplicant
+ * @tparam V The bit width of the second multiplicant
  * @param a First multiplicant
  * @param b Second multiplicant
  * @return Product of a and b
@@ -168,7 +188,7 @@ template <std::size_t W, std::size_t V>
  * the partial products everywhere where the first multiplicand has a 1 bit. The simplicity, of
  * course, comes at the cost of performance.
  *
- * @tparam UInteger The unsigned integer instance used for the operation
+ * @tparam W The bit width of the multiplicants
  * @param a First multiplicant
  * @param b Second multiplicant
  * @return Product of a and b
@@ -184,7 +204,7 @@ template <size_t W>[[nodiscard]] uinteger<W> mul(const uinteger<W>& a, const uin
  * @see https://en.wikipedia.org/wiki/Division_algorithm#Restoring_division
  *
  * @param numerator The number that is to be divided
- * @param denominator The number that devides the other number
+ * @param denominator The number that divides the other number
  * @tparam W Width of the numbers used in division.
  *
  * @return Pair of (quotient, remainder)

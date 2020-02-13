@@ -1,7 +1,7 @@
 #pragma once
 
-#include "aarith/operations/comparisons.hpp"
-#include "aarith/operations/exact_operations.hpp"
+#include "aarith/operations/uinteger_comparisons.hpp"
+#include "aarith/operations/uinteger_operations.hpp"
 #include "aarith/types/uinteger.hpp"
 #include "aarith/utilities/bit_operations.hpp"
 #include <iostream>
