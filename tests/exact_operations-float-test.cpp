@@ -1,5 +1,5 @@
-#include "aarith/operations/comparisons.hpp"
-#include "aarith/operations/exact_operations.hpp"
+#include "aarith/operations/float_comparisons.hpp"
+#include "aarith/operations/float_operations.hpp"
 #include "aarith/types/normfloat.hpp"
 #include <catch.hpp>
 

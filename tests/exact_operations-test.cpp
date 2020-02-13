@@ -1,5 +1,5 @@
-#include "aarith/operations/comparisons.hpp"
-#include "aarith/operations/exact_operations.hpp"
+#include "aarith/operations/uinteger_comparisons.hpp"
+#include "aarith/operations/uinteger_operations.hpp"
 #include "aarith/types/uinteger.hpp"
 #include "aarith/utilities/string_utils.hpp"
 #include <catch.hpp>
@@ -274,6 +274,35 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
     }
 }
 
+SCENARIO("Expanding subtraction works correctly", "[uinteger][arithmetic]")
+{
+    GIVEN("A n-bit zero and a m-bit (m>n)  max")
+    {
+        static const uinteger<4> zero = uinteger<4>::min();
+        static const uinteger<8> large = uinteger<8>::max();
+        static const uinteger<8> expected = uinteger<8>{1U};
+
+        THEN("Subtracting max from zero should give one")
+        {
+            auto const result = expanding_sub(zero,large);
+            REQUIRE(result == expected);
+        }
+    }
+
+    GIVEN("A n-bit zero and a m-bit (m<n) max")
+    {
+        static const uinteger<8> zero = uinteger<8>::min();
+        static const uinteger<4> large = uinteger<4>::max();
+        static const uinteger<8> expected = sub(uinteger<8>{1U},add(uinteger<8>{uinteger<4>::max()}, uinteger<8>{1U}));
+
+        THEN("Subtracting max from zero should give 1-(small::max+1)")
+        {
+            auto const result = expanding_sub(zero,large);
+            REQUIRE(result == expected);
+        }
+    }
+}
+
 SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
 {
     GIVEN("The maximal and minimal values of uinteger<V>")
@@ -307,7 +336,7 @@ SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
 
             THEN("Expanding addition has the highest bet set and is modulo 2 otherwise")
             {
-                uinteger<90> result = expanding_add(max,a);
+                uinteger<90> result = expanding_add(max, a);
                 CHECK(result.bit(89));
                 REQUIRE(width_cast<89>(result) == expected_trunc);
             }
@@ -473,8 +502,8 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
         uinteger<64> a{val_a};
         AND_GIVEN("A random number b")
         {
-            uint64_t val_b = GENERATE(take(
-                100, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
+            uint64_t val_b = GENERATE(
+                take(100, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
             uinteger<64> b{val_b};
 
             THEN("The multiplication should match its uint64_t counterpart")

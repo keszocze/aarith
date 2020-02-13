@@ -1,4 +1,4 @@
-#include <aarith/operations/comparisons.hpp>
+#include <aarith/operations/uinteger_comparisons.hpp>
 #include <aarith/types/uinteger.hpp>
 #include <aarith/utilities/string_utils.hpp>
 #include <catch.hpp>
@@ -222,7 +222,7 @@ SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
             static constexpr auto s = 63U;
             const uinteger<Width> a{number_a};
 
-            const auto result = a << s;
+            const uinteger<Width> result = a << s;
             REQUIRE(result.word(0) == 0x8000000000000000);
             REQUIRE(result.word(1) == 3);
         }
@@ -737,7 +737,10 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[uinteger][utility]
             CHECK(nl::is_modulo == il::is_modulo);
             CHECK(nl::radix == il::radix);
             CHECK(nl::digits == il::digits);
+            // TODO remove this when log10 becomes constexpr in clang's stdlibc
+            #ifndef __clang__
             CHECK(nl::digits10 == il::digits10);
+            #endif
             CHECK(nl::max_digits10 == il::max_digits10);
             CHECK(nl::min_exponent10 == il::min_exponent10);
             CHECK(nl::min_exponent == il::min_exponent);
@@ -781,7 +784,10 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[uinteger][utility]
             CHECK(nl::is_modulo == il::is_modulo);
             CHECK(nl::radix == il::radix);
             CHECK(nl::digits == il::digits);
+            // TODO remove this when log10 becomes constexpr in clang's stdlibc
+            #ifndef __clang__
             CHECK(nl::digits10 == il::digits10);
+            #endif
             CHECK(nl::max_digits10 == il::max_digits10);
             CHECK(nl::min_exponent10 == il::min_exponent10);
             CHECK(nl::min_exponent == il::min_exponent);

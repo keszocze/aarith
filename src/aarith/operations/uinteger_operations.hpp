@@ -1,10 +1,9 @@
 #pragma once
 
-#include <aarith/types/uinteger.hpp>
-#include <aarith/types/normfloat.hpp>
+#include <aarith/operations/uinteger_comparisons.hpp>
 #include <aarith/types/traits.hpp>
+#include <aarith/types/uinteger.hpp>
 #include <aarith/utilities/bit_operations.hpp>
-#include <aarith/operations/comparisons.hpp>
 
 #include <iostream>
 
@@ -34,6 +33,7 @@ template <size_t W, size_t V>
     uinteger<res_width> sum;
     using word_type = typename uinteger<res_width>::word_type;
     word_type carry{0U};
+
     if (initial_carry)
     {
         carry = 1U;
@@ -90,6 +90,24 @@ template <size_t W, size_t V>
 }
 
 /**
+ * @brief Subtracts two unsigned integers of, possibly, different bit widths.
+ *
+ * @tparam W Width of the minuend
+ * @tparam V Width of the subtrahend
+ * @param a Minuend
+ * @param b Subtrahend
+ * @return Difference of correct bit width
+ */
+template <size_t W, size_t V>
+[[nodiscard]] uinteger<std::max(W, V)> expanding_sub(const uinteger<W>& a, const uinteger<V>& b)
+{
+    constexpr size_t res_width = std::max(W, V);
+    uinteger<res_width> result{sub(width_cast<res_width>(a), width_cast<res_width>(b))};
+
+    return result;
+}
+
+/**
  * @brief Adds two unsigned integers
  *
  * @tparam UInteger The unsigned integer instance used for the addition
@@ -124,7 +142,8 @@ template <size_t W>[[nodiscard]] auto sub(const uinteger<W>& a, const uinteger<W
  * @brief Multiplies two unsigned integers expanding the bit width so that the result fits.
  *
  *
- * @tparam UInteger The unsigned integer instance used for the operation
+ * @tparam W The bit width of the first multiplicant
+ * @tparam V The bit width of the second multiplicant
  * @param a First multiplicant
  * @param b Second multiplicant
  * @return Product of a and b
@@ -169,7 +188,7 @@ template <std::size_t W, std::size_t V>
  * the partial products everywhere where the first multiplicand has a 1 bit. The simplicity, of
  * course, comes at the cost of performance.
  *
- * @tparam UInteger The unsigned integer instance used for the operation
+ * @tparam W The bit width of the multiplicants
  * @param a First multiplicant
  * @param b Second multiplicant
  * @return Product of a and b
@@ -185,7 +204,7 @@ template <size_t W>[[nodiscard]] uinteger<W> mul(const uinteger<W>& a, const uin
  * @see https://en.wikipedia.org/wiki/Division_algorithm#Restoring_division
  *
  * @param numerator The number that is to be divided
- * @param denominator The number that devides the other number
+ * @param denominator The number that divides the other number
  * @tparam W Width of the numbers used in division.
  *
  * @return Pair of (quotient, remainder)
@@ -255,147 +274,6 @@ template <class UInteger>
 [[nodiscard]] auto div(const UInteger& numerator, const UInteger& denominator) -> UInteger
 {
     return restoring_division(numerator, denominator).first;
-}
-
-/**
- * @brief Adds to normfloats.
- *
- * @param lhs The first number that is to be summed up
- * @param rhs The second number that is to be summed up
- * @tparam E Width of exponent
- * @tparam M Width of mantissa including the leading 1
- *
- * @return The sum
- *
- */
-template<size_t E, size_t M>
-[[nodiscard]] auto add(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
--> normfloat<E, M>
-{
-    if(abs(lhs) < abs(rhs))
-    {
-        return add(rhs, lhs);
-    }
-
-    if(lhs.get_sign() != rhs.get_sign())
-    {
-        auto swap_sign = rhs;
-        swap_sign.set_sign(~swap_sign.get_sign());
-        return sub(lhs, swap_sign);
-    }
-
-    const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
-    const auto new_mantissa = rhs.get_mantissa() >> exponent_delta.word(0);
-    const auto mantissa_sum = expanding_add(lhs.get_mantissa(),  new_mantissa);
-
-    normfloat<E, mantissa_sum.width()> sum;
-    sum.set_sign(lhs.get_sign());
-    sum.set_exponent(lhs.get_exponent());
-    sum.set_mantissa(mantissa_sum);
-
-    return normalize<E, mantissa_sum.width(), M>(sum);
-}
-
-/**
- * @brief Subtraction with normfloats: lhs-rhs.
- *
- * @param lhs The minuend
- * @param rhs The subtrahend
- * @tparam E Width of exponent
- * @tparam M Width of mantissa including the leading 1
- *
- * @return The difference lhs-rhs
- *
- */
-template<size_t E, size_t M>
-[[nodiscard]] auto sub(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
--> normfloat<E, M>
-{
-    if(abs(lhs) < abs(rhs))
-    {
-        auto swap = rhs;
-        swap.set_sign(~swap.get_sign());
-        return add(swap, lhs);
-    }
-
-    if(lhs.get_sign() != rhs.get_sign())
-    {
-        auto swap_sign = rhs;
-        swap_sign.set_sign(~swap_sign.get_sign());
-        return add(lhs, swap_sign);
-    }
-
-    const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
-    const auto new_mantissa = rhs.get_mantissa() >> exponent_delta.word(0);
-    const auto mantissa_sum = sub(lhs.get_mantissa(), new_mantissa);
-
-    normfloat<E, mantissa_sum.width()> sum;
-    sum.set_sign(lhs.get_sign());
-    sum.set_exponent(lhs.get_exponent());
-    sum.set_mantissa(mantissa_sum);
-
-    return normalize<E, mantissa_sum.width(), M>(sum);
-}
-
-/**
- * @brief Multiplication with normfloats: lhs*rhs.
- *
- * @param lhs The multiplicand
- * @param rhs The multiplicator
- * @tparam E Width of exponent
- * @tparam M Width of mantissa including the leading 1
- *
- * @return The product lhs*rhs
- *
- */
-template<size_t E, size_t M>
-[[nodiscard]] auto mul(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
--> normfloat<E, M>
-{
-    auto mproduct = expanding_mul(lhs.get_mantissa(), rhs.get_mantissa());
-    mproduct = mproduct >> (M-1);
-    auto esum = width_cast<E>(sub(expanding_add(lhs.get_exponent(), rhs.get_exponent()), width_cast<E+1>(lhs.get_bias())));
-    auto sign = lhs.get_sign() ^ rhs.get_sign();
-
-    normfloat<E, mproduct.width()> product;
-    product.set_mantissa(mproduct);
-    product.set_exponent(esum);
-    product.set_sign(sign);
-
-    return normalize<E, mproduct.width(), M>(product);
-}
-
-/**
- * @brief Division with normfloats: lhs/rhs.
- *
- * @param lhs The dividend
- * @param rhs The divisor
- * @tparam E Width of exponent
- * @tparam M Width of mantissa including the leading 1
- *
- * @return The quotient lhs/rhs
- *
- */
-template<size_t E, size_t M>
-[[nodiscard]] auto div(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
--> normfloat<E, M>
-{
-    auto dividend = width_cast<2*M+3>(lhs.get_mantissa());
-    auto divisor = width_cast<2*M+3>(rhs.get_mantissa());
-    dividend <<= M+3;
-    auto mquotient = div(dividend, divisor);
-    //mquotient >>= 1;
-    auto rdmquotient = rshift_and_round(mquotient, 4);
-
-    auto esum = width_cast<E>(sub(expanding_add(lhs.get_exponent(), lhs.get_bias()), width_cast<E+1>(rhs.get_exponent())));
-    auto sign = lhs.get_sign() ^ rhs.get_sign();
-
-    normfloat<E, rdmquotient.width()> quotient;
-    quotient.set_mantissa(rdmquotient);
-    quotient.set_exponent(esum);
-    quotient.set_sign(sign);
-
-    return normalize<E, rdmquotient.width(), M>(quotient);
 }
 
 } // namespace aarith
