@@ -509,7 +509,7 @@ word_container<(S - E) + 1> bit_range(const word_container<W>& w)
  */
 template<size_t S, size_t W>
 std::pair<word_container<W-(S+1)>, word_container<S+1>> split(const word_container<W>& w) {
-    static_assert(S<W && S > 0);
+    static_assert(S < W-1 && S >= 0);
 
     const word_container<W-(S+1)> lhs{width_cast<W-(S+1)>(w >> (S+1))};
 
