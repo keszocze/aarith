@@ -20,7 +20,8 @@ namespace aarith {
  * @return Sum of correct maximal bit width
  */
 template <size_t W, size_t V>
-[[nodiscard]] uinteger<std::max(W, V) + 1> expanding_add(const uinteger<W>& a, const uinteger<V>& b)
+[[nodiscard]] uinteger<std::max(W, V) + 1> expanding_add(const uinteger<W>& a, const uinteger<V>& b,
+                                                         const bool initial_carry = false)
 {
     static_assert(is_integral<uinteger<W>>::value);
     static_assert(is_unsigned<uinteger<W>>::value);
@@ -32,6 +33,11 @@ template <size_t W, size_t V>
     uinteger<res_width> sum;
     using word_type = typename uinteger<res_width>::word_type;
     word_type carry{0U};
+
+    if (initial_carry)
+    {
+        carry = 1U;
+    }
 
     /*
      * If the bit widths are not the same we actually have to check that we don't access values
@@ -99,7 +105,6 @@ template <size_t W, size_t V>
     uinteger<res_width> result{sub(width_cast<res_width>(a), width_cast<res_width>(b))};
 
     return result;
-
 }
 
 /**
