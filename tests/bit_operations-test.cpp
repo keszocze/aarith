@@ -3,6 +3,8 @@
 #include <aarith/types/word_container.hpp>
 #include <aarith/utilities/bit_operations.hpp>
 #include <aarith/operations/word_container_comparisons.hpp>
+#include <aarith/utilities/string_utils.hpp>
+
 using namespace aarith;
 
 SCENARIO("Splitting uint64_ts", "[util]")
@@ -630,6 +632,40 @@ SCENARIO("Bit operations are performed correctly", "[word_container][bit_logic]"
                 {
                     CHECK(doubled.word(n.word_count()) == static_cast<uint64_t>(0));
                 }
+            }
+        }
+    }
+}
+
+SCENARIO("Splitting a word_container/extraction from a word_container","[word_container],[util]")
+{
+    GIVEN("A word_container w") {
+
+        const word_container<32> w1{5675676};
+        const word_container<50> w2{5675676};
+        const word_container<7> w3{21};
+
+
+        WHEN("The container is split")
+        {
+            THEN("The parts are as expected")
+            {
+                        std::cout << "w\t" << to_binary(w3) << "\n";
+                        auto s3f = split<2>(w3).first;
+                        auto s3s = split<2>(w3).second;
+                        std::cout << "fst\t" << to_binary(s3f) << "\n";
+                        std::cout << "snd\t" << to_binary(s3s) << "\n";
+            }
+        }
+        WHEN("Ranges are extraccted")
+        {
+            THEN("The parts are as expected")
+            {
+                std::cout << "w\t" << to_binary(w3) << "\n";
+
+                auto e3 = bit_range<6,2>(w3);
+
+                std::cout << to_binary(e3) << "\n";
             }
         }
     }

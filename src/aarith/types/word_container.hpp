@@ -486,4 +486,44 @@ auto operator>>(const word_container<Width>& lhs, const size_t rhs) -> word_cont
     return shifted;
 }
 
+/**
+ * @brief Extracts a range from the word container
+ *
+ * Note that the indexing is done
+ *  - zero based starting from the LSB
+ *  - is inclusive (i.e. the start and end point are part of the range)
+ *
+ * @tparam S Starting index (inclusive, from left to right)
+ * @tparam E  Ending index (inclusive, from left to right)
+ * @tparam W Width of the word container that the range is taken from
+ * @param w  Word container from which the range is taken from
+ * @return Range word[S,E], including the
+ */
+template <size_t S, size_t E, size_t W>
+word_container<(S - E) + 1> bit_range(const word_container<W>& w)
+{
+    static_assert(S < W, "Range must start within the word");
+    static_assert(E <= S, "Range must be positive (i.e. this method will not reverse the word");
+
+    return width_cast<(S - E) + 1>(w >> E);
+}
+
+/**
+ * @brief Splits the word container at the given splitting point
+ * @tparam S Splitting point
+ * @tparam W Width of the word wontainer to be split
+ * @param w Word container that is split
+ * @return Pair of <word[W-1,S+1], word[S,0]>
+ */
+template<size_t S, size_t W>
+std::pair<word_container<W-(S+1)>, word_container<S+1>> split(const word_container<W>& w) {
+    static_assert(S < W-1 && S >= 0);
+
+    const word_container<W-(S+1)> lhs{width_cast<W-(S+1)>(w >> (S+1))};
+
+    const word_container<S+1> rhs=width_cast<S+1>(w);
+
+    return std::make_pair(lhs,rhs);
+}
+
 } // namespace aarith
