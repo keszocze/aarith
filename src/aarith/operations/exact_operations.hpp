@@ -59,8 +59,10 @@ template <size_t W, size_t V>
                 b_ = b.word(i);
             }
 
-            auto const partial_sum = a_ + b_ + carry;
-            carry = (partial_sum < a_ || partial_sum < b_) ? 1U : 0U;
+            auto partial_sum = a_ + b_;
+            auto new_carry = (partial_sum < a_ || partial_sum < b_) ? 1U : 0U;
+            partial_sum += carry;
+            carry = new_carry | (partial_sum < a_ || partial_sum < b_) ? 1U : 0U;
             sum.set_word(i, partial_sum);
         }
     }
@@ -69,8 +71,10 @@ template <size_t W, size_t V>
     {
         for (auto i = 0U; i < a.word_count(); ++i)
         {
-            auto const partial_sum = a.word(i) + b.word(i) + carry;
-            carry = (partial_sum < a.word(i) || partial_sum < b.word(i)) ? 1U : 0U;
+            auto partial_sum = a.word(i) + b.word(i);
+            auto new_carry = (partial_sum < a.word(i) || partial_sum < b.word(i)) ? 1U : 0U;
+            partial_sum += carry;
+            carry = new_carry | (partial_sum < a.word(i) || partial_sum < b.word(i)) ? 1U : 0U;
             sum.set_word(i, partial_sum);
         }
 
@@ -112,10 +116,8 @@ template <size_t W>[[nodiscard]] auto sub(const uinteger<W>& a, const uinteger<W
     static_assert(is_integral<uinteger<W>>::value);
     static_assert(is_unsigned<uinteger<W>>::value);
 
-    uinteger<W> result;
-    uinteger<W> minus_b = add(~b, uinteger<W>::one());
-    result = add(a, minus_b);
-    return result;
+    auto result = expanding_add(a, ~b, true);
+    return width_cast<W>(result);
 }
 
 /**
