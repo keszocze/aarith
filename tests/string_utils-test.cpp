@@ -22,6 +22,15 @@ SCENARIO("Converting uintegers into strings", "[uinteger][string]")
             ss << uint;
             REQUIRE(ss.str() == "204");
         }
+        AND_WHEN("Using a magic number")
+        {
+            THEN("The number should be correctly transformed")
+            {
+                const uinteger<8> magic(0b00010000);
+
+                REQUIRE(to_decimal(magic) == "16");
+            }
+        }
     }
     WHEN("Converting a uinteger into a hexadecimal string")
     {
@@ -36,6 +45,15 @@ SCENARIO("Converting uintegers into strings", "[uinteger][string]")
             ss << uint;
             REQUIRE(ss.str() == "00cc");
         }
+        AND_WHEN("Using a magic number")
+        {
+            THEN("The number should be correctly transformed")
+            {
+                const uinteger<8> magic(0b00010000);
+
+                REQUIRE(to_hex(magic) == "10");
+            }
+        }
     }
     WHEN("Converting a uinteger into an octal string")
     {
@@ -49,6 +67,16 @@ SCENARIO("Converting uintegers into strings", "[uinteger][string]")
             ss.setf(std::ios::oct);
             ss << uint;
             REQUIRE(ss.str() == "000314");
+        }
+        AND_WHEN("Using a magic number")
+        {
+            THEN("The number should be correctly transformed")
+            {
+                const uinteger<8> magic(0b00010000);
+
+                std::cout << to_octal(magic) << "\n";
+                REQUIRE(to_octal(magic) == "20");
+            }
         }
     }
 }
