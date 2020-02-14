@@ -711,6 +711,7 @@ SCENARIO("Bit operations are performed correctly", "[uinteger][bit]")
 }
 
 
+
 SCENARIO("std::numeric_limits gets instantiated correctly", "[uinteger][utility]")
 {
     GIVEN("The bit width of 32")

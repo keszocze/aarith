@@ -2,6 +2,7 @@
 
 #include <aarith/types/sinteger.hpp>
 #include <aarith/types/uinteger.hpp>
+#include <aarith/operations/uinteger_operations.hpp>
 
 namespace aarith {
 
@@ -164,10 +165,10 @@ template <size_t W, size_t V>
  * @param b Second multiplicant
  * @return Product of a and b
  */
-    template <size_t W>[[nodiscard]] sinteger<W> mul(const sinteger<W>& a, const sinteger<W>& b)
-    {
-        return width_cast<W>(expanding_mul(a, b));
-    }
+template <size_t W>[[nodiscard]] sinteger<W> mul(const sinteger<W>& a, const sinteger<W>& b)
+{
+    return width_cast<W>(expanding_mul(a, b));
+}
 
 /**
  * @brief Computes the absolute value of a given signed integer.
@@ -209,6 +210,88 @@ template <size_t W> auto operator-(const sinteger<W>& n) -> sinteger<W>
 {
     const sinteger<W> one(1U);
     return add(~n, one);
+}
+
+/**
+ * @brief Implements the restoring division algorithm.
+ *
+ * @see https://en.wikipedia.org/wiki/Division_algorithm#Restoring_division
+ *
+ * @param numerator The number that is to be divided
+ * @param denominator The number that divides the other number
+ * @tparam W Width of the numbers used in division.
+ *
+ * @return Pair of (quotient, remainder)
+ *
+ */
+template <std::size_t W, std::size_t V>
+[[nodiscard]] std::pair<sinteger<W>, sinteger<W>> restoring_division(const sinteger<W>& numerator,
+                                                                     const sinteger<V>& denominator)
+
+{
+
+
+
+    using SInteger = sinteger<W>;
+//    using LargeSInteger = sinteger<2 * W>;
+
+    // Cover some special cases in order to speed everything up
+    if (denominator.is_zero())
+    {
+        throw std::runtime_error("Attempted division by zero");
+    }
+    if (numerator.is_zero())
+    {
+        return std::make_pair(SInteger::zero(), SInteger::zero());
+    }
+    if (denominator == SInteger::one())
+    {
+        return std::make_pair(numerator, SInteger::zero());
+    }
+
+    if (numerator == denominator)
+    {
+        return std::make_pair(SInteger::one(), SInteger::zero());
+    }
+
+
+
+
+    const bool negate = numerator.is_negative() ^ denominator.is_negative();
+
+    const uinteger<W> N = expanding_abs(numerator);
+    const uinteger<W> D = expanding_abs(denominator);
+
+    std::cout << "N" << to_binary(N) << " " << N << "\n";
+    std::cout << "D" << to_binary(D) << " " << D << "\n";
+
+    if (N < D)
+    {
+        return std::make_pair(SInteger::zero(), numerator);
+    }
+
+    const auto div = restoring_division(N, D);
+
+    sinteger<W+1> Q(div.first);
+    sinteger<W+1> remainder(div.second);
+
+    if (negate)
+    {
+        Q=-Q;
+    }
+
+    return std::make_pair(width_cast<W>(Q), width_cast<W>(remainder));
+}
+
+template <size_t W>
+[[nodiscard]] auto remainder(const sinteger<W>& numerator, const sinteger<W>& denominator) -> sinteger<W>
+{
+    return restoring_division(numerator, denominator).second;
+}
+template <size_t W>
+[[nodiscard]] auto div(const sinteger<W>& numerator, const sinteger<W>& denominator) -> sinteger<W>
+{
+    return restoring_division(numerator, denominator).first;
 }
 
 /**

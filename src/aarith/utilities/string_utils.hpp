@@ -74,7 +74,7 @@ auto to_bcd(const uinteger<Width>& num) -> uinteger<number_of_decimal_digits(Wid
     return bcd;
 }
 
-/// Convert the given uinteger value into a binary string representation.
+/// Convert the given uinteger value into a binary string representation
 template <size_t Width> auto to_binary(const word_container<Width>& value) -> std::string
 {
     std::string result;
@@ -85,7 +85,7 @@ template <size_t Width> auto to_binary(const word_container<Width>& value) -> st
     return result;
 }
 
-/// Remove all leading zeroes from a string that represents a number.
+/// Remove all leadingremove_leadin zeroes from a string that represents a number.
 inline auto remove_leading_zeroes(const std::string& number, bool can_be_empty = false)
     -> std::string
 {

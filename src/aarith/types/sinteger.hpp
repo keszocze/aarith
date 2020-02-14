@@ -99,6 +99,22 @@ public:
         return zero;
     }
 
+    [[nodiscard]] static constexpr sinteger one()
+    {
+        sinteger one(1);
+        return one;
+    }
+
+    /**
+     * @brief Returns minus one
+     * @return minus one
+     */
+    [[nodiscard]] static constexpr sinteger minus_one()
+    {
+        sinteger minus_one = sinteger::all_ones();
+        return minus_one;
+    }
+
     /**
      * @brief Returns whether the number is negative.
      * @return Whether the number is negative

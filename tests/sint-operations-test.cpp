@@ -147,7 +147,53 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
     }
 }
 
+SCENARIO("Division of signed integers", "[sinteger][arithmetic][foo]")
+{
 
+    GIVEN ("A signed integer n")
+    {
+        const sinteger<8> n(16);
+
+        std::cout << to_binary(n) << "\tabs(" << to_binary(n) <<")="<< to_binary(expanding_abs(n)) <<  " " << expanding_abs(n) << "\n";
+
+        uinteger<8> a = expanding_abs(n);
+        std::cout << a << to_binary(a) << "\n";
+
+        uinteger<8> b(0b00001000);
+        std::cout << b << " " << to_binary(b)<< " " << to_decimal(b) << " " << to_hex(b)  << "\n";
+
+//        AND_GIVEN("Minus one")
+//        {
+//            const sinteger<8> minus_one = sinteger<8>::minus_one();
+//
+//            THEN("n / minus one should")
+//            {
+//
+//
+//                const int64_t min64 = std::numeric_limits<int64_t>::min();
+//                const int64_t minus_one64 = int64_t(-1);
+//
+//                const int32_t min32 = std::numeric_limits<int32_t>::min();
+//                const int32_t minus_one32 = int32_t(-1);
+//
+//                std::cout << min64<< "/" << minus_one64 << "=" << (min64/minus_one64) << "\n";
+//                std::cout << min64 << "%" << minus_one64 << "=" << (min64%minus_one64) << "\n";
+//
+//                std::cout << min32<< "/" << minus_one32 << "=" << (min32/minus_one32) << "\n";
+//                std::cout << min32 << "%" << minus_one32 << "=" << (min32%minus_one32) << "\n";
+//            }
+//
+//        }
+        AND_GIVEN("Another signed integer m") {
+            const sinteger<8> m(-4);
+
+            const std::pair<sinteger<8>,sinteger<8>> result = restoring_division(n,m);
+
+            std::cout << to_binary(n) << "/" << to_binary(m) << "=" << to_binary(result.first) << "\t" << to_binary(result.second) << "\n";
+        }
+    }
+
+}
 SCENARIO("Multiplying signed integers", "[sinteger][arithmetic]")
 {
     GIVEN("Two signed integers m and r"){
