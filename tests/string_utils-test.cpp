@@ -59,7 +59,7 @@ SCENARIO("Converting sintegers into strings", "[sinteger][string]")
 
     WHEN("Converting a sinteger into a decimal string")
     {
-        THEN("The string represents the sinteger, both normal and in negative form")
+        THEN("The string represents the sinteger, both normal and in negative version")
         {
             REQUIRE(to_decimal(num) == "204");
             REQUIRE(to_decimal(-num) == "-204");
@@ -77,7 +77,7 @@ SCENARIO("Converting sintegers into strings", "[sinteger][string]")
     }
     WHEN("Converting a sinteger into a hexadecimal string")
     {
-        THEN("The string represents the sinteger, both normal and in negative form")
+        THEN("The string represents the sinteger, both normal and in negative version")
         {
             REQUIRE(to_hex(num) == "00cc");
             REQUIRE(to_hex(-num) == "-00cc");
@@ -96,7 +96,7 @@ SCENARIO("Converting sintegers into strings", "[sinteger][string]")
     }
     WHEN("Converting a sinteger into an octal string")
     {
-        THEN("The string represents the sinteger, both normal and in negative form")
+        THEN("The string represents the sinteger, both normal and in negative version")
         {
             REQUIRE(to_octal(num) == "000314");
             REQUIRE(to_octal(-num) == "-000314");
