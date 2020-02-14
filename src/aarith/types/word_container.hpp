@@ -366,47 +366,47 @@ template <size_t Width>
 [[nodiscard]] auto operator&(const word_container<Width>& lhs, const word_container<Width>& rhs)
     -> word_container<Width>
 {
-    word_container<Width> logical_and;
+    word_container<Width> bitwise_and;
     for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
-        logical_and.set_word(counter, lhs.word(counter) & rhs.word(counter));
+        bitwise_and.set_word(counter, lhs.word(counter) & rhs.word(counter));
     }
-    return logical_and;
+    return bitwise_and;
 }
 
 template <size_t Width>
 auto operator|(const word_container<Width>& lhs, const word_container<Width>& rhs)
     -> word_container<Width>
 {
-    word_container<Width> logical_or;
+    word_container<Width> bitwise_or;
     for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
-        logical_or.set_word(counter, lhs.word(counter) | rhs.word(counter));
+        bitwise_or.set_word(counter, lhs.word(counter) | rhs.word(counter));
     }
-    return logical_or;
+    return bitwise_or;
 }
 
 template <size_t Width>
 auto operator^(const word_container<Width>& lhs, const word_container<Width>& rhs)
     -> word_container<Width>
 {
-    word_container<Width> logical_or;
+    word_container<Width> bitwise_xor;
     for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
-        logical_or.set_word(counter, lhs.word(counter) ^ rhs.word(counter));
+        bitwise_xor.set_word(counter, lhs.word(counter) ^ rhs.word(counter));
     }
-    return logical_or;
+    return bitwise_xor;
 }
 
 template <size_t Width>
 [[nodiscard]] auto operator~(const word_container<Width>& rhs) -> word_container<Width>
 {
-    word_container<Width> logical_not;
+    word_container<Width> bitwise_not;
     for (auto counter = 0U; counter < rhs.word_count(); ++counter)
     {
-        logical_not.set_word(counter, ~rhs.word(counter));
+        bitwise_not.set_word(counter, ~rhs.word(counter));
     }
-    return logical_not;
+    return bitwise_not;
 }
 
 /**
