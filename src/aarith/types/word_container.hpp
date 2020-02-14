@@ -511,19 +511,20 @@ word_container<(S - E) + 1> bit_range(const word_container<W>& w)
 /**
  * @brief Splits the word container at the given splitting point
  * @tparam S Splitting point
- * @tparam W Width of the word wontainer to be split
+ * @tparam W Width of the word container to be split
  * @param w Word container that is split
  * @return Pair of <word[W-1,S+1], word[S,0]>
  */
-template<size_t S, size_t W>
-std::pair<word_container<W-(S+1)>, word_container<S+1>> split(const word_container<W>& w) {
-    static_assert(S < W-1 && S >= 0);
+template <size_t S, size_t W>
+std::pair<word_container<W - (S + 1)>, word_container<S + 1>> split(const word_container<W>& w)
+{
+    static_assert(S < W - 1 && S >= 0);
 
-    const word_container<W-(S+1)> lhs{width_cast<W-(S+1)>(w >> (S+1))};
+    const word_container<W - (S + 1)> lhs{width_cast<W - (S + 1)>(w >> (S + 1))};
 
-    const word_container<S+1> rhs=width_cast<S+1>(w);
+    const word_container<S + 1> rhs = width_cast<S + 1>(w);
 
-    return std::make_pair(lhs,rhs);
+    return std::make_pair(lhs, rhs);
 }
 
 } // namespace aarith
