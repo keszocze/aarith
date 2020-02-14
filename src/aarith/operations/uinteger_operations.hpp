@@ -226,22 +226,25 @@ template <std::size_t W, std::size_t V>
     // Cover some special cases in order to speed everything up
     if (numerator == denominator)
     {
-        return std::make_pair(UInteger{1U}, UInteger{0U});
+        return std::make_pair(UInteger::one(), UInteger::zero());
+    }
+    if (numerator.is_zero()) {
+        return std::make_pair(UInteger::zero(), UInteger::zero());
     }
     if (numerator < denominator)
     {
-        return std::make_pair(UInteger{0U}, numerator);
+        return std::make_pair(UInteger::zero(), numerator);
     }
-    if (denominator == UInteger{1U})
+    if (denominator == UInteger::one())
     {
-        return std::make_pair(numerator, UInteger{0U});
+        return std::make_pair(numerator, UInteger::zero());
     }
 
     // Perform restoring division in all other cases
     const auto n = numerator.width();
     const LargeUInteger D = (width_cast<2 * W>(denominator) << n);
     LargeUInteger R = width_cast<2 * W>(numerator);
-    UInteger Q{0U};
+    UInteger Q=UInteger::zero();
 
     for (size_t i = 0; i < n; ++i)
     {

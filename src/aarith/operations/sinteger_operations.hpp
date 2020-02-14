@@ -103,8 +103,8 @@ template <size_t W, size_t V>
 [[nodiscard]] auto expanding_mul(const sinteger<W>& m, const sinteger<V>& r) -> sinteger<V + W>
 {
 
-//    std::cout << "m\t" << to_binary(m) << "\n";
-//    std::cout << "r\t" << to_binary(r) << "\n";
+    //    std::cout << "m\t" << to_binary(m) << "\n";
+    //    std::cout << "r\t" << to_binary(r) << "\n";
 
     constexpr size_t K = W + V + 2;
 
@@ -117,9 +117,9 @@ template <size_t W, size_t V>
     sinteger<K> P{r};
     P = P << 1;
 
-//    std::cout << "A\t" << to_binary(A) << "\n";
-//    std::cout << "S\t" << to_binary(S) << "\n";
-//    std::cout << "P\t" << to_binary(P) << "\n\n";
+    //    std::cout << "A\t" << to_binary(A) << "\n";
+    //    std::cout << "S\t" << to_binary(S) << "\n";
+    //    std::cout << "P\t" << to_binary(P) << "\n\n";
 
     for (size_t i = 0; i < V; ++i)
     {
@@ -127,29 +127,28 @@ template <size_t W, size_t V>
         bool last_bit = P.bit(0);
         bool snd_last_bit = P.bit(1);
 
-//        std::cout << "P" << i << "\t" << to_binary(P) << "\n";
+        //        std::cout << "P" << i << "\t" << to_binary(P) << "\n";
 
         if (snd_last_bit && !last_bit)
         {
-//            std::cout << "P = P + S\n";
+            //            std::cout << "P = P + S\n";
             P = add(P, S);
-//            std::cout << "P" << i << "\t" << to_binary(P) << "\n";
+            //            std::cout << "P" << i << "\t" << to_binary(P) << "\n";
         }
         if (!snd_last_bit && last_bit)
         {
-//            std::cout << "P = P + A\n";
+            //            std::cout << "P = P + A\n";
             P = add(P, A);
-//            std::cout << "P" << i << "\t" << to_binary(P) << "\n";
+            //            std::cout << "P" << i << "\t" << to_binary(P) << "\n";
         }
 
         P = P >> 1;
 
-//        std::cout << "P" << i << "\t" << to_binary(P) << "\n\n";
+        //        std::cout << "P" << i << "\t" << to_binary(P) << "\n\n";
     }
 
     return width_cast<W + V>(P >> 1);
 }
-
 
 /**
  * @brief Multiplies two signed integers.
