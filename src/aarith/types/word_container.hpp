@@ -387,6 +387,18 @@ auto operator|(const word_container<Width>& lhs, const word_container<Width>& rh
 }
 
 template <size_t Width>
+auto operator^(const word_container<Width>& lhs, const word_container<Width>& rhs)
+    -> word_container<Width>
+{
+    word_container<Width> logical_or;
+    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
+    {
+        logical_or.set_word(counter, lhs.word(counter) ^ rhs.word(counter));
+    }
+    return logical_or;
+}
+
+template <size_t Width>
 [[nodiscard]] auto operator~(const word_container<Width>& rhs) -> word_container<Width>
 {
     word_container<Width> logical_not;
@@ -515,15 +527,16 @@ word_container<(S - E) + 1> bit_range(const word_container<W>& w)
  * @param w Word container that is split
  * @return Pair of <word[W-1,S+1], word[S,0]>
  */
-template<size_t S, size_t W>
-std::pair<word_container<W-(S+1)>, word_container<S+1>> split(const word_container<W>& w) {
-    static_assert(S < W-1 && S >= 0);
+template <size_t S, size_t W>
+std::pair<word_container<W - (S + 1)>, word_container<S + 1>> split(const word_container<W>& w)
+{
+    static_assert(S < W - 1 && S >= 0);
 
-    const word_container<W-(S+1)> lhs{width_cast<W-(S+1)>(w >> (S+1))};
+    const word_container<W - (S + 1)> lhs{width_cast<W - (S + 1)>(w >> (S + 1))};
 
-    const word_container<S+1> rhs=width_cast<S+1>(w);
+    const word_container<S + 1> rhs = width_cast<S + 1>(w);
 
-    return std::make_pair(lhs,rhs);
+    return std::make_pair(lhs, rhs);
 }
 
 } // namespace aarith
