@@ -1,7 +1,9 @@
 #pragma once
 
+#include "aarith/operations/sinteger_operations.hpp"
 #include "aarith/operations/uinteger_comparisons.hpp"
 #include "aarith/operations/uinteger_operations.hpp"
+#include "aarith/types/sinteger.hpp"
 #include "aarith/types/uinteger.hpp"
 #include "aarith/utilities/bit_operations.hpp"
 #include <iostream>
@@ -32,10 +34,38 @@ template <size_t Width> auto to_hex(const uinteger<Width>& value) -> std::string
     return to_base_2n<4>(value);
 }
 
+/// Convert the given sinteger value into a hexadecimal string representation.
+template <size_t Width> auto to_hex(const sinteger<Width>& value) -> std::string
+{
+
+    std::string res;
+    if (value.is_negative())
+    {
+        res += "-";
+    }
+    const auto absval = expanding_abs(value);
+    res += to_base_2n<4>(absval);
+    return res;
+}
+
 /// Convert the given uinteger value into a octal string representation.
 template <size_t Width> auto to_octal(const uinteger<Width>& value) -> std::string
 {
     return to_base_2n<3>(value);
+}
+
+/// Convert the given sinteger value into a octal string representation.
+template <size_t Width> auto to_octal(const sinteger<Width>& value) -> std::string
+{
+
+    std::string res;
+    if (value.is_negative())
+    {
+        res += "-";
+    }
+    const auto absval = expanding_abs(value);
+    res += to_base_2n<3>(absval);
+    return res;
 }
 
 /// Convert the given uinteger value into a binary coded decimal (BCD), represented within a new
@@ -132,8 +162,41 @@ template <size_t Width> auto to_decimal(const uinteger<Width>& value) -> std::st
     return remove_leading_zeroes(to_hex(to_bcd(value)));
 }
 
+/// Convert the given sinteger value into a decimal string representation.
+template <size_t Width> auto to_decimal(const sinteger<Width>& value) -> std::string
+{
+
+    std::string res;
+    if (value.is_negative())
+    {
+        res += "-";
+    }
+    const auto absval = expanding_abs(value);
+    res += remove_leading_zeroes(to_hex(to_bcd(absval)));
+    return res;
+}
+
 template <size_t Width>
 auto operator<<(std::ostream& out, const uinteger<Width>& value) -> std::ostream&
+{
+    if (out.flags() & std::ios::hex)
+    {
+        out << to_hex(value);
+    }
+    else if (out.flags() & std::ios::oct)
+    {
+        out << to_octal(value);
+    }
+    else
+    {
+        out << to_decimal(value);
+    }
+    return out;
+}
+
+// TODO make this moar generic so that we do not have to dublicate this code
+template <size_t Width>
+auto operator<<(std::ostream& out, const sinteger<Width>& value) -> std::ostream&
 {
     if (out.flags() & std::ios::hex)
     {
