@@ -218,8 +218,6 @@ template <std::size_t W, std::size_t V>
     using UInteger = uinteger<W>;
     using LargeUInteger = uinteger<2 * W>;
 
-    std::cout << numerator << "/" << denominator << "\n";
-
     if (denominator.is_zero())
     {
         throw std::runtime_error("Attempted division by zero");
@@ -250,7 +248,6 @@ template <std::size_t W, std::size_t V>
 
     for (size_t i = 0; i < n; ++i)
     {
-        std::cout << "actually runnign\n";
         const auto bit = (n - 1) - i;
         const LargeUInteger TwoR = (R << 1);
         if (TwoR >= D)
