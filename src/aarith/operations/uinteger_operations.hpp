@@ -116,7 +116,9 @@ template <size_t W, size_t V>
  * @param initial_carry True if there is an initial carry coming in
  * @return Sum of a and b
  */
-template <size_t W>[[nodiscard]] uinteger<W> add(const uinteger<W>& a, const uinteger<W>& b, const bool initial_carry=false)
+template <size_t W>
+[[nodiscard]] uinteger<W> add(const uinteger<W>& a, const uinteger<W>& b,
+                              const bool initial_carry = false)
 {
     uinteger<W + 1> result = expanding_add<W, W>(a, b, initial_carry);
     return width_cast<W>(result);
