@@ -8,7 +8,7 @@ stages:
         variables:
             - $CI_PROJECT_NAMESPACE == "keszocze"
 
-try_compiling:
+compile_gcc:
     extends: .ciconf
     stage: compile
     artifacts:
@@ -22,6 +22,16 @@ try_compiling:
         - CC=gcc-8 CXX=g++-8 cmake ..
         - /opt/sonar-build-wrapper/build-wrapper-linux-x86-64 --out-dir bw_output make -j 4 all
 
+compile_clang:
+    extends: .ciconf
+    stage: compile
+    script:
+        - mkdir build
+        - cd build
+        - CC=clang-9 CXX=clang++-9 cmake ..
+        - make -j 4
+        - cd tests
+        - find -name "*-test" -exec {} \;
 
 run_sonarqube:
     extends: .ciconf

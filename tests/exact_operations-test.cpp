@@ -1,5 +1,5 @@
-#include "aarith/operations/comparisons.hpp"
-#include "aarith/operations/exact_operations.hpp"
+#include "aarith/operations/uinteger_comparisons.hpp"
+#include "aarith/operations/uinteger_operations.hpp"
 #include "aarith/types/uinteger.hpp"
 #include "aarith/utilities/string_utils.hpp"
 #include <catch.hpp>
@@ -71,6 +71,38 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
             THEN("The next word is unchanged")
             {
                 REQUIRE(result.word(1) == 0);
+            }
+        }
+    }
+
+    GIVEN("Two uinteger<N> a and b with N > 2*word_width")
+    {
+        using uint = uinteger<129>;
+        static_assert(uint::word_count() > 2);
+
+        WHEN("There should be a carry into the third word")
+        {
+            const auto a = uint::from_words(0, 0xffffffffffffffff, 0xffffffffffffffff);
+            const auto b = a;
+            auto const result = add(a, b);
+            const auto ref = uint::from_words(1, 0xffffffffffffffff, 0xfffffffffffffffe);
+
+            THEN("There is a carry in the third word")
+            {
+                REQUIRE(result == ref);
+            }
+        }
+        
+        WHEN("There should be no carry into the third word")
+        {
+            const auto a = uint::from_words(0, 0xfffffffffffffffe, 0xffffffffffffffff);
+            const auto b = uint(1U);
+            auto const result = add(a, b);
+            const auto ref = uint::from_words(0, 0xffffffffffffffff, 0);
+
+            THEN("There is no carry in the third word")
+            {
+                REQUIRE(result == ref);
             }
         }
     }
@@ -193,6 +225,21 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
                 }
             }
         }
+        WHEN("The size is 129 bits (three words and the third word uses only one bit) and max-1 is calculated")
+        {
+            THEN("The MSB should remain 1")
+            {
+                using uint = uinteger<129>;
+                
+                uint opd1 = ~uint(0U);
+                uint one = uint(1U);
+
+                auto res = sub(opd1, one);
+                auto ref = uint::from_words(0x1, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFE);
+
+                REQUIRE(res == ref);
+            }
+        }
     }
 
     GIVEN("Two uinteger<N> a and b are subtracted")
@@ -223,6 +270,35 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
                     REQUIRE(result == expected);
                 }
             }
+        }
+    }
+}
+
+SCENARIO("Expanding subtraction works correctly", "[uinteger][arithmetic]")
+{
+    GIVEN("A n-bit zero and a m-bit (m>n)  max")
+    {
+        static const uinteger<4> zero = uinteger<4>::min();
+        static const uinteger<8> large = uinteger<8>::max();
+        static const uinteger<8> expected = uinteger<8>{1U};
+
+        THEN("Subtracting max from zero should give one")
+        {
+            auto const result = expanding_sub(zero,large);
+            REQUIRE(result == expected);
+        }
+    }
+
+    GIVEN("A n-bit zero and a m-bit (m<n) max")
+    {
+        static const uinteger<8> zero = uinteger<8>::min();
+        static const uinteger<4> large = uinteger<4>::max();
+        static const uinteger<8> expected = sub(uinteger<8>{1U},add(uinteger<8>{uinteger<4>::max()}, uinteger<8>{1U}));
+
+        THEN("Subtracting max from zero should give 1-(small::max+1)")
+        {
+            auto const result = expanding_sub(zero,large);
+            REQUIRE(result == expected);
         }
     }
 }
@@ -260,7 +336,7 @@ SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
 
             THEN("Expanding addition has the highest bet set and is modulo 2 otherwise")
             {
-                uinteger<90> result = expanding_add(max,a);
+                uinteger<90> result = expanding_add(max, a);
                 CHECK(result.bit(89));
                 REQUIRE(width_cast<89>(result) == expected_trunc);
             }
@@ -426,8 +502,8 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
         uinteger<64> a{val_a};
         AND_GIVEN("A random number b")
         {
-            uint64_t val_b = GENERATE(take(
-                100, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
+            uint64_t val_b = GENERATE(
+                take(100, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
             uinteger<64> b{val_b};
 
             THEN("The multiplication should match its uint64_t counterpart")

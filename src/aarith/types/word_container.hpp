@@ -68,13 +68,15 @@ public:
             set_word(i, other.word(i));
         }
 
-        if constexpr (this->word_count() > other.word_count())
+        if constexpr (word_container<Width, WordType>::word_count() >
+                      word_container<V>::word_count())
         {
             for (size_t i = other.word_count(); i < this->word_count(); ++i)
             {
                 set_word(i, 0U);
             }
         }
+
         return *this;
     }
 
@@ -122,6 +124,15 @@ public:
     [[nodiscard]] auto msb() const -> bit_type
     {
         return bit(Width - 1);
+    }
+
+    /**
+     * @brief Sets the value of the most significant bit (MSB)
+     * @param b The value the MSB is set to
+     */
+    void set_msb(const bool b)
+    {
+        set_bit(Width - 1, b);
     }
 
     /**
@@ -188,7 +199,7 @@ public:
                  masked_word | (static_cast<word_type>(value & 1) << (index % word_width())));
     }
 
-    void set_word(size_t index, word_type value)
+    void set_word(const size_t index, const word_type value)
     {
         if (index >= word_count())
         {
@@ -458,24 +469,61 @@ auto operator>>(const word_container<Width>& lhs, const size_t rhs) -> word_cont
     const auto shift_word_right = rhs - skip_words * lhs.word_width();
     const auto shift_word_left = lhs.word_width() - shift_word_right;
 
-    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
+    for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
     {
-        if (skip_words <= counter)
+        typename word_container<Width>::word_type new_word;
+        new_word = lhs.word(counter) >> shift_word_right;
+        if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
         {
-            typename word_container<Width>::word_type new_word;
-            new_word = lhs.word(counter) >> shift_word_right;
-            if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
-            {
-                new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
-            }
-            shifted.set_word(counter - skip_words, new_word);
+            new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
         }
+        shifted.set_word(counter - skip_words, new_word);
     }
     typename word_container<Width>::word_type new_word;
     new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
     shifted.set_word(lhs.word_count() - skip_words - 1, new_word);
 
     return shifted;
+}
+
+/**
+ * @brief Extracts a range from the word container
+ *
+ * Note that the indexing is done
+ *  - zero based starting from the LSB
+ *  - is inclusive (i.e. the start and end point are part of the range)
+ *
+ * @tparam S Starting index (inclusive, from left to right)
+ * @tparam E  Ending index (inclusive, from left to right)
+ * @tparam W Width of the word container that the range is taken from
+ * @param w  Word container from which the range is taken from
+ * @return Range word[S,E], including the
+ */
+template <size_t S, size_t E, size_t W>
+word_container<(S - E) + 1> bit_range(const word_container<W>& w)
+{
+    static_assert(S < W, "Range must start within the word");
+    static_assert(E <= S, "Range must be positive (i.e. this method will not reverse the word");
+
+    return width_cast<(S - E) + 1>(w >> E);
+}
+
+/**
+ * @brief Splits the word container at the given splitting point
+ * @tparam S Splitting point
+ * @tparam W Width of the word wontainer to be split
+ * @param w Word container that is split
+ * @return Pair of <word[W-1,S+1], word[S,0]>
+ */
+template<size_t S, size_t W>
+std::pair<word_container<W-(S+1)>, word_container<S+1>> split(const word_container<W>& w) {
+    static_assert(S < W-1 && S >= 0);
+
+    const word_container<W-(S+1)> lhs{width_cast<W-(S+1)>(w >> (S+1))};
+
+    const word_container<S+1> rhs=width_cast<S+1>(w);
+
+    return std::make_pair(lhs,rhs);
 }
 
 } // namespace aarith
