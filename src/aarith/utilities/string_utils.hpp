@@ -244,7 +244,7 @@ template <size_t E, size_t M> auto to_sci_string(const normfloat<E, M> nf) -> st
         flc_mantissa = width_cast<24, M>(fl_mantissa);
         flc_mantissa <<= shift_mantissa;
     }
-    uint32_t ui_mantissa = static_cast<uint32_t>(flc_mantissa.word(0)) & 0x7fffff | 0x3f800000;
+    uint32_t ui_mantissa = (static_cast<uint32_t>(flc_mantissa.word(0)) & 0x7fffff) | 0x3f800000;
     float* mantissa = reinterpret_cast<float*>(&ui_mantissa);
 
     auto const exponent = sub(nf.get_exponent(), nf.get_bias());
