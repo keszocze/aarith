@@ -5,6 +5,7 @@
 #include <aarith/operations/uinteger_operations.hpp>
 #include <cstdint>
 #include <iostream>
+#include <functional>
 
 namespace aarith {
 
