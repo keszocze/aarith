@@ -89,8 +89,10 @@ template <class UInteger>
 }
 
 template <size_t W>
-[[nodiscard]] uinteger<W> approx_operation_pre_masking(const uinteger<W>& a, const uinteger<W> b,
-                                                       const std::function<uinteger<W>(uinteger<W>,uinteger<W>)>  fun, size_t width = W)
+[[nodiscard]] uinteger<W>
+approx_operation_pre_masking(const uinteger<W>& a, const uinteger<W> b,
+                             const std::function<uinteger<W>(uinteger<W>, uinteger<W>)> fun,
+                             size_t width = W)
 {
     const uinteger<W> mask = generate_bitmask<uinteger<W>>(width);
     auto const a_masked = a & mask;
@@ -100,15 +102,19 @@ template <size_t W>
 }
 
 template <size_t W, class word_type>
-[[nodiscard]] uinteger<W> approx_add_pre_masking(const uinteger<W,word_type>& a, const uinteger<W,word_type> b, const size_t width=W)
+[[nodiscard]] uinteger<W> approx_add_pre_masking(const uinteger<W, word_type>& a,
+                                                 const uinteger<W, word_type> b,
+                                                 const size_t width = W)
 {
 
     /*
-     * I *hate* C++ for making me use an explicit std::function because it is too stupid to actually deduce
-     * parameters from a lambda (for which I even explicitly stated the intended return type)
+     * I *hate* C++ for making me use an explicit std::function because it is too stupid to actually
+     * deduce parameters from a lambda (for which I even explicitly stated the intended return type)
      */
-    const std::function<uinteger<W>(uinteger<W>, uinteger<W>)> add_fun = [](const uinteger<W,word_type>& a_, const uinteger<W,word_type>& b_) -> uinteger<W,word_type> {
-        return aarith::add<W>(a_,b_,false);
+    const std::function<uinteger<W>(uinteger<W>, uinteger<W>)> add_fun =
+        [](const uinteger<W, word_type>& a_,
+           const uinteger<W, word_type>& b_) -> uinteger<W, word_type> {
+        return aarith::add<W>(a_, b_, false);
     };
     return approx_operation_pre_masking(a, b, add_fun, width);
 }
@@ -172,56 +178,58 @@ auto approx_uint_bitmasking_mul(const uinteger<width>& opd1, const uinteger<widt
     return product;
 }
 
-template <size_t width, size_t splitting_point, size_t shared_bits = 0>
-uinteger<width> FAUadder(const uinteger<width>& a, const uinteger<width>& b)
+template <size_t width, size_t lsp_width, size_t shared_bits = 0>
+uinteger<width+1> FAUadder(const uinteger<width>& a, [[maybe_unused]] const uinteger<width>& b)
 {
-    const uinteger<splitting_point> a_lsp{width_cast<splitting_point>(a)};
-    const uinteger<splitting_point> b_lsp{width_cast<splitting_point>(b)};
 
-    static_assert(shared_bits < splitting_point);
+    static_assert(shared_bits <= lsp_width);
+    static_assert(lsp_width < width);
+    static_assert(lsp_width > 0);
 
-    std::cout << group_digits(to_binary(a), splitting_point) << "\n";
-    std::cout << group_digits(to_binary(b), splitting_point) << "\n";
+    constexpr size_t lsp_index = lsp_width - 1;
 
-    std::cout << group_digits(to_binary(a_lsp), splitting_point) << "\n";
-    std::cout << group_digits(to_binary(b_lsp), splitting_point) << "\n";
+    const auto a_split = split<lsp_index>(a);
+    const auto b_split = split<lsp_index>(b);
 
-    uinteger<splitting_point + 1> lsp_sum = expanding_add(a_lsp, b_lsp);
+    constexpr size_t msp_width = width - lsp_width;
 
-    std::cout << group_digits(to_binary(lsp_sum), splitting_point) << "\n";
 
-    uinteger<splitting_point> lsp = width_cast<splitting_point>(lsp_sum);
-    std::cout << group_digits(to_binary(lsp), splitting_point) << "\n";
+    const uinteger<lsp_width> a_lsp = a_split.second;
+    const uinteger<lsp_width> b_lsp = b_split.second;
 
-    // set everything to ones in case of a carry
-    const bool has_carry = lsp_sum.msb();
+    const uinteger<msp_width> a_msp = a_split.first;
+    const uinteger<msp_width> b_msp = b_split.first;
 
-    if (has_carry)
+    uinteger<lsp_width + 1> lsp_sum = expanding_add(a_lsp, b_lsp);
+
+    uinteger<lsp_width> lsp = width_cast<lsp_width>(lsp_sum);
+
+
+    // conditionally perform carry prediction
+    bool predicted_carry = false;
+    if constexpr (shared_bits > 0)
+    {
+        uinteger<shared_bits> a_shared = bit_range<lsp_index, lsp_index - (shared_bits - 1)>(a);
+        uinteger<shared_bits> b_shared = bit_range<lsp_index, lsp_index - (shared_bits - 1)>(b);
+
+        uinteger<shared_bits + 1> shared_sum = expanding_add(a_shared, b_shared);
+
+        predicted_carry = shared_sum.msb();
+    }
+
+    // only if we did not predict a carry, we are going to use the all1 rule for error correction
+    if (lsp_sum.msb() && !predicted_carry)
     {
         lsp = lsp.all_ones();
     }
 
-    const uinteger<width - splitting_point> a_msp{
-        width_cast<width - splitting_point>(a >> splitting_point)};
-    const uinteger<width - splitting_point> b_msp{
-        width_cast<width - splitting_point>(b >> splitting_point)};
+    const uinteger<msp_width + 1> msp = expanding_add(a_msp,b_msp,predicted_carry);
 
-    std::cout << "lsp " << group_digits(to_binary(lsp), splitting_point) << "\n";
+    uinteger<width+1> result{lsp};
 
-    std::cout << group_digits(to_binary(a_msp), splitting_point) << "\n";
-    std::cout << group_digits(to_binary(b_msp), splitting_point) << "\n";
+    const auto extended_msp = width_cast<width + 1>(msp);
+    result = add(result, extended_msp << lsp_width);
 
-    const auto msp = add(a_msp, b_msp, has_carry);
-
-    std::cout << "msp " << group_digits(to_binary(msp), splitting_point) << "\n";
-
-    uinteger<width> result{lsp};
-
-    std::cout << "res " << group_digits(to_binary(result), splitting_point) << "\n";
-
-    result = add(result, width_cast<width>(msp) << splitting_point);
-
-    std::cout << "res " << group_digits(to_binary(result), splitting_point) << "\n";
     return result;
 }
 
