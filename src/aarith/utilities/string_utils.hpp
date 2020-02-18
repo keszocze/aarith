@@ -64,7 +64,8 @@ auto to_bcd(const uinteger<Width>& num) -> uinteger<number_of_decimal_digits(Wid
 
         for (auto c_bcd = 0U; c_bcd < bcd_digits; ++c_bcd)
         {
-            if ((bcd & mask) > four)
+            auto masked = bcd & mask;
+            if (masked > four)
             {
                 bcd = bcd + three;
             }

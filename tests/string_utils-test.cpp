@@ -21,6 +21,19 @@ SCENARIO("Converting uintegers into strings", "[uinteger][string]")
             ss << uint;
             REQUIRE(ss.str() == "204");
         }
+        AND_WHEN("All numbers from 0 to 65535 are tested.")
+        {
+            auto i = 0U;
+            for(; i < 65536; ++i)
+            {
+                uinteger<16> res(i);
+                if(std::to_string(i) != to_decimal(res))
+                {
+                    break;
+                }
+            }
+            REQUIRE(i == 65536);
+        }
     }
     WHEN("Converting a uinteger into a hexadecimal string")
     {
