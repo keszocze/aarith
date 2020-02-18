@@ -75,10 +75,10 @@ template <size_t W, size_t V> bool operator<(const uinteger<W>& a, const uintege
     }
 
 
-    for (auto i = min_count - 1 ; i >= 0; --i)
+    for (auto i = min_count; i > 0; --i)
     {
-        auto const word_a = a.word(i);
-        auto const word_b = b.word(i);
+        auto const word_a = a.word(i-1);
+        auto const word_b = b.word(i-1);
         if (word_a < word_b)
         {
             return true;
