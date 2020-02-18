@@ -22,14 +22,18 @@ SCENARIO("Converting uintegers into strings", "[uinteger][string]")
             ss << uint;
             REQUIRE(ss.str() == "204");
         }
-        AND_WHEN("Using a magic number")
+        AND_WHEN("All numbers from 0 to 65535 are tested.")
         {
-            THEN("The number should be correctly transformed")
+            auto i = 0U;
+            for(; i < 65536; ++i)
             {
-                const uinteger<8> magic(0b00010000);
-
-                REQUIRE(to_decimal(magic) == "16");
+                uinteger<16> res(i);
+                if(std::to_string(i) != to_decimal(res))
+                {
+                    break;
+                }
             }
+            REQUIRE(i == 65536);
         }
     }
     WHEN("Converting a uinteger into a hexadecimal string")
@@ -74,8 +78,7 @@ SCENARIO("Converting uintegers into strings", "[uinteger][string]")
             {
                 const uinteger<8> magic(0b00010000);
 
-                std::cout << to_octal(magic) << "\n";
-                REQUIRE(to_octal(magic) == "20");
+                REQUIRE(remove_leading_zeroes(to_octal(magic)) == "20");
             }
         }
     }
