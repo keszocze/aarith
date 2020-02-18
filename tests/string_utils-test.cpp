@@ -1,3 +1,4 @@
+#include "aarith/types/sinteger.hpp"
 #include "aarith/types/uinteger.hpp"
 #include "aarith/utilities/string_utils.hpp"
 #include <catch.hpp>
@@ -48,6 +49,15 @@ SCENARIO("Converting uintegers into strings", "[uinteger][string]")
             ss << uint;
             REQUIRE(ss.str() == "00cc");
         }
+        AND_WHEN("Using a magic number")
+        {
+            THEN("The number should be correctly transformed")
+            {
+                const uinteger<8> magic(0b00010000);
+
+                REQUIRE(to_hex(magic) == "10");
+            }
+        }
     }
     WHEN("Converting a uinteger into an octal string")
     {
@@ -61,6 +71,77 @@ SCENARIO("Converting uintegers into strings", "[uinteger][string]")
             ss.setf(std::ios::oct);
             ss << uint;
             REQUIRE(ss.str() == "000314");
+        }
+        AND_WHEN("Using a magic number")
+        {
+            THEN("The number should be correctly transformed")
+            {
+                const uinteger<8> magic(0b00010000);
+
+                REQUIRE(remove_leading_zeroes(to_octal(magic)) == "20");
+            }
+        }
+    }
+}
+
+SCENARIO("Converting sintegers into strings", "[sinteger][string]")
+{
+    const sinteger<16> num{204};
+
+    WHEN("Converting a sinteger into a decimal string")
+    {
+        THEN("The string represents the sinteger, both normal and in negative version")
+        {
+            REQUIRE(to_decimal(num) == "204");
+            REQUIRE(to_decimal(-num) == "-204");
+        }
+        THEN("Using << works as well")
+        {
+            std::stringstream ss;
+            ss << num;
+            REQUIRE(ss.str() == "204");
+
+            ss.str("");
+            ss << -num;
+            REQUIRE(ss.str() == "-204");
+        }
+    }
+    WHEN("Converting a sinteger into a hexadecimal string")
+    {
+        THEN("The string represents the sinteger, both normal and in negative version")
+        {
+            REQUIRE(to_hex(num) == "00cc");
+            REQUIRE(to_hex(-num) == "-00cc");
+        }
+        THEN("Using << works as well")
+        {
+            std::stringstream ss;
+            ss.setf(std::ios::hex);
+            ss << num;
+            REQUIRE(ss.str() == "00cc");
+
+            ss.str("");
+            ss << -num;
+            REQUIRE(ss.str() == "-00cc");
+        }
+    }
+    WHEN("Converting a sinteger into an octal string")
+    {
+        THEN("The string represents the sinteger, both normal and in negative version")
+        {
+            REQUIRE(to_octal(num) == "000314");
+            REQUIRE(to_octal(-num) == "-000314");
+        }
+        THEN("Using << works as well")
+        {
+            std::stringstream ss;
+            ss.setf(std::ios::oct);
+            ss << num;
+            REQUIRE(ss.str() == "000314");
+
+            ss.str("");
+            ss << -num;
+            REQUIRE(ss.str() == "-000314");
         }
     }
 }
