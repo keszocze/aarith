@@ -150,72 +150,152 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
 SCENARIO("Division of signed integers", "[sinteger][arithmetic][foo]")
 {
 
-    GIVEN ("A signed integer n")
+    GIVEN("A signed integer<64> n != INT_MIN")
     {
-        const sinteger<8> n(16);
 
-        std::cout << to_binary(n) << "\tabs(" << to_binary(n) <<")="<< to_binary(expanding_abs(n)) <<  " " << expanding_abs(n) << "\n";
+        const int64_t n_ = GENERATE(take(
+            100, random(std::numeric_limits<int64_t>::max(), std::numeric_limits<int64_t>::max())));
+        const sinteger<64> n{n_};
 
-        uinteger<8> a = expanding_abs(n);
-        std::cout << a << to_binary(a) << "\n";
-
-        uinteger<8> b(0b00001000);
-        std::cout << b << " " << to_binary(b)<< " " << to_decimal(b) << " " << to_hex(b)  << "\n";
-
-//        AND_GIVEN("Minus one")
-//        {
-//            const sinteger<8> minus_one = sinteger<8>::minus_one();
-//
-//            THEN("n / minus one should")
-//            {
-//
-//
-//                const int64_t min64 = std::numeric_limits<int64_t>::min();
-//                const int64_t minus_one64 = int64_t(-1);
-//
-//                const int32_t min32 = std::numeric_limits<int32_t>::min();
-//                const int32_t minus_one32 = int32_t(-1);
-//
-//                std::cout << min64<< "/" << minus_one64 << "=" << (min64/minus_one64) << "\n";
-//                std::cout << min64 << "%" << minus_one64 << "=" << (min64%minus_one64) << "\n";
-//
-//                std::cout << min32<< "/" << minus_one32 << "=" << (min32/minus_one32) << "\n";
-//                std::cout << min32 << "%" << minus_one32 << "=" << (min32%minus_one32) << "\n";
-//            }
-//
-//        }
-        AND_GIVEN("Another signed integer m") {
-            const sinteger<8> m(-4);
-
-            const std::pair<sinteger<8>,sinteger<8>> result = restoring_division(n,m);
-
-            std::cout << to_binary(n) << "/" << to_binary(m) << "=" << to_binary(result.first) << "\t" << to_binary(result.second) << "\n";
+        WHEN("Dividing by itself")
+        {
+            AND_WHEN("n is not equal to zero")
+            {
+                THEN("The result should be one without remainder")
+                {
+                    if (!n.is_zero())
+                    {
+                        const auto result = restoring_division(n, n);
+                        CHECK(result.second == sinteger<64>::zero());
+                        REQUIRE(result.first == sinteger<61>::one());
+                    }
+                    else
+                    {
+                        REQUIRE_THROWS_AS(restoring_division(n, n), std::runtime_error);
+                    }
+                }
+            }
         }
+
+        WHEN("Dividing by zero")
+        {
+            THEN("An exception should be raised")
+            {
+                REQUIRE_THROWS_AS(restoring_division(n, sinteger<64>::zero()), std::runtime_error);
+            }
+        }
+
+        WHEN("Dividing by one")
+        {
+            THEN("The result should be the number itself")
+            {
+
+                const auto result = restoring_division(n, sinteger<64>::one());
+                CHECK(result.second == sinteger<64>::zero());
+                REQUIRE(result.first == n);
+            }
+        }
+
+        WHEN("Dividing by minus one")
+        {
+            THEN("The result should flip its sign")
+            {
+
+                const auto result = restoring_division(n, sinteger<64>::minus_one());
+                CHECK(result.second == sinteger<64>::zero());
+                REQUIRE(result.first == -n);
+            }
+        }
+
+        AND_GIVEN("Another signed integer<64> m != INT_MIN")
+        {
+            const int64_t m_ = GENERATE(take(100, random(std::numeric_limits<int64_t>::max(),
+                                                         std::numeric_limits<int64_t>::max())));
+            const sinteger<64> m{m_};
+            WHEN("Dividing the numbers")
+            {
+                THEN("The behaviour should match its int64_t counterpart")
+                {
+                    const auto result64_div = n_ / m_;
+                    const auto result64_rem = n_ % m_;
+                    const auto result = restoring_division(n, m);
+                    CHECK(result.first.word(0) == result64_div);
+                    CHECK(result.second.word(0) == result64_rem);
+                }
+            }
+        }
+
+        //        AND_GIVEN("Minus one")
+        //        {
+        //            const sinteger<8> minus_one = sinteger<8>::minus_one();
+        //
+        //            THEN("n / minus one should")
+        //            {
+        //
+        //
+        //                const int64_t min64 = std::numeric_limits<int64_t>::min();
+        //                const int64_t minus_one64 = int64_t(-1);
+        //
+        //                const int32_t min32 = std::numeric_limits<int32_t>::min();
+        //                const int32_t minus_one32 = int32_t(-1);
+        //
+        //                std::cout << min64<< "/" << minus_one64 << "=" << (min64/minus_one64) <<
+        //                "\n"; std::cout << min64 << "%" << minus_one64 << "=" <<
+        //                (min64%minus_one64) << "\n";
+        //
+        //                std::cout << min32<< "/" << minus_one32 << "=" << (min32/minus_one32) <<
+        //                "\n"; std::cout << min32 << "%" << minus_one32 << "=" <<
+        //                (min32%minus_one32) << "\n";
+        //            }
+        //
+        //        }
+        //        AND_GIVEN("Another signed integer m") {
+        //            const sinteger<8> m(3);
+        //
+        //            const std::pair<sinteger<8>,sinteger<8>> result = restoring_division(n,m);
+        //
+        //            std::cout << n <<  " = " << result.first << " * " << m << " + " <<
+        //            result.second << "\n";
+        //        }
     }
 
+    GIVEN("INT_MIN")
+    {
+        AND_GIVEN("Minus one")
+        {
+            WHEN("Dividing INT_MIN by minus one")
+            {
+                THEN("The result should be INT_MIN")
+                {
+                    const auto result = restoring_division(sinteger<64>::min(), sinteger<64>::minus_one());
+                    CHECK(result.first == sinteger<64>::min());
+                    CHECK(result.second == sinteger<64>::zero());
+                }
+            }
+        }
+    }
 }
 SCENARIO("Multiplying signed integers", "[sinteger][arithmetic]")
 {
-    GIVEN("Two signed integers m and r"){
+    GIVEN("Two signed integers m and r")
+    {
         THEN("Then the multiplication should be donce correctly")
         {
-
         }
 
-        WHEN("m is the most negative number") {
+        WHEN("m is the most negative number")
+        {
             THEN("The algorithm should still work")
             {
                 const sinteger<8> m{-16};
                 const sinteger<8> r{2};
 
-                const sinteger<8> res = mul(m,r);
-
-
+                const sinteger<8> res = mul(m, r);
 
                 int8_t mi = -16;
                 int8_t ri = 2;
 
-                int8_t resi = mi*ri;
+                int8_t resi = mi * ri;
                 CHECK((uint8_t)res.word(0) == (uint8_t)resi);
             }
         }

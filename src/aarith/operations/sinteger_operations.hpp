@@ -254,6 +254,10 @@ template <std::size_t W, std::size_t V>
         return std::make_pair(SInteger::one(), SInteger::zero());
     }
 
+    if (numerator == sinteger<W>::min() && denominator == sinteger<W>::minus_one()) {
+
+    }
+
 
 
 
