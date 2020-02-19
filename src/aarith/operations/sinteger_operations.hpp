@@ -215,6 +215,8 @@ template <size_t W> auto operator-(const sinteger<W>& n) -> sinteger<W>
 /**
  * @brief Implements the restoring division algorithm.
  *
+ * @note sinteger<W>::min/sinteger<W>(-1) will return <sinteger<W>::min,0>, i.e. some weird overflow happens
+ *
  * @see https://en.wikipedia.org/wiki/Division_algorithm#Restoring_division
  *
  * @param numerator The number that is to be divided
@@ -254,10 +256,6 @@ template <std::size_t W, std::size_t V>
         return std::make_pair(SInteger::one(), SInteger::zero());
     }
 
-    if (numerator == sinteger<W>::min() && denominator == sinteger<W>::minus_one()) {
-
-    }
-
 
 
 
@@ -290,11 +288,31 @@ template <std::size_t W, std::size_t V>
     return std::make_pair(Q_cast, remainder_cast);
 }
 
+/**
+ * @brief Computes the remainder of the division of one sinteger by another sinteger
+ * *
+ * @tparam W Width of the numbers being used in the division
+ * @param numerator The number that is to be divided
+ * @param denominator The number that divides the other number
+ * @return The remainder of the division operation
+ */
 template <size_t W>
 [[nodiscard]] auto remainder(const sinteger<W>& numerator, const sinteger<W>& denominator) -> sinteger<W>
 {
     return restoring_division(numerator, denominator).second;
 }
+
+
+/**
+ * @brief Divides one sinteger by another sinteger
+ *
+ * @note sinteger<W>::min/sinteger<W>(-1) will return <sinteger<W>::min,0>, i.e. some weird overflow happens
+ *
+ * @tparam W Width of the numbers being used in the division
+ * @param numerator The number that is to be divided
+ * @param denominator The number that divides the other number
+ * @return The quotient of the division operation
+ */
 template <size_t W>
 [[nodiscard]] auto div(const sinteger<W>& numerator, const sinteger<W>& denominator) -> sinteger<W>
 {
