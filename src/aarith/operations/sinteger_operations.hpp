@@ -262,8 +262,6 @@ template <std::size_t W, std::size_t V>
     const uinteger<W> N = expanding_abs(numerator);
     const uinteger<W> D = expanding_abs(denominator);
 
-    std::cout << "N" << to_binary(N) << " " << N << "\n";
-    std::cout << "D" << to_binary(D) << " " << D << "\n";
 
     if (N < D)
     {
@@ -275,12 +273,17 @@ template <std::size_t W, std::size_t V>
     sinteger<W+1> Q(div.first);
     sinteger<W+1> remainder(div.second);
 
+
+
     if (negate)
     {
         Q=-Q;
     }
 
-    return std::make_pair(width_cast<W>(Q), width_cast<W>(remainder));
+    sinteger<W> Q_cast = width_cast<W>(Q);
+    sinteger<W> remainder_cast = width_cast<W>(remainder);
+
+    return std::make_pair(Q_cast, remainder_cast);
 }
 
 template <size_t W>
