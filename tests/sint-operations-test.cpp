@@ -150,12 +150,54 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
 SCENARIO("Division of signed integers", "[sinteger][arithmetic][foo]")
 {
 
+    GIVEN("The number 1 << 65")
+    {
+        const sinteger<70> m = (sinteger<70>::one() << 65);
+
+        const sinteger<70> two{2};
+
+        WHEN("Repeatedly dividing by two")
+        {
+            THEN("The division should work correctly over word boundaries")
+            {
+                const auto div1 = restoring_division(m, two);
+
+                CHECK(div1.first.word(1) == 1U);
+                CHECK(div1.first.word(0) == 0U);
+                CHECK(div1.second == sinteger<70>::zero());
+
+                const auto div2 = restoring_division(div1.first, two);
+
+                CHECK(div2.first.word(1) == 0U);
+                CHECK(div2.first.word(0) == (int64_t(1) << int64_t(63)));
+                CHECK(div2.second == sinteger<70>::zero());
+            }
+        }
+    }
+
     GIVEN("A signed integer<64> n != INT_MIN")
     {
 
         const int64_t n_ = GENERATE(take(
             100, random(std::numeric_limits<int64_t>::max(), std::numeric_limits<int64_t>::max())));
         const sinteger<64> n{n_};
+
+        WHEN("Dividing zero by this number")
+        {
+            THEN("The result should be zero")
+            {
+                if (!n.is_zero())
+                {
+                    const auto result = restoring_division(sinteger<64>::zero(), n);
+                    CHECK(result.second == sinteger<64>::zero());
+                    REQUIRE(result.first == sinteger<64>::zero());
+                }
+                else
+                {
+                    REQUIRE_THROWS_AS(restoring_division(n, n), std::runtime_error);
+                }
+            }
+        }
 
         WHEN("Dividing by itself")
         {
@@ -224,39 +266,6 @@ SCENARIO("Division of signed integers", "[sinteger][arithmetic][foo]")
                 }
             }
         }
-
-        //        AND_GIVEN("Minus one")
-        //        {
-        //            const sinteger<8> minus_one = sinteger<8>::minus_one();
-        //
-        //            THEN("n / minus one should")
-        //            {
-        //
-        //
-        //                const int64_t min64 = std::numeric_limits<int64_t>::min();
-        //                const int64_t minus_one64 = int64_t(-1);
-        //
-        //                const int32_t min32 = std::numeric_limits<int32_t>::min();
-        //                const int32_t minus_one32 = int32_t(-1);
-        //
-        //                std::cout << min64<< "/" << minus_one64 << "=" << (min64/minus_one64) <<
-        //                "\n"; std::cout << min64 << "%" << minus_one64 << "=" <<
-        //                (min64%minus_one64) << "\n";
-        //
-        //                std::cout << min32<< "/" << minus_one32 << "=" << (min32/minus_one32) <<
-        //                "\n"; std::cout << min32 << "%" << minus_one32 << "=" <<
-        //                (min32%minus_one32) << "\n";
-        //            }
-        //
-        //        }
-        //        AND_GIVEN("Another signed integer m") {
-        //            const sinteger<8> m(3);
-        //
-        //            const std::pair<sinteger<8>,sinteger<8>> result = restoring_division(n,m);
-        //
-        //            std::cout << n <<  " = " << result.first << " * " << m << " + " <<
-        //            result.second << "\n";
-        //        }
     }
 
     GIVEN("INT_MIN")
@@ -267,7 +276,8 @@ SCENARIO("Division of signed integers", "[sinteger][arithmetic][foo]")
             {
                 THEN("The result should be INT_MIN")
                 {
-                    const auto result = restoring_division(sinteger<64>::min(), sinteger<64>::minus_one());
+                    const auto result =
+                        restoring_division(sinteger<64>::min(), sinteger<64>::minus_one());
                     CHECK(result.first == sinteger<64>::min());
                     CHECK(result.second == sinteger<64>::zero());
                 }
@@ -279,7 +289,7 @@ SCENARIO("Multiplying signed integers", "[sinteger][arithmetic]")
 {
     GIVEN("Two signed integers m and r")
     {
-        THEN("Then the multiplication should be donce correctly")
+        THEN("Then the multiplication should be done correctly")
         {
         }
 
