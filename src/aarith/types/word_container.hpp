@@ -588,12 +588,28 @@ template <class F, size_t W, size_t V>
     return result;
 }
 
+/**
+ * @brief Zips two word containers that might have a different number of words, expanding missing words with zeroes.
+ *
+ * If the word_containers have a different number of words, the "missing" words are filled up with zeroes such that
+ * this method will return a word_container that has the max width of both input word_containers.
+ *
+ * @tparam F "Catch all" type for the zip with function
+ * @tparam W Width of the first word_container
+ * @tparam V Width of the second word_container
+ * @param w First word_container
+ * @param v Second word_container
+ * @param f The zip_with function
+ * @return
+ */
 template <class F, size_t W, size_t V>
 [[nodiscard]] word_container<std::max(W,V)> zip_with_expand(const word_container<W>& w, const word_container<V>& v, const F f)
 {
     constexpr size_t wc = word_container<W>::word_count();
     constexpr size_t vc = word_container<V>::word_count();
 
+
+    // simply return the "standard" zip_with when the word widths are identical
     if constexpr (wc == vc) {
         return zip_with(w,v,f);
     }
