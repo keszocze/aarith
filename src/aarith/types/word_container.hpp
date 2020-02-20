@@ -587,7 +587,20 @@ template <class F, size_t W, size_t V>
     return result;
 }
 
-
+/**
+ *
+ * @brief Reduces the vector using a given two-ary function.
+ *
+ * This is also known as a fold.
+ *
+ * @tparam R Return type of the reducing function
+ * @tparam F "Catch all" type for the reducing function
+ * @tparam W The width of the word_container
+ * @param w The word_container
+ * @param f The reducing function of type (word_container<W>::word_type, R) -> R
+ * @param initial_value The initial value that is fed into f
+ * @return The value from reducing the word_container using f and the given initial value
+ */
 template <class R, class F, size_t W>
 [[nodiscard]] R reduce(const word_container<W>& w, const F f, const R initial_value)
 {
@@ -601,6 +614,19 @@ template <class R, class F, size_t W>
     return result;
 }
 
+/**
+ * @brief zips and reduces two word_containers
+ *
+ * @tparam R The return type of the reducing function
+ * @tparam F "Catch all" type for the reducing function
+ * @tparam W The width of the first word_container
+ * @tparam V The width of the second word_container
+ * @param w The first word_container
+ * @param v The second word_container
+ * @param f The reducing function of type (word_container<W>::word_type, word_container<V>__word_type, R) -> R
+ * @param initial_value The initial value that is fed into f
+ * @return The value from zipping and reducing the two word_containers
+ */
 template <class R, class F, size_t W, size_t V>
 [[nodiscard]] R zip_reduce(const word_container<W>& w, const word_container<V>& v, const F f,
                            const R initial_value)

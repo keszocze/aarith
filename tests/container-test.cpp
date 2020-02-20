@@ -134,7 +134,7 @@ SCENARIO("Performing common functional operations", "[word_container]")
                     for (const auto n : ns)
                     {
                         const auto result = zip_reduce(w, v, f, n);
-                        
+
                         CHECK(result == (1U + 2U + 3U + 8U + 16U +  64U + n));
                     }
                 }
