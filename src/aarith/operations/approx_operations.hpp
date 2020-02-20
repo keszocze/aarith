@@ -167,4 +167,6 @@ auto approx_uint_bitmasking_mul(const uinteger<width>& opd1, const uinteger<widt
     return product;
 }
 
+
+
 } // namespace aarith

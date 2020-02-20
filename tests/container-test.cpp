@@ -40,10 +40,19 @@ SCENARIO("Performing common functional operations", "[word_container]")
             }
         }
 
+        WHEN("Reducing the word_container")
+        {
+            THEN("Summing up the individual words should work fine") {
+                const auto f = [](const word_container<265>::word_type a, uint64_t w) { return a + w; };
+                const auto result = reduce(w,f,0);
+                CHECK(result == 6U);
+            }
+        }
+
         AND_GIVEN("Another word container v")
         {
             const word_container<256> v{8, 16, 32, 64};
-            WHEN("Performign the zip_with operation")
+            WHEN("Performing the zip_with operation")
             {
 
                 THEN("Element-wise addition should work as intended")

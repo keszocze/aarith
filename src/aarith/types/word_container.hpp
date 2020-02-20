@@ -547,7 +547,7 @@ std::pair<word_container<W - (S + 1)>, word_container<S + 1>> split(const word_c
  * @param f Function of type word_container<W>::word_type -> word_container<W>::word_type
  * @return A new word_container with the transformed words
  */
-template <class F, size_t W>[[nodiscard]] word_container<W> map(const word_container<W>& w, F f)
+template <class F, size_t W>[[nodiscard]] word_container<W> map(const word_container<W>& w, const F f)
 {
 
     word_container<W> result;
@@ -558,24 +558,41 @@ template <class F, size_t W>[[nodiscard]] word_container<W> map(const word_conta
     return result;
 }
 
-//
+
 /**
- * @brief Applies a function to all words of two word_containers and zips them to a new word_container
+ * @brief Applies a function to all words of two word_containers and zips them to a new
+ * word_container
+ *
+ * If the word_containers have a different number of words, the result will be of size min(W,V);
+ *
  * @tparam F "Catch-all" parameter for functions operating on the words of the word_container
- * @tparam W Bit width of the word_container to operate on
+ * @tparam W Bit width of the first word_container to operate on
+ * @tparam V Bit width of the secnd word_container to operate on
  * @param w The first word_container to operate on
  * @param v The second word_container to operate on
- * @param f Function of type (word_container<W>::word_type, word_container<W>::word_type) -> word_container<W>
+ * @param f Function of type (word_container<W>::word_type, word_container<W>::word_type) ->
+ * word_container<W>
  * @return The newly created, zipped word_container
  */
-template <class F, size_t W>
-[[nodiscard]] word_container<W> zip_with(const word_container<W>& w, const word_container<W>& v, F f)
+template <class F, size_t W, size_t V>
+[[nodiscard]]  word_container<std::min(W, V)> zip_with(const word_container<W>& w, const word_container<V>& v, const F f)
 {
-    word_container<W> result;
-    for (size_t i = 0; i < w.word_count(); ++i)
+    constexpr size_t L = std::min(W,V);
+    word_container<L> result;
+    for (size_t i = 0; i < result.word_count(); ++i)
     {
         result.set_word(i, f(w.word(i), v.word(i)));
     }
+    return result;
+}
+
+template <class R, class F, size_t W> [[nodiscard]] R reduce(const word_container<W>& w, const F f, const R initial_value) {
+    R result = initial_value;
+
+    for (size_t i = 0; i < w.word_count(); ++i) {
+        result = f(w.word(i), result);
+    }
+
     return result;
 }
 
