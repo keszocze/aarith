@@ -547,7 +547,8 @@ std::pair<word_container<W - (S + 1)>, word_container<S + 1>> split(const word_c
  * @param f Function of type word_container<W>::word_type -> word_container<W>::word_type
  * @return A new word_container with the transformed words
  */
-template <class F, size_t W>[[nodiscard]] word_container<W> map(const word_container<W>& w, const F f)
+template <class F, size_t W>
+[[nodiscard]] word_container<W> map(const word_container<W>& w, const F f)
 {
 
     word_container<W> result;
@@ -557,7 +558,6 @@ template <class F, size_t W>[[nodiscard]] word_container<W> map(const word_conta
     }
     return result;
 }
-
 
 /**
  * @brief Applies a function to all words of two word_containers and zips them to a new
@@ -575,9 +575,10 @@ template <class F, size_t W>[[nodiscard]] word_container<W> map(const word_conta
  * @return The newly created, zipped word_container
  */
 template <class F, size_t W, size_t V>
-[[nodiscard]]  word_container<std::min(W, V)> zip_with(const word_container<W>& w, const word_container<V>& v, const F f)
+[[nodiscard]] word_container<std::min(W, V)> zip_with(const word_container<W>& w,
+                                                      const word_container<V>& v, const F f)
 {
-    constexpr size_t L = std::min(W,V);
+    constexpr size_t L = std::min(W, V);
     word_container<L> result;
     for (size_t i = 0; i < result.word_count(); ++i)
     {
@@ -586,11 +587,31 @@ template <class F, size_t W, size_t V>
     return result;
 }
 
-template <class R, class F, size_t W> [[nodiscard]] R reduce(const word_container<W>& w, const F f, const R initial_value) {
+
+template <class R, class F, size_t W>
+[[nodiscard]] R reduce(const word_container<W>& w, const F f, const R initial_value)
+{
     R result = initial_value;
 
-    for (size_t i = 0; i < w.word_count(); ++i) {
+    for (size_t i = 0; i < w.word_count(); ++i)
+    {
         result = f(w.word(i), result);
+    }
+
+    return result;
+}
+
+template <class R, class F, size_t W, size_t V>
+[[nodiscard]] R zip_reduce(const word_container<W>& w, const word_container<V>& v, const F f,
+                           const R initial_value)
+{
+    R result = initial_value;
+
+    constexpr size_t L = std::min(W, V);
+
+    for (size_t i = 0; i < word_container<L>::word_count(); ++i)
+    {
+        result = f(w.word(i), v.word(i), result);
     }
 
     return result;

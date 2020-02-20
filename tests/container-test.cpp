@@ -49,7 +49,7 @@ SCENARIO("Performing common functional operations", "[word_container]")
             }
         }
 
-        AND_GIVEN("Another word container v")
+        AND_GIVEN("Another word container v of same length")
         {
             const word_container<256> v{8, 16, 32, 64};
             WHEN("Performing the zip_with operation")
@@ -66,6 +66,21 @@ SCENARIO("Performing common functional operations", "[word_container]")
                     {
                         CHECK(result.word(i) == w.word(i) + v.word(i));
                     }
+                }
+            }
+            WHEN("Performing the zip_reduce operation")
+            {
+
+                THEN("Element-wise addition should work as intended")
+                {
+
+                    const auto f = [](word_container<256>::word_type a,
+                                      word_container<256>::word_type b,
+                                      uint64_t m) { return a + b + m; };
+                    const auto result = zip_reduce(w, v, f,0 );
+
+                    CHECK(result == (1U+2U+3U+8U+16U+32U+64U));
+
                 }
             }
         }
