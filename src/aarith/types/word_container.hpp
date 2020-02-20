@@ -539,13 +539,25 @@ std::pair<word_container<W - (S + 1)>, word_container<S + 1>> split(const word_c
     return std::make_pair(lhs, rhs);
 }
 
+/**
+ * @brief Applies a given function to all words within the word_container
+ * @tparam F "Catch-all" parameter for functions operating on the words of the word_container
+ * @tparam W Bit width of the word_container to operate on
+ * @param w The word_container to operate on
+ * @param f Function of type word_container<W>::word_type -> word_container<W>::word_type
+ * @return A new word_container with the transformed words
+ */
 template <class F, size_t W>[[nodiscard]] word_container<W> map(const word_container<W>& w, F f)
 {
 
     word_container<W> result;
     for (size_t i = 0; i < w.word_count(); ++i)
     {
-        result.set_word(i,f(w.word(i))) ;
+        result.set_word(i, f(w.word(i)));
+    }
+    return result;
+}
+
     }
     return result;
 }
