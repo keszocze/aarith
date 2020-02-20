@@ -589,10 +589,12 @@ template <class F, size_t W, size_t V>
 }
 
 /**
- * @brief Zips two word containers that might have a different number of words, expanding missing words with zeroes.
+ * @brief Zips two word containers that might have a different number of words, expanding missing
+ * words with zeroes.
  *
- * If the word_containers have a different number of words, the "missing" words are filled up with zeroes such that
- * this method will return a word_container that has the max width of both input word_containers.
+ * If the word_containers have a different number of words, the "missing" words are filled up with
+ * zeroes such that this method will return a word_container that has the max width of both input
+ * word_containers.
  *
  * @tparam F "Catch all" type for the zip with function
  * @tparam W Width of the first word_container
@@ -603,40 +605,29 @@ template <class F, size_t W, size_t V>
  * @return
  */
 template <class F, size_t W, size_t V>
-[[nodiscard]] word_container<std::max(W,V)> zip_with_expand(const word_container<W>& w, const word_container<V>& v, const F f)
+[[nodiscard]] word_container<std::max(W, V)> zip_with_expand(const word_container<W>& w,
+                                                             const word_container<V>& v, const F f)
 {
     constexpr size_t wc = word_container<W>::word_count();
     constexpr size_t vc = word_container<V>::word_count();
 
-
     // simply return the "standard" zip_with when the word widths are identical
-    if constexpr (wc == vc) {
-        return zip_with(w,v,f);
+    if constexpr (wc == vc)
+    {
+        return zip_with(w, v, f);
     }
-    else {
-        constexpr size_t min = std::min(wc, vc);
-        constexpr size_t max = std::max(wc, vc);
+    else
+    {
 
-        word_container<std::max(W,V)> result;
+        constexpr size_t max = std::max(W, V);
 
-        using wt = typename word_container<W>::word_type;
-        using vt = typename word_container<V>::word_type;
+        word_container<max> result;
+        word_container<max> w_{w};
+        word_container<max> v_{v};
 
-        for (size_t i = 0; i < min; ++i)
+        for (size_t i = 0; i < word_container<max>::word_count(); ++i)
         {
-            result.set_word(i, f(w.word(i),v.word(i)));
-        }
-
-        for (size_t i = min; i < max; ++i)
-        {
-            if constexpr (wc < vc)
-            {
-                result.set_word(i,f(wt(),v.word(i)));
-            }
-            else
-            {
-                result.set_word(i, f(w.word(i), vt()));
-            }
+            result.set_word(i, f(w_.word(i), v_.word(i)));
         }
         return result;
     }
@@ -683,52 +674,67 @@ template <class R, class F, size_t W>
  * @param initial_value The initial value that is fed into f
  * @return The value from zipping and reducing the two word_containers
  */
-template <class R, class F, size_t W, size_t V, bool fill_with_zeroes = false>
+template <class R, class F, size_t W, size_t V>
 [[nodiscard]] R zip_reduce(const word_container<W>& w, const word_container<V>& v, const F f,
                            const R initial_value)
 {
     R result = initial_value;
 
-    if constexpr (fill_with_zeroes &&
-                  word_container<W>::word_count() != word_container<V>::word_count())
+    constexpr size_t L = std::min(W, V);
+
+    for (size_t i = 0; i < word_container<L>::word_count(); ++i)
     {
-        constexpr size_t wc = w.word_count();
-        constexpr size_t vc = v.word_count();
-
-        using wt = typename word_container<W>::word_type;
-        using vt = typename word_container<V>::word_type;
-
-        constexpr size_t min = std::min(wc, vc);
-        constexpr size_t max = std::max(wc, vc);
-
-        for (size_t i = 0; i < min; ++i)
-        {
-            result = f(w.word(i), v.word(i), result);
-        }
-
-        for (size_t i = min; i < max; ++i)
-        {
-            if constexpr (wc < vc)
-            {
-                result = f(wt(), v.word(i), result);
-            }
-            else
-            {
-                result = f(w.word(i), vt(), result);
-            }
-        }
-    }
-    else
-    {
-        constexpr size_t L = std::min(W, V);
-
-        for (size_t i = 0; i < word_container<L>::word_count(); ++i)
-        {
-            result = f(w.word(i), v.word(i), result);
-        }
+        result = f(w.word(i), v.word(i), result);
     }
 
     return result;
+}
+
+/**
+ * @brief zips and reduces two word_containers that might have a different word count
+ *
+ * This method expands missing words by using zeros instead. This means that no values are skipped.
+ *
+ * @tparam R The return type of the reducing function
+ * @tparam F "Catch all" type for the reducing function
+ * @tparam W The width of the first word_container
+ * @tparam V The width of the second word_container
+ * @param w The first word_container
+ * @param v The second word_container
+ * @param f The reducing function of type (word_container<W>::word_type,
+ * word_container<V>__word_type, R) -> R
+ * @param initial_value The initial value that is fed into f
+ * @return The value from zipping and reducing the two word_containers
+ */
+template <class R, class F, size_t W, size_t V>
+[[nodiscard]] R zip_reduce_expand(const word_container<W>& w, const word_container<V>& v, const F f,
+                                  const R initial_value)
+{
+
+    R result = initial_value;
+
+    constexpr size_t wc = w.word_count();
+    constexpr size_t vc = v.word_count();
+
+    if constexpr (wc == vc)
+    {
+        return zip_reduce(w, v, f, initial_value);
+    }
+    else
+    {
+
+        constexpr size_t max = std::max(W, V);
+
+        word_container<max> w_{w};
+        word_container<max> v_{v};
+
+        for (size_t i = 0; i < word_container<max>::word_count(); ++i)
+        {
+            result = f(w_.word(i), v_.word(i), result);
+        }
+
+        return result;
+    }
 }
 
 } // namespace aarith
