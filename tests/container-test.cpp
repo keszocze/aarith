@@ -42,9 +42,12 @@ SCENARIO("Performing common functional operations", "[word_container]")
 
         WHEN("Reducing the word_container")
         {
-            THEN("Summing up the individual words should work fine") {
-                const auto f = [](const word_container<265>::word_type a, uint64_t w) { return a + w; };
-                const auto result = reduce(w,f,0);
+            THEN("Summing up the individual words should work fine")
+            {
+                const auto f = [](const word_container<265>::word_type a, uint64_t w) {
+                    return a + w;
+                };
+                const auto result = reduce(w, f, 0);
                 CHECK(result == 6U);
             }
         }
@@ -60,6 +63,7 @@ SCENARIO("Performing common functional operations", "[word_container]")
 
                     const auto f = [](word_container<256>::word_type a,
                                       word_container<256>::word_type b) { return a + b; };
+
                     const auto result = zip_with(w, v, f);
 
                     for (size_t i = 0; i < w.word_count(); ++i)
@@ -74,13 +78,65 @@ SCENARIO("Performing common functional operations", "[word_container]")
                 THEN("Element-wise addition should work as intended")
                 {
 
+                    const std::vector<uint64_t> ns{8U, 15U, 5743U, 0U};
+
                     const auto f = [](word_container<256>::word_type a,
                                       word_container<256>::word_type b,
                                       uint64_t m) { return a + b + m; };
-                    const auto result = zip_reduce(w, v, f,0 );
 
-                    CHECK(result == (1U+2U+3U+8U+16U+32U+64U));
+                    for (const auto n : ns)
+                    {
+                        const auto result = zip_reduce(w, v, f, n);
 
+                        CHECK(result == (1U + 2U + 3U + 8U + 16U + 32U + 64U + n));
+                    }
+                }
+            }
+        }
+
+        AND_GIVEN("Another word container v of different length")
+        {
+            const word_container<192> v{8, 16, 64};
+            WHEN("Performing the zip_with operation")
+            {
+
+                THEN("Element-wise addition should work as intended")
+                {
+
+                    // "cheat" by knowing the underlying word type
+                    const auto f = [](const uint64_t a,const uint64_t b) { return a + b; };
+
+                    const word_container<192> result_w_v = zip_with(w, v, f);
+                    const word_container<192> result_v_w = zip_with(v, w, f);
+
+                    for (size_t i = 0; i < result_w_v.word_count(); ++i)
+                    {
+                        CHECK(result_w_v.word(i) == w.word(i) + v.word(i));
+                    }
+                    for (size_t i = 0; i < result_v_w.word_count(); ++i)
+                    {
+                        CHECK(result_v_w.word(i) == w.word(i) + v.word(i));
+                    }
+                }
+            }
+            WHEN("Performing the zip_reduce operation")
+            {
+
+                THEN("Element-wise addition should work as intended")
+                {
+
+                    const std::vector<uint64_t> ns{8U, 15U, 5743U, 0U};
+
+                    const auto f = [](word_container<256>::word_type a,
+                                      word_container<256>::word_type b,
+                                      uint64_t m) { return a + b + m; };
+
+                    for (const auto n : ns)
+                    {
+                        const auto result = zip_reduce(w, v, f, n);
+                        
+                        CHECK(result == (1U + 2U + 3U + 8U + 16U +  64U + n));
+                    }
                 }
             }
         }
