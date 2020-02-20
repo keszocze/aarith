@@ -42,6 +42,10 @@ add_executable(bit-operations-test bit_operations-test.cpp)
 target_link_libraries(bit-operations-test Catch2::WithMain aarith::Library)
 add_test(NAME bit-operations-test COMMAND bit-operations-test)
 
+add_executable(container-test container-test.cpp)
+target_link_libraries(container-test Catch2::WithMain aarith::Library)
+add_test(NAME container-test COMMAND container-test)
+
 
 add_executable(sint-test sint-test.cpp sint-operations-test.cpp sint-comparisons-test.cpp)
 target_link_libraries(sint-test Catch2::WithMain aarith::Library)

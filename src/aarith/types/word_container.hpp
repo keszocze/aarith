@@ -287,7 +287,7 @@ public:
 
     constexpr auto crbegin() const noexcept
     {
-        return words.bcregin();
+        return words.crbegin();
     }
 
     constexpr auto crend() const noexcept
@@ -537,6 +537,17 @@ std::pair<word_container<W - (S + 1)>, word_container<S + 1>> split(const word_c
     const word_container<S + 1> rhs = width_cast<S + 1>(w);
 
     return std::make_pair(lhs, rhs);
+}
+
+template <class F, size_t W>[[nodiscard]] word_container<W> map(const word_container<W>& w, F f)
+{
+
+    word_container<W> result;
+    for (size_t i = 0; i < w.word_count(); ++i)
+    {
+        result.set_word(i,f(w.word(i))) ;
+    }
+    return result;
 }
 
 } // namespace aarith
