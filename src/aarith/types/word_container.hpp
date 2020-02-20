@@ -558,6 +558,23 @@ template <class F, size_t W>[[nodiscard]] word_container<W> map(const word_conta
     return result;
 }
 
+//
+/**
+ * @brief Applies a function to all words of two word_containers and zips them to a new word_container
+ * @tparam F "Catch-all" parameter for functions operating on the words of the word_container
+ * @tparam W Bit width of the word_container to operate on
+ * @param w The first word_container to operate on
+ * @param v The second word_container to operate on
+ * @param f Function of type (word_container<W>::word_type, word_container<W>::word_type) -> word_container<W>
+ * @return The newly created, zipped word_container
+ */
+template <class F, size_t W>
+[[nodiscard]] word_container<W> zip_with(const word_container<W>& w, const word_container<W>& v, F f)
+{
+    word_container<W> result;
+    for (size_t i = 0; i < w.word_count(); ++i)
+    {
+        result.set_word(i, f(w.word(i), v.word(i)));
     }
     return result;
 }

@@ -18,7 +18,7 @@ SCENARIO("Performing common functional operations", "[word_container]")
         {
             THEN("All individual words should be increased by one")
             {
-                const auto result = map(w, [](uint64_t a) { return a + 1; });
+                const auto result = map(w, [](word_container<256>::word_type a) { return a + 1; });
 
                 for (size_t i = 0; i < result.word_count(); ++i)
                 {
@@ -31,7 +31,7 @@ SCENARIO("Performing common functional operations", "[word_container]")
         {
             THEN("All individual words should be increased by one")
             {
-                const auto result = map(w, [](uint64_t a) { return a << 2; });
+                const auto result = map(w, [](word_container<256>::word_type a) { return a << 2; });
 
                 CHECK(result.word(0) == 12);
                 CHECK(result.word(1) == 8);
@@ -45,10 +45,20 @@ SCENARIO("Performing common functional operations", "[word_container]")
             const word_container<256> v{8, 16, 32, 64};
             WHEN("Performign the zip_with operation")
             {
-                //            std::cout << group_digits(to_binary(v), 64) << "\n";
+
+                THEN("Element-wise addition should work as intended")
+                {
+
+                    const auto f = [](word_container<256>::word_type a,
+                                      word_container<256>::word_type b) { return a + b; };
+                    const auto result = zip_with(w, v, f);
+
+                    for (size_t i = 0; i < w.word_count(); ++i)
+                    {
+                        CHECK(result.word(i) == w.word(i) + v.word(i));
+                    }
+                }
             }
-
-
         }
     }
 }
