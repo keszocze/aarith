@@ -66,7 +66,7 @@ template <size_t W, size_t V>
             sum.set_word(i, partial_sum);
         }
     }
-    // Here we can simple iterate until we reached the end of either of the two uintegers
+    // Here we can simply iterate until we reached the end of either of the two uintegers
     else
     {
         for (auto i = 0U; i < a.word_count(); ++i)
