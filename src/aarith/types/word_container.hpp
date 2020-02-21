@@ -589,6 +589,49 @@ template <class F, size_t W, size_t V>
 }
 
 /**
+ * @brief Applies a function to all words of two word_containers and zips them to a new
+ * word_container carrying along a state
+ *
+ * The state that is carry will be parsed to the next function call on the two words of the container and may be
+ * updated in the process (e.g. generating a carry that propagates through the container).
+ *
+ * If the word_containers have a different number of words, the result will be of size min(W,V);
+ *
+ * @tparam F "Catch-all" parameter for functions operating on the words of the word_container
+ * @tparam W Bit width of the first word_container to operate on
+ * @tparam V Bit width of the secnd word_container to operate on
+ * @param w The first word_container to operate on
+ * @param v The second word_container to operate on
+ * @param f Function of type (word_container<W>::word_type, word_container<W>::word_type, word_container<W>::word_type) ->
+ * std::pari<word_container<W>,word_container<W>::word_type>
+ * @param initial_state The initial state to be passed into the operation
+ * @return The newly created, zipped word_container
+ */
+template <class F, size_t W, size_t V>
+[[nodiscard]] word_container<std::min(W, V)>
+zip_with_state(const word_container<W>& w, const word_container<V>& v, const F f,
+               const typename word_container<std::min(W, V)>::word_type initial_state =
+                   typename word_container<std::min(W, V)>::word_type())
+{
+    constexpr size_t L = std::min(W, V);
+    word_container<L> result;
+
+    using wt = typename word_container<L>::word_type;
+
+    wt state = initial_state;
+
+    for (size_t i = 0; i < result.word_count(); ++i)
+    {
+        const auto fun_res = f(w.word(i), v.word(i), state);
+        state = fun_res.second;
+        wt new_word = fun_res.first;
+        std::cout << "setting word " << i << " to " << new_word << "\n";
+        result.set_word(i, new_word);
+    }
+    return result;
+}
+
+/**
  * @brief Zips two word containers that might have a different number of words, expanding missing
  * words with zeroes.
  *
@@ -601,7 +644,8 @@ template <class F, size_t W, size_t V>
  * @tparam V Width of the second word_container
  * @param w First word_container
  * @param v Second word_container
- * @param f The zip_with function
+ * @param f The zip_with function of type (word_container<W>::word_type,
+ * word_container<W>::word_type) -> word_container<W>
  * @return
  */
 template <class F, size_t W, size_t V>
@@ -621,15 +665,58 @@ template <class F, size_t W, size_t V>
 
         constexpr size_t max = std::max(W, V);
 
-        word_container<max> result;
         word_container<max> w_{w};
         word_container<max> v_{v};
 
-        for (size_t i = 0; i < word_container<max>::word_count(); ++i)
-        {
-            result.set_word(i, f(w_.word(i), v_.word(i)));
-        }
-        return result;
+        return zip_with(w_, v_, f);
+    }
+}
+
+/**
+ * @brief Zips two word containers that might have a different number of words, expanding missing
+ * words with zeroes carrying along a state.
+ *
+ * The state that is carry will be parsed to the next function call on the two words of the container and may be
+ * updated in the process (e.g. generating a carry that propagates through the container).
+ *
+ *
+ * If the word_containers have a different number of words, the "missing" words are filled up with
+ * zeroes such that this method will return a word_container that has the max width of both input
+ * word_containers.
+ *
+ * @tparam F "Catch all" type for the zip with function
+ * @tparam W Width of the first word_container
+ * @tparam V Width of the second word_container
+ * @param w First word_container
+ * @param v Second word_container
+ * @param f Function of type (word_container<W>::word_type, word_container<W>::word_type, word_container<W>::word_type) ->
+ * std::pari<word_container<W>,word_container<W>::word_type>
+ * @param initial_state The initial state to be passed into the operation
+ * @return
+ */
+template <class F, size_t W, size_t V>
+[[nodiscard]] word_container<std::max(W, V)>
+zip_with_state_expand(const word_container<W>& w, const word_container<V>& v, const F f,
+                      const typename word_container<std::max(W, V)>::word_type initial_state =
+                          typename word_container<std::max(W, V)>::word_type())
+{
+    constexpr size_t wc = word_container<W>::word_count();
+    constexpr size_t vc = word_container<V>::word_count();
+
+    // simply return the "standard" zip_with when the word widths are identical
+    if constexpr (wc == vc)
+    {
+        return zip_with_state(w, v, f);
+    }
+    else
+    {
+
+        constexpr size_t max = std::max(W, V);
+
+        word_container<max> w_{w};
+        word_container<max> v_{v};
+
+        return zip_with_state(w_, v_, f, initial_state);
     }
 }
 
@@ -728,12 +815,8 @@ template <class R, class F, size_t W, size_t V>
         word_container<max> w_{w};
         word_container<max> v_{v};
 
-        for (size_t i = 0; i < word_container<max>::word_count(); ++i)
-        {
-            result = f(w_.word(i), v_.word(i), result);
-        }
-
-        return result;
+        return zip_reduce(w_, v_, f, initial_value);
+        ;
     }
 }
 

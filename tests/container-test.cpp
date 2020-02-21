@@ -74,6 +74,36 @@ SCENARIO("Performing common functional operations", "[word_container]")
                     }
                 }
             }
+
+            WHEN("Performing the zip_with_state operation") {
+                THEN("It should be capable of modeling addition") {
+                    const word_container<128> a{0, std::numeric_limits<uint64_t>::max()};
+                    const word_container<128> b{0, std::numeric_limits<uint64_t>::max()};
+
+                    std::cout << group_digits(to_binary(a),64) << "\n";
+                    std::cout << group_digits(to_binary(b),64) << "\n";
+
+                    const auto f = [](uint64_t ain, uint64_t bin, uint64_t cin) {
+                        uint64_t partial_sum = ain + bin;
+                        uint64_t new_carry = (partial_sum < ain || partial_sum < bin) ? 1U : 0U;
+
+                        partial_sum = partial_sum + cin;
+                        new_carry = new_carry | (partial_sum < ain || partial_sum < bin) ? 1U : 0U;
+
+
+                        return std::make_pair(partial_sum, new_carry);
+                    };
+
+                    const auto result = zip_with_state(a,b,f);
+
+                    const auto uinteger_result = add(uinteger<128>(a), uinteger<128>(b));
+
+                    std::cout << group_digits(to_binary(result),64) << "\n";
+
+                    CHECK(uinteger<192>(result) == uinteger_result);
+
+                }
+            }
             WHEN("Performing the trivial approximate addition")
             {
                 THEN("The result should work out well, filling additional slots with zeroes") {
