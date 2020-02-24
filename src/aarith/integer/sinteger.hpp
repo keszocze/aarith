@@ -136,36 +136,6 @@ public:
     static constexpr bool value = false;
 };
 
-template <size_t Width>
-[[nodiscard]] auto operator&(const sinteger<Width>& lhs, const sinteger<Width>& rhs)
-    -> sinteger<Width>
-{
-    word_array<Width> lhs_w{lhs};
-    word_array<Width> rhs_w{rhs};
-
-    word_array<Width> result = lhs_w & rhs_w;
-
-    return sinteger<Width>{result};
-}
-
-template <size_t Width>
-[[nodiscard]] auto operator|(const sinteger<Width>& lhs, const sinteger<Width>& rhs)
-    -> sinteger<Width>
-{
-    word_array<Width> lhs_w{lhs};
-    word_array<Width> rhs_w{rhs};
-
-    word_array<Width> result = lhs_w | rhs_w;
-
-    return sinteger<Width>{result};
-}
-
-template <size_t Width>[[nodiscard]] auto operator~(const sinteger<Width>& rhs) -> sinteger<Width>
-{
-    word_array<Width> rhs_w{rhs};
-    word_array<Width> result = ~rhs_w;
-    return sinteger<Width>{result};
-}
 
 template <size_t DestinationWidth, size_t SourceWidth>
 [[nodiscard]] auto width_cast(const sinteger<SourceWidth>& source) -> sinteger<DestinationWidth>

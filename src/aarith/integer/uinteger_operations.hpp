@@ -8,6 +8,55 @@
 
 namespace aarith {
 
+    template <size_t Width>
+    [[nodiscard]] auto operator<<(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
+    {
+
+        word_array<Width> tmp{lhs};
+
+        return uinteger<Width>{tmp << rhs};
+    }
+
+    template <size_t Width>
+    auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
+    {
+
+        word_array<Width> tmp{lhs};
+        return uinteger<Width>{tmp >> rhs};
+    }
+
+    template <size_t Width>
+    [[nodiscard]] auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
+    -> uinteger<Width>
+    {
+        word_array<Width> lhs_w{lhs};
+        word_array<Width> rhs_w{rhs};
+
+        word_array<Width> result = lhs_w & rhs_w;
+
+        return uinteger<Width>{result};
+    }
+
+    template <size_t Width>
+    [[nodiscard]] auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
+    -> uinteger<Width>
+    {
+        word_array<Width> lhs_w{lhs};
+        word_array<Width> rhs_w{rhs};
+
+        word_array<Width> result = lhs_w | rhs_w;
+
+        return uinteger<Width>{result};
+    }
+
+    template <size_t Width>[[nodiscard]] auto operator~(const uinteger<Width>& rhs) -> uinteger<Width>
+    {
+        word_array<Width> rhs_w{rhs};
+        word_array<Width> result = ~rhs_w;
+        return uinteger<Width>{result};
+    }
+
+
 /**
  * @brief Adds two unsigned integers of, possibly, different bit widths.
  *
@@ -279,8 +328,6 @@ template <class UInteger>
 }
 
 } // namespace aarith
-
-#include "uinteger.hpp"
 
 namespace aarith::exact_operators {
 
