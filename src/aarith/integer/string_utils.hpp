@@ -101,7 +101,7 @@ auto to_bcd(const uinteger<Width>& num) -> uinteger<number_of_decimal_digits(Wid
 }
 
 /// Convert the given uinteger value into a binary string representation
-template <size_t Width> auto to_binary(const word_container<Width>& value) -> std::string
+template <size_t Width> auto to_binary(const word_array<Width>& value) -> std::string
 {
     std::string result;
     for (auto i = Width; i > 0; --i)

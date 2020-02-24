@@ -1,7 +1,7 @@
 #pragma once
 
 #include <aarith/core/traits.hpp>
-#include <aarith/core/word_container.hpp>
+#include <aarith/core/word_array.hpp>
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -14,31 +14,31 @@
 namespace aarith {
 
 template <size_t Width, class WordType = uint64_t>
-class uinteger : public word_container<Width, WordType>
+class uinteger : public word_array<Width, WordType>
 {
 public:
     uinteger() = default;
 
     explicit uinteger(WordType n)
-        : word_container<Width, WordType>(n)
+        : word_array<Width, WordType>(n)
     {
     }
 
     template <class... Args>
     uinteger(WordType fst, Args... args)
-        : word_container<Width>(fst, args...)
+        : word_array<Width>(fst, args...)
     {
     }
 
     template <size_t V>
     uinteger<Width, WordType>(const uinteger<V, WordType>& other)
-        : word_container<Width>(static_cast<const word_container<V, WordType>&>(other))
+        : word_array<Width>(static_cast<const word_array<V, WordType>&>(other))
     {
     }
 
     template <size_t V>
-    uinteger<Width, WordType>(const word_container<V, WordType>& other)
-        : word_container<Width>(other)
+    uinteger<Width, WordType>(const word_array<V, WordType>& other)
+        : word_array<Width>(other)
     {
     }
 
@@ -95,7 +95,7 @@ template <size_t Width>
 [[nodiscard]] auto operator<<(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
 {
 
-    word_container<Width> tmp{lhs};
+    word_array<Width> tmp{lhs};
 
     return uinteger<Width>{tmp << rhs};
 }
@@ -104,7 +104,7 @@ template <size_t Width>
 auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
 {
 
-    word_container<Width> tmp{lhs};
+    word_array<Width> tmp{lhs};
     return uinteger<Width>{tmp >> rhs};
 }
 
@@ -112,10 +112,10 @@ template <size_t Width>
 [[nodiscard]] auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
     -> uinteger<Width>
 {
-    word_container<Width> lhs_w{lhs};
-    word_container<Width> rhs_w{rhs};
+    word_array<Width> lhs_w{lhs};
+    word_array<Width> rhs_w{rhs};
 
-    word_container<Width> result = lhs_w & rhs_w;
+    word_array<Width> result = lhs_w & rhs_w;
 
     return uinteger<Width>{result};
 }
@@ -124,27 +124,27 @@ template <size_t Width>
 [[nodiscard]] auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
     -> uinteger<Width>
 {
-    word_container<Width> lhs_w{lhs};
-    word_container<Width> rhs_w{rhs};
+    word_array<Width> lhs_w{lhs};
+    word_array<Width> rhs_w{rhs};
 
-    word_container<Width> result = lhs_w | rhs_w;
+    word_array<Width> result = lhs_w | rhs_w;
 
     return uinteger<Width>{result};
 }
 
 template <size_t Width>[[nodiscard]] auto operator~(const uinteger<Width>& rhs) -> uinteger<Width>
 {
-    word_container<Width> rhs_w{rhs};
-    word_container<Width> result = ~rhs_w;
+    word_array<Width> rhs_w{rhs};
+    word_array<Width> result = ~rhs_w;
     return uinteger<Width>{result};
 }
 
 template <size_t DestinationWidth, size_t SourceWidth>
 [[nodiscard]] auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>
 {
-    word_container<SourceWidth> in{source};
+    word_array<SourceWidth> in{source};
 
-    word_container<DestinationWidth> result = width_cast<DestinationWidth>(in);
+    word_array<DestinationWidth> result = width_cast<DestinationWidth>(in);
 
     return uinteger<DestinationWidth>{result};
 }
