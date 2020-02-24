@@ -523,7 +523,7 @@ word_container<(S - E) + 1> bit_range(const word_container<W>& w)
 /**
  * @brief Splits the word container at the given splitting point
  * @tparam S Splitting point
- * @tparam W Width of the word wontainer to be split
+ * @tparam W Width of the word container to be split
  * @param w Word container that is split
  * @return Pair of <word[W-1,S+1], word[S,0]>
  */

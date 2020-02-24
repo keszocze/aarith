@@ -147,29 +147,165 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
     }
 }
 
-
-SCENARIO("Multiplying signed integers", "[sinteger][arithmetic]")
+SCENARIO("Division of signed integers", "[sinteger][arithmetic][foo]")
 {
-    GIVEN("Two signed integers m and r"){
-        THEN("Then the multiplication should be donce correctly")
-        {
 
+    GIVEN("The number 1 << 65")
+    {
+        const sinteger<70> m = (sinteger<70>::one() << 65);
+
+        const sinteger<70> two{2};
+
+        WHEN("Repeatedly dividing by two")
+        {
+            THEN("The division should work correctly over word boundaries")
+            {
+                const auto div1 = restoring_division(m, two);
+
+                CHECK(div1.first.word(1) == 1U);
+                CHECK(div1.first.word(0) == 0U);
+                CHECK(div1.second == sinteger<70>::zero());
+
+                const auto div2 = restoring_division(div1.first, two);
+
+                CHECK(div2.first.word(1) == 0U);
+                CHECK(div2.first.word(0) == (int64_t(1) << int64_t(63)));
+                CHECK(div2.second == sinteger<70>::zero());
+            }
+        }
+    }
+
+    GIVEN("A signed integer<64> n != INT_MIN")
+    {
+
+        const int64_t n_ = GENERATE(take(
+            100, random(std::numeric_limits<int64_t>::max(), std::numeric_limits<int64_t>::max())));
+        const sinteger<64> n{n_};
+
+        WHEN("Dividing zero by this number")
+        {
+            THEN("The result should be zero")
+            {
+                if (!n.is_zero())
+                {
+                    const auto result = restoring_division(sinteger<64>::zero(), n);
+                    CHECK(result.second == sinteger<64>::zero());
+                    REQUIRE(result.first == sinteger<64>::zero());
+                }
+                else
+                {
+                    REQUIRE_THROWS_AS(restoring_division(n, n), std::runtime_error);
+                }
+            }
         }
 
-        WHEN("m is the most negative number") {
+        WHEN("Dividing by itself")
+        {
+            AND_WHEN("n is not equal to zero")
+            {
+                THEN("The result should be one without remainder")
+                {
+                    if (!n.is_zero())
+                    {
+                        const auto result = restoring_division(n, n);
+                        CHECK(result.second == sinteger<64>::zero());
+                        REQUIRE(result.first == sinteger<61>::one());
+                    }
+                    else
+                    {
+                        REQUIRE_THROWS_AS(restoring_division(n, n), std::runtime_error);
+                    }
+                }
+            }
+        }
+
+        WHEN("Dividing by zero")
+        {
+            THEN("An exception should be raised")
+            {
+                REQUIRE_THROWS_AS(restoring_division(n, sinteger<64>::zero()), std::runtime_error);
+            }
+        }
+
+        WHEN("Dividing by one")
+        {
+            THEN("The result should be the number itself")
+            {
+
+                const auto result = restoring_division(n, sinteger<64>::one());
+                CHECK(result.second == sinteger<64>::zero());
+                REQUIRE(result.first == n);
+            }
+        }
+
+        WHEN("Dividing by minus one")
+        {
+            THEN("The result should flip its sign")
+            {
+
+                const auto result = restoring_division(n, sinteger<64>::minus_one());
+                CHECK(result.second == sinteger<64>::zero());
+                REQUIRE(result.first == -n);
+            }
+        }
+
+        AND_GIVEN("Another signed integer<64> m != INT_MIN")
+        {
+            const int64_t m_ = GENERATE(take(100, random(std::numeric_limits<int64_t>::max(),
+                                                         std::numeric_limits<int64_t>::max())));
+            const sinteger<64> m{m_};
+            WHEN("Dividing the numbers")
+            {
+                THEN("The behaviour should match its int64_t counterpart")
+                {
+                    const auto result64_div = n_ / m_;
+                    const auto result64_rem = n_ % m_;
+                    const auto result = restoring_division(n, m);
+                    CHECK(result.first.word(0) == result64_div);
+                    CHECK(result.second.word(0) == result64_rem);
+                }
+            }
+        }
+    }
+
+    GIVEN("INT_MIN")
+    {
+        AND_GIVEN("Minus one")
+        {
+            WHEN("Dividing INT_MIN by minus one")
+            {
+                THEN("The result should be INT_MIN")
+                {
+                    const auto result =
+                        restoring_division(sinteger<64>::min(), sinteger<64>::minus_one());
+                    CHECK(result.first == sinteger<64>::min());
+                    CHECK(result.second == sinteger<64>::zero());
+                }
+            }
+        }
+    }
+}
+SCENARIO("Multiplying signed integers", "[sinteger][arithmetic]")
+{
+    GIVEN("Two signed integers m and r")
+    {
+        THEN("Then the multiplication should be done correctly")
+        {
+        }
+
+        WHEN("m is the most negative number")
+        {
             THEN("The algorithm should still work")
             {
                 const sinteger<8> m{-16};
                 const sinteger<8> r{2};
 
-                const sinteger<8> res = mul(m,r);
-
-
+                const sinteger<8> res = mul(m, r);
 
                 int8_t mi = -16;
                 int8_t ri = 2;
 
-                int8_t resi = mi*ri;
+                int8_t resi = mi * ri;
                 CHECK((uint8_t)res.word(0) == (uint8_t)resi);
             }
         }
