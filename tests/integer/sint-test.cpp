@@ -242,7 +242,7 @@ SCENARIO("Create negative sintegers", "[sinteger][bit_logic]")
 {
     GIVEN("A int64_t negative number")
     {
-        int64_t n = GENERATE(take(100, random(-922337236854775808, -1L)));
+        int64_t n = GENERATE(take(100, random(-922337236854775808LL, -1LL)));
         int64_t pos_n = -n;
 
         sinteger<64> zero;
@@ -275,7 +275,7 @@ SCENARIO("Create negative sintegers", "[sinteger][bit_logic]")
     }
 }
 
- SCENARIO("Right shift operator works as expected", "[sinteger][bit-logic]")
+SCENARIO("Right shift operator works as expected", "[sinteger][bit-logic]")
 {
     GIVEN("One positive sinteger a and a number of shifted bits s")
     {
@@ -303,14 +303,11 @@ SCENARIO("Create negative sintegers", "[sinteger][bit_logic]")
             typename sinteger<Width>::word_type number_a = 3;
             number_a <<= (sinteger<Width>::word_width() - 4);
 
-
             static constexpr auto s = static_cast<size_t>(sinteger<Width>::word_width());
             sinteger<Width> a(0U);
             a.set_word(a.word_count() - 1, number_a);
 
-
             const auto result = a >> s;
-
 
             CHECK(result.word(a.word_count() - 3) == 0);
             CHECK(result.word(a.word_count() - 2) == number_a);
@@ -333,7 +330,6 @@ SCENARIO("Create negative sintegers", "[sinteger][bit_logic]")
             REQUIRE(result.word(a.word_count() - 1) == 0);
         }
 
-
         WHEN("The bits are shifted exactly by word_width-2 over word boundaries")
         {
             const size_t Width = 192;
@@ -352,7 +348,6 @@ SCENARIO("Create negative sintegers", "[sinteger][bit_logic]")
             REQUIRE(result.word(a.word_count() - 2) == ref);
             REQUIRE(result.word(a.word_count() - 1) == 1);
         }
-
 
         WHEN("The bits are shifted by 2*word_width-1")
         {
@@ -373,7 +368,6 @@ SCENARIO("Create negative sintegers", "[sinteger][bit_logic]")
             REQUIRE(result.word(a.word_count() - 2) == 0);
             REQUIRE(result.word(a.word_count() - 1) == 0);
         }
-
 
         WHEN("The shift amount is a multiple of the word width")
         {
@@ -690,7 +684,6 @@ SCENARIO("Bit operations are performed correctly", "[sinteger][bit]")
     }
 }
 
-
 SCENARIO("std::numeric_limits gets instantiated correctly", "[sinteger][utility]")
 {
     GIVEN("The bit width of 32")
@@ -716,10 +709,10 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[sinteger][utility]
             CHECK(nl::is_modulo == il::is_modulo);
             CHECK(nl::radix == il::radix);
             CHECK(nl::digits == il::digits);
-            // TODO remove this when log10 becomes constexpr in clang's stdlibc
-            #ifndef __clang__
+// TODO remove this when log10 becomes constexpr in clang's stdlibc
+#ifdef __GNUG__
             CHECK(nl::digits10 == il::digits10);
-            #endif
+#endif
             CHECK(nl::max_digits10 == il::max_digits10);
             CHECK(nl::min_exponent10 == il::min_exponent10);
             CHECK(nl::min_exponent == il::min_exponent);
@@ -761,10 +754,10 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[sinteger][utility]
             CHECK(nl::is_modulo == il::is_modulo);
             CHECK(nl::radix == il::radix);
             CHECK(nl::digits == il::digits);
-            // TODO remove this when log10 becomes constexpr in clang's stdlibc
-            #ifndef __clang__
+// TODO remove this when log10 becomes constexpr in clang's stdlibc
+#ifdef __GNUG__
             CHECK(nl::digits10 == il::digits10);
-            #endif
+#endif
             CHECK(nl::max_digits10 == il::max_digits10);
             CHECK(nl::min_exponent10 == il::min_exponent10);
             CHECK(nl::min_exponent == il::min_exponent);
@@ -774,13 +767,13 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[sinteger][utility]
             CHECK(nl::tinyness_before == il::tinyness_before);
             CHECK(static_cast<int64_t>(nl::min().word(0)) == il::min());
             CHECK(static_cast<int64_t>(nl::lowest().word(0)) == il::lowest());
-            CHECK(nl::max().word(0) == il::max());
-            CHECK(nl::epsilon().word(0) == il::epsilon());
-            CHECK(nl::round_error().word(0) == il::round_error());
-            CHECK(nl::infinity().word(0) == il::infinity());
-            CHECK(nl::quiet_NaN().word(0) == il::quiet_NaN());
-            CHECK(nl::signaling_NaN().word(0) == il::signaling_NaN());
-            CHECK(nl::denorm_min().word(0) == il::denorm_min());
+            CHECK(static_cast<int64_t>(nl::max().word(0)) == il::max());
+            CHECK(static_cast<int64_t>(nl::epsilon().word(0)) == il::epsilon());
+            CHECK(static_cast<int64_t>(nl::round_error().word(0)) == il::round_error());
+            CHECK(static_cast<int64_t>(nl::infinity().word(0)) == il::infinity());
+            CHECK(static_cast<int64_t>(nl::quiet_NaN().word(0)) == il::quiet_NaN());
+            CHECK(static_cast<int64_t>(nl::signaling_NaN().word(0)) == il::signaling_NaN());
+            CHECK(static_cast<int64_t>(nl::denorm_min().word(0)) == il::denorm_min());
         }
     }
 }

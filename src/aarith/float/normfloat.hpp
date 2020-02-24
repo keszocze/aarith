@@ -1,24 +1,22 @@
 #pragma once
 
+#include <aarith/core/traits.hpp>
 #include <aarith/float/float_utils.hpp>
 #include <aarith/integer/uinteger.hpp>
-#include <aarith/core/traits.hpp>
 #include <cstdint>
 #include <iostream>
-#include <type_traits>
 #include <string>
 #include <time.h>
-
+#include <type_traits>
 
 namespace aarith {
 
-template <size_t E, size_t M>
-class normfloat
+template <size_t E, size_t M> class normfloat
 {
 public:
     static_assert(M > 0, "Mantissa width has to be greater zero.");
     static_assert(E > 1, "Exponent width has to be greater one.");
-    
+
     explicit normfloat()
     {
         exponent = uinteger<E>(0U);
@@ -26,11 +24,12 @@ public:
         sign_neg = false;
     }
 
-    template<class F>
-    explicit normfloat(F f)
+    template <class F> explicit normfloat(F f)
     {
-        static_assert(!std::is_integral<F>::value, "Only floating point numbers are supported");
-        //static_assert(get_mantissa_width<F>() < M, "Mantissa of f does not fit into explicit mantissa of normfloat.");
+        static_assert(std::is_floating_point<F>::value,
+                      "Only floating point numbers are supported");
+        // static_assert(get_mantissa_width<F>() < M, "Mantissa of f does not fit into explicit
+        // mantissa of normfloat.");
 
         auto f_exponent = extract_exponent(f);
         auto f_mantissa = extract_mantissa(f);
@@ -40,7 +39,7 @@ public:
         sign_neg = extract_sign(f) == 1;
 
         constexpr auto wider_mantissa = M >= f_mantissa_width;
-        if(wider_mantissa)
+        if (wider_mantissa)
         {
             mantissa = uinteger<M>(f_mantissa);
             constexpr auto mantissa_shift = M - f_mantissa_width;
@@ -53,92 +52,87 @@ public:
             mantissa = uinteger<M>(f_mantissa);
         }
 
-        if(f_exponent > 0)
+        if (f_exponent > 0)
         {
             constexpr auto wider_exponent = E >= f_exponent_width;
-            if(wider_exponent)
+            if (wider_exponent)
             {
                 exponent = uinteger<E>(f_exponent);
-                const auto f_bias = width_cast<E>(normfloat<f_exponent_width, f_mantissa_width>::get_bias());
+                const auto f_bias =
+                    width_cast<E>(normfloat<f_exponent_width, f_mantissa_width>::get_bias());
                 const auto exponent_delta = sub(get_bias(), f_bias);
                 exponent = add(exponent, exponent_delta);
-
             }
             else
             {
                 const auto bias = get_bias();
-                const auto exponent_delta = normfloat<f_exponent_width, f_mantissa_width>::get_bias().word(0) - bias.word(0);
-                f_exponent -= exponent_delta;
+                const auto exponent_delta =
+                    normfloat<f_exponent_width, f_mantissa_width>::get_bias().word(0) -
+                    bias.word(0);
+                f_exponent -= static_cast<decltype(f_exponent)>(exponent_delta);
                 exponent = uinteger<E>(f_exponent);
             }
         }
         else
         {
-            mantissa.set_bit(M-1, false);
+            mantissa.set_bit(M - 1, false);
         }
     }
 
-    static constexpr auto exponent_width()
-    -> size_t
+    static constexpr auto exponent_width() -> size_t
     {
         return E;
     }
 
-    static constexpr auto mantissa_width()
-    -> size_t
+    static constexpr auto mantissa_width() -> size_t
     {
         return M;
     }
 
-    static constexpr auto get_bias()
-    -> uinteger<E>
+    static constexpr auto get_bias() -> uinteger<E>
     {
         const uinteger<E> one(1U);
         const uinteger<E> shifted = one << (E - 1);
         return sub(shifted, one);
     }
 
-    auto get_sign() const
-    -> unsigned int
+    auto get_sign() const -> unsigned int
     {
-        return (sign_neg)?1U:0U;
+        return (sign_neg) ? 1U : 0U;
     }
 
-    void set_sign(uint8_t sign)
+    void set_sign(unsigned int sign)
     {
-        sign_neg = (sign&1U) > 0;
+        sign_neg = (sign & 1U) > 0;
     }
 
-    auto get_exponent() const
-    -> uinteger<E>
+    auto get_exponent() const -> uinteger<E>
     {
         return exponent;
     }
 
-    void set_exponent(const uinteger<E> &set_to)
+    void set_exponent(const uinteger<E>& set_to)
     {
         exponent = set_to;
     }
 
-    auto get_mantissa() const
-    -> uinteger<M>
+    auto get_mantissa() const -> uinteger<M>
     {
         return mantissa;
     }
 
-    void set_mantissa(const uinteger<M> &set_to)
+    void set_mantissa(const uinteger<M>& set_to)
     {
         mantissa = set_to;
     }
 
-    auto bit(size_t index) const
-    -> typename uinteger<M>::bit_type
+    auto bit(size_t index) const -> typename uinteger<M>::bit_type
     {
-        if(index < M)
+        if (index < M)
         {
             return mantissa.bit(index);
         }
-        else if(index < M + E)
+        else if (index < M + E)
         {
             return exponent.bit(index - M);
         }
@@ -148,8 +142,7 @@ public:
         }
     }
 
-    auto is_normalized() const
-    -> bool
+    auto is_normalized() const -> bool
     {
         return bit(M) == 1;
     }
@@ -158,7 +151,6 @@ private:
     bool sign_neg;
     uinteger<E> exponent;
     uinteger<M> mantissa;
-
 };
 
 template <size_t E, size_t M> class is_integral<normfloat<E, M>>
@@ -179,13 +171,12 @@ public:
     static constexpr bool value = false;
 };
 
-template<size_t E, size_t M1, size_t M2>
-auto equal_except_rounding(const normfloat<E, M1> lhs, const normfloat<E, M2> rhs)
--> bool
-{   
-    if(lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent())
+template <size_t E, size_t M1, size_t M2>
+auto equal_except_rounding(const normfloat<E, M1> lhs, const normfloat<E, M2> rhs) -> bool
+{
+    if (lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent())
     {
-        if(lhs.get_mantissa() == rhs.get_mantissa())
+        if (lhs.get_mantissa() == rhs.get_mantissa())
         {
             return true;
         }
@@ -197,17 +188,17 @@ auto equal_except_rounding(const normfloat<E, M1> lhs, const normfloat<E, M2> rh
 
             const auto m1 = lhs.get_mantissa();
             const auto m2 = rhs.get_mantissa();
-            
+
             const auto bit1 = m1.bit(offset_M1);
             const auto bit2 = m2.bit(offset_M2);
 
             bool rounding_error = true;
             bool has_to_be_equal = bit1 == bit2;
-            for(auto i = 0U; i < Min; ++i)
+            for (auto i = 0U; i < Min; ++i)
             {
-                if(has_to_be_equal)
+                if (has_to_be_equal)
                 {
-                    if(m1.bit(i+offset_M1) != m2.bit(i+offset_M2))
+                    if (m1.bit(i + offset_M1) != m2.bit(i + offset_M2))
                     {
                         rounding_error = false;
                         break;
@@ -215,9 +206,9 @@ auto equal_except_rounding(const normfloat<E, M1> lhs, const normfloat<E, M2> rh
                 }
                 else
                 {
-                    if(m1.bit(i+offset_M1) != m2.bit(i+offset_M2))
+                    if (m1.bit(i + offset_M1) != m2.bit(i + offset_M2))
                     {
-                        if(m1.bit(i+offset_M1) == bit1 && m2.bit(i+offset_M2) == bit2)
+                        if (m1.bit(i + offset_M1) == bit1 && m2.bit(i + offset_M2) == bit2)
                         {
                             continue;
                         }
@@ -226,7 +217,7 @@ auto equal_except_rounding(const normfloat<E, M1> lhs, const normfloat<E, M2> rh
                             has_to_be_equal = true;
                         }
                     }
-                    else if(i == 1)
+                    else if (i == 1)
                     {
                         has_to_be_equal = true;
                     }
@@ -244,9 +235,7 @@ auto equal_except_rounding(const normfloat<E, M1> lhs, const normfloat<E, M2> rh
     return false;
 }
 
-template<size_t E, size_t M>
-auto abs(const normfloat<E, M> nf)
--> normfloat<E, M>
+template <size_t E, size_t M> auto abs(const normfloat<E, M> nf) -> normfloat<E, M>
 {
     auto absolute = nf;
     absolute.set_sign(0U);
@@ -254,9 +243,8 @@ auto abs(const normfloat<E, M> nf)
     return absolute;
 }
 
-template<size_t M>
-auto rshift_and_round(const uinteger <M> &m, const size_t shift_by)
--> uinteger<M>
+template <size_t M>
+auto rshift_and_round(const uinteger<M>& m, const size_t shift_by) -> uinteger<M>
 {
     if (shift_by == 0)
     {
@@ -270,20 +258,20 @@ auto rshift_and_round(const uinteger <M> &m, const size_t shift_by)
 
     auto round = 0U;
 
-    if(m.bit(shift_by-1) == 1)
+    if (m.bit(shift_by - 1) == 1)
     {
         bool on_border = true;
-        for(auto c = shift_by-1; c > 0; --c)
+        for (auto c = shift_by - 1; c > 0; --c)
         {
-            if(m.bit(c-1) == 1)
+            if (m.bit(c - 1) == 1)
             {
                 on_border = false;
                 break;
             }
         }
-        if(on_border)
+        if (on_border)
         {
-            srand (time(NULL));
+            srand(static_cast<unsigned int>(time(NULL)));
             round = rand() % 2;
         }
         else
@@ -295,9 +283,8 @@ auto rshift_and_round(const uinteger <M> &m, const size_t shift_by)
     return add((m >> shift_by), uinteger<M>(round));
 }
 
-template<size_t E, size_t M1, size_t M2=M1>
-auto normalize(const normfloat<E, M1> &nf)
--> normfloat<E, M2>
+template <size_t E, size_t M1, size_t M2 = M1>
+auto normalize(const normfloat<E, M1>& nf) -> normfloat<E, M2>
 {
     auto denormalized = nf;
 
@@ -306,12 +293,12 @@ auto normalize(const normfloat<E, M1> &nf)
 
     auto one_at = find_leading_one(mantissa);
 
-    if(one_at == M1)
+    if (one_at == M1)
     {
         exponent = uinteger<E>(0U);
         denormalized.set_sign(0);
     }
-    else if(one_at >= M2)
+    else if (one_at >= M2)
     {
         auto shift_by = one_at + 1 - M2;
         mantissa = rshift_and_round(mantissa, shift_by);
@@ -333,28 +320,26 @@ auto normalize(const normfloat<E, M1> &nf)
     return normalized_float;
 }
 
-template<class uint>
-auto find_leading_one(const uint mantissa)
--> typename uint::word_type
+template <class uint> auto find_leading_one(const uint mantissa) -> typename uint::word_type
 {
     static_assert(is_integral<uint>::value);
     static_assert(is_unsigned<uint>::value);
 
     const auto width = uint::width();
     auto one_at = width;
-    
-    for(auto i = uint::word_count(); i > 0; --i)
+
+    for (auto i = uint::word_count(); i > 0; --i)
     {
-        if(mantissa.word(i-1) == 0)
+        if (mantissa.word(i - 1) == 0)
         {
-            if(i == uint::word_count())
+            if (i == uint::word_count())
             {
-                auto const modulo = width % (sizeof(typename uint::word_type)*8);
-                one_at -= modulo == 0 ? sizeof(typename uint::word_type)*8 : modulo;
+                auto const modulo = width % (sizeof(typename uint::word_type) * 8);
+                one_at -= modulo == 0 ? sizeof(typename uint::word_type) * 8 : modulo;
             }
             else
             {
-                one_at -= sizeof(typename uint::word_type)*8;
+                one_at -= sizeof(typename uint::word_type) * 8;
             }
         }
         else
@@ -363,16 +348,16 @@ auto find_leading_one(const uint mantissa)
         }
     }
 
-    while(one_at > 0)
+    while (one_at > 0)
     {
         --one_at;
-        if(mantissa.bit(one_at) == 1)
+        if (mantissa.bit(one_at) == 1)
         {
             break;
         }
     }
 
-    if(one_at == 0 && mantissa.bit(0) == 0)
+    if (one_at == 0 && mantissa.bit(0) == 0)
     {
         one_at = width;
     }

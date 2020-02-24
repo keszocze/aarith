@@ -142,7 +142,7 @@ public:
     static constexpr int digits = W; // TODO what happens if W > max_int?
 
     // TODO remove this when log10 becomes constexpr in clang's stdlibc
-    #ifndef __clang__
+    #ifdef __GNUG__
         static constexpr int digits10 = std::numeric_limits<aarith::uinteger<W>>::digits *
                                     std::log10(std::numeric_limits<aarith::uinteger<W>>::radix);
     #endif

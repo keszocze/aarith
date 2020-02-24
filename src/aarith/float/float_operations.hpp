@@ -20,7 +20,7 @@ namespace aarith {
  *
  */
 template<size_t E, size_t M>
-[[nodiscard]] auto add(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
+[[nodiscard]] auto add(const normfloat<E, M>& lhs, const normfloat<E, M>& rhs)
 -> normfloat<E, M>
 {
     if(abs(lhs) < abs(rhs))

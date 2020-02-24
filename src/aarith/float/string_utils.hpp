@@ -103,7 +103,7 @@ namespace aarith {
     {
         uinteger<M> fl_mantissa = nf.get_mantissa();
         uinteger<24> flc_mantissa;
-        if (M >= 24)
+        if constexpr (M >= 24)
         {
             auto shift_mantissa = M - 24;
             fl_mantissa = fl_mantissa >> shift_mantissa;
