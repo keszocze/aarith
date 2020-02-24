@@ -1,7 +1,8 @@
 #pragma once
 
-#include "aarith/utilities/bit_operations.hpp"
 #include "traits.hpp"
+
+
 #include <algorithm>
 #include <array>
 #include <cstdint>

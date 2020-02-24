@@ -1,19 +1,31 @@
 #pragma once
 
-#include "aarith/float/float_comparisons.hpp"
-#include "aarith/float/float_operations.hpp"
-#include "aarith/integer/sinteger_operations.hpp"
-#include "aarith/integer/uinteger_comparisons.hpp"
-#include "aarith/integer/uinteger_operations.hpp"
-#include "aarith/float/normfloat.hpp"
-#include "aarith/integer/sinteger.hpp"
-#include "aarith/integer/uinteger.hpp"
-#include "aarith/utilities/bit_operations.hpp"
+#include <aarith/float/float_comparisons.hpp>
+#include <aarith/float/float_operations.hpp>
+#include <aarith/float/normfloat.hpp>
+#include <aarith/integer/sinteger.hpp>
+#include <aarith/integer/sinteger_operations.hpp>
+#include <aarith/integer/uinteger.hpp>
+#include <aarith/integer/uinteger_comparisons.hpp>
+#include <aarith/integer/uinteger_operations.hpp>
 #include <iostream>
 #include <sstream>
 #include <string>
 
 namespace aarith {
+
+inline constexpr auto number_of_decimal_digits(size_t bits) -> size_t
+{
+    // When converted to decimal, an n-bit binary numeral will have at most k*n decimal digits,
+    // rounded up, where k = log_10 2 ~ 0.301.
+    return (bits * 301) / 1000 + ((bits * 301) % 1000 == 0 ? 0 : 1);
+}
+
+template <class T, class U>
+constexpr auto rounded_integer_division(T dividend, U divisor) -> decltype(T{} / U{})
+{
+    return dividend / divisor + (dividend % divisor ? 1 : 0);
+}
 
 /// Convert the given uinteger value into a string representation with base 2^N.
 template <size_t N, size_t Width> auto to_base_2n(const uinteger<Width>& value)

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <aarith/utilities/bit_operations.hpp>
 #include <aarith/float/float_utils.hpp>
 #include <aarith/integer/uinteger.hpp>
 #include <aarith/core/traits.hpp>

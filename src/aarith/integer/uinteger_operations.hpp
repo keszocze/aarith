@@ -3,7 +3,6 @@
 #include <aarith/integer/uinteger_comparisons.hpp>
 #include <aarith/core/traits.hpp>
 #include <aarith/integer/uinteger.hpp>
-#include <aarith/utilities/bit_operations.hpp>
 
 #include <iostream>
 

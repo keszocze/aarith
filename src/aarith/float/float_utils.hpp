@@ -1,5 +1,10 @@
 #pragma once
 
+#include <aarith/core/traits.hpp>
+
+#include <type_traits>
+#include <cstdint>
+
 namespace aarith {
 
 template<class F>
