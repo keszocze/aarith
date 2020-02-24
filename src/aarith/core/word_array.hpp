@@ -209,14 +209,97 @@ public:
         words[index] = value & word_mask(index);
     }
 
+    /**
+     * @brief Returns a const reference to the element at specified location pos, with bounds
+     checking.
+     *
+     * If pos is not within the range of the container, an exception of type std::out_of_range is
+     thrown.
+     *
+     * @param pos position of the element to return
+
+     * @return Const reference to the requested element.
+     */
     auto at(size_t pos) const
     {
         return words.at(pos);
     }
 
+    /**
+     * @brief Returns a reference to the element at specified location pos. No bounds checking is
+     * performed.
+     * @param pos position of the element to return
+     * @return Const reference to the requested element.
+     */
     auto operator[](size_t pos) const
     {
         return words[pos];
+    }
+
+    /**
+     * @brief Checks if the container has no elements
+     *
+     * @return false
+     */
+    [[nodiscard]] constexpr bool empty() const noexcept
+    {
+        return false;
+    }
+
+    /**
+     * @brief Returns a const reference to the first element in the container.
+     * @return Const reference to the first element
+     */
+    auto front() const
+    {
+        return words.front();
+    }
+
+    /**
+     *
+     * @return Const reference to the last element.
+     *
+     **/
+    auto back() const
+    {
+        return words.back();
+    }
+
+    /**
+     * @brief Returns the number of words in the array
+     *
+     * @note The most significant word might be be used entirely. The most significant bits might be
+     * masked away.
+     *
+     * @return The number of words used store the number
+     */
+    [[nodiscard]] constexpr size_t size() const noexcept
+    {
+        return word_count();
+    }
+
+    /**
+     * @brief Assigns the given value value to all elements in the container.
+     * @param valuethe value to assign to the elements
+     */
+    constexpr void fill(const word_type& value)
+    {
+        for (size_t i = 0; i < word_count(); ++i)
+        {
+            set_word(i, value);
+        }
+    }
+
+    /**
+     * @brief Returns the maxmimum number of elements that can be stored in this word_array
+     *
+     * This number is fixed.
+     *
+     * @return The maximum number of elements
+     */
+    constexpr size_t max_size() const noexcept
+    {
+        return word_count();
     }
 
     // Sets the words to the given values, where the right-most argument corresponds to word 0.
