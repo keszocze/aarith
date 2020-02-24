@@ -1,8 +1,17 @@
-add_executable(uint-test
-  uint-test.cpp
-)
-target_link_libraries(uint-test Catch2::WithMain aarith::Library)
-add_test(NAME uint-test COMMAND uint-test)
+function(add_aarith_test testname filename)
+  SET(targetname "${testname}-test")
+  add_executable(${targetname} ${filename})
+  target_link_libraries(${targetname} Catch2::WithMain aarith::Library)
+  add_test(NAME ${targetname} COMMAND ${targetname})
+endfunction(add_aarith_test)
+
+add_aarith_test(uint uint-test.cpp)
+
+#add_executable(uint-test
+#  uint-test.cpp
+#)
+#target_link_libraries(uint-test Catch2::WithMain aarith::Library)
+#add_test(NAME uint-test COMMAND uint-test)
 
 add_executable(exact_operations-test
   exact_operations-test.cpp
