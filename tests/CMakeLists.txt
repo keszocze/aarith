@@ -7,27 +7,13 @@ endfunction(add_aarith_test)
 
 add_aarith_test(uint integer/uint-test.cpp)
 add_aarith_test(exact-operations integer/exact_operations-test.cpp)
-add_aarith_test(exact-operations-float-test float/exact_operations-float-test.cpp)
-
-
-
-
-
-add_aarith_test(comparisons-test integer/comparisons-test.cpp)
-
-add_aarith_test(string_utils-test integer/string_utils-test.cpp)
-
-add_aarith_test(uint-anytime-test integer/uint-anytime-test.cpp)
-
-
-add_aarith_test(util-test integer/string_utils-test.cpp)
-
-
-add_aarith_test(bit-operations-test core/bit_operations-test.cpp)
-
-
-add_aarith_test(sint-test integer/sint-test.cpp integer/sint-operations-test.cpp integer/sint-comparisons-test.cpp)
-
+add_aarith_test(exact-operations-float float/exact_operations-float-test.cpp)
+add_aarith_test(comparisons integer/comparisons-test.cpp)
+add_aarith_test(string_utils integer/string_utils-test.cpp)
+add_aarith_test(uint-anytime integer/uint-anytime-test.cpp)
+add_aarith_test(util integer/string_utils-test.cpp)
+add_aarith_test(bit-operations core/bit_operations-test.cpp)
+add_aarith_test(sint integer/sint-test.cpp integer/sint-operations-test.cpp integer/sint-comparisons-test.cpp)
 add_aarith_test(container container-test.cpp)
 
 

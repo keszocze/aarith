@@ -1,6 +1,5 @@
-#include <aarith/operations/uinteger_comparisons.hpp>
-#include <aarith/types/uinteger.hpp>
-#include <aarith/utilities/string_utils.hpp>
+#include <aarith/integer.hpp>
+#include <aarith/core.hpp>
 #include <aarith/operations/approx_operations.hpp>
 #include <catch.hpp>
 #include <iostream>
@@ -8,18 +7,18 @@
 
 using namespace aarith;
 
-SCENARIO("Performing common functional operations", "[word_container]")
+SCENARIO("Performing common functional operations", "[word_array]")
 {
     GIVEN("A word container w ")
     {
 
-        const word_container<256> w{5, 1, 2, 3};
+        const word_array<256> w{5, 1, 2, 3};
 
         WHEN("Mapping the values by adding one")
         {
             THEN("All individual words should be increased by one")
             {
-                const auto result = map(w, [](word_container<256>::word_type a) { return a + 1; });
+                const auto result = map(w, [](word_array<256>::word_type a) { return a + 1; });
 
                 CHECK(result.word(0) == 4);
                 CHECK(result.word(1) == 3);
@@ -32,7 +31,7 @@ SCENARIO("Performing common functional operations", "[word_container]")
         {
             THEN("All individual words should be increased by one")
             {
-                const auto result = map(w, [](word_container<256>::word_type a) { return a << 2; });
+                const auto result = map(w, [](word_array<256>::word_type a) { return a << 2; });
 
                 CHECK(result.word(0) == 12);
                 CHECK(result.word(1) == 8);
@@ -42,11 +41,11 @@ SCENARIO("Performing common functional operations", "[word_container]")
             }
         }
 
-        WHEN("Reducing the word_container")
+        WHEN("Reducing the word_array")
         {
             THEN("Summing up the individual words should work fine")
             {
-                const auto f = [](const word_container<265>::word_type a, uint64_t w) {
+                const auto f = [](const word_array<265>::word_type a, uint64_t w) {
                     return a + w;
                 };
                 const auto result = reduce(w, f, 0);
@@ -56,15 +55,15 @@ SCENARIO("Performing common functional operations", "[word_container]")
 
         AND_GIVEN("Another word container v of same length")
         {
-            const word_container<256> v{8, 16, 32, 64};
+            const word_array<256> v{8, 16, 32, 64};
             WHEN("Performing the zip_with operation")
             {
 
                 THEN("Element-wise addition should work as intended")
                 {
 
-                    const auto f = [](word_container<256>::word_type a,
-                                      word_container<256>::word_type b) { return a + b; };
+                    const auto f = [](word_array<256>::word_type a,
+                                      word_array<256>::word_type b) { return a + b; };
 
                     const auto result = zip_with(w, v, f);
 
@@ -75,8 +74,8 @@ SCENARIO("Performing common functional operations", "[word_container]")
                 }
                 THEN("It should be capable of modelling additions")
                 {
-                    const word_container<128> a{0, std::numeric_limits<uint64_t>::max()};
-                    const word_container<128> b{0, std::numeric_limits<uint64_t>::max()};
+                    const word_array<128> a{0, std::numeric_limits<uint64_t>::max()};
+                    const word_array<128> b{0, std::numeric_limits<uint64_t>::max()};
 
                     std::cout << group_digits(to_binary(a),64) << "\n";
                     std::cout << group_digits(to_binary(b),64) << "\n";
@@ -104,8 +103,8 @@ SCENARIO("Performing common functional operations", "[word_container]")
 
             WHEN("Performing the zip_with_state operation") {
                 THEN("It should be capable of modeling addition") {
-                    const word_container<128> a{0, std::numeric_limits<uint64_t>::max()};
-                    const word_container<128> b{0, std::numeric_limits<uint64_t>::max()};
+                    const word_array<128> a{0, std::numeric_limits<uint64_t>::max()};
+                    const word_array<128> b{0, std::numeric_limits<uint64_t>::max()};
 
                     std::cout << group_digits(to_binary(a),64) << "\n";
                     std::cout << group_digits(to_binary(b),64) << "\n";
@@ -149,8 +148,8 @@ SCENARIO("Performing common functional operations", "[word_container]")
 
                     const std::vector<uint64_t> ns{8U, 15U, 5743U, 0U};
 
-                    const auto f = [](word_container<256>::word_type a,
-                                      word_container<256>::word_type b,
+                    const auto f = [](word_array<256>::word_type a,
+                                      word_array<256>::word_type b,
                                       uint64_t m) { return a + b + m; };
 
                     for (const auto n : ns)
@@ -176,7 +175,7 @@ SCENARIO("Performing common functional operations", "[word_container]")
 
         AND_GIVEN("Another word container v of different length")
         {
-            const word_container<192> v{8, 16, 64};
+            const word_array<192> v{8, 16, 64};
             WHEN("Performing the zip_with operation")
             {
 
@@ -186,8 +185,8 @@ SCENARIO("Performing common functional operations", "[word_container]")
                     // "cheat" by knowing the underlying word type
                     const auto f = [](const uint64_t a,const uint64_t b) { return a + b; };
 
-                    const word_container<192> result_w_v = zip_with(w, v, f);
-                    const word_container<192> result_v_w = zip_with(v, w, f);
+                    const word_array<192> result_w_v = zip_with(w, v, f);
+                    const word_array<192> result_v_w = zip_with(v, w, f);
 
                     for (size_t i = 0; i < result_w_v.word_count(); ++i)
                     {
@@ -220,8 +219,8 @@ SCENARIO("Performing common functional operations", "[word_container]")
 
                     const std::vector<uint64_t> ns{8U, 15U, 5743U, 0U};
 
-                    const auto f = [](word_container<256>::word_type a,
-                                      word_container<256>::word_type b,
+                    const auto f = [](word_array<256>::word_type a,
+                                      word_array<256>::word_type b,
                                       uint64_t m) { return a + b + m; };
 
                     for (const auto n : ns)

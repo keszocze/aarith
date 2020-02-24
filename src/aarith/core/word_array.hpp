@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "traits.hpp"
 
 #include <algorithm>
@@ -52,9 +51,9 @@ public:
             set_word(i, other.word(i));
         }
     }
-    template <size_t V> word_container<Width> operator=(const word_container<V>& other)
+    template <size_t V> word_array<Width> operator=(const word_array<V>& other)
     {
-        static_assert(V <= Width, "Can not create a word_container from larger container");
+        static_assert(V <= Width, "Can not create a word_array from larger container");
 
         if constexpr (V == Width)
         {
@@ -453,8 +452,6 @@ template <size_t DestinationWidth, size_t SourceWidth>
         }
     }
     return word_container;
-}
-
 }
 
 } // namespace aarith
