@@ -1,7 +1,6 @@
 #pragma once
 
-#include <aarith/core/traits.hpp>
-#include <aarith/core/word_array.hpp>
+#include <aarith/core.hpp>
 #include <algorithm>
 #include <array>
 #include <cmath>
