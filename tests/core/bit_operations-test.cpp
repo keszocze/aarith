@@ -199,6 +199,10 @@ SCENARIO("Left shift operator works as expected", "[word_array][bit_logic]")
             const word_array<TestWidth> a{number_a};
 
             const auto result = a << s;
+
+            std::cout << group_digits(to_binary(a),8) << "\n";
+            std::cout << group_digits(to_binary(result),8) << "\n";
+
             REQUIRE(result.word(0) == 49152);
         }
 

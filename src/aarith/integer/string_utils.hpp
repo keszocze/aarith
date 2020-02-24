@@ -1,8 +1,8 @@
 #pragma once
 
 #include <aarith/core/string_utils.hpp>
-#include <aarith/integer/uinteger_operations.hpp>
 #include <aarith/integer/sinteger_operations.hpp>
+#include <aarith/integer/uinteger_operations.hpp>
 
 namespace aarith {
 
@@ -29,6 +29,12 @@ template <size_t Width> auto to_hex(const uinteger<Width>& value) -> std::string
     return to_base_2n<4>(value);
 }
 
+/// Convert the given uinteger value into a octal string representation.
+template <size_t Width> auto to_octal(const uinteger<Width>& value) -> std::string
+{
+    return to_base_2n<3>(value);
+}
+
 /// Convert the given sinteger value into a hexadecimal string representation.
 template <size_t Width> auto to_hex(const sinteger<Width>& value) -> std::string
 {
@@ -41,12 +47,6 @@ template <size_t Width> auto to_hex(const sinteger<Width>& value) -> std::string
     const auto absval = expanding_abs(value);
     res += to_base_2n<4>(absval);
     return res;
-}
-
-/// Convert the given uinteger value into a octal string representation.
-template <size_t Width> auto to_octal(const uinteger<Width>& value) -> std::string
-{
-    return to_base_2n<3>(value);
 }
 
 /// Convert the given sinteger value into a octal string representation.
@@ -100,17 +100,6 @@ auto to_bcd(const uinteger<Width>& num) -> uinteger<number_of_decimal_digits(Wid
     return bcd;
 }
 
-/// Convert the given uinteger value into a binary string representation
-template <size_t Width> auto to_binary(const word_array<Width>& value) -> std::string
-{
-    std::string result;
-    for (auto i = Width; i > 0; --i)
-    {
-        result += value.bit(i - 1) ? '1' : '0';
-    }
-    return result;
-}
-
 /// Convert the given uinteger value into a decimal string representation.
 template <size_t Width> auto to_decimal(const uinteger<Width>& value) -> std::string
 {
@@ -131,42 +120,41 @@ template <size_t Width> auto to_decimal(const sinteger<Width>& value) -> std::st
     return res;
 }
 
-    template <size_t Width>
-    auto operator<<(std::ostream& out, const uinteger<Width>& value) -> std::ostream&
+template <size_t Width>
+auto operator<<(std::ostream& out, const uinteger<Width>& value) -> std::ostream&
+{
+    if (out.flags() & std::ios::hex)
     {
-        if (out.flags() & std::ios::hex)
-        {
-            out << to_hex(value);
-        }
-        else if (out.flags() & std::ios::oct)
-        {
-            out << to_octal(value);
-        }
-        else
-        {
-            out << to_decimal(value);
-        }
-        return out;
+        out << to_hex(value);
     }
+    else if (out.flags() & std::ios::oct)
+    {
+        out << to_octal(value);
+    }
+    else
+    {
+        out << to_decimal(value);
+    }
+    return out;
+}
 
 // TODO make this moar generic so that we do not have to dublicate this code
-    template <size_t Width>
-    auto operator<<(std::ostream& out, const sinteger<Width>& value) -> std::ostream&
+template <size_t Width>
+auto operator<<(std::ostream& out, const sinteger<Width>& value) -> std::ostream&
+{
+    if (out.flags() & std::ios::hex)
     {
-        if (out.flags() & std::ios::hex)
-        {
-            out << to_hex(value);
-        }
-        else if (out.flags() & std::ios::oct)
-        {
-            out << to_octal(value);
-        }
-        else
-        {
-            out << to_decimal(value);
-        }
-        return out;
+        out << to_hex(value);
     }
-
+    else if (out.flags() & std::ios::oct)
+    {
+        out << to_octal(value);
+    }
+    else
+    {
+        out << to_decimal(value);
+    }
+    return out;
+}
 
 } // namespace aarith

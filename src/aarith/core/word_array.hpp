@@ -2,7 +2,6 @@
 
 #include "traits.hpp"
 
-
 #include <algorithm>
 #include <array>
 #include <cstdint>
@@ -69,8 +68,7 @@ public:
             set_word(i, other.word(i));
         }
 
-        if constexpr (word_array<Width, WordType>::word_count() >
-                      word_array<V>::word_count())
+        if constexpr (word_array<Width, WordType>::word_count() > word_array<V>::word_count())
         {
             for (size_t i = other.word_count(); i < this->word_count(); ++i)
             {
@@ -211,6 +209,16 @@ public:
         words[index] = value & word_mask(index);
     }
 
+    auto at(size_t pos) const
+    {
+        return words.at(pos);
+    }
+
+    auto operator[](size_t pos) const
+    {
+        return words[pos];
+    }
+
     // Sets the words to the given values, where the right-most argument corresponds to word 0.
     template <class... Args> void set_words(Args... args)
     {
@@ -343,8 +351,7 @@ private:
 };
 
 template <size_t DestinationWidth, size_t SourceWidth>
-[[nodiscard]] auto width_cast(const word_array<SourceWidth>& source)
-    -> word_array<DestinationWidth>
+[[nodiscard]] auto width_cast(const word_array<SourceWidth>& source) -> word_array<DestinationWidth>
 {
     word_array<DestinationWidth> word_container;
     if constexpr (DestinationWidth >= SourceWidth)
@@ -377,8 +384,7 @@ template <size_t Width>
 }
 
 template <size_t Width>
-auto operator|(const word_array<Width>& lhs, const word_array<Width>& rhs)
-    -> word_array<Width>
+auto operator|(const word_array<Width>& lhs, const word_array<Width>& rhs) -> word_array<Width>
 {
     word_array<Width> bitwise_or;
     for (auto counter = 0U; counter < lhs.word_count(); ++counter)
@@ -389,8 +395,7 @@ auto operator|(const word_array<Width>& lhs, const word_array<Width>& rhs)
 }
 
 template <size_t Width>
-auto operator^(const word_array<Width>& lhs, const word_array<Width>& rhs)
-    -> word_array<Width>
+auto operator^(const word_array<Width>& lhs, const word_array<Width>& rhs) -> word_array<Width>
 {
     word_array<Width> bitwise_xor;
     for (auto counter = 0U; counter < lhs.word_count(); ++counter)
@@ -430,8 +435,7 @@ template <size_t Width> auto count_leading_zeroes(const word_array<Width>& value
 }
 
 template <size_t Width>
-[[nodiscard]] auto operator<<(const word_array<Width>& lhs, const size_t rhs)
-    -> word_array<Width>
+[[nodiscard]] auto operator<<(const word_array<Width>& lhs, const size_t rhs) -> word_array<Width>
 {
     if (rhs >= Width)
     {
@@ -513,8 +517,7 @@ auto operator>>(const word_array<Width>& lhs, const size_t rhs) -> word_array<Wi
  * @param w  Word container from which the range is taken from
  * @return Range word[S,E], including the
  */
-template <size_t S, size_t E, size_t W>
-word_array<(S - E) + 1> bit_range(const word_array<W>& w)
+template <size_t S, size_t E, size_t W> word_array<(S - E) + 1> bit_range(const word_array<W>& w)
 {
     static_assert(S < W, "Range must start within the word");
     static_assert(E <= S, "Range must be positive (i.e. this method will not reverse the word");
