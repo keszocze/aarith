@@ -1,7 +1,6 @@
 #include <catch.hpp>
 
-#include <aarith/core/word_container_comparisons.hpp>
-#include <aarith/core/word_container.hpp>
+#include <aarith/core.hpp>
 
 using namespace aarith;
 
