@@ -1,7 +1,8 @@
 #pragma once
 
-#include <aarith/core/word_container.hpp>
-#include <aarith/core/word_container_comparisons.hpp>
+#include <aarith/core/word_array.hpp>
+#include <aarith/core/word_array_comparisons.hpp>
+#include <aarith/core/word_array_operations.hpp>
 
 #include <aarith/core/traits.hpp>
 

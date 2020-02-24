@@ -277,7 +277,7 @@ SCENARIO("Expanding subtraction works correctly", "[uinteger][arithmetic]")
     {
         static const uinteger<4> zero = uinteger<4>::min();
         static const uinteger<8> large = uinteger<8>::max();
-        static const uinteger<8> expected = uinteger<8>{1U};
+        static const uinteger<9> expected = uinteger<9>{0x101};
 
         THEN("Subtracting max from zero should give one")
         {
@@ -290,7 +290,7 @@ SCENARIO("Expanding subtraction works correctly", "[uinteger][arithmetic]")
     {
         static const uinteger<8> zero = uinteger<8>::min();
         static const uinteger<4> large = uinteger<4>::max();
-        static const uinteger<8> expected = sub(uinteger<8>{1U},add(uinteger<8>{uinteger<4>::max()}, uinteger<8>{1U}));
+        static const uinteger<9> expected = sub(uinteger<9>{1U}, add(uinteger<9>{uinteger<4>::max()}, uinteger<9>{1U}));
 
         THEN("Subtracting max from zero should give 1-(small::max+1)")
         {

@@ -2,7 +2,6 @@
 
 #include "traits.hpp"
 
-
 #include <algorithm>
 #include <array>
 #include <cstdint>
@@ -13,7 +12,7 @@
 
 namespace aarith {
 
-template <size_t Width, class WordType = uint64_t> class word_container
+template <size_t Width, class WordType = uint64_t> class word_array
 {
 public:
     using word_type = WordType;
@@ -24,37 +23,37 @@ public:
      * Constructors etc.
      */
 
-    word_container() = default;
+    word_array() = default;
 
-    word_container(WordType w)
+    word_array(WordType w)
     {
         this->words[0] = w & word_mask(0);
     }
 
-    template <class... Args> word_container(WordType w, Args... args)
+    template <class... Args> word_array(WordType w, Args... args)
     {
         set_words(w, args...);
     }
 
-    template <class... Args> static auto from_words(Args... args) -> word_container
+    template <class... Args> static auto from_words(Args... args) -> word_array
     {
-        word_container wc;
+        word_array wc;
         wc.set_words(args...);
         return wc;
     }
 
-    template <size_t V> word_container(const word_container<V>& other)
+    template <size_t V> word_array(const word_array<V>& other)
     {
-        static_assert(V <= Width, "Can not create a word_container from larger container");
+        static_assert(V <= Width, "Can not create a word_array from larger container");
 
         for (auto i = 0U; i < other.word_count(); ++i)
         {
             set_word(i, other.word(i));
         }
     }
-    template <size_t V> word_container<Width> operator=(const word_container<V>& other)
+    template <size_t V> word_array<Width> operator=(const word_array<V>& other)
     {
-        static_assert(V <= Width, "Can not create a word_container from larger container");
+        static_assert(V <= Width, "Can not create a word_array from larger container");
 
         if constexpr (V == Width)
         {
@@ -69,8 +68,7 @@ public:
             set_word(i, other.word(i));
         }
 
-        if constexpr (word_container<Width, WordType>::word_count() >
-                      word_container<V>::word_count())
+        if constexpr (word_array<Width, WordType>::word_count() > word_array<V>::word_count())
         {
             for (size_t i = other.word_count(); i < this->word_count(); ++i)
             {
@@ -152,9 +150,9 @@ public:
         return static_cast<bit_type>(masked_bit > 0 ? 1 : 0);
     }
 
-    template <size_t Count> auto bits(size_t index) const -> word_container<Count>
+    template <size_t Count> auto bits(size_t index) const -> word_array<Count>
     {
-        word_container<Count> result;
+        word_array<Count> result;
         for (auto i = 0U; i < Count; ++i)
         {
             result.set_bit(i, bit(index + i));
@@ -211,6 +209,99 @@ public:
         words[index] = value & word_mask(index);
     }
 
+    /**
+     * @brief Returns a const reference to the element at specified location pos, with bounds
+     checking.
+     *
+     * If pos is not within the range of the container, an exception of type std::out_of_range is
+     thrown.
+     *
+     * @param pos position of the element to return
+
+     * @return Const reference to the requested element.
+     */
+    auto at(size_t pos) const
+    {
+        return words.at(pos);
+    }
+
+    /**
+     * @brief Returns a reference to the element at specified location pos. No bounds checking is
+     * performed.
+     * @param pos position of the element to return
+     * @return Const reference to the requested element.
+     */
+    auto operator[](size_t pos) const
+    {
+        return words[pos];
+    }
+
+    /**
+     * @brief Checks if the container has no elements
+     *
+     * @return false
+     */
+    [[nodiscard]] constexpr bool empty() const noexcept
+    {
+        return false;
+    }
+
+    /**
+     * @brief Returns a const reference to the first element in the container.
+     * @return Const reference to the first element
+     */
+    auto front() const
+    {
+        return words.front();
+    }
+
+    /**
+     *
+     * @return Const reference to the last element.
+     *
+     **/
+    auto back() const
+    {
+        return words.back();
+    }
+
+    /**
+     * @brief Returns the number of words in the array
+     *
+     * @note The most significant word might be be used entirely. The most significant bits might be
+     * masked away.
+     *
+     * @return The number of words used store the number
+     */
+    [[nodiscard]] constexpr size_t size() const noexcept
+    {
+        return word_count();
+    }
+
+    /**
+     * @brief Assigns the given value value to all elements in the container.
+     * @param valuethe value to assign to the elements
+     */
+    constexpr void fill(const word_type& value)
+    {
+        for (size_t i = 0; i < word_count(); ++i)
+        {
+            set_word(i, value);
+        }
+    }
+
+    /**
+     * @brief Returns the maxmimum number of elements that can be stored in this word_array
+     *
+     * This number is fixed.
+     *
+     * @return The maximum number of elements
+     */
+    constexpr size_t max_size() const noexcept
+    {
+        return word_count();
+    }
+
     // Sets the words to the given values, where the right-most argument corresponds to word 0.
     template <class... Args> void set_words(Args... args)
     {
@@ -221,9 +312,9 @@ public:
      * Constants
      */
 
-    [[nodiscard]] static constexpr word_container all_ones()
+    [[nodiscard]] static constexpr word_array all_ones()
     {
-        word_container n;
+        word_array n;
         word_type ones = ~(static_cast<word_type>(0U));
         for (size_t i = 0; i < n.word_count(); ++i)
         {
@@ -232,9 +323,9 @@ public:
         return n;
     }
 
-    [[nodiscard]] static constexpr word_container all_zeroes()
+    [[nodiscard]] static constexpr word_array all_zeroes()
     {
-        return word_container{0U};
+        return word_array{0U};
     }
 
     /*
@@ -331,7 +422,7 @@ private:
 
         msg += head;
         msg += std::to_string(index);
-        msg += " for word_container<";
+        msg += " for word_array<";
         msg += std::to_string(width());
         msg += "> with max index ";
         msg += foot;
@@ -343,10 +434,9 @@ private:
 };
 
 template <size_t DestinationWidth, size_t SourceWidth>
-[[nodiscard]] auto width_cast(const word_container<SourceWidth>& source)
-    -> word_container<DestinationWidth>
+[[nodiscard]] auto width_cast(const word_array<SourceWidth>& source) -> word_array<DestinationWidth>
 {
-    word_container<DestinationWidth> word_container;
+    word_array<DestinationWidth> word_container;
     if constexpr (DestinationWidth >= SourceWidth)
     {
         for (auto i = 0U; i < source.word_count(); ++i)
@@ -362,183 +452,6 @@ template <size_t DestinationWidth, size_t SourceWidth>
         }
     }
     return word_container;
-}
-
-template <size_t Width>
-[[nodiscard]] auto operator&(const word_container<Width>& lhs, const word_container<Width>& rhs)
-    -> word_container<Width>
-{
-    word_container<Width> bitwise_and;
-    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
-    {
-        bitwise_and.set_word(counter, lhs.word(counter) & rhs.word(counter));
-    }
-    return bitwise_and;
-}
-
-template <size_t Width>
-auto operator|(const word_container<Width>& lhs, const word_container<Width>& rhs)
-    -> word_container<Width>
-{
-    word_container<Width> bitwise_or;
-    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
-    {
-        bitwise_or.set_word(counter, lhs.word(counter) | rhs.word(counter));
-    }
-    return bitwise_or;
-}
-
-template <size_t Width>
-auto operator^(const word_container<Width>& lhs, const word_container<Width>& rhs)
-    -> word_container<Width>
-{
-    word_container<Width> bitwise_xor;
-    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
-    {
-        bitwise_xor.set_word(counter, lhs.word(counter) ^ rhs.word(counter));
-    }
-    return bitwise_xor;
-}
-
-template <size_t Width>
-[[nodiscard]] auto operator~(const word_container<Width>& rhs) -> word_container<Width>
-{
-    word_container<Width> bitwise_not;
-    for (auto counter = 0U; counter < rhs.word_count(); ++counter)
-    {
-        bitwise_not.set_word(counter, ~rhs.word(counter));
-    }
-    return bitwise_not;
-}
-
-/**
- * @brief  Counts the number of bits set to zero before the first one appears (from MSB to LSB)
- * @tparam Width Width of the word_container
- * @param value The word to count the leading zeroes in
- * @return
- */
-template <size_t Width> auto count_leading_zeroes(const word_container<Width>& value) -> size_t
-{
-    for (auto i = Width; i > 0; --i)
-    {
-        if (value.bit(i - 1))
-        {
-            return (Width - i);
-        }
-    }
-    return Width;
-}
-
-template <size_t Width>
-[[nodiscard]] auto operator<<(const word_container<Width>& lhs, const size_t rhs)
-    -> word_container<Width>
-{
-    if (rhs >= Width)
-    {
-        return word_container<Width>(0U);
-    }
-    if (rhs == 0)
-    {
-        return lhs;
-    }
-    word_container<Width> shifted;
-    const auto skip_words = rhs / lhs.word_width();
-    const auto shift_word_left = rhs - skip_words * lhs.word_width();
-    const auto shift_word_right = lhs.word_width() - shift_word_left;
-
-    for (auto counter = lhs.word_count(); counter > 0; --counter)
-    {
-        if (counter + skip_words < lhs.word_count())
-        {
-            typename word_container<Width>::word_type new_word;
-            new_word = lhs.word(counter) << shift_word_left;
-            if (shift_word_right < lhs.word_width())
-            {
-                new_word = new_word | (lhs.word(counter - 1) >> shift_word_right);
-            }
-            shifted.set_word(counter + skip_words, new_word);
-        }
-    }
-    typename word_container<Width>::word_type new_word;
-    new_word = lhs.word(0) << shift_word_left;
-    shifted.set_word(skip_words, new_word);
-
-    return shifted;
-}
-
-template <size_t Width>
-auto operator>>(const word_container<Width>& lhs, const size_t rhs) -> word_container<Width>
-{
-    if (rhs >= Width)
-    {
-        return word_container<Width>(0U);
-    }
-    if (rhs == 0)
-    {
-        return lhs;
-    }
-
-    word_container<Width> shifted;
-    const auto skip_words = rhs / lhs.word_width();
-    const auto shift_word_right = rhs - skip_words * lhs.word_width();
-    const auto shift_word_left = lhs.word_width() - shift_word_right;
-
-    for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
-    {
-        typename word_container<Width>::word_type new_word;
-        new_word = lhs.word(counter) >> shift_word_right;
-        if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
-        {
-            new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
-        }
-        shifted.set_word(counter - skip_words, new_word);
-    }
-    typename word_container<Width>::word_type new_word;
-    new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
-    shifted.set_word(lhs.word_count() - skip_words - 1, new_word);
-
-    return shifted;
-}
-
-/**
- * @brief Extracts a range from the word container
- *
- * Note that the indexing is done
- *  - zero based starting from the LSB
- *  - is inclusive (i.e. the start and end point are part of the range)
- *
- * @tparam S Starting index (inclusive, from left to right)
- * @tparam E  Ending index (inclusive, from left to right)
- * @tparam W Width of the word container that the range is taken from
- * @param w  Word container from which the range is taken from
- * @return Range word[S,E], including the
- */
-template <size_t S, size_t E, size_t W>
-word_container<(S - E) + 1> bit_range(const word_container<W>& w)
-{
-    static_assert(S < W, "Range must start within the word");
-    static_assert(E <= S, "Range must be positive (i.e. this method will not reverse the word");
-
-    return width_cast<(S - E) + 1>(w >> E);
-}
-
-/**
- * @brief Splits the word container at the given splitting point
- * @tparam S Splitting point
- * @tparam W Width of the word container to be split
- * @param w Word container that is split
- * @return Pair of <word[W-1,S+1], word[S,0]>
- */
-template <size_t S, size_t W>
-std::pair<word_container<W - (S + 1)>, word_container<S + 1>> split(const word_container<W>& w)
-{
-    static_assert(S < W - 1 && S >= 0);
-
-    const word_container<W - (S + 1)> lhs{width_cast<W - (S + 1)>(w >> (S + 1))};
-
-    const word_container<S + 1> rhs = width_cast<S + 1>(w);
-
-    return std::make_pair(lhs, rhs);
 }
 
 } // namespace aarith

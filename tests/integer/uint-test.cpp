@@ -561,7 +561,7 @@ SCENARIO("Checking whether an uinteger is not equal to zero/false")
     }
 }
 
-SCENARIO("Using the for loop operation feature from the word_container base class","[uinteger][utility]")
+SCENARIO("Using the for loop operation feature from the word_array base class","[uinteger][utility]")
 {
     GIVEN("An unsigned integer")
     {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <aarith/core/traits.hpp>
-#include <aarith/core/word_container.hpp>
+#include <aarith/core/word_array.hpp>
 #include <algorithm>
 #include <array>
 #include <cmath>
@@ -14,19 +14,19 @@
 namespace aarith {
 
 template <size_t Width, class WordType = uint64_t>
-class sinteger : public word_container<Width, WordType>
+class sinteger : public word_array<Width, WordType>
 {
 public:
     sinteger() = default;
 
     explicit sinteger(WordType n)
-        : word_container<Width, WordType>(n)
+        : word_array<Width, WordType>(n)
     {
     }
 
     template <typename T, typename = std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>>>
     explicit sinteger(T t)
-        : word_container<Width, WordType>(static_cast<WordType>(t))
+        : word_array<Width, WordType>(static_cast<WordType>(t))
     {
         if (t < 0)
         {
@@ -41,25 +41,25 @@ public:
     template <typename T, class... Args,
               typename = std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>>>
     explicit sinteger(T t, Args... args)
-        : word_container<Width, WordType>(static_cast<WordType>(t), args...)
+        : word_array<Width, WordType>(static_cast<WordType>(t), args...)
     {
     }
 
     template <class... Args>
     sinteger(WordType fst, Args... args)
-        : word_container<Width>(fst, args...)
+        : word_array<Width>(fst, args...)
     {
     }
 
     template <size_t V>
     sinteger<Width, WordType>(const sinteger<V, WordType>& other)
-        : word_container<Width>(static_cast<const word_container<V, WordType>&>(other))
+        : word_array<Width>(static_cast<const word_array<V, WordType>&>(other))
     {
     }
 
     template <size_t V>
-    sinteger<Width, WordType>(const word_container<V, WordType>& other)
-        : word_container<Width>(other)
+    sinteger<Width, WordType>(const word_array<V, WordType>& other)
+        : word_array<Width>(other)
     {
     }
 
@@ -136,46 +136,16 @@ public:
     static constexpr bool value = false;
 };
 
-template <size_t Width>
-[[nodiscard]] auto operator&(const sinteger<Width>& lhs, const sinteger<Width>& rhs)
-    -> sinteger<Width>
-{
-    word_container<Width> lhs_w{lhs};
-    word_container<Width> rhs_w{rhs};
-
-    word_container<Width> result = lhs_w & rhs_w;
-
-    return sinteger<Width>{result};
-}
-
-template <size_t Width>
-[[nodiscard]] auto operator|(const sinteger<Width>& lhs, const sinteger<Width>& rhs)
-    -> sinteger<Width>
-{
-    word_container<Width> lhs_w{lhs};
-    word_container<Width> rhs_w{rhs};
-
-    word_container<Width> result = lhs_w | rhs_w;
-
-    return sinteger<Width>{result};
-}
-
-template <size_t Width>[[nodiscard]] auto operator~(const sinteger<Width>& rhs) -> sinteger<Width>
-{
-    word_container<Width> rhs_w{rhs};
-    word_container<Width> result = ~rhs_w;
-    return sinteger<Width>{result};
-}
 
 template <size_t DestinationWidth, size_t SourceWidth>
 [[nodiscard]] auto width_cast(const sinteger<SourceWidth>& source) -> sinteger<DestinationWidth>
 {
-    word_container<SourceWidth> in{source};
+    word_array<SourceWidth> in{source};
     if constexpr (DestinationWidth > SourceWidth)
     {
         const bool is_negative = source.is_negative();
 
-        word_container<DestinationWidth> result = width_cast<DestinationWidth>(in);
+        word_array<DestinationWidth> result = width_cast<DestinationWidth>(in);
 
         // TODO find a quicker way to correctly expand the width
         if (is_negative)
@@ -189,7 +159,7 @@ template <size_t DestinationWidth, size_t SourceWidth>
     }
     else
     {
-        word_container<DestinationWidth> result = width_cast<DestinationWidth>(in);
+        word_array<DestinationWidth> result = width_cast<DestinationWidth>(in);
         return sinteger<DestinationWidth>{result};
     }
 }
