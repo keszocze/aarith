@@ -11,8 +11,8 @@ Can be downloaded from releases ...
 Just copy the header file into your project and include it.
 Done!
 
-With CMake and `add_subdirectory`
----------------------------------
+With CMake and ``add_subdirectory``
+-----------------------------------
 
 Check out the `aarith` repository into your project (possibly as a submodule) and type in
 
@@ -20,7 +20,7 @@ Check out the `aarith` repository into your project (possibly as a submodule) an
 
    add_subdirectory(aarith)
 
-You can then use the library by linking against `aarith::aarith`.
+You can then use the library by linking against `aarith::Library`.
 
 With CMake and installation
 ---------------------------
@@ -32,5 +32,5 @@ You can then use it by typing into your `CMakeLists.txt`
 
    find_package(aarith [REQUIRED])
 
-You can then use the library by linking against `aarith::aarith`.
+You can then use the library by linking against `aarith::Library`.
 
