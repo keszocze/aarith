@@ -120,27 +120,8 @@ template <size_t Width> auto to_decimal(const sinteger<Width>& value) -> std::st
     return res;
 }
 
-template <size_t Width>
-auto operator<<(std::ostream& out, const uinteger<Width>& value) -> std::ostream&
-{
-    if (out.flags() & std::ios::hex)
-    {
-        out << to_hex(value);
-    }
-    else if (out.flags() & std::ios::oct)
-    {
-        out << to_octal(value);
-    }
-    else
-    {
-        out << to_decimal(value);
-    }
-    return out;
-}
-
-// TODO make this moar generic so that we do not have to dublicate this code
-template <size_t Width>
-auto operator<<(std::ostream& out, const sinteger<Width>& value) -> std::ostream&
+template <typename Integer, typename = std::enable_if_t<aarith::is_integral<Integer>::value> >
+auto operator<<(std::ostream& out, const Integer& value) -> std::ostream&
 {
     if (out.flags() & std::ios::hex)
     {
