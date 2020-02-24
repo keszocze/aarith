@@ -1,10 +1,7 @@
 #include "aarith/operations/approx_operations.hpp"
-#include "aarith/integer/uinteger_operations.hpp"
-#include "aarith/integer/uinteger.hpp"
-#include <aarith/integer/string_utils.hpp>
+#include <aarith/integer.hpp>
 #include <catch.hpp>
 #include <iostream>
-#include <sstream>
 
 using namespace aarith;
 

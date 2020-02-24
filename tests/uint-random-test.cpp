@@ -1,6 +1,4 @@
-#include <aarith/integer/uinteger_operations.hpp>
-#include <aarith/integer/uinteger.hpp>
-#include <aarith/integer/string_utils.hpp>
+#include <aarith/integer.hpp>
 #include "gen_uinteger.hpp"
 
 #include <catch.hpp>
