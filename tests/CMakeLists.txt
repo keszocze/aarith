@@ -32,11 +32,13 @@ add_executable(uint-anytime-test uint-anytime-test.cpp)
 target_link_libraries(uint-anytime-test Catch2::WithMain aarith::Library)
 add_test(NAME uint-anytime-test COMMAND uint-anytime-test)
 
-
 add_executable(util-test string_utils-test.cpp)
 target_link_libraries(util-test Catch2::WithMain aarith::Library)
 add_test(NAME util-test COMMAND util-test)
 
+add_executable(uint-FAU-test uint-approx-test.cpp)
+target_link_libraries(uint-FAU-test Catch2::WithMain aarith::Library)
+add_test(NAME uint-FAU-test COMMAND uint-FAU-test)
 
 add_executable(bit-operations-test bit_operations-test.cpp)
 target_link_libraries(bit-operations-test Catch2::WithMain aarith::Library)
