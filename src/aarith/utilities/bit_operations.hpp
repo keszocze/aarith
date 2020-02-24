@@ -7,17 +7,17 @@
 namespace aarith {
 
 
-[[nodiscard]] constexpr std::pair<uint32_t, uint32_t> split(const uint64_t n)
-{
-    uint64_t bitmask{(1ULL << 32) - 1};
-
-    return {static_cast<uint32_t>(n >> 32), static_cast<uint32_t>(n & bitmask)};
-}
-
-[[nodiscard]] constexpr uint64_t unsplit(const uint32_t upper, const uint32_t lower)
-{
-    return (static_cast<uint64_t>(upper) << 32) | lower;
-}
+//[[nodiscard]] constexpr std::pair<uint32_t, uint32_t> split(const uint64_t n)
+//{
+//    uint64_t bitmask{(1ULL << 32) - 1};
+//
+//    return {static_cast<uint32_t>(n >> 32), static_cast<uint32_t>(n & bitmask)};
+//}
+//
+//[[nodiscard]] constexpr uint64_t unsplit(const uint32_t upper, const uint32_t lower)
+//{
+//    return (static_cast<uint64_t>(upper) << 32) | lower;
+//}
 
 inline constexpr auto number_of_decimal_digits(size_t bits) -> size_t
 {
