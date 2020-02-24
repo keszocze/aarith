@@ -576,7 +576,7 @@ template <class F, size_t W>
  */
 template <class F, size_t W, size_t V>
 [[nodiscard]] word_container<std::min(W, V)> zip_with(const word_container<W>& w,
-                                                      const word_container<V>& v, const F f)
+                                                      const word_container<V>& v, F f)
 {
     constexpr size_t L = std::min(W, V);
     word_container<L> result;

@@ -73,6 +73,33 @@ SCENARIO("Performing common functional operations", "[word_container]")
                         CHECK(result.word(i) == w.word(i) + v.word(i));
                     }
                 }
+                THEN("It should be capable of modelling additions")
+                {
+                    const word_container<128> a{0, std::numeric_limits<uint64_t>::max()};
+                    const word_container<128> b{0, std::numeric_limits<uint64_t>::max()};
+
+                    std::cout << group_digits(to_binary(a),64) << "\n";
+                    std::cout << group_digits(to_binary(b),64) << "\n";
+
+                    const auto f = [carry = uint64_t(0)](uint64_t ain, uint64_t bin) mutable {
+                        uint64_t partial_sum = ain + bin;
+                        uint64_t new_carry = (partial_sum < ain || partial_sum < bin) ? 1U : 0U;
+
+                        partial_sum = partial_sum + carry;
+                        carry = new_carry || (partial_sum < ain || partial_sum < bin) ? 1U : 0U;
+
+
+                        return partial_sum;
+                    };
+
+                    const auto result = zip_with(a,b,f);
+
+                    const auto uinteger_result = add(uinteger<128>(a), uinteger<128>(b));
+
+                    std::cout << group_digits(to_binary(result),64) << "\n";
+
+                    CHECK(uinteger<192>(result) == uinteger_result);
+                }
             }
 
             WHEN("Performing the zip_with_state operation") {
