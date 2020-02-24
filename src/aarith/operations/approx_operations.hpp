@@ -47,8 +47,19 @@ approx_operation_post_masking(const UInteger& a, const UInteger b,
                               Function fun,
                               const size_t bits = UInteger::width())
 {
-    const UInteger result = fun(a,b);
-    const UInteger mask = generate_bitmask<UInteger>(bits);
+    const auto result = fun(a,b);
+    const auto mask = generate_bitmask<UInteger>(bits);
+
+    return result & mask;
+}
+
+template <size_t W>
+[[nodiscard]] auto approx_expanding_add_post_masking(const uinteger<W>& a, const uinteger<W> b,
+                                                     const size_t bits = W+1)
+-> uinteger<W+1>
+{
+    const auto result = expanding_add(a,b);
+    const auto mask = generate_bitmask<uinteger<result.width()>>(bits);
 
     return result & mask;
 }
@@ -60,11 +71,15 @@ template <class UInteger>
     return approx_operation_post_masking(a,b,&aarith::add<UInteger::width()>,bits);
 }
 
-template <class UInteger>
-[[nodiscard]] UInteger approx_mul_post_masking(const UInteger& a, const UInteger b,
-                                               const size_t bits = UInteger::width())
+template <size_t W>
+[[nodiscard]] auto approx_expanding_sub_post_masking(const uinteger<W> a, const uinteger<W> b,
+                                                     const size_t bits = W)
+-> uinteger<W>
 {
-    return approx_operation_post_masking(a,b,&aarith::mul<UInteger::width()>,bits);
+    const auto result = expanding_sub(a,b);
+    const auto mask = generate_bitmask<uinteger<result.width()>>(bits);
+
+    return result & mask;
 }
 
 template <class UInteger>
@@ -72,6 +87,24 @@ template <class UInteger>
                                                const size_t bits = UInteger::width())
 {
     return approx_operation_post_masking(a,b,&aarith::sub<UInteger::width()>,bits);
+}
+
+template <size_t W>
+[[nodiscard]] auto approx_expanding_mul_post_masking(const uinteger<W>& a, const uinteger<W> b,
+                                                     const size_t bits = 2*W)
+-> uinteger<2*W>
+{
+    const auto result = expanding_mul(a,b);
+    const auto mask = generate_bitmask<uinteger<result.width()>>(bits);
+
+    return result & mask;
+}
+
+template <class UInteger>
+[[nodiscard]] UInteger approx_mul_post_masking(const UInteger& a, const UInteger b,
+                                               const size_t bits = UInteger::width())
+{
+    return approx_operation_post_masking(a,b,&aarith::mul<UInteger::width()>,bits);
 }
 
 template <class UInteger>
@@ -147,8 +180,9 @@ template <class UInteger>
  * @return The result of the multiplication with double the size of the inputs
  */
 template <size_t width>
-auto approx_uint_bitmasking_mul(const uinteger<width>& opd1, const uinteger<width>& opd2,
-                                const size_t bits) -> uinteger<2 * width>
+auto approx_uint_bitmasking_expanding_mul(const uinteger<width>& opd1, const uinteger<width>& opd2,
+                                const size_t bits)
+-> uinteger<2 * width>
 {
     constexpr auto product_width = 2 * width;
 
@@ -165,6 +199,28 @@ auto approx_uint_bitmasking_mul(const uinteger<width>& opd1, const uinteger<widt
     }
 
     return product;
+}
+
+template <size_t width>
+auto approx_uint_bitmasking_mul(const uinteger<width>& opd1, const uinteger<width>& opd2,
+                                const size_t bits)
+-> uinteger<width>
+{
+    constexpr auto product_width = 2 * width;
+
+    auto const mask = generate_bitmask<uinteger<product_width>>(bits);
+
+    uinteger<product_width> opd2_extended = width_cast<product_width, width>(opd2);
+
+    uinteger<product_width> product;
+    for (auto i = 0U; i < width; ++i)
+    {
+        auto const opd2_masked = opd2_extended & mask;
+        product = ((opd1.bit(i) == 0) ? product : add(product, opd2_masked));
+        opd2_extended <<= 1;
+    }
+
+    return width_cast<width>(product);
 }
 
 } // namespace aarith

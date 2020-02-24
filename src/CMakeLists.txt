@@ -9,6 +9,7 @@ target_sources(aarith INTERFACE
   aarith/operations/uinteger_operations.hpp
   aarith/operations/float_operations.hpp
   aarith/operations/approx_operations.hpp
+  aarith/operations/float_approx_operations.hpp
   aarith/operations/sinteger_operations.hpp
   aarith/operations/uinteger_comparisons.hpp
   aarith/operations/float_comparisons.hpp
@@ -16,6 +17,8 @@ target_sources(aarith INTERFACE
   aarith/utilities/string_utils.hpp
   aarith/utilities/float_utils.hpp
 )
+
 target_include_directories(aarith INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_features(aarith INTERFACE cxx_std_17)
 add_library(aarith::Library ALIAS aarith)
+
