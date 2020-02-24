@@ -1,4 +1,5 @@
 #include <aarith/integer.hpp>
+
 #include <bitset>
 #include <catch.hpp>
 #include <sstream>

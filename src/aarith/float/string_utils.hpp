@@ -1,6 +1,11 @@
 #pragma once
 
+#include <aarith/integer.hpp>
+
 #include <aarith/core/string_utils.hpp>
+
+
+#include <sstream>
 
 namespace aarith {
 
@@ -117,7 +122,7 @@ namespace aarith {
 
         const sinteger<E> s_exponent(exponent);
         auto const s_abs_exponent = abs(s_exponent);
-        const uinteger<E> abs_exponent(abs_exponent);
+        const uinteger<E> abs_exponent(s_abs_exponent);
 
         std::stringstream str;
         str << ((nf.get_sign() == 1) ? "-" : "") << *mantissa << "E"

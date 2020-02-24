@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace aarith {
 
     inline constexpr auto number_of_decimal_digits(size_t bits) -> size_t
