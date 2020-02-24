@@ -14,7 +14,7 @@ target_sources(aarith INTERFACE
         aarith/float/float_comparisons.hpp
   aarith/utilities/bit_operations.hpp
   aarith/utilities/string_utils.hpp
-  aarith/utilities/float_utils.hpp
+        aarith/float/float_utils.hpp
 )
 target_include_directories(aarith INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_features(aarith INTERFACE cxx_std_17)
