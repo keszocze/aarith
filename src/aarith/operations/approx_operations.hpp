@@ -73,7 +73,7 @@ template <class UInteger>
 template <size_t W>
 [[nodiscard]] auto approx_expanding_sub_post_masking(const uinteger<W> a, const uinteger<W> b,
                                                      const size_t bits = W)
--> uinteger<W>
+-> uinteger<W+1>
 {
     const auto result = expanding_sub(a,b);
     const auto mask = generate_bitmask<uinteger<result.width()>>(bits);

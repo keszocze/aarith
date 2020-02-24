@@ -20,7 +20,7 @@ namespace aarith {
  */
 template <size_t W, size_t V>
 [[nodiscard]] uinteger<std::max(W, V) + 1> expanding_add(const uinteger<W>& a, const uinteger<V>& b,
-                                                         const bool initial_carry = false)
+                                                         const bool initial_carry)
 {
     static_assert(is_integral<uinteger<W>>::value);
     static_assert(is_unsigned<uinteger<W>>::value);
@@ -88,6 +88,12 @@ template <size_t W, size_t V>
     return sum;
 }
 
+template <size_t W, size_t V>
+[[nodiscard]] uinteger<std::max(W, V) + 1> expanding_add(const uinteger<W>& a, const uinteger<V>& b)
+{
+    return expanding_add(a, b, false);
+}
+
 /**
  * @brief Subtracts two unsigned integers of, possibly, different bit widths.
  *
@@ -98,9 +104,9 @@ template <size_t W, size_t V>
  * @return Difference of correct bit width
  */
 template <size_t W, size_t V>
-[[nodiscard]] uinteger<std::max(W, V)> expanding_sub(const uinteger<W>& a, const uinteger<V>& b)
+[[nodiscard]] uinteger<std::max(W, V)+1> expanding_sub(const uinteger<W>& a, const uinteger<V>& b)
 {
-    constexpr size_t res_width = std::max(W, V);
+    constexpr size_t res_width = std::max(W, V)+1;
     uinteger<res_width> result{sub(width_cast<res_width>(a), width_cast<res_width>(b))};
 
     return result;
