@@ -91,7 +91,8 @@ public:
 
     [[nodiscard]] static constexpr auto word_count() noexcept -> size_t
     {
-        return size_in_words<word_type>(Width);
+        const auto word_size = sizeof(word_type) * 8;
+        return (Width / word_size) + (Width % word_size ? 1 : 0);
     }
 
     [[nodiscard]] static constexpr auto word_mask(size_t index) noexcept -> word_type

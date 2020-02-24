@@ -6,11 +6,6 @@
 
 namespace aarith {
 
-template <class T>[[nodiscard]] constexpr size_t size_in_words(const size_t w)
-{
-    const auto word_size = sizeof(T) * 8;
-    return (w / word_size) + (w % word_size ? 1 : 0);
-}
 
 [[nodiscard]] constexpr std::pair<uint32_t, uint32_t> split(const uint64_t n)
 {
