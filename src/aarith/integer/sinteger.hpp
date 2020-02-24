@@ -1,8 +1,7 @@
 #pragma once
 
-#include "aarith/utilities/bit_operations.hpp"
-#include "traits.hpp"
-#include <aarith/types/word_container.hpp>
+#include <aarith/core/traits.hpp>
+#include <aarith/core/word_container.hpp>
 #include <algorithm>
 #include <array>
 #include <cmath>

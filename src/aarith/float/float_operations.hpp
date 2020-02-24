@@ -1,10 +1,10 @@
 #pragma once
 
-#include <aarith/types/uinteger.hpp>
-#include <aarith/types/normfloat.hpp>
-#include <aarith/operations/uinteger_comparisons.hpp>
-#include <aarith/operations/uinteger_operations.hpp>
-#include <aarith/types/traits.hpp>
+#include <aarith/integer/uinteger.hpp>
+#include <aarith/float/normfloat.hpp>
+#include <aarith/integer/uinteger_comparisons.hpp>
+#include <aarith/integer/uinteger_operations.hpp>
+#include <aarith/core/traits.hpp>
 
 namespace aarith {
 
@@ -151,7 +151,7 @@ template<size_t E, size_t M>
 
 } // namespace aarith
 
-#include "aarith/types/uinteger.hpp"
+#include "aarith/integer/uinteger.hpp"
 
 namespace aarith::exact_operators {
 

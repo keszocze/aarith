@@ -1,7 +1,7 @@
 #pragma once
 
-#include <aarith/types/sinteger.hpp>
-#include <aarith/types/traits.hpp>
+#include <aarith/integer/sinteger.hpp>
+#include <aarith/core/traits.hpp>
 #include <cstdint>
 
 #include <bitset>

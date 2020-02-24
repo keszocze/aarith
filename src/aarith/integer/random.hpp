@@ -3,6 +3,8 @@
 #include <random>
 #include <stdexcept>
 
+#include <aarith/integer/uinteger.hpp>
+
 namespace aarith {
 
 /**

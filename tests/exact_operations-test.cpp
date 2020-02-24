@@ -1,7 +1,4 @@
-#include "aarith/operations/uinteger_comparisons.hpp"
-#include "aarith/operations/uinteger_operations.hpp"
-#include "aarith/types/uinteger.hpp"
-#include "aarith/utilities/string_utils.hpp"
+#include <aarith/integer.hpp>
 #include <catch.hpp>
 
 using namespace aarith;

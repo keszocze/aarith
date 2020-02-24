@@ -1,6 +1,4 @@
-#include "aarith/operations/float_comparisons.hpp"
-#include "aarith/operations/float_operations.hpp"
-#include "aarith/types/normfloat.hpp"
+#include <aarith/float.hpp>
 #include <catch.hpp>
 
 using namespace aarith;

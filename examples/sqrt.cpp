@@ -1,7 +1,5 @@
-#include <aarith/types/normfloat.hpp>
-#include <aarith/operations/float_operations.hpp>
-#include <aarith/operations/float_approx_operations.hpp>
-#include <aarith/utilities/string_utils.hpp>
+#include <aarith/float.hpp>
+#include <aarith/float/approx_operations.hpp>
 #include <cmath>
 
 using namespace aarith;
