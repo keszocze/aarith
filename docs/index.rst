@@ -3,15 +3,11 @@ Aarith -- An Arbitrary precision library
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Contents
 
-
-Installation
-============
-
-Foo bar blubb, der Witterauf weiß, wie's geht!
-
-
+   installation
+   tutorial
+   reference
 
 
 Indices and tables
@@ -20,8 +16,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`search`
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Arbitrary precision integers
-
-   integers
