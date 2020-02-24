@@ -1,8 +1,8 @@
 #pragma once
 
-#include <aarith/operations/uinteger_comparisons.hpp>
-#include <aarith/types/traits.hpp>
-#include <aarith/types/uinteger.hpp>
+#include <aarith/integer/uinteger_comparisons.hpp>
+#include <aarith/core/traits.hpp>
+#include <aarith/integer/uinteger.hpp>
 #include <aarith/utilities/bit_operations.hpp>
 
 #include <iostream>
@@ -281,7 +281,7 @@ template <class UInteger>
 
 } // namespace aarith
 
-#include "aarith/types/uinteger.hpp"
+#include "uinteger.hpp"
 
 namespace aarith::exact_operators {
 

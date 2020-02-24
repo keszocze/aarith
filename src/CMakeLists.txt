@@ -1,17 +1,17 @@
 add_library(aarith INTERFACE)
 target_sources(aarith INTERFACE
-  aarith/types/uinteger.hpp
-  aarith/types/sinteger.hpp
-  aarith/types/word_container.hpp
-  aarith/types/normfloat.hpp
-  aarith/types/traits.hpp
-  aarith/types/random.hpp
-  aarith/operations/uinteger_operations.hpp
-  aarith/operations/float_operations.hpp
+        aarith/integer/uinteger.hpp
+        aarith/integer/sinteger.hpp
+        aarith/core/word_container.hpp
+        aarith/float/normfloat.hpp
+        aarith/core/traits.hpp
+        aarith/integer/random.hpp
+        aarith/integer/uinteger_operations.hpp
+        aarith/float/float_operations.hpp
   aarith/operations/approx_operations.hpp
-  aarith/operations/sinteger_operations.hpp
-  aarith/operations/uinteger_comparisons.hpp
-  aarith/operations/float_comparisons.hpp
+        aarith/integer/sinteger_operations.hpp
+        aarith/integer/uinteger_comparisons.hpp
+        aarith/float/float_comparisons.hpp
   aarith/utilities/bit_operations.hpp
   aarith/utilities/string_utils.hpp
   aarith/utilities/float_utils.hpp

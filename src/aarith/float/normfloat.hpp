@@ -2,8 +2,8 @@
 
 #include <aarith/utilities/bit_operations.hpp>
 #include <aarith/utilities/float_utils.hpp>
-#include <aarith/types/uinteger.hpp>
-#include <aarith/types/traits.hpp>
+#include <aarith/integer/uinteger.hpp>
+#include <aarith/core/traits.hpp>
 #include <cstdint>
 #include <iostream>
 #include <type_traits>

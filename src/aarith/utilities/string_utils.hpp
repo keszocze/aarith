@@ -1,13 +1,13 @@
 #pragma once
 
-#include "aarith/operations/float_comparisons.hpp"
-#include "aarith/operations/float_operations.hpp"
-#include "aarith/operations/sinteger_operations.hpp"
-#include "aarith/operations/uinteger_comparisons.hpp"
-#include "aarith/operations/uinteger_operations.hpp"
-#include "aarith/types/normfloat.hpp"
-#include "aarith/types/sinteger.hpp"
-#include "aarith/types/uinteger.hpp"
+#include "aarith/float/float_comparisons.hpp"
+#include "aarith/float/float_operations.hpp"
+#include "aarith/integer/sinteger_operations.hpp"
+#include "aarith/integer/uinteger_comparisons.hpp"
+#include "aarith/integer/uinteger_operations.hpp"
+#include "aarith/float/normfloat.hpp"
+#include "aarith/integer/sinteger.hpp"
+#include "aarith/integer/uinteger.hpp"
 #include "aarith/utilities/bit_operations.hpp"
 #include <iostream>
 #include <sstream>

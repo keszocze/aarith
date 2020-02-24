@@ -1,5 +1,5 @@
-#include "aarith/types/sinteger.hpp"
-#include "aarith/types/uinteger.hpp"
+#include "aarith/integer/sinteger.hpp"
+#include "aarith/integer/uinteger.hpp"
 #include "aarith/utilities/string_utils.hpp"
 #include <catch.hpp>
 #include <sstream>

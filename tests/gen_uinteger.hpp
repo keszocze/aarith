@@ -1,7 +1,7 @@
 #pragma once
 
-#include "aarith/types/uinteger.hpp"
-#include "aarith/types/random.hpp"
+#include "aarith/integer/uinteger.hpp"
+#include "aarith/integer/random.hpp"
 
 #include <catch.hpp>
 

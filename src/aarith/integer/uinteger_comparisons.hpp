@@ -1,7 +1,7 @@
 #pragma once
 
-#include "aarith/types/uinteger.hpp"
-#include "aarith/types/traits.hpp"
+#include "uinteger.hpp"
+#include "aarith/core/traits.hpp"
 #include <cstdint>
 
 namespace aarith {

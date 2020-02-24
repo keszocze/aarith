@@ -1,5 +1,5 @@
-#include "aarith/types/sinteger.hpp"
-#include <aarith/operations/sinteger_comparisons.hpp>
+#include "aarith/integer/sinteger.hpp"
+#include <aarith/integer/sinteger_comparisons.hpp>
 #include <catch.hpp>
 
 using namespace aarith;

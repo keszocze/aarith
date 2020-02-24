@@ -1,8 +1,8 @@
 #pragma once
 
-#include <aarith/types/sinteger.hpp>
-#include <aarith/types/uinteger.hpp>
-#include <aarith/operations/uinteger_operations.hpp>
+#include <aarith/integer/sinteger.hpp>
+#include <aarith/integer/uinteger.hpp>
+#include <aarith/integer/uinteger_operations.hpp>
 
 namespace aarith {
 

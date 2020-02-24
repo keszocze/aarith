@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "aarith/types/traits.hpp"
-#include "aarith/types/word_container.hpp"
+#include "traits.hpp"
+#include "word_container.hpp"
 #include <cstdint>
 
 namespace aarith {

@@ -1,5 +1,5 @@
-#include <aarith/operations/uinteger_operations.hpp>
-#include <aarith/types/uinteger.hpp>
+#include <aarith/integer/uinteger_operations.hpp>
+#include <aarith/integer/uinteger.hpp>
 #include <bitset>
 #include <iostream>
 

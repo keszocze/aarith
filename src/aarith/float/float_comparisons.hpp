@@ -1,6 +1,6 @@
 #pragma once
 
-#include "aarith/types/normfloat.hpp"
+#include "normfloat.hpp"
 #include <cstdint>
 
 namespace aarith {

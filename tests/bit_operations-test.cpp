@@ -1,7 +1,7 @@
 #include <catch.hpp>
 
-#include <aarith/operations/word_container_comparisons.hpp>
-#include <aarith/types/word_container.hpp>
+#include <aarith/core/word_container_comparisons.hpp>
+#include <aarith/core/word_container.hpp>
 #include <aarith/utilities/bit_operations.hpp>
 #include <aarith/utilities/string_utils.hpp>
 
