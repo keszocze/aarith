@@ -1,6 +1,6 @@
-function(add_aarith_test testname filename)
+function(add_aarith_test testname)
   SET(targetname "${testname}-test")
-  add_executable(${targetname} ${filename})
+  add_executable(${targetname} ${ARGN})
   target_link_libraries(${targetname} Catch2::WithMain aarith::Library)
   add_test(NAME ${targetname} COMMAND ${targetname})
 endfunction(add_aarith_test)

@@ -97,6 +97,7 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
         const sinteger<150> c_(-1337);
         const sinteger<150> zero150(0);
         const sinteger<150> sum150_fun = fun_add(c, c_);
+        const sinteger<150> sum150 = add(c, c_);
 
         THEN("The sum should be zero")
         {
@@ -522,7 +523,6 @@ SCENARIO("MIN/MAX Values behave as expected", "[sinteger][utility]")
         {
             REQUIRE(add(max, one) == min);
             REQUIRE(add(max, one) == fun_add(max,one));
-            std::cout << "fasd\n";
 
             REQUIRE(sub(min, one) == max);
         }
