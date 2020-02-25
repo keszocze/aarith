@@ -14,7 +14,7 @@ add_aarith_test(uint-anytime integer/uint-anytime-test.cpp)
 add_aarith_test(util integer/string_utils-test.cpp)
 add_aarith_test(bit-operations core/bit_operations-test.cpp)
 add_aarith_test(sint integer/sint-test.cpp integer/sint-operations-test.cpp integer/sint-comparisons-test.cpp)
-add_aarith_test(container container-test.cpp)
+add_aarith_test(container core/functional-style-test.cpp)
 
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/")
