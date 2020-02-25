@@ -733,10 +733,7 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[uinteger][utility]
             CHECK(nl::is_modulo == il::is_modulo);
             CHECK(nl::radix == il::radix);
             CHECK(nl::digits == il::digits);
-// TODO remove this when log10 becomes constexpr in clang's stdlibc
-#ifdef __GNUG__
             CHECK(nl::digits10 == il::digits10);
-#endif
             CHECK(nl::max_digits10 == il::max_digits10);
             CHECK(nl::min_exponent10 == il::min_exponent10);
             CHECK(nl::min_exponent == il::min_exponent);
@@ -779,10 +776,7 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[uinteger][utility]
             CHECK(nl::is_modulo == il::is_modulo);
             CHECK(nl::radix == il::radix);
             CHECK(nl::digits == il::digits);
-            // TODO remove this when log10 becomes constexpr in clang's stdlibc
-#ifdef __GNUG__
             CHECK(nl::digits10 == il::digits10);
-#endif
             CHECK(nl::max_digits10 == il::max_digits10);
             CHECK(nl::min_exponent10 == il::min_exponent10);
             CHECK(nl::min_exponent == il::min_exponent);

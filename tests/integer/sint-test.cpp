@@ -709,10 +709,7 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[sinteger][utility]
             CHECK(signed_integer::is_modulo == il::is_modulo);
             CHECK(signed_integer::radix == il::radix);
             CHECK(signed_integer::digits == il::digits);
-// TODO remove this when log10 becomes constexpr in clang's stdlibc
-#ifdef __GNUG__
             CHECK(signed_integer::digits10 == il::digits10);
-#endif
             CHECK(signed_integer::max_digits10 == il::max_digits10);
             CHECK(signed_integer::min_exponent10 == il::min_exponent10);
             CHECK(signed_integer::min_exponent == il::min_exponent);
@@ -753,10 +750,7 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[sinteger][utility]
             CHECK(signed_integer::is_modulo == il::is_modulo);
             CHECK(signed_integer::radix == il::radix);
             CHECK(signed_integer::digits == il::digits);
-// TODO remove this when log10 becomes constexpr in clang's stdlibc
-#ifdef __GNUG__
             CHECK(signed_integer::digits10 == il::digits10);
-#endif
             CHECK(signed_integer::max_digits10 == il::max_digits10);
             CHECK(signed_integer::min_exponent10 == il::min_exponent10);
             CHECK(signed_integer::min_exponent == il::min_exponent);

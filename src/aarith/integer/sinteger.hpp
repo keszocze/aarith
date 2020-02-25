@@ -165,6 +165,8 @@ template <size_t DestinationWidth, size_t SourceWidth>
 
 } // namespace aarith
 
+#include <aarith/core/number_utils.hpp>
+
 // We are only allowed to extend std with specializations
 // https://en.cppreference.com/w/cpp/language/extending_std
 template <size_t W> class std::numeric_limits<aarith::sinteger<W>>
@@ -187,12 +189,9 @@ public:
     static constexpr bool is_modulo = false;
     static constexpr int radix = 2;
     static constexpr int digits = W - 1; // TODO what happens if W > max_int?
-
-// TODO remove this when log10 becomes constexpr in clang's stdlibc
-#ifdef __GNUG__
-    static constexpr int digits10 = std::numeric_limits<aarith::sinteger<W>>::digits *
-                                    std::log10(std::numeric_limits<aarith::sinteger<W>>::radix);
-#endif
+    static constexpr int digits10 =
+        aarith::ceil<int>(std::numeric_limits<aarith::sinteger<W>>::digits * aarith::log<10, 2>()) -
+        1;
 
     // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says
     // so
