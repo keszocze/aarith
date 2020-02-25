@@ -9,6 +9,7 @@ Aarith -- An Arbitrary precision library
 
    installation
    tutorial
+   philosophy
    reference
 
 Citation
