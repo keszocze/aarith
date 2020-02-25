@@ -30,7 +30,7 @@ public:
     {
         if (t < 0)
         {
-            const WordType ones(-1);
+            auto const ones = static_cast<WordType>(-1);
             for (size_t i = 1; i < sinteger<Width>::word_count(); i++)
             {
                 this->set_word(i, ones);
@@ -136,7 +136,6 @@ public:
     static constexpr bool value = false;
 };
 
-
 template <size_t DestinationWidth, size_t SourceWidth>
 [[nodiscard]] auto width_cast(const sinteger<SourceWidth>& source) -> sinteger<DestinationWidth>
 {
@@ -150,10 +149,10 @@ template <size_t DestinationWidth, size_t SourceWidth>
         // TODO find a quicker way to correctly expand the width
         if (is_negative)
         {
-            for (size_t i= SourceWidth; i < DestinationWidth; ++i) {
+            for (size_t i = SourceWidth; i < DestinationWidth; ++i)
+            {
                 result.set_bit(i);
             }
-
         }
         return sinteger<DestinationWidth>{result};
     }
@@ -165,6 +164,8 @@ template <size_t DestinationWidth, size_t SourceWidth>
 }
 
 } // namespace aarith
+
+#include <aarith/core/number_utils.hpp>
 
 // We are only allowed to extend std with specializations
 // https://en.cppreference.com/w/cpp/language/extending_std
@@ -188,13 +189,9 @@ public:
     static constexpr bool is_modulo = false;
     static constexpr int radix = 2;
     static constexpr int digits = W - 1; // TODO what happens if W > max_int?
-
-
-    // TODO remove this when log10 becomes constexpr in clang's stdlibc
-    #ifndef __clang__
-    static constexpr int digits10 = std::numeric_limits<aarith::sinteger<W>>::digits *
-                                    std::log10(std::numeric_limits<aarith::sinteger<W>>::radix);
-    #endif
+    static constexpr int digits10 =
+        aarith::ceil<int>(std::numeric_limits<aarith::sinteger<W>>::digits * aarith::log<10, 2>()) -
+        1;
 
     // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says
     // so

@@ -1,8 +1,8 @@
 #include <aarith/integer.hpp>
 
 #include <catch.hpp>
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 using namespace aarith;
 
@@ -15,13 +15,10 @@ SCENARIO("Creating uintegers using the from_words method")
             const uint64_t uzero = 0U;
             const uint64_t uones = ~uzero;
 
-
-
-
-            const uinteger<89> from_word=uinteger<89>::from_words(uzero,uones);
+            const uinteger<89> from_word = uinteger<89>::from_words(uzero, uones);
             uinteger<89> manually;
-            manually.set_word(0,uones);
-            manually.set_word(1,uzero);
+            manually.set_word(0, uones);
+            manually.set_word(1, uzero);
 
             CHECK(from_word == manually);
             CHECK(from_word.word(0) == uones);
@@ -32,7 +29,7 @@ SCENARIO("Creating uintegers using the from_words method")
     }
 }
 
- SCENARIO("Casting uintegers into different width", "[uinteger]")
+SCENARIO("Casting uintegers into different width", "[uinteger]")
 {
     GIVEN("width_cast is called")
     {
@@ -561,7 +558,8 @@ SCENARIO("Checking whether an uinteger is not equal to zero/false")
     }
 }
 
-SCENARIO("Using the for loop operation feature from the word_array base class","[uinteger][utility]")
+SCENARIO("Using the for loop operation feature from the word_array base class",
+         "[uinteger][utility]")
 {
     GIVEN("An unsigned integer")
     {
@@ -709,8 +707,6 @@ SCENARIO("Bit operations are performed correctly", "[uinteger][bit]")
     }
 }
 
-
-
 SCENARIO("std::numeric_limits gets instantiated correctly", "[uinteger][utility]")
 {
     GIVEN("The bit width of 32")
@@ -737,16 +733,12 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[uinteger][utility]
             CHECK(nl::is_modulo == il::is_modulo);
             CHECK(nl::radix == il::radix);
             CHECK(nl::digits == il::digits);
-            // TODO remove this when log10 becomes constexpr in clang's stdlibc
-            #ifndef __clang__
             CHECK(nl::digits10 == il::digits10);
-            #endif
             CHECK(nl::max_digits10 == il::max_digits10);
             CHECK(nl::min_exponent10 == il::min_exponent10);
             CHECK(nl::min_exponent == il::min_exponent);
             CHECK(nl::max_exponent == il::max_exponent);
             CHECK(nl::max_digits10 == il::max_exponent10);
-            CHECK(nl::traps == il::traps);
             CHECK(nl::tinyness_before == il::tinyness_before);
             CHECK(static_cast<base>(nl::min().word(0)) == il::min());
             CHECK(static_cast<base>(nl::lowest().word(0)) == il::lowest());
@@ -784,16 +776,12 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[uinteger][utility]
             CHECK(nl::is_modulo == il::is_modulo);
             CHECK(nl::radix == il::radix);
             CHECK(nl::digits == il::digits);
-            // TODO remove this when log10 becomes constexpr in clang's stdlibc
-            #ifndef __clang__
             CHECK(nl::digits10 == il::digits10);
-            #endif
             CHECK(nl::max_digits10 == il::max_digits10);
             CHECK(nl::min_exponent10 == il::min_exponent10);
             CHECK(nl::min_exponent == il::min_exponent);
             CHECK(nl::max_exponent == il::max_exponent);
             CHECK(nl::max_digits10 == il::max_exponent10);
-            CHECK(nl::traps == il::traps);
             CHECK(nl::tinyness_before == il::tinyness_before);
             CHECK(static_cast<base>(nl::min().word(0)) == il::min());
             CHECK(static_cast<base>(nl::lowest().word(0)) == il::lowest());

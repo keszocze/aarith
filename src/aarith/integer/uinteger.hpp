@@ -69,7 +69,7 @@ public:
 
     [[nodiscard]] static constexpr uinteger one()
     {
-        uinteger n=uinteger::all_zeroes();
+        uinteger n = uinteger::all_zeroes();
         n.set_bit(0);
         return n;
     }
@@ -89,7 +89,6 @@ public:
         return *this = *this + addend;
     }
 };
-
 
 template <size_t DestinationWidth, size_t SourceWidth>
 [[nodiscard]] auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>
@@ -117,6 +116,8 @@ public:
 
 } // namespace aarith
 
+#include <aarith/core/number_utils.hpp>
+
 // We are only allowed to extend std with specializations
 // https://en.cppreference.com/w/cpp/language/extending_std
 template <size_t W> class std::numeric_limits<aarith::uinteger<W>>
@@ -134,20 +135,17 @@ public:
     static constexpr bool has_denorm_loss = false;
 
     // TODO do we need to take that into account somewhere?
-    static constexpr std::float_round_style round_style =
-        std::round_toward_zero;
+    static constexpr std::float_round_style round_style = std::round_toward_zero;
     static constexpr bool is_iec559 = false;
     static constexpr bool is_modulo = true;
     static constexpr int radix = 2;
     static constexpr int digits = W; // TODO what happens if W > max_int?
+    static constexpr int digits10 =
+        aarith::ceil<int>(std::numeric_limits<aarith::uinteger<W>>::digits * aarith::log<10, 2>()) -
+        1;
 
-    // TODO remove this when log10 becomes constexpr in clang's stdlibc
-    #ifndef __clang__
-        static constexpr int digits10 = std::numeric_limits<aarith::uinteger<W>>::digits *
-                                    std::log10(std::numeric_limits<aarith::uinteger<W>>::radix);
-    #endif
-
-    // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says so
+    // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says
+    // so
     static constexpr int max_digits10 = 0;
 
     static constexpr int min_exponent = 0;

@@ -63,7 +63,7 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
                 REQUIRE(result.word(1) == 1);
             }
         }
-        
+
         WHEN("There is no carry into the next word")
         {
             static constexpr uint64_t number_a = 1ULL << 63U;
@@ -100,7 +100,7 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
                 REQUIRE(result == ref);
             }
         }
-        
+
         WHEN("There should be no carry into the third word")
         {
             const auto a = uint::from_words(0, 0xfffffffffffffffe, 0xffffffffffffffff);
@@ -149,8 +149,6 @@ SCENARIO("Adding tow uintgers of different bit width", "[uinteger][arithmetic][a
             REQUIRE(result_fun2 == result2);
             REQUIRE(result1 == result2);
         }
-
-
     }
     GIVEN("An uinteger consisting of zeros only")
     {
@@ -168,7 +166,6 @@ SCENARIO("Adding tow uintgers of different bit width", "[uinteger][arithmetic][a
             CHECK(result.word(2) == 1U);
             CHECK(result.word(1) == 0U);
             REQUIRE(result.word(0) == 0U);
-
         }
     }
 }
@@ -206,10 +203,6 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
         }
         WHEN("b equals zero")
         {
-
-
-            uinteger<150> a;
-
             THEN("Subtracting b (i.e. zero) should not change a)")
             {
                 uinteger<150> a;
@@ -243,12 +236,13 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
                 }
             }
         }
-        WHEN("The size is 129 bits (three words and the third word uses only one bit) and max-1 is calculated")
+        WHEN("The size is 129 bits (three words and the third word uses only one bit) and max-1 is "
+             "calculated")
         {
             THEN("The MSB should remain 1")
             {
                 using uint = uinteger<129>;
-                
+
                 uint opd1 = ~uint(0U);
                 uint one = uint(1U);
 
@@ -302,7 +296,7 @@ SCENARIO("Expanding subtraction works correctly", "[uinteger][arithmetic]")
 
         THEN("Subtracting max from zero should give one")
         {
-            auto const result = expanding_sub(zero,large);
+            auto const result = expanding_sub(zero, large);
             REQUIRE(result == expected);
         }
     }
@@ -311,11 +305,12 @@ SCENARIO("Expanding subtraction works correctly", "[uinteger][arithmetic]")
     {
         static const uinteger<8> zero = uinteger<8>::min();
         static const uinteger<4> large = uinteger<4>::max();
-        static const uinteger<8> expected = sub(uinteger<8>{1U},add(uinteger<8>{uinteger<4>::max()}, uinteger<8>{1U}));
+        static const uinteger<8> expected =
+            sub(uinteger<8>{1U}, add(uinteger<8>{uinteger<4>::max()}, uinteger<8>{1U}));
 
         THEN("Subtracting max from zero should give 1-(small::max+1)")
         {
-            auto const result = expanding_sub(zero,large);
+            auto const result = expanding_sub(zero, large);
             REQUIRE(result == expected);
         }
     }
@@ -335,7 +330,8 @@ SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
             REQUIRE(~max == min);
         }
 
-        THEN ("uinteger::min and uinteger::lowest are the same") {
+        THEN("uinteger::min and uinteger::lowest are the same")
+        {
             REQUIRE(uinteger<89>::min() == std::numeric_limits<uinteger<89>>::lowest());
         }
 
@@ -367,9 +363,8 @@ SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
         WHEN("Subracting from min value")
         {
             const uint64_t a_ = GENERATE(
-                    take(100, random(static_cast<uint64_t>(0), std::numeric_limits<uint64_t>::max())));
+                take(100, random(static_cast<uint64_t>(0), std::numeric_limits<uint64_t>::max())));
             const uinteger<89> a{a_};
-
 
             THEN("Truncating subtraction is underflow modulo 2")
             {
@@ -377,8 +372,6 @@ SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
                 uinteger<89> result = sub(min, a);
                 REQUIRE(result == expected);
             }
-
-
         }
 
         THEN("Adding or subtracting min should not change the other value")
@@ -729,7 +722,6 @@ SCENARIO("Computing the remainder of two uintegers works as expected", "[uintege
             uint64_t rem_int = val_a % val_b;
             CHECK(quot_int == quotient.word(0));
             CHECK(rem_int == remainder.word(0));
-
         }
     }
 }
