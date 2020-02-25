@@ -3,7 +3,7 @@
 
 using namespace aarith;
 
-template <class base_type, size_t N> auto eval_fau_adder()
+template <class base_type, size_t N, size_t P> void eval_fau_adder()
 {
 
     static_assert(std::is_same_v<base_type, uint8_t> || std::is_same_v<base_type, uint16_t> ||
@@ -14,6 +14,9 @@ template <class base_type, size_t N> auto eval_fau_adder()
 
     static_assert(N < digits);
 
+    std::cout << "Evaluating the FAU adder for " << digits << " bits using " << N << " lower bits and " << P << " visibility bits\n";
+    std::cout <<" \texpecting maximum error of\t" << ((1 << (N-P))-1) << "\n";
+
     uinteger<digits + 2> max_diff;
 
     for (size_t a_ = 0U; a_ <= max_val; ++a_)
@@ -23,7 +26,7 @@ template <class base_type, size_t N> auto eval_fau_adder()
         {
             const uinteger<digits> b{b_};
             const auto result_correct = expanding_add(a, b);
-            const auto result_fau = FAUadder<digits, N>(a, b);
+            const auto result_fau = FAUadder<digits, N, P>(a, b);
 
             uinteger<digits + 2> difference;
             if (result_fau < result_correct)
@@ -39,10 +42,24 @@ template <class base_type, size_t N> auto eval_fau_adder()
         }
     }
 
-    return max_diff;
+    std::cout << "\tactual maximum error\t\t" << max_diff << "\n";
 }
 int main()
 {
-    const auto res = eval_fau_adder<uint8_t, 4>();
-    std::cout << res << "\n";
+    eval_fau_adder<uint8_t, 4,0>();
+    eval_fau_adder<uint8_t, 4,1>();
+    eval_fau_adder<uint8_t, 4,2>();
+    eval_fau_adder<uint8_t, 4,3>();
+
+
+    eval_fau_adder<uint8_t, 6,0>();
+    eval_fau_adder<uint8_t, 6,1>();
+    eval_fau_adder<uint8_t, 6,2>();
+    eval_fau_adder<uint8_t, 6,3>();
+
+
+//    eval_fau_adder<uint16_t, 4,0>();
+//    eval_fau_adder<uint16_t, 4,1>();
+//    eval_fau_adder<uint16_t, 4,2>();
+//    eval_fau_adder<uint16_t, 4,3>();
 }
