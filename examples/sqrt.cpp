@@ -50,13 +50,13 @@ auto iterative_square_root_FAU(const normfloat<E, M> a, const unsigned int itera
 int main()
 {
     float ref = 1.5f;
-    normfloat<6, 16> a(ref);
+    normfloat<8, 24> a(ref);
 
     std::cout << "sqrt(" << ref << ") = " << std::endl
               << "\tstandard: " << std::sqrt(ref) << std::endl
               << "\taarith::float (exact): " << iterative_square_root(a, 6) << std::endl
               << "\taarith::float (anytime): " << iterative_square_root(a, 6, 10) << std::endl
-              << "\taarith::float (FAU adder): " << iterative_square_root_FAU<6, 16, 8, 4>(a, 6) << std::endl;
+              << "\taarith::float (FAU adder): " << iterative_square_root_FAU<8, 24, 8, 4>(a, 6) << std::endl;
 
     return 0;
 }
