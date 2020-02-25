@@ -742,7 +742,6 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[uinteger][utility]
             CHECK(nl::min_exponent == il::min_exponent);
             CHECK(nl::max_exponent == il::max_exponent);
             CHECK(nl::max_digits10 == il::max_exponent10);
-            CHECK(nl::traps == il::traps);
             CHECK(nl::tinyness_before == il::tinyness_before);
             CHECK(static_cast<base>(nl::min().word(0)) == il::min());
             CHECK(static_cast<base>(nl::lowest().word(0)) == il::lowest());
@@ -789,7 +788,6 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[uinteger][utility]
             CHECK(nl::min_exponent == il::min_exponent);
             CHECK(nl::max_exponent == il::max_exponent);
             CHECK(nl::max_digits10 == il::max_exponent10);
-            CHECK(nl::traps == il::traps);
             CHECK(nl::tinyness_before == il::tinyness_before);
             CHECK(static_cast<base>(nl::min().word(0)) == il::min());
             CHECK(static_cast<base>(nl::lowest().word(0)) == il::lowest());
