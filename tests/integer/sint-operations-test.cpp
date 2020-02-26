@@ -3,6 +3,28 @@
 
 using namespace aarith;
 
+SCENARIO("FOO", "[foo]")
+{
+    GIVEN("Two sinteger with different word_count")
+    {
+        const sinteger<64> a{16};
+        const sinteger<128> b{32, 8};
+        const sinteger<128> expected{32,24};
+        WHEN("Adding the integers")
+        {
+            THEN("All words need to be respected in the operation")
+            {
+                const auto result = expanding_add(a, b);
+                std::cout << group_digits(to_binary(a), 64) << "\n";
+                std::cout << group_digits(to_binary(b), 64) << "\n";
+                std::cout << group_digits(to_binary(result), 64) << "\n";
+                std::cout << group_digits(to_binary(expected), 64) << "\n";
+                REQUIRE(result == expected);
+            }
+        }
+    }
+}
+
 SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][addition]")
 {
     GIVEN("Two positive sinteger<N> a and b with N <= word_width")
@@ -79,6 +101,7 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
             }
         }
     }
+
     GIVEN("A sinteger and its negative")
     {
         const sinteger<16> a(15);
@@ -111,7 +134,6 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
             REQUIRE(sum64 == zero64);
             REQUIRE(sum64.is_zero());
             REQUIRE(sum64 == add(b_, b));
-
 
             CHECK(sum150_fun == sum150);
             REQUIRE(sum150 == zero150);
@@ -159,7 +181,7 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
     }
 }
 
-SCENARIO("Division of signed integers", "[sinteger][arithmetic][foo]")
+SCENARIO("Division of signed integers", "[sinteger][arithmetic]")
 {
 
     GIVEN("The number 1 << 65")
@@ -522,7 +544,7 @@ SCENARIO("MIN/MAX Values behave as expected", "[sinteger][utility]")
         THEN("Adding/subtracting one should wrap around")
         {
             REQUIRE(add(max, one) == min);
-            REQUIRE(add(max, one) == fun_add(max,one));
+            REQUIRE(add(max, one) == fun_add(max, one));
 
             REQUIRE(sub(min, one) == max);
         }
