@@ -3,29 +3,7 @@
 
 using namespace aarith;
 
-SCENARIO("FOO", "[foo]")
-{
-    GIVEN("Two sinteger with different word_count")
-    {
-        const sinteger<64> a{16};
-        const sinteger<128> b{32, 8};
-        const sinteger<128> expected{32,24};
-        WHEN("Adding the integers")
-        {
-            THEN("All words need to be respected in the operation")
-            {
-                const auto result = expanding_add(b, a);
-                std::cout << group_digits(to_binary(a), 64) << "\n";
-                std::cout << group_digits(to_binary(b), 64) << "\n";
-                std::cout << group_digits(to_binary(result), 64) << "\n";
-                std::cout << group_digits(to_binary(expected), 64) << "\n";
-                REQUIRE(result == expected);
-            }
-        }
-    }
-}
-
-SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][addition]")
+SCENARIO("Adding two positive sintegers", "[sinteger][arithmetic][addition]")
 {
     GIVEN("Two positive sinteger<N> a and b with N <= word_width")
     {
@@ -63,7 +41,24 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
             }
         }
     }
-
+    GIVEN("Two sintegers with different word_count")
+    {
+        const sinteger<64> a{16};
+        const sinteger<128> b{32, 8};
+        const sinteger<128> expected{32, 24};
+        WHEN("Adding the integers")
+        {
+            THEN("All words need to be respected in the operation")
+            {
+                const auto result = expanding_add(b, a);
+                std::cout << group_digits(to_binary(a), 64) << "\n";
+                std::cout << group_digits(to_binary(b), 64) << "\n";
+                std::cout << group_digits(to_binary(result), 64) << "\n";
+                std::cout << group_digits(to_binary(expected), 64) << "\n";
+                REQUIRE(result == expected);
+            }
+        }
+    }
     GIVEN("Two positive sinteger<N> a and b with N > word_width")
     {
         static constexpr size_t TestWidth = 128;
