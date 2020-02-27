@@ -48,15 +48,18 @@ template <size_t Width>[[nodiscard]] auto operator~(const sinteger<Width>& rhs) 
  * @return Sum of correct maximal bit width
  */
 template <size_t W, size_t V>
-[[nodiscard]] sinteger<std::max(W, V) + 1> expanding_add(const sinteger<W>& a, const sinteger<V>& b)
+[[nodiscard]] sinteger<std::max(W, V) + 1> expanding_add(const sinteger<W>& a, const sinteger<V>& b,
+                                                         const bool initial_carry = false)
 {
     static_assert(is_integral<sinteger<W>>::value);
     static_assert(is_integral<sinteger<V>>::value);
 
     constexpr size_t res_width = std::max(W, V) + 1U;
 
+    std::cout << "a.word_count()=" << a.word_count() <<"\tb.word_count()="<<b.word_count() <<"\n";
+
     sinteger<res_width> sum;
-    typename sinteger<res_width>::word_type carry{0U};
+    typename sinteger<res_width>::word_type carry = initial_carry ? 1U : 0U;
     for (auto i = 0U; i < a.word_count(); ++i)
     {
         auto const partial_sum = a.word(i) + b.word(i) + carry;
@@ -117,13 +120,11 @@ template <class IntA, class IntB>
  * @param initial_carry True if there is an initial carry coming in
  * @return Sum of correct maximal bit width
  */
-    template <class Int>
-    [[nodiscard]] auto fun_add(const Int& a, const Int& b, const bool initial_carry = false)
-    -> Int
-    {
-        return width_cast<Int::width()>(fun_add_expand(a,b,initial_carry));
-    }
-
+template <class Int>
+[[nodiscard]] auto fun_add(const Int& a, const Int& b, const bool initial_carry = false) -> Int
+{
+    return width_cast<Int::width()>(fun_add_expand(a, b, initial_carry));
+}
 
 /**
  * @brief Adds two signed integers
