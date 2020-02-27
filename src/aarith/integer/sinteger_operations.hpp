@@ -60,11 +60,17 @@ template <size_t W, size_t V>
     sinteger<res_width> a_=width_cast<res_width>(a);
     sinteger<res_width> b_=width_cast<res_width>(b);
 
-    typename sinteger<res_width>::word_type carry = initial_carry ? 1U : 0U;
+    using word_type = typename uinteger<res_width>::word_type;
+    word_type carry = initial_carry ? 1U : 0U;
     for (auto i = 0U; i < a_.word_count(); ++i)
     {
-        auto const partial_sum = a_.word(i) + b_.word(i) + carry;
-        carry = (partial_sum < a_.word(i) || partial_sum < b_.word(i)) ? 1 : 0;
+        word_type word_a = a_.word(i);
+        word_type word_b = b_.word(i);
+
+        word_type partial_sum = word_a + word_b;
+        word_type new_carry = (partial_sum < word_a || partial_sum < word_b) ? 1 : 0;
+        partial_sum = partial_sum + carry;
+        carry = new_carry || partial_sum < word_a || partial_sum < word_b;
         sum.set_word(i, partial_sum);
     }
     return sum;
