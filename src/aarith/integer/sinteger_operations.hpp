@@ -56,14 +56,15 @@ template <size_t W, size_t V>
 
     constexpr size_t res_width = std::max(W, V) + 1U;
 
-    std::cout << "a.word_count()=" << a.word_count() <<"\tb.word_count()="<<b.word_count() <<"\n";
-
     sinteger<res_width> sum;
+    sinteger<res_width> a_=width_cast<res_width>(a);
+    sinteger<res_width> b_=width_cast<res_width>(b);
+
     typename sinteger<res_width>::word_type carry = initial_carry ? 1U : 0U;
-    for (auto i = 0U; i < a.word_count(); ++i)
+    for (auto i = 0U; i < a_.word_count(); ++i)
     {
-        auto const partial_sum = a.word(i) + b.word(i) + carry;
-        carry = (partial_sum < a.word(i) || partial_sum < b.word(i)) ? 1 : 0;
+        auto const partial_sum = a_.word(i) + b_.word(i) + carry;
+        carry = (partial_sum < a_.word(i) || partial_sum < b_.word(i)) ? 1 : 0;
         sum.set_word(i, partial_sum);
     }
     return sum;
