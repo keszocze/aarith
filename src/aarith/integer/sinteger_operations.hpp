@@ -64,8 +64,8 @@ template <size_t W, size_t V>
     word_type carry = initial_carry ? 1U : 0U;
     for (auto i = 0U; i < a_.word_count(); ++i)
     {
-        word_type word_a = a_.word(i);
-        word_type word_b = b_.word(i);
+        word_type word_a {a_.word(i)};
+        word_type word_b {b_.word(i)};
 
         word_type partial_sum = word_a + word_b;
         word_type new_carry = (partial_sum < word_a || partial_sum < word_b) ? 1 : 0;
@@ -108,7 +108,7 @@ template <class IntA, class IntB>
         word_type new_carry = (partial_sum < ain || partial_sum < bin) ? 1U : 0U;
 
         partial_sum = partial_sum + carry;
-        carry = new_carry || (partial_sum < ain || partial_sum < bin) ? 1U : 0U;
+        carry = (new_carry || partial_sum < ain || partial_sum < bin) ? 1U : 0U;
 
         return partial_sum;
     };

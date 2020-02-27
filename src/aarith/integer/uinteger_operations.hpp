@@ -1,61 +1,60 @@
 #pragma once
 
-#include <aarith/integer/uinteger_comparisons.hpp>
 #include <aarith/core/traits.hpp>
 #include <aarith/integer/uinteger.hpp>
+#include <aarith/integer/uinteger_comparisons.hpp>
 
 #include <iostream>
 
 namespace aarith {
 
-    template <size_t Width>
-    [[nodiscard]] auto operator<<(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
-    {
+template <size_t Width>
+[[nodiscard]] auto operator<<(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
+{
 
-        word_array<Width> tmp{lhs};
+    word_array<Width> tmp{lhs};
 
-        return uinteger<Width>{tmp << rhs};
-    }
+    return uinteger<Width>{tmp << rhs};
+}
 
-    template <size_t Width>
-    auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
-    {
+template <size_t Width>
+auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
+{
 
-        word_array<Width> tmp{lhs};
-        return uinteger<Width>{tmp >> rhs};
-    }
+    word_array<Width> tmp{lhs};
+    return uinteger<Width>{tmp >> rhs};
+}
 
-    template <size_t Width>
-    [[nodiscard]] auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
+template <size_t Width>
+[[nodiscard]] auto operator&(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
     -> uinteger<Width>
-    {
-        word_array<Width> lhs_w{lhs};
-        word_array<Width> rhs_w{rhs};
+{
+    word_array<Width> lhs_w{lhs};
+    word_array<Width> rhs_w{rhs};
 
-        word_array<Width> result = lhs_w & rhs_w;
+    word_array<Width> result = lhs_w & rhs_w;
 
-        return uinteger<Width>{result};
-    }
+    return uinteger<Width>{result};
+}
 
-    template <size_t Width>
-    [[nodiscard]] auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
+template <size_t Width>
+[[nodiscard]] auto operator|(const uinteger<Width>& lhs, const uinteger<Width>& rhs)
     -> uinteger<Width>
-    {
-        word_array<Width> lhs_w{lhs};
-        word_array<Width> rhs_w{rhs};
+{
+    word_array<Width> lhs_w{lhs};
+    word_array<Width> rhs_w{rhs};
 
-        word_array<Width> result = lhs_w | rhs_w;
+    word_array<Width> result = lhs_w | rhs_w;
 
-        return uinteger<Width>{result};
-    }
+    return uinteger<Width>{result};
+}
 
-    template <size_t Width>[[nodiscard]] auto operator~(const uinteger<Width>& rhs) -> uinteger<Width>
-    {
-        word_array<Width> rhs_w{rhs};
-        word_array<Width> result = ~rhs_w;
-        return uinteger<Width>{result};
-    }
-
+template <size_t Width>[[nodiscard]] auto operator~(const uinteger<Width>& rhs) -> uinteger<Width>
+{
+    word_array<Width> rhs_w{rhs};
+    word_array<Width> result = ~rhs_w;
+    return uinteger<Width>{result};
+}
 
 /**
  * @brief Adds two unsigned integers of, possibly, different bit widths.
@@ -80,58 +79,23 @@ template <size_t W, size_t V>
 
     uinteger<res_width> sum;
     using word_type = typename uinteger<res_width>::word_type;
-    word_type carry{0U};
+    uinteger<res_width> a_ = width_cast<res_width>(a);
+    uinteger<res_width> b_ = width_cast<res_width>(b);
 
-    if (initial_carry)
+    word_type carry = initial_carry ? 1U : 0U;
+
+    for (auto i = 0U; i < sum.word_count(); ++i)
     {
-        carry = 1U;
-    }
 
-    /*
-     * If the bit widths are not the same we actually have to check that we don't access values
-     * outside the underlying word container.
-     */
-    if constexpr (uinteger<W>::word_count() != uinteger<V>::word_count())
-    {
-        for (auto i = 0U; i < sum.word_count(); ++i)
-        {
+        word_type word_a{a_.word(i)};
+        word_type word_b{b_.word(i)};
 
-            word_type a_{0U};
-            word_type b_{0U};
-            if (i < a.word_count())
-            {
-                a_ = a.word(i);
-            }
-            if (i < b.word_count())
-            {
-                b_ = b.word(i);
-            }
 
-            auto partial_sum = a_ + b_;
-            auto new_carry = (partial_sum < a_ || partial_sum < b_) ? 1U : 0U;
-            partial_sum += carry;
-            carry = new_carry | (partial_sum < a_ || partial_sum < b_) ? 1U : 0U;
-            sum.set_word(i, partial_sum);
-        }
-    }
-    // Here we can simply iterate until we reached the end of either of the two uintegers
-    else
-    {
-        for (auto i = 0U; i < a.word_count(); ++i)
-        {
-            auto partial_sum = a.word(i) + b.word(i);
-            auto new_carry = (partial_sum < a.word(i) || partial_sum < b.word(i)) ? 1U : 0U;
-            partial_sum += carry;
-            carry = new_carry | (partial_sum < a.word(i) || partial_sum < b.word(i)) ? 1U : 0U;
-            sum.set_word(i, partial_sum);
-        }
-
-        // we check whether an the additional bit results in an additional word and only propagate
-        // the carry if this word exists
-        if constexpr (uinteger<W>::word_count() < uinteger<res_width>::word_count())
-        {
-            sum.set_word(sum.word_count() - 1, carry);
-        }
+        auto partial_sum = word_a + word_b;
+        word_type new_carry = (partial_sum < word_a || partial_sum < word_b) ? 1U : 0U;
+        partial_sum += carry;
+        carry = (new_carry || partial_sum < word_a || partial_sum < word_b) ? 1U : 0U;
+        sum.set_word(i, partial_sum);
     }
 
     return sum;
@@ -276,7 +240,8 @@ template <std::size_t W, std::size_t V>
     {
         return std::make_pair(UInteger::one(), UInteger::zero());
     }
-    if (numerator.is_zero()) {
+    if (numerator.is_zero())
+    {
         return std::make_pair(UInteger::zero(), UInteger::zero());
     }
     if (numerator < denominator)
@@ -292,7 +257,7 @@ template <std::size_t W, std::size_t V>
     const auto n = numerator.width();
     const LargeUInteger D = (width_cast<2 * W>(denominator) << n);
     LargeUInteger R = width_cast<2 * W>(numerator);
-    UInteger Q=UInteger::zero();
+    UInteger Q = UInteger::zero();
 
     for (size_t i = 0; i < n; ++i)
     {
