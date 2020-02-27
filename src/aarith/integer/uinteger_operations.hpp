@@ -104,6 +104,9 @@ template <size_t W, size_t V>
 /**
  * @brief Subtracts two unsigned integers of, possibly, different bit widths.
  *
+ * Expanding does not, in contrast to @see expanding_add, ensure that no underflow will happen. It simply makes
+ * sure that the resulting bit width is the larger of the both input bit widths.
+ *
  * @tparam W Width of the minuend
  * @tparam V Width of the subtrahend
  * @param a Minuend
