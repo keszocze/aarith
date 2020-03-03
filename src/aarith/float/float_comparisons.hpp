@@ -1,12 +1,12 @@
 #pragma once
 
-#include "normfloat.hpp"
+#include "normalized_float.hpp"
 #include <cstdint>
 
 namespace aarith {
 
 template<size_t E, size_t M>
-auto operator<(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
+auto operator<(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
 -> bool
 {
     if(lhs.get_sign() > rhs.get_sign())
@@ -39,28 +39,28 @@ auto operator<(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
 }
 
 template<size_t E, size_t M>
-auto operator==(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
+auto operator==(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
 -> bool
 {
     return lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent() && lhs.get_mantissa() == rhs.get_mantissa();
 }
 
 template<size_t E, size_t M>
-auto operator>(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
+auto operator>(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
 -> bool
 {
     return rhs < lhs;
 }
 
 template<size_t e, size_t m>
-auto operator>=(const normfloat<e, m> lhs, const normfloat<e, m> rhs)
+auto operator>=(const normalized_float<e, m> lhs, const normalized_float<e, m> rhs)
 -> bool
 {
     return rhs < lhs || lhs == rhs;
 }
 
 template<size_t e, size_t m>
-auto operator<=(const normfloat<e, m> lhs, const normfloat<e, m> rhs)
+auto operator<=(const normalized_float<e, m> lhs, const normalized_float<e, m> rhs)
 -> bool
 {
     return lhs < rhs || lhs == rhs;
