@@ -27,7 +27,7 @@ endfunction(add_aarith_test)
 
 add_aarith_test(uint FILES integer/uint-test.cpp)
 add_aarith_test(uint-exact-operations FILES integer/uint-operations-test.cpp)
-add_aarith_test(float-exact-operations-float FILES float/exact_operations-float-test.cpp)
+add_aarith_test(float-exact-operations FILES float/exact_operations-float-test.cpp)
 add_aarith_test(uint-comparisons FILES integer/uint-comparisons-test.cpp)
 add_aarith_test(string_utils FILES integer/string_utils-test.cpp)
 add_aarith_test(uint-anytime FILES integer/uint-anytime-test.cpp)

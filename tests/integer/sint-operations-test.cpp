@@ -3,6 +3,7 @@
 
 using namespace aarith;
 
+
 SCENARIO("Adding two positive sintegers", "[sinteger][arithmetic][addition]")
 {
     GIVEN("Two positive sinteger<N> a and b with N <= word_width")
