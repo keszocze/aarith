@@ -1,40 +1,40 @@
 #pragma once
 
-#include <aarith/integer/sinteger.hpp>
+#include <aarith/integer/integer.hpp>
 #include <aarith/integer/uinteger.hpp>
 #include <aarith/integer/uinteger_operations.hpp>
 
 namespace aarith {
 
 template <size_t Width>
-[[nodiscard]] auto operator&(const sinteger<Width>& lhs, const sinteger<Width>& rhs)
-    -> sinteger<Width>
+[[nodiscard]] auto operator&(const integer<Width>& lhs, const integer<Width>& rhs)
+    -> integer<Width>
 {
     word_array<Width> lhs_w{lhs};
     word_array<Width> rhs_w{rhs};
 
     word_array<Width> result = lhs_w & rhs_w;
 
-    return sinteger<Width>{result};
+    return integer<Width>{result};
 }
 
 template <size_t Width>
-[[nodiscard]] auto operator|(const sinteger<Width>& lhs, const sinteger<Width>& rhs)
-    -> sinteger<Width>
+[[nodiscard]] auto operator|(const integer<Width>& lhs, const integer<Width>& rhs)
+    -> integer<Width>
 {
     word_array<Width> lhs_w{lhs};
     word_array<Width> rhs_w{rhs};
 
     word_array<Width> result = lhs_w | rhs_w;
 
-    return sinteger<Width>{result};
+    return integer<Width>{result};
 }
 
-template <size_t Width>[[nodiscard]] auto operator~(const sinteger<Width>& rhs) -> sinteger<Width>
+template <size_t Width>[[nodiscard]] auto operator~(const integer<Width>& rhs) -> integer<Width>
 {
     word_array<Width> rhs_w{rhs};
     word_array<Width> result = ~rhs_w;
-    return sinteger<Width>{result};
+    return integer<Width>{result};
 }
 
 /**
@@ -48,15 +48,15 @@ template <size_t Width>[[nodiscard]] auto operator~(const sinteger<Width>& rhs) 
  * @return Sum of correct maximal bit width
  */
 template <size_t W, size_t V>
-[[nodiscard]] sinteger<std::max(W, V) + 1> expanding_add(const sinteger<W>& a, const sinteger<V>& b)
+[[nodiscard]] integer<std::max(W, V) + 1> expanding_add(const integer<W>& a, const integer<V>& b)
 {
-    static_assert(is_integral<sinteger<W>>::value);
-    static_assert(is_integral<sinteger<V>>::value);
+    static_assert(is_integral<integer<W>>::value);
+    static_assert(is_integral<integer<V>>::value);
 
     constexpr size_t res_width = std::max(W, V) + 1U;
 
-    sinteger<res_width> sum;
-    typename sinteger<res_width>::word_type carry{0U};
+    integer<res_width> sum;
+    typename integer<res_width>::word_type carry{0U};
     for (auto i = 0U; i < a.word_count(); ++i)
     {
         auto const partial_sum = a.word(i) + b.word(i) + carry;
@@ -133,9 +133,9 @@ template <class IntA, class IntB>
  * @param b Second summand
  * @return Sum of a and b
  */
-template <size_t W>[[nodiscard]] sinteger<W> add(const sinteger<W>& a, const sinteger<W>& b)
+template <size_t W>[[nodiscard]] integer<W> add(const integer<W>& a, const integer<W>& b)
 {
-    sinteger<W + 1> result = expanding_add<W, W>(a, b);
+    integer<W + 1> result = expanding_add<W, W>(a, b);
     return width_cast<W>(result);
 }
 
@@ -147,12 +147,12 @@ template <size_t W>[[nodiscard]] sinteger<W> add(const sinteger<W>& a, const sin
  * @param b Subtrahend
  * @return Difference between a and b
  */
-template <size_t W>[[nodiscard]] auto sub(const sinteger<W>& a, const sinteger<W>& b) -> sinteger<W>
+template <size_t W>[[nodiscard]] auto sub(const integer<W>& a, const integer<W>& b) -> integer<W>
 {
-    static_assert(is_integral<sinteger<W>>::value);
+    static_assert(is_integral<integer<W>>::value);
 
-    sinteger<W> result;
-    sinteger<W> minus_b = add(~b, sinteger<W>(1U));
+    integer<W> result;
+    integer<W> minus_b = add(~b, integer<W>(1U));
     result = add(a, minus_b);
     return result;
 }
@@ -167,8 +167,8 @@ template <size_t W>[[nodiscard]] auto sub(const sinteger<W>& a, const sinteger<W
  * @return Difference of correct bit width
  */
 template <size_t W, size_t V>
-[[nodiscard]] auto expanding_sub(const sinteger<W>& a, const sinteger<V>& b)
-    -> sinteger<std::max(W, V)>
+[[nodiscard]] auto expanding_sub(const integer<W>& a, const integer<V>& b)
+    -> integer<std::max(W, V)>
 {
     constexpr size_t res_width = std::max(W, V);
     uinteger<res_width> result{sub(width_cast<res_width>(a), width_cast<res_width>(b))};
@@ -191,7 +191,7 @@ template <size_t W, size_t V>
  * @return Product of a and b
  */
 template <size_t W, size_t V>
-[[nodiscard]] auto expanding_mul(const sinteger<W>& m, const sinteger<V>& r) -> sinteger<V + W>
+[[nodiscard]] auto expanding_mul(const integer<W>& m, const integer<V>& r) -> integer<V + W>
 {
 
     //    std::cout << "m\t" << to_binary(m) << "\n";
@@ -199,13 +199,13 @@ template <size_t W, size_t V>
 
     constexpr size_t K = W + V + 2;
 
-    sinteger<K> A{width_cast<W + 1>(m)};
-    sinteger<K> S = -A;
+    integer<K> A{width_cast<W + 1>(m)};
+    integer<K> S = -A;
 
     A = A << V + 1;
     S = S << V + 1;
 
-    sinteger<K> P{r};
+    integer<K> P{r};
     P = P << 1;
 
     //    std::cout << "A\t" << to_binary(A) << "\n";
@@ -256,7 +256,7 @@ template <size_t W, size_t V>
  * @param b Second multiplicant
  * @return Product of a and b
  */
-template <size_t W>[[nodiscard]] sinteger<W> mul(const sinteger<W>& a, const sinteger<W>& b)
+template <size_t W>[[nodiscard]] integer<W> mul(const integer<W>& a, const integer<W>& b)
 {
     return width_cast<W>(expanding_mul(a, b));
 }
@@ -264,13 +264,13 @@ template <size_t W>[[nodiscard]] sinteger<W> mul(const sinteger<W>& a, const sin
 /**
  * @brief Computes the absolute value of a given signed integer.
  *
- * @warn There is a potential loss of precision as abs(sinteger::min) > sinteger::max
+ * @warn There is a potential loss of precision as abs(integer::min) > integer::max
  *
  * @tparam Width The width of the signed integer
  * @param n The signed inter to be "absolute valued"
  * @return The absolute value of the signed integer
  */
-template <size_t Width>[[nodiscard]] auto abs(const sinteger<Width>& n) -> sinteger<Width>
+template <size_t Width>[[nodiscard]] auto abs(const integer<Width>& n) -> integer<Width>
 {
     return n.is_negative() ? -n : n;
 }
@@ -285,7 +285,7 @@ template <size_t Width>[[nodiscard]] auto abs(const sinteger<Width>& n) -> sinte
  * @param n The signed inter to be "absolute valued"
  * @return The absolute value of the signed integer
  */
-template <size_t Width>[[nodiscard]] auto expanding_abs(const sinteger<Width>& n) -> uinteger<Width>
+template <size_t Width>[[nodiscard]] auto expanding_abs(const integer<Width>& n) -> uinteger<Width>
 {
     uinteger<Width> abs = n.is_negative() ? -n : n;
     return abs;
@@ -297,16 +297,16 @@ template <size_t Width>[[nodiscard]] auto expanding_abs(const sinteger<Width>& n
  * @param n  The signed integer whose sign is to be changed
  * @return  The negative value of the signed integer
  */
-template <size_t W> auto operator-(const sinteger<W>& n) -> sinteger<W>
+template <size_t W> auto operator-(const integer<W>& n) -> integer<W>
 {
-    const sinteger<W> one(1U);
+    const integer<W> one(1U);
     return add(~n, one);
 }
 
 /**
  * @brief Implements the restoring division algorithm.
  *
- * @note sinteger<W>::min/sinteger<W>(-1) will return <sinteger<W>::min,0>, i.e. some weird
+ * @note integer<W>::min/integer<W>(-1) will return <integer<W>::min,0>, i.e. some weird
  * overflow happens
  *
  * @see https://en.wikipedia.org/wiki/Division_algorithm#Restoring_division
@@ -319,13 +319,13 @@ template <size_t W> auto operator-(const sinteger<W>& n) -> sinteger<W>
  *
  */
 template <std::size_t W, std::size_t V>
-[[nodiscard]] std::pair<sinteger<W>, sinteger<W>> restoring_division(const sinteger<W>& numerator,
-                                                                     const sinteger<V>& denominator)
+[[nodiscard]] std::pair<integer < W>, integer<W>> restoring_division(const integer<W>& numerator,
+                                                                     const integer<V>& denominator)
 
 {
 
-    using SInteger = sinteger<W>;
-    //    using LargeSInteger = sinteger<2 * W>;
+    using SInteger = integer<W>;
+    //    using LargeSInteger = integer<2 * W>;
 
     // Cover some special cases in order to speed everything up
     if (denominator.is_zero())
@@ -358,22 +358,22 @@ template <std::size_t W, std::size_t V>
 
     const auto div = restoring_division(N, D);
 
-    sinteger<W + 1> Q(div.first);
-    sinteger<W + 1> remainder(div.second);
+    integer<W + 1> Q(div.first);
+    integer<W + 1> remainder(div.second);
 
     if (negate)
     {
         Q = -Q;
     }
 
-    sinteger<W> Q_cast = width_cast<W>(Q);
-    sinteger<W> remainder_cast = width_cast<W>(remainder);
+    integer<W> Q_cast = width_cast<W>(Q);
+    integer<W> remainder_cast = width_cast<W>(remainder);
 
     return std::make_pair(Q_cast, remainder_cast);
 }
 
 /**
- * @brief Computes the remainder of the division of one sinteger by another sinteger
+ * @brief Computes the remainder of the division of one integer by another integer
  * *
  * @tparam W Width of the numbers being used in the division
  * @param numerator The number that is to be divided
@@ -381,16 +381,16 @@ template <std::size_t W, std::size_t V>
  * @return The remainder of the division operation
  */
 template <size_t W>
-[[nodiscard]] auto remainder(const sinteger<W>& numerator, const sinteger<W>& denominator)
-    -> sinteger<W>
+[[nodiscard]] auto remainder(const integer<W>& numerator, const integer<W>& denominator)
+    -> integer<W>
 {
     return restoring_division(numerator, denominator).second;
 }
 
 /**
- * @brief Divides one sinteger by another sinteger
+ * @brief Divides one integer by another integer
  *
- * @note sinteger<W>::min/sinteger<W>(-1) will return <sinteger<W>::min,0>, i.e. some weird
+ * @note integer<W>::min/integer<W>(-1) will return <integer<W>::min,0>, i.e. some weird
  * overflow happens
  *
  * @tparam W Width of the numbers being used in the division
@@ -399,7 +399,7 @@ template <size_t W>
  * @return The quotient of the division operation
  */
 template <size_t W>
-[[nodiscard]] auto div(const sinteger<W>& numerator, const sinteger<W>& denominator) -> sinteger<W>
+[[nodiscard]] auto div(const integer<W>& numerator, const integer<W>& denominator) -> integer<W>
 {
     return restoring_division(numerator, denominator).first;
 }
@@ -412,17 +412,17 @@ template <size_t W>
  * @return
  */
 template <size_t Width>
-auto operator>>(const sinteger<Width>& lhs, const size_t rhs) -> sinteger<Width>
+auto operator>>(const integer<Width>& lhs, const size_t rhs) -> integer<Width>
 {
     if (rhs >= Width)
     {
         if (lhs.is_negative())
         {
-            return sinteger<Width>::all_ones();
+            return integer<Width>::all_ones();
         }
         else
         {
-            return sinteger<Width>(0U);
+            return integer<Width>(0U);
         }
     }
     if (rhs == 0)
@@ -430,11 +430,11 @@ auto operator>>(const sinteger<Width>& lhs, const size_t rhs) -> sinteger<Width>
         return lhs;
     }
 
-    sinteger<Width> shifted;
+    integer<Width> shifted;
 
     if (lhs.is_zero())
     {
-        shifted = sinteger<Width>::all_ones();
+        shifted = integer<Width>::all_ones();
     }
 
     const auto skip_words = rhs / lhs.word_width();
@@ -443,7 +443,7 @@ auto operator>>(const sinteger<Width>& lhs, const size_t rhs) -> sinteger<Width>
 
     for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
     {
-        typename sinteger<Width>::word_type new_word;
+        typename integer<Width>::word_type new_word;
         new_word = lhs.word(counter) >> shift_word_right;
         if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
         {
@@ -452,7 +452,7 @@ auto operator>>(const sinteger<Width>& lhs, const size_t rhs) -> sinteger<Width>
 
         shifted.set_word(counter - skip_words, new_word);
     }
-    typename sinteger<Width>::word_type new_word;
+    typename integer<Width>::word_type new_word;
     new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
 
     shifted.set_word(lhs.word_count() - skip_words - 1, new_word);

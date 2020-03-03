@@ -33,7 +33,7 @@ add_aarith_test(string_utils FILES integer/string_utils-test.cpp)
 add_aarith_test(uint-anytime FILES integer/uint-anytime-test.cpp)
 add_aarith_test(util FILES integer/string_utils-test.cpp)
 add_aarith_test(bit-operations FILES core/bit_operations-test.cpp)
-add_aarith_test(sint FILES integer/sint-test.cpp integer/sint-operations-test.cpp integer/sint-comparisons-test.cpp)
+add_aarith_test(integer FILES integer/integer-test.cpp integer/integer-operations-test.cpp integer/integer-comparisons-test.cpp)
 add_aarith_test(container FILES core/functional-style-test.cpp)
 
 

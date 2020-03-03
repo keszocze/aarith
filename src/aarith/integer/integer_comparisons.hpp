@@ -1,6 +1,6 @@
 #pragma once
 
-#include <aarith/integer/sinteger.hpp>
+#include <aarith/integer/integer.hpp>
 #include <aarith/core/traits.hpp>
 #include <cstdint>
 
@@ -9,7 +9,7 @@
 
 namespace aarith {
 
-template <size_t W, size_t V> bool operator==(const sinteger<W>& a, const sinteger<V>& b)
+template <size_t W, size_t V> bool operator==(const integer<W>& a, const integer<V>& b)
 {
     // TODO remove when clang implements the stuff as constexpr
 #ifndef __clang__
@@ -27,7 +27,7 @@ template <size_t W, size_t V> bool operator==(const sinteger<W>& a, const sinteg
 
     const bool numbers_are_negative = a.is_negative(); // we can pick either a or b
 
-    using word_type = typename sinteger<W>::word_type;
+    using word_type = typename integer<W>::word_type;
 
     if constexpr (W > V)
     {
@@ -40,7 +40,7 @@ template <size_t W, size_t V> bool operator==(const sinteger<W>& a, const sinteg
              */
             if (numbers_are_negative)
             {
-                const word_type mask = sinteger<W>::word_mask(i);
+                const word_type mask = integer<W>::word_mask(i);
                 if (a.word(i) != mask)
                 {
                     return false;
@@ -66,7 +66,7 @@ template <size_t W, size_t V> bool operator==(const sinteger<W>& a, const sinteg
         {
             if (numbers_are_negative)
             {
-                const word_type mask = sinteger<V>::word_mask(i);
+                const word_type mask = integer<V>::word_mask(i);
                 if (b.word(i) != mask)
                 {
                     return false;
@@ -113,10 +113,10 @@ template <size_t W, size_t V> bool operator==(const sinteger<W>& a, const sinteg
     return true;
 }
 
-template <size_t W, size_t V> bool operator<(const sinteger<W>& a, const sinteger<V>& b)
+template <size_t W, size_t V> bool operator<(const integer<W>& a, const integer<V>& b)
 {
 
-    using word_type = typename sinteger<W>::word_type;
+    using word_type = typename integer<W>::word_type;
     const auto min_count = std::min(a.word_count(), b.word_count());
     const auto max_count = std::max(a.word_count(), b.word_count());
 
@@ -173,22 +173,22 @@ template <size_t W, size_t V> bool operator<(const sinteger<W>& a, const sintege
     return false;
 }
 
-template <size_t W, size_t V> bool operator!=(const sinteger<W>& a, const sinteger<V>& b)
+template <size_t W, size_t V> bool operator!=(const integer<W>& a, const integer<V>& b)
 {
     return !(a == b);
 }
 
-template <size_t W, size_t V> bool operator<=(const sinteger<W>& a, const sinteger<V>& b)
+template <size_t W, size_t V> bool operator<=(const integer<W>& a, const integer<V>& b)
 {
     return (a < b) || (a == b);
 }
 
-template <size_t W, size_t V> bool operator>=(const sinteger<W>& a, const sinteger<V>& b)
+template <size_t W, size_t V> bool operator>=(const integer<W>& a, const integer<V>& b)
 {
     return b <= a;
 }
 
-template <size_t W, size_t V> bool operator>(const sinteger<W>& a, const sinteger<V>& b)
+template <size_t W, size_t V> bool operator>(const integer<W>& a, const integer<V>& b)
 {
     return b < a;
 }

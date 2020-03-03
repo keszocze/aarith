@@ -1,7 +1,7 @@
 #pragma once
 
 #include <aarith/core/string_utils.hpp>
-#include <aarith/integer/sinteger_operations.hpp>
+#include <aarith/integer/integer_operations.hpp>
 #include <aarith/integer/uinteger_operations.hpp>
 
 namespace aarith {
@@ -35,8 +35,8 @@ template <size_t Width> auto to_octal(const uinteger<Width>& value) -> std::stri
     return to_base_2n<3>(value);
 }
 
-/// Convert the given sinteger value into a hexadecimal string representation.
-template <size_t Width> auto to_hex(const sinteger<Width>& value) -> std::string
+/// Convert the given integer value into a hexadecimal string representation.
+template <size_t Width> auto to_hex(const integer<Width>& value) -> std::string
 {
 
     std::string res;
@@ -49,8 +49,8 @@ template <size_t Width> auto to_hex(const sinteger<Width>& value) -> std::string
     return res;
 }
 
-/// Convert the given sinteger value into a octal string representation.
-template <size_t Width> auto to_octal(const sinteger<Width>& value) -> std::string
+/// Convert the given integer value into a octal string representation.
+template <size_t Width> auto to_octal(const integer<Width>& value) -> std::string
 {
 
     std::string res;
@@ -106,8 +106,8 @@ template <size_t Width> auto to_decimal(const uinteger<Width>& value) -> std::st
     return remove_leading_zeroes(to_hex(to_bcd(value)));
 }
 
-/// Convert the given sinteger value into a decimal string representation.
-template <size_t Width> auto to_decimal(const sinteger<Width>& value) -> std::string
+/// Convert the given integer value into a decimal string representation.
+template <size_t Width> auto to_decimal(const integer<Width>& value) -> std::string
 {
 
     std::string res;

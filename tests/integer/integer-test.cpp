@@ -6,13 +6,13 @@
 
 using namespace aarith;
 
-SCENARIO("Casting sintegers into different width", "[sinteger]")
+SCENARIO("Casting sintegers into different width", "[integer]")
 {
     GIVEN("width_cast is called")
     {
         static constexpr uint16_t test_value = 123;
         static constexpr size_t SourceWidth = 16;
-        const sinteger<SourceWidth> uint{test_value};
+        const integer<SourceWidth> uint{test_value};
 
         WHEN("The source width <= destination width")
         {
@@ -45,13 +45,13 @@ SCENARIO("Casting sintegers into different width", "[sinteger]")
     }
 }
 
-SCENARIO("Copy constructor of sintegers with various bit widths", "[sinteger][utility]")
+SCENARIO("Copy constructor of sintegers with various bit widths", "[integer][utility]")
 {
-    GIVEN("An sinteger<N> a")
+    GIVEN("An integer<N> a")
     {
         const uint64_t val_a = GENERATE(
             take(10, random(static_cast<uint64_t>(0U), std::numeric_limits<uint64_t>::max())));
-        sinteger<196> a(0U, val_a, 0U);
+        integer<196> a(0U, val_a, 0U);
 
         THEN("Assignment of individual words is correct")
         {
@@ -60,10 +60,10 @@ SCENARIO("Copy constructor of sintegers with various bit widths", "[sinteger][ut
             CHECK(a.word(2) == 0U);
         }
 
-        AND_GIVEN("An sinteger<N> b")
+        AND_GIVEN("An integer<N> b")
         {
             const uint64_t val_b = 1337;
-            const sinteger<196> b = sinteger<196>::from_words(val_b, 0U, 2 * val_b);
+            const integer<196> b = integer<196>::from_words(val_b, 0U, 2 * val_b);
 
             THEN("Assignment opeator of individual words is correct")
             {
@@ -74,23 +74,23 @@ SCENARIO("Copy constructor of sintegers with various bit widths", "[sinteger][ut
                 CHECK(a.word(2) == val_b);
             }
         }
-        AND_GIVEN("An sinteger<M> b")
+        AND_GIVEN("An integer<M> b")
         {
             WHEN("M < N")
             {
                 const uint64_t val_b = 23;
-                const sinteger<64> tmp = sinteger<64>::from_words(val_b);
+                const integer<64> tmp = integer<64>::from_words(val_b);
 
                 THEN("The copy constructor should work")
                 {
-                    sinteger<128> b{tmp};
+                    integer<128> b{tmp};
 
                     CHECK(b.word(0) == val_b);
                     CHECK(b.word(1) == 0U);
                 }
                 THEN("The assignment operator should work")
                 {
-                    sinteger<128> b;
+                    integer<128> b;
                     b = tmp;
                     CHECK(b.word(0) == val_b);
                     CHECK(b.word(1) == 0U);
@@ -105,19 +105,19 @@ SCENARIO("Copy constructor of sintegers with various bit widths", "[sinteger][ut
             //        //        WHEN("M > N")
             //        //        {
             //        //            const uint64_t val_b = 23;
-            //        //            const sinteger<150> tmp =
-            //        sinteger<150>::from_words(0U,val_b,0U);
+            //        //            const integer<150> tmp =
+            //        integer<150>::from_words(0U,val_b,0U);
             //        //            std::cout << tmp << "\n";
-            //        //            const sinteger<128> b = tmp;
+            //        //            const integer<128> b = tmp;
             //        //            std::cout << b << "\n";
             //        //        }
         }
     }
 }
 
-SCENARIO("Left shift operator works as expected", "[sinteger][bit_logic]")
+SCENARIO("Left shift operator works as expected", "[integer][bit_logic]")
 {
-    GIVEN("One sinteger a and a number of shifted bits s")
+    GIVEN("One integer a and a number of shifted bits s")
     {
 
         const size_t TestWidth = 16;
@@ -126,7 +126,7 @@ SCENARIO("Left shift operator works as expected", "[sinteger][bit_logic]")
         {
             static constexpr uint16_t number_a = 7;
             static constexpr auto s = 4U;
-            const sinteger<TestWidth> a{number_a};
+            const integer<TestWidth> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 112);
@@ -135,7 +135,7 @@ SCENARIO("Left shift operator works as expected", "[sinteger][bit_logic]")
         {
             static constexpr uint16_t number_a = 7;
             static constexpr auto s = 14U;
-            const sinteger<TestWidth> a{number_a};
+            const integer<TestWidth> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 49152);
@@ -147,7 +147,7 @@ SCENARIO("Left shift operator works as expected", "[sinteger][bit_logic]")
 
             static constexpr uint16_t number_a = 7;
             static constexpr auto s = 63U;
-            const sinteger<Width> a{number_a};
+            const integer<Width> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 0x8000000000000000);
@@ -159,7 +159,7 @@ SCENARIO("Left shift operator works as expected", "[sinteger][bit_logic]")
 
             static constexpr uint16_t number_a = 7;
             static constexpr auto s = 127U;
-            const sinteger<Width> a{number_a};
+            const integer<Width> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 0);
@@ -172,7 +172,7 @@ SCENARIO("Left shift operator works as expected", "[sinteger][bit_logic]")
 
             static constexpr uint16_t number_a = 3;
             static constexpr auto s = 0;
-            const sinteger<Width> a{number_a};
+            const integer<Width> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 3);
@@ -184,8 +184,8 @@ SCENARIO("Left shift operator works as expected", "[sinteger][bit_logic]")
             const size_t Width = 192;
 
             static constexpr uint16_t number_a = 3;
-            static constexpr auto s = static_cast<size_t>(sinteger<Width>::word_width());
-            const sinteger<Width> a{number_a};
+            static constexpr auto s = static_cast<size_t>(integer<Width>::word_width());
+            const integer<Width> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 0);
@@ -197,8 +197,8 @@ SCENARIO("Left shift operator works as expected", "[sinteger][bit_logic]")
             const size_t Width = 192;
 
             static constexpr uint16_t number_a = 3;
-            static constexpr auto s = 2 * static_cast<size_t>(sinteger<Width>::word_width());
-            const sinteger<Width> a{number_a};
+            static constexpr auto s = 2 * static_cast<size_t>(integer<Width>::word_width());
+            const integer<Width> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 0);
@@ -210,8 +210,8 @@ SCENARIO("Left shift operator works as expected", "[sinteger][bit_logic]")
             const size_t Width = 192;
 
             static constexpr uint16_t number_a = 3;
-            static constexpr auto s = static_cast<size_t>(sinteger<Width>::word_width()) - 1U;
-            const sinteger<Width> a{number_a};
+            static constexpr auto s = static_cast<size_t>(integer<Width>::word_width()) - 1U;
+            const integer<Width> a{number_a};
 
             auto reference = a.word(0) << s;
 
@@ -225,10 +225,10 @@ SCENARIO("Left shift operator works as expected", "[sinteger][bit_logic]")
             const size_t Width = 192;
 
             static constexpr uint16_t number_a = 3;
-            static constexpr auto s = 2U * static_cast<size_t>(sinteger<Width>::word_width()) - 1U;
-            const sinteger<Width> a{number_a};
+            static constexpr auto s = 2U * static_cast<size_t>(integer<Width>::word_width()) - 1U;
+            const integer<Width> a{number_a};
 
-            auto reference = a.word(0) << (s % (sizeof(sinteger<Width>::word_width()) * 8));
+            auto reference = a.word(0) << (s % (sizeof(integer<Width>::word_width()) * 8));
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 0);
@@ -238,20 +238,20 @@ SCENARIO("Left shift operator works as expected", "[sinteger][bit_logic]")
     }
 }
 
-SCENARIO("Create negative sintegers", "[sinteger][bit_logic]")
+SCENARIO("Create negative sintegers", "[integer][bit_logic]")
 {
     GIVEN("A int64_t negative number")
     {
         int64_t n = GENERATE(take(100, random(-922337236854775808LL, -1LL)));
         int64_t pos_n = -n;
 
-        sinteger<64> zero;
+        integer<64> zero;
 
         WHEN("We create a signed integer from it")
         {
 
-            sinteger<64> negative{n};
-            sinteger<64> positive{pos_n};
+            integer<64> negative{n};
+            integer<64> positive{pos_n};
 
             THEN("Then it behaves as expected")
             {
@@ -275,18 +275,18 @@ SCENARIO("Create negative sintegers", "[sinteger][bit_logic]")
     }
 }
 
-SCENARIO("Right shift operator works as expected", "[sinteger][bit-logic]")
+SCENARIO("Right shift operator works as expected", "[integer][bit-logic]")
 {
-    GIVEN("One positive sinteger a and a number of shifted bits s")
+    GIVEN("One positive integer a and a number of shifted bits s")
     {
         WHEN("The bits are not shifted")
         {
             const size_t Width = 192;
 
-            typename sinteger<Width>::word_type number_a = 3;
-            number_a <<= (sinteger<Width>::word_width() - 2);
+            typename integer<Width>::word_type number_a = 3;
+            number_a <<= (integer<Width>::word_width() - 2);
             static constexpr auto s = 0;
-            sinteger<Width> a(0U);
+            integer<Width> a(0U);
             a.set_word(a.word_count() - 1, number_a);
 
             const auto result = a >> s;
@@ -300,11 +300,11 @@ SCENARIO("Right shift operator works as expected", "[sinteger][bit-logic]")
         {
             const size_t Width = 192;
 
-            typename sinteger<Width>::word_type number_a = 3;
-            number_a <<= (sinteger<Width>::word_width() - 4);
+            typename integer<Width>::word_type number_a = 3;
+            number_a <<= (integer<Width>::word_width() - 4);
 
-            static constexpr auto s = static_cast<size_t>(sinteger<Width>::word_width());
-            sinteger<Width> a(0U);
+            static constexpr auto s = static_cast<size_t>(integer<Width>::word_width());
+            integer<Width> a(0U);
             a.set_word(a.word_count() - 1, number_a);
 
             const auto result = a >> s;
@@ -318,10 +318,10 @@ SCENARIO("Right shift operator works as expected", "[sinteger][bit-logic]")
         {
             const size_t Width = 192;
 
-            typename sinteger<Width>::word_type number_a = 3;
-            number_a <<= sinteger<Width>::word_width() - 4;
-            static constexpr auto s = 2 * static_cast<size_t>(sinteger<Width>::word_width());
-            sinteger<Width> a(0U);
+            typename integer<Width>::word_type number_a = 3;
+            number_a <<= integer<Width>::word_width() - 4;
+            static constexpr auto s = 2 * static_cast<size_t>(integer<Width>::word_width());
+            integer<Width> a(0U);
             a.set_word(a.word_count() - 1, number_a);
 
             const auto result = a >> s;
@@ -334,13 +334,13 @@ SCENARIO("Right shift operator works as expected", "[sinteger][bit-logic]")
         {
             const size_t Width = 192;
 
-            typename sinteger<Width>::word_type number_a = 3;
-            number_a <<= sinteger<Width>::word_width() - 3;
-            static constexpr auto s = static_cast<size_t>(sinteger<Width>::word_width()) - 2;
-            sinteger<Width> a(0U);
+            typename integer<Width>::word_type number_a = 3;
+            number_a <<= integer<Width>::word_width() - 3;
+            static constexpr auto s = static_cast<size_t>(integer<Width>::word_width()) - 2;
+            integer<Width> a(0U);
             a.set_word(a.word_count() - 1, number_a);
 
-            typename sinteger<Width>::word_type ref = uint64_t(1) << 63U;
+            typename integer<Width>::word_type ref = uint64_t(1) << 63U;
 
             const auto result = a >> s;
 
@@ -353,11 +353,11 @@ SCENARIO("Right shift operator works as expected", "[sinteger][bit-logic]")
         {
             const size_t Width = 192;
 
-            typename sinteger<Width>::word_type number_a = 3;
-            number_a <<= sinteger<Width>::word_width() - 3;
+            typename integer<Width>::word_type number_a = 3;
+            number_a <<= integer<Width>::word_width() - 3;
 
-            static constexpr auto s = 2 * static_cast<size_t>(sinteger<Width>::word_width()) - 1;
-            sinteger<Width> a(0U);
+            static constexpr auto s = 2 * static_cast<size_t>(integer<Width>::word_width()) - 1;
+            integer<Width> a(0U);
             a.set_word(a.word_count() - 1, number_a);
 
             auto ref = number_a << 1;
@@ -375,26 +375,26 @@ SCENARIO("Right shift operator works as expected", "[sinteger][bit-logic]")
             THEN("The result should still be correct")
             {
                 static constexpr size_t width = 256;
-                static constexpr size_t word_width = sinteger<width>::word_width();
+                static constexpr size_t word_width = integer<width>::word_width();
 
-                static const sinteger<width> a{1U};
-                static const sinteger<width> expected0 =
-                    sinteger<width>::from_words(0U, 0U, 0U, 1U);
-                static const sinteger<width> expected1 =
-                    sinteger<width>::from_words(0U, 0U, 1U, 0U);
-                static const sinteger<width> expected2 =
-                    sinteger<width>::from_words(0U, 1U, 0U, 0U);
-                static const sinteger<width> expected3 =
-                    sinteger<width>::from_words(1U, 0U, 0U, 0U);
-                static const sinteger<width> expected4 =
-                    sinteger<width>::from_words(0U, 0U, 0U, 0U);
+                static const integer<width> a{1U};
+                static const integer<width> expected0 =
+                    integer<width>::from_words(0U, 0U, 0U, 1U);
+                static const integer<width> expected1 =
+                    integer<width>::from_words(0U, 0U, 1U, 0U);
+                static const integer<width> expected2 =
+                    integer<width>::from_words(0U, 1U, 0U, 0U);
+                static const integer<width> expected3 =
+                    integer<width>::from_words(1U, 0U, 0U, 0U);
+                static const integer<width> expected4 =
+                    integer<width>::from_words(0U, 0U, 0U, 0U);
 
-                std::vector<sinteger<width>> expecteds{expected0, expected1, expected2, expected3,
-                                                       expected4};
+                std::vector<integer<width>> expecteds{expected0, expected1, expected2, expected3,
+                                                      expected4};
 
                 for (auto i = 0U; i < expecteds.size(); ++i)
                 {
-                    sinteger<width> result = a << (word_width * i);
+                    integer<width> result = a << (word_width * i);
                     CHECK(result == expecteds[i]);
                 }
             }
@@ -405,9 +405,9 @@ SCENARIO("Right shift operator works as expected", "[sinteger][bit-logic]")
             THEN("The result should still be correct")
             {
                 const size_t w = 128;
-                const sinteger<w> a{1U};
-                const sinteger<w> expected;
-                const sinteger<w> result = a >> w;
+                const integer<w> a{1U};
+                const integer<w> expected;
+                const integer<w> result = a >> w;
 
                 CHECK(expected == result);
             }
@@ -415,7 +415,7 @@ SCENARIO("Right shift operator works as expected", "[sinteger][bit-logic]")
     }
 }
 
-SCENARIO("Logical AND works as expected", "[sinteger][arithmetic]")
+SCENARIO("Logical AND works as expected", "[integer][arithmetic]")
 {
     GIVEN("Two sintegers")
     {
@@ -425,8 +425,8 @@ SCENARIO("Logical AND works as expected", "[sinteger][arithmetic]")
 
             static constexpr uint16_t number_a = 7;
             static constexpr uint16_t number_b = 14;
-            const sinteger<Width> a{number_a};
-            const sinteger<Width> b{number_b};
+            const integer<Width> a{number_a};
+            const integer<Width> b{number_b};
 
             const auto result = a & b;
             const auto result_ref = number_a & number_b;
@@ -435,7 +435,7 @@ SCENARIO("Logical AND works as expected", "[sinteger][arithmetic]")
     }
 }
 
-SCENARIO("Logical OR works as expected", "[sinteger][arithmetic]")
+SCENARIO("Logical OR works as expected", "[integer][arithmetic]")
 {
     GIVEN("Two sintegers")
     {
@@ -445,8 +445,8 @@ SCENARIO("Logical OR works as expected", "[sinteger][arithmetic]")
 
             static constexpr uint16_t number_a = 7;
             static constexpr uint16_t number_b = 14;
-            const sinteger<Width> a{number_a};
-            const sinteger<Width> b{number_b};
+            const integer<Width> a{number_a};
+            const integer<Width> b{number_b};
 
             const auto result = a | b;
             const auto result_ref = number_a | number_b;
@@ -455,16 +455,16 @@ SCENARIO("Logical OR works as expected", "[sinteger][arithmetic]")
     }
 }
 
-SCENARIO("Logical NOT works as expected", "[sinteger][arithmetic]")
+SCENARIO("Logical NOT works as expected", "[integer][arithmetic]")
 {
     GIVEN("One sintegers")
     {
-        WHEN("The sinteger consists of only one word")
+        WHEN("The integer consists of only one word")
         {
             const size_t Width = 70;
 
             static constexpr uint16_t number_a = 7;
-            const sinteger<Width> a{number_a};
+            const integer<Width> a{number_a};
 
             const auto result = ~a;
             const auto result_ref = ~number_a;
@@ -473,50 +473,50 @@ SCENARIO("Logical NOT works as expected", "[sinteger][arithmetic]")
     }
 }
 
-SCENARIO("Checking whether an sinteger is not equal to zero/false")
+SCENARIO("Checking whether an integer is not equal to zero/false")
 {
-    GIVEN("An sinteger<N>=0=a for various N")
+    GIVEN("An integer<N>=0=a for various N")
     {
         THEN("a.is_zero() should be true")
         {
 
             const uint8_t zero = 0U;
 
-            CHECK(sinteger<64>{zero}.is_zero());
-            CHECK(sinteger<128>{zero}.is_zero());
-            CHECK(sinteger<150>{zero}.is_zero());
-            CHECK(sinteger<32>{zero}.is_zero());
-            CHECK(sinteger<23>{zero}.is_zero());
-            CHECK(sinteger<256>{zero}.is_zero());
-            CHECK(sinteger<1337>{zero}.is_zero());
-            CHECK(sinteger<8>{zero}.is_zero());
+            CHECK(integer<64>{zero}.is_zero());
+            CHECK(integer<128>{zero}.is_zero());
+            CHECK(integer<150>{zero}.is_zero());
+            CHECK(integer<32>{zero}.is_zero());
+            CHECK(integer<23>{zero}.is_zero());
+            CHECK(integer<256>{zero}.is_zero());
+            CHECK(integer<1337>{zero}.is_zero());
+            CHECK(integer<8>{zero}.is_zero());
         }
         THEN("a should evaluate to false in a Boolean context")
         {
 
             const uint8_t zero = 0U;
 
-            CHECK_FALSE(sinteger<64>{zero});
-            CHECK_FALSE(sinteger<128>{zero});
-            CHECK_FALSE(sinteger<150>{zero});
-            CHECK_FALSE(sinteger<32>{zero});
-            CHECK_FALSE(sinteger<23>{zero});
-            CHECK_FALSE(sinteger<256>{zero});
-            CHECK_FALSE(sinteger<1337>{zero});
-            CHECK_FALSE(sinteger<8>{zero});
+            CHECK_FALSE(integer<64>{zero});
+            CHECK_FALSE(integer<128>{zero});
+            CHECK_FALSE(integer<150>{zero});
+            CHECK_FALSE(integer<32>{zero});
+            CHECK_FALSE(integer<23>{zero});
+            CHECK_FALSE(integer<256>{zero});
+            CHECK_FALSE(integer<1337>{zero});
+            CHECK_FALSE(integer<8>{zero});
         }
     }
 
-    GIVEN("A non-zero sinteger")
+    GIVEN("A non-zero integer")
     {
 
         uint64_t val = GENERATE(1, 2, 4, 5567868, 234, 21, 45, 56768);
-        sinteger<64> a{val};
-        sinteger<128> b = sinteger<128>::from_words(val, 0U);
-        sinteger<128> c = sinteger<128>::from_words(val, val);
+        integer<64> a{val};
+        integer<128> b = integer<128>::from_words(val, 0U);
+        integer<128> c = integer<128>::from_words(val, val);
 
-        sinteger<150> d = sinteger<150>::from_words(val, 0U, 0U);
-        sinteger<256> e = sinteger<256>::from_words(val, val, 0U, 0U);
+        integer<150> d = integer<150>::from_words(val, 0U, 0U);
+        integer<256> e = integer<256>::from_words(val, val, 0U, 0U);
 
         THEN("is_zero should correctly return this fact")
         {
@@ -546,11 +546,11 @@ SCENARIO("Using the for loop operation feature from ")
             uint64_t val_a = GENERATE(0, 1, 2, 3);
             uint64_t val_b = GENERATE(3, 56, 567, 324);
 
-            sinteger<64> a{val_a};
-            sinteger<128> b = sinteger<128>::from_words(val_a, val_b);
+            integer<64> a{val_a};
+            integer<128> b = integer<128>::from_words(val_a, val_b);
 
             size_t index = 0;
-            for (const sinteger<64>::word_type w : a)
+            for (const integer<64>::word_type w : a)
             {
                 CHECK(w == a.word(index));
                 index++;
@@ -560,7 +560,7 @@ SCENARIO("Using the for loop operation feature from ")
 
             index = 0;
 
-            for (const sinteger<128>::word_type w : b)
+            for (const integer<128>::word_type w : b)
             {
                 CHECK(w == b.word(index));
                 index++;
@@ -573,8 +573,8 @@ SCENARIO("Using the for loop operation feature from ")
             uint64_t val_a = GENERATE(0, 1, 2, 3);
             uint64_t val_b = GENERATE(3, 56, 567, 324);
 
-            sinteger<64> a{val_a};
-            sinteger<128> b = sinteger<128>::from_words(val_a, val_b);
+            integer<64> a{val_a};
+            integer<128> b = integer<128>::from_words(val_a, val_b);
 
             size_t index = 0;
             for (auto iter = a.begin(); iter != a.end(); ++iter)
@@ -601,8 +601,8 @@ SCENARIO("Using the for loop operation feature from ")
             uint64_t val_a = GENERATE(0, 1, 2, 3);
             uint64_t val_b = GENERATE(3, 56, 567, 324);
 
-            sinteger<64> a{val_a};
-            sinteger<128> b = sinteger<128>::from_words(val_a, val_b);
+            integer<64> a{val_a};
+            integer<128> b = integer<128>::from_words(val_a, val_b);
 
             size_t index = 0;
             for (auto iter = a.rbegin(); iter != a.rend(); ++iter)
@@ -626,13 +626,13 @@ SCENARIO("Using the for loop operation feature from ")
     }
 }
 
-SCENARIO("Bit operations are performed correctly", "[sinteger][bit]")
+SCENARIO("Bit operations are performed correctly", "[integer][bit]")
 {
-    GIVEN("An sinteger<N> n")
+    GIVEN("An integer<N> n")
     {
         auto val =
             GENERATE(0, 56567, 23, static_cast<uint64_t>(-4354566), static_cast<uint64_t>(-1));
-        const sinteger<150> n = sinteger<150>::from_words(2 * val, val);
+        const integer<150> n = integer<150>::from_words(2 * val, val);
         WHEN("One zero word is prepended")
         {
             const auto prepended_n = width_cast<214>(n);
@@ -657,7 +657,7 @@ SCENARIO("Bit operations are performed correctly", "[sinteger][bit]")
         WHEN("The size is oubled")
         {
             const auto doubled = width_cast<300>(n);
-            THEN("The result should have twice the bits of the original sinteger")
+            THEN("The result should have twice the bits of the original integer")
             {
                 CHECK(doubled.width() == 2 * n.width());
             }
@@ -684,13 +684,13 @@ SCENARIO("Bit operations are performed correctly", "[sinteger][bit]")
     }
 }
 
-SCENARIO("std::numeric_limits gets instantiated correctly", "[sinteger][utility]")
+SCENARIO("std::numeric_limits gets instantiated correctly", "[integer][utility]")
 {
     GIVEN("The bit width of 32")
     {
         THEN("The values should match the int32_t ones")
         {
-            using sint = sinteger<32>;
+            using sint = integer<32>;
             using signed_integer = std::numeric_limits<sint>;
             using il = std::numeric_limits<int32_t>;
 
@@ -731,7 +731,7 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[sinteger][utility]
     {
         THEN("The values should match the int64_t ones")
         {
-            using sint = sinteger<64>;
+            using sint = integer<64>;
             using signed_integer = std::numeric_limits<sint>;
             using il = std::numeric_limits<int64_t>;
 

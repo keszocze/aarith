@@ -14,24 +14,24 @@
 namespace aarith {
 
 template <size_t Width, class WordType = uint64_t>
-class sinteger : public word_array<Width, WordType>
+class integer : public word_array<Width, WordType>
 {
 public:
-    sinteger() = default;
+    integer() = default;
 
-    explicit sinteger(WordType n)
+    explicit integer(WordType n)
         : word_array<Width, WordType>(n)
     {
     }
 
     template <typename T, typename = std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>>>
-    explicit sinteger(T t)
+    explicit integer(T t)
         : word_array<Width, WordType>(static_cast<WordType>(t))
     {
         if (t < 0)
         {
             auto const ones = static_cast<WordType>(-1);
-            for (size_t i = 1; i < sinteger<Width>::word_count(); i++)
+            for (size_t i = 1; i < integer<Width>::word_count(); i++)
             {
                 this->set_word(i, ones);
             }
@@ -40,67 +40,67 @@ public:
 
     template <typename T, class... Args,
               typename = std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>>>
-    explicit sinteger(T t, Args... args)
+    explicit integer(T t, Args... args)
         : word_array<Width, WordType>(static_cast<WordType>(t), args...)
     {
     }
 
     template <class... Args>
-    sinteger(WordType fst, Args... args)
+    integer(WordType fst, Args... args)
         : word_array<Width>(fst, args...)
     {
     }
 
     template <size_t V>
-    sinteger<Width, WordType>(const sinteger<V, WordType>& other)
+    integer<Width, WordType>(const integer<V, WordType>& other)
         : word_array<Width>(static_cast<const word_array<V, WordType>&>(other))
     {
     }
 
     template <size_t V>
-    sinteger<Width, WordType>(const word_array<V, WordType>& other)
+    integer<Width, WordType>(const word_array<V, WordType>& other)
         : word_array<Width>(other)
     {
     }
 
-    auto operator<<=(const size_t shift_by) -> sinteger&
+    auto operator<<=(const size_t shift_by) -> integer&
     {
         return *this = *this << shift_by;
     }
 
-    auto operator>>=(const size_t shift_by) -> sinteger&
+    auto operator>>=(const size_t shift_by) -> integer&
     {
         return *this = *this >> shift_by;
     }
 
-    auto operator+=(const sinteger<Width> addend) -> sinteger&
+    auto operator+=(const integer<Width> addend) -> integer&
     {
         return *this = *this + addend;
     }
 
-    [[nodiscard]] static constexpr sinteger min()
+    [[nodiscard]] static constexpr integer min()
     {
-        sinteger min;
+        integer min;
         min.set_bit(Width - 1, true);
         return min;
     }
 
-    [[nodiscard]] static constexpr sinteger max()
+    [[nodiscard]] static constexpr integer max()
     {
-        sinteger max = sinteger::all_ones();
+        integer max = integer::all_ones();
         max.set_bit(Width - 1, false);
         return max;
     }
 
-    [[nodiscard]] static constexpr sinteger zero()
+    [[nodiscard]] static constexpr integer zero()
     {
-        sinteger zero = sinteger::all_zeroes();
+        integer zero = integer::all_zeroes();
         return zero;
     }
 
-    [[nodiscard]] static constexpr sinteger one()
+    [[nodiscard]] static constexpr integer one()
     {
-        sinteger one(1);
+        integer one(1);
         return one;
     }
 
@@ -108,9 +108,9 @@ public:
      * @brief Returns minus one
      * @return minus one
      */
-    [[nodiscard]] static constexpr sinteger minus_one()
+    [[nodiscard]] static constexpr integer minus_one()
     {
-        sinteger minus_one = sinteger::all_ones();
+        integer minus_one = integer::all_ones();
         return minus_one;
     }
 
@@ -124,20 +124,20 @@ public:
     }
 };
 
-template <size_t Width> class is_integral<sinteger<Width>>
+template <size_t Width> class is_integral<integer<Width>>
 {
 public:
     static constexpr bool value = true;
 };
 
-template <size_t Width> class is_unsigned<sinteger<Width>>
+template <size_t Width> class is_unsigned<integer<Width>>
 {
 public:
     static constexpr bool value = false;
 };
 
 template <size_t DestinationWidth, size_t SourceWidth>
-[[nodiscard]] auto width_cast(const sinteger<SourceWidth>& source) -> sinteger<DestinationWidth>
+[[nodiscard]] auto width_cast(const integer<SourceWidth>& source) -> integer<DestinationWidth>
 {
     word_array<SourceWidth> in{source};
     if constexpr (DestinationWidth > SourceWidth)
@@ -154,12 +154,12 @@ template <size_t DestinationWidth, size_t SourceWidth>
                 result.set_bit(i);
             }
         }
-        return sinteger<DestinationWidth>{result};
+        return integer<DestinationWidth>{result};
     }
     else
     {
         word_array<DestinationWidth> result = width_cast<DestinationWidth>(in);
-        return sinteger<DestinationWidth>{result};
+        return integer<DestinationWidth>{result};
     }
 }
 
@@ -169,7 +169,7 @@ template <size_t DestinationWidth, size_t SourceWidth>
 
 // We are only allowed to extend std with specializations
 // https://en.cppreference.com/w/cpp/language/extending_std
-template <size_t W> class std::numeric_limits<aarith::sinteger<W>>
+template <size_t W> class std::numeric_limits<aarith::integer<W>>
 {
 public:
     static constexpr bool is_specialized = true;
@@ -190,8 +190,8 @@ public:
     static constexpr int radix = 2;
     static constexpr int digits = W - 1; // TODO what happens if W > max_int?
     static constexpr int digits10 =
-        aarith::ceil<int>(std::numeric_limits<aarith::sinteger<W>>::digits * aarith::log<10, 2>()) -
-        1;
+            aarith::ceil<int>(std::numeric_limits<aarith::integer<W>>::digits * aarith::log<10, 2>()) -
+            1;
 
     // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says
     // so
@@ -208,48 +208,48 @@ public:
 
     static constexpr bool tinyness_before = false;
 
-    static constexpr aarith::sinteger<W> min() noexcept
+    static constexpr aarith::integer<W> min() noexcept
     {
-        return aarith::sinteger<W>::min();
+        return aarith::integer<W>::min();
     }
 
-    static constexpr aarith::sinteger<W> lowest() noexcept
+    static constexpr aarith::integer<W> lowest() noexcept
     {
-        return aarith::sinteger<W>::min();
+        return aarith::integer<W>::min();
     }
 
-    static constexpr aarith::sinteger<W> max() noexcept
+    static constexpr aarith::integer<W> max() noexcept
     {
-        return aarith::sinteger<W>::max();
+        return aarith::integer<W>::max();
     }
 
-    static constexpr aarith::sinteger<W> epsilon() noexcept
+    static constexpr aarith::integer<W> epsilon() noexcept
     {
-        return aarith::sinteger<W>::zero();
+        return aarith::integer<W>::zero();
     }
 
-    static constexpr aarith::sinteger<W> round_error() noexcept
+    static constexpr aarith::integer<W> round_error() noexcept
     {
-        return aarith::sinteger<W>::zero();
+        return aarith::integer<W>::zero();
     }
 
-    static constexpr aarith::sinteger<W> infinity() noexcept
+    static constexpr aarith::integer<W> infinity() noexcept
     {
-        return aarith::sinteger<W>::zero();
+        return aarith::integer<W>::zero();
     }
 
-    static constexpr aarith::sinteger<W> quiet_NaN() noexcept
+    static constexpr aarith::integer<W> quiet_NaN() noexcept
     {
-        return aarith::sinteger<W>::zero();
+        return aarith::integer<W>::zero();
     }
 
-    static constexpr aarith::sinteger<W> signaling_NaN() noexcept
+    static constexpr aarith::integer<W> signaling_NaN() noexcept
     {
-        return aarith::sinteger<W>::zero();
+        return aarith::integer<W>::zero();
     }
 
-    static constexpr aarith::sinteger<W> denorm_min() noexcept
+    static constexpr aarith::integer<W> denorm_min() noexcept
     {
-        return aarith::sinteger<W>::zero();
+        return aarith::integer<W>::zero();
     }
 };
