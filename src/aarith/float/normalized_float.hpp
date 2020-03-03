@@ -67,8 +67,8 @@ public:
             {
                 const auto bias = get_bias();
                 const auto exponent_delta =
-                        normalized_float<f_exponent_width, f_mantissa_width>::get_bias().word(0) -
-                        bias.word(0);
+                    normalized_float<f_exponent_width, f_mantissa_width>::get_bias().word(0) -
+                    bias.word(0);
                 f_exponent -= static_cast<decltype(f_exponent)>(exponent_delta);
                 exponent = uinteger<E>(f_exponent);
             }
@@ -172,7 +172,8 @@ public:
 };
 
 template <size_t E, size_t M1, size_t M2>
-auto equal_except_rounding(const normalized_float<E, M1> lhs, const normalized_float<E, M2> rhs) -> bool
+auto equal_except_rounding(const normalized_float<E, M1> lhs, const normalized_float<E, M2> rhs)
+    -> bool
 {
     if (lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent())
     {
