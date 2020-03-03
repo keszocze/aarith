@@ -380,7 +380,7 @@ public:
 
     constexpr auto crbegin() const noexcept
     {
-        return words.bcregin();
+        return words.crbegin();
     }
 
     constexpr auto crend() const noexcept

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "aarith/integer/uinteger.hpp"
+#include <aarith/integer/uinteger.hpp>
 #include <aarith/integer/uinteger_operations.hpp>
 #include <cstdint>
 #include <iostream>
@@ -42,7 +42,7 @@ template <class UInteger> auto generate_bitmask(const size_t leading_ones) -> UI
 }
 
 template <class UInteger, class Function>
-[[nodiscard]] UInteger approx_operation_post_masking(const UInteger& a, const UInteger& b,
+[[nodiscard]] UInteger approx_operation_post_masking(const UInteger& a, const UInteger b,
                                                      Function fun,
                                                      const size_t bits = UInteger::width())
 {
@@ -53,42 +53,42 @@ template <class UInteger, class Function>
 }
 
 template <class UInteger>
-[[nodiscard]] UInteger approx_add_post_masking(const UInteger& a, const UInteger& b,
+[[nodiscard]] UInteger approx_add_post_masking(const UInteger& a, const UInteger b,
                                                const size_t bits = UInteger::width())
 {
     return approx_operation_post_masking(a, b, &aarith::add<UInteger::width()>, bits);
 }
 
 template <class UInteger>
-[[nodiscard]] UInteger approx_mul_post_masking(const UInteger& a, const UInteger& b,
+[[nodiscard]] UInteger approx_mul_post_masking(const UInteger& a, const UInteger b,
                                                const size_t bits = UInteger::width())
 {
     return approx_operation_post_masking(a, b, &aarith::mul<UInteger::width()>, bits);
 }
 
 template <class UInteger>
-[[nodiscard]] UInteger approx_sub_post_masking(const UInteger& a, const UInteger& b,
+[[nodiscard]] UInteger approx_sub_post_masking(const UInteger& a, const UInteger b,
                                                const size_t bits = UInteger::width())
 {
     return approx_operation_post_masking(a, b, &aarith::sub<UInteger::width()>, bits);
 }
 
 template <class UInteger>
-[[nodiscard]] UInteger approx_div_post_masking(const UInteger& a, const UInteger& b,
+[[nodiscard]] UInteger approx_div_post_masking(const UInteger& a, const UInteger b,
                                                const size_t bits = UInteger::width())
 {
     return approx_operation_post_masking(a, b, &aarith::div<UInteger>, bits);
 }
 
 template <class UInteger>
-[[nodiscard]] UInteger approx_rem_post_masking(const UInteger& a, const UInteger& b,
+[[nodiscard]] UInteger approx_rem_post_masking(const UInteger& a, const UInteger b,
                                                const size_t bits = UInteger::width())
 {
     return approx_operation_post_masking(a, b, &aarith::remainder<UInteger>, bits);
 }
 
 template <class UInteger, class Function>
-[[nodiscard]] UInteger approx_operation_pre_masking(const UInteger& a, const UInteger& b,
+[[nodiscard]] UInteger approx_operation_pre_masking(const UInteger& a, const UInteger b,
                                                     Function fun,
                                                     const size_t bits = UInteger::width())
 {
@@ -100,37 +100,35 @@ template <class UInteger, class Function>
 }
 
 template <class UInteger>
-[[nodiscard]] UInteger approx_add_pre_masking(const UInteger& a, const UInteger& b,
+[[nodiscard]] UInteger approx_add_pre_masking(const UInteger& a, const UInteger b,
                                               const size_t bits = UInteger::width())
 {
-    return approx_operation_pre_masking(
-        a, b, [](auto const& a, auto const& b) { return aarith::add<UInteger::width()>(a, b); },
-        bits);
+    return approx_operation_pre_masking(a, b, &aarith::add<UInteger::width()>, bits);
 }
 
 template <class UInteger>
-[[nodiscard]] UInteger approx_mul_pre_masking(const UInteger& a, const UInteger& b,
+[[nodiscard]] UInteger approx_mul_pre_masking(const UInteger& a, const UInteger b,
                                               const size_t bits = UInteger::width())
 {
     return approx_operation_pre_masking(a, b, &aarith::mul<UInteger::width()>, bits);
 }
 
 template <class UInteger>
-[[nodiscard]] UInteger approx_sub_pre_masking(const UInteger& a, const UInteger& b,
+[[nodiscard]] UInteger approx_sub_pre_masking(const UInteger& a, const UInteger b,
                                               const size_t bits = UInteger::width())
 {
     return approx_operation_pre_masking(a, b, &aarith::sub<UInteger::width()>, bits);
 }
 
 template <class UInteger>
-[[nodiscard]] UInteger approx_div_pre_masking(const UInteger& a, const UInteger& b,
+[[nodiscard]] UInteger approx_div_pre_masking(const UInteger& a, const UInteger b,
                                               const size_t bits = UInteger::width())
 {
     return approx_operation_pre_masking(a, b, &aarith::div<UInteger>, bits);
 }
 
 template <class UInteger>
-[[nodiscard]] UInteger approx_rem_pre_masking(const UInteger& a, const UInteger& b,
+[[nodiscard]] UInteger approx_rem_pre_masking(const UInteger& a, const UInteger b,
                                               const size_t bits = UInteger::width())
 {
     return approx_operation_pre_masking(a, b, &aarith::remainder<UInteger>, bits);
@@ -165,6 +163,19 @@ auto approx_uint_bitmasking_mul(const uinteger<width>& opd1, const uinteger<widt
     }
 
     return product;
+}
+
+template <size_t W, size_t V>
+[[nodiscard]] uinteger<std::max(W, V)> trivial_approx_add(const uinteger<W>& a,
+                                                          const uinteger<V>& b)
+{
+
+    const auto word_adder = [](const typename uinteger<W>::word_type a_,
+                               const typename uinteger<V>::word_type b_) { return a_ + b_; };
+
+    uinteger<std::max(W, V)> result = zip_with_expand<decltype(word_adder), W, V>(a, b, word_adder);
+
+    return result;
 }
 
 } // namespace aarith

@@ -6,38 +6,36 @@
 
 namespace aarith {
 
-
-    template <size_t Width>
-    [[nodiscard]] auto operator&(const sinteger<Width>& lhs, const sinteger<Width>& rhs)
+template <size_t Width>
+[[nodiscard]] auto operator&(const sinteger<Width>& lhs, const sinteger<Width>& rhs)
     -> sinteger<Width>
-    {
-        word_array<Width> lhs_w{lhs};
-        word_array<Width> rhs_w{rhs};
+{
+    word_array<Width> lhs_w{lhs};
+    word_array<Width> rhs_w{rhs};
 
-        word_array<Width> result = lhs_w & rhs_w;
+    word_array<Width> result = lhs_w & rhs_w;
 
-        return sinteger<Width>{result};
-    }
+    return sinteger<Width>{result};
+}
 
-    template <size_t Width>
-    [[nodiscard]] auto operator|(const sinteger<Width>& lhs, const sinteger<Width>& rhs)
+template <size_t Width>
+[[nodiscard]] auto operator|(const sinteger<Width>& lhs, const sinteger<Width>& rhs)
     -> sinteger<Width>
-    {
-        word_array<Width> lhs_w{lhs};
-        word_array<Width> rhs_w{rhs};
+{
+    word_array<Width> lhs_w{lhs};
+    word_array<Width> rhs_w{rhs};
 
-        word_array<Width> result = lhs_w | rhs_w;
+    word_array<Width> result = lhs_w | rhs_w;
 
-        return sinteger<Width>{result};
-    }
+    return sinteger<Width>{result};
+}
 
-    template <size_t Width>[[nodiscard]] auto operator~(const sinteger<Width>& rhs) -> sinteger<Width>
-    {
-        word_array<Width> rhs_w{rhs};
-        word_array<Width> result = ~rhs_w;
-        return sinteger<Width>{result};
-    }
-
+template <size_t Width>[[nodiscard]] auto operator~(const sinteger<Width>& rhs) -> sinteger<Width>
+{
+    word_array<Width> rhs_w{rhs};
+    word_array<Width> result = ~rhs_w;
+    return sinteger<Width>{result};
+}
 
 /**
  * @brief Adds two signed integers of, possibly, different bit widths.
@@ -67,6 +65,65 @@ template <size_t W, size_t V>
     }
     return sum;
 }
+
+/**
+ * @brief Adds two signed integers of, possibly, different bit widths.
+ *
+ * @tparam W Width of the first summand
+ * @tparam V Width of the second summand
+ * @param a First summand
+ * @param b Second summand
+ * @param initial_carry True if there is an initial carry coming in
+ * @return Sum of correct maximal bit width
+ */
+template <class IntA, class IntB>
+[[nodiscard]] auto fun_add_expand(const IntA& a, const IntB& b, const bool initial_carry = false)
+    -> decltype(width_cast<std::max(IntA::width(), IntB::width()) + 1U>(a))
+// IntC
+{
+    static_assert(is_integral<IntA>::value);
+    static_assert(is_integral<IntB>::value);
+    static_assert(is_unsigned<IntA>::value == is_unsigned<IntB>::value);
+    static_assert(std::is_same<typename IntA::word_type, typename IntB::word_type>::value);
+
+    constexpr size_t res_width = std::max(IntA::width(), IntB::width()) + 1U;
+    using word_type = typename IntA::word_type;
+    word_type carry = initial_carry ? 1U : 0U;
+
+    const auto a_expanded = width_cast<res_width>(a);
+    const auto b_expanded = width_cast<res_width>(b);
+
+    const auto f = [carry = word_type(carry)](word_type ain, word_type bin) mutable {
+        word_type partial_sum = ain + bin;
+        word_type new_carry = (partial_sum < ain || partial_sum < bin) ? 1U : 0U;
+
+        partial_sum = partial_sum + carry;
+        carry = new_carry || (partial_sum < ain || partial_sum < bin) ? 1U : 0U;
+
+        return partial_sum;
+    };
+
+    const auto result = width_cast<res_width>(zip_with(a_expanded, b_expanded, f));
+    return result;
+}
+
+/**
+ * @brief Adds two signed integers of, possibly, different bit widths.
+ *
+ * @tparam W Width of the first summand
+ * @tparam V Width of the second summand
+ * @param a First summand
+ * @param b Second summand
+ * @param initial_carry True if there is an initial carry coming in
+ * @return Sum of correct maximal bit width
+ */
+    template <class Int>
+    [[nodiscard]] auto fun_add(const Int& a, const Int& b, const bool initial_carry = false)
+    -> Int
+    {
+        return width_cast<Int::width()>(fun_add_expand(a,b,initial_carry));
+    }
+
 
 /**
  * @brief Adds two signed integers
@@ -123,9 +180,9 @@ template <size_t W, size_t V>
  * @brief Multiplies two signed integers.
  *
  *
- * This implements the Booth multiplication algorithm with extension to correctly handle the most
- * negative number. See https://en.wikipedia.org/wiki/Booth%27s_multiplication_algorithm for
- * details.
+ * This implements the Booth multiplication algorithm with extension to correctly handle the
+ * most negative number. See https://en.wikipedia.org/wiki/Booth%27s_multiplication_algorithm
+ * for details.
  *
  * @tparam W The bit width of the first multiplicant
  * @tparam V The bit width of the second multiplicant
@@ -187,11 +244,12 @@ template <size_t W, size_t V>
 /**
  * @brief Multiplies two signed integers.
  *
- * @note No Type conversion is performed. If the bit widths do not match, the code will not compile!
+ * @note No Type conversion is performed. If the bit widths do not match, the code will not
+ * compile!
  *
- * This implements the Booth multiplication algorithm with extension to correctly handle the most
- * negative number. See https://en.wikipedia.org/wiki/Booth%27s_multiplication_algorithm for
- * details. The result is then cropped to fit the initial bit width
+ * This implements the Booth multiplication algorithm with extension to correctly handle the
+ * most negative number. See https://en.wikipedia.org/wiki/Booth%27s_multiplication_algorithm
+ * for details. The result is then cropped to fit the initial bit width
  *
  * @tparam W The bit width of the multiplicants
  * @param a First multiplicant
@@ -248,7 +306,8 @@ template <size_t W> auto operator-(const sinteger<W>& n) -> sinteger<W>
 /**
  * @brief Implements the restoring division algorithm.
  *
- * @note sinteger<W>::min/sinteger<W>(-1) will return <sinteger<W>::min,0>, i.e. some weird overflow happens
+ * @note sinteger<W>::min/sinteger<W>(-1) will return <sinteger<W>::min,0>, i.e. some weird
+ * overflow happens
  *
  * @see https://en.wikipedia.org/wiki/Division_algorithm#Restoring_division
  *
@@ -265,10 +324,8 @@ template <std::size_t W, std::size_t V>
 
 {
 
-
-
     using SInteger = sinteger<W>;
-//    using LargeSInteger = sinteger<2 * W>;
+    //    using LargeSInteger = sinteger<2 * W>;
 
     // Cover some special cases in order to speed everything up
     if (denominator.is_zero())
@@ -289,14 +346,10 @@ template <std::size_t W, std::size_t V>
         return std::make_pair(SInteger::one(), SInteger::zero());
     }
 
-
-
-
     const bool negate = numerator.is_negative() ^ denominator.is_negative();
 
     const uinteger<W> N = expanding_abs(numerator);
     const uinteger<W> D = expanding_abs(denominator);
-
 
     if (N < D)
     {
@@ -305,14 +358,12 @@ template <std::size_t W, std::size_t V>
 
     const auto div = restoring_division(N, D);
 
-    sinteger<W+1> Q(div.first);
-    sinteger<W+1> remainder(div.second);
-
-
+    sinteger<W + 1> Q(div.first);
+    sinteger<W + 1> remainder(div.second);
 
     if (negate)
     {
-        Q=-Q;
+        Q = -Q;
     }
 
     sinteger<W> Q_cast = width_cast<W>(Q);
@@ -330,16 +381,17 @@ template <std::size_t W, std::size_t V>
  * @return The remainder of the division operation
  */
 template <size_t W>
-[[nodiscard]] auto remainder(const sinteger<W>& numerator, const sinteger<W>& denominator) -> sinteger<W>
+[[nodiscard]] auto remainder(const sinteger<W>& numerator, const sinteger<W>& denominator)
+    -> sinteger<W>
 {
     return restoring_division(numerator, denominator).second;
 }
 
-
 /**
  * @brief Divides one sinteger by another sinteger
  *
- * @note sinteger<W>::min/sinteger<W>(-1) will return <sinteger<W>::min,0>, i.e. some weird overflow happens
+ * @note sinteger<W>::min/sinteger<W>(-1) will return <sinteger<W>::min,0>, i.e. some weird
+ * overflow happens
  *
  * @tparam W Width of the numbers being used in the division
  * @param numerator The number that is to be divided

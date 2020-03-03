@@ -17,9 +17,11 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
             const uinteger<TestWidth> result = add(a, b);
+            auto const result_fun = fun_add(a,b);
 
             THEN("It should be the correct sum")
             {
+                CHECK(result_fun == result);
                 REQUIRE(result.word(0) == number_a + number_b);
             }
         }
@@ -30,9 +32,11 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
             auto const result = add(a, b);
+            auto const result_fun = fun_add(a,b);
 
             THEN("It should be the masked to fit")
             {
+                CHECK(result == result_fun);
                 REQUIRE(result.word(0) == 0);
             }
         }
@@ -50,9 +54,12 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
             auto const result = add(a, b);
+            auto const result_fun = fun_add(a,b);
+
 
             THEN("It is added to the next word")
             {
+                CHECK(result_fun == result);
                 REQUIRE(result.word(1) == 1);
             }
         }
@@ -64,9 +71,11 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
             auto const result = add(a, b);
+            auto const result_fun = fun_add(a,b);
 
             THEN("The next word is unchanged")
             {
+                CHECK(result_fun == result);
                 REQUIRE(result.word(1) == 0);
             }
         }
@@ -82,10 +91,12 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
             const auto a = uint::from_words(0, 0xffffffffffffffff, 0xffffffffffffffff);
             const auto b = a;
             auto const result = add(a, b);
+            auto const result_fun = fun_add(a,b);
             const auto ref = uint::from_words(1, 0xffffffffffffffff, 0xfffffffffffffffe);
 
             THEN("There is a carry in the third word")
             {
+                CHECK(result_fun == result);
                 REQUIRE(result == ref);
             }
         }
@@ -96,9 +107,11 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
             const auto b = uint(1U);
             auto const result = add(a, b);
             const auto ref = uint::from_words(0, 0xffffffffffffffff, 0);
+            auto const result_fun = fun_add(a,b);
 
             THEN("There is no carry in the third word")
             {
+                CHECK(result_fun == result);
                 REQUIRE(result == ref);
             }
         }
@@ -119,6 +132,8 @@ SCENARIO("Adding tow uintgers of different bit width", "[uinteger][arithmetic][a
         THEN("Adding a small number of bit width 32 should not change the second word")
         {
             uinteger<129> result = expanding_add(large, m);
+            auto const result_fun = fun_add_expand(large,m);
+            CHECK(result_fun == result);
             CHECK(result.word(2) == 0U);
             CHECK(result.word(1) == 1U);
             REQUIRE(result.word(0) == m_);
@@ -128,6 +143,10 @@ SCENARIO("Adding tow uintgers of different bit width", "[uinteger][arithmetic][a
         {
             uinteger<129> result1 = expanding_add(large, m);
             uinteger<129> result2 = expanding_add(m, large);
+            auto const result_fun1 = fun_add_expand(large, m);
+            auto const result_fun2 = fun_add_expand(m, large);
+            REQUIRE(result_fun1 == result1);
+            REQUIRE(result_fun2 == result2);
             REQUIRE(result1 == result2);
         }
     }
@@ -142,6 +161,8 @@ SCENARIO("Adding tow uintgers of different bit width", "[uinteger][arithmetic][a
             static const uinteger<32> one{1U};
 
             const uinteger<129> result = expanding_add(large, one);
+            const auto result_fun = fun_add_expand(large, one);
+            CHECK(result_fun == result);
             CHECK(result.word(2) == 1U);
             CHECK(result.word(1) == 0U);
             REQUIRE(result.word(0) == 0U);
@@ -324,12 +345,16 @@ SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
             THEN("Truncating addition is overflow modulo 2")
             {
                 uinteger<89> result = add(max, a);
+                const auto result_fun = fun_add(max,a);
+                REQUIRE(result_fun == result);
                 REQUIRE(result == expected_trunc);
             }
 
             THEN("Expanding addition has the highest bet set and is modulo 2 otherwise")
             {
                 uinteger<90> result = expanding_add(max, a);
+                uinteger<90> result_fun = fun_add_expand(max,a);
+                CHECK(result_fun == result);
                 CHECK(result.bit(89));
                 REQUIRE(width_cast<89>(result) == expected_trunc);
             }
@@ -354,7 +379,10 @@ SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
             static const uinteger<89> n{23543785U}; // randomly chosen
 
             CHECK(add(max, min) == max);
+            CHECK(fun_add(max, min) == max);
+
             CHECK(add(n, min) == n);
+            CHECK(fun_add(n, min) == n);
             CHECK(sub(max, min) == max);
             REQUIRE(sub(n, min) == n);
         }
@@ -531,9 +559,6 @@ SCENARIO("Bit and Word operations work correctly", "[uinteger][utility]")
                 }
                 else
                 {
-                    //                                    std::cout << uinteger<64>{mask} << "\t" <<
-                    //                                    a << "\t" << uinteger<64>{a.word(0)} <<
-                    //                                    "\n";
                     CHECK(!is_one);
                 }
             }

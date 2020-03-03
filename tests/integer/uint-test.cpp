@@ -599,7 +599,7 @@ SCENARIO("Using the for loop operation feature from the word_array base class",
             uinteger<128> b = uinteger<128>::from_words(val_a, val_b);
 
             size_t index = 0;
-            for (auto iter = a.begin(); iter != a.end(); ++iter)
+            for (auto iter = a.cbegin(); iter != a.cend(); ++iter)
             {
                 CHECK(*iter == a.word(index));
                 index++;
@@ -609,7 +609,7 @@ SCENARIO("Using the for loop operation feature from the word_array base class",
 
             index = 0;
 
-            for (auto iter = b.begin(); iter != b.end(); ++iter)
+            for (auto iter = b.cbegin(); iter != b.cend(); ++iter)
             {
                 CHECK(*iter == b.word(index));
                 index++;
@@ -627,7 +627,7 @@ SCENARIO("Using the for loop operation feature from the word_array base class",
             uinteger<128> b = uinteger<128>::from_words(val_a, val_b);
 
             size_t index = 0;
-            for (auto iter = a.rbegin(); iter != a.rend(); ++iter)
+            for (auto iter = a.crbegin(); iter != a.crend(); ++iter)
             {
                 CHECK(*iter == a.word((a.word_count() - 1) - index));
                 index++;
@@ -637,7 +637,7 @@ SCENARIO("Using the for loop operation feature from the word_array base class",
 
             index = 0;
 
-            for (auto iter = b.rbegin(); iter != b.rend(); ++iter)
+            for (auto iter = b.crbegin(); iter != b.crend(); ++iter)
             {
                 CHECK(*iter == b.word((b.word_count() - 1) - index));
                 index++;

@@ -17,9 +17,11 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
             const sinteger<TestWidth> a{number_a};
             const sinteger<TestWidth> b{number_b};
             const sinteger<TestWidth> result = add(a, b);
+            const sinteger<TestWidth> result_fun = fun_add(a, b);
 
             THEN("It should be the correct sum")
             {
+                CHECK(result_fun == result);
                 REQUIRE(result.word(0) == number_a + number_b);
             }
         }
@@ -30,9 +32,11 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
             const sinteger<TestWidth> a{number_a};
             const sinteger<TestWidth> b{number_b};
             auto const result = add(a, b);
+            const sinteger<TestWidth> result_fun = fun_add(a, b);
 
             THEN("It should be the masked to fit")
             {
+                CHECK(result_fun == result);
                 REQUIRE(result.word(0) == 0);
             }
         }
@@ -50,9 +54,11 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
             const sinteger<TestWidth> a{number_a};
             const sinteger<TestWidth> b{number_b};
             auto const result = add(a, b);
+            const sinteger<TestWidth> result_fun = fun_add(a, b);
 
             THEN("It is added to the next word")
             {
+                CHECK(result_fun == result);
                 REQUIRE(result.word(1) == 1);
             }
         }
@@ -64,9 +70,11 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
             const sinteger<TestWidth> a{number_a};
             const sinteger<TestWidth> b{number_b};
             auto const result = add(a, b);
+            const sinteger<TestWidth> result_fun = fun_add(a, b);
 
             THEN("The next word is unchanged")
             {
+                REQUIRE(result_fun == result);
                 REQUIRE(result.word(1) == 0);
             }
         }
@@ -77,33 +85,35 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
         const sinteger<16> a_(-15);
         const sinteger<16> zero16(0);
         const sinteger<16> sum16 = add(a, a_);
+        const sinteger<16> sum16_fun = fun_add(a, a_);
 
         const sinteger<64> b(150);
         const sinteger<64> b_(-150);
         const sinteger<64> zero64(0);
         const sinteger<64> sum64 = add(b, b_);
+        const sinteger<64> sum64_fun = fun_add(b, b_);
 
         const sinteger<150> c(1337);
         const sinteger<150> c_(-1337);
         const sinteger<150> zero150(0);
+        const sinteger<150> sum150_fun = fun_add(c, c_);
         const sinteger<150> sum150 = add(c, c_);
 
         THEN("The sum should be zero")
         {
+
+            CHECK(sum16_fun == sum16);
             REQUIRE(sum16 == zero16);
             REQUIRE(sum16.is_zero());
             REQUIRE(sum16 == add(a_, a));
 
+            CHECK(sum64_fun == sum64);
             REQUIRE(sum64 == zero64);
             REQUIRE(sum64.is_zero());
             REQUIRE(sum64 == add(b_, b));
 
-            //            std::cout << to_binary(a) << "\n" << to_binary(a_) << "\n" <<
-            //            to_binary(add(a,a_)) << "\n"; std::cout << to_binary(b) << "\n" <<
-            //            to_binary(b_) << "\n" << to_binary(add(b,b_)) << "\n"; std::cout <<
-            //            group_digits(to_binary(c),64) << "\n" << group_digits(to_binary(c_),64) <<
-            //            "\n" << group_digits(to_binary(add(c,c_)),64) << "\n";
 
+            CHECK(sum150_fun == sum150);
             REQUIRE(sum150 == zero150);
             REQUIRE(sum150.is_zero());
             REQUIRE(sum150 == add(c_, c));
@@ -123,19 +133,25 @@ SCENARIO("Adding two positive sintegers exactly", "[sinteger][arithmetic][additi
         const sinteger<16> a_(-16);
         const sinteger<16> zero16(0);
         const sinteger<16> sum16 = add(a, a_);
+        const sinteger<16> sum16_fun = fun_add(a, a_);
 
         const sinteger<64> b(150);
         const sinteger<64> b_(-235);
         const sinteger<64> zero64(0);
         const sinteger<64> sum64 = add(b, b_);
+        const sinteger<64> sum64_fun = fun_add(b, b_);
 
         const sinteger<150> c(1337);
         const sinteger<150> c_(-5000);
         const sinteger<150> zero150(0);
         const sinteger<150> sum150 = add(c, c_);
+        const sinteger<150> sum150_fun = fun_add(c, c_);
 
         THEN("The sum should be negative")
         {
+            CHECK(sum150_fun == sum150);
+            CHECK(sum16_fun == sum16);
+            CHECK(sum64_fun == sum64);
             REQUIRE(sum16.is_negative());
             REQUIRE(sum64.is_negative());
             REQUIRE(sum150.is_negative());
@@ -506,6 +522,8 @@ SCENARIO("MIN/MAX Values behave as expected", "[sinteger][utility]")
         THEN("Adding/subtracting one should wrap around")
         {
             REQUIRE(add(max, one) == min);
+            REQUIRE(add(max, one) == fun_add(max,one));
+
             REQUIRE(sub(min, one) == max);
         }
 
