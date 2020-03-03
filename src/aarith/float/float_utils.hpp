@@ -96,72 +96,33 @@ template <class F> uint8_t extract_sign(F num)
     return static_cast<uint8_t>(sign);
 }
 
-// inline auto extract_sign(float num) -> uint8_t
-//{
-//    constexpr auto exponent_width = get_exponent_width<float>();
-//    constexpr auto mantissa_width = get_mantissa_width<float>();
-//
-//    uint32_t inum = get_float_bits<uint32_t>(num);
-//
-//    auto sign = inum >> (exponent_width + mantissa_width);
-//    return static_cast<uint8_t>(sign);
-//}
-//
-// inline auto extract_sign(double num) -> uint8_t
-//{
-//    constexpr auto exponent_width = get_exponent_width<double>();
-//    constexpr auto mantissa_width = get_mantissa_width<double>();
-//
-//    uint64_t lnum = get_float_bits<uint64_t>(num);
-//
-//    auto sign = lnum >> (exponent_width + mantissa_width);
-//    return static_cast<uint8_t>(sign);
-//}
-
-inline auto extract_exponent(float num) -> unsigned int
+template <class F> inline auto extract_exponent(F num) -> unsigned int
 {
-    constexpr auto exponent_width = get_exponent_width<float>();
-    constexpr auto mantissa_width = get_mantissa_width<float>();
+    constexpr auto exponent_width = get_exponent_width<F>();
+    constexpr auto mantissa_width = get_mantissa_width<F>();
 
-    uint32_t inum = bit_cast<uint32_t>(num);
+    using int_type = typename float_extraction_helper::bit_cast_to_type_trait<F>::type;
+
+    const int_type inum = bit_cast<int_type, F>(num);
 
     const auto exponent = (inum >> mantissa_width) & ((1U << exponent_width) - 1);
 
     return static_cast<unsigned int>(exponent);
 }
 
-inline auto extract_exponent(double num) -> unsigned int
+template <class F>
+inline auto extract_mantissa(F num) ->
+    typename float_extraction_helper::bit_cast_to_type_trait<F>::type
 {
-    constexpr auto exponent_width = get_exponent_width<double>();
-    constexpr auto mantissa_width = get_mantissa_width<double>();
+    constexpr auto mantissa_width = get_mantissa_width<F>();
 
-    uint64_t lnum = bit_cast<uint64_t>(num);
+    using int_type = typename float_extraction_helper::bit_cast_to_type_trait<F>::type;
 
-    const auto exponent = (lnum >> mantissa_width) & ((1U << exponent_width) - 1);
-
-    return static_cast<unsigned int>(exponent);
-}
-
-inline auto extract_mantissa(float num) -> uint32_t
-{
-    constexpr auto mantissa_width = get_mantissa_width<float>();
-
-    uint32_t inum = bit_cast<uint32_t>(num);
+    int_type inum = bit_cast<int_type, F>(num);
 
     const auto mantissa = (inum & ((1U << mantissa_width) - 1)) | (1U << mantissa_width);
 
-    return static_cast<uint32_t>(mantissa);
-}
-
-inline auto extract_mantissa(double num) -> uint64_t
-{
-    constexpr auto mantissa_width = get_mantissa_width<double>();
-
-    uint64_t lnum = bit_cast<uint64_t>(num);
-
-    const auto mantissa = (lnum & ((1ULL << mantissa_width) - 1)) | (1ULL << mantissa_width);
-
-    return static_cast<uint64_t>(mantissa);
+    return static_cast<int_type>(mantissa);
 }
 
 } // namespace aarith
