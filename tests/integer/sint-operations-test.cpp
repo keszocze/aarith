@@ -52,10 +52,6 @@ SCENARIO("Adding two positive sintegers", "[sinteger][arithmetic][addition]")
             THEN("All words need to be respected in the operation")
             {
                 const auto result = expanding_add(b, a);
-                std::cout << group_digits(to_binary(a), 64) << "\n";
-                std::cout << group_digits(to_binary(b), 64) << "\n";
-                std::cout << group_digits(to_binary(result), 64) << "\n";
-                std::cout << group_digits(to_binary(expected), 64) << "\n";
                 REQUIRE(result == expected);
             }
         }
