@@ -6,6 +6,70 @@
 
 namespace aarith {
 
+    /**
+ * @brief Arithmetic right-shift operator
+ * @tparam Width The width of the signed integer
+ * @param lhs The integer to be shifted
+ * @param rhs The number of bits to be shifted
+ * @return
+ */
+    template <size_t Width>
+    auto operator>>(const integer<Width>& lhs, const size_t rhs) -> integer<Width>
+    {
+        if (rhs >= Width)
+        {
+            if (lhs.is_negative())
+            {
+                return integer<Width>::all_ones();
+            }
+            else
+            {
+                return integer<Width>(0U);
+            }
+        }
+        if (rhs == 0)
+        {
+            return lhs;
+        }
+
+        integer<Width> shifted;
+
+        if (lhs.is_zero())
+        {
+            shifted = integer<Width>::all_ones();
+        }
+
+        const auto skip_words = rhs / lhs.word_width();
+        const auto shift_word_right = rhs - skip_words * lhs.word_width();
+        const auto shift_word_left = lhs.word_width() - shift_word_right;
+
+        for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
+        {
+            typename integer<Width>::word_type new_word;
+            new_word = lhs.word(counter) >> shift_word_right;
+            if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
+            {
+                new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
+            }
+
+            shifted.set_word(counter - skip_words, new_word);
+        }
+        typename integer<Width>::word_type new_word;
+        new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
+
+        shifted.set_word(lhs.word_count() - skip_words - 1, new_word);
+
+        if (lhs.is_negative())
+        {
+            for (size_t i = (Width - 1); i >= (Width - rhs); --i)
+            {
+                shifted.set_bit(i);
+            }
+        }
+
+        return shifted;
+    }
+
 template <size_t Width>
 [[nodiscard]] auto operator&(const integer<Width>& lhs, const integer<Width>& rhs)
     -> integer<Width>
@@ -65,64 +129,6 @@ template <size_t W, size_t V>
     }
     return sum;
 }
-
-/**
- * @brief Adds two signed integers of, possibly, different bit widths.
- *
- * @tparam W Width of the first summand
- * @tparam V Width of the second summand
- * @param a First summand
- * @param b Second summand
- * @param initial_carry True if there is an initial carry coming in
- * @return Sum of correct maximal bit width
- */
-template <class IntA, class IntB>
-[[nodiscard]] auto fun_add_expand(const IntA& a, const IntB& b, const bool initial_carry = false)
-    -> decltype(width_cast<std::max(IntA::width(), IntB::width()) + 1U>(a))
-// IntC
-{
-    static_assert(is_integral<IntA>::value);
-    static_assert(is_integral<IntB>::value);
-    static_assert(is_unsigned<IntA>::value == is_unsigned<IntB>::value);
-    static_assert(std::is_same<typename IntA::word_type, typename IntB::word_type>::value);
-
-    constexpr size_t res_width = std::max(IntA::width(), IntB::width()) + 1U;
-    using word_type = typename IntA::word_type;
-    word_type carry = initial_carry ? 1U : 0U;
-
-    const auto a_expanded = width_cast<res_width>(a);
-    const auto b_expanded = width_cast<res_width>(b);
-
-    const auto f = [carry = word_type(carry)](word_type ain, word_type bin) mutable {
-        word_type partial_sum = ain + bin;
-        word_type new_carry = (partial_sum < ain || partial_sum < bin) ? 1U : 0U;
-
-        partial_sum = partial_sum + carry;
-        carry = new_carry || (partial_sum < ain || partial_sum < bin) ? 1U : 0U;
-
-        return partial_sum;
-    };
-
-    const auto result = width_cast<res_width>(zip_with(a_expanded, b_expanded, f));
-    return result;
-}
-
-/**
- * @brief Adds two signed integers of, possibly, different bit widths.
- *
- * @tparam W Width of the first summand
- * @tparam V Width of the second summand
- * @param a First summand
- * @param b Second summand
- * @param initial_carry True if there is an initial carry coming in
- * @return Sum of correct maximal bit width
- */
-    template <class Int>
-    [[nodiscard]] auto fun_add(const Int& a, const Int& b, const bool initial_carry = false)
-    -> Int
-    {
-        return width_cast<Int::width()>(fun_add_expand(a,b,initial_carry));
-    }
 
 
 /**
@@ -404,68 +410,72 @@ template <size_t W>
     return restoring_division(numerator, denominator).first;
 }
 
+
+
+
 /**
- * @brief Arithmetic right-shift operator
- * @tparam Width The width of the signed integer
- * @param lhs The integer to be shifted
- * @param rhs The number of bits to be shifted
- * @return
+ * @brief Adds two signed integers of, possibly, different bit widths.
+ *
+ * This is an implementation using a more functional style of programming. It is not particularly fast and only
+ * here for eudcational purposes. You can use method as a means to understand how to work on an integer
+ *
+ * @tparam W Width of the first summand
+ * @tparam V Width of the second summand
+ * @param a First summand
+ * @param b Second summand
+ * @param initial_carry True if there is an initial carry coming in
+ * @return Sum of correct maximal bit width
  */
-template <size_t Width>
-auto operator>>(const integer<Width>& lhs, const size_t rhs) -> integer<Width>
-{
-    if (rhs >= Width)
+    template <class IntA, class IntB>
+    [[nodiscard]] auto fun_add_expand(const IntA& a, const IntB& b, const bool initial_carry = false)
+    -> decltype(width_cast<std::max(IntA::width(), IntB::width()) + 1U>(a))
+// IntC
     {
-        if (lhs.is_negative())
-        {
-            return integer<Width>::all_ones();
-        }
-        else
-        {
-            return integer<Width>(0U);
-        }
-    }
-    if (rhs == 0)
-    {
-        return lhs;
-    }
+        static_assert(is_integral<IntA>::value);
+        static_assert(is_integral<IntB>::value);
+        static_assert(is_unsigned<IntA>::value == is_unsigned<IntB>::value);
+        static_assert(std::is_same<typename IntA::word_type, typename IntB::word_type>::value);
 
-    integer<Width> shifted;
+        constexpr size_t res_width = std::max(IntA::width(), IntB::width()) + 1U;
+        using word_type = typename IntA::word_type;
+        word_type carry = initial_carry ? 1U : 0U;
 
-    if (lhs.is_zero())
-    {
-        shifted = integer<Width>::all_ones();
-    }
+        const auto a_expanded = width_cast<res_width>(a);
+        const auto b_expanded = width_cast<res_width>(b);
 
-    const auto skip_words = rhs / lhs.word_width();
-    const auto shift_word_right = rhs - skip_words * lhs.word_width();
-    const auto shift_word_left = lhs.word_width() - shift_word_right;
+        const auto f = [carry = word_type(carry)](word_type ain, word_type bin) mutable {
+            word_type partial_sum = ain + bin;
+            word_type new_carry = (partial_sum < ain || partial_sum < bin) ? 1U : 0U;
 
-    for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
-    {
-        typename integer<Width>::word_type new_word;
-        new_word = lhs.word(counter) >> shift_word_right;
-        if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
-        {
-            new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
-        }
+            partial_sum = partial_sum + carry;
+            carry = new_carry || (partial_sum < ain || partial_sum < bin) ? 1U : 0U;
 
-        shifted.set_word(counter - skip_words, new_word);
-    }
-    typename integer<Width>::word_type new_word;
-    new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
+            return partial_sum;
+        };
 
-    shifted.set_word(lhs.word_count() - skip_words - 1, new_word);
-
-    if (lhs.is_negative())
-    {
-        for (size_t i = (Width - 1); i >= (Width - rhs); --i)
-        {
-            shifted.set_bit(i);
-        }
+        const auto result = width_cast<res_width>(zip_with(a_expanded, b_expanded, f));
+        return result;
     }
 
-    return shifted;
-}
+/**
+ * @brief Adds two signed integers of, possibly, different bit widths.
+ *
+ * @see fun_add_expand
+ *
+ * @tparam W Width of the first summand
+ * @tparam V Width of the second summand
+ * @param a First summand
+ * @param b Second summand
+ * @param initial_carry True if there is an initial carry coming in
+ * @return Sum of correct maximal bit width
+ */
+    template <class Int>
+    [[nodiscard]] auto fun_add(const Int& a, const Int& b, const bool initial_carry = false)
+    -> Int
+    {
+        return width_cast<Int::width()>(fun_add_expand(a,b,initial_carry));
+    }
+
+
 
 } // namespace aarith
