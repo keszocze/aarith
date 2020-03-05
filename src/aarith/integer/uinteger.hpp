@@ -114,6 +114,12 @@ public:
     static constexpr bool value = true;
 };
 
+template <size_t Width> class is_word_array<uinteger<Width>>
+{
+public:
+    static constexpr bool value = true;
+};
+
 } // namespace aarith
 
 #include <aarith/core/number_utils.hpp>

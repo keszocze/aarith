@@ -136,6 +136,12 @@ public:
     static constexpr bool value = false;
 };
 
+template <size_t Width> class is_word_array<integer<Width>>
+{
+public:
+    static constexpr bool value = true;
+};
+
 template <size_t DestinationWidth, size_t SourceWidth>
 [[nodiscard]] auto width_cast(const integer<SourceWidth>& source) -> integer<DestinationWidth>
 {
@@ -190,8 +196,8 @@ public:
     static constexpr int radix = 2;
     static constexpr int digits = W - 1; // TODO what happens if W > max_int?
     static constexpr int digits10 =
-            aarith::ceil<int>(std::numeric_limits<aarith::integer<W>>::digits * aarith::log<10, 2>()) -
-            1;
+        aarith::ceil<int>(std::numeric_limits<aarith::integer<W>>::digits * aarith::log<10, 2>()) -
+        1;
 
     // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says
     // so
