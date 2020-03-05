@@ -1,31 +1,30 @@
 #pragma once
 
-#include <aarith/integer/uinteger_comparisons.hpp>
 #include <aarith/core/traits.hpp>
 #include <aarith/core/word_array_operations.hpp>
 #include <aarith/integer/uinteger.hpp>
+#include <aarith/integer/uinteger_comparisons.hpp>
 
 #include <iostream>
 
 namespace aarith {
 
+template <size_t Width>
+auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
+{
 
-    template <size_t Width>
-    auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
-    {
+    word_array<Width> tmp{lhs};
+    return uinteger<Width>{tmp >> rhs};
+}
 
-        word_array<Width> tmp{lhs};
-        return uinteger<Width>{tmp >> rhs};
-    }
+template <size_t Width>
+[[nodiscard]] auto operator<<(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
+{
 
-    template <size_t Width>
-    [[nodiscard]] auto operator<<(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
-    {
+    word_array<Width> tmp{lhs};
 
-        word_array<Width> tmp{lhs};
-
-        return uinteger<Width>{tmp << rhs};
-    }
+    return uinteger<Width>{tmp << rhs};
+}
 
 /**
  * @brief Adds two unsigned integers of, possibly, different bit widths.
@@ -246,7 +245,8 @@ template <std::size_t W, std::size_t V>
     {
         return std::make_pair(UInteger::one(), UInteger::zero());
     }
-    if (numerator.is_zero()) {
+    if (numerator.is_zero())
+    {
         return std::make_pair(UInteger::zero(), UInteger::zero());
     }
     if (numerator < denominator)
@@ -262,7 +262,7 @@ template <std::size_t W, std::size_t V>
     const auto n = numerator.width();
     const LargeUInteger D = (width_cast<2 * W>(denominator) << n);
     LargeUInteger R = width_cast<2 * W>(numerator);
-    UInteger Q=UInteger::zero();
+    UInteger Q = UInteger::zero();
 
     for (size_t i = 0; i < n; ++i)
     {

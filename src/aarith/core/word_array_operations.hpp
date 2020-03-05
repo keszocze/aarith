@@ -2,9 +2,7 @@
 
 namespace aarith {
 
-template <typename W>
-[[nodiscard]] auto operator&(const W& lhs, const W& rhs)
-    -> W
+template <typename W>[[nodiscard]] auto operator&(const W& lhs, const W& rhs) -> W
 {
     static_assert(is_word_array<W>::value);
     W bitwise_and;
@@ -15,8 +13,7 @@ template <typename W>
     return bitwise_and;
 }
 
-template <typename W>
-auto operator|(const W& lhs, const W& rhs) -> W
+template <typename W> auto operator|(const W& lhs, const W& rhs) -> W
 {
     static_assert(is_word_array<W>::value);
     W bitwise_or;
@@ -27,8 +24,7 @@ auto operator|(const W& lhs, const W& rhs) -> W
     return bitwise_or;
 }
 
-template <typename W>
-auto operator^(const W& lhs, const W& rhs) -> W
+template <typename W> auto operator^(const W& lhs, const W& rhs) -> W
 {
     static_assert(is_word_array<W>::value);
     W bitwise_xor;
@@ -39,8 +35,7 @@ auto operator^(const W& lhs, const W& rhs) -> W
     return bitwise_xor;
 }
 
-template <typename W>
-[[nodiscard]] auto operator~(const W& rhs) -> W
+template <typename W>[[nodiscard]] auto operator~(const W& rhs) -> W
 {
     static_assert(is_word_array<W>::value);
     W bitwise_not;
@@ -187,8 +182,7 @@ std::pair<word_array<W - (S + 1)>, word_array<S + 1>> split(const word_array<W>&
  * @param f Function of type word_array<W>::word_type -> word_array<W>::word_type
  * @return A new word_array with the transformed words
  */
-template <class F, size_t W>
-[[nodiscard]] word_array<W> map(const word_array<W>& w, const F f)
+template <class F, size_t W>[[nodiscard]] word_array<W> map(const word_array<W>& w, const F f)
 {
 
     word_array<W> result;
@@ -215,7 +209,8 @@ template <class F, size_t W>
  * @return The newly created, zipped word_array
  */
 template <class F, size_t W, size_t V>
-[[nodiscard]] word_array<std::min(W, V)> zip_with(const word_array<W>& w, const word_array<V>& v, F f)
+[[nodiscard]] word_array<std::min(W, V)> zip_with(const word_array<W>& w, const word_array<V>& v,
+                                                  F f)
 {
     constexpr size_t L = std::min(W, V);
     word_array<L> result;
