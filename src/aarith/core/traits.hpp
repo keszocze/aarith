@@ -4,6 +4,12 @@
 
 namespace aarith {
 
+template <class Type> class is_word_array
+{
+public:
+    static constexpr bool value = false;
+};
+
 template <class Type> class is_integral
 {
 public:
