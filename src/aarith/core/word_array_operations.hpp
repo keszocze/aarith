@@ -1,5 +1,7 @@
 #pragma once
 
+#include <aarith/core/word_array.hpp>
+
 namespace aarith {
 
 template <typename W>[[nodiscard]] auto operator&(const W& lhs, const W& rhs) -> W
@@ -260,7 +262,6 @@ zip_with_state(const word_array<W>& w, const word_array<V>& v, const F f,
         const auto fun_res = f(w.word(i), v.word(i), state);
         state = fun_res.second;
         wt new_word = fun_res.first;
-        std::cout << "setting word " << i << " to " << new_word << "\n";
         result.set_word(i, new_word);
     }
     return result;

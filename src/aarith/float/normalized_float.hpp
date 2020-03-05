@@ -11,25 +11,25 @@
 
 namespace aarith {
 
-template <size_t E, size_t M> class normfloat
+template <size_t E, size_t M> class normalized_float
 {
 public:
     static_assert(M > 0, "Mantissa width has to be greater zero.");
     static_assert(E > 1, "Exponent width has to be greater one.");
 
-    explicit normfloat()
+    explicit normalized_float()
     {
         exponent = uinteger<E>(0U);
         mantissa = uinteger<M>(0U);
         sign_neg = false;
     }
 
-    template <class F> explicit normfloat(F f)
+    template <class F> explicit normalized_float(F f)
     {
         static_assert(std::is_floating_point<F>::value,
                       "Only floating point numbers are supported");
         // static_assert(get_mantissa_width<F>() < M, "Mantissa of f does not fit into explicit
-        // mantissa of normfloat.");
+        // mantissa of normalized_float.");
 
         auto f_exponent = extract_exponent(f);
         auto f_mantissa = extract_mantissa(f);
@@ -59,7 +59,7 @@ public:
             {
                 exponent = uinteger<E>(f_exponent);
                 const auto f_bias =
-                    width_cast<E>(normfloat<f_exponent_width, f_mantissa_width>::get_bias());
+                    width_cast<E>(normalized_float<f_exponent_width, f_mantissa_width>::get_bias());
                 const auto exponent_delta = sub(get_bias(), f_bias);
                 exponent = add(exponent, exponent_delta);
             }
@@ -67,7 +67,7 @@ public:
             {
                 const auto bias = get_bias();
                 const auto exponent_delta =
-                    normfloat<f_exponent_width, f_mantissa_width>::get_bias().word(0) -
+                    normalized_float<f_exponent_width, f_mantissa_width>::get_bias().word(0) -
                     bias.word(0);
                 f_exponent -= static_cast<decltype(f_exponent)>(exponent_delta);
                 exponent = uinteger<E>(f_exponent);
@@ -153,26 +153,27 @@ private:
     uinteger<M> mantissa;
 };
 
-template <size_t E, size_t M> class is_integral<normfloat<E, M>>
+template <size_t E, size_t M> class is_integral<normalized_float<E, M>>
 {
 public:
     static constexpr bool value = false;
 };
 
-template <size_t E, size_t M> class is_float<normfloat<E, M>>
+template <size_t E, size_t M> class is_float<normalized_float<E, M>>
 {
 public:
     static constexpr bool value = true;
 };
 
-template <size_t E, size_t M> class is_unsigned<normfloat<E, M>>
+template <size_t E, size_t M> class is_unsigned<normalized_float<E, M>>
 {
 public:
     static constexpr bool value = false;
 };
 
 template <size_t E, size_t M1, size_t M2>
-auto equal_except_rounding(const normfloat<E, M1> lhs, const normfloat<E, M2> rhs) -> bool
+auto equal_except_rounding(const normalized_float<E, M1> lhs, const normalized_float<E, M2> rhs)
+    -> bool
 {
     if (lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent())
     {
@@ -235,7 +236,7 @@ auto equal_except_rounding(const normfloat<E, M1> lhs, const normfloat<E, M2> rh
     return false;
 }
 
-template <size_t E, size_t M> auto abs(const normfloat<E, M> nf) -> normfloat<E, M>
+template <size_t E, size_t M> auto abs(const normalized_float<E, M> nf) -> normalized_float<E, M>
 {
     auto absolute = nf;
     absolute.set_sign(0U);
@@ -284,7 +285,7 @@ auto rshift_and_round(const uinteger<M>& m, const size_t shift_by) -> uinteger<M
 }
 
 template <size_t E, size_t M1, size_t M2 = M1>
-auto normalize(const normfloat<E, M1>& nf) -> normfloat<E, M2>
+auto normalize(const normalized_float<E, M1>& nf) -> normalized_float<E, M2>
 {
     auto denormalized = nf;
 
@@ -311,7 +312,7 @@ auto normalize(const normfloat<E, M1>& nf) -> normfloat<E, M2>
         exponent = sub(exponent, uinteger<E>(shift_by));
     }
 
-    normfloat<E, M2> normalized_float;
+    normalized_float<E, M2> normalized_float;
 
     normalized_float.set_sign(denormalized.get_sign());
     normalized_float.set_exponent(exponent);

@@ -10,20 +10,20 @@
 namespace aarith {
 
 template <size_t Width>
-auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
-{
-
-    word_array<Width> tmp{lhs};
-    return uinteger<Width>{tmp >> rhs};
-}
-
-template <size_t Width>
 [[nodiscard]] auto operator<<(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
 {
 
     word_array<Width> tmp{lhs};
 
     return uinteger<Width>{tmp << rhs};
+}
+
+template <size_t Width>
+auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
+{
+
+    word_array<Width> tmp{lhs};
+    return uinteger<Width>{tmp >> rhs};
 }
 
 /**
@@ -49,65 +49,31 @@ template <size_t W, size_t V>
 
     uinteger<res_width> sum;
     using word_type = typename uinteger<res_width>::word_type;
-    word_type carry{0U};
+    uinteger<res_width> a_ = width_cast<res_width>(a);
+    uinteger<res_width> b_ = width_cast<res_width>(b);
 
-    if (initial_carry)
+    word_type carry = initial_carry ? 1U : 0U;
+
+    for (auto i = 0U; i < sum.word_count(); ++i)
     {
-        carry = 1U;
+
+        word_type word_a{a_.word(i)};
+        word_type word_b{b_.word(i)};
+
+        auto partial_sum = word_a + word_b;
+        word_type new_carry = (partial_sum < word_a || partial_sum < word_b) ? 1U : 0U;
+        partial_sum += carry;
+        carry = (new_carry || partial_sum < word_a || partial_sum < word_b) ? 1U : 0U;
+        sum.set_word(i, partial_sum);
     }
-
-    /*
-     * If the bit widths are not the same we actually have to check that we don't access values
-     * outside the underlying word container.
-     */
-    if constexpr (uinteger<W>::word_count() != uinteger<V>::word_count())
-    {
-        for (auto i = 0U; i < sum.word_count(); ++i)
-        {
-
-            word_type a_{0U};
-            word_type b_{0U};
-            if (i < a.word_count())
-            {
-                a_ = a.word(i);
-            }
-            if (i < b.word_count())
-            {
-                b_ = b.word(i);
-            }
-
-            auto partial_sum = a_ + b_;
-            auto new_carry = (partial_sum < a_ || partial_sum < b_) ? 1U : 0U;
-            partial_sum += carry;
-            carry = new_carry | (partial_sum < a_ || partial_sum < b_) ? 1U : 0U;
-            sum.set_word(i, partial_sum);
-        }
-    }
-    // Here we can simply iterate until we reached the end of either of the two uintegers
-    else
-    {
-        for (auto i = 0U; i < a.word_count(); ++i)
-        {
-            auto partial_sum = a.word(i) + b.word(i);
-            auto new_carry = (partial_sum < a.word(i) || partial_sum < b.word(i)) ? 1U : 0U;
-            partial_sum += carry;
-            carry = new_carry | (partial_sum < a.word(i) || partial_sum < b.word(i)) ? 1U : 0U;
-            sum.set_word(i, partial_sum);
-        }
-
-        // we check whether an the additional bit results in an additional word and only propagate
-        // the carry if this word exists
-        if constexpr (uinteger<W>::word_count() < uinteger<res_width>::word_count())
-        {
-            sum.set_word(sum.word_count() - 1, carry);
-        }
-    }
-
     return sum;
 }
 
 /**
  * @brief Subtracts two unsigned integers of, possibly, different bit widths.
+ *
+ * Expanding does not, in contrast to @see expanding_add, ensure that no underflow will happen. It
+ * simply makes sure that the resulting bit width is the larger of the both input bit widths.
  *
  * @tparam W Width of the minuend
  * @tparam V Width of the subtrahend

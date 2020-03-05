@@ -3,7 +3,7 @@
 
 using namespace aarith;
 
-SCENARIO("Adding two positive sintegers exactly", "[integer][arithmetic][addition]")
+SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
 {
     GIVEN("Two positive integer<N> a and b with N <= word_width")
     {
@@ -41,7 +41,20 @@ SCENARIO("Adding two positive sintegers exactly", "[integer][arithmetic][additio
             }
         }
     }
-
+    GIVEN("Two integers with different word_count")
+    {
+        const integer<64> a{16};
+        const integer<128> b{32, 8};
+        const integer<128> expected{32, 24};
+        WHEN("Adding the integers")
+        {
+            THEN("All words need to be respected in the operation")
+            {
+                const auto result = expanding_add(b, a);
+                REQUIRE(result == expected);
+            }
+        }
+    }
     GIVEN("Two positive integer<N> a and b with N > word_width")
     {
         static constexpr size_t TestWidth = 128;
@@ -159,7 +172,7 @@ SCENARIO("Adding two positive sintegers exactly", "[integer][arithmetic][additio
     }
 }
 
-SCENARIO("Division of signed integers", "[integer][arithmetic][foo]")
+SCENARIO("Division of signed integers", "[integer][arithmetic]")
 {
 
     GIVEN("The number 1 << 65")

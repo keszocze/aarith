@@ -81,7 +81,8 @@ auto operator>>(const integer<Width>& lhs, const size_t rhs) -> integer<Width>
  * @return Sum of correct maximal bit width
  */
 template <size_t W, size_t V>
-[[nodiscard]] integer<std::max(W, V) + 1> expanding_add(const integer<W>& a, const integer<V>& b)
+[[nodiscard]] integer<std::max(W, V) + 1> expanding_add(const integer<W>& a, const integer<V>& b,
+                                                        const bool initial_carry = false)
 {
     static_assert(is_integral<integer<W>>::value);
     static_assert(is_integral<integer<V>>::value);
@@ -89,11 +90,20 @@ template <size_t W, size_t V>
     constexpr size_t res_width = std::max(W, V) + 1U;
 
     integer<res_width> sum;
-    typename integer<res_width>::word_type carry{0U};
-    for (auto i = 0U; i < a.word_count(); ++i)
+    integer<res_width> a_ = width_cast<res_width>(a);
+    integer<res_width> b_ = width_cast<res_width>(b);
+
+    using word_type = typename uinteger<res_width>::word_type;
+    word_type carry = initial_carry ? 1U : 0U;
+    for (auto i = 0U; i < a_.word_count(); ++i)
     {
-        auto const partial_sum = a.word(i) + b.word(i) + carry;
-        carry = (partial_sum < a.word(i) || partial_sum < b.word(i)) ? 1 : 0;
+        word_type word_a{a_.word(i)};
+        word_type word_b{b_.word(i)};
+
+        word_type partial_sum = word_a + word_b;
+        word_type new_carry = (partial_sum < word_a || partial_sum < word_b) ? 1 : 0;
+        partial_sum = partial_sum + carry;
+        carry = new_carry || partial_sum < word_a || partial_sum < word_b;
         sum.set_word(i, partial_sum);
     }
     return sum;
@@ -168,9 +178,6 @@ template <size_t W, size_t V>
 [[nodiscard]] auto expanding_mul(const integer<W>& m, const integer<V>& r) -> integer<V + W>
 {
 
-    //    std::cout << "m\t" << to_binary(m) << "\n";
-    //    std::cout << "r\t" << to_binary(r) << "\n";
-
     constexpr size_t K = W + V + 2;
 
     integer<K> A{width_cast<W + 1>(m)};
@@ -182,34 +189,22 @@ template <size_t W, size_t V>
     integer<K> P{r};
     P = P << 1;
 
-    //    std::cout << "A\t" << to_binary(A) << "\n";
-    //    std::cout << "S\t" << to_binary(S) << "\n";
-    //    std::cout << "P\t" << to_binary(P) << "\n\n";
-
     for (size_t i = 0; i < V; ++i)
     {
 
         bool last_bit = P.bit(0);
         bool snd_last_bit = P.bit(1);
 
-        //        std::cout << "P" << i << "\t" << to_binary(P) << "\n";
-
         if (snd_last_bit && !last_bit)
         {
-            //            std::cout << "P = P + S\n";
             P = add(P, S);
-            //            std::cout << "P" << i << "\t" << to_binary(P) << "\n";
         }
         if (!snd_last_bit && last_bit)
         {
-            //            std::cout << "P = P + A\n";
             P = add(P, A);
-            //            std::cout << "P" << i << "\t" << to_binary(P) << "\n";
         }
 
         P = P >> 1;
-
-        //        std::cout << "P" << i << "\t" << to_binary(P) << "\n\n";
     }
 
     return width_cast<W + V>(P >> 1);
@@ -219,7 +214,7 @@ template <size_t W, size_t V>
  * @brief Multiplies two signed integers.
  *
  * @note No Type conversion is performed. If the bit widths do not match, the code will not
- * compile!
+ * compile! Use @see expanding_mul for that.
  *
  * This implements the Booth multiplication algorithm with extension to correctly handle the
  * most negative number. See https://en.wikipedia.org/wiki/Booth%27s_multiplication_algorithm
