@@ -433,6 +433,12 @@ private:
     std::array<word_type, word_count()> words{{0}};
 };
 
+template <size_t Width> class is_word_array<word_array<Width>>
+{
+public:
+    static constexpr bool value = true;
+};
+
 template <size_t DestinationWidth, size_t SourceWidth>
 [[nodiscard]] auto width_cast(const word_array<SourceWidth>& source) -> word_array<DestinationWidth>
 {
