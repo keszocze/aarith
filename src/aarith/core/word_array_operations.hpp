@@ -2,11 +2,11 @@
 
 namespace aarith {
 
-template <size_t Width>
-[[nodiscard]] auto operator&(const word_array<Width>& lhs, const word_array<Width>& rhs)
-    -> word_array<Width>
+template <typename W>
+[[nodiscard]] auto operator&(const W& lhs, const W& rhs)
+    -> W
 {
-    word_array<Width> bitwise_and;
+    W bitwise_and;
     for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
         bitwise_and.set_word(counter, lhs.word(counter) & rhs.word(counter));
@@ -14,10 +14,10 @@ template <size_t Width>
     return bitwise_and;
 }
 
-template <size_t Width>
-auto operator|(const word_array<Width>& lhs, const word_array<Width>& rhs) -> word_array<Width>
+template <typename W>
+auto operator|(const W& lhs, const W& rhs) -> W
 {
-    word_array<Width> bitwise_or;
+    W bitwise_or;
     for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
         bitwise_or.set_word(counter, lhs.word(counter) | rhs.word(counter));
@@ -25,10 +25,10 @@ auto operator|(const word_array<Width>& lhs, const word_array<Width>& rhs) -> wo
     return bitwise_or;
 }
 
-template <size_t Width>
-auto operator^(const word_array<Width>& lhs, const word_array<Width>& rhs) -> word_array<Width>
+template <typename W>
+auto operator^(const W& lhs, const W& rhs) -> W
 {
-    word_array<Width> bitwise_xor;
+    W bitwise_xor;
     for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
         bitwise_xor.set_word(counter, lhs.word(counter) ^ rhs.word(counter));
@@ -36,10 +36,10 @@ auto operator^(const word_array<Width>& lhs, const word_array<Width>& rhs) -> wo
     return bitwise_xor;
 }
 
-template <size_t Width>
-[[nodiscard]] auto operator~(const word_array<Width>& rhs) -> word_array<Width>
+template <typename W>
+[[nodiscard]] auto operator~(const W& rhs) -> W
 {
-    word_array<Width> bitwise_not;
+    W bitwise_not;
     for (auto counter = 0U; counter < rhs.word_count(); ++counter)
     {
         bitwise_not.set_word(counter, ~rhs.word(counter));

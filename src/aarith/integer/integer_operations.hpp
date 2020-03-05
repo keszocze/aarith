@@ -70,36 +70,6 @@ namespace aarith {
         return shifted;
     }
 
-template <size_t Width>
-[[nodiscard]] auto operator&(const integer<Width>& lhs, const integer<Width>& rhs)
-    -> integer<Width>
-{
-    word_array<Width> lhs_w{lhs};
-    word_array<Width> rhs_w{rhs};
-
-    word_array<Width> result = lhs_w & rhs_w;
-
-    return integer<Width>{result};
-}
-
-template <size_t Width>
-[[nodiscard]] auto operator|(const integer<Width>& lhs, const integer<Width>& rhs)
-    -> integer<Width>
-{
-    word_array<Width> lhs_w{lhs};
-    word_array<Width> rhs_w{rhs};
-
-    word_array<Width> result = lhs_w | rhs_w;
-
-    return integer<Width>{result};
-}
-
-template <size_t Width>[[nodiscard]] auto operator~(const integer<Width>& rhs) -> integer<Width>
-{
-    word_array<Width> rhs_w{rhs};
-    word_array<Width> result = ~rhs_w;
-    return integer<Width>{result};
-}
 
 /**
  * @brief Adds two signed integers of, possibly, different bit widths.
