@@ -8,10 +8,13 @@ namespace aarith {
 
 /**
  * @brief Arithmetic right-shift operator
+ *
+ * This shift preserves the signedness of the integer.
+ *
  * @tparam Width The width of the signed integer
  * @param lhs The integer to be shifted
  * @param rhs The number of bits to be shifted
- * @return
+ * @return The shifted integer
  */
 template <size_t Width>
 auto operator>>(const integer<Width>& lhs, const size_t rhs) -> integer<Width>
@@ -88,14 +91,17 @@ template <size_t W, size_t V>
     static_assert(is_integral_v<integer<V>>);
 
     constexpr size_t res_width = std::max(W, V) + 1U;
+    using word_type = typename uinteger<res_width>::word_type;
 
     integer<res_width> sum;
+
     integer<res_width> a_ = width_cast<res_width>(a);
     integer<res_width> b_ = width_cast<res_width>(b);
 
-    using word_type = typename uinteger<res_width>::word_type;
+
     word_type carry = initial_carry ? 1U : 0U;
-    for (auto i = 0U; i < a_.word_count(); ++i)
+
+    for (auto i = 0U; i < sum.word_count(); ++i)
     {
         word_type word_a{a_.word(i)};
         word_type word_b{b_.word(i)};
@@ -210,25 +216,6 @@ template <size_t W, size_t V>
     return width_cast<W + V>(P >> 1);
 }
 
-/**
- * @brief Multiplies two signed integers.
- *
- * @note No Type conversion is performed. If the bit widths do not match, the code will not
- * compile! Use @see expanding_mul for that.
- *
- * This implements the Booth multiplication algorithm with extension to correctly handle the
- * most negative number. See https://en.wikipedia.org/wiki/Booth%27s_multiplication_algorithm
- * for details. The result is then cropped to fit the initial bit width
- *
- * @tparam W The bit width of the multiplicants
- * @param a First multiplicant
- * @param b Second multiplicant
- * @return Product of a and b
- */
-template <size_t W>[[nodiscard]] integer<W> mul(const integer<W>& a, const integer<W>& b)
-{
-    return width_cast<W>(expanding_mul(a, b));
-}
 
 /**
  * @brief Computes the absolute value of a given signed integer.
@@ -342,43 +329,11 @@ template <std::size_t W, std::size_t V>
 }
 
 /**
- * @brief Computes the remainder of the division of one integer by another integer
- * *
- * @tparam W Width of the numbers being used in the division
- * @param numerator The number that is to be divided
- * @param denominator The number that divides the other number
- * @return The remainder of the division operation
- */
-template <size_t W>
-[[nodiscard]] auto remainder(const integer<W>& numerator, const integer<W>& denominator)
-    -> integer<W>
-{
-    return restoring_division(numerator, denominator).second;
-}
-
-/**
- * @brief Divides one integer by another integer
- *
- * @note integer<W>::min/integer<W>(-1) will return <integer<W>::min,0>, i.e. some weird
- * overflow happens
- *
- * @tparam W Width of the numbers being used in the division
- * @param numerator The number that is to be divided
- * @param denominator The number that divides the other number
- * @return The quotient of the division operation
- */
-template <size_t W>
-[[nodiscard]] auto div(const integer<W>& numerator, const integer<W>& denominator) -> integer<W>
-{
-    return restoring_division(numerator, denominator).first;
-}
-
-/**
  * @brief Adds two signed integers of, possibly, different bit widths.
  *
  * This is an implementation using a more functional style of programming. It is not particularly
- * fast and only here for eudcational purposes. You can use method as a means to understand how to
- * work on an integer
+ * fast and only here for educational purposes. You can use method as a means to understand how to
+ * work on an integer.
  *
  * @tparam W Width of the first summand
  * @tparam V Width of the second summand

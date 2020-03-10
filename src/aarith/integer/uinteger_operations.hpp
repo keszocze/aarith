@@ -26,14 +26,14 @@ template <size_t W, size_t V>
                                                          const bool initial_carry = false)
 {
     static_assert(is_integral_v<uinteger<W>>);
-    static_assert(is_unsigned_v<uinteger<W>>);
     static_assert(is_integral_v<uinteger<V>>);
-    static_assert(is_unsigned_v<uinteger<V>>);
+
 
     constexpr size_t res_width = std::max(W, V) + 1U;
+    using word_type = typename uinteger<res_width>::word_type;
 
     uinteger<res_width> sum;
-    using word_type = typename uinteger<res_width>::word_type;
+
     uinteger<res_width> a_ = width_cast<res_width>(a);
     uinteger<res_width> b_ = width_cast<res_width>(b);
 
@@ -45,7 +45,7 @@ template <size_t W, size_t V>
         word_type word_a{a_.word(i)};
         word_type word_b{b_.word(i)};
 
-        auto partial_sum = word_a + word_b;
+        word_type partial_sum = word_a + word_b;
         word_type new_carry = (partial_sum < word_a || partial_sum < word_b) ? 1U : 0U;
         partial_sum += carry;
         carry = (new_carry || partial_sum < word_a || partial_sum < word_b) ? 1U : 0U;
@@ -109,6 +109,9 @@ template <size_t W>[[nodiscard]] auto sub(const uinteger<W>& a, const uinteger<W
 /**
  * @brief Multiplies two unsigned integers expanding the bit width so that the result fits.
  *
+ * This implements the simplest multiplication algorithm (binary "long multiplication") that adds up
+ * the partial products everywhere where the first multiplicand has a 1 bit. The simplicity, of
+ * course, comes at the cost of performance.
  *
  * @tparam W The bit width of the first multiplicant
  * @tparam V The bit width of the second multiplicant
@@ -119,6 +122,7 @@ template <size_t W>[[nodiscard]] auto sub(const uinteger<W>& a, const uinteger<W
 template <std::size_t W, std::size_t V>
 [[nodiscard]] uinteger<W + V> expanding_mul(const uinteger<W>& a, const uinteger<V>& b)
 {
+
     constexpr std::size_t res_width = W + V;
     uinteger<res_width> result{0U};
     if constexpr (res_width <= 64)
@@ -148,22 +152,21 @@ template <std::size_t W, std::size_t V>
 }
 
 /**
- * @brief Multiplies two unsigned integers.
+ * @brief Multiplies two integers.
  *
- * @note No Type conversion is performed. If the bit widths do not match, the code will not compile!
+ * @note No Type conversion is performed. If the bit widths do not match, the code will not
+ * compile! Use @see expanding_mul for that.
  *
- * This implements the simplest multiplication algorithm (binary "long multiplication") that adds up
- * the partial products everywhere where the first multiplicand has a 1 bit. The simplicity, of
- * course, comes at the cost of performance.
+ * The result is then cropped to fit the initial bit width
  *
- * @tparam W The bit width of the multiplicants
+ * @tparam I The integer type to operate on
  * @param a First multiplicant
  * @param b Second multiplicant
  * @return Product of a and b
  */
-template <size_t W>[[nodiscard]] uinteger<W> mul(const uinteger<W>& a, const uinteger<W>& b)
+template <typename I>[[nodiscard]] I mul(const I& a, const I& b)
 {
-    return width_cast<W>(expanding_mul(a, b));
+    return width_cast<I::width()>(expanding_mul(a, b));
 }
 
 /**
@@ -236,14 +239,37 @@ template <std::size_t W, std::size_t V>
     return std::make_pair(Q, remainder);
 }
 
-template <class UInteger>
-[[nodiscard]] auto remainder(const UInteger& numerator, const UInteger& denominator) -> UInteger
+
+/**
+ * @brief Computes the remainder of the division of one integer by another integer
+ *
+ * @note For signed integers, weird under-/overflows for ::min() may occur
+ *
+ * @tparam I Integer type to work on
+ * @param numerator The number that is to be divided
+ * @param denominator The number that divides the other number
+ * @return The remainder of the division operation
+ */
+template <typename I>
+[[nodiscard]] auto remainder(const I& numerator, const I& denominator) -> I
 {
     return restoring_division(numerator, denominator).second;
 }
 
-template <class UInteger>
-[[nodiscard]] auto div(const UInteger& numerator, const UInteger& denominator) -> UInteger
+
+/**
+ * @brief Divides one integer by another integer
+ *
+ * @note integer<W>::min/integer<W>(-1) will return <integer<W>::min,0>, i.e. some weird
+ * overflow happens for signed integers
+ *
+ * @tparam I Integer type to work on
+ * @param numerator The number that is to be divided
+ * @param denominator The number that divides the other number
+ * @return The quotient of the division operation
+ */
+template <typename I>
+[[nodiscard]] auto div(const I& numerator, const I& denominator) -> I
 {
     return restoring_division(numerator, denominator).first;
 }

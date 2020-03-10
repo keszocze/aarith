@@ -125,7 +125,6 @@ SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
             REQUIRE(sum64.is_zero());
             REQUIRE(sum64 == add(b_, b));
 
-
             CHECK(sum150_fun == sum150);
             REQUIRE(sum150 == zero150);
             REQUIRE(sum150.is_zero());
@@ -140,31 +139,46 @@ SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
         }
     }
 
+    GIVEN("The number zero")
+    {
+        const integer<16> z16;
+        const integer<63> z63;
+        const integer<150> z150;
+        WHEN("Adding a negative number")
+        {
+
+            const integer<16> neg16{-5};
+            const integer<63> neg63{-5};
+            const integer<150> neg150{-5};
+
+            THEN("The result should be the negative number")
+            {
+                CHECK(add(z16, neg16) == neg16);
+                CHECK(add(z63, neg63) == neg63);
+                CHECK(add(z150, neg150) == neg150);
+            }
+        }
+    }
+
     GIVEN("A positive integer and a negative integer with larger absolute value")
     {
         const integer<16> a(15);
         const integer<16> a_(-16);
         const integer<16> zero16(0);
         const integer<16> sum16 = add(a, a_);
-        const integer<16> sum16_fun = fun_add(a, a_);
 
         const integer<64> b(150);
         const integer<64> b_(-235);
         const integer<64> zero64(0);
         const integer<64> sum64 = add(b, b_);
-        const integer<64> sum64_fun = fun_add(b, b_);
 
         const integer<150> c(1337);
         const integer<150> c_(-5000);
         const integer<150> zero150(0);
         const integer<150> sum150 = add(c, c_);
-        const integer<150> sum150_fun = fun_add(c, c_);
 
         THEN("The sum should be negative")
         {
-            CHECK(sum150_fun == sum150);
-            CHECK(sum16_fun == sum16);
-            CHECK(sum64_fun == sum64);
             REQUIRE(sum16.is_negative());
             REQUIRE(sum64.is_negative());
             REQUIRE(sum150.is_negative());
@@ -535,7 +549,7 @@ SCENARIO("MIN/MAX Values behave as expected", "[integer][utility]")
         THEN("Adding/subtracting one should wrap around")
         {
             REQUIRE(add(max, one) == min);
-            REQUIRE(add(max, one) == fun_add(max,one));
+            REQUIRE(add(max, one) == fun_add(max, one));
 
             REQUIRE(sub(min, one) == max);
         }
