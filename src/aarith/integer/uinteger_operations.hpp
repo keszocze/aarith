@@ -9,22 +9,7 @@
 
 namespace aarith {
 
-template <size_t Width>
-[[nodiscard]] auto operator<<(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
-{
 
-    word_array<Width> tmp{lhs};
-
-    return uinteger<Width>{tmp << rhs};
-}
-
-template <size_t Width>
-auto operator>>(const uinteger<Width>& lhs, const size_t rhs) -> uinteger<Width>
-{
-
-    word_array<Width> tmp{lhs};
-    return uinteger<Width>{tmp >> rhs};
-}
 
 /**
  * @brief Adds two unsigned integers of, possibly, different bit widths.

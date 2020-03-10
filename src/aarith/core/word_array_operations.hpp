@@ -66,18 +66,29 @@ template <size_t Width> auto count_leading_zeroes(const word_array<Width>& value
     return Width;
 }
 
-template <size_t Width>
-[[nodiscard]] auto operator<<(const word_array<Width>& lhs, const size_t rhs) -> word_array<Width>
+/**
+ * @brief Left-shift operator
+ * @tparam W The word_container type to work on
+ * @param lhs The word_container to be shifted
+ * @param rhs The number of bits to shift
+ * @return The shifted word_container
+ */
+template <typename  W>
+[[nodiscard]] auto operator<<(const W& lhs, const size_t rhs) -> W
 {
-    if (rhs >= Width)
+    static_assert(is_word_array_v<W>);
+
+    constexpr size_t width = lhs.width();
+
+    if (rhs >= width)
     {
-        return word_array<Width>(0U);
+        return W{0U};
     }
     if (rhs == 0)
     {
         return lhs;
     }
-    word_array<Width> shifted;
+    W shifted;
     const auto skip_words = rhs / lhs.word_width();
     const auto shift_word_left = rhs - skip_words * lhs.word_width();
     const auto shift_word_right = lhs.word_width() - shift_word_left;
@@ -86,7 +97,7 @@ template <size_t Width>
     {
         if (counter + skip_words < lhs.word_count())
         {
-            typename word_array<Width>::word_type new_word;
+            typename W::word_type new_word;
             new_word = lhs.word(counter) << shift_word_left;
             if (shift_word_right < lhs.word_width())
             {
@@ -95,7 +106,7 @@ template <size_t Width>
             shifted.set_word(counter + skip_words, new_word);
         }
     }
-    typename word_array<Width>::word_type new_word;
+    typename W::word_type new_word;
     new_word = lhs.word(0) << shift_word_left;
     shifted.set_word(skip_words, new_word);
 
