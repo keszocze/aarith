@@ -113,7 +113,7 @@ namespace aarith {
         {
             auto shift_mantissa = 24 - M;
             flc_mantissa = width_cast<24, M>(fl_mantissa);
-            flc_mantissa <<= shift_mantissa;
+            flc_mantissa = ( flc_mantissa << shift_mantissa);
         }
         uint32_t ui_mantissa = (static_cast<uint32_t>(flc_mantissa.word(0)) & 0x7fffff) | 0x3f800000;
         float* mantissa = reinterpret_cast<float*>(&ui_mantissa);

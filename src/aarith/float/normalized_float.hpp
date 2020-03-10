@@ -308,7 +308,7 @@ auto normalize(const normalized_float<E, M1>& nf) -> normalized_float<E, M2>
     else
     {
         auto shift_by = M2 - one_at - 1;
-        mantissa <<= shift_by;
+        mantissa = (mantissa << shift_by);
         exponent = sub(exponent, uinteger<E>(shift_by));
     }
 

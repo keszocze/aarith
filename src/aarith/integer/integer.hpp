@@ -63,21 +63,6 @@ public:
     {
     }
 
-    auto operator<<=(const size_t shift_by) -> integer&
-    {
-        return *this = *this << shift_by;
-    }
-
-    auto operator>>=(const size_t shift_by) -> integer&
-    {
-        return *this = *this >> shift_by;
-    }
-
-    auto operator+=(const integer<Width> addend) -> integer&
-    {
-        return *this = *this + addend;
-    }
-
     [[nodiscard]] static constexpr integer min()
     {
         integer min;

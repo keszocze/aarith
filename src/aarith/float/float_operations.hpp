@@ -133,7 +133,7 @@ template<size_t E, size_t M>
 {
     auto dividend = width_cast<2*M+3>(lhs.get_mantissa());
     auto divisor = width_cast<2*M+3>(rhs.get_mantissa());
-    dividend <<= M+3;
+    dividend = (dividend << M+3);
     auto mquotient = div(dividend, divisor);
     //mquotient >>= 1;
     auto rdmquotient = rshift_and_round(mquotient, 4);

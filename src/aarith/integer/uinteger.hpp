@@ -74,20 +74,6 @@ public:
         return n;
     }
 
-    auto operator<<=(const size_t shift_by) -> uinteger&
-    {
-        return *this = *this << shift_by;
-    }
-
-    auto operator>>=(const size_t shift_by) -> uinteger&
-    {
-        return *this = *this >> shift_by;
-    }
-
-    auto operator+=(const uinteger<Width> addend) -> uinteger&
-    {
-        return *this = *this + addend;
-    }
 };
 
 template <size_t DestinationWidth, size_t SourceWidth>

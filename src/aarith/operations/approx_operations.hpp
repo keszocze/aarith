@@ -159,7 +159,7 @@ auto approx_uint_bitmasking_mul(const uinteger<width>& opd1, const uinteger<widt
     {
         auto const opd2_masked = opd2_extended & mask;
         product = ((opd1.bit(i) == 0) ? product : add(product, opd2_masked));
-        opd2_extended <<= 1;
+        opd2_extended = (opd2_extended <<1);
     }
 
     return product;

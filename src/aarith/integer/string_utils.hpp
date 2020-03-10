@@ -88,12 +88,12 @@ auto to_bcd(const uinteger<Width>& num) -> uinteger<number_of_decimal_digits(Wid
                 bcd = bcd + three;
             }
 
-            three <<= 4;
-            four <<= 4;
-            mask <<= 4;
+            three = (three << 4);
+            four = (four << 4);
+            mask = (mask << 4);
         }
 
-        bcd <<= 1;
+        bcd = (bcd << 1);
         const auto new_word = bcd.word(0) | (num.bit(i - 1));
         bcd.set_word(0, new_word);
     }
