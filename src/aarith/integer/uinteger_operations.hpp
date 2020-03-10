@@ -9,33 +9,34 @@
 
 namespace aarith {
 
-
-
 /**
  * @brief Adds two unsigned integers of, possibly, different bit widths.
  *
- * @tparam W Width of the first summand
- * @tparam V Width of the second summand
+ * @tparam I Integer type of the first summand
+ * @tparam T Integer type of the second summand
  * @param a First summand
  * @param b Second summand
  * @param initial_carry True if there is an initial carry coming in
- * @return Sum of correct maximal bit width
+ * @return Sum of a and b with bit width max(I::width,T::width)+1
  */
-template <size_t W, size_t V>
-[[nodiscard]] uinteger<std::max(W, V) + 1> expanding_add(const uinteger<W>& a, const uinteger<V>& b,
-                                                         const bool initial_carry = false)
+template <typename I, typename T>
+[[nodiscard]] auto expanding_add(const I& a, const T& b, const bool initial_carry = false)
 {
-    static_assert(is_integral_v<uinteger<W>>);
-    static_assert(is_integral_v<uinteger<V>>);
 
+    static_assert(is_integral_v<I>);
+    static_assert(is_integral_v<T>);
 
-    constexpr size_t res_width = std::max(W, V) + 1U;
-    using word_type = typename uinteger<res_width>::word_type;
+    // TODO do we need this assertion?
+    static_assert(aarith::is_unsigned_v<I> == aarith::is_unsigned_v<T>);
 
-    uinteger<res_width> sum;
+    constexpr size_t res_width = std::max(I::width(), T::width()) + 1U;
 
-    uinteger<res_width> a_ = width_cast<res_width>(a);
-    uinteger<res_width> b_ = width_cast<res_width>(b);
+    auto a_ = width_cast<res_width>(a);
+    auto b_ = width_cast<res_width>(b);
+
+    using word_type = typename decltype(a_)::word_type; // weird but works O_0
+
+    decltype(a_) sum{0U};
 
     word_type carry = initial_carry ? 1U : 0U;
 
@@ -55,10 +56,26 @@ template <size_t W, size_t V>
 }
 
 /**
- * @brief Subtracts two unsigned integers of, possibly, different bit widths.
+ * @brief Computes the difference of two integers.
+ *
+ * @tparam I The integer type used in the subtraction
+ * @param a Minuend
+ * @param b Subtrahend
+ * @return Difference between a and b
+ */
+template <typename I>[[nodiscard]] auto sub(const I& a, const I& b) -> I
+{
+    static_assert(is_integral_v<I>);
+
+    auto result = expanding_add(a, ~b, true);
+    return width_cast<I::width()>(result);
+}
+
+/**
+ * @brief Subtracts two integers of, possibly, different bit widths.
  *
  * Expanding does not, in contrast to @see expanding_add, ensure that no underflow will happen. It
- * simply makes sure that the resulting bit width is the larger of the both input bit widths.
+ * simply makes sure that the resulting bit width is the larger of both input bit widths.
  *
  * @tparam W Width of the minuend
  * @tparam V Width of the subtrahend
@@ -66,11 +83,14 @@ template <size_t W, size_t V>
  * @param b Subtrahend
  * @return Difference of correct bit width
  */
-template <size_t W, size_t V>
-[[nodiscard]] uinteger<std::max(W, V)> expanding_sub(const uinteger<W>& a, const uinteger<V>& b)
+template <typename I, typename T>[[nodiscard]] auto expanding_sub(const I& a, const T& b)
 {
-    constexpr size_t res_width = std::max(W, V);
-    uinteger<res_width> result{sub(width_cast<res_width>(a), width_cast<res_width>(b))};
+
+    // TODO do we need this assertion?
+    static_assert(aarith::is_unsigned_v<I> == aarith::is_unsigned_v<T>);
+
+    constexpr size_t res_width = std::max(I::width(), T::width());
+    const auto result{sub(width_cast<res_width>(a), width_cast<res_width>(b))};
 
     return result;
 }
@@ -86,24 +106,8 @@ template <size_t W, size_t V>
 template <typename I>[[nodiscard]] I add(const I& a, const I& b)
 {
     constexpr size_t W = I::width();
-    const auto result = expanding_add<W, W>(a, b);
+    const auto result = expanding_add<I, I>(a, b);
     return width_cast<W>(result);
-}
-
-/**
- * @brief Computes the difference of two integers.
- *
- * @tparam I The integer type used in the subtraction
- * @param a Minuend
- * @param b Subtrahend
- * @return Difference between a and b
- */
-template <typename I>[[nodiscard]] auto sub(const I& a, const I& b) -> I
-{
-    static_assert(is_integral_v<I>);
-
-    auto result = expanding_add(a, ~b, true);
-    return width_cast<I::width()>(result);
 }
 
 /**
@@ -239,7 +243,6 @@ template <std::size_t W, std::size_t V>
     return std::make_pair(Q, remainder);
 }
 
-
 /**
  * @brief Computes the remainder of the division of one integer by another integer
  *
@@ -250,12 +253,10 @@ template <std::size_t W, std::size_t V>
  * @param denominator The number that divides the other number
  * @return The remainder of the division operation
  */
-template <typename I>
-[[nodiscard]] auto remainder(const I& numerator, const I& denominator) -> I
+template <typename I>[[nodiscard]] auto remainder(const I& numerator, const I& denominator) -> I
 {
     return restoring_division(numerator, denominator).second;
 }
-
 
 /**
  * @brief Divides one integer by another integer
@@ -268,8 +269,7 @@ template <typename I>
  * @param denominator The number that divides the other number
  * @return The quotient of the division operation
  */
-template <typename I>
-[[nodiscard]] auto div(const I& numerator, const I& denominator) -> I
+template <typename I>[[nodiscard]] auto div(const I& numerator, const I& denominator) -> I
 {
     return restoring_division(numerator, denominator).first;
 }
