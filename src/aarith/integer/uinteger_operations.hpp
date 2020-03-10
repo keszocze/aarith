@@ -76,34 +76,34 @@ template <size_t W, size_t V>
 }
 
 /**
- * @brief Adds two unsigned integers
+ * @brief Adds two integers
  *
- * @tparam UInteger The unsigned integer instance used for the addition
+ * @tparam I The integer type used for the addition
  * @param a First summand
  * @param b Second summand
  * @return Sum of a and b
  */
-template <size_t W>[[nodiscard]] uinteger<W> add(const uinteger<W>& a, const uinteger<W>& b)
+template <typename I>[[nodiscard]] I add(const I& a, const I& b)
 {
-    uinteger<W + 1> result = expanding_add<W, W>(a, b);
+    constexpr size_t W = I::width();
+    const auto result = expanding_add<W, W>(a, b);
     return width_cast<W>(result);
 }
 
 /**
- * @brief Computes the difference of two unsigned integers.
+ * @brief Computes the difference of two integers.
  *
- * @tparam W the bit width of the operands
+ * @tparam I The integer type used in the subtraction
  * @param a Minuend
  * @param b Subtrahend
  * @return Difference between a and b
  */
-template <size_t W>[[nodiscard]] auto sub(const uinteger<W>& a, const uinteger<W>& b) -> uinteger<W>
+template <typename I>[[nodiscard]] auto sub(const I& a, const I& b) -> I
 {
-    static_assert(is_integral_v<uinteger<W>>);
-    static_assert(is_unsigned_v<uinteger<W>>);
+    static_assert(is_integral_v<I>);
 
     auto result = expanding_add(a, ~b, true);
-    return width_cast<W>(result);
+    return width_cast<I::width()>(result);
 }
 
 /**

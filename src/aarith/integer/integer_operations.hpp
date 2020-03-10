@@ -129,23 +129,23 @@ template <size_t W>[[nodiscard]] integer<W> add(const integer<W>& a, const integ
     return width_cast<W>(result);
 }
 
-/**
- * @brief Computes the difference of two signed integers.
- *
- * @tparam W the bit width of the operands
- * @param a Minuend
- * @param b Subtrahend
- * @return Difference between a and b
- */
-template <size_t W>[[nodiscard]] auto sub(const integer<W>& a, const integer<W>& b) -> integer<W>
-{
-    static_assert(is_integral_v<integer<W>>);
-
-    integer<W> result;
-    integer<W> minus_b = add(~b, integer<W>(1U));
-    result = add(a, minus_b);
-    return result;
-}
+///**
+// * @brief Computes the difference of two signed integers.
+// *
+// * @tparam W the bit width of the operands
+// * @param a Minuend
+// * @param b Subtrahend
+// * @return Difference between a and b
+// */
+//template <size_t W>[[nodiscard]] auto sub(const integer<W>& a, const integer<W>& b) -> integer<W>
+//{
+//    static_assert(is_integral_v<integer<W>>);
+//
+//    integer<W> result;
+//    integer<W> minus_b = add(~b, integer<W>(1U));
+//    result = add(a, minus_b,true);
+//    return result;
+//}
 
 /**
  * @brief Subtracts two signed integers of, possibly, different bit widths.
