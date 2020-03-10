@@ -77,7 +77,7 @@ template <typename W>[[nodiscard]] auto operator<<(const W& lhs, const size_t rh
 {
     static_assert(is_word_array_v<W>);
 
-    constexpr size_t width = lhs.width();
+    constexpr size_t width = W::width();
 
     if (rhs >= width)
     {
@@ -133,7 +133,7 @@ template <typename W> auto operator>>(const W& lhs, const size_t rhs) -> W
         static_assert(is_unsigned_v<W>);
     }
 
-    constexpr size_t width = lhs.width();
+    constexpr size_t width = W::width();
 
     if (rhs >= width)
     {
