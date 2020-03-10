@@ -1,7 +1,7 @@
 #pragma once
 
-#include <aarith/integer/integer.hpp>
 #include <aarith/core/traits.hpp>
+#include <aarith/integer/integer.hpp>
 #include <cstdint>
 
 #include <bitset>
@@ -171,26 +171,6 @@ template <size_t W, size_t V> bool operator<(const integer<W>& a, const integer<
     }
 
     return false;
-}
-
-template <size_t W, size_t V> bool operator!=(const integer<W>& a, const integer<V>& b)
-{
-    return !(a == b);
-}
-
-template <size_t W, size_t V> bool operator<=(const integer<W>& a, const integer<V>& b)
-{
-    return (a < b) || (a == b);
-}
-
-template <size_t W, size_t V> bool operator>=(const integer<W>& a, const integer<V>& b)
-{
-    return b <= a;
-}
-
-template <size_t W, size_t V> bool operator>(const integer<W>& a, const integer<V>& b)
-{
-    return b < a;
 }
 
 } // namespace aarith
