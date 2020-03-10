@@ -68,7 +68,7 @@ template <size_t Width> auto to_octal(const integer<Width>& value) -> std::strin
 template <size_t Width>
 auto to_bcd(const uinteger<Width>& num) -> uinteger<number_of_decimal_digits(Width) * 4>
 {
-    using namespace aarith::exact_operators;
+    using namespace aarith::arithmetic_operators;
 
     constexpr auto bcd_digits = number_of_decimal_digits(Width);
     constexpr auto bcd_width = bcd_digits * 4;

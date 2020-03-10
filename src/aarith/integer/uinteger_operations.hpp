@@ -276,36 +276,31 @@ template <typename I>[[nodiscard]] auto div(const I& numerator, const I& denomin
 
 } // namespace aarith
 
-namespace aarith::exact_operators {
+namespace aarith::arithmetic_operators {
 
-template <size_t Width>
-auto operator+(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
+template <typename I> auto operator+(const I& lhs, const I& rhs) -> I
 {
     return add(lhs, rhs);
 }
 
-template <size_t Width>
-auto operator-(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
+template <typename I> auto operator-(const I& lhs, const I& rhs) -> I
 {
     return sub(lhs, rhs);
 }
 
-template <size_t Width>
-auto operator*(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
+template <typename I> auto operator*(const I& lhs, const I& rhs) -> I
 {
     return mul(lhs, rhs);
 }
 
-template <size_t Width>
-auto operator/(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
+template <typename I> auto operator/(const I& lhs, const I& rhs) -> I
 {
     return div(lhs, rhs);
 }
 
-template <size_t Width>
-auto operator%(const uinteger<Width>& lhs, const uinteger<Width>& rhs) -> uinteger<Width>
+template <typename I> auto operator%(const I& lhs, const I& rhs) -> I
 {
     return remainder(lhs, rhs);
 }
 
-} // namespace aarith::exact_operators
+} // namespace aarith::arithmetic_operators

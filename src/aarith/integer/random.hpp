@@ -40,7 +40,7 @@ public:
         }
         // Modulo is slightly biased towards smaller numbers. Possible fix: e.g. use "Java's
         // algorithm.
-        using namespace exact_operators;
+        using namespace arithmetic_operators;
         return the_params.a + (uint % length);
     }
 
@@ -61,7 +61,7 @@ public:
             throw std::logic_error{"uniform_uinteger_distribution: a must be <= b"};
         }
         the_params = params;
-        using namespace exact_operators;
+        using namespace arithmetic_operators;
         length = the_params.b - the_params.a;
     }
 
