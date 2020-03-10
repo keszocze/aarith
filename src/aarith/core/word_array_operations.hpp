@@ -73,8 +73,7 @@ template <size_t Width> auto count_leading_zeroes(const word_array<Width>& value
  * @param rhs The number of bits to shift
  * @return The shifted word_container
  */
-template <typename  W>
-[[nodiscard]] auto operator<<(const W& lhs, const size_t rhs) -> W
+template <typename W>[[nodiscard]] auto operator<<(const W& lhs, const size_t rhs) -> W
 {
     static_assert(is_word_array_v<W>);
 
@@ -113,26 +112,42 @@ template <typename  W>
     return shifted;
 }
 
-template <size_t Width>
-auto operator>>(const word_array<Width>& lhs, const size_t rhs) -> word_array<Width>
+/**
+ * @brief Right-shift operator
+ * @tparam Width The width of the word_array
+ * @param lhs The word_array that is to be shifted
+ * @param rhs The number of bits to shift
+ * @return The shifted word_array
+ */
+template <typename W> auto operator>>(const W& lhs, const size_t rhs) -> W
 {
-    if (rhs >= Width)
+
+    static_assert(is_word_array_v<W>);
+
+    if constexpr (is_integral_v<W>)
     {
-        return word_array<Width>(0U);
+        static_assert(is_unsigned_v<W>);
+    }
+
+    constexpr size_t width = lhs.width();
+
+    if (rhs >= width)
+    {
+        return W{0U};
     }
     if (rhs == 0)
     {
         return lhs;
     }
 
-    word_array<Width> shifted;
+    W shifted;
     const auto skip_words = rhs / lhs.word_width();
     const auto shift_word_right = rhs - skip_words * lhs.word_width();
     const auto shift_word_left = lhs.word_width() - shift_word_right;
 
     for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
     {
-        typename word_array<Width>::word_type new_word;
+        typename W::word_type new_word;
         new_word = lhs.word(counter) >> shift_word_right;
         if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
         {
@@ -140,7 +155,7 @@ auto operator>>(const word_array<Width>& lhs, const size_t rhs) -> word_array<Wi
         }
         shifted.set_word(counter - skip_words, new_word);
     }
-    typename word_array<Width>::word_type new_word;
+    typename W::word_type new_word;
     new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
     shifted.set_word(lhs.word_count() - skip_words - 1, new_word);
 
