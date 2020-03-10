@@ -87,7 +87,7 @@ template <class UInteger>
     return approx_operation_post_masking(a, b, &aarith::remainder<UInteger>, bits);
 }
 
-template <class UInteger, class Function>
+template <typename UInteger, typename Function>
 [[nodiscard]] UInteger approx_operation_pre_masking(const UInteger& a, const UInteger b,
                                                     Function fun,
                                                     const size_t bits = UInteger::width())
@@ -103,7 +103,11 @@ template <class UInteger>
 [[nodiscard]] UInteger approx_add_pre_masking(const UInteger& a, const UInteger b,
                                               const size_t bits = UInteger::width())
 {
-    return approx_operation_pre_masking(a, b, &aarith::add<UInteger::width()>, bits);
+
+    const auto fun = [](const UInteger& a_, const UInteger& b_) {
+        return add(a_,b_);
+    };
+    return approx_operation_pre_masking(a, b, fun, bits);
 }
 
 template <class UInteger>
