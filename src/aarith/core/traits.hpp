@@ -1,6 +1,7 @@
 #pragma once
 
 #include <limits>
+#include <type_traits>
 
 namespace aarith {
 
@@ -35,5 +36,11 @@ public:
 };
 
 template <class Type> inline constexpr bool is_float_v = is_float<Type>::value;
+
+template <typename A, typename B>
+inline constexpr bool same_word_type = std::is_same_v<typename  A::word_type, typename B::word_type>;
+
+template <typename A, typename B>
+inline constexpr bool same_sign = (is_unsigned_v<A> == is_unsigned_v<B>);
 
 } // namespace aarith

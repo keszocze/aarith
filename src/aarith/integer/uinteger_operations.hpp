@@ -27,7 +27,7 @@ template <typename I, typename T>
     static_assert(is_integral_v<T>);
 
     // TODO do we need this assertion?
-    static_assert(aarith::is_unsigned_v<I> == aarith::is_unsigned_v<T>);
+    static_assert(aarith::same_sign<I,T>);
 
     constexpr size_t res_width = std::max(I::width(), T::width()) + 1U;
 
@@ -87,7 +87,8 @@ template <typename I, typename T>[[nodiscard]] auto expanding_sub(const I& a, co
 {
 
     // TODO do we need this assertion?
-    static_assert(aarith::is_unsigned_v<I> == aarith::is_unsigned_v<T>);
+    static_assert(aarith::same_sign<I,T>);
+    static_assert(aarith::same_word_type<I,T>);
 
     constexpr size_t res_width = std::max(I::width(), T::width());
     const auto result{sub(width_cast<res_width>(a), width_cast<res_width>(b))};
@@ -295,8 +296,8 @@ template <class IntA, class IntB>
     static_assert(is_integral_v<IntB>);
 
     // TODO do we need this assertion?
-    static_assert(is_unsigned_v<IntA> == is_unsigned_v<IntB>);
-    static_assert(std::is_same_v<typename IntA::word_type, typename IntB::word_type>);
+    static_assert(same_sign<IntA, IntB>);
+    static_assert(same_word_type<IntA, IntB>);
 
     constexpr size_t res_width = std::max(IntA::width(), IntB::width()) + 1U;
     using word_type = typename IntA::word_type;
@@ -338,6 +339,10 @@ template <typename I>
 
 } // namespace aarith
 
+/**
+ * Convenience namespace to include when code should be written the "normal" way. There is one caveat though:
+ * No automatic type conversion will take place!
+ */
 namespace aarith::arithmetic_operators {
 
 template <typename I> auto operator+(const I& lhs, const I& rhs) -> I
