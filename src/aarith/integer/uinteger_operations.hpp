@@ -274,6 +274,68 @@ template <typename I>[[nodiscard]] auto div(const I& numerator, const I& denomin
     return restoring_division(numerator, denominator).first;
 }
 
+/**
+ * @brief Adds two signed integers of, possibly, different bit widths.
+ *
+ * This is an implementation using a more functional style of programming. It is not particularly
+ * fast and only here for educational purposes. You can use method as a means to understand how to
+ * work on an integer.
+ *
+ * @tparam IntA The integer type of the first summand
+ * @tparam IntB The integer type of the second summand
+ * @param a First summand
+ * @param b Second summand
+ * @param initial_carry True if there is an initial carry coming in
+ * @return Sum of correct maximal bit width
+ */
+template <class IntA, class IntB>
+[[nodiscard]] auto fun_add_expand(const IntA& a, const IntB& b, const bool initial_carry = false)
+{
+    static_assert(is_integral_v<IntA>);
+    static_assert(is_integral_v<IntB>);
+
+    // TODO do we need this assertion?
+    static_assert(is_unsigned_v<IntA> == is_unsigned_v<IntB>);
+    static_assert(std::is_same_v<typename IntA::word_type, typename IntB::word_type>);
+
+    constexpr size_t res_width = std::max(IntA::width(), IntB::width()) + 1U;
+    using word_type = typename IntA::word_type;
+    word_type carry = initial_carry ? 1U : 0U;
+
+    const auto a_expanded = width_cast<res_width>(a);
+    const auto b_expanded = width_cast<res_width>(b);
+
+    const auto f = [carry = word_type(carry)](word_type ain, word_type bin) mutable {
+        word_type partial_sum = ain + bin;
+        word_type new_carry = (partial_sum < ain || partial_sum < bin) ? 1U : 0U;
+
+        partial_sum = partial_sum + carry;
+        carry = new_carry || (partial_sum < ain || partial_sum < bin) ? 1U : 0U;
+
+        return partial_sum;
+    };
+
+    const auto result = width_cast<res_width>(zip_with(a_expanded, b_expanded, f));
+    return result;
+}
+
+/**
+ * @brief Adds two integers of, possibly, different bit widths.
+ *
+ * @see fun_add_expand
+ *
+ * @tparam I Integer type used in the addition
+ * @param a First summand
+ * @param b Second summand
+ * @param initial_carry True if there is an initial carry coming in
+ * @return Sum of a and b
+ */
+template <typename I>
+[[nodiscard]] auto fun_add(const I& a, const I& b, const bool initial_carry = false) -> I
+{
+    return width_cast<I::width()>(fun_add_expand(a, b, initial_carry));
+}
+
 } // namespace aarith
 
 namespace aarith::arithmetic_operators {
