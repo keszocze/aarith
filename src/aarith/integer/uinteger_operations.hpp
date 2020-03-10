@@ -40,10 +40,10 @@ template <size_t W, size_t V>
 [[nodiscard]] uinteger<std::max(W, V) + 1> expanding_add(const uinteger<W>& a, const uinteger<V>& b,
                                                          const bool initial_carry = false)
 {
-    static_assert(is_integral<uinteger<W>>::value);
-    static_assert(is_unsigned<uinteger<W>>::value);
-    static_assert(is_integral<uinteger<V>>::value);
-    static_assert(is_unsigned<uinteger<V>>::value);
+    static_assert(is_integral_v<uinteger<W>>);
+    static_assert(is_unsigned_v<uinteger<W>>);
+    static_assert(is_integral_v<uinteger<V>>);
+    static_assert(is_unsigned_v<uinteger<V>>);
 
     constexpr size_t res_width = std::max(W, V) + 1U;
 
@@ -114,8 +114,8 @@ template <size_t W>[[nodiscard]] uinteger<W> add(const uinteger<W>& a, const uin
  */
 template <size_t W>[[nodiscard]] auto sub(const uinteger<W>& a, const uinteger<W>& b) -> uinteger<W>
 {
-    static_assert(is_integral<uinteger<W>>::value);
-    static_assert(is_unsigned<uinteger<W>>::value);
+    static_assert(is_integral_v<uinteger<W>>);
+    static_assert(is_unsigned_v<uinteger<W>>);
 
     auto result = expanding_add(a, ~b, true);
     return width_cast<W>(result);
@@ -143,8 +143,8 @@ template <std::size_t W, std::size_t V>
     }
     else
     {
-        static_assert(is_integral<uinteger<res_width>>::value);
-        static_assert(is_unsigned<uinteger<res_width>>::value);
+        static_assert(is_integral_v<uinteger<res_width>>);
+        static_assert(is_unsigned_v<uinteger<res_width>>);
 
         const auto leading_zeroes = V - count_leading_zeroes(b);
         uinteger<res_width> a_ = width_cast<res_width>(a);

@@ -6,7 +6,7 @@ namespace aarith {
 
 template <typename W>[[nodiscard]] auto operator&(const W& lhs, const W& rhs) -> W
 {
-    static_assert(is_word_array<W>::value);
+    static_assert(is_word_array_v<W>);
     W bitwise_and;
     for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
@@ -17,7 +17,7 @@ template <typename W>[[nodiscard]] auto operator&(const W& lhs, const W& rhs) ->
 
 template <typename W> auto operator|(const W& lhs, const W& rhs) -> W
 {
-    static_assert(is_word_array<W>::value);
+    static_assert(is_word_array_v<W>);
     W bitwise_or;
     for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
@@ -28,7 +28,7 @@ template <typename W> auto operator|(const W& lhs, const W& rhs) -> W
 
 template <typename W> auto operator^(const W& lhs, const W& rhs) -> W
 {
-    static_assert(is_word_array<W>::value);
+    static_assert(is_word_array_v<W>);
     W bitwise_xor;
     for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
@@ -39,7 +39,7 @@ template <typename W> auto operator^(const W& lhs, const W& rhs) -> W
 
 template <typename W>[[nodiscard]] auto operator~(const W& rhs) -> W
 {
-    static_assert(is_word_array<W>::value);
+    static_assert(is_word_array_v<W>);
     W bitwise_not;
     for (auto counter = 0U; counter < rhs.word_count(); ++counter)
     {

@@ -84,8 +84,8 @@ template <size_t W, size_t V>
 [[nodiscard]] integer<std::max(W, V) + 1> expanding_add(const integer<W>& a, const integer<V>& b,
                                                         const bool initial_carry = false)
 {
-    static_assert(is_integral<integer<W>>::value);
-    static_assert(is_integral<integer<V>>::value);
+    static_assert(is_integral_v<integer<W>>);
+    static_assert(is_integral_v<integer<V>>);
 
     constexpr size_t res_width = std::max(W, V) + 1U;
 
@@ -133,7 +133,7 @@ template <size_t W>[[nodiscard]] integer<W> add(const integer<W>& a, const integ
  */
 template <size_t W>[[nodiscard]] auto sub(const integer<W>& a, const integer<W>& b) -> integer<W>
 {
-    static_assert(is_integral<integer<W>>::value);
+    static_assert(is_integral_v<integer<W>>);
 
     integer<W> result;
     integer<W> minus_b = add(~b, integer<W>(1U));
@@ -392,10 +392,10 @@ template <class IntA, class IntB>
     -> decltype(width_cast<std::max(IntA::width(), IntB::width()) + 1U>(a))
 // IntC
 {
-    static_assert(is_integral<IntA>::value);
-    static_assert(is_integral<IntB>::value);
-    static_assert(is_unsigned<IntA>::value == is_unsigned<IntB>::value);
-    static_assert(std::is_same<typename IntA::word_type, typename IntB::word_type>::value);
+    static_assert(is_integral_v<IntA>);
+    static_assert(is_integral_v<IntB>);
+    static_assert(is_unsigned_v<IntA> == is_unsigned_v<IntB>);
+    static_assert(std::is_same_v<typename IntA::word_type, typename IntB::word_type>);
 
     constexpr size_t res_width = std::max(IntA::width(), IntB::width()) + 1U;
     using word_type = typename IntA::word_type;
