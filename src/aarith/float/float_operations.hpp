@@ -153,7 +153,7 @@ template<size_t E, size_t M>
 
 #include "aarith/integer/uinteger.hpp"
 
-namespace aarith::exact_operators {
+namespace aarith::arithmetic_operators {
 
 template<size_t E, size_t M>
 auto operator+(const normalized_float<E, M>& lhs, const normalized_float<E, M>& rhs) -> normalized_float<E, M>
@@ -185,4 +185,4 @@ auto operator%(const normalized_float<E, M>& lhs, const normalized_float<E, M>& 
     return remainder(lhs, rhs);
 }
 
-} // namespace aarith::exact_operators
+} // namespace aarith::arithmetic_operators
