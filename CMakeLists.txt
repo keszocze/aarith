@@ -18,4 +18,7 @@ add_custom_target(clangformat
         COMMAND clang-format
         -style=file
         -i
-        ${ALL_SOURCE_FILES})
+        ${ALL_SOURCE_FILES} EXCLUDE_FROM_ALL)
+
+
+
