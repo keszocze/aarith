@@ -60,17 +60,8 @@ SCENARIO("Generate a bitmask for a certain number of bits", "[uinteger][utlitiy]
     }
 }
 
-//SCENARIO("Dummy scenario enforcing compilation of newly created methods")
-//{
-//    const uinteger<32> a{0U};
-//    const uinteger<32> b{1U};
-//
-//    std::cout << approx_add_post_masking(a, b, 10) << approx_sub_post_masking(a, b, 10)
-//              << approx_mul_post_masking(a, b, 10) << approx_div_post_masking(a, b, 10)
-//              << approx_rem_post_masking(a, b, 10) << "\n";
-//}
-
-SCENARIO("Approximate sum of unsigned integers with anytime bitmasking", "[uinteger][arithmetic]")
+SCENARIO("Approximate sum of unsigned integers with anytime bitmasking",
+         "[uinteger][arithmetic][anytime]")
 {
     GIVEN("Two uintegers with width < word_width")
     {
@@ -83,11 +74,16 @@ SCENARIO("Approximate sum of unsigned integers with anytime bitmasking", "[uinte
             static constexpr uint16_t number_b = 32767U;
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
-            auto const result = approx_add_pre_masking(a, b, 1U);
+            auto const result_pre = approx_add_pre_masking(a, b, 1U);
+            auto const result_post = approx_add_post_masking(a, b, 1U);
 
             THEN("It should be number_a")
             {
-                REQUIRE(result.word(0) == number_a);
+                REQUIRE(result_pre.word(0) == number_a);
+            }
+            AND_THEN("Pre and post masking should be identical")
+            {
+                REQUIRE(result_pre == result_post);
             }
         }
         WHEN("Eight bits are calculated")
@@ -96,12 +92,17 @@ SCENARIO("Approximate sum of unsigned integers with anytime bitmasking", "[uinte
             static constexpr uint16_t number_b = 32767U;
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
-            auto const result = approx_add_pre_masking(a, b, 8U);
+            auto const result_pre = approx_add_pre_masking(a, b, 8U);
+            auto const result_post = approx_add_post_masking(a, b, 8U);
             auto const result_8bits = 65280U;
 
             THEN("It should be number_a")
             {
-                REQUIRE(result.word(0) == result_8bits);
+                REQUIRE(result_pre.word(0) == result_8bits);
+            }
+            AND_THEN("Pre and post masking should be identical")
+            {
+                REQUIRE(result_pre == result_post);
             }
         }
         WHEN("All bits are calculated")
@@ -110,79 +111,179 @@ SCENARIO("Approximate sum of unsigned integers with anytime bitmasking", "[uinte
             static constexpr uint16_t number_b = 32767U;
             const uinteger<TestWidth> a{number_a};
             const uinteger<TestWidth> b{number_b};
-            auto const result = approx_add_pre_masking(a, b, 16U);
+            auto const result_pre = approx_add_pre_masking(a, b, 16U);
+            auto const result_post = approx_add_post_masking(a, b, 16U);
             auto const result_16bits = 65535U;
 
             THEN("It should be number_a")
             {
-                REQUIRE(result.word(0) == result_16bits);
+                REQUIRE(result_pre.word(0) == result_16bits);
+            }
+            AND_THEN("Pre and post masking should be identical")
+            {
+                REQUIRE(result_pre == result_post);
             }
         }
     }
 }
 
-SCENARIO("Approximate product of unsigned integers with anytime bitmasking",
-         "[uinteger][arithmetic]")
+SCENARIO("Approximate difference of unsigned integers with anytime bitmasking",
+         "[uinteger][arithmetic][anytime]")
 {
     GIVEN("Two uintegers with width < word_width")
     {
-        static constexpr size_t TestWidth = 8;
+        static constexpr size_t TestWidth = 16;
         static_assert(uinteger<TestWidth>::word_count() == 1);
-        static constexpr uint8_t number_a = 170U;
-        static constexpr uint8_t number_b = 255U;
-        const uinteger<TestWidth> a{number_a};
-        const uinteger<TestWidth> b{number_b};
 
         WHEN("One bit is calculated")
         {
-            auto const result = approx_uint_bitmasking_mul(a, b, 1U);
+            static constexpr uint16_t number_a = 32768U;
+            static constexpr uint16_t number_b = 32767U;
+            const uinteger<TestWidth> a{number_a};
+            const uinteger<TestWidth> b{number_b};
+            auto const result_pre = approx_sub_pre_masking(a, b, 1U);
+            auto const result_post = approx_sub_post_masking(a, b, 1U);
 
-            REQUIRE(result.word(0) == 0);
-        }
-        WHEN("Two bits are calculated")
-        {
-            auto const result = approx_uint_bitmasking_mul(a, b, 2U);
-            auto const result_2bits = 16384U;
-
-            REQUIRE(result.word(0) == result_2bits);
-        }
-        WHEN("Two bits are calculated and a and b are switched")
-        {
-            auto const result = approx_uint_bitmasking_mul(b, a, 2U);
-            auto const result_2bits = 16384U;
-
-            REQUIRE(result.word(0) == result_2bits);
+            THEN("It should be one")
+            {
+                REQUIRE(result_pre.word(0) == number_a);
+            }
+            AND_THEN("Pre and post masking should be identical")
+            {
+                REQUIRE(result_pre == result_post);
+            }
         }
         WHEN("Eight bits are calculated")
         {
-            auto const result = approx_uint_bitmasking_mul(a, b, 8U);
-            auto const result_8bits = 42496U;
+            static constexpr uint16_t number_a = 32768U;
+            static constexpr uint16_t number_b = 32767U;
+            const uinteger<TestWidth> a{number_a};
+            const uinteger<TestWidth> b{number_b};
+            auto const result_pre = approx_add_pre_masking(a, b, 8U);
+            auto const result_post = approx_add_post_masking(a, b, 8U);
+            auto const result_8bits = 65280U;
 
-            REQUIRE(result.word(0) == result_8bits);
-        }
-        WHEN("Eight bits are calculated and a and b are switched")
-        {
-            auto const result = approx_uint_bitmasking_mul(b, a, 8U);
-            auto const result_8bits = 42496U;
-
-            REQUIRE(result.word(0) == result_8bits);
+            THEN("It should be number_a")
+            {
+                REQUIRE(result_pre.word(0) == result_8bits);
+            }
+            AND_THEN("Pre and post masking should be identical")
+            {
+                REQUIRE(result_pre == result_post);
+            }
         }
         WHEN("All bits are calculated")
         {
-            auto const result = approx_uint_bitmasking_mul(a, b, 16U);
-            auto const result_16bits = 43350U;
+            static constexpr uint16_t number_a = 32768U;
+            static constexpr uint16_t number_b = 32767U;
+            const uinteger<TestWidth> a{number_a};
+            const uinteger<TestWidth> b{number_b};
+            auto const result_pre = approx_add_pre_masking(a, b, 16U);
+            auto const result_post = approx_add_post_masking(a, b, 16U);
+            auto const result_16bits = 65535U;
 
-            REQUIRE(result.word(0) == result_16bits);
-        }
-        WHEN("All bits are calculated and a and b are switched")
-        {
-            auto const result = approx_uint_bitmasking_mul(b, a, 16U);
-            auto const result_16bits = 43350U;
-
-            REQUIRE(result.word(0) == result_16bits);
+            THEN("It should be number_a")
+            {
+                REQUIRE(result_pre.word(0) == result_16bits);
+            }
+            AND_THEN("Pre and post masking should be identical")
+            {
+                REQUIRE(result_pre == result_post);
+            }
         }
     }
 }
+
+//SCENARIO("Approximate product of unsigned integers with anytime bitmasking",
+//         "[uinteger][arithmetic][anytime]")
+//{
+//    GIVEN("Two uintegers with width < word_width")
+//    {
+//        static constexpr size_t TestWidth = 8;
+//        static_assert(uinteger<TestWidth>::word_count() == 1);
+//        static constexpr uint8_t number_a = 170U;
+//        static constexpr uint8_t number_b = 255U;
+//        const uinteger<TestWidth> a{number_a};
+//        const uinteger<TestWidth> b{number_b};
+//
+//        WHEN("One bit is calculated")
+//        {
+//            auto const result = approx_uint_bitmasking_mul(a, b, 1U);
+//            auto const result_pre = approx_mul_pre_masking(a, b, 1U);
+//            auto const result_post = approx_mul_post_masking(a, b, 1U);
+//
+//            CHECK(result == result_pre);
+//            CHECK(result == result_post);
+//            REQUIRE(result.word(0) == 0);
+//        }
+//        WHEN("Two bits are calculated")
+//        {
+//            auto const result = approx_uint_bitmasking_mul(a, b, 2U);
+//            auto const result_2bits = 16384U;
+//            auto const result_pre = approx_mul_pre_masking(a, b, 1U);
+//            auto const result_post = approx_mul_post_masking(a, b, 1U);
+//
+//            CHECK(result == result_pre);
+//            CHECK(result == result_post);
+//            REQUIRE(result.word(0) == result_2bits);
+//        }
+//        WHEN("Two bits are calculated and a and b are switched")
+//        {
+//            auto const result = approx_uint_bitmasking_mul(b, a, 2U);
+//            auto const result_2bits = 16384U;
+//            auto const result_pre = approx_mul_pre_masking(a, b, 1U);
+//            auto const result_post = approx_mul_post_masking(a, b, 1U);
+//
+//            CHECK(result == result_pre);
+//            CHECK(result == result_post);
+//            REQUIRE(result.word(0) == result_2bits);
+//        }
+//        WHEN("Eight bits are calculated")
+//        {
+//            auto const result = approx_uint_bitmasking_mul(a, b, 8U);
+//            auto const result_8bits = 42496U;
+//            auto const result_pre = approx_mul_pre_masking(a, b, 1U);
+//            auto const result_post = approx_mul_post_masking(a, b, 1U);
+//
+//            CHECK(result == result_pre);
+//            CHECK(result == result_post);
+//            REQUIRE(result.word(0) == result_8bits);
+//        }
+//        WHEN("Eight bits are calculated and a and b are switched")
+//        {
+//            auto const result = approx_uint_bitmasking_mul(b, a, 8U);
+//            auto const result_8bits = 42496U;
+//            auto const result_pre = approx_mul_pre_masking(a, b, 1U);
+//            auto const result_post = approx_mul_post_masking(a, b, 1U);
+//
+//            CHECK(result == result_pre);
+//            CHECK(result == result_post);
+//            REQUIRE(result.word(0) == result_8bits);
+//        }
+//        WHEN("All bits are calculated")
+//        {
+//            auto const result = approx_uint_bitmasking_mul(a, b, 16U);
+//            auto const result_16bits = 43350U;
+//            auto const result_pre = approx_mul_pre_masking(a, b, 1U);
+//            auto const result_post = approx_mul_post_masking(a, b, 1U);
+//
+//            CHECK(result == result_pre);
+//            CHECK(result == result_post);
+//            REQUIRE(result.word(0) == result_16bits);
+//        }
+//        WHEN("All bits are calculated and a and b are switched")
+//        {
+//            auto const result = approx_uint_bitmasking_mul(b, a, 16U);
+//            auto const result_16bits = 43350U;
+//            auto const result_pre = approx_mul_pre_masking(a, b, 1U);
+//            auto const result_post = approx_mul_post_masking(a, b, 1U);
+//
+//            CHECK(result == result_pre);
+//            CHECK(result == result_post);
+//            REQUIRE(result.word(0) == result_16bits);
+//        }
+//    }
+//}
 
 // for static_assert tests:
 // https://stackoverflow.com/questions/30155619/expected-build-failure-tests-in-cmake
