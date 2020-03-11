@@ -9,8 +9,8 @@
 
 namespace aarith {
 
-/// Convert the given normfloat to a string with digits to the power of 2
-    template <size_t N, size_t E, size_t M> auto to_base_2n(const normfloat<E, M> nf) -> std::string
+/// Convert the given normalized_float to a string with digits to the power of 2
+    template <size_t N, size_t E, size_t M> auto to_base_2n(const normalized_float<E, M> nf) -> std::string
     {
         std::string str;
 
@@ -19,26 +19,26 @@ namespace aarith {
         return str;
     }
 
-/// Convert the given normfloat value into a hexadecimal string representation.
-    template <size_t E, size_t M> auto to_hex(const normfloat<E, M>& value) -> std::string
+/// Convert the given normalized_float value into a hexadecimal string representation.
+    template <size_t E, size_t M> auto to_hex(const normalized_float<E, M>& value) -> std::string
     {
         return to_base_2n<4>(value);
     }
 
-/// Convert the given normfloat value into a octal string representation.
-    template <size_t E, size_t M> auto to_octal(const normfloat<E, M>& value) -> std::string
+/// Convert the given normalized_float value into a octal string representation.
+    template <size_t E, size_t M> auto to_octal(const normalized_float<E, M>& value) -> std::string
     {
         return to_base_2n<3>(value);
     }
 
-/// Convert the given normfloat value into a binary string representation.
-    template <size_t E, size_t M> auto to_binary(const normfloat<E, M>& value) -> std::string
+/// Convert the given normalized_float value into a binary string representation.
+    template <size_t E, size_t M> auto to_binary(const normalized_float<E, M>& value) -> std::string
     {
         return to_base_2n<1>(value);
     }
 
-/// Convert the given normfloat to a representation that can be posted to a calculator
-    template <size_t E, size_t M> auto to_compute_string(const normfloat<E, M> nf) -> std::string
+/// Convert the given normalized_float to a representation that can be posted to a calculator
+    template <size_t E, size_t M> auto to_compute_string(const normalized_float<E, M> nf) -> std::string
     {
         std::stringstream stream("");
         stream << "(-1)^" << nf.get_sign() << " * 2^(";
@@ -98,8 +98,8 @@ namespace aarith {
         return stream.str();
     }
 
-/// Convert the given normfloat to a scientific string representation
-    template <size_t E, size_t M> auto to_sci_string(const normfloat<E, M> nf) -> std::string
+/// Convert the given normalized_float to a scientific string representation
+    template <size_t E, size_t M> auto to_sci_string(const normalized_float<E, M> nf) -> std::string
     {
         uinteger<M> fl_mantissa = nf.get_mantissa();
         uinteger<24> flc_mantissa;
@@ -134,7 +134,7 @@ namespace aarith {
 
 
     template <size_t E, size_t M>
-    auto operator<<(std::ostream& out, const normfloat<E, M>& value) -> std::ostream&
+    auto operator<<(std::ostream& out, const normalized_float<E, M>& value) -> std::ostream&
     {
         if (out.flags() & std::ios::hex)
         {

@@ -77,8 +77,6 @@ SCENARIO("Performing common functional operations", "[word_array]")
                     const word_array<128> a{0, std::numeric_limits<uint64_t>::max()};
                     const word_array<128> b{0, std::numeric_limits<uint64_t>::max()};
 
-                    std::cout << group_digits(to_binary(a),64) << "\n";
-                    std::cout << group_digits(to_binary(b),64) << "\n";
 
                     const auto f = [carry = uint64_t(0)](uint64_t ain, uint64_t bin) mutable {
                         uint64_t partial_sum = ain + bin;
@@ -95,8 +93,6 @@ SCENARIO("Performing common functional operations", "[word_array]")
 
                     const auto uinteger_result = add(uinteger<128>(a), uinteger<128>(b));
 
-                    std::cout << group_digits(to_binary(result),64) << "\n";
-
                     CHECK(uinteger<192>(result) == uinteger_result);
                 }
             }
@@ -106,8 +102,6 @@ SCENARIO("Performing common functional operations", "[word_array]")
                     const word_array<128> a{0, std::numeric_limits<uint64_t>::max()};
                     const word_array<128> b{0, std::numeric_limits<uint64_t>::max()};
 
-                    std::cout << group_digits(to_binary(a),64) << "\n";
-                    std::cout << group_digits(to_binary(b),64) << "\n";
 
                     const auto f = [](uint64_t ain, uint64_t bin, uint64_t cin) {
                         uint64_t partial_sum = ain + bin;
@@ -124,7 +118,6 @@ SCENARIO("Performing common functional operations", "[word_array]")
 
                     const auto uinteger_result = add(uinteger<128>(a), uinteger<128>(b));
 
-                    std::cout << group_digits(to_binary(result),64) << "\n";
 
                     CHECK(uinteger<192>(result) == uinteger_result);
 

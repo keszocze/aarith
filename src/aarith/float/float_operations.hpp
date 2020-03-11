@@ -1,7 +1,7 @@
 #pragma once
 
 #include <aarith/integer/uinteger.hpp>
-#include <aarith/float/normfloat.hpp>
+#include <aarith/float/normalized_float.hpp>
 #include <aarith/integer/uinteger_comparisons.hpp>
 #include <aarith/integer/uinteger_operations.hpp>
 #include <aarith/core/traits.hpp>
@@ -20,8 +20,8 @@ namespace aarith {
  *
  */
 template<size_t E, size_t M>
-[[nodiscard]] auto add(const normfloat<E, M>& lhs, const normfloat<E, M>& rhs)
--> normfloat<E, M>
+[[nodiscard]] auto add(const normalized_float<E, M>& lhs, const normalized_float<E, M>& rhs)
+-> normalized_float<E, M>
 {
     if(abs(lhs) < abs(rhs))
     {
@@ -39,7 +39,7 @@ template<size_t E, size_t M>
     const auto new_mantissa = rhs.get_mantissa() >> exponent_delta.word(0);
     const auto mantissa_sum = expanding_add(lhs.get_mantissa(),  new_mantissa);
 
-    normfloat<E, mantissa_sum.width()> sum;
+    normalized_float<E, mantissa_sum.width()> sum;
     sum.set_sign(lhs.get_sign());
     sum.set_exponent(lhs.get_exponent());
     sum.set_mantissa(mantissa_sum);
@@ -59,8 +59,8 @@ template<size_t E, size_t M>
  *
  */
 template<size_t E, size_t M>
-[[nodiscard]] auto sub(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
--> normfloat<E, M>
+[[nodiscard]] auto sub(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
+-> normalized_float<E, M>
 {
     if(abs(lhs) < abs(rhs))
     {
@@ -80,7 +80,7 @@ template<size_t E, size_t M>
     const auto new_mantissa = rhs.get_mantissa() >> exponent_delta.word(0);
     const auto mantissa_sum = sub(lhs.get_mantissa(), new_mantissa);
 
-    normfloat<E, mantissa_sum.width()> sum;
+    normalized_float<E, mantissa_sum.width()> sum;
     sum.set_sign(lhs.get_sign());
     sum.set_exponent(lhs.get_exponent());
     sum.set_mantissa(mantissa_sum);
@@ -100,15 +100,15 @@ template<size_t E, size_t M>
  *
  */
 template<size_t E, size_t M>
-[[nodiscard]] auto mul(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
--> normfloat<E, M>
+[[nodiscard]] auto mul(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
+-> normalized_float<E, M>
 {
     auto mproduct = expanding_mul(lhs.get_mantissa(), rhs.get_mantissa());
     mproduct = mproduct >> (M-1);
     auto esum = width_cast<E>(sub(expanding_add(lhs.get_exponent(), rhs.get_exponent()), width_cast<E+1>(lhs.get_bias())));
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
-    normfloat<E, mproduct.width()> product;
+    normalized_float<E, mproduct.width()> product;
     product.set_mantissa(mproduct);
     product.set_exponent(esum);
     product.set_sign(sign);
@@ -128,8 +128,8 @@ template<size_t E, size_t M>
  *
  */
 template<size_t E, size_t M>
-[[nodiscard]] auto div(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
--> normfloat<E, M>
+[[nodiscard]] auto div(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
+-> normalized_float<E, M>
 {
     auto dividend = width_cast<2*M+3>(lhs.get_mantissa());
     auto divisor = width_cast<2*M+3>(rhs.get_mantissa());
@@ -141,7 +141,7 @@ template<size_t E, size_t M>
     auto esum = width_cast<E>(sub(expanding_add(lhs.get_exponent(), lhs.get_bias()), width_cast<E+1>(rhs.get_exponent())));
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
-    normfloat<E, rdmquotient.width()> quotient;
+    normalized_float<E, rdmquotient.width()> quotient;
     quotient.set_mantissa(rdmquotient);
     quotient.set_exponent(esum);
     quotient.set_sign(sign);
@@ -156,31 +156,31 @@ template<size_t E, size_t M>
 namespace aarith::exact_operators {
 
 template<size_t E, size_t M>
-auto operator+(const normfloat<E, M>& lhs, const normfloat<E, M>& rhs) -> normfloat<E, M>
+auto operator+(const normalized_float<E, M>& lhs, const normalized_float<E, M>& rhs) -> normalized_float<E, M>
 {
     return add(lhs, rhs);
 }
 
 template<size_t E, size_t M>
-auto operator-(const normfloat<E, M>& lhs, const normfloat<E, M>& rhs) -> normfloat<E, M>
+auto operator-(const normalized_float<E, M>& lhs, const normalized_float<E, M>& rhs) -> normalized_float<E, M>
 {
     return sub(lhs, rhs);
 }
 
 template<size_t E, size_t M>
-auto operator*(const normfloat<E, M>& lhs, const normfloat<E, M>& rhs) -> normfloat<E, M>
+auto operator*(const normalized_float<E, M>& lhs, const normalized_float<E, M>& rhs) -> normalized_float<E, M>
 {
     return mul(lhs, rhs);
 }
 
 template<size_t E, size_t M>
-auto operator/(const normfloat<E, M>& lhs, const normfloat<E, M>& rhs) -> normfloat<E, M>
+auto operator/(const normalized_float<E, M>& lhs, const normalized_float<E, M>& rhs) -> normalized_float<E, M>
 {
     return div(lhs, rhs);
 }
 
 template<size_t E, size_t M>
-auto operator%(const normfloat<E, M>& lhs, const normfloat<E, M>& rhs) -> normfloat<E, M>
+auto operator%(const normalized_float<E, M>& lhs, const normalized_float<E, M>& rhs) -> normalized_float<E, M>
 {
     return remainder(lhs, rhs);
 }
