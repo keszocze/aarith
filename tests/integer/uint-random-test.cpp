@@ -5,8 +5,6 @@
 #include <iostream>
 #include <mpir.h>
 
-using namespace aarith;
-
 template <size_t BitWidth>
 bool is_uint_add_correct(const uinteger<BitWidth>& lhs, const uinteger<BitWidth>& rhs,
                          const uinteger<BitWidth>& result)

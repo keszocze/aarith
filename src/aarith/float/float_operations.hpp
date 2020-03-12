@@ -2,9 +2,7 @@
 
 #include <aarith/core/traits.hpp>
 #include <aarith/float/normalized_float.hpp>
-#include <aarith/integer/uinteger.hpp>
-#include <aarith/integer/uinteger_comparisons.hpp>
-#include <aarith/integer/uinteger_operations.hpp>
+#include <aarith/integer.hpp>
 
 namespace aarith {
 
@@ -152,8 +150,6 @@ template <size_t E, size_t M>
 }
 
 } // namespace aarith
-
-#include "aarith/integer/uinteger.hpp"
 
 namespace aarith::arithmetic_operators {
 

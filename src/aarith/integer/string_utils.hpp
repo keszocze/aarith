@@ -1,8 +1,7 @@
 #pragma once
 
 #include <aarith/core/string_utils.hpp>
-#include <aarith/integer/integer_operations.hpp>
-#include <aarith/integer/uinteger_operations.hpp>
+#include <aarith/integer.hpp>
 
 namespace aarith {
 
@@ -120,7 +119,7 @@ template <size_t Width> auto to_decimal(const integer<Width>& value) -> std::str
     return res;
 }
 
-template <typename Integer, typename = std::enable_if_t<aarith::is_integral_v<Integer>>>
+template <typename Integer, typename = std::enable_if_t<is_integral_v<Integer>>>
 auto operator<<(std::ostream& out, const Integer& value) -> std::ostream&
 {
     if (out.flags() & std::ios::hex)
