@@ -84,11 +84,8 @@ template <size_t DestinationWidth, size_t SourceWidth>
     }
     else
     {
-
-        word_array<SourceWidth> in{source};
-
-        word_array<DestinationWidth> result = width_cast<DestinationWidth>(in);
-
+        word_array<DestinationWidth> result =
+            width_cast<DestinationWidth>(static_cast<word_array<SourceWidth>>(source));
         return uinteger<DestinationWidth>{result};
     }
 }
