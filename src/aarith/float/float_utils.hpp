@@ -1,7 +1,7 @@
 #pragma once
 
-#include <aarith/core/traits.hpp>
 #include <aarith/core/bit_cast.hpp>
+#include <aarith/core/traits.hpp>
 
 #include <cstdint>
 #include <cstring>
@@ -34,8 +34,6 @@ template <class F> constexpr auto get_exponent_width()
         return 11U;
     }
 }
-
-
 
 /**
  * @brief Namespace to prevent people from accidentally using this trait

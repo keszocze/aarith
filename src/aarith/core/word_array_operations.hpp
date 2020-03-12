@@ -125,8 +125,8 @@ template <typename W> auto operator>>(const W& lhs, const size_t rhs) -> W
     static_assert(is_word_array_v<W>);
 
     /*
-     * This prevents this shift operator to be chosen by the compiler when using signed integers. For signed
-     * integers, the correct arithmetic right-shift will be used.
+     * This prevents this shift operator to be chosen by the compiler when using signed integers.
+     * For signed integers, the correct arithmetic right-shift will be used.
      */
     if constexpr (is_integral_v<W>)
     {

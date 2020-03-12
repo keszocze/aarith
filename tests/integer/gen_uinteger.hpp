@@ -3,7 +3,6 @@
 #include <aarith/integer.hpp>
 #include <catch.hpp>
 
-
 using namespace aarith;
 
 template <size_t BitWidth>

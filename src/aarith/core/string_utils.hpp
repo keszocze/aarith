@@ -59,16 +59,14 @@ inline auto group_digits(const std::string& number, size_t group_size, char sepa
 }
 
 /// Convert the given uinteger value into a binary string representation
-    template <size_t Width> auto to_binary(const word_array<Width>& value) -> std::string
+template <size_t Width> auto to_binary(const word_array<Width>& value) -> std::string
+{
+    std::string result;
+    for (auto i = Width; i > 0; --i)
     {
-        std::string result;
-        for (auto i = Width; i > 0; --i)
-        {
-            result += value.bit(i - 1) ? '1' : '0';
-        }
-        return result;
+        result += value.bit(i - 1) ? '1' : '0';
     }
-
-
+    return result;
+}
 
 } // namespace aarith

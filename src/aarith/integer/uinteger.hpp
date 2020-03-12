@@ -73,7 +73,6 @@ public:
         n.set_bit(0);
         return n;
     }
-
 };
 
 template <size_t DestinationWidth, size_t SourceWidth>

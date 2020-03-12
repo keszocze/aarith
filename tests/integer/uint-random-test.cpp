@@ -1,12 +1,11 @@
-#include <aarith/integer.hpp>
 #include "gen_uinteger.hpp"
+#include <aarith/integer.hpp>
 
 #include <catch.hpp>
 #include <iostream>
 #include <mpir.h>
 
 using namespace aarith;
-
 
 template <size_t BitWidth>
 bool is_uint_add_correct(const uinteger<BitWidth>& lhs, const uinteger<BitWidth>& rhs,

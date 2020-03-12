@@ -133,8 +133,8 @@ public:
  *
  * The value of the integer remains unchanged if the bit width is increased.
  *
- * @note Reducing the bit width performs a hard truncation. This means that the sign of the integer might change as a
- * result of this operation. This might be surprising in some situations.
+ * @note Reducing the bit width performs a hard truncation. This means that the sign of the integer
+ * might change as a result of this operation. This might be surprising in some situations.
  *
  * @tparam DestinationWidth The width to which the input is expanded/shrunk
  * @tparam SourceWidth The input width of the integer

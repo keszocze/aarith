@@ -378,16 +378,11 @@ SCENARIO("Right shift operator works as expected", "[integer][bit-logic]")
                 static constexpr size_t word_width = integer<width>::word_width();
 
                 static const integer<width> a{1U};
-                static const integer<width> expected0 =
-                    integer<width>::from_words(0U, 0U, 0U, 1U);
-                static const integer<width> expected1 =
-                    integer<width>::from_words(0U, 0U, 1U, 0U);
-                static const integer<width> expected2 =
-                    integer<width>::from_words(0U, 1U, 0U, 0U);
-                static const integer<width> expected3 =
-                    integer<width>::from_words(1U, 0U, 0U, 0U);
-                static const integer<width> expected4 =
-                    integer<width>::from_words(0U, 0U, 0U, 0U);
+                static const integer<width> expected0 = integer<width>::from_words(0U, 0U, 0U, 1U);
+                static const integer<width> expected1 = integer<width>::from_words(0U, 0U, 1U, 0U);
+                static const integer<width> expected2 = integer<width>::from_words(0U, 1U, 0U, 0U);
+                static const integer<width> expected3 = integer<width>::from_words(1U, 0U, 0U, 0U);
+                static const integer<width> expected4 = integer<width>::from_words(0U, 0U, 0U, 0U);
 
                 std::vector<integer<width>> expecteds{expected0, expected1, expected2, expected3,
                                                       expected4};
@@ -764,7 +759,8 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[integer][utility]"
             CHECK(static_cast<int64_t>(signed_integer::round_error().word(0)) == il::round_error());
             CHECK(static_cast<int64_t>(signed_integer::infinity().word(0)) == il::infinity());
             CHECK(static_cast<int64_t>(signed_integer::quiet_NaN().word(0)) == il::quiet_NaN());
-            CHECK(static_cast<int64_t>(signed_integer::signaling_NaN().word(0)) == il::signaling_NaN());
+            CHECK(static_cast<int64_t>(signed_integer::signaling_NaN().word(0)) ==
+                  il::signaling_NaN());
             CHECK(static_cast<int64_t>(signed_integer::denorm_min().word(0)) == il::denorm_min());
         }
     }

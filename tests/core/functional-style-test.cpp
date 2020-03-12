@@ -1,5 +1,5 @@
-#include <aarith/integer.hpp>
 #include <aarith/core.hpp>
+#include <aarith/integer.hpp>
 #include <aarith/operations/approx_operations.hpp>
 #include <catch.hpp>
 #include <iostream>
@@ -37,7 +37,6 @@ SCENARIO("Performing common functional operations", "[word_array]")
                 CHECK(result.word(1) == 8);
                 CHECK(result.word(2) == 4);
                 CHECK(result.word(3) == 20);
-
             }
         }
 
@@ -45,9 +44,7 @@ SCENARIO("Performing common functional operations", "[word_array]")
         {
             THEN("Summing up the individual words should work fine")
             {
-                const auto f = [](const word_array<265>::word_type a, uint64_t w) {
-                    return a + w;
-                };
+                const auto f = [](const word_array<265>::word_type a, uint64_t w) { return a + w; };
                 const auto result = reduce(w, f, 0);
                 CHECK(result == 11U);
             }
@@ -62,8 +59,9 @@ SCENARIO("Performing common functional operations", "[word_array]")
                 THEN("Element-wise addition should work as intended")
                 {
 
-                    const auto f = [](word_array<256>::word_type a,
-                                      word_array<256>::word_type b) { return a + b; };
+                    const auto f = [](word_array<256>::word_type a, word_array<256>::word_type b) {
+                        return a + b;
+                    };
 
                     const auto result = zip_with(w, v, f);
 
@@ -77,7 +75,6 @@ SCENARIO("Performing common functional operations", "[word_array]")
                     const word_array<128> a{0, std::numeric_limits<uint64_t>::max()};
                     const word_array<128> b{0, std::numeric_limits<uint64_t>::max()};
 
-
                     const auto f = [carry = uint64_t(0)](uint64_t ain, uint64_t bin) mutable {
                         uint64_t partial_sum = ain + bin;
                         uint64_t new_carry = (partial_sum < ain || partial_sum < bin) ? 1U : 0U;
@@ -85,11 +82,10 @@ SCENARIO("Performing common functional operations", "[word_array]")
                         partial_sum = partial_sum + carry;
                         carry = new_carry || (partial_sum < ain || partial_sum < bin) ? 1U : 0U;
 
-
                         return partial_sum;
                     };
 
-                    const auto result = zip_with(a,b,f);
+                    const auto result = zip_with(a, b, f);
 
                     const auto uinteger_result = add(uinteger<128>(a), uinteger<128>(b));
 
@@ -97,11 +93,12 @@ SCENARIO("Performing common functional operations", "[word_array]")
                 }
             }
 
-            WHEN("Performing the zip_with_state operation") {
-                THEN("It should be capable of modeling addition") {
+            WHEN("Performing the zip_with_state operation")
+            {
+                THEN("It should be capable of modeling addition")
+                {
                     const word_array<128> a{0, std::numeric_limits<uint64_t>::max()};
                     const word_array<128> b{0, std::numeric_limits<uint64_t>::max()};
-
 
                     const auto f = [](uint64_t ain, uint64_t bin, uint64_t cin) {
                         uint64_t partial_sum = ain + bin;
@@ -110,25 +107,24 @@ SCENARIO("Performing common functional operations", "[word_array]")
                         partial_sum = partial_sum + cin;
                         new_carry = new_carry | (partial_sum < ain || partial_sum < bin) ? 1U : 0U;
 
-
                         return std::make_pair(partial_sum, new_carry);
                     };
 
-                    const auto result = zip_with_state(a,b,f);
+                    const auto result = zip_with_state(a, b, f);
 
                     const auto uinteger_result = add(uinteger<128>(a), uinteger<128>(b));
 
-
                     CHECK(uinteger<192>(result) == uinteger_result);
-
                 }
             }
             WHEN("Performing the trivial approximate addition")
             {
-                THEN("The result should work out well, filling additional slots with zeroes") {
-                    const auto result = trivial_approx_add<256,256>(w,v);
+                THEN("The result should work out well, filling additional slots with zeroes")
+                {
+                    const auto result = trivial_approx_add<256, 256>(w, v);
 
-                    for (size_t i = 0; i < w.word_count(); ++i) {
+                    for (size_t i = 0; i < w.word_count(); ++i)
+                    {
                         CHECK(result.word(i) == w.word(i) + v.word(i));
                     }
                 }
@@ -141,8 +137,7 @@ SCENARIO("Performing common functional operations", "[word_array]")
 
                     const std::vector<uint64_t> ns{8U, 15U, 5743U, 0U};
 
-                    const auto f = [](word_array<256>::word_type a,
-                                      word_array<256>::word_type b,
+                    const auto f = [](word_array<256>::word_type a, word_array<256>::word_type b,
                                       uint64_t m) { return a + b + m; };
 
                     for (const auto n : ns)
@@ -155,13 +150,14 @@ SCENARIO("Performing common functional operations", "[word_array]")
             }
             WHEN("Performing the trivial approximate addition")
             {
-                THEN("The result should work out well") {
-                    const auto result = trivial_approx_add<256,256>(w,v);
+                THEN("The result should work out well")
+                {
+                    const auto result = trivial_approx_add<256, 256>(w, v);
 
-                    for (size_t i = 0; i < w.word_count(); ++i) {
+                    for (size_t i = 0; i < w.word_count(); ++i)
+                    {
                         CHECK(result.word(i) == w.word(i) + v.word(i));
                     }
-
                 }
             }
         }
@@ -176,7 +172,7 @@ SCENARIO("Performing common functional operations", "[word_array]")
                 {
 
                     // "cheat" by knowing the underlying word type
-                    const auto f = [](const uint64_t a,const uint64_t b) { return a + b; };
+                    const auto f = [](const uint64_t a, const uint64_t b) { return a + b; };
 
                     const word_array<192> result_w_v = zip_with(w, v, f);
                     const word_array<192> result_v_w = zip_with(v, w, f);
@@ -193,15 +189,15 @@ SCENARIO("Performing common functional operations", "[word_array]")
             }
             WHEN("Performing the trivial approximate addition")
             {
-                THEN("The result should work out well, filling additional slots with zeroes") {
-                    const auto result = trivial_approx_add<256,192>(w,v);
+                THEN("The result should work out well, filling additional slots with zeroes")
+                {
+                    const auto result = trivial_approx_add<256, 192>(w, v);
 
-                    for (size_t i = 0; i < w.word_count()-1; ++i) {
+                    for (size_t i = 0; i < w.word_count() - 1; ++i)
+                    {
                         CHECK(result.word(i) == w.word(i) + v.word(i));
                     }
                     CHECK(result.word(3) == w.word(3));
-
-
                 }
             }
             WHEN("Performing the zip_reduce operation")
@@ -212,15 +208,14 @@ SCENARIO("Performing common functional operations", "[word_array]")
 
                     const std::vector<uint64_t> ns{8U, 15U, 5743U, 0U};
 
-                    const auto f = [](word_array<256>::word_type a,
-                                      word_array<256>::word_type b,
+                    const auto f = [](word_array<256>::word_type a, word_array<256>::word_type b,
                                       uint64_t m) { return a + b + m; };
 
                     for (const auto n : ns)
                     {
                         const auto result = zip_reduce(w, v, f, n);
 
-                        CHECK(result == (1U + 2U + 3U + 8U + 16U +  64U + n));
+                        CHECK(result == (1U + 2U + 3U + 8U + 16U + 64U + n));
                     }
                 }
             }

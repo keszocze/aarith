@@ -194,10 +194,10 @@ SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
         {
             const auto result = expanding_add(a, b);
 
-            std::cout << group_digits(to_binary(a),64) << "\n";
-            std::cout << group_digits(to_binary(b),64) << "\n";
-            std::cout << group_digits(to_binary(width_cast<192>(b)),64) << "\n";
-            std::cout << group_digits(to_binary(result),64) << "\n";
+            std::cout << group_digits(to_binary(a), 64) << "\n";
+            std::cout << group_digits(to_binary(b), 64) << "\n";
+            std::cout << group_digits(to_binary(width_cast<192>(b)), 64) << "\n";
+            std::cout << group_digits(to_binary(result), 64) << "\n";
         }
     }
 }

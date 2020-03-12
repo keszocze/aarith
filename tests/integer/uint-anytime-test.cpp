@@ -194,7 +194,7 @@ SCENARIO("Approximate difference of unsigned integers with anytime bitmasking",
     }
 }
 
-//SCENARIO("Approximate product of unsigned integers with anytime bitmasking",
+// SCENARIO("Approximate product of unsigned integers with anytime bitmasking",
 //         "[uinteger][arithmetic][anytime]")
 //{
 //    GIVEN("Two uintegers with width < word_width")

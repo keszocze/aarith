@@ -123,7 +123,6 @@ template <size_t W, size_t V>
     return width_cast<W + V>(P >> 1);
 }
 
-
 /**
  * @brief Computes the absolute value of a given signed integer.
  *
@@ -234,9 +233,5 @@ template <std::size_t W, std::size_t V>
 
     return std::make_pair(Q_cast, remainder_cast);
 }
-
-
-
-
 
 } // namespace aarith
