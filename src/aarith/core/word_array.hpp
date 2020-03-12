@@ -445,22 +445,31 @@ public:
 template <size_t DestinationWidth, size_t SourceWidth>
 [[nodiscard]] auto width_cast(const word_array<SourceWidth>& source) -> word_array<DestinationWidth>
 {
-    word_array<DestinationWidth> word_container;
-    if constexpr (DestinationWidth >= SourceWidth)
+
+    if constexpr (SourceWidth == DestinationWidth)
     {
-        for (auto i = 0U; i < source.word_count(); ++i)
-        {
-            word_container.set_word(i, source.word(i));
-        }
+        return source;
     }
     else
     {
-        for (auto i = 0U; i < word_container.word_count(); ++i)
+
+        word_array<DestinationWidth> word_container;
+        if constexpr (DestinationWidth >= SourceWidth)
         {
-            word_container.set_word(i, source.word(i));
+            for (auto i = 0U; i < source.word_count(); ++i)
+            {
+                word_container.set_word(i, source.word(i));
+            }
         }
+        else
+        {
+            for (auto i = 0U; i < word_container.word_count(); ++i)
+            {
+                word_container.set_word(i, source.word(i));
+            }
+        }
+        return word_container;
     }
-    return word_container;
 }
 
 } // namespace aarith

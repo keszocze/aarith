@@ -78,11 +78,19 @@ public:
 template <size_t DestinationWidth, size_t SourceWidth>
 [[nodiscard]] auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>
 {
-    word_array<SourceWidth> in{source};
+    if constexpr (DestinationWidth == SourceWidth)
+    {
+        return source;
+    }
+    else
+    {
 
-    word_array<DestinationWidth> result = width_cast<DestinationWidth>(in);
+        word_array<SourceWidth> in{source};
 
-    return uinteger<DestinationWidth>{result};
+        word_array<DestinationWidth> result = width_cast<DestinationWidth>(in);
+
+        return uinteger<DestinationWidth>{result};
+    }
 }
 /*
  * Traits
