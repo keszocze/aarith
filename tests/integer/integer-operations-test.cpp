@@ -184,6 +184,22 @@ SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
             REQUIRE(sum150.is_negative());
         }
     }
+    GIVEN("A positive integer and a negative integer with smaller absolute value")
+    {
+        const integer<192> a = integer<192>::from_words(1U, 0U, 0U);
+
+        const integer<64> b{-1};
+
+        WHEN("Adding both numbers")
+        {
+            const auto result = expanding_add(a, b);
+
+            std::cout << group_digits(to_binary(a),64) << "\n";
+            std::cout << group_digits(to_binary(b),64) << "\n";
+            std::cout << group_digits(to_binary(width_cast<192>(b)),64) << "\n";
+            std::cout << group_digits(to_binary(result),64) << "\n";
+        }
+    }
 }
 
 SCENARIO("Division of signed integers", "[integer][arithmetic]")
