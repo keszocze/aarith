@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <limits>
 #include <type_traits>
 
@@ -38,9 +39,20 @@ public:
 template <class Type> inline constexpr bool is_float_v = is_float<Type>::value;
 
 template <typename A, typename B>
-inline constexpr bool same_word_type = std::is_same_v<typename  A::word_type, typename B::word_type>;
+inline constexpr bool same_word_type = std::is_same_v<typename A::word_type, typename B::word_type>;
 
 template <typename A, typename B>
 inline constexpr bool same_sign = (is_unsigned_v<A> == is_unsigned_v<B>);
+
+/**
+ * It seems that the type traits of C++ have no reasonable concept of "unsigned integer" so we have
+ * to add this ourselves.
+ *
+ * @tparam T The type to check for "unsigned int'nes"
+ */
+template <typename T>
+inline constexpr bool is_unsigned_int =
+    std::is_same_v<T, uint64_t> || std::is_same_v<T, uint32_t> || std::is_same_v<T, uint16_t> ||
+    std::is_same_v<T, uint8_t>;
 
 } // namespace aarith
