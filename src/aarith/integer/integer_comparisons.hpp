@@ -1,7 +1,7 @@
 #pragma once
 
 #include <aarith/core/traits.hpp>
-#include <aarith/integer/integer.hpp>
+#include <aarith/integer/integers.hpp>
 #include <cstdint>
 
 #include <bitset>
