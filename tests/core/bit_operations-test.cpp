@@ -373,8 +373,7 @@ SCENARIO("Right shift operator works as expected", "[word_array][utility]")
 
             typename word_array<Width>::word_type number_a = 3;
             number_a <<= word_array<Width>::word_width() - 2;
-            static constexpr auto s =
-                2 * static_cast<size_t>(word_array<Width>::word_width()) - 1;
+            static constexpr auto s = 2 * static_cast<size_t>(word_array<Width>::word_width()) - 1;
             word_array<Width> a(0U);
             a.set_word(a.word_count() - 1, number_a);
 
@@ -405,8 +404,8 @@ SCENARIO("Right shift operator works as expected", "[word_array][utility]")
                 static const word_array<width> expected4 =
                     word_array<width>::from_words(0U, 0U, 0U, 0U);
 
-                std::vector<word_array<width>> expecteds{expected0, expected1, expected2,
-                                                         expected3, expected4};
+                std::vector<word_array<width>> expecteds{expected0, expected1, expected2, expected3,
+                                                         expected4};
 
                 for (auto i = 0U; i < expecteds.size(); ++i)
                 {
@@ -602,9 +601,8 @@ SCENARIO("Bit operations are performed correctly", "[word_array][bit_logic]")
     }
 }
 
-
 // TODO actually write tests..... :(
-//SCENARIO("Splitting a word_array/extraction from a word_array", "[word_array],[util]")
+// SCENARIO("Splitting a word_array/extraction from a word_array", "[word_array],[util]")
 //{
 //    GIVEN("A word_array w")
 //    {

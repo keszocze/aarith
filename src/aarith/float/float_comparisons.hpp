@@ -5,21 +5,20 @@
 
 namespace aarith {
 
-template<size_t E, size_t M>
-auto operator<(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
--> bool
+template <size_t E, size_t M>
+auto operator<(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
 {
-    if(lhs.get_sign() > rhs.get_sign())
+    if (lhs.get_sign() > rhs.get_sign())
     {
         return true;
     }
-    else if(lhs.get_exponent() == rhs.get_exponent())
+    else if (lhs.get_exponent() == rhs.get_exponent())
     {
-        if(lhs.get_mantissa() == rhs.get_mantissa())
+        if (lhs.get_mantissa() == rhs.get_mantissa())
         {
             return false;
-        } 
-        else if(lhs.get_mantissa() < rhs.get_mantissa())
+        }
+        else if (lhs.get_mantissa() < rhs.get_mantissa())
         {
             return lhs.get_sign() == 0;
         }
@@ -28,7 +27,7 @@ auto operator<(const normalized_float<E, M> lhs, const normalized_float<E, M> rh
             return lhs.get_sign() == 1;
         }
     }
-    else if(lhs.get_exponent() < rhs.get_exponent())
+    else if (lhs.get_exponent() < rhs.get_exponent())
     {
         return lhs.get_sign() == 0;
     }
@@ -38,30 +37,27 @@ auto operator<(const normalized_float<E, M> lhs, const normalized_float<E, M> rh
     }
 }
 
-template<size_t E, size_t M>
-auto operator==(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
--> bool
+template <size_t E, size_t M>
+auto operator==(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
 {
-    return lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent() && lhs.get_mantissa() == rhs.get_mantissa();
+    return lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent() &&
+           lhs.get_mantissa() == rhs.get_mantissa();
 }
 
-template<size_t E, size_t M>
-auto operator>(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
--> bool
+template <size_t E, size_t M>
+auto operator>(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
 {
     return rhs < lhs;
 }
 
-template<size_t e, size_t m>
-auto operator>=(const normalized_float<e, m> lhs, const normalized_float<e, m> rhs)
--> bool
+template <size_t e, size_t m>
+auto operator>=(const normalized_float<e, m> lhs, const normalized_float<e, m> rhs) -> bool
 {
     return rhs < lhs || lhs == rhs;
 }
 
-template<size_t e, size_t m>
-auto operator<=(const normalized_float<e, m> lhs, const normalized_float<e, m> rhs)
--> bool
+template <size_t e, size_t m>
+auto operator<=(const normalized_float<e, m> lhs, const normalized_float<e, m> rhs) -> bool
 {
     return lhs < rhs || lhs == rhs;
 }

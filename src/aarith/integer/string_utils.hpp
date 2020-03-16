@@ -1,8 +1,7 @@
 #pragma once
 
 #include <aarith/core/string_utils.hpp>
-#include <aarith/integer/sinteger_operations.hpp>
-#include <aarith/integer/uinteger_operations.hpp>
+#include <aarith/integer.hpp>
 
 namespace aarith {
 
@@ -35,8 +34,8 @@ template <size_t Width> auto to_octal(const uinteger<Width>& value) -> std::stri
     return to_base_2n<3>(value);
 }
 
-/// Convert the given sinteger value into a hexadecimal string representation.
-template <size_t Width> auto to_hex(const sinteger<Width>& value) -> std::string
+/// Convert the given integer value into a hexadecimal string representation.
+template <size_t Width> auto to_hex(const integer<Width>& value) -> std::string
 {
 
     std::string res;
@@ -49,8 +48,8 @@ template <size_t Width> auto to_hex(const sinteger<Width>& value) -> std::string
     return res;
 }
 
-/// Convert the given sinteger value into a octal string representation.
-template <size_t Width> auto to_octal(const sinteger<Width>& value) -> std::string
+/// Convert the given integer value into a octal string representation.
+template <size_t Width> auto to_octal(const integer<Width>& value) -> std::string
 {
 
     std::string res;
@@ -68,7 +67,7 @@ template <size_t Width> auto to_octal(const sinteger<Width>& value) -> std::stri
 template <size_t Width>
 auto to_bcd(const uinteger<Width>& num) -> uinteger<number_of_decimal_digits(Width) * 4>
 {
-    using namespace aarith::exact_operators;
+    using namespace aarith::arithmetic_operators;
 
     constexpr auto bcd_digits = number_of_decimal_digits(Width);
     constexpr auto bcd_width = bcd_digits * 4;
@@ -88,12 +87,12 @@ auto to_bcd(const uinteger<Width>& num) -> uinteger<number_of_decimal_digits(Wid
                 bcd = bcd + three;
             }
 
-            three <<= 4;
-            four <<= 4;
-            mask <<= 4;
+            three = (three << 4);
+            four = (four << 4);
+            mask = (mask << 4);
         }
 
-        bcd <<= 1;
+        bcd = (bcd << 1);
         const auto new_word = bcd.word(0) | (num.bit(i - 1));
         bcd.set_word(0, new_word);
     }
@@ -106,8 +105,8 @@ template <size_t Width> auto to_decimal(const uinteger<Width>& value) -> std::st
     return remove_leading_zeroes(to_hex(to_bcd(value)));
 }
 
-/// Convert the given sinteger value into a decimal string representation.
-template <size_t Width> auto to_decimal(const sinteger<Width>& value) -> std::string
+/// Convert the given integer value into a decimal string representation.
+template <size_t Width> auto to_decimal(const integer<Width>& value) -> std::string
 {
 
     std::string res;
@@ -120,7 +119,7 @@ template <size_t Width> auto to_decimal(const sinteger<Width>& value) -> std::st
     return res;
 }
 
-template <typename Integer, typename = std::enable_if_t<aarith::is_integral<Integer>::value> >
+template <typename Integer, typename = std::enable_if_t<is_integral_v<Integer>>>
 auto operator<<(std::ostream& out, const Integer& value) -> std::ostream&
 {
     if (out.flags() & std::ios::hex)

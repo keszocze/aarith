@@ -25,16 +25,16 @@ endfunction(add_aarith_test)
 
 
 
-add_aarith_test(uint FILES integer/uint-test.cpp)
-add_aarith_test(uint-exact-operations FILES integer/uint-operations-test.cpp)
-add_aarith_test(float-exact-operations FILES float/exact_operations-float-test.cpp)
-add_aarith_test(uint-comparisons FILES integer/uint-comparisons-test.cpp)
-add_aarith_test(string_utils FILES integer/string_utils-test.cpp)
+add_aarith_test(uint-general FILES integer/uint-test.cpp)
+add_aarith_test(uint-operations FILES integer/uint-operations-test.cpp)
 add_aarith_test(uint-anytime FILES integer/uint-anytime-test.cpp)
+add_aarith_test(uint-comparisons FILES integer/uint-comparisons-test.cpp)
+add_aarith_test(float-operations FILES float/exact_operations-float-test.cpp)
+add_aarith_test(string_utils FILES integer/string_utils-test.cpp)
 add_aarith_test(util FILES integer/string_utils-test.cpp)
 add_aarith_test(bit-operations FILES core/bit_operations-test.cpp)
-add_aarith_test(sint FILES integer/sint-test.cpp integer/sint-operations-test.cpp integer/sint-comparisons-test.cpp)
-add_aarith_test(container FILES core/functional-style-test.cpp)
+add_aarith_test(integer FILES integer/integer-test.cpp integer/integer-operations-test.cpp integer/integer-comparisons-test.cpp)
+add_aarith_test(functional-style FILES core/functional-style-test.cpp)
 
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/")
@@ -60,6 +60,6 @@ else()
 endif()
 
 if(BUILD_COVERAGE_DATA)
-  target_compile_options(uint-test PRIVATE --coverage)
-  target_link_options(uint-test PRIVATE --coverage)
+  target_compile_options(uint-general-test PRIVATE --coverage)
+  target_link_options(uint-general-test PRIVATE --coverage)
 endif()

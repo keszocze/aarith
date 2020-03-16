@@ -3,22 +3,21 @@
 
 using namespace aarith;
 
-
-SCENARIO("Adding two positive sintegers", "[sinteger][arithmetic][addition]")
+SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
 {
-    GIVEN("Two positive sinteger<N> a and b with N <= word_width")
+    GIVEN("Two positive integer<N> a and b with N <= word_width")
     {
         static constexpr size_t TestWidth = 16;
-        static_assert(sinteger<TestWidth>::word_count() == 1);
+        static_assert(integer<TestWidth>::word_count() == 1);
 
         WHEN("The result a+b still fits into N bits")
         {
             static constexpr uint8_t number_a = 32;
             static constexpr uint8_t number_b = 16;
-            const sinteger<TestWidth> a{number_a};
-            const sinteger<TestWidth> b{number_b};
-            const sinteger<TestWidth> result = add(a, b);
-            const sinteger<TestWidth> result_fun = fun_add(a, b);
+            const integer<TestWidth> a{number_a};
+            const integer<TestWidth> b{number_b};
+            const integer<TestWidth> result = add(a, b);
+            const integer<TestWidth> result_fun = fun_add(a, b);
 
             THEN("It should be the correct sum")
             {
@@ -30,10 +29,10 @@ SCENARIO("Adding two positive sintegers", "[sinteger][arithmetic][addition]")
         {
             static constexpr uint16_t number_a = (1 << TestWidth) - 1;
             static constexpr uint16_t number_b = 1;
-            const sinteger<TestWidth> a{number_a};
-            const sinteger<TestWidth> b{number_b};
+            const integer<TestWidth> a{number_a};
+            const integer<TestWidth> b{number_b};
             auto const result = add(a, b);
-            const sinteger<TestWidth> result_fun = fun_add(a, b);
+            const integer<TestWidth> result_fun = fun_add(a, b);
 
             THEN("It should be the masked to fit")
             {
@@ -42,11 +41,11 @@ SCENARIO("Adding two positive sintegers", "[sinteger][arithmetic][addition]")
             }
         }
     }
-    GIVEN("Two sintegers with different word_count")
+    GIVEN("Two integers with different word_count")
     {
-        const sinteger<64> a{16};
-        const sinteger<128> b{32, 8};
-        const sinteger<128> expected{32, 24};
+        const integer<64> a{16};
+        const integer<128> b{32, 8};
+        const integer<128> expected{32, 24};
         WHEN("Adding the integers")
         {
             THEN("All words need to be respected in the operation")
@@ -56,19 +55,19 @@ SCENARIO("Adding two positive sintegers", "[sinteger][arithmetic][addition]")
             }
         }
     }
-    GIVEN("Two positive sinteger<N> a and b with N > word_width")
+    GIVEN("Two positive integer<N> a and b with N > word_width")
     {
         static constexpr size_t TestWidth = 128;
-        static_assert(sinteger<TestWidth>::word_count() > 1);
+        static_assert(integer<TestWidth>::word_count() > 1);
 
         WHEN("There is a carry into the next word")
         {
             static constexpr uint64_t number_a = 1ULL << 63;
             static constexpr uint64_t number_b = 1ULL << 63;
-            const sinteger<TestWidth> a{number_a};
-            const sinteger<TestWidth> b{number_b};
+            const integer<TestWidth> a{number_a};
+            const integer<TestWidth> b{number_b};
             auto const result = add(a, b);
-            const sinteger<TestWidth> result_fun = fun_add(a, b);
+            const integer<TestWidth> result_fun = fun_add(a, b);
 
             THEN("It is added to the next word")
             {
@@ -81,10 +80,10 @@ SCENARIO("Adding two positive sintegers", "[sinteger][arithmetic][addition]")
         {
             static constexpr uint64_t number_a = 1ULL << 63;
             static constexpr uint64_t number_b = 0;
-            const sinteger<TestWidth> a{number_a};
-            const sinteger<TestWidth> b{number_b};
+            const integer<TestWidth> a{number_a};
+            const integer<TestWidth> b{number_b};
             auto const result = add(a, b);
-            const sinteger<TestWidth> result_fun = fun_add(a, b);
+            const integer<TestWidth> result_fun = fun_add(a, b);
 
             THEN("The next word is unchanged")
             {
@@ -93,26 +92,25 @@ SCENARIO("Adding two positive sintegers", "[sinteger][arithmetic][addition]")
             }
         }
     }
-
-    GIVEN("A sinteger and its negative")
+    GIVEN("A integer and its negative")
     {
-        const sinteger<16> a(15);
-        const sinteger<16> a_(-15);
-        const sinteger<16> zero16(0);
-        const sinteger<16> sum16 = add(a, a_);
-        const sinteger<16> sum16_fun = fun_add(a, a_);
+        const integer<16> a(15);
+        const integer<16> a_(-15);
+        const integer<16> zero16(0);
+        const integer<16> sum16 = add(a, a_);
+        const integer<16> sum16_fun = fun_add(a, a_);
 
-        const sinteger<64> b(150);
-        const sinteger<64> b_(-150);
-        const sinteger<64> zero64(0);
-        const sinteger<64> sum64 = add(b, b_);
-        const sinteger<64> sum64_fun = fun_add(b, b_);
+        const integer<64> b(150);
+        const integer<64> b_(-150);
+        const integer<64> zero64(0);
+        const integer<64> sum64 = add(b, b_);
+        const integer<64> sum64_fun = fun_add(b, b_);
 
-        const sinteger<150> c(1337);
-        const sinteger<150> c_(-1337);
-        const sinteger<150> zero150(0);
-        const sinteger<150> sum150_fun = fun_add(c, c_);
-        const sinteger<150> sum150 = add(c, c_);
+        const integer<150> c(1337);
+        const integer<150> c_(-1337);
+        const integer<150> zero150(0);
+        const integer<150> sum150_fun = fun_add(c, c_);
+        const integer<150> sum150 = add(c, c_);
 
         THEN("The sum should be zero")
         {
@@ -141,46 +139,77 @@ SCENARIO("Adding two positive sintegers", "[sinteger][arithmetic][addition]")
         }
     }
 
-    GIVEN("A positive sinteger and a negative sinteger with larger absolute value")
+    GIVEN("The number zero")
     {
-        const sinteger<16> a(15);
-        const sinteger<16> a_(-16);
-        const sinteger<16> zero16(0);
-        const sinteger<16> sum16 = add(a, a_);
-        const sinteger<16> sum16_fun = fun_add(a, a_);
+        const integer<16> z16;
+        const integer<63> z63;
+        const integer<150> z150;
+        WHEN("Adding a negative number")
+        {
 
-        const sinteger<64> b(150);
-        const sinteger<64> b_(-235);
-        const sinteger<64> zero64(0);
-        const sinteger<64> sum64 = add(b, b_);
-        const sinteger<64> sum64_fun = fun_add(b, b_);
+            const integer<16> neg16{-5};
+            const integer<63> neg63{-5};
+            const integer<150> neg150{-5};
 
-        const sinteger<150> c(1337);
-        const sinteger<150> c_(-5000);
-        const sinteger<150> zero150(0);
-        const sinteger<150> sum150 = add(c, c_);
-        const sinteger<150> sum150_fun = fun_add(c, c_);
+            THEN("The result should be the negative number")
+            {
+                CHECK(add(z16, neg16) == neg16);
+                CHECK(add(z63, neg63) == neg63);
+                CHECK(add(z150, neg150) == neg150);
+            }
+        }
+    }
+
+    GIVEN("A positive integer and a negative integer with larger absolute value")
+    {
+        const integer<16> a(15);
+        const integer<16> a_(-16);
+        const integer<16> zero16(0);
+        const integer<16> sum16 = add(a, a_);
+
+        const integer<64> b(150);
+        const integer<64> b_(-235);
+        const integer<64> zero64(0);
+        const integer<64> sum64 = add(b, b_);
+
+        const integer<150> c(1337);
+        const integer<150> c_(-5000);
+        const integer<150> zero150(0);
+        const integer<150> sum150 = add(c, c_);
 
         THEN("The sum should be negative")
         {
-            CHECK(sum150_fun == sum150);
-            CHECK(sum16_fun == sum16);
-            CHECK(sum64_fun == sum64);
             REQUIRE(sum16.is_negative());
             REQUIRE(sum64.is_negative());
             REQUIRE(sum150.is_negative());
         }
     }
+    GIVEN("A positive integer and a negative integer with smaller absolute value")
+    {
+        const integer<192> a = integer<192>::from_words(1U, 0U, 0U);
+
+        const integer<64> b{-1};
+
+        WHEN("Adding both numbers")
+        {
+            const auto result = expanding_add(a, b);
+
+            std::cout << group_digits(to_binary(a), 64) << "\n";
+            std::cout << group_digits(to_binary(b), 64) << "\n";
+            std::cout << group_digits(to_binary(width_cast<192>(b)), 64) << "\n";
+            std::cout << group_digits(to_binary(result), 64) << "\n";
+        }
+    }
 }
 
-SCENARIO("Division of signed integers", "[sinteger][arithmetic]")
+SCENARIO("Division of signed integers", "[integer][arithmetic]")
 {
 
     GIVEN("The number 1 << 65")
     {
-        const sinteger<70> m = (sinteger<70>::one() << 65);
+        const integer<70> m = (integer<70>::one() << 65);
 
-        const sinteger<70> two{2};
+        const integer<70> two{2};
 
         WHEN("Repeatedly dividing by two")
         {
@@ -190,13 +219,13 @@ SCENARIO("Division of signed integers", "[sinteger][arithmetic]")
 
                 CHECK(div1.first.word(1) == 1U);
                 CHECK(div1.first.word(0) == 0U);
-                CHECK(div1.second == sinteger<70>::zero());
+                CHECK(div1.second == integer<70>::zero());
 
                 const auto div2 = restoring_division(div1.first, two);
 
                 CHECK(div2.first.word(1) == 0U);
                 CHECK(div2.first.word(0) == (int64_t(1) << int64_t(63)));
-                CHECK(div2.second == sinteger<70>::zero());
+                CHECK(div2.second == integer<70>::zero());
             }
         }
     }
@@ -206,7 +235,7 @@ SCENARIO("Division of signed integers", "[sinteger][arithmetic]")
 
         const int64_t n_ = GENERATE(take(
             100, random(std::numeric_limits<int64_t>::max(), std::numeric_limits<int64_t>::max())));
-        const sinteger<64> n{n_};
+        const integer<64> n{n_};
 
         WHEN("Dividing zero by this number")
         {
@@ -214,9 +243,9 @@ SCENARIO("Division of signed integers", "[sinteger][arithmetic]")
             {
                 if (!n.is_zero())
                 {
-                    const auto result = restoring_division(sinteger<64>::zero(), n);
-                    CHECK(result.second == sinteger<64>::zero());
-                    REQUIRE(result.first == sinteger<64>::zero());
+                    const auto result = restoring_division(integer<64>::zero(), n);
+                    CHECK(result.second == integer<64>::zero());
+                    REQUIRE(result.first == integer<64>::zero());
                 }
                 else
                 {
@@ -234,8 +263,8 @@ SCENARIO("Division of signed integers", "[sinteger][arithmetic]")
                     if (!n.is_zero())
                     {
                         const auto result = restoring_division(n, n);
-                        CHECK(result.second == sinteger<64>::zero());
-                        REQUIRE(result.first == sinteger<61>::one());
+                        CHECK(result.second == integer<64>::zero());
+                        REQUIRE(result.first == integer<61>::one());
                     }
                     else
                     {
@@ -249,7 +278,7 @@ SCENARIO("Division of signed integers", "[sinteger][arithmetic]")
         {
             THEN("An exception should be raised")
             {
-                REQUIRE_THROWS_AS(restoring_division(n, sinteger<64>::zero()), std::runtime_error);
+                REQUIRE_THROWS_AS(restoring_division(n, integer<64>::zero()), std::runtime_error);
             }
         }
 
@@ -258,8 +287,8 @@ SCENARIO("Division of signed integers", "[sinteger][arithmetic]")
             THEN("The result should be the number itself")
             {
 
-                const auto result = restoring_division(n, sinteger<64>::one());
-                CHECK(result.second == sinteger<64>::zero());
+                const auto result = restoring_division(n, integer<64>::one());
+                CHECK(result.second == integer<64>::zero());
                 REQUIRE(result.first == n);
             }
         }
@@ -269,8 +298,8 @@ SCENARIO("Division of signed integers", "[sinteger][arithmetic]")
             THEN("The result should flip its sign")
             {
 
-                const auto result = restoring_division(n, sinteger<64>::minus_one());
-                CHECK(result.second == sinteger<64>::zero());
+                const auto result = restoring_division(n, integer<64>::minus_one());
+                CHECK(result.second == integer<64>::zero());
                 REQUIRE(result.first == -n);
             }
         }
@@ -279,7 +308,7 @@ SCENARIO("Division of signed integers", "[sinteger][arithmetic]")
         {
             const int64_t m_ = GENERATE(take(100, random(std::numeric_limits<int64_t>::max(),
                                                          std::numeric_limits<int64_t>::max())));
-            const sinteger<64> m{m_};
+            const integer<64> m{m_};
             WHEN("Dividing the numbers")
             {
                 THEN("The behaviour should match its int64_t counterpart")
@@ -303,15 +332,15 @@ SCENARIO("Division of signed integers", "[sinteger][arithmetic]")
                 THEN("The result should be INT_MIN")
                 {
                     const auto result =
-                        restoring_division(sinteger<64>::min(), sinteger<64>::minus_one());
-                    CHECK(result.first == sinteger<64>::min());
-                    CHECK(result.second == sinteger<64>::zero());
+                        restoring_division(integer<64>::min(), integer<64>::minus_one());
+                    CHECK(result.first == integer<64>::min());
+                    CHECK(result.second == integer<64>::zero());
                 }
             }
         }
     }
 }
-SCENARIO("Multiplying signed integers", "[sinteger][arithmetic]")
+SCENARIO("Multiplying signed integers", "[integer][arithmetic]")
 {
     GIVEN("Two signed integers m and r")
     {
@@ -323,10 +352,10 @@ SCENARIO("Multiplying signed integers", "[sinteger][arithmetic]")
         {
             THEN("The algorithm should still work")
             {
-                const sinteger<8> m{-16};
-                const sinteger<8> r{2};
+                const integer<8> m{-16};
+                const integer<8> r{2};
 
-                const sinteger<8> res = mul(m, r);
+                const integer<8> res = mul(m, r);
 
                 int8_t mi = -16;
                 int8_t ri = 2;
@@ -338,11 +367,11 @@ SCENARIO("Multiplying signed integers", "[sinteger][arithmetic]")
     }
 }
 
-SCENARIO("Absolute value computation", "[sinteger][utility]")
+SCENARIO("Absolute value computation", "[integer][utility]")
 {
     GIVEN("The smallest possible value")
     {
-        const sinteger<150> min = std::numeric_limits<sinteger<150>>::min();
+        const integer<150> min = std::numeric_limits<integer<150>>::min();
         THEN("The absolute value of that value is the value again")
         {
             REQUIRE(abs(min) == min);
@@ -359,7 +388,7 @@ SCENARIO("Absolute value computation", "[sinteger][utility]")
 
     GIVEN("Any non-smallest value")
     {
-        using sint = sinteger<64>;
+        using sint = integer<64>;
         const int32_t val_32 =
             GENERATE(take(50, random(std::numeric_limits<int32_t>::min() + 1, -1)));
         const int64_t val_64 = GENERATE(
@@ -386,13 +415,13 @@ SCENARIO("Absolute value computation", "[sinteger][utility]")
     }
 }
 
-SCENARIO("Expanding subtraction works correctly", "[sinteger][arithmetic]")
+SCENARIO("Expanding subtraction works correctly", "[integer][arithmetic]")
 {
     GIVEN("A n-bit min and a m-bit (m>n)  max")
     {
-        static const sinteger<4> min4 = sinteger<4>::min();
-        static const sinteger<8> max8 = sinteger<8>::max();
-        static const sinteger<8> expected = sinteger<8>{-135};
+        static const integer<4> min4 = integer<4>::min();
+        static const integer<8> max8 = integer<8>::max();
+        static const integer<8> expected = integer<8>{-135};
 
         THEN("Subtracting max from min should correctly yield (min-max) as it now fits the width")
         {
@@ -403,10 +432,10 @@ SCENARIO("Expanding subtraction works correctly", "[sinteger][arithmetic]")
 
     GIVEN("A n-bit min and a m-bit (m<n) max")
     {
-        static const sinteger<8> min8 = sinteger<8>::min();
-        static const sinteger<4> max4 = sinteger<4>::max();
-        static const sinteger<8> expected =
-            add(sub(sinteger<8>::max(), sinteger<8>(sinteger<4>::max())), sinteger<8>{1U});
+        static const integer<8> min8 = integer<8>::min();
+        static const integer<4> max4 = integer<4>::max();
+        static const integer<8> expected =
+            add(sub(integer<8>::max(), integer<8>(integer<4>::max())), integer<8>{1U});
 
         THEN("Subtracting max from min should give (max-min)+1")
         {
@@ -416,20 +445,20 @@ SCENARIO("Expanding subtraction works correctly", "[sinteger][arithmetic]")
     }
 }
 
-SCENARIO("Width casting of signed integers", "[sinteger][utility]")
+SCENARIO("Width casting of signed integers", "[integer][utility]")
 {
-    GIVEN("A positive sinteger")
+    GIVEN("A positive integer")
     {
-        sinteger<16> i16{400};
-        sinteger<32> i32{400};
-        sinteger<150> i150{354346546};
+        integer<16> i16{400};
+        integer<32> i32{400};
+        integer<150> i150{354346546};
 
         WHEN("Expanding the width")
         {
 
-            sinteger<24> i16e = width_cast<24>(i16);
-            sinteger<50> i32e = width_cast<50>(i32);
-            sinteger<200> i150e = width_cast<200>(i150);
+            integer<24> i16e = width_cast<24>(i16);
+            integer<50> i32e = width_cast<50>(i32);
+            integer<200> i150e = width_cast<200>(i150);
 
             THEN("The numerical value should not have changed")
             {
@@ -442,29 +471,29 @@ SCENARIO("Width casting of signed integers", "[sinteger][utility]")
         {
             THEN("The first bits are simply dropped")
             {
-                sinteger<8> i16r = width_cast<8>(i16);
-                sinteger<20> i32r = width_cast<20>(i32);
-                sinteger<2> i150r = width_cast<2>(i150);
-                CHECK(i16r == sinteger<8>{400 - 256});
+                integer<8> i16r = width_cast<8>(i16);
+                integer<20> i32r = width_cast<20>(i32);
+                integer<2> i150r = width_cast<2>(i150);
+                CHECK(i16r == integer<8>{400 - 256});
                 CHECK(i32r == i32);
-                CHECK(i150r == sinteger<2>{2});
+                CHECK(i150r == integer<2>{2});
                 //                std::cout << group_digits(to_binary(i150),8) << "\n";
                 //                std::cout << group_digits(to_binary(i150r),8) << "\n";
             }
         }
     }
-    GIVEN("A negative sinteger")
+    GIVEN("A negative integer")
     {
-        sinteger<16> i16{-400};
-        sinteger<32> i32{-400};
-        sinteger<150> i150{-354346546};
+        integer<16> i16{-400};
+        integer<32> i32{-400};
+        integer<150> i150{-354346546};
 
         WHEN("Expanding the width")
         {
 
-            sinteger<24> i16e = width_cast<24>(i16);
-            sinteger<50> i32e = width_cast<50>(i32);
-            sinteger<200> i150e = width_cast<200>(i150);
+            integer<24> i16e = width_cast<24>(i16);
+            integer<50> i32e = width_cast<50>(i32);
+            integer<200> i150e = width_cast<200>(i150);
 
             THEN("The numerical value should not have changed")
             {
@@ -477,23 +506,23 @@ SCENARIO("Width casting of signed integers", "[sinteger][utility]")
         {
             THEN("The first bits are simply dropped")
             {
-                sinteger<8> i16r = width_cast<8>(i16);
-                sinteger<20> i32r = width_cast<20>(i32);
-                sinteger<2> i150r = width_cast<2>(i150);
+                integer<8> i16r = width_cast<8>(i16);
+                integer<20> i32r = width_cast<20>(i32);
+                integer<2> i150r = width_cast<2>(i150);
 
-                CHECK(i16r == sinteger<8>{112});
+                CHECK(i16r == integer<8>{112});
                 CHECK(i32r == i32);
-                CHECK(i150r == sinteger<2>{2});
+                CHECK(i150r == integer<2>{2});
             }
         }
     }
 }
 
-SCENARIO("Unary minus operation", "[sinteger][utility]")
+SCENARIO("Unary minus operation", "[integer][utility]")
 {
     GIVEN("The smallest possible value")
     {
-        const sinteger<150> min = std::numeric_limits<sinteger<150>>::min();
+        const integer<150> min = std::numeric_limits<integer<150>>::min();
         THEN("The unary minus value of that value is the value again")
         {
             REQUIRE(-min == min);
@@ -502,7 +531,7 @@ SCENARIO("Unary minus operation", "[sinteger][utility]")
 
     GIVEN("Any non-smallest value")
     {
-        using sint = sinteger<64>;
+        using sint = integer<64>;
         const int32_t val_32 =
             GENERATE(take(50, random(std::numeric_limits<int32_t>::min() + 1, -1)));
         const int64_t val_64 = GENERATE(
@@ -524,15 +553,15 @@ SCENARIO("Unary minus operation", "[sinteger][utility]")
     }
 }
 
-SCENARIO("MIN/MAX Values behave as expected", "[sinteger][utility]")
+SCENARIO("MIN/MAX Values behave as expected", "[integer][utility]")
 {
     GIVEN("The min and max value")
     {
         constexpr size_t w = 50;
-        sinteger<w> min = sinteger<w>::min();
-        sinteger<w> max = sinteger<w>::max();
-        sinteger<w> one(1U);
-        [[maybe_unused]] sinteger<w> zero(0U);
+        integer<w> min = integer<w>::min();
+        integer<w> max = integer<w>::max();
+        integer<w> one(1U);
+        [[maybe_unused]] integer<w> zero(0U);
         THEN("Adding/subtracting one should wrap around")
         {
             REQUIRE(add(max, one) == min);
@@ -550,13 +579,13 @@ SCENARIO("MIN/MAX Values behave as expected", "[sinteger][utility]")
 
 SCENARIO("Left/right shifting sintegers")
 {
-    GIVEN("A positive sinteger")
+    GIVEN("A positive integer")
     {
-        const sinteger<150> a{0U, 1U, 0U};
-        const sinteger<150> b{8, 8, 8};
-        const sinteger<150> b_{4, 4, 4};
-        const sinteger<150> b__{2, 2, 2};
-        const sinteger<150> b___{1, 1, 1};
+        const integer<150> a{0U, 1U, 0U};
+        const integer<150> b{8, 8, 8};
+        const integer<150> b_{4, 4, 4};
+        const integer<150> b__{2, 2, 2};
+        const integer<150> b___{1, 1, 1};
         WHEN("Right Shfiting")
         {
             THEN("It should behave like division by a power of two")
@@ -576,7 +605,7 @@ SCENARIO("Left/right shifting sintegers")
             THEN("It should move correctly over word boundaries")
             {
                 const auto k = (a >> 1);
-                const auto b = sinteger<150>(0U, 0U, (uint64_t(1) << 63U));
+                const auto b = integer<150>(0U, 0U, (uint64_t(1) << 63U));
                 //                std::cout << group_digits(to_binary(k), 64) << "\n";
                 //                std::cout << group_digits(to_binary(b), 64) << "\n";
                 REQUIRE(k == b);
@@ -584,9 +613,9 @@ SCENARIO("Left/right shifting sintegers")
 
             THEN("The it should also work when moving farther than the word width")
             {
-                const sinteger<150> c{12U, 0U, 0U};
-                const sinteger c_shifted = c >> 68;
-                const auto b = sinteger<150>(0U, 0U, (uint64_t(11) << 62U));
+                const integer<150> c{12U, 0U, 0U};
+                const integer c_shifted = c >> 68;
+                const auto b = integer<150>(0U, 0U, (uint64_t(11) << 62U));
                 REQUIRE(c_shifted == b);
                 //                std::cout << group_digits(to_binary(c), 64) << "\n";
                 //                std::cout << group_digits(to_binary(c_shifted), 64) << "\n";
@@ -597,9 +626,9 @@ SCENARIO("Left/right shifting sintegers")
             THEN("It should behave like multiplication by a power of two")
             {
 
-                sinteger<150> _b___ = b___ << 1;
-                sinteger<150> __b___ = b___ << 2;
-                sinteger<150> ___b___ = b___ << 3;
+                integer<150> _b___ = b___ << 1;
+                integer<150> __b___ = b___ << 2;
+                integer<150> ___b___ = b___ << 3;
                 REQUIRE(_b___ == b__);
                 REQUIRE(__b___ == b_);
                 REQUIRE(___b___ == b);
@@ -609,19 +638,19 @@ SCENARIO("Left/right shifting sintegers")
         }
     }
 
-    GIVEN("The sinteger -1")
+    GIVEN("The integer -1")
     {
         WHEN("Right shifting")
         {
             THEN("-1 should not be affected")
             {
-                const sinteger<150> minus_one(-1);
-                const sinteger<150> shifted1 = minus_one >> 1;
-                const sinteger<150> shifted2 = minus_one >> 22;
-                const sinteger<150> shifted3 = minus_one >> 23;
-                const sinteger<150> shifted4 = minus_one >> 149;
-                const sinteger<150> shifted5 = minus_one >> 150;
-                const sinteger<150> shifted6 = minus_one >> 1151;
+                const integer<150> minus_one(-1);
+                const integer<150> shifted1 = minus_one >> 1;
+                const integer<150> shifted2 = minus_one >> 22;
+                const integer<150> shifted3 = minus_one >> 23;
+                const integer<150> shifted4 = minus_one >> 149;
+                const integer<150> shifted5 = minus_one >> 150;
+                const integer<150> shifted6 = minus_one >> 1151;
 
                 CHECK(shifted1 == minus_one);
                 CHECK(shifted2 == minus_one);

@@ -19,6 +19,9 @@ public:
     using bit_type = WordType;
     static_assert(Width > 0, " Width must be at least 1 (bit)");
 
+    static_assert(aarith::is_unsigned_int<WordType>,
+                  "Only unsigned integers can be used as word types");
+
     /*
      * Constructors etc.
      */
@@ -433,25 +436,40 @@ private:
     std::array<word_type, word_count()> words{{0}};
 };
 
+template <size_t Width> class is_word_array<word_array<Width>>
+{
+public:
+    static constexpr bool value = true;
+};
+
 template <size_t DestinationWidth, size_t SourceWidth>
 [[nodiscard]] auto width_cast(const word_array<SourceWidth>& source) -> word_array<DestinationWidth>
 {
-    word_array<DestinationWidth> word_container;
-    if constexpr (DestinationWidth >= SourceWidth)
+
+    if constexpr (SourceWidth == DestinationWidth)
     {
-        for (auto i = 0U; i < source.word_count(); ++i)
-        {
-            word_container.set_word(i, source.word(i));
-        }
+        return source;
     }
     else
     {
-        for (auto i = 0U; i < word_container.word_count(); ++i)
+
+        word_array<DestinationWidth> word_container;
+        if constexpr (DestinationWidth >= SourceWidth)
         {
-            word_container.set_word(i, source.word(i));
+            for (auto i = 0U; i < source.word_count(); ++i)
+            {
+                word_container.set_word(i, source.word(i));
+            }
         }
+        else
+        {
+            for (auto i = 0U; i < word_container.word_count(); ++i)
+            {
+                word_container.set_word(i, source.word(i));
+            }
+        }
+        return word_container;
     }
-    return word_container;
 }
 
 } // namespace aarith

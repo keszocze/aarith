@@ -2,7 +2,7 @@
 
 #include <aarith/core/traits.hpp>
 #include <aarith/float/float_utils.hpp>
-#include <aarith/integer/uinteger.hpp>
+#include <aarith/integer.hpp>
 #include <cstdint>
 #include <iostream>
 #include <string>
@@ -308,7 +308,7 @@ auto normalize(const normalized_float<E, M1>& nf) -> normalized_float<E, M2>
     else
     {
         auto shift_by = M2 - one_at - 1;
-        mantissa <<= shift_by;
+        mantissa = (mantissa << shift_by);
         exponent = sub(exponent, uinteger<E>(shift_by));
     }
 
@@ -323,8 +323,8 @@ auto normalize(const normalized_float<E, M1>& nf) -> normalized_float<E, M2>
 
 template <class uint> auto find_leading_one(const uint mantissa) -> typename uint::word_type
 {
-    static_assert(is_integral<uint>::value);
-    static_assert(is_unsigned<uint>::value);
+    static_assert(is_integral_v<uint>);
+    static_assert(is_unsigned_v<uint>);
 
     const auto width = uint::width();
     auto one_at = width;

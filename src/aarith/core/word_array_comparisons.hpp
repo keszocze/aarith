@@ -8,16 +8,15 @@
 
 namespace aarith {
 
-    /**
-     * @brief Compares two word_containers bit-wise
-     * @tparam W Width of the left word_array
-     * @tparam V Width of the right word_array
-     * @param a Left word_array
-     * @param b Right word_array
-     * @return true iff the word containers are identical in every bit
-     */
-template <size_t W, size_t V>
-bool operator==(const word_array<W>& a, const word_array<V>& b)
+/**
+ * @brief Compares two word_containers bit-wise
+ * @tparam W Width of the left word_array
+ * @tparam V Width of the right word_array
+ * @param a Left word_array
+ * @param b Right word_array
+ * @return true iff the word containers are identical in every bit
+ */
+template <size_t W, size_t V> bool operator==(const word_array<W>& a, const word_array<V>& b)
 {
     if constexpr (W != V)
     {
@@ -36,10 +35,12 @@ bool operator==(const word_array<W>& a, const word_array<V>& b)
     }
 }
 
-
-template <size_t W, size_t V>
-bool operator!=(const word_array<W>& a, const word_array<V>& b)
+template <typename W, typename V> bool operator!=(const W& a, const V& b)
 {
+
+    static_assert(is_word_array_v<W>);
+    static_assert(is_word_array_v<V>);
+
     // we do not care about speed and simply call the equality function....
     return !(a == b);
 }

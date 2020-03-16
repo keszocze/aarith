@@ -1,7 +1,7 @@
 #pragma once
 
-#include <aarith/integer/uinteger.hpp>
-#include <aarith/integer/uinteger_operations.hpp>
+#include <aarith/core/word_array.hpp>
+#include <aarith/integer.hpp>
 #include <cstdint>
 #include <iostream>
 
@@ -10,25 +10,27 @@ namespace aarith {
 /**
  * @brief Generates an uinteger of given size with the specified number of leading ones.
  *
- * Example: generate_bitmask<uinteger<10>(3) = 1110000000
+ * Example: generate_bitmask<uinteger<10>>(3) = 1110000000
  *
- * @tparam UInteger The underlying data type
+ * @note There should never be a reason to call this function directly as a library user.
+ *
+ * @tparam Integer The underlying data type
  * @param leading_ones The number of leading ones
  * @return The bit bask consisting of leading_ones ones followed by zeros
  */
-template <class UInteger> auto generate_bitmask(const size_t leading_ones) -> UInteger
+template <class Integer> auto generate_bitmask(const size_t leading_ones) -> Integer
 {
-    using word_type = typename UInteger::word_type;
+    using word_type = typename Integer::word_type;
 
-    const size_t bits = UInteger::width() - leading_ones;
+    const size_t bits = Integer::width() - leading_ones;
 
     constexpr auto full_mask = static_cast<word_type>(-1);
-    const auto full_mask_words = bits / static_cast<size_t>(UInteger::word_width());
-    const auto remaining_bits = bits % static_cast<size_t>(UInteger::word_width());
+    const auto full_mask_words = bits / static_cast<size_t>(Integer::word_width());
+    const auto remaining_bits = bits % static_cast<size_t>(Integer::word_width());
 
-    const typename UInteger::word_type last_word_mask = (static_cast<word_type>(1) << bits) - 1;
+    const typename Integer::word_type last_word_mask = (static_cast<word_type>(1) << bits) - 1;
 
-    UInteger mask;
+    Integer mask;
     auto counter = 0U;
     for (; counter < full_mask_words; ++counter)
     {
@@ -41,102 +43,135 @@ template <class UInteger> auto generate_bitmask(const size_t leading_ones) -> UI
     return ~mask;
 }
 
-template <class UInteger, class Function>
-[[nodiscard]] UInteger approx_operation_post_masking(const UInteger& a, const UInteger b,
-                                                     Function fun,
-                                                     const size_t bits = UInteger::width())
+template <class Integer, class Function>
+[[nodiscard]] Integer approx_operation_post_masking(const Integer& a, const Integer b, Function fun,
+                                                    size_t bits)
 {
-    const UInteger result = fun(a, b);
-    const UInteger mask = generate_bitmask<UInteger>(bits);
+
+    static_assert(is_integral_v<Integer>);
+
+    /*
+     * In case of signed integers we *always* want to have the signed bit correct and, therefore,
+     * increase the number of correctly computed bits by one
+     */
+    if constexpr (!is_unsigned_v<Integer>)
+    {
+        bits = std::max(bits + 1, Integer::width());
+    }
+
+    const Integer result = fun(a, b);
+    const Integer mask = generate_bitmask<Integer>(bits);
 
     return result & mask;
 }
 
-template <class UInteger>
-[[nodiscard]] UInteger approx_add_post_masking(const UInteger& a, const UInteger b,
-                                               const size_t bits = UInteger::width())
+template <class Integer>
+[[nodiscard]] Integer approx_add_post_masking(const Integer& a, const Integer b,
+                                              const size_t bits = Integer::width())
 {
-    return approx_operation_post_masking(a, b, &aarith::add<UInteger::width()>, bits);
+    const auto fun = [](const Integer& a_, const Integer& b_) { return add(a_, b_); };
+    return approx_operation_post_masking(a, b, fun, bits);
 }
 
-template <class UInteger>
-[[nodiscard]] UInteger approx_mul_post_masking(const UInteger& a, const UInteger b,
-                                               const size_t bits = UInteger::width())
+template <class Integer>
+[[nodiscard]] Integer approx_mul_post_masking(const Integer& a, const Integer b,
+                                              const size_t bits = Integer::width())
 {
-    return approx_operation_post_masking(a, b, &aarith::mul<UInteger::width()>, bits);
+    const auto fun = [](const Integer& a_, const Integer& b_) { return mul(a_, b_); };
+    return approx_operation_post_masking(a, b, fun, bits);
 }
 
-template <class UInteger>
-[[nodiscard]] UInteger approx_sub_post_masking(const UInteger& a, const UInteger b,
-                                               const size_t bits = UInteger::width())
+template <class Integer>
+[[nodiscard]] Integer approx_sub_post_masking(const Integer& a, const Integer b,
+                                              const size_t bits = Integer::width())
 {
-    return approx_operation_post_masking(a, b, &aarith::sub<UInteger::width()>, bits);
+    const auto fun = [](const Integer& a_, const Integer& b_) { return sub(a_, b_); };
+    return approx_operation_post_masking(a, b, fun, bits);
 }
 
-template <class UInteger>
-[[nodiscard]] UInteger approx_div_post_masking(const UInteger& a, const UInteger b,
-                                               const size_t bits = UInteger::width())
+template <class Integer>
+[[nodiscard]] Integer approx_div_post_masking(const Integer& a, const Integer b,
+                                              const size_t bits = Integer::width())
 {
-    return approx_operation_post_masking(a, b, &aarith::div<UInteger>, bits);
+    const auto fun = [](const Integer& a_, const Integer& b_) { return div(a_, b_); };
+    return approx_operation_post_masking(a, b, fun, bits);
 }
 
-template <class UInteger>
-[[nodiscard]] UInteger approx_rem_post_masking(const UInteger& a, const UInteger b,
-                                               const size_t bits = UInteger::width())
+template <class Integer>
+[[nodiscard]] Integer approx_rem_post_masking(const Integer& a, const Integer b,
+                                              const size_t bits = Integer::width())
 {
-    return approx_operation_post_masking(a, b, &aarith::remainder<UInteger>, bits);
+    const auto fun = [](const Integer& a_, const Integer& b_) { return rem(a_, b_); };
+    return approx_operation_post_masking(a, b, fun, bits);
 }
 
-template <class UInteger, class Function>
-[[nodiscard]] UInteger approx_operation_pre_masking(const UInteger& a, const UInteger b,
-                                                    Function fun,
-                                                    const size_t bits = UInteger::width())
+template <typename Integer, typename Function>
+[[nodiscard]] Integer approx_operation_pre_masking(const Integer& a, const Integer b, Function fun,
+                                                   const size_t bits = Integer::width())
 {
-    const UInteger mask = generate_bitmask<UInteger>(bits);
+    static_assert(is_integral_v<Integer>);
+
+    /*
+     * In case of signed integers we *always* want to have the signed bit correct and, therefore,
+     * increase the number of correctly computed bits by one
+     */
+    if constexpr (!is_unsigned_v<Integer>)
+    {
+        bits = std::max(bits + 1, Integer::width());
+    }
+
+    const Integer mask = generate_bitmask<Integer>(bits);
     auto const a_masked = a & mask;
     auto const b_masked = b & mask;
 
     return fun(a_masked, b_masked);
 }
 
-template <class UInteger>
-[[nodiscard]] UInteger approx_add_pre_masking(const UInteger& a, const UInteger b,
-                                              const size_t bits = UInteger::width())
+template <class Integer>
+[[nodiscard]] Integer approx_add_pre_masking(const Integer& a, const Integer b,
+                                             const size_t bits = Integer::width())
 {
-    return approx_operation_pre_masking(a, b, &aarith::add<UInteger::width()>, bits);
+
+    const auto fun = [](const Integer& a_, const Integer& b_) { return add(a_, b_); };
+    return approx_operation_pre_masking(a, b, fun, bits);
 }
 
-template <class UInteger>
-[[nodiscard]] UInteger approx_mul_pre_masking(const UInteger& a, const UInteger b,
-                                              const size_t bits = UInteger::width())
+template <class Integer>
+[[nodiscard]] Integer approx_mul_pre_masking(const Integer& a, const Integer b,
+                                             const size_t bits = Integer::width())
 {
-    return approx_operation_pre_masking(a, b, &aarith::mul<UInteger::width()>, bits);
+
+    const auto fun = [](const Integer& a_, const Integer& b_) { return mul(a_, b_); };
+    return approx_operation_pre_masking(a, b, fun, bits);
 }
 
-template <class UInteger>
-[[nodiscard]] UInteger approx_sub_pre_masking(const UInteger& a, const UInteger b,
-                                              const size_t bits = UInteger::width())
+template <class Integer>
+[[nodiscard]] Integer approx_sub_pre_masking(const Integer& a, const Integer b,
+                                             const size_t bits = Integer::width())
 {
-    return approx_operation_pre_masking(a, b, &aarith::sub<UInteger::width()>, bits);
+    const auto fun = [](const Integer& a_, const Integer& b_) { return sub(a_, b_); };
+    return approx_operation_pre_masking(a, b, fun, bits);
 }
 
-template <class UInteger>
-[[nodiscard]] UInteger approx_div_pre_masking(const UInteger& a, const UInteger b,
-                                              const size_t bits = UInteger::width())
+template <class Integer>
+[[nodiscard]] Integer approx_div_pre_masking(const Integer& a, const Integer b,
+                                             const size_t bits = Integer::width())
 {
-    return approx_operation_pre_masking(a, b, &aarith::div<UInteger>, bits);
+    const auto fun = [](const Integer& a_, const Integer& b_) { return div(a_, b_); };
+    return approx_operation_pre_masking(a, b, fun, bits);
 }
 
-template <class UInteger>
-[[nodiscard]] UInteger approx_rem_pre_masking(const UInteger& a, const UInteger b,
-                                              const size_t bits = UInteger::width())
+template <class Integer>
+[[nodiscard]] Integer approx_rem_pre_masking(const Integer& a, const Integer b,
+                                             const size_t bits = Integer::width())
 {
-    return approx_operation_pre_masking(a, b, &aarith::remainder<UInteger>, bits);
+    const auto fun = [](const Integer& a_, const Integer& b_) { return rem(a_, b_); };
+    return approx_operation_pre_masking(a, b, fun, bits);
 }
 
 /**
- * @brief Multiplies the given most-significand portion of two uintegers by masking the partial
- * products used in the multiplication
+ * @brief Multiplies the given most-significand portion of two unsigned integers by masking the
+ * partial products used in the multiplication.
  *
  * @tparam Width The width of the used uintegers
  * @param opd1 Multiplier
@@ -159,12 +194,26 @@ auto approx_uint_bitmasking_mul(const uinteger<width>& opd1, const uinteger<widt
     {
         auto const opd2_masked = opd2_extended & mask;
         product = ((opd1.bit(i) == 0) ? product : add(product, opd2_masked));
-        opd2_extended <<= 1;
+        opd2_extended = (opd2_extended << 1);
     }
 
     return product;
 }
 
+/** @brief Approximately adds two unsigned integers.
+ *
+ * This adder does not propagate the carry from one word to the next word within the word_array that
+ * stores the unsigned integer.
+ *
+ * This addition is neither fast nor a really good approximate adder. It is merely for educational
+ * purposes to show how to use the zip_with_expand function.
+ *
+ * @tparam W Bit width of the first summand
+ * @tparam V Bit width of the second summand
+ * @param a First summand
+ * @param b Second summand
+ * @return Aproximated addition of a and b
+ */
 template <size_t W, size_t V>
 [[nodiscard]] uinteger<std::max(W, V)> trivial_approx_add(const uinteger<W>& a,
                                                           const uinteger<V>& b)
