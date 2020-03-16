@@ -58,9 +58,10 @@ template <typename I, typename T>
  * @param b Subtrahend
  * @return Difference between a and b
  */
-template <typename I>[[nodiscard]] auto sub(const I& a, const I& b) -> I
+template <typename I, typename T>[[nodiscard]] auto sub(const I& a, const T& b) -> I
 {
     static_assert(is_integral_v<I>);
+    static_assert(I::width() >= T::width());
 
     auto result = expanding_add(a, ~b, true);
     return width_cast<I::width()>(result);
@@ -167,6 +168,82 @@ template <std::size_t W, std::size_t V>
 template <typename I>[[nodiscard]] I mul(const I& a, const I& b)
 {
     return width_cast<I::width()>(expanding_mul(a, b));
+}
+
+/**
+ * @brief Multiplies two unsigned integers using the Karazuba algorithm expanding the bit width so that the result fits.
+ *
+ * This implements the simplest multiplication algorithm (binary "long multiplication") that adds up
+ * the partial products everywhere where the first multiplicand has a 1 bit. The simplicity, of
+ * course, comes at the cost of performance.
+ *
+ * @tparam W The bit width of the first multiplicant
+ * @tparam V The bit width of the second multiplicant
+ * @param a First multiplicant
+ * @param b Second multiplicant
+ * @return Product of a and b
+ */
+template <std::size_t W, std::size_t V>
+[[nodiscard]] uinteger<W + V> expanding_karazuba(const uinteger<W>& a, const uinteger<V>& b)
+{
+
+    constexpr std::size_t res_width = W + V;
+    if constexpr (res_width <= 64)
+    {
+        uinteger<res_width> result{0U};
+        uint64_t result_uint64 = a.word(0) * b.word(0);
+        result.set_word(0, result_uint64);
+        return result;
+    }
+    else if constexpr (W == V && (W & (W - 1)) == 0 ) // W = V and W is power of 2
+    {
+        if(a.is_zero() || b.is_zero())
+        {
+          return uinteger<res_width>(0U);
+        }
+
+        const auto a_split = split<W/2-1>(a);
+        const auto b_split = split<W/2-1>(b);
+
+        const auto ah = uinteger<W/2>(a_split.first);
+        const auto al = uinteger<W/2>(a_split.second);
+        const auto bh = uinteger<W/2>(b_split.first);
+        const auto bl = uinteger<W/2>(b_split.second);
+
+        const auto p1 = expanding_karazuba<W/2, W/2>(ah, bh);        
+        const auto p2 = expanding_karazuba<W/2, W/2>(al, bl);        
+        const auto s1 = expanding_add(ah, al);
+        const auto s2 = expanding_add(bh, bl);
+        uinteger<2*(W/2+1)> p3;
+        
+        //prevent infinite call loop
+        if(s1.bit(s1.width()-1) == 1 || s2.bit(s2.width()-1) == 1) 
+        {
+            p3 = expanding_karazuba<W/2+1, W/2+1>(s1, s2);
+        }
+        else
+        {
+            p3 = expanding_karazuba<W/2, W/2>(width_cast<W/2>(s1), width_cast<W/2>(s2));
+        }
+
+        const auto k1 = width_cast<res_width>(p1) << W;
+        const auto k2 = sub(p3, expanding_add(p1, p2)) << W/2;
+        const auto product = expanding_add(k1, expanding_add(k2, p2));
+
+        return width_cast<res_width>(product);
+    }
+    else
+    {
+        // set width to power of 2
+        constexpr std::size_t karazuba_width = 1UL << static_cast<size_t>(std::ceil(std::log2(static_cast<double>(std::max(W, V)))));
+        
+        const auto a_ = width_cast<karazuba_width>(a);
+        const auto b_ = width_cast<karazuba_width>(b);
+        
+        const auto res = expanding_karazuba(a_, b_);
+
+        return width_cast<res_width>(res);
+    }
 }
 
 /**
