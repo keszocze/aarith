@@ -293,17 +293,7 @@ public:
         }
     }
 
-    /**
-     * @brief Returns the maxmimum number of elements that can be stored in this word_array
-     *
-     * This number is fixed.
-     *
-     * @return The maximum number of elements
-     */
-    constexpr size_t max_size() const noexcept
-    {
-        return word_count();
-    }
+
 
     // Sets the words to the given values, where the right-most argument corresponds to word 0.
     template <class... Args> void set_words(Args... args)
