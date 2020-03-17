@@ -51,7 +51,8 @@ run_tests:
     script:
         - cd build
           #        - find -name "*-test" -exec {} \;
-        - if !$(make test); then return 1; fi
+        - make test
+        - if !$?; then return 1; fi
         - cd tests
         - export GCOV_PREFIX_STRIP=10
         - rm -rf coverage
