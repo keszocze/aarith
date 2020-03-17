@@ -172,9 +172,7 @@ template <typename I>[[nodiscard]] I mul(const I& a, const I& b)
 /**
  * @brief Multiplies two unsigned integers using the Karazuba algorithm expanding the bit width so that the result fits.
  *
- * This implements the simplest multiplication algorithm (binary "long multiplication") that adds up
- * the partial products everywhere where the first multiplicand has a 1 bit. The simplicity, of
- * course, comes at the cost of performance.
+ * This implements the karazuba multiplication algorithm (divide and conquer).
  *
  * @tparam W The bit width of the first multiplicant
  * @tparam V The bit width of the second multiplicant
@@ -194,11 +192,11 @@ template <std::size_t W, std::size_t V>
         result.set_word(0, result_uint64);
         return result;
     }
-    else if constexpr (W == V) // && (W & (W - 1)) == 0 ) // W = V and W is power of 2
+    else if constexpr (W == V) 
     {
         if(a.is_zero() || b.is_zero())
         {
-          return uinteger<res_width>(0U);
+            return uinteger<res_width>(0U);
         }
 
         // set width to power of 2
@@ -240,8 +238,6 @@ template <std::size_t W, std::size_t V>
     }
     else
     {
-        // set width to power of 2
-        //constexpr std::size_t karazuba_width = 1UL << static_cast<size_t>(std::ceil(std::log2(static_cast<double>(std::max(W, V)))));
         constexpr std::size_t max_width = std::max(W, V);
         
         const auto a_ = width_cast<max_width>(a);
