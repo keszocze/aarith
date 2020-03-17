@@ -169,6 +169,86 @@ template <typename I>[[nodiscard]] I mul(const I& a, const I& b)
     return width_cast<I::width()>(expanding_mul(a, b));
 }
 
+// TODO natürlich auch für signed integer zulassen
+
+/**
+ * @brief Exponentiation function
+ *
+ * @note This function does not make any attempts to be fast or to prevent overflows!
+ *
+ * @note If exponent equals std::numeric_limits<size_t>::max(), this method throws an exception,
+ * unless base equals zero
+ * @tparam W Bit width of the integer
+ * @param base
+ * @param exponent
+ * @return The base to the power of the exponent
+ */
+template <size_t W> uinteger<W> pow(const uinteger<W>& base, const size_t exponent)
+{
+
+    if (exponent == std::numeric_limits<size_t>::max())
+    {
+        if (base.is_zero())
+        {
+            return uinteger<W>::zero();
+        }
+        else
+        {
+            throw std::runtime_error(
+                "Attempted exponentiation by std::numeric_limits<size_t>::max()");
+        }
+    }
+
+    uinteger<W> result = uinteger<W>::one();
+
+    for (size_t i = 0U; i <= exponent; ++i)
+    {
+        result = mul(result, base);
+    }
+    return result;
+}
+
+/**
+ *
+ * @brief Exponentiation function
+ *
+ * @note This function does not make any attempts to be fast or to prevent overflows!
+ *
+ * @note If exponent equals std::numeric_limits<IntegerType>::max(), this method throws an exception,
+ * unless base equals zero
+ *
+ * @tparam W The bit width of the integer
+ * @param base
+ * @param exponent
+ * @return The base to the power of the exponent
+ */
+template <size_t W> uinteger<W> pow(const uinteger<W>& base, const uinteger<W>& exponent)
+{
+
+    if (exponent == uinteger<W>::max())
+    {
+        if (base = uinteger<W>::zero())
+        {
+            return uinteger<W>::zero();
+        }
+        else
+        {
+            throw std::runtime_error(
+                "Attempted exponentiation by std::numeric_limits<IntegerType<W>>::max()");
+        }
+    }
+
+    uinteger<W> result = uinteger<W>::one();
+    uinteger<W> iter = uinteger<W>::zero();
+    while (iter <= exponent)
+    {
+        result = mul(result, base);
+        iter = add(iter, uinteger<W>::one());
+    }
+
+    return result;
+}
+
 /**
  * @brief Implements the restoring division algorithm.
  *
