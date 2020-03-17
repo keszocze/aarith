@@ -63,3 +63,5 @@ if(BUILD_COVERAGE_DATA)
   target_compile_options(uint-general-test PRIVATE --coverage)
   target_link_options(uint-general-test PRIVATE --coverage)
 endif()
+
+## integration tests

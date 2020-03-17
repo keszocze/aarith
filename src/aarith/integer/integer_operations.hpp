@@ -58,10 +58,9 @@ template <typename I, typename T>
  * @param b Subtrahend
  * @return Difference between a and b
  */
-template <typename I, typename T>[[nodiscard]] auto sub(const I& a, const T& b) -> I
+template <typename I>[[nodiscard]] auto sub(const I& a, const I& b) -> I
 {
     static_assert(is_integral_v<I>);
-    static_assert(I::width() >= T::width());
 
     auto result = expanding_add(a, ~b, true);
     return width_cast<I::width()>(result);
@@ -223,11 +222,14 @@ template <std::size_t W, std::size_t V>
         }
         else
         {
-            p3 = expanding_karazuba<W/2, W/2>(width_cast<W/2>(s1), width_cast<W/2>(s2));
+            const auto ps1 = width_cast<W/2>(s1);
+            const auto ps2 = width_cast<W/2>(s2);
+            const auto p3t = expanding_karazuba<W/2, W/2>(ps1, ps2);
+            p3 = p3t;
         }
 
         const auto k1 = width_cast<res_width>(p1) << W;
-        const auto k2 = sub(p3, expanding_add(p1, p2)) << W/2;
+        const auto k2 = width_cast<res_width>(expanding_sub(p3, expanding_add(p1, p2))) << W/2;
         const auto product = expanding_add(k1, expanding_add(k2, p2));
 
         return width_cast<res_width>(product);
