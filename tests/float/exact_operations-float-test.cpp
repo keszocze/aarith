@@ -75,7 +75,7 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
                 REQUIRE(result == b);
             }
         }
-        WHEN("The absolute of the first operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")
         {
             static constexpr float number_a = 213.22154f;
@@ -89,7 +89,7 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
             }
         }
-        WHEN("The absolute of the first operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "operand 1 is negative, and the result is not infinity.")
         {
             static constexpr float number_a = -213.22154f;
@@ -103,7 +103,7 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
             }
         }
-        WHEN("The absolute of the first operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "operand 2 is negative, and the result is not infinity.")
         {
             static constexpr float number_a = 213.22154f;
@@ -117,7 +117,7 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
             }
         }
-        WHEN("The absolute of the first operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are negative, and the result is not infinity.")
         {
             static constexpr float number_a = -213.22154f;
@@ -131,7 +131,7 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
             }
         }
-        WHEN("The absolute of the second operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")
         {
             static constexpr float number_a = 93.211546f;
@@ -145,7 +145,7 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
             }
         }
-        WHEN("The absolute of the second operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "operand 1 is negative, and the result is not infinity.")
         {
             static constexpr float number_a = -93.211546f;
@@ -159,7 +159,7 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
             }
         }
-        WHEN("The absolute of the second operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "operand 2 is negative, and the result is not infinity.")
         {
             static constexpr float number_a = 93.211546f;
@@ -173,7 +173,7 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
             }
         }
-        WHEN("The absolute of the second operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "both operands are negative, and the result is not infinity.")
         {
             static constexpr float number_a = -93.211546f;
@@ -265,7 +265,7 @@ SCENARIO("Subtracting two floating-point numbers exactly",
                 REQUIRE(result == normalized_float<E, M>(res));
             }
         }
-        WHEN("The absolute of the first operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")
         {
             static constexpr float number_a = 213.22154f;
@@ -279,7 +279,7 @@ SCENARIO("Subtracting two floating-point numbers exactly",
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
             }
         }
-        WHEN("The absolute of the first operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "operand 1 is negative, and the result is not infinity.")
         {
             static constexpr float number_a = -213.22154f;
@@ -293,7 +293,7 @@ SCENARIO("Subtracting two floating-point numbers exactly",
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
             }
         }
-        WHEN("The absolute of the first operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "operand 2 is negative, and the result is not infinity.")
         {
             static constexpr float number_a = 213.22154f;
@@ -307,7 +307,7 @@ SCENARIO("Subtracting two floating-point numbers exactly",
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
             }
         }
-        WHEN("The absolute of the first operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are negative, and the result is not infinity.")
         {
             static constexpr float number_a = -213.22154f;
@@ -321,7 +321,7 @@ SCENARIO("Subtracting two floating-point numbers exactly",
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
             }
         }
-        WHEN("The absolute of the second operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")
         {
             static constexpr float number_a = 93.211546f;
@@ -335,7 +335,7 @@ SCENARIO("Subtracting two floating-point numbers exactly",
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
             }
         }
-        WHEN("The absolute of the second operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "operand 1 is negative, and the result is not infinity.")
         {
             static constexpr float number_a = -93.211546f;
@@ -349,7 +349,7 @@ SCENARIO("Subtracting two floating-point numbers exactly",
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
             }
         }
-        WHEN("The absolute of the second operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "operand 2 is negative, and the result is not infinity.")
         {
             static constexpr float number_a = 93.211546f;
@@ -363,7 +363,7 @@ SCENARIO("Subtracting two floating-point numbers exactly",
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
             }
         }
-        WHEN("The absolute of the second operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "both operands are negative, and the result is not infinity.")
         {
             static constexpr float number_a = -93.211546f;
@@ -388,7 +388,7 @@ SCENARIO("Exact multiplication of two floating-point numbers",
         static constexpr size_t E = 8;
         static constexpr size_t M = 24;
 
-        WHEN("The absolute of the first operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")
         {
             static constexpr float number_a = 213.22154f;
@@ -402,7 +402,7 @@ SCENARIO("Exact multiplication of two floating-point numbers",
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
             }
         }
-        WHEN("The absolute of the first operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "operand 1 is negative, and the result is not infinity.")
         {
             static constexpr float number_a = -213.22154f;
@@ -416,7 +416,7 @@ SCENARIO("Exact multiplication of two floating-point numbers",
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
             }
         }
-        WHEN("The absolute of the first operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "operand 2 is negative, and the result is not infinity.")
         {
             static constexpr float number_a = 213.22154f;
@@ -430,7 +430,7 @@ SCENARIO("Exact multiplication of two floating-point numbers",
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
             }
         }
-        WHEN("The absolute of the first operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are negative, and the result is not infinity.")
         {
             static constexpr float number_a = -213.22154f;
@@ -444,7 +444,7 @@ SCENARIO("Exact multiplication of two floating-point numbers",
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
             }
         }
-        WHEN("The absolute of the second operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")
         {
             static constexpr float number_a = 93.211546f;
@@ -458,7 +458,7 @@ SCENARIO("Exact multiplication of two floating-point numbers",
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
             }
         }
-        WHEN("The absolute of the second operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "operand 1 is negative, and the result is not infinity.")
         {
             static constexpr float number_a = -93.211546f;
@@ -472,7 +472,7 @@ SCENARIO("Exact multiplication of two floating-point numbers",
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
             }
         }
-        WHEN("The absolute of the second operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "operand 2 is negative, and the result is not infinity.")
         {
             static constexpr float number_a = 93.211546f;
@@ -486,7 +486,7 @@ SCENARIO("Exact multiplication of two floating-point numbers",
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
             }
         }
-        WHEN("The absolute of the second operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "both operands are negative, and the result is not infinity.")
         {
             static constexpr float number_a = -93.211546f;
@@ -510,7 +510,7 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
         static constexpr size_t E = 8;
         static constexpr size_t M = 24;
 
-        WHEN("The absolute of the first operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")
         {
             static constexpr float number_a = 213.22154f;
@@ -524,7 +524,7 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
             }
         }
-        WHEN("The absolute of the first operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "operand 1 is negative, and the result is not infinity.")
         {
             static constexpr float number_a = -213.22154f;
@@ -538,7 +538,7 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
             }
         }
-        WHEN("The absolute of the first operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "operand 2 is negative, and the result is not infinity.")
         {
             static constexpr float number_a = 213.22154f;
@@ -552,7 +552,7 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
             }
         }
-        WHEN("The absolute of the first operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are negative, and the result is not infinity.")
         {
             static constexpr float number_a = -213.22154f;
@@ -566,7 +566,7 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
             }
         }
-        WHEN("The absolute of the second operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")
         {
             static constexpr float number_a = 93.211546f;
@@ -580,7 +580,7 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
             }
         }
-        WHEN("The absolute of the second operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "operand 1 is negative, and the result is not infinity.")
         {
             static constexpr float number_a = -93.211546f;
@@ -594,7 +594,7 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
             }
         }
-        WHEN("The absolute of the second operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "operand 2 is negative, and the result is not infinity.")
         {
             static constexpr float number_a = 93.211546f;
@@ -608,7 +608,7 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
             }
         }
-        WHEN("The absolute of the second operand is higher than the abolute of the first operand, "
+        WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "both operands are negative, and the result is not infinity.")
         {
             static constexpr float number_a = -93.211546f;
