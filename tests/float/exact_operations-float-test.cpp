@@ -399,6 +399,8 @@ SCENARIO("Exact multiplication of two floating-point numbers",
 
             THEN("It should be the correct product.")
             {
+                std::cout << (number_a * number_b) << "\n";
+                std::cout << result << "\n";
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
             }
         }
