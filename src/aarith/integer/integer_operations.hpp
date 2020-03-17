@@ -15,7 +15,7 @@ namespace aarith {
  * @return Sum of a and b with bit width max(I::width,T::width)+1
  */
 template <typename I, typename T>
-[[nodiscard]] auto expanding_add(const I& a, const T& b, const bool initial_carry = false)
+[[nodiscard]] constexpr auto expanding_add(const I& a, const T& b, const bool initial_carry = false)
 {
 
     static_assert(is_integral_v<I>);
@@ -58,7 +58,7 @@ template <typename I, typename T>
  * @param b Subtrahend
  * @return Difference between a and b
  */
-template <typename I>[[nodiscard]] auto sub(const I& a, const I& b) -> I
+template <typename I>[[nodiscard]] auto constexpr sub(const I& a, const I& b) -> I
 {
     static_assert(is_integral_v<I>);
 
@@ -78,7 +78,7 @@ template <typename I>[[nodiscard]] auto sub(const I& a, const I& b) -> I
  * @param b Subtrahend
  * @return Difference of correct bit width
  */
-template <typename I, typename T>[[nodiscard]] auto expanding_sub(const I& a, const T& b)
+template <typename I, typename T>[[nodiscard]] auto constexpr expanding_sub(const I& a, const T& b)
 {
 
     // TODO do we need this assertion?
@@ -99,7 +99,7 @@ template <typename I, typename T>[[nodiscard]] auto expanding_sub(const I& a, co
  * @param b Second summand
  * @return Sum of a and b
  */
-template <typename I>[[nodiscard]] I add(const I& a, const I& b)
+template <typename I>[[nodiscard]] I constexpr add(const I& a, const I& b)
 {
     constexpr size_t W = I::width();
     const auto result = expanding_add<I, I>(a, b);
@@ -120,7 +120,7 @@ template <typename I>[[nodiscard]] I add(const I& a, const I& b)
  * @return Product of a and b
  */
 template <std::size_t W, std::size_t V>
-[[nodiscard]] uinteger<W + V> expanding_mul(const uinteger<W>& a, const uinteger<V>& b)
+[[nodiscard]] constexpr integer<W + V> expanding_mul(const uinteger<W>& a, const uinteger<V>& b)
 {
 
     constexpr std::size_t res_width = W + V;
@@ -164,7 +164,7 @@ template <std::size_t W, std::size_t V>
  * @param b Second multiplicant
  * @return Product of a and b
  */
-template <typename I>[[nodiscard]] I mul(const I& a, const I& b)
+template <typename I>[[nodiscard]] constexpr I mul(const I& a, const I& b)
 {
     return width_cast<I::width()>(expanding_mul(a, b));
 }
@@ -182,8 +182,7 @@ template <typename I>[[nodiscard]] I mul(const I& a, const I& b)
  *
  */
 template <std::size_t W, std::size_t V>
-[[nodiscard]] std::pair<uinteger<W>, uinteger<W>>
-
+[[nodiscard]] constexpr std::pair<uinteger<W>, uinteger<W>>
 restoring_division(const uinteger<W>& numerator, const uinteger<V>& denominator)
 {
     using UInteger = uinteger<W>;
@@ -249,7 +248,7 @@ restoring_division(const uinteger<W>& numerator, const uinteger<V>& denominator)
  * @param denominator The number that divides the other number
  * @return The remainder of the division operation
  */
-template <typename I>[[nodiscard]] auto remainder(const I& numerator, const I& denominator) -> I
+template <typename I>[[nodiscard]] constexpr auto remainder(const I& numerator, const I& denominator) -> I
 {
     return restoring_division(numerator, denominator).second;
 }
@@ -265,7 +264,7 @@ template <typename I>[[nodiscard]] auto remainder(const I& numerator, const I& d
  * @param denominator The number that divides the other number
  * @return The quotient of the division operation
  */
-template <typename I>[[nodiscard]] auto div(const I& numerator, const I& denominator) -> I
+template <typename I>[[nodiscard]] constexpr auto div(const I& numerator, const I& denominator) -> I
 {
     return restoring_division(numerator, denominator).first;
 }
@@ -343,7 +342,7 @@ template <typename I>
  * @return The shifted integer
  */
 template <size_t Width>
-auto operator>>(const integer<Width>& lhs, const size_t rhs) -> integer<Width>
+auto constexpr operator>>(const integer<Width>& lhs, const size_t rhs) -> integer<Width>
 {
     if (rhs >= Width)
     {
@@ -414,7 +413,7 @@ auto operator>>(const integer<Width>& lhs, const size_t rhs) -> integer<Width>
  * @return Product of a and b
  */
 template <size_t W, size_t V>
-[[nodiscard]] auto expanding_mul(const integer<W>& m, const integer<V>& r) -> integer<V + W>
+[[nodiscard]] constexpr auto expanding_mul(const integer<W>& m, const integer<V>& r) -> integer<V + W>
 {
 
     constexpr size_t K = W + V + 2;
@@ -458,7 +457,7 @@ template <size_t W, size_t V>
  * @param n The signed inter to be "absolute valued"
  * @return The absolute value of the signed integer
  */
-template <size_t Width>[[nodiscard]] auto abs(const integer<Width>& n) -> integer<Width>
+template <size_t Width>[[nodiscard]] constexpr auto abs(const integer<Width>& n) -> integer<Width>
 {
     return n.is_negative() ? -n : n;
 }
@@ -473,7 +472,7 @@ template <size_t Width>[[nodiscard]] auto abs(const integer<Width>& n) -> intege
  * @param n The signed inter to be "absolute valued"
  * @return The absolute value of the signed integer
  */
-template <size_t Width>[[nodiscard]] auto expanding_abs(const integer<Width>& n) -> uinteger<Width>
+template <size_t Width>[[nodiscard]] constexpr auto expanding_abs(const integer<Width>& n) -> uinteger<Width>
 {
     uinteger<Width> abs = n.is_negative() ? -n : n;
     return abs;
@@ -485,7 +484,7 @@ template <size_t Width>[[nodiscard]] auto expanding_abs(const integer<Width>& n)
  * @param n  The signed integer whose sign is to be changed
  * @return  The negative value of the signed integer
  */
-template <size_t W> auto operator-(const integer<W>& n) -> integer<W>
+template <size_t W> constexpr auto operator-(const integer<W>& n) -> integer<W>
 {
     const integer<W> one(1U);
     return add(~n, one);
@@ -507,7 +506,7 @@ template <size_t W> auto operator-(const integer<W>& n) -> integer<W>
  *
  */
 template <std::size_t W, std::size_t V>
-[[nodiscard]] std::pair<integer<W>, integer<W>>
+[[nodiscard]] constexpr std::pair<integer<W>, integer<W>>
 
 restoring_division(const integer<W>& numerator, const integer<V>& denominator)
 {
@@ -566,27 +565,27 @@ restoring_division(const integer<W>& numerator, const integer<V>& denominator)
  */
 namespace aarith::arithmetic_operators {
 
-template <typename I> auto operator+(const I& lhs, const I& rhs) -> I
+template <typename I> auto constexpr operator+(const I& lhs, const I& rhs) -> I
 {
     return add(lhs, rhs);
 }
 
-template <typename I> auto operator-(const I& lhs, const I& rhs) -> I
+template <typename I> auto constexpr operator-(const I& lhs, const I& rhs) -> I
 {
     return sub(lhs, rhs);
 }
 
-template <typename I> auto operator*(const I& lhs, const I& rhs) -> I
+template <typename I> auto constexpr operator*(const I& lhs, const I& rhs) -> I
 {
     return mul(lhs, rhs);
 }
 
-template <typename I> auto operator/(const I& lhs, const I& rhs) -> I
+template <typename I> auto constexpr operator/(const I& lhs, const I& rhs) -> I
 {
     return div(lhs, rhs);
 }
 
-template <typename I> auto operator%(const I& lhs, const I& rhs) -> I
+template <typename I> auto constexpr operator%(const I& lhs, const I& rhs) -> I
 {
     return remainder(lhs, rhs);
 }
