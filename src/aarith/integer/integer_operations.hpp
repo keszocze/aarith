@@ -194,42 +194,46 @@ template <std::size_t W, std::size_t V>
         result.set_word(0, result_uint64);
         return result;
     }
-    else if constexpr (W == V && (W & (W - 1)) == 0 ) // W = V and W is power of 2
+    else if constexpr (W == V) // && (W & (W - 1)) == 0 ) // W = V and W is power of 2
     {
         if(a.is_zero() || b.is_zero())
         {
           return uinteger<res_width>(0U);
         }
 
-        const auto a_split = split<W/2-1>(a);
-        const auto b_split = split<W/2-1>(b);
+        // set width to power of 2
+        constexpr std::size_t karazuba_width = 1UL << (static_cast<size_t>(std::ceil(std::log2(static_cast<double>(std::max(W, V)))))-1);
 
-        const auto ah = uinteger<W/2>(a_split.first);
-        const auto al = uinteger<W/2>(a_split.second);
-        const auto bh = uinteger<W/2>(b_split.first);
-        const auto bl = uinteger<W/2>(b_split.second);
+        const auto a_split = split<karazuba_width-1>(a);
+        const auto b_split = split<karazuba_width-1>(b);
 
-        const auto p1 = expanding_karazuba<W/2, W/2>(ah, bh);        
-        const auto p2 = expanding_karazuba<W/2, W/2>(al, bl);        
+        const auto ah = uinteger<W-karazuba_width>(a_split.first);
+        const auto al = uinteger<karazuba_width>(a_split.second);
+        const auto bh = uinteger<W-karazuba_width>(b_split.first);
+        const auto bl = uinteger<karazuba_width>(b_split.second);
+
+        const auto p1 = expanding_karazuba(ah, bh);        
+        const auto p2 = expanding_karazuba(al, bl);        
         const auto s1 = expanding_add(ah, al);
         const auto s2 = expanding_add(bh, bl);
-        uinteger<2*(W/2+1)> p3;
         
         //prevent infinite call loop
-        if(s1.bit(s1.width()-1) == 1 || s2.bit(s2.width()-1) == 1) 
+        uinteger<2*(karazuba_width+1)> p3;
+        if(s1.bit(s1.width()-1) == 1 || s2.bit(s2.width()-1) == 1)
         {
-            p3 = expanding_karazuba<W/2+1, W/2+1>(s1, s2);
+            p3 = expanding_karazuba(s1, s2);
         }
         else
         {
-            const auto ps1 = width_cast<W/2>(s1);
-            const auto ps2 = width_cast<W/2>(s2);
-            const auto p3t = expanding_karazuba<W/2, W/2>(ps1, ps2);
+            const auto ps1 = width_cast<karazuba_width>(s1);
+            const auto ps2 = width_cast<karazuba_width>(s2);
+            const auto p3t = expanding_karazuba(ps1, ps2);
             p3 = p3t;
         }
-
-        const auto k1 = width_cast<res_width>(p1) << W;
-        const auto k2 = width_cast<res_width>(expanding_sub(p3, expanding_add(p1, p2))) << W/2;
+        
+        constexpr auto full_shift = 2*karazuba_width;
+        const auto k1 = width_cast<res_width>(p1) << full_shift;
+        const auto k2 = width_cast<res_width>(expanding_sub(p3, expanding_add(p1, p2))) << karazuba_width;
         const auto product = expanding_add(k1, expanding_add(k2, p2));
 
         return width_cast<res_width>(product);
@@ -237,10 +241,11 @@ template <std::size_t W, std::size_t V>
     else
     {
         // set width to power of 2
-        constexpr std::size_t karazuba_width = 1UL << static_cast<size_t>(std::ceil(std::log2(static_cast<double>(std::max(W, V)))));
+        //constexpr std::size_t karazuba_width = 1UL << static_cast<size_t>(std::ceil(std::log2(static_cast<double>(std::max(W, V)))));
+        constexpr std::size_t max_width = std::max(W, V);
         
-        const auto a_ = width_cast<karazuba_width>(a);
-        const auto b_ = width_cast<karazuba_width>(b);
+        const auto a_ = width_cast<max_width>(a);
+        const auto b_ = width_cast<max_width>(b);
         
         const auto res = expanding_karazuba(a_, b_);
 
