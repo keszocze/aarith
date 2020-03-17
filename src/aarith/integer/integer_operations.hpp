@@ -183,14 +183,14 @@ template <typename I>[[nodiscard]] I mul(const I& a, const I& b)
  * @param exponent
  * @return The base to the power of the exponent
  */
-template <size_t W> uinteger<W> pow(const uinteger<W>& base, const size_t exponent)
+template <typename IntegerType> IntegerType pow(const IntegerType& base, const size_t exponent)
 {
 
     if (exponent == std::numeric_limits<size_t>::max())
     {
         if (base.is_zero())
         {
-            return uinteger<W>::zero();
+            return IntegerType::zero();
         }
         else
         {
@@ -199,7 +199,7 @@ template <size_t W> uinteger<W> pow(const uinteger<W>& base, const size_t expone
         }
     }
 
-    uinteger<W> result = uinteger<W>::one();
+    IntegerType result = IntegerType::one();
 
     for (size_t i = 0U; i <= exponent; ++i)
     {
@@ -217,19 +217,21 @@ template <size_t W> uinteger<W> pow(const uinteger<W>& base, const size_t expone
  * @note If exponent equals std::numeric_limits<IntegerType>::max(), this method throws an exception,
  * unless base equals zero
  *
- * @tparam W The bit width of the integer
+ * @tparam IntegerType The type of integer used in the computation
  * @param base
  * @param exponent
  * @return The base to the power of the exponent
  */
-template <size_t W> uinteger<W> pow(const uinteger<W>& base, const uinteger<W>& exponent)
+template <typename IntegerType> IntegerType pow(const IntegerType& base, const IntegerType& exponent)
 {
 
-    if (exponent == uinteger<W>::max())
+    static_assert(aarith::is_integral_v<IntegerType>, "Exponentiation is only supported for aarith integers");
+
+    if (exponent == IntegerType::max())
     {
-        if (base = uinteger<W>::zero())
+        if (base = IntegerType::zero())
         {
-            return uinteger<W>::zero();
+            return IntegerType::zero();
         }
         else
         {
@@ -238,12 +240,12 @@ template <size_t W> uinteger<W> pow(const uinteger<W>& base, const uinteger<W>& 
         }
     }
 
-    uinteger<W> result = uinteger<W>::one();
-    uinteger<W> iter = uinteger<W>::zero();
+    IntegerType result = IntegerType::one();
+    IntegerType iter = IntegerType::zero();
     while (iter <= exponent)
     {
         result = mul(result, base);
-        iter = add(iter, uinteger<W>::one());
+        iter = add(iter, IntegerType::one());
     }
 
     return result;
