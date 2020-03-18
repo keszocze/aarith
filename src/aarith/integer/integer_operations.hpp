@@ -203,12 +203,8 @@ template <std::size_t W, std::size_t V>
         // std::log2 and std::floor  not constexpr and did not compile with clang
         constexpr size_t is_floored = [](const size_t a) {
 
-            // compute the msb first
-            size_t msb = 0UL;
-            while ((a >> msb) > 0)
-            {
-                msb++;
-            }
+            size_t msb = first_set_bit(a);
+
             // now round down to the respective power of 2
             if (msb == 0)
             {
