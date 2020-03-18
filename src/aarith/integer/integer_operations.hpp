@@ -170,7 +170,8 @@ template <typename I>[[nodiscard]] I mul(const I& a, const I& b)
 }
 
 /**
- * @brief Multiplies two unsigned integers using the Karazuba algorithm expanding the bit width so that the result fits.
+ * @brief Multiplies two unsigned integers using the Karazuba algorithm expanding the bit width so
+ * that the result fits.
  *
  * This implements the karazuba multiplication algorithm (divide and conquer).
  *
@@ -191,17 +192,16 @@ template <std::size_t W, std::size_t V>
         const uinteger<res_width> result(result_uint);
         return result;
     }
-    else if constexpr (W == V) 
+    else if constexpr (W == V)
     {
-        if(a.is_zero() || b.is_zero())
+        if (a.is_zero() || b.is_zero())
         {
             return uinteger<res_width>(0U);
         }
 
         // floor to the next value with power of 2
         // std::log2 and std::floor  not constexpr and did not compile with clang
-        constexpr auto find_msb = [](const size_t a)
-        {
+        constexpr auto find_msb = [](const size_t a) {
             size_t msb = 0UL;
             while ((a >> msb) > 0)
             {
@@ -210,36 +210,35 @@ template <std::size_t W, std::size_t V>
             return msb;
         };
 
-        constexpr auto log2_floor = [](const size_t a, size_t (*find_msb)(size_t))
-        {
+        constexpr auto log2_floor = [](const size_t a, size_t (*find_msb)(size_t)) {
             auto msb = find_msb(a);
-            if(msb == 0)
+            if (msb == 0)
             {
                 return 0UL;
             }
-            return 1UL << (msb-1);
+            return 1UL << (msb - 1);
         };
 
         constexpr size_t floored = log2_floor(W, find_msb);
-        constexpr size_t karazuba_width = (floored == W)?(floored >> 1):(floored);
+        constexpr size_t karazuba_width = (floored == W) ? (floored >> 1) : (floored);
 
-        const auto a_split = split<karazuba_width-1>(a);
-        const auto b_split = split<karazuba_width-1>(b);
+        const auto a_split = split<karazuba_width - 1>(a);
+        const auto b_split = split<karazuba_width - 1>(b);
 
-        const auto ah = uinteger<W-karazuba_width>(a_split.first);
+        const auto ah = uinteger<W - karazuba_width>(a_split.first);
         const auto al = uinteger<karazuba_width>(a_split.second);
-        const auto bh = uinteger<W-karazuba_width>(b_split.first);
+        const auto bh = uinteger<W - karazuba_width>(b_split.first);
         const auto bl = uinteger<karazuba_width>(b_split.second);
 
-        const auto p1 = expanding_karazuba<W-karazuba_width, W-karazuba_width>(ah, bh);        
-        const auto p2 = expanding_karazuba<karazuba_width, karazuba_width>(al, bl);        
+        const auto p1 = expanding_karazuba<W - karazuba_width, W - karazuba_width>(ah, bh);
+        const auto p2 = expanding_karazuba<karazuba_width, karazuba_width>(al, bl);
         const auto s1 = expanding_add(ah, al);
         const auto s2 = expanding_add(bh, bl);
-        
-        //prevent infinite call loop
-        //TODO find a better way to do this
-        uinteger<2*(karazuba_width+1)> p3;
-        if(s1.bit(s1.width()-1) == 1 || s2.bit(s2.width()-1) == 1)
+
+        // prevent infinite call loop
+        // TODO find a better way to do this
+        uinteger<2 * (karazuba_width + 1)> p3;
+        if (s1.bit(s1.width() - 1) == 1 || s2.bit(s2.width() - 1) == 1)
         {
             p3 = expanding_karazuba(s1, s2);
         }
@@ -250,10 +249,11 @@ template <std::size_t W, std::size_t V>
             const auto p3t = expanding_karazuba(ps1, ps2);
             p3 = p3t;
         }
-        
-        constexpr auto full_shift = 2*karazuba_width;
+
+        constexpr auto full_shift = 2 * karazuba_width;
         const auto k1 = width_cast<res_width>(p1) << full_shift;
-        const auto k2 = width_cast<res_width>(expanding_sub(p3, expanding_add(p1, p2))) << karazuba_width;
+        const auto k2 = width_cast<res_width>(expanding_sub(p3, expanding_add(p1, p2)))
+                        << karazuba_width;
         const auto product = expanding_add(k1, expanding_add(k2, p2));
 
         return width_cast<res_width>(product);
@@ -261,10 +261,10 @@ template <std::size_t W, std::size_t V>
     else
     {
         constexpr std::size_t max_width = std::max(W, V);
-        
+
         const auto a_ = width_cast<max_width>(a);
         const auto b_ = width_cast<max_width>(b);
-        
+
         const auto res = expanding_karazuba(a_, b_);
 
         return width_cast<res_width>(res);
