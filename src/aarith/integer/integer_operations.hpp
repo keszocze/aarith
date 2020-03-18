@@ -201,19 +201,9 @@ template <std::size_t W, std::size_t V>
 
         // floor to the next value with power of 2
         // std::log2 and std::floor  not constexpr and did not compile with clang
-        constexpr size_t is_floored = [](const size_t a) {
+        constexpr size_t floor_pow_two = floor_to_pow(W);
 
-            size_t msb = first_set_bit(a);
-
-            // now round down to the respective power of 2
-            if (msb == 0)
-            {
-                return 0UL;
-            }
-            return 1UL << (msb - 1);
-        }(W);
-
-        constexpr size_t karazuba_width = (is_floored == W) ? (is_floored >> 1) : (is_floored);
+        constexpr size_t karazuba_width = (floor_pow_two == W) ? (floor_pow_two >> 1) : (floor_pow_two);
 
         const auto a_split = split<karazuba_width - 1>(a);
         const auto b_split = split<karazuba_width - 1>(b);
