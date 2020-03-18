@@ -67,6 +67,26 @@ template <size_t Width> auto count_leading_zeroes(const word_array<Width>& value
 }
 
 /**
+ * @brief Computes the position of the first set bit (i.e. a bit set to one) in the word_array from
+ * MSB to LSB
+ *
+ * @tparam Width Width of the word_array
+ * @param value The word_array whose first set bit should be found
+ * @return The index of the first set bit in value
+ */
+template <size_t Width> size_t first_set_bit(const word_array<Width>& value)
+{
+    size_t first_bit = 0UL;
+
+    // we have the operator bool checking whether (value >> first_bit) != 0
+    while (value >> first_bit)
+    {
+        ++first_bit;
+    }
+    return first_bit;
+}
+
+/**
  * @brief Left-shift operator
  * @tparam W The word_container type to work on
  * @param lhs The word_container to be shifted

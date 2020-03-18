@@ -184,22 +184,22 @@ SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
             REQUIRE(sum150.is_negative());
         }
     }
-    GIVEN("A positive integer and a negative integer with smaller absolute value")
-    {
-        const integer<192> a = integer<192>::from_words(1U, 0U, 0U);
-
-        const integer<64> b{-1};
-
-        WHEN("Adding both numbers")
-        {
-            const auto result = expanding_add(a, b);
-
-            std::cout << group_digits(to_binary(a), 64) << "\n";
-            std::cout << group_digits(to_binary(b), 64) << "\n";
-            std::cout << group_digits(to_binary(width_cast<192>(b)), 64) << "\n";
-            std::cout << group_digits(to_binary(result), 64) << "\n";
-        }
-    }
+    //    GIVEN("A positive integer and a negative integer with smaller absolute value")
+    //    {
+    //        const integer<192> a = integer<192>::from_words(1U, 0U, 0U);
+    //
+    //        const integer<64> b{-1};
+    //
+    //        WHEN("Adding both numbers")
+    //        {
+    //            const auto result = expanding_add(a, b);
+    //
+    //            std::cout << group_digits(to_binary(a), 64) << "\n";
+    //            std::cout << group_digits(to_binary(b), 64) << "\n";
+    //            std::cout << group_digits(to_binary(width_cast<192>(b)), 64) << "\n";
+    //            std::cout << group_digits(to_binary(result), 64) << "\n";
+    //        }
+    //    }
 }
 
 SCENARIO("Division of signed integers", "[integer][arithmetic]")
@@ -336,6 +336,48 @@ SCENARIO("Division of signed integers", "[integer][arithmetic]")
                     CHECK(result.first == integer<64>::min());
                     CHECK(result.second == integer<64>::zero());
                 }
+            }
+        }
+    }
+}
+
+SCENARIO("Multiplying unsigned integers", "[integer][arithmetic][multiplication]")
+{
+    GIVEN("The largest integer value")
+    {
+        const uinteger<64> a64{std::numeric_limits<uint64_t>::max()};
+        const uinteger<32> a32{std::numeric_limits<uint32_t>::max()};
+
+        const uint64_t result32_uint64 =
+            static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) *
+            static_cast<uint64_t>(std::numeric_limits<uint32_t>::max());
+
+        const uinteger<8> a8{std::numeric_limits<uint8_t>::max()};
+        const uinteger<5> a5{31U};
+
+        WHEN("Mutliplying this value with itself")
+        {
+            THEN("The expanding_mul should not truncate the result")
+            {
+                const auto result64 = expanding_mul(a64, a64);
+                const auto result32 = expanding_mul(a32, a32);
+                const auto result8 = expanding_mul(a8, a8);
+                const auto result5 = expanding_mul(a5, a5);
+
+                CHECK(result64.width() == 128);
+                CHECK(result64 > a64);
+
+                CHECK(result32.width() == 64);
+                CHECK(result32.word(0) == result32_uint64);
+                CHECK(result32 > a32);
+
+                CHECK(result8.width() == 16);
+                CHECK(result8.word(0) == 65025U);
+                CHECK(result8 > a8);
+
+                CHECK(result5.width() == 10);
+                CHECK(result5.word(0) == 961U);
+                CHECK(result5 > a5);
             }
         }
     }
