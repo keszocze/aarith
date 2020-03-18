@@ -199,8 +199,30 @@ template <std::size_t W, std::size_t V>
             return uinteger<res_width>(0U);
         }
 
-        // set width to power of 2
-        constexpr std::size_t karazuba_width = 1UL << (static_cast<size_t>(std::ceil(std::log2(static_cast<double>(std::max(W, V)))))-1);
+        // floor to the next value with power of 2
+        // std::log2 and std::floor  not constexpr and did not compile with clang
+        constexpr auto find_msb = [](const size_t a)
+        {
+            size_t msb = 0UL;
+            while ((a >> msb) > 0)
+            {
+                msb++;
+            }
+            return msb;
+        };
+
+        constexpr auto log2_floor = [](const size_t a, size_t (*find_msb)(size_t))
+        {
+            auto msb = find_msb(a);
+            if(msb == 0)
+            {
+                return 0UL;
+            }
+            return 1UL << (msb-1);
+        };
+
+        constexpr size_t floored = log2_floor(W, find_msb);
+        constexpr size_t karazuba_width = (floored == W)?(floored >> 1):(floored);
 
         const auto a_split = split<karazuba_width-1>(a);
         const auto b_split = split<karazuba_width-1>(b);
@@ -210,12 +232,13 @@ template <std::size_t W, std::size_t V>
         const auto bh = uinteger<W-karazuba_width>(b_split.first);
         const auto bl = uinteger<karazuba_width>(b_split.second);
 
-        const auto p1 = expanding_karazuba(ah, bh);        
-        const auto p2 = expanding_karazuba(al, bl);        
+        const auto p1 = expanding_karazuba<W-karazuba_width, W-karazuba_width>(ah, bh);        
+        const auto p2 = expanding_karazuba<karazuba_width, karazuba_width>(al, bl);        
         const auto s1 = expanding_add(ah, al);
         const auto s2 = expanding_add(bh, bl);
         
         //prevent infinite call loop
+        //TODO find a better way to do this
         uinteger<2*(karazuba_width+1)> p3;
         if(s1.bit(s1.width()-1) == 1 || s2.bit(s2.width()-1) == 1)
         {
