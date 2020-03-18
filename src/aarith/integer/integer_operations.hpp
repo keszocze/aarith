@@ -125,7 +125,7 @@ template <std::size_t W, std::size_t V>
 
     constexpr std::size_t res_width = W + V;
     uinteger<res_width> result{0U};
-    if constexpr (res_width <= 64)
+    if constexpr (res_width <= uinteger<W>::word_width())
     {
         uint64_t result_uint64 = a.word(0) * b.word(0);
         result.set_word(0, result_uint64);
@@ -185,7 +185,7 @@ template <std::size_t W, std::size_t V>
 {
 
     constexpr std::size_t res_width = W + V;
-    if constexpr (res_width <= 64)
+    if constexpr (res_width <= uinteger<W>::word_width())
     {
         uinteger<res_width> result{0U};
         uint64_t result_uint64 = a.word(0) * b.word(0);
