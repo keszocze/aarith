@@ -6,5 +6,5 @@
 
 #include <aarith/core/traits.hpp>
 
-#include <aarith/core/string_utils.hpp>
 #include <aarith/core/number_utils.hpp>
+#include <aarith/core/string_utils.hpp>

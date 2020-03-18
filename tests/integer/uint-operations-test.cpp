@@ -535,15 +535,16 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
     }
 }
 
-SCENARIO("Multiplying two uintegers using the karazuba multiplication", "[uinteger][arithmetic][multiplication]")
+SCENARIO("Multiplying two uintegers using the karazuba multiplication",
+         "[uinteger][arithmetic][multiplication]")
 {
     GIVEN("Two uinteger<N> a and b with N <= 32")
     {
         using uint = uinteger<32>;
-        
+
         auto au = 0xCCCCCCCC;
         auto bu = 0xAAAAAAAA;
-        
+
         auto a = uint(au);
         auto b = uint(bu);
 
@@ -554,17 +555,16 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication", "[uinteg
         {
             REQUIRE(res == ref);
         }
-
     }
 
     GIVEN("Two uinteger<N> a and uinteger<M> b with M!=N and N+M <= 64")
     {
         using uinta = uinteger<22>;
         using uintb = uinteger<14>;
-        
+
         auto au = 0xCCCCC;
         auto bu = 0x2AAA;
-        
+
         auto a = uinta(au);
         auto b = uintb(bu);
 
@@ -585,16 +585,15 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication", "[uinteg
             {
                 using uinta = uinteger<44>;
                 using uintb = uinteger<56>;
-                
+
                 auto au = 0x0;
                 auto bu = 0xAAAAAAAAAAAAAA;
-                
+
                 auto a = uinta(au);
                 auto b = uintb(bu);
 
                 auto res = expanding_karazuba(a, b);
                 auto ref = expanding_mul(a, b);
-
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -605,16 +604,15 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication", "[uinteg
             {
                 using uinta = uinteger<44>;
                 using uintb = uinteger<56>;
-                
+
                 auto au = 0xCCCCCCCCCCC;
                 auto bu = 0x0;
-                
+
                 auto a = uinta(au);
                 auto b = uintb(bu);
 
                 auto res = expanding_karazuba(a, b);
                 auto ref = expanding_mul(a, b);
-
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -625,16 +623,15 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication", "[uinteg
             {
                 using uinta = uinteger<44>;
                 using uintb = uinteger<56>;
-                
+
                 auto au = 0xCCCCCCCCCCC;
                 auto bu = 0xAAAAAAAAAAAAAA;
-                
+
                 auto a = uinta(au);
                 auto b = uintb(bu);
 
                 auto res = expanding_karazuba(a, b);
                 auto ref = expanding_mul(a, b);
-
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -645,16 +642,15 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication", "[uinteg
             {
                 using uinta = uinteger<44>;
                 using uintb = uinteger<56>;
-                
+
                 auto au = 0xFFFFFFFFFFF;
                 auto bu = 0xFFFFFFFFFFFFFF;
-                
+
                 auto a = uinta(au);
                 auto b = uintb(bu);
 
                 auto res = expanding_karazuba(a, b);
                 auto ref = expanding_mul(a, b);
-
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -668,7 +664,7 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication", "[uinteg
             {
                 using uinta = uinteger<102>;
                 using uintb = uinteger<84>;
-                
+
                 auto a = uinta(0U);
                 auto b = uintb::from_words(0xAAAAAAAAAAAAAAAA, 0xAAAAA);
 
@@ -684,7 +680,7 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication", "[uinteg
             {
                 using uinta = uinteger<102>;
                 using uintb = uinteger<84>;
-                
+
                 auto a = uinta::from_words(0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCC);
                 auto b = uintb(0U);
 
@@ -700,7 +696,7 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication", "[uinteg
             {
                 using uinta = uinteger<102>;
                 using uintb = uinteger<84>;
-                
+
                 auto a = uinta::from_words(0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCC);
                 auto b = uintb::from_words(0xAAAAAAAAAAAAAAAA, 0xAAAAA);
 
@@ -716,7 +712,7 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication", "[uinteg
             {
                 using uinta = uinteger<102>;
                 using uintb = uinteger<84>;
-                
+
                 auto a = uinta::from_words(0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFF);
                 auto b = uintb::from_words(0xFFFFFFFFFFFFFFFF, 0xFFFFF);
 
@@ -735,9 +731,12 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication", "[uinteg
             {
                 using uinta = uinteger<300>;
                 using uintb = uinteger<584>;
-                
+
                 auto a = uinta(0U);
-                auto b = uintb::from_words(0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAA);
+                auto b = uintb::from_words(
+                    0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA,
+                    0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA,
+                    0xAAAAAAAAAAAAAAAA, 0xAA);
 
                 auto res = expanding_karazuba(a, b);
                 auto ref = expanding_mul(a, b);
@@ -751,9 +750,9 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication", "[uinteg
             {
                 using uinta = uinteger<300>;
                 using uintb = uinteger<584>;
-                
 
-                auto a = uinta::from_words(0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCCCC);
+                auto a = uinta::from_words(0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCCCCCCCCC,
+                                           0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCCCC);
                 auto b = uintb(0U);
 
                 auto res = expanding_karazuba(a, b);
@@ -768,9 +767,13 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication", "[uinteg
             {
                 using uinta = uinteger<300>;
                 using uintb = uinteger<584>;
-                
-                auto a = uinta::from_words(0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCCCC);
-                auto b = uintb::from_words(0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAA);
+
+                auto a = uinta::from_words(0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCCCCCCCCC,
+                                           0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCCCC);
+                auto b = uintb::from_words(
+                    0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA,
+                    0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA,
+                    0xAAAAAAAAAAAAAAAA, 0xAA);
 
                 auto res = expanding_karazuba(a, b);
                 auto ref = expanding_mul(a, b);
@@ -784,9 +787,13 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication", "[uinteg
             {
                 using uinta = uinteger<300>;
                 using uintb = uinteger<584>;
-                
-                auto a = uinta::from_words(0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFF);
-                auto b = uintb::from_words(0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFF);
+
+                auto a = uinta::from_words(0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
+                                           0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFF);
+                auto b = uintb::from_words(
+                    0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
+                    0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
+                    0xFFFFFFFFFFFFFFFF, 0xFF);
 
                 auto res = expanding_karazuba(a, b);
                 auto ref = expanding_mul(a, b);
@@ -799,7 +806,6 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication", "[uinteg
         }
     }
 }
-
 
 SCENARIO("Bit and Word operations work correctly", "[uinteger][utility]")
 {

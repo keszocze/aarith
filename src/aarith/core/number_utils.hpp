@@ -44,12 +44,9 @@ template <class Result> constexpr Result ceil(double num)
     {
         ++first_bit;
         tmp = tmp >> 1;
-
     }
     return first_bit;
 }
-
-
 
 /**
  * @brief Rounds down to the next power of two
