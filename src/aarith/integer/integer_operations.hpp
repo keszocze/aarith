@@ -128,8 +128,8 @@ template <std::size_t W, std::size_t V>
 
     if constexpr (res_width <= uinteger<W>::word_width())
     {
-        typename uinteger<res_width>::word_type result_in_word_type = a.word(0) * b.word(0);
-        result.set_word(0, result_in_word_type);
+        auto result_uint = a.word(0) * b.word(0);
+        result.set_word(0, result_uint);
     }
     else
     {
@@ -171,8 +171,7 @@ template <typename I>[[nodiscard]] I mul(const I& a, const I& b)
 }
 
 /**
- * @brief Multiplies two unsigned integers using the Karazuba algorithm expanding the bit width so
- * that the result fits.
+ * @brief Multiplies two unsigned integers using the Karazuba algorithm expanding the bit width so that the result fits.
  *
  * This implements the karazuba multiplication algorithm (divide and conquer).
  *
@@ -189,9 +188,8 @@ template <std::size_t W, std::size_t V>
     constexpr std::size_t res_width = W + V;
     if constexpr (res_width <= uinteger<W>::word_width())
     {
-        uinteger<res_width> result{0U};
-        typename uinteger<res_width>::word_type result_in_word_type = a.word(0) * b.word(0);
-        result.set_word(0, result_in_word_type);
+        auto result_uint = a.word(0) * b.word(0);
+        const uinteger<res_width> result(result_uint);
         return result;
     }
     else if constexpr (W == V)
@@ -211,7 +209,6 @@ template <std::size_t W, std::size_t V>
             {
                 msb++;
             }
-
             // now round down to the respective power of 2
             if (msb == 0)
             {

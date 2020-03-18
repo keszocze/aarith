@@ -20,7 +20,7 @@ template <size_t W, size_t V> bool operator==(const word_array<W>& a, const word
 {
     static_assert(is_word_array_v<W>);
     static_assert(is_word_array_v<V>);
-    
+
     if constexpr (W != V)
     {
         return false;
