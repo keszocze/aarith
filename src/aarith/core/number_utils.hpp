@@ -22,8 +22,14 @@ template <class Result> constexpr Result ceil(double num)
 }
 
 /**
- * @brief Computes the position of the first set bit (i.e. a bit set to one) in the size_t from MSB
- * to LSB
+ * @brief Computes the position of the first set bit (i.e. a bit set to one) in the size_t from LSB
+ * to MSB starting with index 1
+ *
+ * The method returns 0 when no bit is set to one.
+ *
+ * @note Be aware that this method starts counting at 1 (instead of the more commonly used 0).
+ *
+ * @example first_set_bit(4)=first_set_bit(0..00100)=3
  *
  * TODO remove this method when clang supports constexpr for std::log2 and std::floor
  *
@@ -33,12 +39,17 @@ template <class Result> constexpr Result ceil(double num)
 [[nodiscard]] constexpr size_t first_set_bit(const size_t n)
 {
     size_t first_bit = 0UL;
-    while (n >> first_bit)
+    size_t tmp = n;
+    while (tmp)
     {
         ++first_bit;
+        tmp = tmp >> 1;
+
     }
     return first_bit;
 }
+
+
 
 /**
  * @brief Rounds down to the next power of two
