@@ -58,7 +58,7 @@ template <typename I, typename T>
  * @param b Subtrahend
  * @return Difference between a and b
  */
-template <typename I>[[nodiscard]] auto sub(const I& a, const I& b) -> I
+template <typename I>[[nodiscard]] constexpr auto sub(const I& a, const I& b) -> I
 {
     static_assert(is_integral_v<I>);
 
