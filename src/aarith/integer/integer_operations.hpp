@@ -120,7 +120,7 @@ template <typename I>[[nodiscard]] I constexpr add(const I& a, const I& b)
  * @return Product of a and b
  */
 template <std::size_t W, std::size_t V>
-[[nodiscard]] uinteger<W + V> expanding_mul(const uinteger<W>& a, const uinteger<V>& b)
+[[nodiscard]] constexpr uinteger<W + V> expanding_mul(const uinteger<W>& a, const uinteger<V>& b)
 {
 
     constexpr std::size_t res_width = W + V;
