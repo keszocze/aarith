@@ -458,7 +458,7 @@ template <size_t W, size_t V>
  * @param n The signed inter to be "absolute valued"
  * @return The absolute value of the signed integer
  */
-template <size_t Width>[[nodiscard]] auto abs(const integer<Width>& n) -> integer<Width>
+template <size_t Width>[[nodiscard]] constexpr auto abs(const integer<Width>& n) -> integer<Width>
 {
     return n.is_negative() ? -n : n;
 }
