@@ -414,7 +414,7 @@ auto operator>>(const integer<Width>& lhs, const size_t rhs) -> integer<Width>
  * @return Product of a and b
  */
 template <size_t W, size_t V>
-[[nodiscard]] auto expanding_mul(const integer<W>& m, const integer<V>& r) -> integer<V + W>
+[[nodiscard]] constexpr auto expanding_mul(const integer<W>& m, const integer<V>& r) -> integer<V + W>
 {
 
     constexpr size_t K = W + V + 2;
