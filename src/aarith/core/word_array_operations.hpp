@@ -4,7 +4,7 @@
 
 namespace aarith {
 
-template <typename W>[[nodiscard]] auto operator&(const W& lhs, const W& rhs) -> W
+template <typename W>[[nodiscard]] constexpr auto operator&(const W& lhs, const W& rhs) -> W
 {
     static_assert(is_word_array_v<W>);
     W bitwise_and;
@@ -15,7 +15,7 @@ template <typename W>[[nodiscard]] auto operator&(const W& lhs, const W& rhs) ->
     return bitwise_and;
 }
 
-template <typename W> auto operator|(const W& lhs, const W& rhs) -> W
+template <typename W> auto constexpr operator|(const W& lhs, const W& rhs) -> W
 {
     static_assert(is_word_array_v<W>);
     W bitwise_or;
@@ -26,7 +26,7 @@ template <typename W> auto operator|(const W& lhs, const W& rhs) -> W
     return bitwise_or;
 }
 
-template <typename W> auto operator^(const W& lhs, const W& rhs) -> W
+template <typename W> constexpr auto operator^(const W& lhs, const W& rhs) -> W
 {
     static_assert(is_word_array_v<W>);
     W bitwise_xor;
