@@ -182,7 +182,7 @@ template <typename I>[[nodiscard]] constexpr I mul(const I& a, const I& b)
  *
  */
 template <std::size_t W, std::size_t V>
-[[nodiscard]] std::pair<uinteger<W>, uinteger<W>>
+[[nodiscard]] constexpr std::pair<uinteger<W>, uinteger<W>>
 
 restoring_division(const uinteger<W>& numerator, const uinteger<V>& denominator)
 {
