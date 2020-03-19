@@ -54,7 +54,7 @@ template <typename W>[[nodiscard]] constexpr auto operator~(const W& rhs) -> W
  * @param value The word to count the leading zeroes in
  * @return
  */
-template <size_t Width> auto count_leading_zeroes(const word_array<Width>& value) -> size_t
+template <size_t Width> constexpr auto count_leading_zeroes(const word_array<Width>& value) -> size_t
 {
     for (auto i = Width; i > 0; --i)
     {
