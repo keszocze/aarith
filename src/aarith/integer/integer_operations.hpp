@@ -507,8 +507,7 @@ template <size_t W> constexpr auto operator-(const integer<W>& n) -> integer<W>
  *
  */
 template <std::size_t W, std::size_t V>
-[[nodiscard]] std::pair<integer<W>, integer<W>>
-
+[[nodiscard]] constexpr std::pair<integer<W>, integer<W>>
 restoring_division(const integer<W>& numerator, const integer<V>& denominator)
 {
 
