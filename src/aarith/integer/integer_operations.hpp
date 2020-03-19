@@ -164,7 +164,7 @@ template <std::size_t W, std::size_t V>
  * @param b Second multiplicant
  * @return Product of a and b
  */
-template <typename I>[[nodiscard]] I mul(const I& a, const I& b)
+template <typename I>[[nodiscard]] constexpr I mul(const I& a, const I& b)
 {
     return width_cast<I::width()>(expanding_mul(a, b));
 }
