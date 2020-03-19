@@ -343,7 +343,7 @@ template <typename I>
  * @return The shifted integer
  */
 template <size_t Width>
-auto operator>>(const integer<Width>& lhs, const size_t rhs) -> integer<Width>
+auto constexpr operator>>(const integer<Width>& lhs, const size_t rhs) -> integer<Width>
 {
     if (rhs >= Width)
     {
