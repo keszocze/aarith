@@ -293,8 +293,6 @@ public:
         }
     }
 
-
-
     // Sets the words to the given values, where the right-most argument corresponds to word 0.
     template <class... Args> void set_words(Args... args)
     {

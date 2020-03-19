@@ -395,12 +395,14 @@ SCENARIO("Exact multiplication of two floating-point numbers",
             static constexpr float number_b = 93.211546f;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
+            const normalized_float<E, M> result_float{number_a * number_b};
             const normalized_float<E, M> result = mul(a, b);
 
             THEN("It should be the correct product.")
             {
+                std::cout << number_a << "\t" << number_b << "\n";
                 std::cout << (number_a * number_b) << "\n";
-                std::cout <<  normalized_float<E, M>(number_a * number_b) << "\n";
+                std::cout << result_float << "\n";
                 std::cout << result << "\n";
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
             }

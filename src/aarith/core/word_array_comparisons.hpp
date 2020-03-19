@@ -17,7 +17,7 @@ namespace aarith {
  * @return true iff the word containers are identical in every bit
  */
 template <size_t W, size_t V>
-    constexpr bool operator==(const word_array<W>& a, const word_array<V>& b)
+constexpr bool operator==(const word_array<W>& a, const word_array<V>& b)
 {
     if constexpr (W != V)
     {

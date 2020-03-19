@@ -249,7 +249,8 @@ restoring_division(const uinteger<W>& numerator, const uinteger<V>& denominator)
  * @param denominator The number that divides the other number
  * @return The remainder of the division operation
  */
-template <typename I>[[nodiscard]] constexpr auto remainder(const I& numerator, const I& denominator) -> I
+template <typename I>
+[[nodiscard]] constexpr auto remainder(const I& numerator, const I& denominator) -> I
 {
     return restoring_division(numerator, denominator).second;
 }
@@ -414,7 +415,8 @@ auto constexpr operator>>(const integer<Width>& lhs, const size_t rhs) -> intege
  * @return Product of a and b
  */
 template <size_t W, size_t V>
-[[nodiscard]] constexpr auto expanding_mul(const integer<W>& m, const integer<V>& r) -> integer<V + W>
+[[nodiscard]] constexpr auto expanding_mul(const integer<W>& m, const integer<V>& r)
+    -> integer<V + W>
 {
 
     constexpr size_t K = W + V + 2;
@@ -473,7 +475,8 @@ template <size_t Width>[[nodiscard]] constexpr auto abs(const integer<Width>& n)
  * @param n The signed inter to be "absolute valued"
  * @return The absolute value of the signed integer
  */
-template <size_t Width>[[nodiscard]] constexpr auto expanding_abs(const integer<Width>& n) -> uinteger<Width>
+template <size_t Width>
+[[nodiscard]] constexpr auto expanding_abs(const integer<Width>& n) -> uinteger<Width>
 {
     uinteger<Width> abs = n.is_negative() ? -n : n;
     return abs;
@@ -570,22 +573,22 @@ template <typename I> auto constexpr operator+(const I& lhs, const I& rhs) -> I
     return add(lhs, rhs);
 }
 
-template <typename I> auto constexpr  operator-(const I& lhs, const I& rhs) -> I
+template <typename I> auto constexpr operator-(const I& lhs, const I& rhs) -> I
 {
     return sub(lhs, rhs);
 }
 
-template <typename I> auto constexpr  operator*(const I& lhs, const I& rhs) -> I
+template <typename I> auto constexpr operator*(const I& lhs, const I& rhs) -> I
 {
     return mul(lhs, rhs);
 }
 
-template <typename I> auto constexpr  operator/(const I& lhs, const I& rhs) -> I
+template <typename I> auto constexpr operator/(const I& lhs, const I& rhs) -> I
 {
     return div(lhs, rhs);
 }
 
-template <typename I> auto constexpr  operator%(const I& lhs, const I& rhs) -> I
+template <typename I> auto constexpr operator%(const I& lhs, const I& rhs) -> I
 {
     return remainder(lhs, rhs);
 }
