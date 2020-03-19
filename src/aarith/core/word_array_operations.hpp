@@ -73,7 +73,7 @@ template <size_t Width> constexpr auto count_leading_zeroes(const word_array<Wid
  * @param rhs The number of bits to shift
  * @return The shifted word_container
  */
-template <typename W>[[nodiscard]] auto operator<<(const W& lhs, const size_t rhs) -> W
+template <typename W>[[nodiscard]] constexpr  auto operator<<(const W& lhs, const size_t rhs) -> W
 {
     static_assert(is_word_array_v<W>);
 
@@ -119,7 +119,7 @@ template <typename W>[[nodiscard]] auto operator<<(const W& lhs, const size_t rh
  * @param rhs The number of bits to shift
  * @return The shifted word_array
  */
-template <typename W> auto operator>>(const W& lhs, const size_t rhs) -> W
+template <typename W> auto constexpr  operator>>(const W& lhs, const size_t rhs) -> W
 {
 
     static_assert(is_word_array_v<W>);
@@ -179,7 +179,7 @@ template <typename W> auto operator>>(const W& lhs, const size_t rhs) -> W
  * @param w  Word container from which the range is taken from
  * @return Range word[S,E], including the
  */
-template <size_t S, size_t E, size_t W> word_array<(S - E) + 1> bit_range(const word_array<W>& w)
+template <size_t S, size_t E, size_t W> [[nodiscard]] constexpr  word_array<(S - E) + 1> bit_range(const word_array<W>& w)
 {
     static_assert(S < W, "Range must start within the word");
     static_assert(E <= S, "Range must be positive (i.e. this method will not reverse the word");
@@ -194,8 +194,8 @@ template <size_t S, size_t E, size_t W> word_array<(S - E) + 1> bit_range(const 
  * @param w Word container that is split
  * @return Pair of <word[W-1,S+1], word[S,0]>
  */
-template <size_t S, size_t W>
-std::pair<word_array<W - (S + 1)>, word_array<S + 1>> split(const word_array<W>& w)
+template <size_t S, size_t W> [[nodiscard]] constexpr
+    std::pair<word_array<W - (S + 1)>, word_array<S + 1>> split(const word_array<W>& w)
 {
     static_assert(S < W - 1 && S >= 0);
 
