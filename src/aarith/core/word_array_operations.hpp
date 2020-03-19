@@ -37,7 +37,7 @@ template <typename W> auto operator^(const W& lhs, const W& rhs) -> W
     return bitwise_xor;
 }
 
-template <typename W>[[nodiscard]] auto operator~(const W& rhs) -> W
+template <typename W>[[nodiscard]] constexpr auto operator~(const W& rhs) -> W
 {
     static_assert(is_word_array_v<W>);
     W bitwise_not;
