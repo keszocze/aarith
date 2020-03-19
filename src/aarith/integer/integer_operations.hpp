@@ -566,27 +566,27 @@ restoring_division(const integer<W>& numerator, const integer<V>& denominator)
  */
 namespace aarith::arithmetic_operators {
 
-template <typename I> auto operator+(const I& lhs, const I& rhs) -> I
+template <typename I> auto constexpr operator+(const I& lhs, const I& rhs) -> I
 {
     return add(lhs, rhs);
 }
 
-template <typename I> auto operator-(const I& lhs, const I& rhs) -> I
+template <typename I> auto constexpr  operator-(const I& lhs, const I& rhs) -> I
 {
     return sub(lhs, rhs);
 }
 
-template <typename I> auto operator*(const I& lhs, const I& rhs) -> I
+template <typename I> auto constexpr  operator*(const I& lhs, const I& rhs) -> I
 {
     return mul(lhs, rhs);
 }
 
-template <typename I> auto operator/(const I& lhs, const I& rhs) -> I
+template <typename I> auto constexpr  operator/(const I& lhs, const I& rhs) -> I
 {
     return div(lhs, rhs);
 }
 
-template <typename I> auto operator%(const I& lhs, const I& rhs) -> I
+template <typename I> auto constexpr  operator%(const I& lhs, const I& rhs) -> I
 {
     return remainder(lhs, rhs);
 }
