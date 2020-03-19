@@ -265,7 +265,7 @@ template <typename I>[[nodiscard]] constexpr auto remainder(const I& numerator, 
  * @param denominator The number that divides the other number
  * @return The quotient of the division operation
  */
-template <typename I>[[nodiscard]] auto div(const I& numerator, const I& denominator) -> I
+template <typename I>[[nodiscard]] constexpr auto div(const I& numerator, const I& denominator) -> I
 {
     return restoring_division(numerator, denominator).first;
 }
