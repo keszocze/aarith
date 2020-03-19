@@ -485,7 +485,7 @@ template <size_t Width>[[nodiscard]] constexpr auto expanding_abs(const integer<
  * @param n  The signed integer whose sign is to be changed
  * @return  The negative value of the signed integer
  */
-template <size_t W> auto operator-(const integer<W>& n) -> integer<W>
+template <size_t W> constexpr auto operator-(const integer<W>& n) -> integer<W>
 {
     const integer<W> one(1U);
     return add(~n, one);
