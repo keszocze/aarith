@@ -15,7 +15,7 @@ namespace aarith {
  * @return Sum of a and b with bit width max(I::width,T::width)+1
  */
 template <typename I, typename T>
-[[nodiscard]] auto expanding_add(const I& a, const T& b, const bool initial_carry = false)
+[[nodiscard]] constexpr auto expanding_add(const I& a, const T& b, const bool initial_carry = false)
 {
 
     static_assert(is_integral_v<I>);
