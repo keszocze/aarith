@@ -78,7 +78,7 @@ template <typename I>[[nodiscard]] constexpr auto sub(const I& a, const I& b) ->
  * @param b Subtrahend
  * @return Difference of correct bit width
  */
-template <typename I, typename T>[[nodiscard]] auto expanding_sub(const I& a, const T& b)
+template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(const I& a, const T& b)
 {
 
     // TODO do we need this assertion?
