@@ -43,7 +43,7 @@ constexpr size_t pow(const size_t base, const size_t exponent)
         }
     }
     size_t result = 1;
-    for (size_t i = 0U; i <= exponent; ++i)
+    for (size_t i = 0U; i < exponent; ++i)
     {
         result = result * base;
     }
