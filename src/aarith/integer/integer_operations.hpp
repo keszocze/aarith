@@ -229,7 +229,7 @@ template <typename IntegerType> IntegerType pow(const IntegerType& base, const I
 
     if (exponent == IntegerType::max())
     {
-        if (base = IntegerType::zero())
+        if (base == IntegerType::zero())
         {
             return IntegerType::zero();
         }
