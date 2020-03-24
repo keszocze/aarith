@@ -12,10 +12,10 @@ SCENARIO("Creating uintegers using the from_words method")
     {
         THEN("The constructed uinteger should be correct")
         {
-            const uint64_t uzero = 0U;
-            const uint64_t uones = ~uzero;
+            constexpr uint64_t uzero = 0U;
+            constexpr uint64_t uones = ~uzero;
 
-            const uinteger<89> from_word = uinteger<89>::from_words(uzero, uones);
+            constexpr uinteger<89> from_word = uinteger<89>::from_words(uzero, uones);
             uinteger<89> manually;
             manually.set_word(0, uones);
             manually.set_word(1, uzero);
@@ -35,7 +35,7 @@ SCENARIO("Casting uintegers into different width", "[uinteger]")
     {
         static constexpr uint16_t test_value = 123;
         static constexpr size_t SourceWidth = 16;
-        const uinteger<SourceWidth> uint{test_value};
+        constexpr uinteger<SourceWidth> uint{test_value};
 
         WHEN("The source width <= destination width")
         {
@@ -75,7 +75,7 @@ SCENARIO("Copy constructor of uintegers with various bit widths", "[uinteger][ut
 
         //        const uint64_t val_a = GENERATE(take(10, random(0U,
         //        std::numeric_limits<uint64_t>::max()));
-        const uint64_t val_a = 24;
+        constexpr uint64_t val_a = 24;
         uinteger<196> a = uinteger<196>::from_words(0U, val_a, 0U);
 
         THEN("Assignment of individual words is correct")
@@ -87,8 +87,8 @@ SCENARIO("Copy constructor of uintegers with various bit widths", "[uinteger][ut
 
         AND_GIVEN("An uinteger<N> b")
         {
-            const uint64_t val_b = 1337;
-            const uinteger<196> b = uinteger<196>::from_words(val_b, 0U, 2 * val_b);
+            constexpr uint64_t val_b = 1337;
+            constexpr uinteger<196> b = uinteger<196>::from_words(val_b, 0U, 2 * val_b);
 
             THEN("Assignment opeator of individual words is correct")
             {
@@ -103,8 +103,8 @@ SCENARIO("Copy constructor of uintegers with various bit widths", "[uinteger][ut
         {
             WHEN("M < N")
             {
-                const uint64_t val_b = 23;
-                const uinteger<64> tmp = uinteger<64>::from_words(val_b);
+                constexpr uint64_t val_b = 23;
+                constexpr uinteger<64> tmp = uinteger<64>::from_words(val_b);
 
                 THEN("The copy constructor should work")
                 {
@@ -147,7 +147,7 @@ SCENARIO("Calculating the word_masks of uintegers", "[uinteger][utility]")
 
     GIVEN("A uinteger<N> where N < word_width")
     {
-        uinteger<32> uint;
+        constexpr uinteger<32> uint;
         THEN("The mask is correct")
         {
             REQUIRE(uint.word_mask(0) == 0xffffffff);
@@ -155,7 +155,7 @@ SCENARIO("Calculating the word_masks of uintegers", "[uinteger][utility]")
     }
     GIVEN("A uinteger<N> where N == word_width")
     {
-        uinteger<64> uint;
+        constexpr uinteger<64> uint;
         THEN("The mask is all 1s")
         {
             REQUIRE(uint.word_mask(0) == 0xffffffffffffffff);
@@ -163,7 +163,7 @@ SCENARIO("Calculating the word_masks of uintegers", "[uinteger][utility]")
     }
     GIVEN("A uinteger<N> where N > word_width and N % word_width != 0")
     {
-        uinteger<96> uint;
+        constexpr uinteger<96> uint;
         THEN("All masks except the last are all 1s")
         {
             REQUIRE(uint.word_mask(0) == 0xffffffffffffffff);
@@ -175,7 +175,7 @@ SCENARIO("Calculating the word_masks of uintegers", "[uinteger][utility]")
     }
     GIVEN("A uinteger<N> where N > word_width and N % word_width == 0")
     {
-        uinteger<128> uint;
+        constexpr uinteger<128> uint;
         THEN("All masks are all 1s")
         {
             REQUIRE(uint.word_mask(0) == 0xffffffffffffffff);
@@ -189,13 +189,13 @@ SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
     GIVEN("One uinteger a and a number of shifted bits s")
     {
 
-        const size_t TestWidth = 16;
+        constexpr size_t TestWidth = 16;
 
         WHEN("The result still fits the width")
         {
             static constexpr uint16_t number_a = 7;
             static constexpr auto s = 4U;
-            const uinteger<TestWidth> a{number_a};
+            constexpr uinteger<TestWidth> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 112);
@@ -204,7 +204,7 @@ SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
         {
             static constexpr uint16_t number_a = 7;
             static constexpr auto s = 14U;
-            const uinteger<TestWidth> a{number_a};
+            constexpr uinteger<TestWidth> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 49152);
@@ -212,11 +212,11 @@ SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
 
         WHEN("Some bits are shifted to the next word")
         {
-            const size_t Width = 70;
+            constexpr size_t Width = 70;
 
             static constexpr uint16_t number_a = 7;
             static constexpr auto s = 63U;
-            const uinteger<Width> a{number_a};
+            constexpr uinteger<Width> a{number_a};
 
             const uinteger<Width> result = a << s;
             REQUIRE(result.word(0) == 0x8000000000000000);
@@ -241,7 +241,7 @@ SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
 
             static constexpr uint16_t number_a = 3;
             static constexpr auto s = 0;
-            const uinteger<Width> a{number_a};
+            constexpr uinteger<Width> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 3);
@@ -254,7 +254,7 @@ SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
 
             static constexpr uint16_t number_a = 3;
             static constexpr auto s = static_cast<size_t>(uinteger<Width>::word_width());
-            const uinteger<Width> a{number_a};
+            constexpr uinteger<Width> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 0);
@@ -267,7 +267,7 @@ SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
 
             static constexpr uint16_t number_a = 3;
             static constexpr auto s = 2 * static_cast<size_t>(uinteger<Width>::word_width());
-            const uinteger<Width> a{number_a};
+            constexpr uinteger<Width> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 0);
@@ -280,7 +280,7 @@ SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
 
             static constexpr uint16_t number_a = 3;
             static constexpr auto s = static_cast<size_t>(uinteger<Width>::word_width()) - 1U;
-            const uinteger<Width> a{number_a};
+            constexpr uinteger<Width> a{number_a};
 
             auto reference = a.word(0) << s;
 
@@ -295,7 +295,7 @@ SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
 
             static constexpr uint16_t number_a = 3;
             static constexpr auto s = 2U * static_cast<size_t>(uinteger<Width>::word_width()) - 1U;
-            const uinteger<Width> a{number_a};
+            constexpr uinteger<Width> a{number_a};
 
             auto reference = a.word(0) << (s % (sizeof(uinteger<Width>::word_width()) * 8));
 
@@ -398,16 +398,16 @@ SCENARIO("Right shift operator works as expected", "[uinteger][utility]")
                 static constexpr size_t width = 256;
                 static constexpr size_t word_width = uinteger<width>::word_width();
 
-                static const uinteger<width> a{1U};
-                static const uinteger<width> expected0 =
+                static constexpr uinteger<width> a{1U};
+                static constexpr uinteger<width> expected0 =
                     uinteger<width>::from_words(0U, 0U, 0U, 1U);
-                static const uinteger<width> expected1 =
+                static constexpr uinteger<width> expected1 =
                     uinteger<width>::from_words(0U, 0U, 1U, 0U);
-                static const uinteger<width> expected2 =
+                static constexpr uinteger<width> expected2 =
                     uinteger<width>::from_words(0U, 1U, 0U, 0U);
-                static const uinteger<width> expected3 =
+                static constexpr uinteger<width> expected3 =
                     uinteger<width>::from_words(1U, 0U, 0U, 0U);
-                static const uinteger<width> expected4 =
+                static constexpr uinteger<width> expected4 =
                     uinteger<width>::from_words(0U, 0U, 0U, 0U);
 
                 std::vector<uinteger<width>> expecteds{expected0, expected1, expected2, expected3,
@@ -425,9 +425,9 @@ SCENARIO("Right shift operator works as expected", "[uinteger][utility]")
         {
             THEN("The result should still be correct")
             {
-                const size_t w = 128;
-                const uinteger<w> a{1U};
-                const uinteger<w> expected;
+                constexpr size_t w = 128;
+                constexpr uinteger<w> a{1U};
+                constexpr uinteger<w> expected;
                 const uinteger<w> result = a << w;
 
                 CHECK(expected == result);
@@ -446,8 +446,8 @@ SCENARIO("Logical AND works as expected", "[uinteger][arithmetic]")
 
             static constexpr uint16_t number_a = 7;
             static constexpr uint16_t number_b = 14;
-            const uinteger<Width> a{number_a};
-            const uinteger<Width> b{number_b};
+            constexpr uinteger<Width> a{number_a};
+            constexpr uinteger<Width> b{number_b};
 
             const auto result = a & b;
             const auto result_ref = number_a & number_b;
@@ -466,8 +466,8 @@ SCENARIO("Logical OR works as expected", "[uinteger][arithmetic]")
 
             static constexpr uint16_t number_a = 7;
             static constexpr uint16_t number_b = 14;
-            const uinteger<Width> a{number_a};
-            const uinteger<Width> b{number_b};
+            constexpr uinteger<Width> a{number_a};
+            constexpr uinteger<Width> b{number_b};
 
             const auto result = a | b;
             const auto result_ref = number_a | number_b;
@@ -485,10 +485,10 @@ SCENARIO("Logical NOT works as expected", "[uinteger][arithmetic]")
             const size_t Width = 70;
 
             static constexpr uint16_t number_a = 7;
-            const uinteger<Width> a{number_a};
+            constexpr uinteger<Width> a{number_a};
 
-            const auto result = ~a;
-            const auto result_ref = ~number_a;
+            constexpr auto result = ~a;
+            constexpr auto result_ref = ~number_a;
             REQUIRE(result.word(0) == result_ref);
         }
     }
