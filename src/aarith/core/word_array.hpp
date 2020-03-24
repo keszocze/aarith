@@ -323,20 +323,22 @@ public:
      * Utility stuff
      */
 
-    [[nodiscard]] bool is_zero() const noexcept
+    [[nodiscard]] bool constexpr is_zero() const noexcept
     {
-        return std::all_of(words.begin(), words.end(), [](const word_type& w) {
-            word_type zero = 0U;
-            return w == zero;
-        });
+
+        for (size_t i = 0; i < word_count(); ++i)
+        {
+            if (word(i) != word_type(0))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
-    [[nodiscard]] explicit operator bool() const noexcept
+    [[nodiscard]] explicit constexpr operator bool() const noexcept
     {
-        return std::any_of(words.begin(), words.end(), [](const word_type& w) {
-            word_type zero = 0U;
-            return w != zero;
-        });
+        return !is_zero();
     }
 
     constexpr auto begin() const noexcept
@@ -431,7 +433,8 @@ public:
 };
 
 template <size_t DestinationWidth, size_t SourceWidth>
-[[nodiscard]] auto constexpr width_cast(const word_array<SourceWidth>& source) -> word_array<DestinationWidth>
+[[nodiscard]] auto constexpr width_cast(const word_array<SourceWidth>& source)
+    -> word_array<DestinationWidth>
 {
 
     if constexpr (SourceWidth == DestinationWidth)
