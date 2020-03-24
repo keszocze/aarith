@@ -686,40 +686,40 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[integer][utility]"
         THEN("The values should match the int32_t ones")
         {
             using sint = integer<32>;
-            using signed_integer = std::numeric_limits<sint>;
-            using il = std::numeric_limits<int32_t>;
+            using integer_limits = std::numeric_limits<sint>;
+            using int32_t_limits = std::numeric_limits<int32_t>;
 
-            CHECK(signed_integer::is_specialized == il::is_specialized);
-            CHECK(signed_integer::is_signed == il::is_signed);
-            CHECK(signed_integer::is_integer == il::is_integer);
-            CHECK(signed_integer::is_exact == il::is_exact);
-            CHECK(signed_integer::has_infinity == il::has_infinity);
-            CHECK(signed_integer::has_quiet_NaN == il::has_quiet_NaN);
-            CHECK(signed_integer::has_signaling_NaN == il::has_signaling_NaN);
-            CHECK(signed_integer::is_bounded == il::is_bounded);
-            CHECK(signed_integer::has_denorm == il::has_denorm);
-            CHECK(signed_integer::has_denorm_loss == il::has_denorm_loss);
-            CHECK(signed_integer::round_style == il::round_style);
-            CHECK(signed_integer::is_iec559 == il::is_iec559);
-            CHECK(signed_integer::is_modulo == il::is_modulo);
-            CHECK(signed_integer::radix == il::radix);
-            CHECK(signed_integer::digits == il::digits);
-            CHECK(signed_integer::digits10 == il::digits10);
-            CHECK(signed_integer::max_digits10 == il::max_digits10);
-            CHECK(signed_integer::min_exponent10 == il::min_exponent10);
-            CHECK(signed_integer::min_exponent == il::min_exponent);
-            CHECK(signed_integer::max_exponent == il::max_exponent);
-            CHECK(signed_integer::max_digits10 == il::max_exponent10);
-            CHECK(signed_integer::tinyness_before == il::tinyness_before);
-            CHECK(static_cast<int32_t>(signed_integer::min().word(0)) == il::min());
-            CHECK(static_cast<int32_t>(signed_integer::lowest().word(0)) == il::lowest());
-            CHECK(signed_integer::max().word(0) == il::max());
-            CHECK(signed_integer::epsilon().word(0) == il::epsilon());
-            CHECK(signed_integer::round_error().word(0) == il::round_error());
-            CHECK(signed_integer::infinity().word(0) == il::infinity());
-            CHECK(signed_integer::quiet_NaN().word(0) == il::quiet_NaN());
-            CHECK(signed_integer::signaling_NaN().word(0) == il::signaling_NaN());
-            CHECK(signed_integer::denorm_min().word(0) == il::denorm_min());
+            CHECK(integer_limits::is_specialized == int32_t_limits::is_specialized);
+            CHECK(integer_limits::is_signed == int32_t_limits::is_signed);
+            CHECK(integer_limits::is_integer == int32_t_limits::is_integer);
+            CHECK(integer_limits::is_exact == int32_t_limits::is_exact);
+            CHECK(integer_limits::has_infinity == int32_t_limits::has_infinity);
+            CHECK(integer_limits::has_quiet_NaN == int32_t_limits::has_quiet_NaN);
+            CHECK(integer_limits::has_signaling_NaN == int32_t_limits::has_signaling_NaN);
+            CHECK(integer_limits::is_bounded == int32_t_limits::is_bounded);
+            CHECK(integer_limits::has_denorm == int32_t_limits::has_denorm);
+            CHECK(integer_limits::has_denorm_loss == int32_t_limits::has_denorm_loss);
+            CHECK(integer_limits::round_style == int32_t_limits::round_style);
+            CHECK(integer_limits::is_iec559 == int32_t_limits::is_iec559);
+            CHECK(integer_limits::is_modulo == int32_t_limits::is_modulo);
+            CHECK(integer_limits::radix == int32_t_limits::radix);
+            CHECK(integer_limits::digits == int32_t_limits::digits);
+            CHECK(integer_limits::digits10 == int32_t_limits::digits10);
+            CHECK(integer_limits::max_digits10 == int32_t_limits::max_digits10);
+            CHECK(integer_limits::min_exponent10 == int32_t_limits::min_exponent10);
+            CHECK(integer_limits::min_exponent == int32_t_limits::min_exponent);
+            CHECK(integer_limits::max_exponent == int32_t_limits::max_exponent);
+            CHECK(integer_limits::max_digits10 == int32_t_limits::max_exponent10);
+            CHECK(integer_limits::tinyness_before == int32_t_limits::tinyness_before);
+            CHECK(static_cast<int32_t>(integer_limits::min().word(0)) == int32_t_limits::min());
+            CHECK(static_cast<int32_t>(integer_limits::lowest().word(0)) == int32_t_limits::lowest());
+            CHECK(integer_limits::max().word(0) == int32_t_limits::max());
+            CHECK(integer_limits::epsilon().word(0) == int32_t_limits::epsilon());
+            CHECK(integer_limits::round_error().word(0) == int32_t_limits::round_error());
+            CHECK(integer_limits::infinity().word(0) == int32_t_limits::infinity());
+            CHECK(integer_limits::quiet_NaN().word(0) == int32_t_limits::quiet_NaN());
+            CHECK(integer_limits::signaling_NaN().word(0) == int32_t_limits::signaling_NaN());
+            CHECK(integer_limits::denorm_min().word(0) == int32_t_limits::denorm_min());
         }
     }
     GIVEN("The bit width of 64")
@@ -727,41 +727,41 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[integer][utility]"
         THEN("The values should match the int64_t ones")
         {
             using sint = integer<64>;
-            using signed_integer = std::numeric_limits<sint>;
-            using il = std::numeric_limits<int64_t>;
+            using integer_limits = std::numeric_limits<sint>;
+            using int64_t_limits = std::numeric_limits<int64_t>;
 
-            CHECK(signed_integer::is_specialized == il::is_specialized);
-            CHECK(signed_integer::is_signed == il::is_signed);
-            CHECK(signed_integer::is_integer == il::is_integer);
-            CHECK(signed_integer::is_exact == il::is_exact);
-            CHECK(signed_integer::has_infinity == il::has_infinity);
-            CHECK(signed_integer::has_quiet_NaN == il::has_quiet_NaN);
-            CHECK(signed_integer::has_signaling_NaN == il::has_signaling_NaN);
-            CHECK(signed_integer::is_bounded == il::is_bounded);
-            CHECK(signed_integer::has_denorm == il::has_denorm);
-            CHECK(signed_integer::has_denorm_loss == il::has_denorm_loss);
-            CHECK(signed_integer::round_style == il::round_style);
-            CHECK(signed_integer::is_iec559 == il::is_iec559);
-            CHECK(signed_integer::is_modulo == il::is_modulo);
-            CHECK(signed_integer::radix == il::radix);
-            CHECK(signed_integer::digits == il::digits);
-            CHECK(signed_integer::digits10 == il::digits10);
-            CHECK(signed_integer::max_digits10 == il::max_digits10);
-            CHECK(signed_integer::min_exponent10 == il::min_exponent10);
-            CHECK(signed_integer::min_exponent == il::min_exponent);
-            CHECK(signed_integer::max_exponent == il::max_exponent);
-            CHECK(signed_integer::max_digits10 == il::max_exponent10);
-            CHECK(signed_integer::tinyness_before == il::tinyness_before);
-            CHECK(static_cast<int64_t>(signed_integer::min().word(0)) == il::min());
-            CHECK(static_cast<int64_t>(signed_integer::lowest().word(0)) == il::lowest());
-            CHECK(static_cast<int64_t>(signed_integer::max().word(0)) == il::max());
-            CHECK(static_cast<int64_t>(signed_integer::epsilon().word(0)) == il::epsilon());
-            CHECK(static_cast<int64_t>(signed_integer::round_error().word(0)) == il::round_error());
-            CHECK(static_cast<int64_t>(signed_integer::infinity().word(0)) == il::infinity());
-            CHECK(static_cast<int64_t>(signed_integer::quiet_NaN().word(0)) == il::quiet_NaN());
-            CHECK(static_cast<int64_t>(signed_integer::signaling_NaN().word(0)) ==
-                  il::signaling_NaN());
-            CHECK(static_cast<int64_t>(signed_integer::denorm_min().word(0)) == il::denorm_min());
+            CHECK(integer_limits::is_specialized == int64_t_limits::is_specialized);
+            CHECK(integer_limits::is_signed == int64_t_limits::is_signed);
+            CHECK(integer_limits::is_integer == int64_t_limits::is_integer);
+            CHECK(integer_limits::is_exact == int64_t_limits::is_exact);
+            CHECK(integer_limits::has_infinity == int64_t_limits::has_infinity);
+            CHECK(integer_limits::has_quiet_NaN == int64_t_limits::has_quiet_NaN);
+            CHECK(integer_limits::has_signaling_NaN == int64_t_limits::has_signaling_NaN);
+            CHECK(integer_limits::is_bounded == int64_t_limits::is_bounded);
+            CHECK(integer_limits::has_denorm == int64_t_limits::has_denorm);
+            CHECK(integer_limits::has_denorm_loss == int64_t_limits::has_denorm_loss);
+            CHECK(integer_limits::round_style == int64_t_limits::round_style);
+            CHECK(integer_limits::is_iec559 == int64_t_limits::is_iec559);
+            CHECK(integer_limits::is_modulo == int64_t_limits::is_modulo);
+            CHECK(integer_limits::radix == int64_t_limits::radix);
+            CHECK(integer_limits::digits == int64_t_limits::digits);
+            CHECK(integer_limits::digits10 == int64_t_limits::digits10);
+            CHECK(integer_limits::max_digits10 == int64_t_limits::max_digits10);
+            CHECK(integer_limits::min_exponent10 == int64_t_limits::min_exponent10);
+            CHECK(integer_limits::min_exponent == int64_t_limits::min_exponent);
+            CHECK(integer_limits::max_exponent == int64_t_limits::max_exponent);
+            CHECK(integer_limits::max_digits10 == int64_t_limits::max_exponent10);
+            CHECK(integer_limits::tinyness_before == int64_t_limits::tinyness_before);
+            CHECK(static_cast<int64_t>(integer_limits::min().word(0)) == int64_t_limits::min());
+            CHECK(static_cast<int64_t>(integer_limits::lowest().word(0)) == int64_t_limits::lowest());
+            CHECK(static_cast<int64_t>(integer_limits::max().word(0)) == int64_t_limits::max());
+            CHECK(static_cast<int64_t>(integer_limits::epsilon().word(0)) == int64_t_limits::epsilon());
+            CHECK(static_cast<int64_t>(integer_limits::round_error().word(0)) == int64_t_limits::round_error());
+            CHECK(static_cast<int64_t>(integer_limits::infinity().word(0)) == int64_t_limits::infinity());
+            CHECK(static_cast<int64_t>(integer_limits::quiet_NaN().word(0)) == int64_t_limits::quiet_NaN());
+            CHECK(static_cast<int64_t>(integer_limits::signaling_NaN().word(0)) ==
+                  int64_t_limits::signaling_NaN());
+            CHECK(static_cast<int64_t>(integer_limits::denorm_min().word(0)) == int64_t_limits::denorm_min());
         }
     }
 }
