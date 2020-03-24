@@ -431,7 +431,7 @@ public:
 };
 
 template <size_t DestinationWidth, size_t SourceWidth>
-[[nodiscard]] auto width_cast(const word_array<SourceWidth>& source) -> word_array<DestinationWidth>
+[[nodiscard]] auto constexpr width_cast(const word_array<SourceWidth>& source) -> word_array<DestinationWidth>
 {
 
     if constexpr (SourceWidth == DestinationWidth)
