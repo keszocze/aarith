@@ -217,7 +217,8 @@ split(const word_array<W>& w)
  * @param f Function of type word_array<W>::word_type -> word_array<W>::word_type
  * @return A new word_array with the transformed words
  */
-template <class F, size_t W>[[nodiscard]] constexpr word_array<W> map(const word_array<W>& w, const F f)
+template <class F, size_t W>
+[[nodiscard]] constexpr word_array<W> map(const word_array<W>& w, const F f)
 {
 
     word_array<W> result;
@@ -244,8 +245,8 @@ template <class F, size_t W>[[nodiscard]] constexpr word_array<W> map(const word
  * @return The newly created, zipped word_array
  */
 template <class F, size_t W, size_t V>
-[[nodiscard]] constexpr word_array<std::min(W, V)> zip_with(const word_array<W>& w, const word_array<V>& v,
-                                                  F f)
+[[nodiscard]] constexpr word_array<std::min(W, V)> zip_with(const word_array<W>& w,
+                                                            const word_array<V>& v, F f)
 {
     constexpr size_t L = std::min(W, V);
     word_array<L> result;
@@ -318,8 +319,8 @@ zip_with_state(const word_array<W>& w, const word_array<V>& v, const F f,
  * @return
  */
 template <class F, size_t W, size_t V>
-[[nodiscard]] constexpr word_array<std::max(W, V)> zip_with_expand(const word_array<W>& w,
-                                                         const word_array<V>& v, const F f)
+[[nodiscard]] constexpr word_array<std::max(W, V)>
+zip_with_expand(const word_array<W>& w, const word_array<V>& v, const F f)
 {
     constexpr size_t wc = word_array<W>::word_count();
     constexpr size_t vc = word_array<V>::word_count();
@@ -433,7 +434,7 @@ template <class R, class F, size_t W>
  */
 template <class R, class F, size_t W, size_t V>
 [[nodiscard]] R constexpr zip_reduce(const word_array<W>& w, const word_array<V>& v, const F f,
-                           const R initial_value)
+                                     const R initial_value)
 {
     R result = initial_value;
 

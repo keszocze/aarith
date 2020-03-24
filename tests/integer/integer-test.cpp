@@ -378,11 +378,16 @@ SCENARIO("Right shift operator works as expected", "[integer][bit-logic]")
                 static constexpr size_t word_width = integer<width>::word_width();
 
                 static constexpr integer<width> a{1U};
-                static constexpr integer<width> expected0 = integer<width>::from_words(0U, 0U, 0U, 1U);
-                static constexpr integer<width> expected1 = integer<width>::from_words(0U, 0U, 1U, 0U);
-                static constexpr integer<width> expected2 = integer<width>::from_words(0U, 1U, 0U, 0U);
-                static constexpr integer<width> expected3 = integer<width>::from_words(1U, 0U, 0U, 0U);
-                static constexpr integer<width> expected4 = integer<width>::from_words(0U, 0U, 0U, 0U);
+                static constexpr integer<width> expected0 =
+                    integer<width>::from_words(0U, 0U, 0U, 1U);
+                static constexpr integer<width> expected1 =
+                    integer<width>::from_words(0U, 0U, 1U, 0U);
+                static constexpr integer<width> expected2 =
+                    integer<width>::from_words(0U, 1U, 0U, 0U);
+                static constexpr integer<width> expected3 =
+                    integer<width>::from_words(1U, 0U, 0U, 0U);
+                static constexpr integer<width> expected4 =
+                    integer<width>::from_words(0U, 0U, 0U, 0U);
 
                 std::vector<integer<width>> expecteds{expected0, expected1, expected2, expected3,
                                                       expected4};
@@ -712,7 +717,8 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[integer][utility]"
             CHECK(integer_limits::max_digits10 == int32_t_limits::max_exponent10);
             CHECK(integer_limits::tinyness_before == int32_t_limits::tinyness_before);
             CHECK(static_cast<int32_t>(integer_limits::min().word(0)) == int32_t_limits::min());
-            CHECK(static_cast<int32_t>(integer_limits::lowest().word(0)) == int32_t_limits::lowest());
+            CHECK(static_cast<int32_t>(integer_limits::lowest().word(0)) ==
+                  int32_t_limits::lowest());
             CHECK(integer_limits::max().word(0) == int32_t_limits::max());
             CHECK(integer_limits::epsilon().word(0) == int32_t_limits::epsilon());
             CHECK(integer_limits::round_error().word(0) == int32_t_limits::round_error());
@@ -753,15 +759,21 @@ SCENARIO("std::numeric_limits gets instantiated correctly", "[integer][utility]"
             CHECK(integer_limits::max_digits10 == int64_t_limits::max_exponent10);
             CHECK(integer_limits::tinyness_before == int64_t_limits::tinyness_before);
             CHECK(static_cast<int64_t>(integer_limits::min().word(0)) == int64_t_limits::min());
-            CHECK(static_cast<int64_t>(integer_limits::lowest().word(0)) == int64_t_limits::lowest());
+            CHECK(static_cast<int64_t>(integer_limits::lowest().word(0)) ==
+                  int64_t_limits::lowest());
             CHECK(static_cast<int64_t>(integer_limits::max().word(0)) == int64_t_limits::max());
-            CHECK(static_cast<int64_t>(integer_limits::epsilon().word(0)) == int64_t_limits::epsilon());
-            CHECK(static_cast<int64_t>(integer_limits::round_error().word(0)) == int64_t_limits::round_error());
-            CHECK(static_cast<int64_t>(integer_limits::infinity().word(0)) == int64_t_limits::infinity());
-            CHECK(static_cast<int64_t>(integer_limits::quiet_NaN().word(0)) == int64_t_limits::quiet_NaN());
+            CHECK(static_cast<int64_t>(integer_limits::epsilon().word(0)) ==
+                  int64_t_limits::epsilon());
+            CHECK(static_cast<int64_t>(integer_limits::round_error().word(0)) ==
+                  int64_t_limits::round_error());
+            CHECK(static_cast<int64_t>(integer_limits::infinity().word(0)) ==
+                  int64_t_limits::infinity());
+            CHECK(static_cast<int64_t>(integer_limits::quiet_NaN().word(0)) ==
+                  int64_t_limits::quiet_NaN());
             CHECK(static_cast<int64_t>(integer_limits::signaling_NaN().word(0)) ==
                   int64_t_limits::signaling_NaN());
-            CHECK(static_cast<int64_t>(integer_limits::denorm_min().word(0)) == int64_t_limits::denorm_min());
+            CHECK(static_cast<int64_t>(integer_limits::denorm_min().word(0)) ==
+                  int64_t_limits::denorm_min());
         }
     }
 }
