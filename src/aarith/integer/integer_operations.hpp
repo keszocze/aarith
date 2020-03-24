@@ -285,7 +285,8 @@ template <typename I>[[nodiscard]] constexpr auto div(const I& numerator, const 
  * @return Sum of correct maximal bit width
  */
 template <class IntA, class IntB>
-[[nodiscard]] auto fun_add_expand(const IntA& a, const IntB& b, const bool initial_carry = false)
+[[nodiscard]] constexpr auto fun_add_expand(const IntA& a, const IntB& b,
+                                            const bool initial_carry = false)
 {
     static_assert(is_integral_v<IntA>);
     static_assert(is_integral_v<IntB>);
@@ -327,7 +328,7 @@ template <class IntA, class IntB>
  * @return Sum of a and b
  */
 template <typename I>
-[[nodiscard]] auto fun_add(const I& a, const I& b, const bool initial_carry = false) -> I
+[[nodiscard]] constexpr auto fun_add(const I& a, const I& b, const bool initial_carry = false) -> I
 {
     return width_cast<I::width()>(fun_add_expand(a, b, initial_carry));
 }

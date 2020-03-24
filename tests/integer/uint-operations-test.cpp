@@ -17,7 +17,7 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
             constexpr uinteger<TestWidth> a{number_a};
             constexpr uinteger<TestWidth> b{number_b};
             constexpr uinteger<TestWidth> result = add(a, b);
-            auto const result_fun = fun_add(a, b);
+            auto constexpr result_fun = fun_add(a, b);
 
             THEN("It should be the correct sum")
             {
@@ -31,8 +31,8 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
             static constexpr uint16_t number_b = 1;
             constexpr uinteger<TestWidth> a{number_a};
             constexpr uinteger<TestWidth> b{number_b};
-            auto const result = add(a, b);
-            auto const result_fun = fun_add(a, b);
+            auto constexpr result = add(a, b);
+            auto constexpr result_fun = fun_add(a, b);
 
             THEN("It should be the masked to fit")
             {
@@ -53,8 +53,8 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
             static constexpr uint64_t number_b = 1ULL << 63U;
             constexpr uinteger<TestWidth> a{number_a};
             constexpr uinteger<TestWidth> b{number_b};
-            auto const result = add(a, b);
-            auto const result_fun = fun_add(a, b);
+            auto constexpr result = add(a, b);
+            auto constexpr result_fun = fun_add(a, b);
 
             THEN("It is added to the next word")
             {
@@ -69,8 +69,8 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
             static constexpr uint64_t number_b = 0;
             constexpr uinteger<TestWidth> a{number_a};
             constexpr uinteger<TestWidth> b{number_b};
-            auto const result = add(a, b);
-            auto const result_fun = fun_add(a, b);
+            auto constexpr result = add(a, b);
+            auto constexpr result_fun = fun_add(a, b);
 
             THEN("The next word is unchanged")
             {
@@ -90,7 +90,7 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
             constexpr auto a = uint::from_words(0, 0xffffffffffffffff, 0xffffffffffffffff);
             constexpr auto b = a;
             auto constexpr result = add(a, b);
-            auto const result_fun = fun_add(a, b);
+            auto constexpr result_fun = fun_add(a, b);
             constexpr auto ref = uint::from_words(1, 0xffffffffffffffff, 0xfffffffffffffffe);
 
             THEN("There is a carry in the third word")
@@ -106,7 +106,7 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
             constexpr auto b = uint(1U);
             auto constexpr result = add(a, b);
             constexpr auto ref = uint::from_words(0, 0xffffffffffffffff, 0);
-            auto const result_fun = fun_add(a, b);
+            auto constexpr result_fun = fun_add(a, b);
 
             THEN("There is no carry in the third word")
             {
