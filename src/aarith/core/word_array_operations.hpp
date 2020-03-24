@@ -154,16 +154,14 @@ template <typename W> auto constexpr operator>>(const W& lhs, const size_t rhs) 
 
     for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
     {
-        word_type new_word{0};
-        new_word = lhs.word(counter) >> shift_word_right;
+        word_type new_word = lhs.word(counter) >> shift_word_right;
         if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
         {
             new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
         }
         shifted.set_word(counter - skip_words, new_word);
     }
-    word_type new_word{0};
-    new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
+    word_type new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
     shifted.set_word(lhs.word_count() - skip_words - 1, new_word);
 
     return shifted;
