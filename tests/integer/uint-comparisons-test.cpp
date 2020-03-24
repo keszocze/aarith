@@ -12,42 +12,49 @@ SCENARIO("Comparing two uintegers", "[uinteger][utility]")
             const size_t TestWidth = 16;
             static constexpr uint16_t number_a = 7;
             static constexpr uint16_t number_b = 23;
-            const uinteger<TestWidth> a{number_a};
-            const uinteger<TestWidth> b{number_b};
+            constexpr uinteger<TestWidth> a{number_a};
+            constexpr uinteger<TestWidth> b{number_b};
 
             THEN("operator< returns true")
             {
-                REQUIRE(a < b);
+                // the extra variable enforces the constexpr context
+                constexpr bool comp = a < b;
+                REQUIRE(comp);
             }
             THEN("operator<= returns true")
             {
-                REQUIRE(a <= b);
+                constexpr bool comp = a <= b;
+                REQUIRE(comp);
             }
             THEN("operator> returns false")
             {
-                REQUIRE_FALSE(a > b);
+                constexpr bool comp = a  > b;
+                REQUIRE_FALSE(comp);
             }
             THEN("operator>= returns false")
             {
-                REQUIRE_FALSE(a >= b);
+                constexpr bool comp = a >= b;
+                REQUIRE_FALSE(comp);
             }
             THEN("operator== returns false")
             {
-                REQUIRE_FALSE(a == b);
+                constexpr bool comp = a == b;
+                REQUIRE_FALSE(comp);
             }
             THEN("operator!= returns true")
             {
-                REQUIRE(a != b);
+                constexpr bool comp = a!=b;
+                REQUIRE(comp);
             }
         }
         WHEN("N > word_width")
         {
-            const size_t TestWidth = 80;
-            uinteger<TestWidth> const a{7, 0};
-            uinteger<TestWidth> const b{23, 0};
+            constexpr size_t TestWidth = 80;
+            constexpr uinteger<TestWidth> const a{7, 0};
+            constexpr uinteger<TestWidth> const b{23, 0};
 
-            uinteger<TestWidth> const c{7, 0};
-            uinteger<TestWidth> const d{0, 23};
+            constexpr uinteger<TestWidth> const c{7, 0};
+            constexpr uinteger<TestWidth> const d{0, 23};
 
             THEN("operator< returns true")
             {
@@ -91,8 +98,8 @@ SCENARIO("Comparing two uintegers with different bit widths", "[uinteger][utilit
             const size_t TestWidth = 16;
             static constexpr uint16_t number_a = 7;
             static constexpr uint16_t number_b = 23;
-            const uinteger<TestWidth> a{number_a};
-            const uinteger<TestWidth + 10> b{number_b};
+            constexpr uinteger<TestWidth> a{number_a};
+            constexpr uinteger<TestWidth + 10> b{number_b};
 
             THEN("operator< returns true")
             {
@@ -122,13 +129,13 @@ SCENARIO("Comparing two uintegers with different bit widths", "[uinteger][utilit
     }
     GIVEN("Two uinteger<N> a and b with a < b with different bit widths")
     {
-        const size_t small = 32;
-        const size_t big = 150;
+        constexpr size_t small = 32;
+        constexpr size_t big = 150;
         static constexpr uint16_t number_a = 7;
         static constexpr uint16_t number_c = 4;
         static constexpr uint16_t number_b = 23;
-        const uinteger<small> a{number_a};
-        const uinteger<big> b = uinteger<big>::from_words(number_b, 0U, number_c);
+        constexpr uinteger<small> a{number_a};
+        constexpr uinteger<big> b = uinteger<big>::from_words(number_b, 0U, number_c);
 
         THEN("operator< returns true")
         {
