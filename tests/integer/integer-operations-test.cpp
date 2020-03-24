@@ -242,21 +242,21 @@ SCENARIO("Division of signed integers", "[integer][arithmetic]")
 
     GIVEN("The number 1 << 65")
     {
-        const integer<70> m = (integer<70>::one() << 65);
+        constexpr integer<70> m = (integer<70>::one() << 65);
 
-        const integer<70> two{2};
+        constexpr integer<70> two{2};
 
         WHEN("Repeatedly dividing by two")
         {
             THEN("The division should work correctly over word boundaries")
             {
-                const auto div1 = restoring_division(m, two);
+                constexpr auto div1 = restoring_division(m, two);
 
                 CHECK(div1.first.word(1) == 1U);
                 CHECK(div1.first.word(0) == 0U);
                 CHECK(div1.second == integer<70>::zero());
 
-                const auto div2 = restoring_division(div1.first, two);
+                constexpr auto div2 = restoring_division(div1.first, two);
 
                 CHECK(div2.first.word(1) == 0U);
                 CHECK(div2.first.word(0) == (int64_t(1) << int64_t(63)));
@@ -366,7 +366,7 @@ SCENARIO("Division of signed integers", "[integer][arithmetic]")
             {
                 THEN("The result should be INT_MIN")
                 {
-                    const auto result =
+                    constexpr auto result =
                         restoring_division(integer<64>::min(), integer<64>::minus_one());
                     CHECK(result.first == integer<64>::min());
                     CHECK(result.second == integer<64>::zero());
@@ -387,10 +387,10 @@ SCENARIO("Multiplying signed integers", "[integer][arithmetic]")
         {
             THEN("The algorithm should still work")
             {
-                const integer<8> m{-16};
-                const integer<8> r{2};
+                constexpr integer<8> m{-16};
+                constexpr integer<8> r{2};
 
-                const integer<8> res = mul(m, r);
+                constexpr integer<8> res = mul(m, r);
 
                 int8_t mi = -16;
                 int8_t ri = 2;
@@ -601,7 +601,7 @@ SCENARIO("MIN/MAX Values behave as expected", "[integer][utility]")
         THEN("Adding/subtracting one should wrap around")
         {
             constexpr auto sum = add(max, one);
-            REQUIRE(sum== min);
+            REQUIRE(sum == min);
             REQUIRE(sum == fun_add(max, one));
 
             REQUIRE(sub(min, one) == max);

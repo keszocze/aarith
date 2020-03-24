@@ -685,8 +685,8 @@ SCENARIO("Computing the remainder of two uintegers works as expected", "[uintege
         constexpr uinteger<32> a{val_a};
         constexpr uinteger<32> b{val_b};
 
-        const uinteger<32> d = div(a, b);
-        const uinteger<32> m = remainder(a, b);
+        constexpr uinteger<32> d = div(a, b);
+        constexpr uinteger<32> m = remainder(a, b);
 
         const uint32_t int_div = val_a / val_b;
         const uint32_t int_mod = val_a % val_b;
