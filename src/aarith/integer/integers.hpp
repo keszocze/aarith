@@ -77,7 +77,7 @@ public:
 };
 
 template <size_t DestinationWidth, size_t SourceWidth>
-[[nodiscard]] auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>
+[[nodiscard]] auto constexpr width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>
 {
     if constexpr (DestinationWidth == SourceWidth)
     {
