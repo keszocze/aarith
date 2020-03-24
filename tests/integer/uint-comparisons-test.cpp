@@ -28,7 +28,7 @@ SCENARIO("Comparing two uintegers", "[uinteger][utility]")
             }
             THEN("operator> returns false")
             {
-                constexpr bool comp = a  > b;
+                constexpr bool comp = a > b;
                 REQUIRE_FALSE(comp);
             }
             THEN("operator>= returns false")
@@ -43,7 +43,7 @@ SCENARIO("Comparing two uintegers", "[uinteger][utility]")
             }
             THEN("operator!= returns true")
             {
-                constexpr bool comp = a!=b;
+                constexpr bool comp = a != b;
                 REQUIRE(comp);
             }
         }

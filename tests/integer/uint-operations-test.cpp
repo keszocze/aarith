@@ -229,7 +229,8 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
                     constexpr uinteger<192> b = uinteger<192>::from_words(zero, all_ones, one);
 
                     constexpr uinteger<192> result = sub(a, b);
-                    constexpr uinteger<192> expected = uinteger<192>::from_words(zero, zero, all_ones);
+                    constexpr uinteger<192> expected =
+                        uinteger<192>::from_words(zero, zero, all_ones);
 
                     REQUIRE(expected == result);
                 }

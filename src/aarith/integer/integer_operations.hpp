@@ -182,8 +182,8 @@ template <typename I>[[nodiscard]] constexpr I mul(const I& a, const I& b)
  *
  */
 template <std::size_t W, std::size_t V>
-[[nodiscard]] std::pair<uinteger<W>, uinteger<W>>
-restoring_division(const uinteger<W>& numerator, const uinteger<V>& denominator)
+[[nodiscard]] std::pair<uinteger<W>, uinteger<W>> restoring_division(const uinteger<W>& numerator,
+                                                                     const uinteger<V>& denominator)
 {
     using UInteger = uinteger<W>;
     using LargeUInteger = uinteger<2 * W>;
@@ -248,8 +248,7 @@ restoring_division(const uinteger<W>& numerator, const uinteger<V>& denominator)
  * @param denominator The number that divides the other number
  * @return The remainder of the division operation
  */
-template <typename I>
-[[nodiscard]] auto remainder(const I& numerator, const I& denominator) -> I
+template <typename I>[[nodiscard]] auto remainder(const I& numerator, const I& denominator) -> I
 {
     return restoring_division(numerator, denominator).second;
 }
