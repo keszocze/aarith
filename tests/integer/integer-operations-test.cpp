@@ -662,3 +662,4 @@ SCENARIO("Left/right shifting sintegers")
         }
     }
 }
+

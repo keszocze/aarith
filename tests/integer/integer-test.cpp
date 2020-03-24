@@ -6,6 +6,48 @@
 
 using namespace aarith;
 
+SCENARIO("Bit shifting is possible as constexpr for signed integers")
+{
+    GIVEN("A signed integer of width N")
+    {
+        THEN("Right-shifting should be a constexpr operation")
+        {
+            constexpr size_t W = 32;
+            constexpr integer<W> num{4};
+
+            constexpr integer<W> shift1{2};
+            constexpr integer<W> shift2{1};
+            constexpr integer<W> shift3{0};
+
+            constexpr integer<W> shifted1 = (num >> 1);
+            constexpr integer<W> shifted2 = (num >> 2);
+            constexpr integer<W> shifted3 = (num >> 3);
+
+            REQUIRE(shift1 == shifted1);
+            REQUIRE(shift2 == shifted2);
+            REQUIRE(shift3 == shifted3);
+        }
+        THEN("Left-shifting should be a constexpr operation")
+        {
+            constexpr size_t W = 32;
+            constexpr integer<W> num{4};
+
+            constexpr integer<W> shift1{8};
+            constexpr integer<W> shift2{16};
+            constexpr integer<W> shift3{32};
+
+            constexpr integer<W> shifted1 = (num << 1);
+            constexpr integer<W> shifted2 = (num << 2);
+            constexpr integer<W> shifted3 = (num << 3);
+
+            REQUIRE(shift1 == shifted1);
+            REQUIRE(shift2 == shifted2);
+            REQUIRE(shift3 == shifted3);
+        }
+    }
+}
+
+
 SCENARIO("Casting sintegers into different width", "[integer]")
 {
     GIVEN("width_cast is called")

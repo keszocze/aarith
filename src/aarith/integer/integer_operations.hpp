@@ -371,10 +371,11 @@ auto constexpr operator>>(const integer<Width>& lhs, const size_t rhs) -> intege
     const auto shift_word_right = rhs - skip_words * lhs.word_width();
     const auto shift_word_left = lhs.word_width() - shift_word_right;
 
+    using word_type = typename integer<Width>::word_type ;
+
     for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
     {
-        typename integer<Width>::word_type new_word;
-        new_word = lhs.word(counter) >> shift_word_right;
+        word_type new_word = lhs.word(counter) >> shift_word_right;
         if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
         {
             new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
@@ -382,8 +383,7 @@ auto constexpr operator>>(const integer<Width>& lhs, const size_t rhs) -> intege
 
         shifted.set_word(counter - skip_words, new_word);
     }
-    typename integer<Width>::word_type new_word;
-    new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
+    word_type  new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
 
     shifted.set_word(lhs.word_count() - skip_words - 1, new_word);
 
