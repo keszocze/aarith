@@ -3,22 +3,37 @@
 
 using namespace aarith;
 
-SCENARIO("Adding integers should be constexpr", "[integer][arithmetic][addition]")
+SCENARIO("Arithmetic should be constexpr", "[integer][arithmetic]")
 {
     GIVEN("Two integers")
     {
         constexpr integer<32> a{4};
         constexpr integer<32> b{8};
 
-        THEN("The addition is constexpr")
+        WHEN("Performing addition")
         {
-            constexpr integer<32> expected{12};
 
-            constexpr integer<33> result_expanded = expanding_add(a, b);
-            constexpr integer<32> result = add(a, b);
+            THEN("The operation is constexpr")
+            {
+                constexpr integer<32> expected{12};
 
-            REQUIRE(result_expanded == expected);
-            REQUIRE(result == expected);
+                constexpr integer<33> result_expanded = expanding_add(a, b);
+                constexpr integer<32> result = add(a, b);
+
+                REQUIRE(result_expanded == expected);
+                REQUIRE(result == expected);
+            }
+        }
+        WHEN("Performing subtraction")
+        {
+            THEN("The operation is constexpr")
+            {
+                constexpr integer<32> expected{4};
+
+                constexpr integer<32> result = sub(b, a);
+
+                REQUIRE(result == expected);
+            }
         }
     }
 }
@@ -391,15 +406,16 @@ SCENARIO("Absolute value computation", "[integer][utility]")
 {
     GIVEN("The smallest possible value")
     {
-        const integer<150> min = std::numeric_limits<integer<150>>::min();
+        constexpr integer<150> min = std::numeric_limits<integer<150>>::min();
         THEN("The absolute value of that value is the value again")
         {
-            REQUIRE(abs(min) == min);
+            constexpr integer<150> absolute = abs(min);
+            REQUIRE(absolute == min);
         }
 
-        THEN("The the 'real' absolute value is 2^(W-1)")
+        THEN("The 'real' absolute value is 2^(W-1)")
         {
-            uinteger<150> abs = expanding_abs(min);
+            constexpr uinteger<150> abs = expanding_abs(min);
             CHECK(abs.word(0) == 0U);
             CHECK(abs.word(1) == 0U);
             REQUIRE(abs.word(2) == (1U << 21U));
