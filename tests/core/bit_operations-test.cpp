@@ -10,14 +10,14 @@ SCENARIO("Counting bits in word_array", "[word_array][util]")
     {
         THEN("The leading zeroe index should be computed correctly")
         {
-            word_array<64> a_zero{0U};
-            word_array<64> a_one{1U};
-            word_array<32> b_zero{0U};
-            word_array<32> b_one{1U};
-            word_array<15> c_zero{0U};
-            word_array<15> c_one{1U};
-            word_array<150> d_zero{0U};
-            word_array<150> d_one{1U};
+            constexpr word_array<64> a_zero{0U};
+            constexpr word_array<64> a_one{1U};
+            constexpr word_array<32> b_zero{0U};
+            constexpr word_array<32> b_one{1U};
+            constexpr word_array<15> c_zero{0U};
+            constexpr word_array<15> c_one{1U};
+            constexpr word_array<150> d_zero{0U};
+            constexpr word_array<150> d_one{1U};
 
             CHECK(count_leading_zeroes(a_zero) == 64);
             CHECK(count_leading_zeroes(b_zero) == 32);
@@ -37,7 +37,7 @@ SCENARIO("Casting word_containers into different width", "[word_array]")
     {
         static constexpr uint16_t test_value = 123;
         static constexpr size_t SourceWidth = 16;
-        const word_array<SourceWidth> uint{test_value};
+        constexpr word_array<SourceWidth> uint{test_value};
 
         WHEN("The source width <= destination width")
         {
@@ -90,7 +90,7 @@ SCENARIO("Copy constructor of word_containers with various bit widths", "[word_a
         AND_GIVEN("An word_array<N> b")
         {
             const uint64_t val_b = 1337;
-            const word_array<196> b = word_array<196>::from_words(val_b, 0U, 2 * val_b);
+            constexpr word_array<196> b = word_array<196>::from_words(val_b, 0U, 2 * val_b);
 
             THEN("Assignment operator of individual words is correct")
             {
@@ -106,11 +106,11 @@ SCENARIO("Copy constructor of word_containers with various bit widths", "[word_a
             WHEN("M < N")
             {
                 const uint64_t val_b = 23;
-                const word_array<64> tmp = word_array<64>::from_words(val_b);
+                constexpr word_array<64> tmp = word_array<64>::from_words(val_b);
 
                 THEN("The copy constructor should work")
                 {
-                    word_array<128> b{tmp};
+                    constexpr word_array<128> b{tmp};
 
                     CHECK(b.word(0) == val_b);
                     CHECK(b.word(1) == 0U);
@@ -139,7 +139,7 @@ SCENARIO("Calculating the word_masks of word_containers", "[word_array][bit_logi
 
     GIVEN("A word_array<N> where N < word_width")
     {
-        word_array<32> uint;
+        constexpr word_array<32> uint;
         THEN("The mask is correct")
         {
             REQUIRE(uint.word_mask(0) == 0xffffffff);
@@ -147,7 +147,7 @@ SCENARIO("Calculating the word_masks of word_containers", "[word_array][bit_logi
     }
     GIVEN("A word_array<N> where N == word_width")
     {
-        word_array<64> uint;
+        constexpr word_array<64> uint;
         THEN("The mask is all 1s")
         {
             REQUIRE(uint.word_mask(0) == 0xffffffffffffffff);
@@ -155,7 +155,7 @@ SCENARIO("Calculating the word_masks of word_containers", "[word_array][bit_logi
     }
     GIVEN("A word_array<N> where N > word_width and N % word_width != 0")
     {
-        word_array<96> uint;
+        constexpr word_array<96> uint;
         THEN("All masks except the last are all 1s")
         {
             REQUIRE(uint.word_mask(0) == 0xffffffffffffffff);
@@ -167,7 +167,7 @@ SCENARIO("Calculating the word_masks of word_containers", "[word_array][bit_logi
     }
     GIVEN("A word_array<N> where N > word_width and N % word_width == 0")
     {
-        word_array<128> uint;
+        constexpr word_array<128> uint;
         THEN("All masks are all 1s")
         {
             REQUIRE(uint.word_mask(0) == 0xffffffffffffffff);
@@ -187,7 +187,7 @@ SCENARIO("Left shift operator works as expected", "[word_array][bit_logic]")
         {
             static constexpr uint16_t number_a = 7;
             static constexpr auto s = 4U;
-            const word_array<TestWidth> a{number_a};
+            constexpr word_array<TestWidth> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 112);
@@ -196,7 +196,7 @@ SCENARIO("Left shift operator works as expected", "[word_array][bit_logic]")
         {
             static constexpr uint16_t number_a = 7;
             static constexpr auto s = 14U;
-            const word_array<TestWidth> a{number_a};
+            constexpr word_array<TestWidth> a{number_a};
 
             const auto result = a << s;
 
@@ -209,7 +209,7 @@ SCENARIO("Left shift operator works as expected", "[word_array][bit_logic]")
 
             static constexpr uint16_t number_a = 7;
             static constexpr auto s = 63U;
-            const word_array<Width> a{number_a};
+            constexpr word_array<Width> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 0x8000000000000000);
@@ -221,7 +221,7 @@ SCENARIO("Left shift operator works as expected", "[word_array][bit_logic]")
 
             static constexpr uint16_t number_a = 7;
             static constexpr auto s = 127U;
-            const word_array<Width> a{number_a};
+            constexpr word_array<Width> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 0);
@@ -234,7 +234,7 @@ SCENARIO("Left shift operator works as expected", "[word_array][bit_logic]")
 
             static constexpr uint16_t number_a = 3;
             static constexpr auto s = 0;
-            const word_array<Width> a{number_a};
+            constexpr word_array<Width> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 3);
@@ -247,7 +247,7 @@ SCENARIO("Left shift operator works as expected", "[word_array][bit_logic]")
 
             static constexpr uint16_t number_a = 3;
             static constexpr auto s = static_cast<size_t>(word_array<Width>::word_width());
-            const word_array<Width> a{number_a};
+            constexpr word_array<Width> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 0);
@@ -260,7 +260,7 @@ SCENARIO("Left shift operator works as expected", "[word_array][bit_logic]")
 
             static constexpr uint16_t number_a = 3;
             static constexpr auto s = 2 * static_cast<size_t>(word_array<Width>::word_width());
-            const word_array<Width> a{number_a};
+            constexpr word_array<Width> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 0);
@@ -273,7 +273,7 @@ SCENARIO("Left shift operator works as expected", "[word_array][bit_logic]")
 
             static constexpr uint16_t number_a = 3;
             static constexpr auto s = static_cast<size_t>(word_array<Width>::word_width()) - 1U;
-            const word_array<Width> a{number_a};
+            constexpr word_array<Width> a{number_a};
 
             auto reference = a.word(0) << s;
 
@@ -289,7 +289,7 @@ SCENARIO("Left shift operator works as expected", "[word_array][bit_logic]")
             static constexpr uint16_t number_a = 3;
             static constexpr auto s =
                 2U * static_cast<size_t>(word_array<Width>::word_width()) - 1U;
-            const word_array<Width> a{number_a};
+            constexpr word_array<Width> a{number_a};
 
             auto reference = a.word(0) << (s % (sizeof(word_array<Width>::word_width()) * 8));
 
@@ -392,16 +392,16 @@ SCENARIO("Right shift operator works as expected", "[word_array][utility]")
                 static constexpr size_t width = 256;
                 static constexpr size_t word_width = word_array<width>::word_width();
 
-                static const word_array<width> a{1U};
-                static const word_array<width> expected0 =
+                static constexpr word_array<width> a{1U};
+                static constexpr word_array<width> expected0 =
                     word_array<width>::from_words(0U, 0U, 0U, 1U);
-                static const word_array<width> expected1 =
+                static constexpr word_array<width> expected1 =
                     word_array<width>::from_words(0U, 0U, 1U, 0U);
-                static const word_array<width> expected2 =
+                static constexpr word_array<width> expected2 =
                     word_array<width>::from_words(0U, 1U, 0U, 0U);
-                static const word_array<width> expected3 =
+                static constexpr word_array<width> expected3 =
                     word_array<width>::from_words(1U, 0U, 0U, 0U);
-                static const word_array<width> expected4 =
+                static constexpr word_array<width> expected4 =
                     word_array<width>::from_words(0U, 0U, 0U, 0U);
 
                 std::vector<word_array<width>> expecteds{expected0, expected1, expected2, expected3,
@@ -419,9 +419,9 @@ SCENARIO("Right shift operator works as expected", "[word_array][utility]")
         {
             THEN("The result should still be correct")
             {
-                const size_t w = 128;
-                const word_array<w> a{1U};
-                const word_array<w> expected;
+                constexpr size_t w = 128;
+                constexpr word_array<w> a{1U};
+                constexpr word_array<w> expected;
                 const word_array<w> result = a << w;
 
                 CHECK(expected == result);
@@ -437,15 +437,15 @@ SCENARIO("Bitwise operations work as expected", "[word_array][bit_logic]")
 
         const size_t Width = 64;
         static constexpr uint16_t number_a = 7;
-        const word_array<Width> a{number_a};
+        constexpr word_array<Width> a{number_a};
 
         WHEN("Negating the word container")
         {
 
             THEN("The result should match the NOT of the underlying WordType")
             {
-                const auto result = ~a;
-                const auto result_ref = ~number_a;
+                constexpr auto result = ~a;
+                constexpr auto result_ref = ~number_a;
                 REQUIRE(result.word(0) == result_ref);
             }
         }
@@ -453,25 +453,25 @@ SCENARIO("Bitwise operations work as expected", "[word_array][bit_logic]")
         AND_GIVEN("Another word container b")
         {
             static constexpr uint16_t number_b = 14;
-            const word_array<Width> b{number_b};
+            constexpr word_array<Width> b{number_b};
 
             THEN("Bitwise AND should work as expected")
             {
-                const auto result = a & b;
-                const auto result_ref = number_a & number_b;
+                constexpr auto result = a & b;
+                constexpr auto result_ref = number_a & number_b;
                 REQUIRE(result.word(0) == result_ref);
             }
 
             AND_THEN("Bitwise OR should work as expected")
             {
-                const auto result = a | b;
-                const auto result_ref = number_a | number_b;
+                constexpr auto result = a | b;
+                constexpr auto result_ref = number_a | number_b;
                 REQUIRE(result.word(0) == result_ref);
             }
             AND_THEN("Bitwise XOR should work as expected")
             {
-                const auto result = a ^ b;
-                const auto result_ref = number_a ^ number_b;
+                constexpr auto result = a ^ b;
+                constexpr auto result_ref = number_a ^ number_b;
                 REQUIRE(result.word(0) == result_ref);
             }
         }
@@ -516,12 +516,12 @@ SCENARIO("Checking whether an word_array is not equal to zero/false")
     {
 
         uint64_t val = GENERATE(1, 2, 4, 5567868, 234, 21, 45, 56768);
-        word_array<64> a{val};
-        word_array<128> b = word_array<128>::from_words(val, 0U);
-        word_array<128> c = word_array<128>::from_words(val, val);
+        const word_array<64> a{val};
+        const word_array<128> b = word_array<128>::from_words(val, 0U);
+        const word_array<128> c = word_array<128>::from_words(val, val);
 
-        word_array<150> d = word_array<150>::from_words(val, 0U, 0U);
-        word_array<256> e = word_array<256>::from_words(val, val, 0U, 0U);
+        const word_array<150> d = word_array<150>::from_words(val, 0U, 0U);
+        const word_array<256> e = word_array<256>::from_words(val, val, 0U, 0U);
 
         THEN("is_zero should correctly return this fact")
         {
