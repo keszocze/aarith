@@ -117,6 +117,47 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
     }
 }
 
+SCENARIO("Bit shifting is possible as constexpr for unsigned integers")
+{
+    GIVEN("An unsigned integer of width N")
+    {
+        THEN("Right-shifting should be a constexpr operation")
+        {
+            constexpr size_t W = 32;
+            constexpr uinteger<W> num{4};
+
+            constexpr uinteger<W> shift1{2};
+            constexpr uinteger<W> shift2{1};
+            constexpr uinteger<W> shift3{0};
+
+            constexpr uinteger<W> shifted1 = (num >> 1);
+            constexpr uinteger<W> shifted2 = (num >> 2);
+            constexpr uinteger<W> shifted3 = (num >> 3);
+
+            REQUIRE(shift1 == shifted1);
+            REQUIRE(shift2 == shifted2);
+            REQUIRE(shift3 == shifted3);
+        }
+        THEN("Left-shifting should be a constexpr operation")
+        {
+            constexpr size_t W = 32;
+            constexpr uinteger<W> num{4};
+
+            constexpr uinteger<W> shift1{8};
+            constexpr uinteger<W> shift2{16};
+            constexpr uinteger<W> shift3{32};
+
+            constexpr uinteger<W> shifted1 = (num << 1);
+            constexpr uinteger<W> shifted2 = (num << 2);
+            constexpr uinteger<W> shifted3 = (num << 3);
+
+            REQUIRE(shift1 == shifted1);
+            REQUIRE(shift2 == shifted2);
+            REQUIRE(shift3 == shifted3);
+        }
+    }
+}
+
 SCENARIO("Adding tow uintgers of different bit width", "[uinteger][arithmetic][addition]")
 {
     GIVEN("An uinteger of bit width 128")
