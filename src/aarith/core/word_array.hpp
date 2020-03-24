@@ -167,14 +167,14 @@ public:
      * Setters
      */
 
-    void set_bit(size_t index, bool value = true)
+    void constexpr set_bit(size_t index, bool value = true)
     {
-        if (index >= width())
-        {
-
-            std::string msg = gen_oob_msg(index, true);
-            throw std::out_of_range(msg);
-        }
+        //        if (index >= width())
+        //        {
+        //
+        //            std::string msg = gen_oob_msg(index, true);
+        //            throw std::out_of_range(msg);
+        //        }
         const size_t word_index = index / word_width();
         const size_t inner_word_index = index % word_width();
         word_type mask = (1ULL << inner_word_index);
@@ -204,11 +204,11 @@ public:
 
     void constexpr set_word(const size_t index, const word_type value)
     {
-//        if (index >= word_count())
-//        {
-//            std::string msg = gen_oob_msg(index, false);
-//            throw std::out_of_range(msg);
-//        }
+        //        if (index >= word_count())
+        //        {
+        //            std::string msg = gen_oob_msg(index, false);
+        //            throw std::out_of_range(msg);
+        //        }
         words[index] = value & word_mask(index);
     }
 
