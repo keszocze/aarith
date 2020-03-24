@@ -26,26 +26,26 @@ public:
      * Constructors etc.
      */
 
-    word_array() = default;
+    constexpr word_array() = default;
 
-    word_array(WordType w)
+    constexpr word_array(WordType w)
     {
         this->words[0] = w & word_mask(0);
     }
 
-    template <class... Args> word_array(WordType w, Args... args)
+    template <class... Args> constexpr word_array(WordType w, Args... args)
     {
         set_words(w, args...);
     }
 
-    template <class... Args> static auto from_words(Args... args) -> word_array
+    template <class... Args> static constexpr auto from_words(Args... args) -> word_array
     {
         word_array wc;
         wc.set_words(args...);
         return wc;
     }
 
-    template <size_t V> word_array(const word_array<V>& other)
+    template <size_t V> constexpr word_array(const word_array<V>& other)
     {
         static_assert(V <= Width, "Can not create a word_array from larger container");
 
@@ -54,7 +54,7 @@ public:
             set_word(i, other.word(i));
         }
     }
-    template <size_t V> word_array<Width> operator=(const word_array<V>& other)
+    template <size_t V> constexpr word_array<Width> operator=(const word_array<V>& other)
     {
         static_assert(V <= Width, "Can not create a word_array from larger container");
 
@@ -113,7 +113,7 @@ public:
         return Width;
     }
 
-    [[nodiscard]] auto word(size_t index) const -> word_type
+    [[nodiscard]] constexpr auto word(size_t index) const -> word_type
     {
         return words[index];
     }
@@ -202,13 +202,13 @@ public:
                  masked_word | (static_cast<word_type>(value & 1) << (index % word_width())));
     }
 
-    void set_word(const size_t index, const word_type value)
+    void constexpr set_word(const size_t index, const word_type value)
     {
-        if (index >= word_count())
-        {
-            std::string msg = gen_oob_msg(index, false);
-            throw std::out_of_range(msg);
-        }
+//        if (index >= word_count())
+//        {
+//            std::string msg = gen_oob_msg(index, false);
+//            throw std::out_of_range(msg);
+//        }
         words[index] = value & word_mask(index);
     }
 
@@ -294,7 +294,7 @@ public:
     }
 
     // Sets the words to the given values, where the right-most argument corresponds to word 0.
-    template <class... Args> void set_words(Args... args)
+    template <class... Args> void constexpr set_words(Args... args)
     {
         set_word_recursively<0>(args...);
     }
@@ -381,7 +381,7 @@ public:
 
 private:
     template <size_t index, class... Args>
-    auto set_word_recursively(word_type value, Args... args) -> size_t
+    auto constexpr set_word_recursively(word_type value, Args... args) -> size_t
     {
         static_assert(index < word_count(), "too many initializer words");
         auto const count = set_word_recursively<index + 1>(args...);
@@ -389,7 +389,7 @@ private:
         return count;
     }
 
-    template <size_t index> auto set_word_recursively(word_type value) -> size_t
+    template <size_t index> auto constexpr set_word_recursively(word_type value) -> size_t
     {
         static_assert(index < word_count(), "too many initializer words");
         words[0] = value & word_mask(0);
