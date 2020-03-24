@@ -542,6 +542,27 @@ SCENARIO("Checking whether an word_array is not equal to zero/false")
     }
 }
 
+SCENARIO("Bit shifting is possible as constexpr")
+{
+    GIVEN("A word_array of width N")
+    {
+        constexpr size_t W = 32;
+        constexpr word_array<W> num{4};
+
+        constexpr word_array<W> shift1{2};
+        constexpr word_array<W> shift2{1};
+        constexpr word_array<W> shift3{0};
+
+        constexpr word_array<W> shifted1 = (num >> 1);
+        constexpr word_array<W> shifted2 = (num >> 2);
+        constexpr word_array<W> shifted3 = (num >> 3);
+
+        REQUIRE(shift1 == shifted1);
+        REQUIRE(shift2 == shifted2);
+        REQUIRE(shift3 == shifted3);
+    }
+}
+
 SCENARIO("Bit operations are performed correctly", "[word_array][bit_logic]")
 {
     GIVEN("An word_array<N> n")
