@@ -546,20 +546,40 @@ SCENARIO("Bit shifting is possible as constexpr")
 {
     GIVEN("A word_array of width N")
     {
-        constexpr size_t W = 32;
-        constexpr word_array<W> num{4};
+        THEN("Right-shifting should be a constexpr operation")
+        {
+            constexpr size_t W = 32;
+            constexpr word_array<W> num{4};
 
-        constexpr word_array<W> shift1{2};
-        constexpr word_array<W> shift2{1};
-        constexpr word_array<W> shift3{0};
+            constexpr word_array<W> shift1{2};
+            constexpr word_array<W> shift2{1};
+            constexpr word_array<W> shift3{0};
 
-        constexpr word_array<W> shifted1 = (num >> 1);
-        constexpr word_array<W> shifted2 = (num >> 2);
-        constexpr word_array<W> shifted3 = (num >> 3);
+            constexpr word_array<W> shifted1 = (num >> 1);
+            constexpr word_array<W> shifted2 = (num >> 2);
+            constexpr word_array<W> shifted3 = (num >> 3);
 
-        REQUIRE(shift1 == shifted1);
-        REQUIRE(shift2 == shifted2);
-        REQUIRE(shift3 == shifted3);
+            REQUIRE(shift1 == shifted1);
+            REQUIRE(shift2 == shifted2);
+            REQUIRE(shift3 == shifted3);
+        }
+        THEN("Left-shifting should be a constexpr operation")
+        {
+            constexpr size_t W = 32;
+            constexpr word_array<W> num{4};
+
+            constexpr word_array<W> shift1{8};
+            constexpr word_array<W> shift2{16};
+            constexpr word_array<W> shift3{32};
+
+            constexpr word_array<W> shifted1 = (num << 1);
+            constexpr word_array<W> shifted2 = (num << 2);
+            constexpr word_array<W> shifted3 = (num << 3);
+
+            REQUIRE(shift1 == shifted1);
+            REQUIRE(shift2 == shifted2);
+            REQUIRE(shift3 == shifted3);
+        }
     }
 }
 

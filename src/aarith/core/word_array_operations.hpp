@@ -93,12 +93,13 @@ template <typename W>[[nodiscard]] constexpr auto operator<<(const W& lhs, const
     const auto shift_word_left = rhs - skip_words * lhs.word_width();
     const auto shift_word_right = lhs.word_width() - shift_word_left;
 
+    using word_type = typename W::word_type;
+
     for (auto counter = lhs.word_count(); counter > 0; --counter)
     {
         if (counter + skip_words < lhs.word_count())
         {
-            typename W::word_type new_word;
-            new_word = lhs.word(counter) << shift_word_left;
+            word_type new_word = lhs.word(counter) << shift_word_left;
             if (shift_word_right < lhs.word_width())
             {
                 new_word = new_word | (lhs.word(counter - 1) >> shift_word_right);
@@ -106,8 +107,7 @@ template <typename W>[[nodiscard]] constexpr auto operator<<(const W& lhs, const
             shifted.set_word(counter + skip_words, new_word);
         }
     }
-    typename W::word_type new_word;
-    new_word = lhs.word(0) << shift_word_left;
+    word_type new_word = lhs.word(0) << shift_word_left;
     shifted.set_word(skip_words, new_word);
 
     return shifted;
