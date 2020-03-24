@@ -17,32 +17,32 @@ template <size_t Width, class WordType = uint64_t>
 class uinteger : public word_array<Width, WordType>
 {
 public:
-    uinteger() = default;
+    constexpr uinteger() = default;
 
-    explicit uinteger(WordType n)
+    constexpr explicit uinteger(WordType n)
         : word_array<Width, WordType>(n)
     {
     }
 
     template <class... Args>
-    uinteger(WordType fst, Args... args)
+    constexpr uinteger(WordType fst, Args... args)
         : word_array<Width>(fst, args...)
     {
     }
 
     template <size_t V>
-    uinteger<Width, WordType>(const uinteger<V, WordType>& other)
+    constexpr uinteger<Width, WordType>(const uinteger<V, WordType>& other)
         : word_array<Width>(static_cast<const word_array<V, WordType>&>(other))
     {
     }
 
     template <size_t V>
-    uinteger<Width, WordType>(const word_array<V, WordType>& other)
+    constexpr uinteger<Width, WordType>(const word_array<V, WordType>& other)
         : word_array<Width>(other)
     {
     }
 
-    template <class... Args> static auto from_words(Args... args) -> uinteger
+    template <class... Args> static constexpr auto from_words(Args... args) -> uinteger
     {
         uinteger n;
         n.set_words(args...);
