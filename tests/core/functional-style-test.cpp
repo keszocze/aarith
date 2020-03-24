@@ -12,7 +12,7 @@ SCENARIO("Performing common functional operations", "[word_array]")
     GIVEN("A word container w ")
     {
 
-        const word_array<256> w{5, 1, 2, 3};
+        constexpr word_array<256> w{5, 1, 2, 3};
 
         WHEN("Mapping the values by adding one")
         {
@@ -52,7 +52,7 @@ SCENARIO("Performing common functional operations", "[word_array]")
 
         AND_GIVEN("Another word container v of same length")
         {
-            const word_array<256> v{8, 16, 32, 64};
+            constexpr word_array<256> v{8, 16, 32, 64};
             WHEN("Performing the zip_with operation")
             {
 
@@ -72,8 +72,8 @@ SCENARIO("Performing common functional operations", "[word_array]")
                 }
                 THEN("It should be capable of modelling additions")
                 {
-                    const word_array<128> a{0, std::numeric_limits<uint64_t>::max()};
-                    const word_array<128> b{0, std::numeric_limits<uint64_t>::max()};
+                    constexpr word_array<128> a{0, std::numeric_limits<uint64_t>::max()};
+                    constexpr word_array<128> b{0, std::numeric_limits<uint64_t>::max()};
 
                     const auto f = [carry = uint64_t(0)](uint64_t ain, uint64_t bin) mutable {
                         uint64_t partial_sum = ain + bin;
@@ -97,8 +97,8 @@ SCENARIO("Performing common functional operations", "[word_array]")
             {
                 THEN("It should be capable of modeling addition")
                 {
-                    const word_array<128> a{0, std::numeric_limits<uint64_t>::max()};
-                    const word_array<128> b{0, std::numeric_limits<uint64_t>::max()};
+                    constexpr word_array<128> a{0, std::numeric_limits<uint64_t>::max()};
+                    constexpr word_array<128> b{0, std::numeric_limits<uint64_t>::max()};
 
                     const auto f = [](uint64_t ain, uint64_t bin, uint64_t cin) {
                         uint64_t partial_sum = ain + bin;
@@ -164,7 +164,7 @@ SCENARIO("Performing common functional operations", "[word_array]")
 
         AND_GIVEN("Another word container v of different length")
         {
-            const word_array<192> v{8, 16, 64};
+            constexpr word_array<192> v{8, 16, 64};
             WHEN("Performing the zip_with operation")
             {
 
