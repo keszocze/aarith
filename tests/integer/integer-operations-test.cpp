@@ -3,6 +3,26 @@
 
 using namespace aarith;
 
+SCENARIO("Adding integers should be constexpr", "[integer][arithmetic][addition]")
+{
+    GIVEN("Two integers")
+    {
+        constexpr integer<32> a{4};
+        constexpr integer<32> b{8};
+
+        THEN("The addition is constexpr")
+        {
+            constexpr integer<32> expected{12};
+
+            constexpr integer<33> result_expanded = expanding_add(a, b);
+            constexpr integer<32> result = add(a, b);
+
+            REQUIRE(result_expanded == expected);
+            REQUIRE(result == expected);
+        }
+    }
+}
+
 SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
 {
     GIVEN("Two positive integer<N> a and b with N <= word_width")
@@ -14,9 +34,9 @@ SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
         {
             static constexpr uint8_t number_a = 32;
             static constexpr uint8_t number_b = 16;
-            const integer<TestWidth> a{number_a};
-            const integer<TestWidth> b{number_b};
-            const integer<TestWidth> result = add(a, b);
+            constexpr integer<TestWidth> a{number_a};
+            constexpr integer<TestWidth> b{number_b};
+            constexpr integer<TestWidth> result = add(a, b);
             const integer<TestWidth> result_fun = fun_add(a, b);
 
             THEN("It should be the correct sum")
@@ -29,9 +49,9 @@ SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
         {
             static constexpr uint16_t number_a = (1 << TestWidth) - 1;
             static constexpr uint16_t number_b = 1;
-            const integer<TestWidth> a{number_a};
-            const integer<TestWidth> b{number_b};
-            auto const result = add(a, b);
+            constexpr integer<TestWidth> a{number_a};
+            constexpr integer<TestWidth> b{number_b};
+            auto constexpr result = add(a, b);
             const integer<TestWidth> result_fun = fun_add(a, b);
 
             THEN("It should be the masked to fit")
@@ -43,14 +63,14 @@ SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
     }
     GIVEN("Two integers with different word_count")
     {
-        const integer<64> a{16};
-        const integer<128> b{32, 8};
-        const integer<128> expected{32, 24};
+        constexpr integer<64> a{16};
+        constexpr integer<128> b{32, 8};
+        constexpr integer<128> expected{32, 24};
         WHEN("Adding the integers")
         {
             THEN("All words need to be respected in the operation")
             {
-                const auto result = expanding_add(b, a);
+                constexpr auto result = expanding_add(b, a);
                 REQUIRE(result == expected);
             }
         }
@@ -64,9 +84,9 @@ SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
         {
             static constexpr uint64_t number_a = 1ULL << 63;
             static constexpr uint64_t number_b = 1ULL << 63;
-            const integer<TestWidth> a{number_a};
-            const integer<TestWidth> b{number_b};
-            auto const result = add(a, b);
+            constexpr integer<TestWidth> a{number_a};
+            constexpr integer<TestWidth> b{number_b};
+            auto constexpr result = add(a, b);
             const integer<TestWidth> result_fun = fun_add(a, b);
 
             THEN("It is added to the next word")
@@ -80,9 +100,9 @@ SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
         {
             static constexpr uint64_t number_a = 1ULL << 63;
             static constexpr uint64_t number_b = 0;
-            const integer<TestWidth> a{number_a};
-            const integer<TestWidth> b{number_b};
-            auto const result = add(a, b);
+            constexpr integer<TestWidth> a{number_a};
+            constexpr integer<TestWidth> b{number_b};
+            auto constexpr result = add(a, b);
             const integer<TestWidth> result_fun = fun_add(a, b);
 
             THEN("The next word is unchanged")
@@ -92,25 +112,25 @@ SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
             }
         }
     }
-    GIVEN("A integer and its negative")
+    GIVEN("An integer and its negative")
     {
-        const integer<16> a(15);
-        const integer<16> a_(-15);
-        const integer<16> zero16(0);
-        const integer<16> sum16 = add(a, a_);
+        constexpr integer<16> a(15);
+        constexpr integer<16> a_(-15);
+        constexpr integer<16> zero16(0);
+        constexpr integer<16> sum16 = add(a, a_);
         const integer<16> sum16_fun = fun_add(a, a_);
 
-        const integer<64> b(150);
-        const integer<64> b_(-150);
-        const integer<64> zero64(0);
-        const integer<64> sum64 = add(b, b_);
+        constexpr integer<64> b(150);
+        constexpr integer<64> b_(-150);
+        constexpr integer<64> zero64(0);
+        constexpr integer<64> sum64 = add(b, b_);
         const integer<64> sum64_fun = fun_add(b, b_);
 
-        const integer<150> c(1337);
-        const integer<150> c_(-1337);
-        const integer<150> zero150(0);
+        constexpr integer<150> c(1337);
+        constexpr integer<150> c_(-1337);
+        constexpr integer<150> zero150(0);
         const integer<150> sum150_fun = fun_add(c, c_);
-        const integer<150> sum150 = add(c, c_);
+        constexpr integer<150> sum150 = add(c, c_);
 
         THEN("The sum should be zero")
         {
@@ -141,15 +161,15 @@ SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
 
     GIVEN("The number zero")
     {
-        const integer<16> z16;
-        const integer<63> z63;
-        const integer<150> z150;
+        constexpr integer<16> z16;
+        constexpr integer<63> z63;
+        constexpr integer<150> z150;
         WHEN("Adding a negative number")
         {
 
-            const integer<16> neg16{-5};
-            const integer<63> neg63{-5};
-            const integer<150> neg150{-5};
+            constexpr integer<16> neg16{-5};
+            constexpr integer<63> neg63{-5};
+            constexpr integer<150> neg150{-5};
 
             THEN("The result should be the negative number")
             {
@@ -162,20 +182,20 @@ SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
 
     GIVEN("A positive integer and a negative integer with larger absolute value")
     {
-        const integer<16> a(15);
-        const integer<16> a_(-16);
-        const integer<16> zero16(0);
-        const integer<16> sum16 = add(a, a_);
+        constexpr integer<16> a(15);
+        constexpr integer<16> a_(-16);
+        constexpr integer<16> zero16(0);
+        constexpr integer<16> sum16 = add(a, a_);
 
-        const integer<64> b(150);
-        const integer<64> b_(-235);
-        const integer<64> zero64(0);
-        const integer<64> sum64 = add(b, b_);
+        constexpr integer<64> b(150);
+        constexpr integer<64> b_(-235);
+        constexpr integer<64> zero64(0);
+        constexpr integer<64> sum64 = add(b, b_);
 
-        const integer<150> c(1337);
-        const integer<150> c_(-5000);
-        const integer<150> zero150(0);
-        const integer<150> sum150 = add(c, c_);
+        constexpr integer<150> c(1337);
+        constexpr integer<150> c_(-5000);
+        constexpr integer<150> zero150(0);
+        constexpr integer<150> sum150 = add(c, c_);
 
         THEN("The sum should be negative")
         {
@@ -186,9 +206,9 @@ SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
     }
     GIVEN("A positive integer and a negative integer with smaller absolute value")
     {
-        const integer<192> a = integer<192>::from_words(1U, 0U, 0U);
+        constexpr integer<192> a = integer<192>::from_words(1U, 0U, 0U);
 
-        const integer<64> b{-1};
+        constexpr integer<64> b{-1};
 
         WHEN("Adding both numbers")
         {
@@ -662,4 +682,3 @@ SCENARIO("Left/right shifting sintegers")
         }
     }
 }
-

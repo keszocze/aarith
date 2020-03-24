@@ -47,7 +47,6 @@ SCENARIO("Bit shifting is possible as constexpr for signed integers")
     }
 }
 
-
 SCENARIO("Casting sintegers into different width", "[integer]")
 {
     GIVEN("width_cast is called")
