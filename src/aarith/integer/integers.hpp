@@ -241,7 +241,7 @@ public:
  * @return integer with specified bit width
  */
 template <size_t DestinationWidth, size_t SourceWidth>
-[[nodiscard]] auto width_cast(const integer<SourceWidth>& source) -> integer<DestinationWidth>
+[[nodiscard]] constexpr auto width_cast(const integer<SourceWidth>& source) -> integer<DestinationWidth>
 {
     word_array<DestinationWidth> result =
         width_cast<DestinationWidth>(static_cast<word_array<SourceWidth>>(source));

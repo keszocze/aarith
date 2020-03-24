@@ -124,7 +124,7 @@ public:
      * The most significant bit is the Width's one (i.e. the one you can get via bit(Width-1)). This
      * method is simply there for convenience.
      */
-    [[nodiscard]] auto msb() const -> bit_type
+    [[nodiscard]] constexpr auto msb() const -> bit_type
     {
         return bit(Width - 1);
     }
@@ -146,14 +146,14 @@ public:
      * @param index The index for which the bit is to be returned
      * @return  The bit at the indexed position
      */
-    auto bit(size_t index) const -> bit_type
+    auto constexpr bit(size_t index) const -> bit_type
     {
         auto const the_word = word(index / word_width());
         auto const masked_bit = the_word & (static_cast<word_type>(1) << (index % word_width()));
         return static_cast<bit_type>(masked_bit > 0 ? 1 : 0);
     }
 
-    template <size_t Count> auto bits(size_t index) const -> word_array<Count>
+    template <size_t Count> constexpr auto bits(size_t index) const -> word_array<Count>
     {
         word_array<Count> result;
         for (auto i = 0U; i < Count; ++i)
