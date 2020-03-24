@@ -12,12 +12,12 @@ SCENARIO("Casting sintegers into different width", "[integer]")
     {
         static constexpr uint16_t test_value = 123;
         static constexpr size_t SourceWidth = 16;
-        const integer<SourceWidth> uint{test_value};
+        constexpr integer<SourceWidth> uint{test_value};
 
         WHEN("The source width <= destination width")
         {
             static constexpr size_t DestinationWidth = 32;
-            auto const result = width_cast<DestinationWidth>(uint);
+            auto constexpr result = width_cast<DestinationWidth>(uint);
 
             THEN("The result has the destination width")
             {
@@ -31,7 +31,7 @@ SCENARIO("Casting sintegers into different width", "[integer]")
         WHEN("The source width > destination width")
         {
             static constexpr size_t DestinationWidth = 8;
-            auto const result = width_cast<DestinationWidth>(uint);
+            auto constexpr result = width_cast<DestinationWidth>(uint);
 
             THEN("The result has the destination width")
             {
@@ -120,13 +120,13 @@ SCENARIO("Left shift operator works as expected", "[integer][bit_logic]")
     GIVEN("One integer a and a number of shifted bits s")
     {
 
-        const size_t TestWidth = 16;
+        constexpr size_t TestWidth = 16;
 
         WHEN("The result still fits the width")
         {
             static constexpr uint16_t number_a = 7;
             static constexpr auto s = 4U;
-            const integer<TestWidth> a{number_a};
+            constexpr integer<TestWidth> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 112);
@@ -135,7 +135,7 @@ SCENARIO("Left shift operator works as expected", "[integer][bit_logic]")
         {
             static constexpr uint16_t number_a = 7;
             static constexpr auto s = 14U;
-            const integer<TestWidth> a{number_a};
+            constexpr integer<TestWidth> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 49152);
@@ -147,7 +147,7 @@ SCENARIO("Left shift operator works as expected", "[integer][bit_logic]")
 
             static constexpr uint16_t number_a = 7;
             static constexpr auto s = 63U;
-            const integer<Width> a{number_a};
+            constexpr integer<Width> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 0x8000000000000000);
@@ -155,11 +155,11 @@ SCENARIO("Left shift operator works as expected", "[integer][bit_logic]")
         }
         WHEN("The bits are shifted to the second next word")
         {
-            const size_t Width = 130;
+            constexpr size_t Width = 130;
 
             static constexpr uint16_t number_a = 7;
             static constexpr auto s = 127U;
-            const integer<Width> a{number_a};
+            constexpr integer<Width> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 0);
@@ -168,11 +168,11 @@ SCENARIO("Left shift operator works as expected", "[integer][bit_logic]")
         }
         WHEN("The bits are not shifted")
         {
-            const size_t Width = 192;
+            constexpr size_t Width = 192;
 
             static constexpr uint16_t number_a = 3;
             static constexpr auto s = 0;
-            const integer<Width> a{number_a};
+            constexpr integer<Width> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 3);
@@ -181,11 +181,11 @@ SCENARIO("Left shift operator works as expected", "[integer][bit_logic]")
         }
         WHEN("The bits are shifted exactly one word")
         {
-            const size_t Width = 192;
+            constexpr size_t Width = 192;
 
             static constexpr uint16_t number_a = 3;
             static constexpr auto s = static_cast<size_t>(integer<Width>::word_width());
-            const integer<Width> a{number_a};
+            constexpr integer<Width> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 0);
@@ -194,11 +194,11 @@ SCENARIO("Left shift operator works as expected", "[integer][bit_logic]")
         }
         WHEN("The bits are shifted exactly two words")
         {
-            const size_t Width = 192;
+            constexpr size_t Width = 192;
 
             static constexpr uint16_t number_a = 3;
             static constexpr auto s = 2 * static_cast<size_t>(integer<Width>::word_width());
-            const integer<Width> a{number_a};
+            constexpr integer<Width> a{number_a};
 
             const auto result = a << s;
             REQUIRE(result.word(0) == 0);
@@ -207,11 +207,11 @@ SCENARIO("Left shift operator works as expected", "[integer][bit_logic]")
         }
         WHEN("The bits are shifted exactly by word_width-1")
         {
-            const size_t Width = 192;
+            constexpr size_t Width = 192;
 
             static constexpr uint16_t number_a = 3;
             static constexpr auto s = static_cast<size_t>(integer<Width>::word_width()) - 1U;
-            const integer<Width> a{number_a};
+            constexpr integer<Width> a{number_a};
 
             auto reference = a.word(0) << s;
 
@@ -222,11 +222,11 @@ SCENARIO("Left shift operator works as expected", "[integer][bit_logic]")
         }
         WHEN("The bits are shifted by 2*word_width-1")
         {
-            const size_t Width = 192;
+            constexpr size_t Width = 192;
 
             static constexpr uint16_t number_a = 3;
             static constexpr auto s = 2U * static_cast<size_t>(integer<Width>::word_width()) - 1U;
-            const integer<Width> a{number_a};
+            constexpr integer<Width> a{number_a};
 
             auto reference = a.word(0) << (s % (sizeof(integer<Width>::word_width()) * 8));
 
@@ -377,12 +377,12 @@ SCENARIO("Right shift operator works as expected", "[integer][bit-logic]")
                 static constexpr size_t width = 256;
                 static constexpr size_t word_width = integer<width>::word_width();
 
-                static const integer<width> a{1U};
-                static const integer<width> expected0 = integer<width>::from_words(0U, 0U, 0U, 1U);
-                static const integer<width> expected1 = integer<width>::from_words(0U, 0U, 1U, 0U);
-                static const integer<width> expected2 = integer<width>::from_words(0U, 1U, 0U, 0U);
-                static const integer<width> expected3 = integer<width>::from_words(1U, 0U, 0U, 0U);
-                static const integer<width> expected4 = integer<width>::from_words(0U, 0U, 0U, 0U);
+                static constexpr integer<width> a{1U};
+                static constexpr integer<width> expected0 = integer<width>::from_words(0U, 0U, 0U, 1U);
+                static constexpr integer<width> expected1 = integer<width>::from_words(0U, 0U, 1U, 0U);
+                static constexpr integer<width> expected2 = integer<width>::from_words(0U, 1U, 0U, 0U);
+                static constexpr integer<width> expected3 = integer<width>::from_words(1U, 0U, 0U, 0U);
+                static constexpr integer<width> expected4 = integer<width>::from_words(0U, 0U, 0U, 0U);
 
                 std::vector<integer<width>> expecteds{expected0, expected1, expected2, expected3,
                                                       expected4};
@@ -399,9 +399,9 @@ SCENARIO("Right shift operator works as expected", "[integer][bit-logic]")
         {
             THEN("The result should still be correct")
             {
-                const size_t w = 128;
-                const integer<w> a{1U};
-                const integer<w> expected;
+                constexpr size_t w = 128;
+                constexpr integer<w> a{1U};
+                constexpr integer<w> expected;
                 const integer<w> result = a >> w;
 
                 CHECK(expected == result);
@@ -416,12 +416,12 @@ SCENARIO("Logical AND works as expected", "[integer][arithmetic]")
     {
         WHEN("The sintegers consists of only one word")
         {
-            const size_t Width = 70;
+            constexpr size_t Width = 70;
 
             static constexpr uint16_t number_a = 7;
             static constexpr uint16_t number_b = 14;
-            const integer<Width> a{number_a};
-            const integer<Width> b{number_b};
+            constexpr integer<Width> a{number_a};
+            constexpr integer<Width> b{number_b};
 
             const auto result = a & b;
             const auto result_ref = number_a & number_b;
@@ -436,15 +436,15 @@ SCENARIO("Logical OR works as expected", "[integer][arithmetic]")
     {
         WHEN("The sintegers consists of only one word")
         {
-            const size_t Width = 70;
+            constexpr size_t Width = 70;
 
             static constexpr uint16_t number_a = 7;
             static constexpr uint16_t number_b = 14;
-            const integer<Width> a{number_a};
-            const integer<Width> b{number_b};
+            constexpr integer<Width> a{number_a};
+            constexpr integer<Width> b{number_b};
 
-            const auto result = a | b;
-            const auto result_ref = number_a | number_b;
+            constexpr auto result = a | b;
+            constexpr auto result_ref = number_a | number_b;
             REQUIRE(result.word(0) == result_ref);
         }
     }
@@ -459,10 +459,10 @@ SCENARIO("Logical NOT works as expected", "[integer][arithmetic]")
             const size_t Width = 70;
 
             static constexpr uint16_t number_a = 7;
-            const integer<Width> a{number_a};
+            constexpr integer<Width> a{number_a};
 
-            const auto result = ~a;
-            const auto result_ref = ~number_a;
+            constexpr auto result = ~a;
+            constexpr auto result_ref = ~number_a;
             REQUIRE(result.word(0) == result_ref);
         }
     }
@@ -475,7 +475,7 @@ SCENARIO("Checking whether an integer is not equal to zero/false")
         THEN("a.is_zero() should be true")
         {
 
-            const uint8_t zero = 0U;
+            constexpr uint8_t zero = 0U;
 
             CHECK(integer<64>{zero}.is_zero());
             CHECK(integer<128>{zero}.is_zero());
@@ -489,7 +489,7 @@ SCENARIO("Checking whether an integer is not equal to zero/false")
         THEN("a should evaluate to false in a Boolean context")
         {
 
-            const uint8_t zero = 0U;
+            constexpr uint8_t zero = 0U;
 
             CHECK_FALSE(integer<64>{zero});
             CHECK_FALSE(integer<128>{zero});
