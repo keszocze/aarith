@@ -455,27 +455,27 @@ SCENARIO("Expanding subtraction works correctly", "[integer][arithmetic]")
 {
     GIVEN("A n-bit min and a m-bit (m>n)  max")
     {
-        static const integer<4> min4 = integer<4>::min();
-        static const integer<8> max8 = integer<8>::max();
-        static const integer<8> expected = integer<8>{-135};
+        static constexpr integer<4> min4 = integer<4>::min();
+        static constexpr integer<8> max8 = integer<8>::max();
+        static constexpr integer<8> expected = integer<8>{-135};
 
         THEN("Subtracting max from min should correctly yield (min-max) as it now fits the width")
         {
-            auto result = expanding_sub(min4, max8);
+            constexpr auto result = expanding_sub(min4, max8);
             REQUIRE(result == expected);
         }
     }
 
     GIVEN("A n-bit min and a m-bit (m<n) max")
     {
-        static const integer<8> min8 = integer<8>::min();
-        static const integer<4> max4 = integer<4>::max();
-        static const integer<8> expected =
+        static constexpr integer<8> min8 = integer<8>::min();
+        static constexpr integer<4> max4 = integer<4>::max();
+        static constexpr integer<8> expected =
             add(sub(integer<8>::max(), integer<8>(integer<4>::max())), integer<8>{1U});
 
         THEN("Subtracting max from min should give (max-min)+1")
         {
-            auto const result = expanding_sub(min8, max4);
+            auto constexpr result = expanding_sub(min8, max4);
             REQUIRE(result == expected);
         }
     }
@@ -485,16 +485,16 @@ SCENARIO("Width casting of signed integers", "[integer][utility]")
 {
     GIVEN("A positive integer")
     {
-        integer<16> i16{400};
-        integer<32> i32{400};
-        integer<150> i150{354346546};
+        constexpr integer<16> i16{400};
+        constexpr integer<32> i32{400};
+        constexpr integer<150> i150{354346546};
 
         WHEN("Expanding the width")
         {
 
-            integer<24> i16e = width_cast<24>(i16);
-            integer<50> i32e = width_cast<50>(i32);
-            integer<200> i150e = width_cast<200>(i150);
+            constexpr integer<24> i16e = width_cast<24>(i16);
+            constexpr integer<50> i32e = width_cast<50>(i32);
+            constexpr integer<200> i150e = width_cast<200>(i150);
 
             THEN("The numerical value should not have changed")
             {
@@ -507,9 +507,9 @@ SCENARIO("Width casting of signed integers", "[integer][utility]")
         {
             THEN("The first bits are simply dropped")
             {
-                integer<8> i16r = width_cast<8>(i16);
-                integer<20> i32r = width_cast<20>(i32);
-                integer<2> i150r = width_cast<2>(i150);
+                constexpr integer<8> i16r = width_cast<8>(i16);
+                constexpr integer<20> i32r = width_cast<20>(i32);
+                constexpr integer<2> i150r = width_cast<2>(i150);
                 CHECK(i16r == integer<8>{400 - 256});
                 CHECK(i32r == i32);
                 CHECK(i150r == integer<2>{2});
@@ -520,16 +520,16 @@ SCENARIO("Width casting of signed integers", "[integer][utility]")
     }
     GIVEN("A negative integer")
     {
-        integer<16> i16{-400};
-        integer<32> i32{-400};
-        integer<150> i150{-354346546};
+        constexpr integer<16> i16{-400};
+        constexpr integer<32> i32{-400};
+        constexpr integer<150> i150{-354346546};
 
         WHEN("Expanding the width")
         {
 
-            integer<24> i16e = width_cast<24>(i16);
-            integer<50> i32e = width_cast<50>(i32);
-            integer<200> i150e = width_cast<200>(i150);
+            constexpr integer<24> i16e = width_cast<24>(i16);
+            constexpr integer<50> i32e = width_cast<50>(i32);
+            constexpr integer<200> i150e = width_cast<200>(i150);
 
             THEN("The numerical value should not have changed")
             {
@@ -542,9 +542,9 @@ SCENARIO("Width casting of signed integers", "[integer][utility]")
         {
             THEN("The first bits are simply dropped")
             {
-                integer<8> i16r = width_cast<8>(i16);
-                integer<20> i32r = width_cast<20>(i32);
-                integer<2> i150r = width_cast<2>(i150);
+                constexpr integer<8> i16r = width_cast<8>(i16);
+                constexpr integer<20> i32r = width_cast<20>(i32);
+                constexpr integer<2> i150r = width_cast<2>(i150);
 
                 CHECK(i16r == integer<8>{112});
                 CHECK(i32r == i32);
@@ -558,10 +558,11 @@ SCENARIO("Unary minus operation", "[integer][utility]")
 {
     GIVEN("The smallest possible value")
     {
-        const integer<150> min = std::numeric_limits<integer<150>>::min();
+        constexpr integer<150> min = std::numeric_limits<integer<150>>::min();
         THEN("The unary minus value of that value is the value again")
         {
-            REQUIRE(-min == min);
+            constexpr integer<150> minus_min = -min;
+            REQUIRE(minus_min == min);
         }
     }
 
@@ -594,21 +595,22 @@ SCENARIO("MIN/MAX Values behave as expected", "[integer][utility]")
     GIVEN("The min and max value")
     {
         constexpr size_t w = 50;
-        integer<w> min = integer<w>::min();
-        integer<w> max = integer<w>::max();
-        integer<w> one(1U);
-        [[maybe_unused]] integer<w> zero(0U);
+        constexpr integer<w> min = integer<w>::min();
+        constexpr integer<w> max = integer<w>::max();
+        constexpr integer<w> one(1U);
         THEN("Adding/subtracting one should wrap around")
         {
-            REQUIRE(add(max, one) == min);
-            REQUIRE(add(max, one) == fun_add(max, one));
+            constexpr auto sum = add(max, one);
+            REQUIRE(sum== min);
+            REQUIRE(sum == fun_add(max, one));
 
             REQUIRE(sub(min, one) == max);
         }
 
         THEN("Taking the absolute value of the min value yields the same value")
         {
-            REQUIRE(abs(min) == min);
+            constexpr auto abs_min = abs(min);
+            REQUIRE(abs_min == min);
         }
     }
 }
@@ -617,11 +619,11 @@ SCENARIO("Left/right shifting sintegers")
 {
     GIVEN("A positive integer")
     {
-        const integer<150> a{0U, 1U, 0U};
-        const integer<150> b{8, 8, 8};
-        const integer<150> b_{4, 4, 4};
-        const integer<150> b__{2, 2, 2};
-        const integer<150> b___{1, 1, 1};
+        constexpr integer<150> a{0U, 1U, 0U};
+        constexpr integer<150> b{8, 8, 8};
+        constexpr integer<150> b_{4, 4, 4};
+        constexpr integer<150> b__{2, 2, 2};
+        constexpr integer<150> b___{1, 1, 1};
         WHEN("Right Shfiting")
         {
             THEN("It should behave like division by a power of two")
@@ -640,8 +642,8 @@ SCENARIO("Left/right shifting sintegers")
             }
             THEN("It should move correctly over word boundaries")
             {
-                const auto k = (a >> 1);
-                const auto b = integer<150>(0U, 0U, (uint64_t(1) << 63U));
+                constexpr auto k = (a >> 1);
+                constexpr auto b = integer<150>(0U, 0U, (uint64_t(1) << 63U));
                 //                std::cout << group_digits(to_binary(k), 64) << "\n";
                 //                std::cout << group_digits(to_binary(b), 64) << "\n";
                 REQUIRE(k == b);
@@ -649,9 +651,9 @@ SCENARIO("Left/right shifting sintegers")
 
             THEN("The it should also work when moving farther than the word width")
             {
-                const integer<150> c{12U, 0U, 0U};
-                const integer c_shifted = c >> 68;
-                const auto b = integer<150>(0U, 0U, (uint64_t(11) << 62U));
+                constexpr integer<150> c{12U, 0U, 0U};
+                constexpr integer c_shifted = c >> 68;
+                constexpr auto b = integer<150>(0U, 0U, (uint64_t(11) << 62U));
                 REQUIRE(c_shifted == b);
                 //                std::cout << group_digits(to_binary(c), 64) << "\n";
                 //                std::cout << group_digits(to_binary(c_shifted), 64) << "\n";
@@ -662,9 +664,9 @@ SCENARIO("Left/right shifting sintegers")
             THEN("It should behave like multiplication by a power of two")
             {
 
-                integer<150> _b___ = b___ << 1;
-                integer<150> __b___ = b___ << 2;
-                integer<150> ___b___ = b___ << 3;
+                constexpr integer<150> _b___ = b___ << 1;
+                constexpr integer<150> __b___ = b___ << 2;
+                constexpr integer<150> ___b___ = b___ << 3;
                 REQUIRE(_b___ == b__);
                 REQUIRE(__b___ == b_);
                 REQUIRE(___b___ == b);
@@ -680,13 +682,13 @@ SCENARIO("Left/right shifting sintegers")
         {
             THEN("-1 should not be affected")
             {
-                const integer<150> minus_one(-1);
-                const integer<150> shifted1 = minus_one >> 1;
-                const integer<150> shifted2 = minus_one >> 22;
-                const integer<150> shifted3 = minus_one >> 23;
-                const integer<150> shifted4 = minus_one >> 149;
-                const integer<150> shifted5 = minus_one >> 150;
-                const integer<150> shifted6 = minus_one >> 1151;
+                constexpr integer<150> minus_one(-1);
+                constexpr integer<150> shifted1 = minus_one >> 1;
+                constexpr integer<150> shifted2 = minus_one >> 22;
+                constexpr integer<150> shifted3 = minus_one >> 23;
+                constexpr integer<150> shifted4 = minus_one >> 149;
+                constexpr integer<150> shifted5 = minus_one >> 150;
+                constexpr integer<150> shifted6 = minus_one >> 1151;
 
                 CHECK(shifted1 == minus_one);
                 CHECK(shifted2 == minus_one);
