@@ -47,6 +47,24 @@ SCENARIO("Bit shifting is possible as constexpr for signed integers")
     }
 }
 
+SCENARIO("Testing various operations for constexpr'nes")
+{
+    GIVEN("A signed integer")
+    {
+        constexpr integer<17> num{4};
+        THEN("The is_negative method should be constexpr")
+        {
+            constexpr bool is_neg = num.is_negative();
+            REQUIRE_FALSE(is_neg);
+        }
+        THEN("The is_zero method should be constexpr")
+        {
+            constexpr bool is_zero = num.is_zero();
+            REQUIRE_FALSE(is_zero);
+        }
+    }
+}
+
 SCENARIO("Casting sintegers into different width", "[integer]")
 {
     GIVEN("width_cast is called")
