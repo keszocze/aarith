@@ -34,6 +34,7 @@ add_aarith_test(string_utils FILES integer/string_utils-test.cpp)
 add_aarith_test(util FILES integer/string_utils-test.cpp)
 add_aarith_test(bit-operations FILES core/bit_operations-test.cpp)
 add_aarith_test(integer FILES integer/integer-test.cpp integer/integer-operations-test.cpp integer/integer-comparisons-test.cpp)
+add_aarith_test(integer-ranges FILES integer/ranges_test.cpp)
 add_aarith_test(functional-style FILES core/functional-style-test.cpp)
 add_aarith_test(number-util FILES core/number_utils-test.cpp)
 
