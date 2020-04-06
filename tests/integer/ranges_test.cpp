@@ -9,7 +9,7 @@ SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
     {
         constexpr size_t W = 8;
         using I = integer<W>;
-        integer_range<I> r = std::make_pair(I::one(), 8U);
+        integer_range<I> r = std::make_pair(I::zero(), 8U);
 
         for (const I i: r) {
             std::cout << i << "\n";
