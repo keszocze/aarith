@@ -579,6 +579,43 @@ template <size_t W> auto operator-(const integer<W>& n) -> integer<W>
 }
 
 /**
+ * @brief Computes the sign of the integer.
+ *
+ * For the number zero, the function returns a signum of 0,  -1 for negative numbers and +1 for
+ * positive numbers.
+ *
+ * @tparam W The width of the integer
+ * @param n The integer
+ * @return The sign of the integer
+ */
+template <size_t W>[[nodiscard]] int8_t signum(integer<W> n)
+{
+    if (n.is_negative())
+    {
+        return -1;
+    }
+    if (n.is_zero())
+    {
+        return 0;
+    }
+    return 1;
+}
+
+/**
+ * @brief Computes the sign of the unsigned integer.
+ *
+ * For the number zero, the function returns a signum of 0 and a 1 for every other number.
+ *
+ * @tparam W The width of the unsigned integer
+ * @param n The integer
+ * @return The sign of the integer
+ */
+template <size_t W>[[nodiscard]] int8_t signum(uinteger<W> n)
+{
+    return n.is_zero() ? 0 : 1;
+}
+
+/**
  * @brief Implements the restoring division algorithm.
  *
  * @note integer<W>::min/integer<W>(-1) will return <integer<W>::min,0>, i.e. some weird
