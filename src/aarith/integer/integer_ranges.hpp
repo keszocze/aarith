@@ -3,7 +3,6 @@
 #include <aarith/integer/integers.hpp>
 
 namespace aarith {
-template <typename Integer> using integer_range = std::pair<Integer, Integer>;
 
 template <typename Integer> class integer_iter
 {
@@ -66,13 +65,33 @@ public:
     }
 };
 
-template <typename Integer> integer_iter<Integer> begin(integer_range<Integer> r)
+template <typename Integer> class irange
 {
-    return integer_iter<Integer>(r.first, r.second);
-}
-template <typename Integer> integer_iter<Integer> end([[maybe_unused]] integer_range<Integer> r)
-{
-    return integer_iter<Integer>();
-}
+    Integer start_;
+    Integer end_;
+
+public:
+
+    irange(const Integer start, const Integer end)
+        : start_(start)
+        , end_(end)
+    {
+        static_assert(is_integral_v<Integer>);
+        if (end < start)
+        {
+            throw std::invalid_argument("The end of the range must not be smaller than the start");
+        }
+    }
+
+    [[nodiscard]] integer_iter<Integer> begin() const
+    {
+        return integer_iter<Integer>(start_, end_);
+    }
+
+    [[nodiscard]] integer_iter<Integer> end() const
+    {
+        return integer_iter<Integer>();
+    }
+};
 
 } // namespace aarith
