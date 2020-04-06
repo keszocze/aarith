@@ -10,3 +10,12 @@ add_subdirectory(tests)
 
 add_executable(aarith_main main.cpp)
 target_link_libraries(aarith_main aarith::Library)
+
+
+
+
+
+option(BUILD_EXPERIMENTS "build experiments" ON)
+if(BUILD_EXPERIMENTS)
+    add_subdirectory(experiments)
+endif()

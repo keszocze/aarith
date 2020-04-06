@@ -180,7 +180,7 @@ auto approx_uint_bitmasking_mul(const uinteger<width>& opd1, const uinteger<widt
 }
 
 template <size_t width, size_t lsp_width, size_t shared_bits = 0>
-uinteger<width+1> FAUadder(const uinteger<width>& a, [[maybe_unused]] const uinteger<width>& b)
+uinteger<width+1> FAUadder(const uinteger<width>& a, const uinteger<width>& b)
 {
 
     static_assert(shared_bits <= lsp_width);
