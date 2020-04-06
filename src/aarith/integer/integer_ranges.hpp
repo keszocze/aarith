@@ -4,7 +4,7 @@
 
 namespace aarith {
 
-template <typename Integer> class irange
+template <typename Integer> class integer_range
 {
     Integer start_;
     Integer end_;
@@ -71,7 +71,7 @@ template <typename Integer> class irange
     };
 
 public:
-    irange(const Integer start, const Integer end)
+    integer_range(const Integer start, const Integer end)
         : start_(start)
         , end_(end)
     {
