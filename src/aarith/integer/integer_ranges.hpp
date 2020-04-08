@@ -122,9 +122,7 @@ template <typename Integer> class integer_range
     {
 
         std::optional<I> current;
-        const I start;
-        const I end;
-        const I stride;
+        const integer_range<I> range;
 
     public:
         using value_type = I;
@@ -133,19 +131,15 @@ template <typename Integer> class integer_range
         using pointer = I*;
         using difference_type = void;
 
-        integer_iter<I>(const I current, const I start, const I end, const I stride)
+        integer_iter<I>(const I current, const integer_range<I> range)
             : current(current)
-            , start(start)
-            , end(end)
-            , stride(stride)
+            , range(range)
         {
         }
 
-        integer_iter<I>(const I start, const I end, const I stride)
+        integer_iter<I>(const integer_range<I> range)
             : current(std::nullopt)
-            , start(start)
-            , end(end)
-            , stride(stride)
+            , range(range)
         {
         }
 
@@ -160,13 +154,13 @@ template <typename Integer> class integer_range
 
         integer_iter& operator++()
         { // preincrement
-            if (current == end)
+            if (current == range.end_)
             {
                 current = std::nullopt;
             }
             else if (current)
             {
-                current = add(*current, stride);
+                current = add(*current, range.stride_);
             }
 
             return *this;
@@ -174,8 +168,8 @@ template <typename Integer> class integer_range
 
         friend bool operator==(integer_iter<I> const& lhs, integer_iter<I> const& rhs)
         {
-            return (lhs.current ==
-                    rhs.current); // && (lhs.end == rhs.end) && (lhs.stride == rhs.stride);
+            return (lhs.current == rhs.current);
+            // && (lhs.end == rhs.end) && (lhs.stride == rhs.stride);
         }
         friend bool operator!=(integer_iter<I> const& lhs, integer_iter<I> const& rhs)
         {
@@ -209,12 +203,12 @@ public:
 
     [[nodiscard]] integer_iter<Integer> cbegin() const
     {
-        return integer_iter<Integer>(start_, start_, end_, stride_);
+        return integer_iter<Integer>(start_, *this);
     }
 
     [[nodiscard]] integer_iter<Integer> cend() const
     {
-        return integer_iter<Integer>(start_, end_, stride_);
+        return integer_iter<Integer>(*this);
     }
 
     friend bool operator==(integer_range<Integer> const& lhs, integer_range<Integer> const& rhs)
