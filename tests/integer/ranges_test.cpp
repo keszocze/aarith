@@ -10,7 +10,12 @@ SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
         constexpr size_t W = 8;
         using I = integer<W>;
 
-        for (const I i : integer_range<I>(I::zero(), 8U))
+        for (const I i : integer_range(I::zero(), I{8}))
+        {
+            std::cout << i << "\n";
+        }
+
+        for (const I i : integer_range(I::zero(), I{8}, I{2}))
         {
             std::cout << i << "\n";
         }

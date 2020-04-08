@@ -6,6 +6,8 @@
 
 namespace aarith {
 
+// TODO fancy template parameter packs nutzen!
+
 template <class Type> class is_word_array
 {
 public:
