@@ -122,25 +122,28 @@ template <typename Integer> class integer_range
     {
 
         std::optional<I> current;
-        std::optional<I> end;
+        const I start;
+        const I end;
         const I stride;
 
     public:
         using value_type = I;
-        using refernce = I;
+        using reference = I;
         using iterator_category = std::input_iterator_tag;
         using pointer = I*;
         using difference_type = void;
 
-        integer_iter<I>()
-            : current(std::nullopt)
-            , end(std::nullopt)
-            , stride(I::zero())
+        integer_iter<I>(const I current, const I start, const I end, const I stride)
+            : current(current)
+            , start(start)
+            , end(end)
+            , stride(stride)
         {
         }
 
         integer_iter<I>(const I start, const I end, const I stride)
-            : current(start)
+            : current(std::nullopt)
+            , start(start)
             , end(end)
             , stride(stride)
         {
@@ -171,7 +174,8 @@ template <typename Integer> class integer_range
 
         friend bool operator==(integer_iter<I> const& lhs, integer_iter<I> const& rhs)
         {
-            return lhs.current == rhs.current;
+            return (lhs.current ==
+                    rhs.current); // && (lhs.end == rhs.end) && (lhs.stride == rhs.stride);
         }
         friend bool operator!=(integer_iter<I> const& lhs, integer_iter<I> const& rhs)
         {
@@ -186,9 +190,10 @@ public:
         , stride_(stride)
     {
         static_assert(is_integral_v<Integer>);
-        if (end < start)
+
+        if (stride_ <= Integer::zero())
         {
-            throw std::invalid_argument("The end of the range must not be smaller than the start");
+            throw std::invalid_argument("Stride must be positive");
         }
     }
 
@@ -204,12 +209,22 @@ public:
 
     [[nodiscard]] integer_iter<Integer> cbegin() const
     {
-        return integer_iter<Integer>(start_, end_, stride_);
+        return integer_iter<Integer>(start_, start_, end_, stride_);
     }
 
     [[nodiscard]] integer_iter<Integer> cend() const
     {
-        return integer_iter<Integer>();
+        return integer_iter<Integer>(start_, end_, stride_);
+    }
+
+    friend bool operator==(integer_range<Integer> const& lhs, integer_range<Integer> const& rhs)
+    {
+        return (lhs.start_ == rhs.start_) && (lhs.end_ == rhs.end_) && (lhs.stride_ == rhs.stride_);
+    }
+
+    friend bool operator!=(integer_range<Integer> const& lhs, integer_range<Integer> const& rhs)
+    {
+        return !(lhs == rhs);
     }
 };
 
