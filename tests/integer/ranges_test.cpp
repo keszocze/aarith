@@ -18,26 +18,42 @@ SCENARIO("Iterating ranges")
         {
 
             THEN("Then all numbers a <= i <= b are produced")
-
-            //            int  val = 0;
-
-            //            int k = 7;
-            for (const I num : integer_range(a, b))
             {
-                //                CHECK(I{k} == num);
-                //                ++k
-                std::cout << num << "\n";
+
+                int k = 0;
+                for (const I num : integer_range(a, b))
+                {
+                    REQUIRE(I{k} == num);
+                    k++;
+                }
+            }
+        }
+        AND_WHEN("A stride of two is used")
+        {
+            THEN("Only the even numbers are produced")
+            {
+                int k = 0;
+                for (const I i : integer_range(a, b, I{2}))
+                {
+                    REQUIRE(I{k} == i);
+                    k += 2;
+                }
             }
         }
 
-        for (const I i : integer_range(a, b, I{2}))
+        AND_WHEN("A stride of three is used")
         {
-            std::cout << i << "\n";
-        }
-
-        for (const I i : integer_range(a, b, I{3}))
-        {
-            std::cout << i << "\n";
+            THEN("There is no overflow")
+            {
+                const std::array<int,3> nums{0,3,6};
+                int k=0;
+                for (const I i : integer_range(a, b, I{3}))
+                {
+                    REQUIRE(I{nums[k]} == i);
+                    k++;
+                }
+                REQUIRE(k == 3);
+            }
         }
     }
 

@@ -25,7 +25,7 @@ template <typename Integer> class integer_range
         using pointer = I*;
         using difference_type = void;
 
-        integer_iter<I,IsForwardIterator>(const I current, const integer_range<I> range)
+        integer_iter<I, IsForwardIterator>(const I current, const integer_range<I> range)
             : current(current)
             , range(range)
         {
@@ -48,23 +48,43 @@ template <typename Integer> class integer_range
 
         integer_iter& operator++()
         { // preincrement
-            if (current == range.end_)
+            if constexpr (IsForwardIterator)
             {
-                current = std::nullopt;
-            }
-            else if (current)
-            {
-                const I curr = *current;
-                const I stride = range.stride_;
-                const I dist = sub(range.end_, curr);
-
-                if (dist >= stride)
-                {
-                    current = add(*current, range.stride_);
-                }
-                else
+                if (current == range.end_)
                 {
                     current = std::nullopt;
+                }
+                else if (current)
+                {
+                    const I curr = *current;
+                    const I stride = range.stride_;
+                    const I dist = sub(range.end_, curr);
+
+                    if (dist >= stride)
+                    {
+                        current = add(curr, stride);
+                    }
+                    else
+                    {
+                        current = std::nullopt;
+                    }
+                }
+            }
+            else {
+                if (current == range.begin_) {
+                    current = std::nullopt;
+                }
+                else if (current) {
+                    const I curr = *current;
+                    const I stride = range.stride_;
+                    const I dist = sub(curr, range.begin_);
+
+                    if (dist >= stride) {
+                        current = sub(curr, stride);
+                    }
+                    else {
+                        current = std::nullopt;
+                    }
                 }
             }
 
@@ -117,6 +137,30 @@ public:
     [[nodiscard]] integer_iter<Integer> cend() const
     {
         return integer_iter<Integer>(*this);
+    }
+
+    [[nodiscard]] integer_iter<Integer> rbegin() const
+    {
+        return cbegin();
+    }
+
+    [[nodiscard]] integer_iter<Integer> rend() const
+    {
+        return cend();
+    }
+
+    [[nodiscard]] integer_iter<Integer> crbegin() const
+    {
+        if (start_ > end_)
+        {
+            return cend();
+        }
+        return integer_iter<Integer,false>(start_, *this);
+    }
+
+    [[nodiscard]] integer_iter<Integer> crend() const
+    {
+        return integer_iter<Integer,false>(*this);
     }
 
     friend bool operator==(integer_range<Integer> const& lhs, integer_range<Integer> const& rhs)
