@@ -144,8 +144,6 @@ template <size_t W, size_t V> bool operator==(const integer<W>& a, const integer
     integer<max_width> a_ = width_cast<max_width>(a);
     integer<max_width> b_ = width_cast<max_width>(b);
 
-    using word_type = typename integer<W>::word_type;
-
     for (size_t i = 0U; i < integer<max_width>::word_count(); ++i)
     {
         if (a_.word(i) != b_.word(i))
