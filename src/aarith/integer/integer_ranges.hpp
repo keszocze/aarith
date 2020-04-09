@@ -54,7 +54,18 @@ template <typename Integer> class integer_range
             }
             else if (current)
             {
-                current = add(*current, range.stride_);
+                const I curr = *current;
+                const I stride = range.stride_;
+                const I dist = sub(range.end_, curr);
+
+                if (dist >= stride)
+                {
+                    current = add(*current, range.stride_);
+                }
+                else
+                {
+                    current = std::nullopt;
+                }
             }
 
             return *this;
@@ -96,7 +107,8 @@ public:
 
     [[nodiscard]] integer_iter<Integer> cbegin() const
     {
-        if (start_ > end_) {
+        if (start_ > end_)
+        {
             return cend();
         }
         return integer_iter<Integer>(start_, *this);

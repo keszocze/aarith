@@ -34,6 +34,11 @@ SCENARIO("Iterating ranges")
         {
             std::cout << i << "\n";
         }
+
+        for (const I i : integer_range(I::zero(), I{8}, I{3}))
+        {
+            std::cout << i << "\n";
+        }
     }
 
     GIVEN("Two non-negative integers a and b with a > b")
