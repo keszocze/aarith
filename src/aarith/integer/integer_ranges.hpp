@@ -12,7 +12,7 @@ template <typename Integer> class integer_range
     Integer end_;
     Integer stride_;
 
-    template <typename I> class integer_iter
+    template <typename I, bool IsForwardIterator=true> class integer_iter
     {
 
         std::optional<I> current;
@@ -25,13 +25,13 @@ template <typename Integer> class integer_range
         using pointer = I*;
         using difference_type = void;
 
-        integer_iter<I>(const I current, const integer_range<I> range)
+        integer_iter<I,IsForwardIterator>(const I current, const integer_range<I> range)
             : current(current)
             , range(range)
         {
         }
 
-        integer_iter<I>(const integer_range<I> range)
+        integer_iter<I, IsForwardIterator>(const integer_range<I> range)
             : current(std::nullopt)
             , range(range)
         {
