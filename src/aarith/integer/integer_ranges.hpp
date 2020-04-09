@@ -8,11 +8,11 @@ namespace aarith {
 
 template <typename Integer> class integer_range
 {
-    Integer start_;
-    Integer end_;
-    Integer stride_;
+    const Integer start_;
+    const Integer end_;
+    const Integer stride_;
 
-    template <typename I, bool IsForwardIterator=true> class integer_iter
+    template <typename I, bool IsForwardIterator = true> class integer_iter
     {
 
         std::optional<I> current;
