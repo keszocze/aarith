@@ -94,6 +94,9 @@ public:
 
     [[nodiscard]] integer_iter<Integer> cbegin() const
     {
+        if (start_ > end_) {
+            return cend();
+        }
         return integer_iter<Integer>(start_, *this);
     }
 

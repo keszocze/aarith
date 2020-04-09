@@ -5,10 +5,11 @@ using namespace aarith;
 
 SCENARIO("Iterating ranges")
 {
-    GIVEN("Two non-negative integer<N> a and b with")
+    constexpr size_t W = 8;
+    using I = integer<W>;
+
+    GIVEN("Two non-negative integers a and b with a < b")
     {
-        constexpr size_t W = 8;
-        using I = integer<W>;
 
         I a = I::zero();
         I b = I{8};
@@ -20,17 +21,49 @@ SCENARIO("Iterating ranges")
 
             //            int  val = 0;
 
-            int k = 7;
+            //            int k = 7;
             for (const I num : integer_range(a, b))
             {
-                CHECK(I{k} == num);
-                ++k
+                //                CHECK(I{k} == num);
+                //                ++k
+                std::cout << num << "\n";
             }
         }
 
         for (const I i : integer_range(I::zero(), I{8}, I{2}))
         {
             std::cout << i << "\n";
+        }
+    }
+
+    GIVEN("Two non-negative integers a and b with a > b")
+    {
+        I a = I{23};
+        I b = I{13};
+        WHEN("Creating the range [a,b]") {
+            THEN("The range should be empty") {
+
+                std::cout << "Iterating over an empty range:\n";
+                for (const I num :integer_range(a,b)) {
+                    std::cout << num << "\n";
+                }
+                std::cout << "\n";
+            }
+        }
+    }
+
+    GIVEN("A single non-negative integer a")
+    {
+        I a{15};
+        WHEN("Iterating the range [a,a]")
+        {
+            THEN("There should be one value, namely a")
+            {
+                for (const I num : integer_range(a, a))
+                {
+                    std::cout << num << "\n";
+                }
+            }
         }
     }
 }
