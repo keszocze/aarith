@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include <aarith/integer/integers.hpp>
 
 namespace aarith {
