@@ -11,8 +11,8 @@ SCENARIO("Iterating ranges")
     GIVEN("Two non-negative integers a and b with a < b")
     {
 
-        I a = I::zero();
-        I b = I{8};
+        const I a = I::zero();
+        const I b = I{8};
 
         WHEN("Iterating the number range [a,b]")
         {
@@ -30,14 +30,32 @@ SCENARIO("Iterating ranges")
             }
         }
 
-        for (const I i : integer_range(I::zero(), I{8}, I{2}))
+        for (const I i : integer_range(a, b, I{2}))
         {
             std::cout << i << "\n";
         }
 
-        for (const I i : integer_range(I::zero(), I{8}, I{3}))
+        for (const I i : integer_range(a, b, I{3}))
         {
             std::cout << i << "\n";
+        }
+    }
+
+    GIVEN("Two integers a and b with a < 0 < b")
+    {
+
+        const I a{-1};
+        const I b{1};
+
+        WHEN("They form a range")
+        {
+            THEN("The iterations works fine")
+            {
+                for (const I i : integer_range(a, b, I{1}))
+                {
+                    std::cout << i << "\n";
+                }
+            }
         }
     }
 
@@ -45,11 +63,14 @@ SCENARIO("Iterating ranges")
     {
         I a = I{23};
         I b = I{13};
-        WHEN("Creating the range [a,b]") {
-            THEN("The range should be empty") {
+        WHEN("Creating the range [a,b]")
+        {
+            THEN("The range should be empty")
+            {
 
                 std::cout << "Iterating over an empty range:\n";
-                for (const I num :integer_range(a,b)) {
+                for (const I num : integer_range(a, b))
+                {
                     std::cout << num << "\n";
                 }
                 std::cout << "\n";
