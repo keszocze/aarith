@@ -13,44 +13,20 @@ namespace aarith {
  *
  * @note Two numbers can be equal even though they have different bit widths!
  */
-template <size_t W, size_t V> bool operator==(const uinteger<W>& a, const uinteger<V>& b)
+template <template <size_t> typename Int, size_t W, size_t V>
+bool operator==(const Int<W>& a, const Int<V>& b)
 {
 
-    // TODO remove when clang implements the stuff as constexpr
-#ifndef __clang__
-    constexpr auto min_count = std::min(a.word_count(), b.word_count());
-    constexpr auto max_count = std::max(a.word_count(), b.word_count());
-#else
-    const auto min_count = std::min(a.word_count(), b.word_count());
-    const auto max_count = std::max(a.word_count(), b.word_count());
-#endif
+    constexpr size_t max_width = std::max(W, V);
 
-    for (auto i = 0U; i < min_count; ++i)
+    Int<max_width> a_ = width_cast<max_width>(a);
+    Int<max_width> b_ = width_cast<max_width>(b);
+
+    for (size_t i = 0U; i < integer<max_width>::word_count(); ++i)
     {
-        if (a.word(i) != b.word(i))
+        if (a_.word(i) != b_.word(i))
         {
             return false;
-        }
-    }
-
-    if constexpr (W > V)
-    {
-        for (size_t i = min_count; i < max_count; ++i)
-        {
-            if (a.word(i) != 0U)
-            {
-                return false;
-            }
-        }
-    }
-    else
-    {
-        for (size_t i = min_count; i < max_count; ++i)
-        {
-            if (b.word(i) != 0U)
-            {
-                return false;
-            }
         }
     }
 
@@ -131,29 +107,29 @@ template <typename W, typename V> bool operator>(const W& a, const V& b)
     return b < a;
 }
 
-template <size_t W, size_t V> bool operator==(const integer<W>& a, const integer<V>& b)
-{
-
-    if (a.is_negative() != b.is_negative())
-    {
-        return false;
-    }
-
-    constexpr size_t max_width = std::max(W, V);
-
-    integer<max_width> a_ = width_cast<max_width>(a);
-    integer<max_width> b_ = width_cast<max_width>(b);
-
-    for (size_t i = 0U; i < integer<max_width>::word_count(); ++i)
-    {
-        if (a_.word(i) != b_.word(i))
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
+// template <size_t W, size_t V> bool operator==(const integer<W>& a, const integer<V>& b)
+//{
+//
+//    if (a.is_negative() != b.is_negative())
+//    {
+//        return false;
+//    }
+//
+//    constexpr size_t max_width = std::max(W, V);
+//
+//    integer<max_width> a_ = width_cast<max_width>(a);
+//    integer<max_width> b_ = width_cast<max_width>(b);
+//
+//    for (size_t i = 0U; i < integer<max_width>::word_count(); ++i)
+//    {
+//        if (a_.word(i) != b_.word(i))
+//        {
+//            return false;
+//        }
+//    }
+//
+//    return true;
+//}
 
 template <size_t W, size_t V> bool operator<(const integer<W>& a, const integer<V>& b)
 {
