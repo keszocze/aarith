@@ -45,8 +45,8 @@ SCENARIO("Iterating ranges")
         {
             THEN("There is no overflow")
             {
-                const std::array<int,3> nums{0,3,6};
-                int k=0;
+                const std::array<int, 3> nums{0, 3, 6};
+                int k = 0;
                 for (const I i : integer_range(a, b, I{3}))
                 {
                     REQUIRE(I{nums[k]} == i);

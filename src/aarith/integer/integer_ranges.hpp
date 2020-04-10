@@ -70,19 +70,24 @@ template <typename Integer> class integer_range
                     }
                 }
             }
-            else {
-                if (current == range.begin_) {
+            else
+            {
+                if (current == range.begin_)
+                {
                     current = std::nullopt;
                 }
-                else if (current) {
+                else if (current)
+                {
                     const I curr = *current;
                     const I stride = range.stride_;
                     const I dist = sub(curr, range.begin_);
 
-                    if (dist >= stride) {
+                    if (dist >= stride)
+                    {
                         current = sub(curr, stride);
                     }
-                    else {
+                    else
+                    {
                         current = std::nullopt;
                     }
                 }
@@ -155,12 +160,12 @@ public:
         {
             return cend();
         }
-        return integer_iter<Integer,false>(start_, *this);
+        return integer_iter<Integer, false>(start_, *this);
     }
 
     [[nodiscard]] integer_iter<Integer> crend() const
     {
-        return integer_iter<Integer,false>(*this);
+        return integer_iter<Integer, false>(*this);
     }
 
     friend bool operator==(integer_range<Integer> const& lhs, integer_range<Integer> const& rhs)
