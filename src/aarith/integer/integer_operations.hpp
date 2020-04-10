@@ -18,11 +18,11 @@ template <typename I, typename T>
 [[nodiscard]] auto expanding_add(const I& a, const T& b, const bool initial_carry = false)
 {
 
-    static_assert(is_integral_v<I>);
-    static_assert(is_integral_v<T>);
+    static_assert(::aarith::is_integral_v<I>);
+    static_assert(::aarith::is_integral_v<T>);
 
     // TODO do we need this assertion?
-    static_assert(aarith::same_sign<I, T>);
+    static_assert(::aarith::same_sign<I, T>);
 
     constexpr size_t res_width = std::max(I::width(), T::width()) + 1U;
 
@@ -60,7 +60,7 @@ template <typename I, typename T>
  */
 template <typename I>[[nodiscard]] auto sub(const I& a, const I& b) -> I
 {
-    static_assert(is_integral_v<I>);
+    static_assert(::aarith::is_integral_v<I>);
 
     auto result = expanding_add(a, ~b, true);
     return width_cast<I::width()>(result);
@@ -82,8 +82,8 @@ template <typename I, typename T>[[nodiscard]] auto expanding_sub(const I& a, co
 {
 
     // TODO do we need this assertion?
-    static_assert(aarith::same_sign<I, T>);
-    static_assert(aarith::same_word_type<I, T>);
+    static_assert(::aarith::same_sign<I, T>);
+    static_assert(::aarith::same_word_type<I, T>);
 
     constexpr size_t res_width = std::max(I::width(), T::width());
     const auto result{sub(width_cast<res_width>(a), width_cast<res_width>(b))};
@@ -133,8 +133,8 @@ template <std::size_t W, std::size_t V>
     }
     else
     {
-        static_assert(is_integral_v<uinteger<res_width>>);
-        static_assert(is_unsigned_v<uinteger<res_width>>);
+        static_assert(::aarith::is_integral_v<uinteger<res_width>>);
+        static_assert(::aarith::is_unsigned_v<uinteger<res_width>>);
 
         const auto leading_zeroes = V - count_leading_zeroes(b);
         uinteger<res_width> a_ = width_cast<res_width>(a);
@@ -374,12 +374,12 @@ template <typename I>[[nodiscard]] auto div(const I& numerator, const I& denomin
 template <class IntA, class IntB>
 [[nodiscard]] auto fun_add_expand(const IntA& a, const IntB& b, const bool initial_carry = false)
 {
-    static_assert(is_integral_v<IntA>);
-    static_assert(is_integral_v<IntB>);
+    static_assert(::aarith::is_integral_v<IntA>);
+    static_assert(::aarith::is_integral_v<IntB>);
 
     // TODO do we need this assertion?
-    static_assert(same_sign<IntA, IntB>);
-    static_assert(same_word_type<IntA, IntB>);
+    static_assert(::aarith::same_sign<IntA, IntB>);
+    static_assert(::aarith::same_word_type<IntA, IntB>);
 
     constexpr size_t res_width = std::max(IntA::width(), IntB::width()) + 1U;
     using word_type = typename IntA::word_type;

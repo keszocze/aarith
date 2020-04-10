@@ -105,19 +105,19 @@ template <size_t W, size_t V> bool operator<(const uinteger<W>& a, const uintege
 
 template <typename W, typename V> bool operator<=(const W& a, const V& b)
 {
-    static_assert(same_sign<W, V>);
+    static_assert(::aarith::same_sign<W, V>);
     return (a < b) || (a == b);
 }
 
 template <typename W, typename V> bool operator>=(const W& a, const V& b)
 {
-    static_assert(same_sign<W, V>);
+    static_assert(::aarith::same_sign<W, V>);
     return b <= a;
 }
 
 template <typename W, typename V> bool operator>(const W& a, const V& b)
 {
-    static_assert(same_sign<W, V>);
+    static_assert(::aarith::same_sign<W, V>);
     return b < a;
 }
 

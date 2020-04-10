@@ -19,7 +19,7 @@ public:
     using bit_type = WordType;
     static_assert(Width > 0, " Width must be at least 1 (bit)");
 
-    static_assert(aarith::is_unsigned_int<WordType>,
+    static_assert(::aarith::is_unsigned_int<WordType>,
                   "Only unsigned integers can be used as word types");
 
     /*
@@ -436,7 +436,7 @@ private:
     std::array<word_type, word_count()> words{{0}};
 };
 
-template <size_t Width> class is_word_array<word_array<Width>>
+template <size_t Width> class ::aarith::is_word_array<word_array<Width>>
 {
 public:
     static constexpr bool value = true;

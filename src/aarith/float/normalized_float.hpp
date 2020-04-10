@@ -325,8 +325,8 @@ auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<
 
 template <class uint> auto find_leading_one(const uint mantissa) -> typename uint::word_type
 {
-    static_assert(is_integral_v<uint>);
-    static_assert(is_unsigned_v<uint>);
+    static_assert(::aarith::is_integral_v<uint>);
+    static_assert(::aarith::is_unsigned_v<uint>);
 
     const auto width = uint::width();
     auto one_at = width;
