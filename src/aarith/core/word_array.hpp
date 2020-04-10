@@ -436,7 +436,7 @@ private:
     std::array<word_type, word_count()> words{{0}};
 };
 
-template <size_t Width> class ::aarith::is_word_array<word_array<Width>>
+template <size_t Width> class is_word_array<word_array<Width>>
 {
 public:
     static constexpr bool value = true;
