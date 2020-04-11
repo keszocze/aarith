@@ -202,7 +202,7 @@ SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
     //    }
 }
 
-SCENARIO("Division of signed integers", "[integer][arithmetic]")
+SCENARIO("Division of signed integers", "[integer][arithmetic][division]")
 {
 
     GIVEN("The number 1 << 65")
@@ -382,7 +382,7 @@ SCENARIO("Multiplying unsigned integers", "[integer][arithmetic][multiplication]
         }
     }
 }
-SCENARIO("Multiplying signed integers", "[integer][arithmetic]")
+SCENARIO("Multiplying signed integers", "[integer][arithmetic][multiplication]")
 {
     GIVEN("Two signed integers m and r")
     {
@@ -409,7 +409,7 @@ SCENARIO("Multiplying signed integers", "[integer][arithmetic]")
     }
 }
 
-SCENARIO("Absolute value computation", "[integer][utility]")
+SCENARIO("Absolute value computation", "[integer][operations][utility]")
 {
     GIVEN("The smallest possible value")
     {
@@ -457,7 +457,7 @@ SCENARIO("Absolute value computation", "[integer][utility]")
     }
 }
 
-SCENARIO("Expanding subtraction works correctly", "[integer][arithmetic]")
+SCENARIO("Expanding subtraction works correctly", "[integer][arithmetic][subtraction]")
 {
     GIVEN("A n-bit min and a m-bit (m>n)  max")
     {
@@ -560,7 +560,7 @@ SCENARIO("Width casting of signed integers", "[integer][utility]")
     }
 }
 
-SCENARIO("Unary minus operation", "[integer][utility]")
+SCENARIO("Unary minus operation", "[integer][arithmetic][utility]")
 {
     GIVEN("The smallest possible value")
     {
@@ -595,7 +595,7 @@ SCENARIO("Unary minus operation", "[integer][utility]")
     }
 }
 
-SCENARIO("MIN/MAX Values behave as expected", "[integer][utility]")
+SCENARIO("MIN/MAX Values behave as expected", "[integer][operation][utility]")
 {
     GIVEN("The min and max value")
     {
@@ -619,7 +619,7 @@ SCENARIO("MIN/MAX Values behave as expected", "[integer][utility]")
     }
 }
 
-SCENARIO("Left/right shifting sintegers")
+SCENARIO("Left/right shifting sintegers","[integer][operation][utility]")
 {
     GIVEN("A positive integer")
     {
