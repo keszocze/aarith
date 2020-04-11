@@ -6,6 +6,8 @@
 
 namespace aarith {
 
+// TODO fancy template parameter packs nutzen!
+
 template <class Type> class is_word_array
 {
 public:
@@ -52,7 +54,7 @@ inline constexpr bool same_sign = (is_unsigned_v<A> == is_unsigned_v<B>);
  */
 template <typename T>
 inline constexpr bool is_unsigned_int =
-    std::is_same_v<T, uint64_t> || std::is_same_v<T, uint32_t> || std::is_same_v<T, uint16_t> ||
-    std::is_same_v<T, uint8_t>;
+    std::is_same_v<T, std::size_t> || std::is_same_v<T, uint64_t> || std::is_same_v<T, uint32_t> ||
+    std::is_same_v<T, uint16_t> || std::is_same_v<T, uint8_t>;
 
 } // namespace aarith

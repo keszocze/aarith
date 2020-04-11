@@ -285,4 +285,14 @@ template <size_t W, size_t V> bool operator<(const integer<W>& a, const integer<
     return false;
 }
 
+template <typename Integer> const Integer& min(const Integer& a, const Integer& b)
+{
+    return (a < b) ? a : b;
+}
+
+template <typename Integer> const Integer& max(const Integer& a, const Integer& b)
+{
+    return (a < b) ? b : a;
+}
+
 } // namespace aarith
