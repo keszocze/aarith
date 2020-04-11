@@ -704,3 +704,53 @@ SCENARIO("Left/right shifting sintegers")
         }
     }
 }
+
+SCENARIO("Computing the signum of an integer", "[integer][operation][utility]")
+{
+    GIVEN("The number  zero")
+    {
+        THEN("The signum should be zero")
+        {
+            REQUIRE(signum(integer<8>::zero()) == 0);
+            REQUIRE(signum(integer<1>::zero()) == 0);
+            REQUIRE(signum(integer<16>::zero()) == 0);
+            REQUIRE(signum(integer<32>::zero()) == 0);
+            REQUIRE(signum(integer<64>::zero()) == 0);
+            REQUIRE(signum(integer<128>::zero()) == 0);
+            REQUIRE(signum(integer<300>::zero()) == 0);
+            REQUIRE(signum(integer<1313>::zero()) == 0);
+        }
+    }
+    GIVEN("A non-negative number")
+    {
+        THEN("The signum should be one")
+        {
+            int8_t val_a =
+                GENERATE(take(100, random(int8_t(1), std::numeric_limits<int8_t>::max())));
+
+            REQUIRE(signum(integer<8>{val_a}) == 1);
+            REQUIRE(signum(integer<16>{val_a}) == 1);
+            REQUIRE(signum(integer<17>{val_a}) == 1);
+            REQUIRE(signum(integer<32>{val_a}) == 1);
+            REQUIRE(signum(integer<64>{val_a}) == 1);
+            REQUIRE(signum(integer<128>{val_a}) == 1);
+            REQUIRE(signum(integer<256>{val_a, val_a}) == 1);
+        }
+    }
+    GIVEN("A negative number")
+    {
+        THEN("The signum should be one")
+        {
+            int8_t val_a =
+                    GENERATE(take(100, random(std::numeric_limits<int8_t>::min(), int8_t(-1))));
+
+            REQUIRE(signum(integer<8>{val_a}) == -1);
+            REQUIRE(signum(integer<16>{val_a}) == -1);
+            REQUIRE(signum(integer<17>{val_a}) == -1);
+            REQUIRE(signum(integer<32>{val_a}) == -1);
+            REQUIRE(signum(integer<64>{val_a}) == -1);
+            REQUIRE(signum(integer<128>{val_a}) == -1);
+        }
+    }
+
+}
