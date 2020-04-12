@@ -21,3 +21,7 @@ add_custom_target(clangformat
 
 
 
+option(BUILD_BENCHMARKS "build experiments" OFF)
+if(BUILD_BENCHMARKS)
+    add_subdirectory(benchmarks)
+endif()
