@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.13)
 project(aarith)
+option(BUILD_BENCHMARKS "build experiments" OFF)
+
+
 
 include(TargetWarnings.cmake)
 enable_testing()
@@ -19,9 +22,6 @@ add_custom_target(clangformat
         COMMAND clang-format -style=file -i ${ALL_SOURCE_FILES}
         )
 
-
-
-option(BUILD_BENCHMARKS "build experiments" OFF)
 if(BUILD_BENCHMARKS)
     add_subdirectory(benchmarks)
 endif()

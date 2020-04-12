@@ -1,11 +1,9 @@
-#pragma once
+#include <aarith/integer.hpp>
 
 #include <chrono>
 #include <iostream>
 #include <string>
 #include <tuple>
-
-#include <aarith/integer.hpp>
 
 template <typename T> void bench_int(std::string name)
 {
@@ -52,13 +50,13 @@ template <template <size_t> typename I, size_t W> void bench_aarith_int(std::str
     Integer a = std::numeric_limits<Integer>::min();
     count_type counter_a = std::numeric_limits<count_type>::min();
 
+    std::cout << a << "\t" << max_val << "\n";
 
-    while(counter_a <= max_val)
+    while (counter_a <= max_val)
     {
 
         Integer b = std::numeric_limits<Integer>::min();
         count_type counter_b = std::numeric_limits<count_type>::min();
-
 
         while (counter_b <= max_val)
         {
@@ -67,12 +65,20 @@ template <template <size_t> typename I, size_t W> void bench_aarith_int(std::str
             const I<W> prod = mul(a, b);
             const I<W> fun = add(mul(add(a, b), b), a);
 
+            std::cout << a << "\t" << b << "\n";
+
             counter_b = add(counter_b, I<W + 1>::one());
             b = add(b, Integer::one());
         }
 
+
+
+
+
         counter_a = add(counter_a, I<W + 1>::one());
-        a = add(a,Integer::one());
+        a = add(a, Integer::one());
+
+
     }
 
     const steady_clock::time_point end = std::chrono::steady_clock::now();
@@ -80,4 +86,22 @@ template <template <size_t> typename I, size_t W> void bench_aarith_int(std::str
     const auto dur = duration_cast<std::chrono::milliseconds>(duration).count();
 
     std::cout << name << "<" << W << ">;" << dur << "\n";
+}
+
+int main()
+{
+
+    using namespace std;
+    using namespace aarith;
+
+    bench_int<int8_t>("int8");
+    bench_int<uint8_t>("uint8");
+//    bench_int<int16_t>("int16");
+//    bench_int<uint16_t>("uint16");
+
+//    bench_aarith_int<integer, 8>("integer");
+    bench_aarith_int<uinteger, 8>("uinteger");
+//    bench_aarith_int<integer, 16>("integer");
+//    bench_aarith_int<uinteger, 16>("uinteger");
+    return 0;
 }
