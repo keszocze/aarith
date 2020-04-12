@@ -619,7 +619,7 @@ SCENARIO("MIN/MAX Values behave as expected", "[integer][operation][utility]")
     }
 }
 
-SCENARIO("Left/right shifting sintegers","[integer][operation][utility]")
+SCENARIO("Left/right shifting sintegers", "[integer][operation][utility]")
 {
     GIVEN("A positive integer")
     {
@@ -742,7 +742,7 @@ SCENARIO("Computing the signum of an integer", "[integer][operation][utility]")
         THEN("The signum should be one")
         {
             int8_t val_a =
-                    GENERATE(take(100, random(std::numeric_limits<int8_t>::min(), int8_t(-1))));
+                GENERATE(take(100, random(std::numeric_limits<int8_t>::min(), int8_t(-1))));
 
             REQUIRE(signum(integer<8>{val_a}) == -1);
             REQUIRE(signum(integer<16>{val_a}) == -1);
@@ -752,5 +752,4 @@ SCENARIO("Computing the signum of an integer", "[integer][operation][utility]")
             REQUIRE(signum(integer<128>{val_a}) == -1);
         }
     }
-
 }
