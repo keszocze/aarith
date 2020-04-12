@@ -183,7 +183,8 @@ template <typename I>[[nodiscard]] constexpr I mul(const I& a, const I& b)
  * @return Product of a and b
  */
 template <std::size_t W, std::size_t V>
-[[nodiscard]] constexpr uinteger<W + V> expanding_karazuba(const uinteger<W>& a, const uinteger<V>& b)
+[[nodiscard]] constexpr uinteger<W + V> expanding_karazuba(const uinteger<W>& a,
+                                                           const uinteger<V>& b)
 {
 
     constexpr std::size_t res_width = W + V;
@@ -634,9 +635,8 @@ template <size_t W>[[nodiscard]] constexpr int8_t signum(uinteger<W> n)
  *
  */
 template <std::size_t W, std::size_t V>
-[[nodiscard]] std::pair<integer<W>, integer<W>>
-constexpr 
-restoring_division(const integer<W>& numerator, const integer<V>& denominator)
+[[nodiscard]] std::pair<integer<W>, integer<W>> constexpr restoring_division(
+    const integer<W>& numerator, const integer<V>& denominator)
 {
 
     using SInteger = integer<W>;
@@ -694,7 +694,8 @@ restoring_division(const integer<W>& numerator, const integer<V>& denominator)
  * @param b Second integer
  * @return The distance between the two integers
  */
-template <typename Integer>[[nodiscard]] constexpr Integer distance(const Integer& a, const Integer& b)
+template <typename Integer>
+[[nodiscard]] constexpr Integer distance(const Integer& a, const Integer& b)
 {
     return (a <= b) ? sub(b, a) : sub(a, b);
 }

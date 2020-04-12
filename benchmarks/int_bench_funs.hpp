@@ -45,7 +45,7 @@ template <template <size_t> typename I, size_t W> void bench_aarith_int(std::str
 
     using Integer = I<W>;
     using count_type = I<W + 1>;
-    count_type max_val = std::numeric_limits<count_type>::min();
+    constexpr count_type max_val = std::numeric_limits<count_type>::min();
 
     const steady_clock::time_point start = std::chrono::steady_clock::now();
 
