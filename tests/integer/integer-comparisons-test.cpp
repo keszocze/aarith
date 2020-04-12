@@ -166,7 +166,8 @@ SCENARIO("Comparing two positive sintegers with different bit widths", "[uintege
     }
 }
 
-SCENARIO("Investigating the comparison of max and min values", "[integer][comparison][utility]")
+SCENARIO("Investigating the comparison of max and min values",
+         "[integer][comparison][utility]")
 {
     GIVEN("integer<8>::max/min")
     {
@@ -191,6 +192,9 @@ SCENARIO("Investigating the comparison of max and min values", "[integer][compar
 
         WHEN("Constructing min and max value into a larger integer")
         {
+
+            std::cout << to_binary(T::min()) << "\n";
+
             integer<9> min = T::min();
             integer<9> max = T::max();
             THEN("min should be negative")

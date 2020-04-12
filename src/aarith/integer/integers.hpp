@@ -32,7 +32,7 @@ public:
 
     template <size_t V>
     uinteger<Width, WordType>(const uinteger<V, WordType>& other)
-        : word_array<Width>(static_cast<const word_array<V, WordType>&>(other))
+        : word_array<Width>(width_cast<Width>(other))
     {
     }
 
@@ -151,7 +151,7 @@ public:
 
     template <size_t V>
     integer<Width, WordType>(const integer<V, WordType>& other)
-        : word_array<Width>(static_cast<const word_array<V, WordType>&>(other))
+        : word_array<Width>(width_cast<Width>(other))
     {
     }
 
