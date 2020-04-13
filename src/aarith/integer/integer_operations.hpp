@@ -125,10 +125,11 @@ template <std::size_t W, std::size_t V>
 
     constexpr std::size_t res_width = W + V;
     uinteger<res_width> result{0U};
-    if constexpr (res_width <= 64)
+
+    if constexpr (res_width <= uinteger<W>::word_width())
     {
-        uint64_t result_uint64 = a.word(0) * b.word(0);
-        result.set_word(0, result_uint64);
+        auto result_uint = a.word(0) * b.word(0);
+        result.set_word(0, result_uint);
     }
     else
     {
@@ -167,6 +168,92 @@ template <std::size_t W, std::size_t V>
 template <typename I>[[nodiscard]] constexpr I mul(const I& a, const I& b)
 {
     return width_cast<I::width()>(expanding_mul(a, b));
+}
+
+/**
+ * @brief Multiplies two unsigned integers using the Karazuba algorithm expanding the bit width so
+ * that the result fits.
+ *
+ * This implements the karazuba multiplication algorithm (divide and conquer).
+ *
+ * @tparam W The bit width of the first multiplicant
+ * @tparam V The bit width of the second multiplicant
+ * @param a First multiplicant
+ * @param b Second multiplicant
+ * @return Product of a and b
+ */
+template <std::size_t W, std::size_t V>
+[[nodiscard]] uinteger<W + V> expanding_karazuba(const uinteger<W>& a, const uinteger<V>& b)
+{
+
+    constexpr std::size_t res_width = W + V;
+    if constexpr (res_width <= uinteger<W>::word_width())
+    {
+        auto result_uint = a.word(0) * b.word(0);
+        const uinteger<res_width> result(result_uint);
+        return result;
+    }
+    else if constexpr (W == V)
+    {
+        if (a.is_zero() || b.is_zero())
+        {
+            return uinteger<res_width>(0U);
+        }
+
+        // floor to the next value with power of 2
+        // std::log2 and std::floor  not constexpr and did not compile with clang
+        constexpr size_t floor_pow_two = floor_to_pow(W);
+
+        constexpr size_t karazuba_width =
+            (floor_pow_two == W) ? (floor_pow_two >> 1) : (floor_pow_two);
+
+        const auto a_split = split<karazuba_width - 1>(a);
+        const auto b_split = split<karazuba_width - 1>(b);
+
+        const auto ah = uinteger<W - karazuba_width>(a_split.first);
+        const auto al = uinteger<karazuba_width>(a_split.second);
+        const auto bh = uinteger<W - karazuba_width>(b_split.first);
+        const auto bl = uinteger<karazuba_width>(b_split.second);
+
+        const auto p1 = expanding_karazuba<W - karazuba_width, W - karazuba_width>(ah, bh);
+        const auto p2 = expanding_karazuba<karazuba_width, karazuba_width>(al, bl);
+        const auto s1 = expanding_add(ah, al);
+        const auto s2 = expanding_add(bh, bl);
+
+        // prevent infinite call loop
+        // TODO find a better way to do this
+        uinteger<2 * (karazuba_width + 1)> p3;
+        if (s1.bit(s1.width() - 1) == 1 || s2.bit(s2.width() - 1) == 1)
+        {
+            p3 = expanding_karazuba(s1, s2);
+        }
+        else
+        {
+            const auto ps1 = width_cast<karazuba_width>(s1);
+            const auto ps2 = width_cast<karazuba_width>(s2);
+            const auto p3t = expanding_karazuba(ps1, ps2);
+            p3 = p3t;
+        }
+
+        constexpr auto full_shift = 2 * karazuba_width;
+        const auto k1 = width_cast<res_width>(p1) << full_shift;
+        const auto k2 = width_cast<res_width>(expanding_sub(p3, expanding_add(p1, p2)))
+                        << karazuba_width;
+        const auto product = expanding_add(k1, expanding_add(k2, p2));
+
+        return width_cast<res_width>(product);
+    }
+    else
+    {
+        constexpr std::size_t max_width = std::max(W, V);
+
+        const auto a_ = width_cast<max_width>(a);
+        const auto b_ = width_cast<max_width>(b);
+
+        const auto res = expanding_karazuba(a_, b_);
+
+        return width_cast<res_width>(res);
+    }
 }
 
 /**

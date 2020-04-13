@@ -576,6 +576,278 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
     }
 }
 
+SCENARIO("Multiplying two uintegers using the karazuba multiplication",
+         "[uinteger][arithmetic][multiplication]")
+{
+    GIVEN("Two uinteger<N> a and b with N <= 32")
+    {
+        using uint = uinteger<32>;
+
+        auto au = 0xCCCCCCCC;
+        auto bu = 0xAAAAAAAA;
+
+        auto a = uint(au);
+        auto b = uint(bu);
+
+        auto res = expanding_karazuba(a, b);
+        auto ref = expanding_mul(a, b);
+
+        THEN("The result should be equal to the standard multiplication.")
+        {
+            REQUIRE(res == ref);
+        }
+    }
+
+    GIVEN("Two uinteger<N> a and uinteger<M> b with M!=N and N+M <= 64")
+    {
+        using uinta = uinteger<22>;
+        using uintb = uinteger<14>;
+
+        auto au = 0xCCCCC;
+        auto bu = 0x2AAA;
+
+        auto a = uinta(au);
+        auto b = uintb(bu);
+
+        auto res = expanding_karazuba(a, b);
+        auto ref = expanding_mul(a, b);
+
+        THEN("The result should be equal to the standard multiplication.")
+        {
+            REQUIRE(res == ref);
+        }
+    }
+
+    GIVEN("Two uinteger<N> a and uinteger<M> b with N+M > 64")
+    {
+        GIVEN("N<=64 and M<=64")
+        {
+            GIVEN("a = 0")
+            {
+                using uinta = uinteger<44>;
+                using uintb = uinteger<56>;
+
+                auto au = 0x0;
+                auto bu = 0xAAAAAAAAAAAAAA;
+
+                auto a = uinta(au);
+                auto b = uintb(bu);
+
+                auto res = expanding_karazuba(a, b);
+                auto ref = expanding_mul(a, b);
+
+                THEN("The result should be equal to the standard multiplication.")
+                {
+                    REQUIRE(res == ref);
+                }
+            }
+            GIVEN("b = 0")
+            {
+                using uinta = uinteger<44>;
+                using uintb = uinteger<56>;
+
+                auto au = 0xCCCCCCCCCCC;
+                auto bu = 0x0;
+
+                auto a = uinta(au);
+                auto b = uintb(bu);
+
+                auto res = expanding_karazuba(a, b);
+                auto ref = expanding_mul(a, b);
+
+                THEN("The result should be equal to the standard multiplication.")
+                {
+                    REQUIRE(res == ref);
+                }
+            }
+            GIVEN("a > 0 and b > 0")
+            {
+                using uinta = uinteger<44>;
+                using uintb = uinteger<56>;
+
+                auto au = 0xCCCCCCCCCCC;
+                auto bu = 0xAAAAAAAAAAAAAA;
+
+                auto a = uinta(au);
+                auto b = uintb(bu);
+
+                auto res = expanding_karazuba(a, b);
+                auto ref = expanding_mul(a, b);
+
+                THEN("The result should be equal to the standard multiplication.")
+                {
+                    REQUIRE(res == ref);
+                }
+            }
+            GIVEN("a = max and b = max")
+            {
+                using uinta = uinteger<44>;
+                using uintb = uinteger<56>;
+
+                auto au = 0xFFFFFFFFFFF;
+                auto bu = 0xFFFFFFFFFFFFFF;
+
+                auto a = uinta(au);
+                auto b = uintb(bu);
+
+                auto res = expanding_karazuba(a, b);
+                auto ref = expanding_mul(a, b);
+
+                THEN("The result should be equal to the standard multiplication.")
+                {
+                    REQUIRE(res == ref);
+                }
+            }
+        }
+        GIVEN("N>64, N<=128, M>64, and M<=128")
+        {
+            GIVEN("a = 0")
+            {
+                using uinta = uinteger<102>;
+                using uintb = uinteger<84>;
+
+                auto a = uinta(0U);
+                auto b = uintb::from_words(0xAAAAAAAAAAAAAAAA, 0xAAAAA);
+
+                auto res = expanding_karazuba(a, b);
+                auto ref = expanding_mul(a, b);
+
+                THEN("The result should be equal to the standard multiplication.")
+                {
+                    REQUIRE(res == ref);
+                }
+            }
+            GIVEN("b = 0")
+            {
+                using uinta = uinteger<102>;
+                using uintb = uinteger<84>;
+
+                auto a = uinta::from_words(0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCC);
+                auto b = uintb(0U);
+
+                auto res = expanding_karazuba(a, b);
+                auto ref = expanding_mul(a, b);
+
+                THEN("The result should be equal to the standard multiplication.")
+                {
+                    REQUIRE(res == ref);
+                }
+            }
+            GIVEN("a > 0 and b > 0")
+            {
+                using uinta = uinteger<102>;
+                using uintb = uinteger<84>;
+
+                auto a = uinta::from_words(0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCC);
+                auto b = uintb::from_words(0xAAAAAAAAAAAAAAAA, 0xAAAAA);
+
+                auto res = expanding_karazuba(a, b);
+                auto ref = expanding_mul(a, b);
+
+                THEN("The result should be equal to the standard multiplication.")
+                {
+                    REQUIRE(res == ref);
+                }
+            }
+            GIVEN("a = max and b = max")
+            {
+                using uinta = uinteger<102>;
+                using uintb = uinteger<84>;
+
+                auto a = uinta::from_words(0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFF);
+                auto b = uintb::from_words(0xFFFFFFFFFFFFFFFF, 0xFFFFF);
+
+                auto res = expanding_karazuba(a, b);
+                auto ref = expanding_mul(a, b);
+
+                THEN("The result should be equal to the standard multiplication.")
+                {
+                    REQUIRE(res == ref);
+                }
+            }
+        }
+        GIVEN("N>256, and M>256")
+        {
+            GIVEN("a = 0")
+            {
+                using uinta = uinteger<300>;
+                using uintb = uinteger<584>;
+
+                auto a = uinta(0U);
+                auto b = uintb::from_words(
+                    0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA,
+                    0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA,
+                    0xAAAAAAAAAAAAAAAA, 0xAA);
+
+                auto res = expanding_karazuba(a, b);
+                auto ref = expanding_mul(a, b);
+
+                THEN("The result should be equal to the standard multiplication.")
+                {
+                    REQUIRE(res == ref);
+                }
+            }
+            GIVEN("b = 0")
+            {
+                using uinta = uinteger<300>;
+                using uintb = uinteger<584>;
+
+                auto a = uinta::from_words(0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCCCCCCCCC,
+                                           0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCCCC);
+                auto b = uintb(0U);
+
+                auto res = expanding_karazuba(a, b);
+                auto ref = expanding_mul(a, b);
+
+                THEN("The result should be equal to the standard multiplication.")
+                {
+                    REQUIRE(res == ref);
+                }
+            }
+            GIVEN("a > 0 and b > 0")
+            {
+                using uinta = uinteger<300>;
+                using uintb = uinteger<584>;
+
+                auto a = uinta::from_words(0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCCCCCCCCC,
+                                           0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCCCCCCCCC, 0xCCCCCCCCCCC);
+                auto b = uintb::from_words(
+                    0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA,
+                    0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA, 0xAAAAAAAAAAAAAAAA,
+                    0xAAAAAAAAAAAAAAAA, 0xAA);
+
+                auto res = expanding_karazuba(a, b);
+                auto ref = expanding_mul(a, b);
+
+                THEN("The result should be equal to the standard multiplication.")
+                {
+                    REQUIRE(res == ref);
+                }
+            }
+            GIVEN("a = F and b = F")
+            {
+                using uinta = uinteger<300>;
+                using uintb = uinteger<584>;
+
+                auto a = uinta::from_words(0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
+                                           0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFF);
+                auto b = uintb::from_words(
+                    0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
+                    0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFF,
+                    0xFFFFFFFFFFFFFFFF, 0xFF);
+
+                auto res = expanding_karazuba(a, b);
+                auto ref = expanding_mul(a, b);
+
+                THEN("The result should be equal to the standard multiplication.")
+                {
+                    REQUIRE(res == ref);
+                }
+            }
+        }
+    }
+}
+
 SCENARIO("Bit and Word operations work correctly", "[uinteger][utility]")
 {
     WHEN("A uinteger<N> is created using uinteger<N>::from_words")

@@ -19,6 +19,7 @@ namespace aarith {
 template <size_t W, size_t V>
 constexpr bool operator==(const word_array<W>& a, const word_array<V>& b)
 {
+
     if constexpr (W != V)
     {
         return false;
@@ -38,7 +39,6 @@ constexpr bool operator==(const word_array<W>& a, const word_array<V>& b)
 
 template <typename W, typename V> constexpr bool operator!=(const W& a, const V& b)
 {
-
     static_assert(is_word_array_v<W>);
     static_assert(is_word_array_v<V>);
 

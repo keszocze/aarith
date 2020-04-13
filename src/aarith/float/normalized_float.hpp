@@ -11,7 +11,7 @@
 
 namespace aarith {
 
-template <size_t E, size_t M> class normalized_float
+template <size_t E, size_t M, typename WordType = uint64_t> class normalized_float
 {
 public:
     static_assert(M > 0, "Mantissa width has to be greater zero.");
@@ -19,8 +19,8 @@ public:
 
     explicit constexpr normalized_float()
     {
-        exponent = uinteger<E>(0U);
-        mantissa = uinteger<M>(0U);
+        exponent = uinteger<E, WordType>(0U);
+        mantissa = uinteger<M, WordType>(0U);
         sign_neg = false;
     }
 
@@ -41,7 +41,7 @@ public:
         constexpr auto wider_mantissa = M >= f_mantissa_width;
         if (wider_mantissa)
         {
-            mantissa = uinteger<M>(f_mantissa);
+            mantissa = uinteger<M, WordType>(f_mantissa);
             constexpr auto mantissa_shift = M - f_mantissa_width;
             mantissa = mantissa << mantissa_shift;
         }
@@ -49,7 +49,7 @@ public:
         {
             constexpr auto mantissa_shift = f_mantissa_width - M;
             f_mantissa >>= mantissa_shift;
-            mantissa = uinteger<M>(f_mantissa);
+            mantissa = uinteger<M, WordType>(f_mantissa);
         }
 
         if (f_exponent > 0)
@@ -57,7 +57,7 @@ public:
             constexpr auto wider_exponent = E >= f_exponent_width;
             if (wider_exponent)
             {
-                exponent = uinteger<E>(f_exponent);
+                exponent = uinteger<E, WordType>(f_exponent);
                 const auto f_bias =
                     width_cast<E>(normalized_float<f_exponent_width, f_mantissa_width>::get_bias());
                 const auto exponent_delta = sub(get_bias(), f_bias);
@@ -70,7 +70,7 @@ public:
                     normalized_float<f_exponent_width, f_mantissa_width>::get_bias().word(0) -
                     bias.word(0);
                 f_exponent -= static_cast<decltype(f_exponent)>(exponent_delta);
-                exponent = uinteger<E>(f_exponent);
+                exponent = uinteger<E, WordType>(f_exponent);
             }
         }
         else
@@ -91,8 +91,8 @@ public:
 
     static constexpr auto get_bias() -> uinteger<E>
     {
-        const uinteger<E> one(1U);
-        const uinteger<E> shifted = one << (E - 1);
+        const uinteger<E, WordType> one(1U);
+        const uinteger<E, WordType> shifted = one << (E - 1);
         return sub(shifted, one);
     }
 
@@ -106,27 +106,27 @@ public:
         sign_neg = (sign & 1U) > 0;
     }
 
-    auto get_exponent() const -> uinteger<E>
+    auto get_exponent() const -> uinteger<E, WordType>
     {
         return exponent;
     }
 
-    void set_exponent(const uinteger<E>& set_to)
+    void set_exponent(const uinteger<E, WordType>& set_to)
     {
         exponent = set_to;
     }
 
-    auto get_mantissa() const -> uinteger<M>
+    auto get_mantissa() const -> uinteger<M, WordType>
     {
         return mantissa;
     }
 
-    void set_mantissa(const uinteger<M>& set_to)
+    void set_mantissa(const uinteger<M, WordType>& set_to)
     {
         mantissa = set_to;
     }
 
-    auto bit(size_t index) const -> typename uinteger<M>::bit_type
+    auto bit(size_t index) const -> typename uinteger<M, WordType>::bit_type
     {
         if (index < M)
         {
@@ -138,7 +138,7 @@ public:
         }
         else
         {
-            return static_cast<typename uinteger<M>::bit_type>(get_sign());
+            return static_cast<typename uinteger<M, WordType>::bit_type>(get_sign());
         }
     }
 
@@ -149,31 +149,31 @@ public:
 
 private:
     bool sign_neg;
-    uinteger<E> exponent;
-    uinteger<M> mantissa;
+    uinteger<E, WordType> exponent;
+    uinteger<M, WordType> mantissa;
 };
 
-template <size_t E, size_t M> class is_integral<normalized_float<E, M>>
+template <size_t E, size_t M, typename WordType> class is_integral<normalized_float<E, M, WordType>>
 {
 public:
     static constexpr bool value = false;
 };
 
-template <size_t E, size_t M> class is_float<normalized_float<E, M>>
+template <size_t E, size_t M, typename WordType> class is_float<normalized_float<E, M, WordType>>
 {
 public:
     static constexpr bool value = true;
 };
 
-template <size_t E, size_t M> class is_unsigned<normalized_float<E, M>>
+template <size_t E, size_t M, typename WordType> class is_unsigned<normalized_float<E, M, WordType>>
 {
 public:
     static constexpr bool value = false;
 };
 
-template <size_t E, size_t M1, size_t M2>
-auto equal_except_rounding(const normalized_float<E, M1> lhs, const normalized_float<E, M2> rhs)
-    -> bool
+template <size_t E, size_t M1, size_t M2, typename WordType = uint64_t>
+auto equal_except_rounding(const normalized_float<E, M1, WordType> lhs,
+                           const normalized_float<E, M2, WordType> rhs) -> bool
 {
     if (lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent())
     {
@@ -236,7 +236,8 @@ auto equal_except_rounding(const normalized_float<E, M1> lhs, const normalized_f
     return false;
 }
 
-template <size_t E, size_t M> auto abs(const normalized_float<E, M> nf) -> normalized_float<E, M>
+template <size_t E, size_t M, typename WordType = uint64_t>
+auto abs(const normalized_float<E, M, WordType> nf) -> normalized_float<E, M, WordType>
 {
     auto absolute = nf;
     absolute.set_sign(0U);
@@ -244,8 +245,9 @@ template <size_t E, size_t M> auto abs(const normalized_float<E, M> nf) -> norma
     return absolute;
 }
 
-template <size_t M>
-auto rshift_and_round(const uinteger<M>& m, const size_t shift_by) -> uinteger<M>
+template <size_t M, typename WordType = uint64_t>
+auto rshift_and_round(const uinteger<M, WordType>& m, const size_t shift_by)
+    -> uinteger<M, WordType>
 {
     if (shift_by == 0)
     {
@@ -284,8 +286,8 @@ auto rshift_and_round(const uinteger<M>& m, const size_t shift_by) -> uinteger<M
     return add((m >> shift_by), uinteger<M>(round));
 }
 
-template <size_t E, size_t M1, size_t M2 = M1>
-auto normalize(const normalized_float<E, M1>& nf) -> normalized_float<E, M2>
+template <size_t E, size_t M1, size_t M2 = M1, typename WordType = uint64_t>
+auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<E, M2, WordType>
 {
     auto denormalized = nf;
 
@@ -296,14 +298,14 @@ auto normalize(const normalized_float<E, M1>& nf) -> normalized_float<E, M2>
 
     if (one_at == M1)
     {
-        exponent = uinteger<E>(0U);
+        exponent = uinteger<E, WordType>(0U);
         denormalized.set_sign(0);
     }
     else if (one_at >= M2)
     {
         auto shift_by = one_at + 1 - M2;
         mantissa = rshift_and_round(mantissa, shift_by);
-        exponent = add(exponent, uinteger<E>(shift_by));
+        exponent = add(exponent, uinteger<E, WordType>(shift_by));
     }
     else
     {
@@ -312,7 +314,7 @@ auto normalize(const normalized_float<E, M1>& nf) -> normalized_float<E, M2>
         exponent = sub(exponent, uinteger<E>(shift_by));
     }
 
-    normalized_float<E, M2> normalized_float;
+    normalized_float<E, M2, WordType> normalized_float;
 
     normalized_float.set_sign(denormalized.get_sign());
     normalized_float.set_exponent(exponent);
