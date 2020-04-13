@@ -170,6 +170,88 @@ template <typename I>[[nodiscard]] constexpr I mul(const I& a, const I& b)
     return width_cast<I::width()>(expanding_mul(a, b));
 }
 
+// TODO natürlich auch für signed integer zulassen
+
+/**
+ * @brief Exponentiation function
+ *
+ * @note This function does not make any attempts to be fast or to prevent overflows!
+ *
+ * @note If exponent equals std::numeric_limits<size_t>::max(), this method throws an exception,
+ * unless base equals zero
+ * @tparam W Bit width of the integer
+ * @param base
+ * @param exponent
+ * @return The base to the power of the exponent
+ */
+template <typename IntegerType> IntegerType pow(const IntegerType& base, const size_t exponent)
+{
+
+    if (exponent == std::numeric_limits<size_t>::max())
+    {
+        if (base.is_zero())
+        {
+            return IntegerType::zero();
+        }
+        else
+        {
+            throw std::runtime_error(
+                "Attempted exponentiation by std::numeric_limits<size_t>::max()");
+        }
+    }
+
+    IntegerType result = IntegerType::one();
+
+    for (size_t i = 0U; i <= exponent; ++i)
+    {
+        result = mul(result, base);
+    }
+    return result;
+}
+
+/**
+ *
+ * @brief Exponentiation function
+ *
+ * @note This function does not make any attempts to be fast or to prevent overflows!
+ *
+ * @note If exponent equals std::numeric_limits<IntegerType>::max(), this method throws an exception,
+ * unless base equals zero
+ *
+ * @tparam IntegerType The type of integer used in the computation
+ * @param base
+ * @param exponent
+ * @return The base to the power of the exponent
+ */
+template <typename IntegerType> IntegerType pow(const IntegerType& base, const IntegerType& exponent)
+{
+
+    static_assert(aarith::is_integral_v<IntegerType>, "Exponentiation is only supported for aarith integers");
+
+    if (exponent == IntegerType::max())
+    {
+        if (base == IntegerType::zero())
+        {
+            return IntegerType::zero();
+        }
+        else
+        {
+            throw std::runtime_error(
+                "Attempted exponentiation by std::numeric_limits<IntegerType<W>>::max()");
+        }
+    }
+
+    IntegerType result = IntegerType::one();
+    IntegerType iter = IntegerType::zero();
+    while (iter <= exponent)
+    {
+        result = mul(result, base);
+        iter = add(iter, IntegerType::one());
+    }
+
+    return result;
+}
+
 /**
  * @brief Multiplies two unsigned integers using the Karazuba algorithm expanding the bit width so
  * that the result fits.
