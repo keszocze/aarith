@@ -136,7 +136,7 @@ SCENARIO("Comparing two positive sintegers with different bit widths", "[uintege
         static constexpr uint16_t number_b = 23;
         constexpr integer<small> a{number_a};
         constexpr integer<small> a_neg{-number_a};
-        constexpr integer<big> b = integer<big>::from_words(number_b, 0U, 0U);
+        const integer<big> b = integer<big>::from_words(number_b, 0U, 0U);
 
         constexpr integer<big> c_neg{-number_b};
 
@@ -200,17 +200,33 @@ SCENARIO("Investigating the comparison of max and min values", "[integer][compar
         {
             integer<9> min = T::min();
             integer<9> max = T::max();
+
+            // TODO why is the copy assignment constructor not called?
+            integer<9> min_;
+            min_ = T::min();
+            integer<9> max_;
+            max_ = T::max();
+
             THEN("min should be negative")
             {
+                CHECK(min_.is_negative());
                 REQUIRE(min.is_negative());
             }
             AND_THEN("the values should match the values from the integers with the smaller width")
             {
+
+                CHECK(min == min_);
+                CHECK(max == max_);
+
+                CHECK(min_ == T::min());
+                CHECK(max_ == T::max());
+
                 CHECK(min == T::min());
                 REQUIRE(max == T::max());
             }
             AND_THEN("min should be smaller than max")
             {
+                CHECK(min_ < max);
                 REQUIRE(min < max);
             }
         }

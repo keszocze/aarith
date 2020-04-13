@@ -50,7 +50,8 @@ template <template <size_t> typename I, size_t W> void bench_aarith_int(std::str
     Integer a = std::numeric_limits<Integer>::min();
     count_type counter_a = std::numeric_limits<Integer>::min();
 
-    std::cout << counter_a << "\t" << std::numeric_limits<Integer>::min() << "/" << max_val << " " << (counter_a < max_val) << "\n";
+    std::cout << counter_a << "\t" << std::numeric_limits<Integer>::min() << "/" << max_val << " "
+              << (counter_a < max_val) << "\n";
 
     while (counter_a <= max_val)
     {
@@ -65,7 +66,6 @@ template <template <size_t> typename I, size_t W> void bench_aarith_int(std::str
             const I<W> prod = mul(a, b);
             const I<W> fun = add(mul(add(a, b), b), a);
 
-            //            std::cout << a << "\t" << b << "\n";
 
             counter_b = add(counter_b, I<W + 1>::one());
             b = add(b, Integer::one());
@@ -88,15 +88,15 @@ int main()
     using namespace std;
     using namespace aarith;
 
-    //    bench_int<int8_t>("int8");
-    //    bench_int<uint8_t>("uint8");
-    //    bench_int<int16_t>("int16");
-    //    bench_int<uint16_t>("uint16");
+    bench_int<int8_t>("int8");
+    bench_int<uint8_t>("uint8");
+    bench_int<int16_t>("int16");
+    bench_int<uint16_t>("uint16");
     //
     bench_aarith_int<integer, 8>("integer");
-        bench_aarith_int<uinteger, 8>("uinteger");
+    bench_aarith_int<uinteger, 8>("uinteger");
     bench_aarith_int<integer, 16>("integer");
-    //    bench_aarith_int<uinteger, 16>("uinteger");
+    bench_aarith_int<uinteger, 16>("uinteger");
 
     return 0;
 }
