@@ -15,7 +15,7 @@ namespace aarith {
  * @return Sum of a and b with bit width max(I::width,T::width)+1
  */
 template <typename I, typename T>
-[[nodiscard]] auto expanding_add(const I& a, const T& b, const bool initial_carry = false)
+[[nodiscard]] constexpr auto expanding_add(const I& a, const T& b, const bool initial_carry = false)
 {
 
     static_assert(is_integral_v<I>);
@@ -58,7 +58,7 @@ template <typename I, typename T>
  * @param b Subtrahend
  * @return Difference between a and b
  */
-template <typename I>[[nodiscard]] auto sub(const I& a, const I& b) -> I
+template <typename I>[[nodiscard]] constexpr auto sub(const I& a, const I& b) -> I
 {
     static_assert(is_integral_v<I>);
 
@@ -78,7 +78,7 @@ template <typename I>[[nodiscard]] auto sub(const I& a, const I& b) -> I
  * @param b Subtrahend
  * @return Difference of correct bit width
  */
-template <typename I, typename T>[[nodiscard]] auto expanding_sub(const I& a, const T& b)
+template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(const I& a, const T& b)
 {
 
     // TODO do we need this assertion?
@@ -99,7 +99,7 @@ template <typename I, typename T>[[nodiscard]] auto expanding_sub(const I& a, co
  * @param b Second summand
  * @return Sum of a and b
  */
-template <typename I>[[nodiscard]] I add(const I& a, const I& b)
+template <typename I>[[nodiscard]] I constexpr add(const I& a, const I& b)
 {
     constexpr size_t W = I::width();
     const auto result = expanding_add<I, I>(a, b);
@@ -120,15 +120,16 @@ template <typename I>[[nodiscard]] I add(const I& a, const I& b)
  * @return Product of a and b
  */
 template <std::size_t W, std::size_t V>
-[[nodiscard]] uinteger<W + V> expanding_mul(const uinteger<W>& a, const uinteger<V>& b)
+[[nodiscard]] constexpr uinteger<W + V> expanding_mul(const uinteger<W>& a, const uinteger<V>& b)
 {
 
     constexpr std::size_t res_width = W + V;
     uinteger<res_width> result{0U};
-    if constexpr (res_width <= 64)
+
+    if constexpr (res_width <= uinteger<W>::word_width())
     {
-        uint64_t result_uint64 = a.word(0) * b.word(0);
-        result.set_word(0, result_uint64);
+        auto result_uint = a.word(0) * b.word(0);
+        result.set_word(0, result_uint);
     }
     else
     {
@@ -164,9 +165,177 @@ template <std::size_t W, std::size_t V>
  * @param b Second multiplicant
  * @return Product of a and b
  */
-template <typename I>[[nodiscard]] I mul(const I& a, const I& b)
+template <typename I>[[nodiscard]] constexpr I mul(const I& a, const I& b)
 {
     return width_cast<I::width()>(expanding_mul(a, b));
+}
+
+// TODO natürlich auch für signed integer zulassen
+
+/**
+ * @brief Exponentiation function
+ *
+ * @note This function does not make any attempts to be fast or to prevent overflows!
+ *
+ * @note If exponent equals std::numeric_limits<size_t>::max(), this method throws an exception,
+ * unless base equals zero
+ * @tparam W Bit width of the integer
+ * @param base
+ * @param exponent
+ * @return The base to the power of the exponent
+ */
+template <typename IntegerType> IntegerType pow(const IntegerType& base, const size_t exponent)
+{
+
+    if (exponent == std::numeric_limits<size_t>::max())
+    {
+        if (base.is_zero())
+        {
+            return IntegerType::zero();
+        }
+        else
+        {
+            throw std::runtime_error(
+                "Attempted exponentiation by std::numeric_limits<size_t>::max()");
+        }
+    }
+
+    IntegerType result = IntegerType::one();
+
+    for (size_t i = 0U; i <= exponent; ++i)
+    {
+        result = mul(result, base);
+    }
+    return result;
+}
+
+/**
+ *
+ * @brief Exponentiation function
+ *
+ * @note This function does not make any attempts to be fast or to prevent overflows!
+ *
+ * @note If exponent equals std::numeric_limits<IntegerType>::max(), this method throws an exception,
+ * unless base equals zero
+ *
+ * @tparam IntegerType The type of integer used in the computation
+ * @param base
+ * @param exponent
+ * @return The base to the power of the exponent
+ */
+template <typename IntegerType> IntegerType pow(const IntegerType& base, const IntegerType& exponent)
+{
+
+    static_assert(aarith::is_integral_v<IntegerType>, "Exponentiation is only supported for aarith integers");
+
+    if (exponent == IntegerType::max())
+    {
+        if (base == IntegerType::zero())
+        {
+            return IntegerType::zero();
+        }
+        else
+        {
+            throw std::runtime_error(
+                "Attempted exponentiation by std::numeric_limits<IntegerType<W>>::max()");
+        }
+    }
+
+    IntegerType result = IntegerType::one();
+    IntegerType iter = IntegerType::zero();
+    while (iter <= exponent)
+    {
+        result = mul(result, base);
+        iter = add(iter, IntegerType::one());
+    }
+
+    return result;
+}
+
+/**
+ * @brief Multiplies two unsigned integers using the Karazuba algorithm expanding the bit width so
+ * that the result fits.
+ *
+ * This implements the karazuba multiplication algorithm (divide and conquer).
+ *
+ * @tparam W The bit width of the first multiplicant
+ * @tparam V The bit width of the second multiplicant
+ * @param a First multiplicant
+ * @param b Second multiplicant
+ * @return Product of a and b
+ */
+template <std::size_t W, std::size_t V>
+[[nodiscard]] uinteger<W + V> expanding_karazuba(const uinteger<W>& a, const uinteger<V>& b)
+{
+
+    constexpr std::size_t res_width = W + V;
+    if constexpr (res_width <= uinteger<W>::word_width())
+    {
+        auto result_uint = a.word(0) * b.word(0);
+        const uinteger<res_width> result(result_uint);
+        return result;
+    }
+    else if constexpr (W == V)
+    {
+        if (a.is_zero() || b.is_zero())
+        {
+            return uinteger<res_width>(0U);
+        }
+
+        // floor to the next value with power of 2
+        // std::log2 and std::floor  not constexpr and did not compile with clang
+        constexpr size_t floor_pow_two = floor_to_pow(W);
+
+        constexpr size_t karazuba_width =
+            (floor_pow_two == W) ? (floor_pow_two >> 1) : (floor_pow_two);
+
+        const auto a_split = split<karazuba_width - 1>(a);
+        const auto b_split = split<karazuba_width - 1>(b);
+
+        const auto ah = uinteger<W - karazuba_width>(a_split.first);
+        const auto al = uinteger<karazuba_width>(a_split.second);
+        const auto bh = uinteger<W - karazuba_width>(b_split.first);
+        const auto bl = uinteger<karazuba_width>(b_split.second);
+
+        const auto p1 = expanding_karazuba<W - karazuba_width, W - karazuba_width>(ah, bh);
+        const auto p2 = expanding_karazuba<karazuba_width, karazuba_width>(al, bl);
+        const auto s1 = expanding_add(ah, al);
+        const auto s2 = expanding_add(bh, bl);
+
+        // prevent infinite call loop
+        // TODO find a better way to do this
+        uinteger<2 * (karazuba_width + 1)> p3;
+        if (s1.bit(s1.width() - 1) == 1 || s2.bit(s2.width() - 1) == 1)
+        {
+            p3 = expanding_karazuba(s1, s2);
+        }
+        else
+        {
+            const auto ps1 = width_cast<karazuba_width>(s1);
+            const auto ps2 = width_cast<karazuba_width>(s2);
+            const auto p3t = expanding_karazuba(ps1, ps2);
+            p3 = p3t;
+        }
+
+        constexpr auto full_shift = 2 * karazuba_width;
+        const auto k1 = width_cast<res_width>(p1) << full_shift;
+        const auto k2 = width_cast<res_width>(expanding_sub(p3, expanding_add(p1, p2)))
+                        << karazuba_width;
+        const auto product = expanding_add(k1, expanding_add(k2, p2));
+
+        return width_cast<res_width>(product);
+    }
+    else
+    {
+        constexpr std::size_t max_width = std::max(W, V);
+
+        const auto a_ = width_cast<max_width>(a);
+        const auto b_ = width_cast<max_width>(b);
+
+        const auto res = expanding_karazuba(a_, b_);
+
+        return width_cast<res_width>(res);
+    }
 }
 
 /**
@@ -182,8 +351,7 @@ template <typename I>[[nodiscard]] I mul(const I& a, const I& b)
  *
  */
 template <std::size_t W, std::size_t V>
-[[nodiscard]] std::pair<uinteger<W>, uinteger<W>>
-
+[[nodiscard]] constexpr std::pair<uinteger<W>, uinteger<W>>
 restoring_division(const uinteger<W>& numerator, const uinteger<V>& denominator)
 {
     using UInteger = uinteger<W>;
@@ -249,7 +417,8 @@ restoring_division(const uinteger<W>& numerator, const uinteger<V>& denominator)
  * @param denominator The number that divides the other number
  * @return The remainder of the division operation
  */
-template <typename I>[[nodiscard]] auto remainder(const I& numerator, const I& denominator) -> I
+template <typename I>
+[[nodiscard]] constexpr auto remainder(const I& numerator, const I& denominator) -> I
 {
     return restoring_division(numerator, denominator).second;
 }
@@ -265,7 +434,7 @@ template <typename I>[[nodiscard]] auto remainder(const I& numerator, const I& d
  * @param denominator The number that divides the other number
  * @return The quotient of the division operation
  */
-template <typename I>[[nodiscard]] auto div(const I& numerator, const I& denominator) -> I
+template <typename I>[[nodiscard]] constexpr auto div(const I& numerator, const I& denominator) -> I
 {
     return restoring_division(numerator, denominator).first;
 }
@@ -285,7 +454,8 @@ template <typename I>[[nodiscard]] auto div(const I& numerator, const I& denomin
  * @return Sum of correct maximal bit width
  */
 template <class IntA, class IntB>
-[[nodiscard]] auto fun_add_expand(const IntA& a, const IntB& b, const bool initial_carry = false)
+[[nodiscard]] constexpr auto fun_add_expand(const IntA& a, const IntB& b,
+                                            const bool initial_carry = false)
 {
     static_assert(is_integral_v<IntA>);
     static_assert(is_integral_v<IntB>);
@@ -327,7 +497,7 @@ template <class IntA, class IntB>
  * @return Sum of a and b
  */
 template <typename I>
-[[nodiscard]] auto fun_add(const I& a, const I& b, const bool initial_carry = false) -> I
+[[nodiscard]] constexpr auto fun_add(const I& a, const I& b, const bool initial_carry = false) -> I
 {
     return width_cast<I::width()>(fun_add_expand(a, b, initial_carry));
 }
@@ -343,7 +513,7 @@ template <typename I>
  * @return The shifted integer
  */
 template <size_t Width>
-auto operator>>(const integer<Width>& lhs, const size_t rhs) -> integer<Width>
+auto constexpr operator>>(const integer<Width>& lhs, const size_t rhs) -> integer<Width>
 {
     if (rhs >= Width)
     {
@@ -372,10 +542,11 @@ auto operator>>(const integer<Width>& lhs, const size_t rhs) -> integer<Width>
     const auto shift_word_right = rhs - skip_words * lhs.word_width();
     const auto shift_word_left = lhs.word_width() - shift_word_right;
 
+    using word_type = typename integer<Width>::word_type;
+
     for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
     {
-        typename integer<Width>::word_type new_word;
-        new_word = lhs.word(counter) >> shift_word_right;
+        word_type new_word = lhs.word(counter) >> shift_word_right;
         if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
         {
             new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
@@ -383,8 +554,7 @@ auto operator>>(const integer<Width>& lhs, const size_t rhs) -> integer<Width>
 
         shifted.set_word(counter - skip_words, new_word);
     }
-    typename integer<Width>::word_type new_word;
-    new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
+    word_type new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
 
     shifted.set_word(lhs.word_count() - skip_words - 1, new_word);
 
@@ -414,7 +584,8 @@ auto operator>>(const integer<Width>& lhs, const size_t rhs) -> integer<Width>
  * @return Product of a and b
  */
 template <size_t W, size_t V>
-[[nodiscard]] auto expanding_mul(const integer<W>& m, const integer<V>& r) -> integer<V + W>
+[[nodiscard]] constexpr auto expanding_mul(const integer<W>& m, const integer<V>& r)
+    -> integer<V + W>
 {
 
     constexpr size_t K = W + V + 2;
@@ -458,7 +629,7 @@ template <size_t W, size_t V>
  * @param n The signed inter to be "absolute valued"
  * @return The absolute value of the signed integer
  */
-template <size_t Width>[[nodiscard]] auto abs(const integer<Width>& n) -> integer<Width>
+template <size_t Width>[[nodiscard]] constexpr auto abs(const integer<Width>& n) -> integer<Width>
 {
     return n.is_negative() ? -n : n;
 }
@@ -473,7 +644,8 @@ template <size_t Width>[[nodiscard]] auto abs(const integer<Width>& n) -> intege
  * @param n The signed inter to be "absolute valued"
  * @return The absolute value of the signed integer
  */
-template <size_t Width>[[nodiscard]] auto expanding_abs(const integer<Width>& n) -> uinteger<Width>
+template <size_t Width>
+[[nodiscard]] constexpr auto expanding_abs(const integer<Width>& n) -> uinteger<Width>
 {
     uinteger<Width> abs = n.is_negative() ? -n : n;
     return abs;
@@ -485,7 +657,7 @@ template <size_t Width>[[nodiscard]] auto expanding_abs(const integer<Width>& n)
  * @param n  The signed integer whose sign is to be changed
  * @return  The negative value of the signed integer
  */
-template <size_t W> auto operator-(const integer<W>& n) -> integer<W>
+template <size_t W> constexpr auto operator-(const integer<W>& n) -> integer<W>
 {
     const integer<W> one(1U);
     return add(~n, one);
@@ -507,8 +679,7 @@ template <size_t W> auto operator-(const integer<W>& n) -> integer<W>
  *
  */
 template <std::size_t W, std::size_t V>
-[[nodiscard]] std::pair<integer<W>, integer<W>>
-
+[[nodiscard]] constexpr std::pair<integer<W>, integer<W>>
 restoring_division(const integer<W>& numerator, const integer<V>& denominator)
 {
 
@@ -566,27 +737,27 @@ restoring_division(const integer<W>& numerator, const integer<V>& denominator)
  */
 namespace aarith::arithmetic_operators {
 
-template <typename I> auto operator+(const I& lhs, const I& rhs) -> I
+template <typename I> auto constexpr operator+(const I& lhs, const I& rhs) -> I
 {
     return add(lhs, rhs);
 }
 
-template <typename I> auto operator-(const I& lhs, const I& rhs) -> I
+template <typename I> auto constexpr operator-(const I& lhs, const I& rhs) -> I
 {
     return sub(lhs, rhs);
 }
 
-template <typename I> auto operator*(const I& lhs, const I& rhs) -> I
+template <typename I> auto constexpr operator*(const I& lhs, const I& rhs) -> I
 {
     return mul(lhs, rhs);
 }
 
-template <typename I> auto operator/(const I& lhs, const I& rhs) -> I
+template <typename I> auto constexpr operator/(const I& lhs, const I& rhs) -> I
 {
     return div(lhs, rhs);
 }
 
-template <typename I> auto operator%(const I& lhs, const I& rhs) -> I
+template <typename I> auto constexpr operator%(const I& lhs, const I& rhs) -> I
 {
     return remainder(lhs, rhs);
 }

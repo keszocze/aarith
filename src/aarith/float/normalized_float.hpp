@@ -17,14 +17,14 @@ public:
     static_assert(M > 0, "Mantissa width has to be greater zero.");
     static_assert(E > 1, "Exponent width has to be greater one.");
 
-    explicit normalized_float()
+    explicit constexpr normalized_float()
     {
         exponent = uinteger<E, WordType>(0U);
         mantissa = uinteger<M, WordType>(0U);
         sign_neg = false;
     }
 
-    template <class F> explicit normalized_float(F f)
+    template <class F> explicit constexpr normalized_float(F f)
     {
         static_assert(std::is_floating_point<F>::value,
                       "Only floating point numbers are supported");
@@ -96,12 +96,12 @@ public:
         return sub(shifted, one);
     }
 
-    auto get_sign() const -> unsigned int
+    constexpr auto get_sign() const -> unsigned int
     {
         return (sign_neg) ? 1U : 0U;
     }
 
-    void set_sign(unsigned int sign)
+    void constexpr set_sign(unsigned int sign)
     {
         sign_neg = (sign & 1U) > 0;
     }
