@@ -4,7 +4,7 @@
 
 namespace aarith {
 
-template <typename W>[[nodiscard]] auto operator&(const W& lhs, const W& rhs) -> W
+template <typename W>[[nodiscard]] constexpr auto operator&(const W& lhs, const W& rhs) -> W
 {
     static_assert(is_word_array_v<W>);
     W bitwise_and;
@@ -15,7 +15,7 @@ template <typename W>[[nodiscard]] auto operator&(const W& lhs, const W& rhs) ->
     return bitwise_and;
 }
 
-template <typename W> auto operator|(const W& lhs, const W& rhs) -> W
+template <typename W> auto constexpr operator|(const W& lhs, const W& rhs) -> W
 {
     static_assert(is_word_array_v<W>);
     W bitwise_or;
@@ -26,7 +26,7 @@ template <typename W> auto operator|(const W& lhs, const W& rhs) -> W
     return bitwise_or;
 }
 
-template <typename W> auto operator^(const W& lhs, const W& rhs) -> W
+template <typename W> constexpr auto operator^(const W& lhs, const W& rhs) -> W
 {
     static_assert(is_word_array_v<W>);
     W bitwise_xor;
@@ -37,7 +37,7 @@ template <typename W> auto operator^(const W& lhs, const W& rhs) -> W
     return bitwise_xor;
 }
 
-template <typename W>[[nodiscard]] auto operator~(const W& rhs) -> W
+template <typename W>[[nodiscard]] constexpr auto operator~(const W& rhs) -> W
 {
     static_assert(is_word_array_v<W>);
     W bitwise_not;
@@ -54,7 +54,8 @@ template <typename W>[[nodiscard]] auto operator~(const W& rhs) -> W
  * @param value The word to count the leading zeroes in
  * @return
  */
-template <size_t Width> auto count_leading_zeroes(const word_array<Width>& value) -> size_t
+template <size_t Width>
+constexpr auto count_leading_zeroes(const word_array<Width>& value) -> size_t
 {
     for (auto i = Width; i > 0; --i)
     {
@@ -67,13 +68,33 @@ template <size_t Width> auto count_leading_zeroes(const word_array<Width>& value
 }
 
 /**
+ * @brief Computes the position of the first set bit (i.e. a bit set to one) in the word_array from
+ * MSB to LSB
+ *
+ * @tparam Width Width of the word_array
+ * @param value The word_array whose first set bit should be found
+ * @return The index of the first set bit in value
+ */
+template <size_t Width> size_t first_set_bit(const word_array<Width>& value)
+{
+    size_t first_bit = 0UL;
+
+    // we have the operator bool checking whether (value >> first_bit) != 0
+    while (value >> first_bit)
+    {
+        ++first_bit;
+    }
+    return first_bit;
+}
+
+/**
  * @brief Left-shift operator
  * @tparam W The word_container type to work on
  * @param lhs The word_container to be shifted
  * @param rhs The number of bits to shift
  * @return The shifted word_container
  */
-template <typename W>[[nodiscard]] auto operator<<(const W& lhs, const size_t rhs) -> W
+template <typename W>[[nodiscard]] constexpr auto operator<<(const W& lhs, const size_t rhs) -> W
 {
     static_assert(is_word_array_v<W>);
 
@@ -92,12 +113,13 @@ template <typename W>[[nodiscard]] auto operator<<(const W& lhs, const size_t rh
     const auto shift_word_left = rhs - skip_words * lhs.word_width();
     const auto shift_word_right = lhs.word_width() - shift_word_left;
 
+    using word_type = typename W::word_type;
+
     for (auto counter = lhs.word_count(); counter > 0; --counter)
     {
         if (counter + skip_words < lhs.word_count())
         {
-            typename W::word_type new_word;
-            new_word = lhs.word(counter) << shift_word_left;
+            word_type new_word = lhs.word(counter) << shift_word_left;
             if (shift_word_right < lhs.word_width())
             {
                 new_word = new_word | (lhs.word(counter - 1) >> shift_word_right);
@@ -105,8 +127,7 @@ template <typename W>[[nodiscard]] auto operator<<(const W& lhs, const size_t rh
             shifted.set_word(counter + skip_words, new_word);
         }
     }
-    typename W::word_type new_word;
-    new_word = lhs.word(0) << shift_word_left;
+    word_type new_word = lhs.word(0) << shift_word_left;
     shifted.set_word(skip_words, new_word);
 
     return shifted;
@@ -119,7 +140,7 @@ template <typename W>[[nodiscard]] auto operator<<(const W& lhs, const size_t rh
  * @param rhs The number of bits to shift
  * @return The shifted word_array
  */
-template <typename W> auto operator>>(const W& lhs, const size_t rhs) -> W
+template <typename W> auto constexpr operator>>(const W& lhs, const size_t rhs) -> W
 {
 
     static_assert(is_word_array_v<W>);
@@ -149,18 +170,18 @@ template <typename W> auto operator>>(const W& lhs, const size_t rhs) -> W
     const auto shift_word_right = rhs - skip_words * lhs.word_width();
     const auto shift_word_left = lhs.word_width() - shift_word_right;
 
+    using word_type = typename W::word_type;
+
     for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
     {
-        typename W::word_type new_word;
-        new_word = lhs.word(counter) >> shift_word_right;
+        word_type new_word = lhs.word(counter) >> shift_word_right;
         if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
         {
             new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
         }
         shifted.set_word(counter - skip_words, new_word);
     }
-    typename W::word_type new_word;
-    new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
+    word_type new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
     shifted.set_word(lhs.word_count() - skip_words - 1, new_word);
 
     return shifted;
@@ -179,7 +200,8 @@ template <typename W> auto operator>>(const W& lhs, const size_t rhs) -> W
  * @param w  Word container from which the range is taken from
  * @return Range word[S,E], including the
  */
-template <size_t S, size_t E, size_t W> word_array<(S - E) + 1> bit_range(const word_array<W>& w)
+template <size_t S, size_t E, size_t W>
+[[nodiscard]] constexpr word_array<(S - E) + 1> bit_range(const word_array<W>& w)
 {
     static_assert(S < W, "Range must start within the word");
     static_assert(E <= S, "Range must be positive (i.e. this method will not reverse the word");
@@ -195,7 +217,8 @@ template <size_t S, size_t E, size_t W> word_array<(S - E) + 1> bit_range(const 
  * @return Pair of <word[W-1,S+1], word[S,0]>
  */
 template <size_t S, size_t W>
-std::pair<word_array<W - (S + 1)>, word_array<S + 1>> split(const word_array<W>& w)
+[[nodiscard]] constexpr std::pair<word_array<W - (S + 1)>, word_array<S + 1>>
+split(const word_array<W>& w)
 {
     static_assert(S < W - 1 && S >= 0);
 
@@ -214,7 +237,8 @@ std::pair<word_array<W - (S + 1)>, word_array<S + 1>> split(const word_array<W>&
  * @param f Function of type word_array<W>::word_type -> word_array<W>::word_type
  * @return A new word_array with the transformed words
  */
-template <class F, size_t W>[[nodiscard]] word_array<W> map(const word_array<W>& w, const F f)
+template <class F, size_t W>
+[[nodiscard]] constexpr word_array<W> map(const word_array<W>& w, const F f)
 {
 
     word_array<W> result;
@@ -241,8 +265,8 @@ template <class F, size_t W>[[nodiscard]] word_array<W> map(const word_array<W>&
  * @return The newly created, zipped word_array
  */
 template <class F, size_t W, size_t V>
-[[nodiscard]] word_array<std::min(W, V)> zip_with(const word_array<W>& w, const word_array<V>& v,
-                                                  F f)
+[[nodiscard]] constexpr word_array<std::min(W, V)> zip_with(const word_array<W>& w,
+                                                            const word_array<V>& v, F f)
 {
     constexpr size_t L = std::min(W, V);
     word_array<L> result;
@@ -275,7 +299,7 @@ template <class F, size_t W, size_t V>
  * @return The newly created, zipped word_array
  */
 template <class F, size_t W, size_t V>
-[[nodiscard]] word_array<std::min(W, V)>
+[[nodiscard]] constexpr word_array<std::min(W, V)>
 zip_with_state(const word_array<W>& w, const word_array<V>& v, const F f,
                const typename word_array<std::min(W, V)>::word_type initial_state =
                    typename word_array<std::min(W, V)>::word_type())
@@ -315,8 +339,8 @@ zip_with_state(const word_array<W>& w, const word_array<V>& v, const F f,
  * @return
  */
 template <class F, size_t W, size_t V>
-[[nodiscard]] word_array<std::max(W, V)> zip_with_expand(const word_array<W>& w,
-                                                         const word_array<V>& v, const F f)
+[[nodiscard]] constexpr word_array<std::max(W, V)>
+zip_with_expand(const word_array<W>& w, const word_array<V>& v, const F f)
 {
     constexpr size_t wc = word_array<W>::word_count();
     constexpr size_t vc = word_array<V>::word_count();
@@ -362,7 +386,7 @@ template <class F, size_t W, size_t V>
  * @return
  */
 template <class F, size_t W, size_t V>
-[[nodiscard]] word_array<std::max(W, V)>
+[[nodiscard]] constexpr word_array<std::max(W, V)>
 zip_with_state_expand(const word_array<W>& w, const word_array<V>& v, const F f,
                       const typename word_array<std::max(W, V)>::word_type initial_state =
                           typename word_array<std::max(W, V)>::word_type())
@@ -402,7 +426,7 @@ zip_with_state_expand(const word_array<W>& w, const word_array<V>& v, const F f,
  * @return The value from reducing the word_array using f and the given initial value
  */
 template <class R, class F, size_t W>
-[[nodiscard]] R reduce(const word_array<W>& w, const F f, const R initial_value)
+[[nodiscard]] R constexpr reduce(const word_array<W>& w, const F f, const R initial_value)
 {
     R result = initial_value;
 
@@ -429,8 +453,8 @@ template <class R, class F, size_t W>
  * @return The value from zipping and reducing the two word_arrays
  */
 template <class R, class F, size_t W, size_t V>
-[[nodiscard]] R zip_reduce(const word_array<W>& w, const word_array<V>& v, const F f,
-                           const R initial_value)
+[[nodiscard]] R constexpr zip_reduce(const word_array<W>& w, const word_array<V>& v, const F f,
+                                     const R initial_value)
 {
     R result = initial_value;
 

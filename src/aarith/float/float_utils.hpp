@@ -57,7 +57,7 @@ template <> struct bit_cast_to_type_trait<double>
  * @param num The number whose sign is extracted
  * @return The sign of the provided number
  */
-template <class F> uint8_t extract_sign(F num)
+template <class F> constexpr uint8_t extract_sign(F num)
 {
 
     static_assert(std::is_same_v<F, float> || std::is_same_v<F, double>);
@@ -73,7 +73,7 @@ template <class F> uint8_t extract_sign(F num)
     return static_cast<uint8_t>(sign);
 }
 
-template <class F> inline auto extract_exponent(F num) -> unsigned int
+template <class F> inline constexpr auto extract_exponent(F num) -> unsigned int
 {
     constexpr auto exponent_width = get_exponent_width<F>();
     constexpr auto mantissa_width = get_mantissa_width<F>();
@@ -88,7 +88,7 @@ template <class F> inline auto extract_exponent(F num) -> unsigned int
 }
 
 template <class F>
-inline auto extract_mantissa(F num) ->
+inline constexpr auto extract_mantissa(F num) ->
     typename float_extraction_helper::bit_cast_to_type_trait<F>::type
 {
     constexpr auto mantissa_width = get_mantissa_width<F>();

@@ -13,7 +13,7 @@ namespace aarith {
  *
  * @note Two numbers can be equal even though they have different bit widths!
  */
-template <size_t W, size_t V> bool operator==(const uinteger<W>& a, const uinteger<V>& b)
+template <size_t W, size_t V> bool constexpr operator==(const uinteger<W>& a, const uinteger<V>& b)
 {
 
     // TODO remove when clang implements the stuff as constexpr
@@ -57,7 +57,7 @@ template <size_t W, size_t V> bool operator==(const uinteger<W>& a, const uinteg
     return true;
 }
 
-template <size_t W, size_t V> bool operator<(const uinteger<W>& a, const uinteger<V>& b)
+template <size_t W, size_t V> constexpr bool operator<(const uinteger<W>& a, const uinteger<V>& b)
 {
 
     const auto min_count = std::min(a.word_count(), b.word_count());
@@ -103,25 +103,25 @@ template <size_t W, size_t V> bool operator<(const uinteger<W>& a, const uintege
     return false;
 }
 
-template <typename W, typename V> bool operator<=(const W& a, const V& b)
+template <typename W, typename V> constexpr bool operator<=(const W& a, const V& b)
 {
     static_assert(same_sign<W, V>);
     return (a < b) || (a == b);
 }
 
-template <typename W, typename V> bool operator>=(const W& a, const V& b)
+template <typename W, typename V> constexpr bool operator>=(const W& a, const V& b)
 {
     static_assert(same_sign<W, V>);
     return b <= a;
 }
 
-template <typename W, typename V> bool operator>(const W& a, const V& b)
+template <typename W, typename V> constexpr bool operator>(const W& a, const V& b)
 {
     static_assert(same_sign<W, V>);
     return b < a;
 }
 
-template <size_t W, size_t V> bool operator==(const integer<W>& a, const integer<V>& b)
+template <size_t W, size_t V> constexpr bool operator==(const integer<W>& a, const integer<V>& b)
 {
     // TODO remove when clang implements the stuff as constexpr
 #ifndef __clang__
@@ -225,7 +225,7 @@ template <size_t W, size_t V> bool operator==(const integer<W>& a, const integer
     return true;
 }
 
-template <size_t W, size_t V> bool operator<(const integer<W>& a, const integer<V>& b)
+template <size_t W, size_t V> constexpr bool operator<(const integer<W>& a, const integer<V>& b)
 {
 
     using word_type = typename integer<W>::word_type;
