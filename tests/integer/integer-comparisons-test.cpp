@@ -192,8 +192,10 @@ SCENARIO("Determining strict (in)equality")
                     T b{i};
 
                     const bool strictly_equal = strict_eq(a, b);
+                    const bool strictly_unequal = strict_not_eq(a, b);
 
                     REQUIRE(strictly_equal);
+                    REQUIRE_FALSE(strictly_unequal);
                 }
             }
         }
@@ -207,8 +209,10 @@ SCENARIO("Determining strict (in)equality")
                     I b{i};
 
                     const bool strictly_equal = strict_eq(a, b);
+                    const bool strictly_unequal = strict_not_eq(a, b);
 
                     REQUIRE_FALSE(strictly_equal);
+                    REQUIRE(strictly_unequal);
                 }
             }
         }
@@ -230,7 +234,9 @@ SCENARIO("Determining strict (in)equality")
                     T b{i};
 
                     const bool strictly_equal = strict_eq(a, b);
+                    const bool strictly_unequal = strict_not_eq(a, b);
 
+                    REQUIRE_FALSE(strictly_unequal);
                     REQUIRE(strictly_equal);
                 }
             }
@@ -245,9 +251,36 @@ SCENARIO("Determining strict (in)equality")
                     I b{i};
 
                     const bool strictly_equal = strict_eq(a, b);
+                    const bool strictly_unequal = strict_not_eq(a, b);
 
                     REQUIRE_FALSE(strictly_equal);
+                    REQUIRE(strictly_unequal);
                 }
+            }
+        }
+        WHEN("Trying to use the comparisons in a constexpr context")
+        {
+            THEN("It should compile for unsigned integers")
+            {
+                constexpr uinteger<8> a = uinteger<8>::one();
+                constexpr uinteger<9> b = uinteger<9>::one();
+
+                constexpr bool strictly_equal = strict_eq(a, b);
+                constexpr bool strictly_unequal = strict_not_eq(a, b);
+
+                REQUIRE_FALSE(strictly_equal);
+                REQUIRE(strictly_unequal);
+            }
+            AND_THEN("It should compile for unsigned integers")
+            {
+                constexpr integer<8> a = integer<8>::one();
+                constexpr integer<9> b = integer<9>::one();
+
+                constexpr bool strictly_equal = strict_eq(a, b);
+                constexpr bool strictly_unequal = strict_not_eq(a, b);
+
+                REQUIRE_FALSE(strictly_equal);
+                REQUIRE(strictly_unequal);
             }
         }
     }
