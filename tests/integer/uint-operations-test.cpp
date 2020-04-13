@@ -14,10 +14,10 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
         {
             static constexpr uint8_t number_a = 32;
             static constexpr uint8_t number_b = 16;
-            const uinteger<TestWidth> a{number_a};
-            const uinteger<TestWidth> b{number_b};
-            const uinteger<TestWidth> result = add(a, b);
-            auto const result_fun = fun_add(a, b);
+            constexpr uinteger<TestWidth> a{number_a};
+            constexpr uinteger<TestWidth> b{number_b};
+            constexpr uinteger<TestWidth> result = add(a, b);
+            auto constexpr result_fun = fun_add(a, b);
 
             THEN("It should be the correct sum")
             {
@@ -29,10 +29,10 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
         {
             static constexpr uint16_t number_a = (1U << TestWidth) - 1U;
             static constexpr uint16_t number_b = 1;
-            const uinteger<TestWidth> a{number_a};
-            const uinteger<TestWidth> b{number_b};
-            auto const result = add(a, b);
-            auto const result_fun = fun_add(a, b);
+            constexpr uinteger<TestWidth> a{number_a};
+            constexpr uinteger<TestWidth> b{number_b};
+            auto constexpr result = add(a, b);
+            auto constexpr result_fun = fun_add(a, b);
 
             THEN("It should be the masked to fit")
             {
@@ -51,10 +51,10 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
         {
             static constexpr uint64_t number_a = 1ULL << 63U;
             static constexpr uint64_t number_b = 1ULL << 63U;
-            const uinteger<TestWidth> a{number_a};
-            const uinteger<TestWidth> b{number_b};
-            auto const result = add(a, b);
-            auto const result_fun = fun_add(a, b);
+            constexpr uinteger<TestWidth> a{number_a};
+            constexpr uinteger<TestWidth> b{number_b};
+            auto constexpr result = add(a, b);
+            auto constexpr result_fun = fun_add(a, b);
 
             THEN("It is added to the next word")
             {
@@ -67,10 +67,10 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
         {
             static constexpr uint64_t number_a = 1ULL << 63U;
             static constexpr uint64_t number_b = 0;
-            const uinteger<TestWidth> a{number_a};
-            const uinteger<TestWidth> b{number_b};
-            auto const result = add(a, b);
-            auto const result_fun = fun_add(a, b);
+            constexpr uinteger<TestWidth> a{number_a};
+            constexpr uinteger<TestWidth> b{number_b};
+            auto constexpr result = add(a, b);
+            auto constexpr result_fun = fun_add(a, b);
 
             THEN("The next word is unchanged")
             {
@@ -87,11 +87,11 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
 
         WHEN("There should be a carry into the third word")
         {
-            const auto a = uint::from_words(0, 0xffffffffffffffff, 0xffffffffffffffff);
-            const auto b = a;
-            auto const result = add(a, b);
-            auto const result_fun = fun_add(a, b);
-            const auto ref = uint::from_words(1, 0xffffffffffffffff, 0xfffffffffffffffe);
+            constexpr auto a = uint::from_words(0, 0xffffffffffffffff, 0xffffffffffffffff);
+            constexpr auto b = a;
+            auto constexpr result = add(a, b);
+            auto constexpr result_fun = fun_add(a, b);
+            constexpr auto ref = uint::from_words(1, 0xffffffffffffffff, 0xfffffffffffffffe);
 
             THEN("There is a carry in the third word")
             {
@@ -102,17 +102,58 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
 
         WHEN("There should be no carry into the third word")
         {
-            const auto a = uint::from_words(0, 0xfffffffffffffffe, 0xffffffffffffffff);
-            const auto b = uint(1U);
-            auto const result = add(a, b);
-            const auto ref = uint::from_words(0, 0xffffffffffffffff, 0);
-            auto const result_fun = fun_add(a, b);
+            constexpr auto a = uint::from_words(0, 0xfffffffffffffffe, 0xffffffffffffffff);
+            constexpr auto b = uint(1U);
+            auto constexpr result = add(a, b);
+            constexpr auto ref = uint::from_words(0, 0xffffffffffffffff, 0);
+            auto constexpr result_fun = fun_add(a, b);
 
             THEN("There is no carry in the third word")
             {
                 CHECK(result_fun == result);
                 REQUIRE(result == ref);
             }
+        }
+    }
+}
+
+SCENARIO("Bit shifting is possible as constexpr for unsigned integers")
+{
+    GIVEN("An unsigned integer of width N")
+    {
+        THEN("Right-shifting should be a constexpr operation")
+        {
+            constexpr size_t W = 32;
+            constexpr uinteger<W> num{4};
+
+            constexpr uinteger<W> shift1{2};
+            constexpr uinteger<W> shift2{1};
+            constexpr uinteger<W> shift3{0};
+
+            constexpr uinteger<W> shifted1 = (num >> 1);
+            constexpr uinteger<W> shifted2 = (num >> 2);
+            constexpr uinteger<W> shifted3 = (num >> 3);
+
+            REQUIRE(shift1 == shifted1);
+            REQUIRE(shift2 == shifted2);
+            REQUIRE(shift3 == shifted3);
+        }
+        THEN("Left-shifting should be a constexpr operation")
+        {
+            constexpr size_t W = 32;
+            constexpr uinteger<W> num{4};
+
+            constexpr uinteger<W> shift1{8};
+            constexpr uinteger<W> shift2{16};
+            constexpr uinteger<W> shift3{32};
+
+            constexpr uinteger<W> shifted1 = (num << 1);
+            constexpr uinteger<W> shifted2 = (num << 2);
+            constexpr uinteger<W> shifted3 = (num << 3);
+
+            REQUIRE(shift1 == shifted1);
+            REQUIRE(shift2 == shifted2);
+            REQUIRE(shift3 == shifted3);
         }
     }
 }
@@ -152,14 +193,14 @@ SCENARIO("Adding tow uintgers of different bit width", "[uinteger][arithmetic][a
     GIVEN("An uinteger consisting of zeros only")
     {
         static constexpr uint64_t ones = static_cast<uint64_t>(-1);
-        static const uinteger<128> large = uinteger<128>::from_words(ones, ones);
+        static constexpr uinteger<128> large = uinteger<128>::from_words(ones, ones);
 
         THEN("Adding a one with few bits should create a correct overflow")
         {
 
-            static const uinteger<32> one{1U};
+            static constexpr uinteger<32> one{1U};
 
-            const uinteger<129> result = expanding_add(large, one);
+            constexpr uinteger<129> result = expanding_add(large, one);
             const auto result_fun = fun_add_expand(large, one);
             CHECK(result_fun == result);
             CHECK(result.word(2) == 1U);
@@ -177,10 +218,10 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
         {
             AND_WHEN("a >= b")
             {
-                const uinteger<32> a{15u};
-                const uinteger<32> b{7u};
-                const uinteger<32> expected{static_cast<uint32_t>(15 - 7)};
-                auto const result = sub(a, b);
+                constexpr uinteger<32> a{15u};
+                constexpr uinteger<32> b{7u};
+                constexpr uinteger<32> expected{static_cast<uint32_t>(15 - 7)};
+                auto constexpr result = sub(a, b);
 
                 THEN("The result is a - b")
                 {
@@ -189,10 +230,10 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
             }
             AND_WHEN("a < b")
             {
-                const uinteger<32> a{7u};
-                const uinteger<32> b{15u};
-                const uinteger<32> expected{static_cast<uint32_t>(7 - 15)};
-                auto const result = sub(a, b);
+                constexpr uinteger<32> a{7u};
+                constexpr uinteger<32> b{15u};
+                constexpr uinteger<32> expected{static_cast<uint32_t>(7 - 15)};
+                auto constexpr result = sub(a, b);
 
                 THEN("The result wraps around")
                 {
@@ -206,11 +247,11 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
             {
                 uinteger<150> a;
 
-                const uinteger<150> b{0u};
+                constexpr uinteger<150> b{0u};
                 for (const unsigned a_num : {0u, 23u, 1337u})
                 {
                     a = uinteger<150>{a_num};
-                    uinteger<150> result = sub(a, b);
+                    const uinteger<150> result = sub(a, b);
                     REQUIRE(result == a);
                 }
             }
@@ -221,15 +262,16 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
             {
                 THEN("The new borrow must be set as well")
                 {
-                    const uint64_t all_ones = static_cast<uint64_t>(-1);
-                    const uint64_t zero = 0u;
-                    const uint64_t one = 1u;
+                    constexpr uint64_t all_ones = static_cast<uint64_t>(-1);
+                    constexpr uint64_t zero = 0u;
+                    constexpr uint64_t one = 1u;
 
-                    const uinteger<192> a = uinteger<192>::from_words(one, zero, zero);
-                    const uinteger<192> b = uinteger<192>::from_words(zero, all_ones, one);
+                    constexpr uinteger<192> a = uinteger<192>::from_words(one, zero, zero);
+                    constexpr uinteger<192> b = uinteger<192>::from_words(zero, all_ones, one);
 
-                    const uinteger<192> result = sub(a, b);
-                    const uinteger<192> expected = uinteger<192>::from_words(zero, zero, all_ones);
+                    constexpr uinteger<192> result = sub(a, b);
+                    constexpr uinteger<192> expected =
+                        uinteger<192>::from_words(zero, zero, all_ones);
 
                     REQUIRE(expected == result);
                 }
@@ -242,11 +284,11 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
             {
                 using uint = uinteger<129>;
 
-                uint opd1 = ~uint(0U);
-                uint one = uint(1U);
+                constexpr uint opd1 = ~uint(0U);
+                constexpr uint one = uint(1U);
 
-                auto res = sub(opd1, one);
-                auto ref = uint::from_words(0x1, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFE);
+                constexpr auto res = sub(opd1, one);
+                constexpr auto ref = uint::from_words(0x1, 0xFFFFFFFFFFFFFFFF, 0xFFFFFFFFFFFFFFFE);
 
                 REQUIRE(res == ref);
             }
@@ -259,10 +301,10 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
         {
             AND_WHEN("There is a borrow between words")
             {
-                auto const a = uinteger<128>::from_words(1, 0);
-                auto const b = uinteger<128>::from_words(0, 1);
-                auto const expected = uinteger<128>::from_words(0, static_cast<uint64_t>(-1));
-                auto const result = sub(a, b);
+                auto constexpr a = uinteger<128>::from_words(1, 0);
+                auto constexpr b = uinteger<128>::from_words(0, 1);
+                auto constexpr expected = uinteger<128>::from_words(0, static_cast<uint64_t>(-1));
+                auto constexpr result = sub(a, b);
 
                 THEN("The result borrow is subtracted from the next word")
                 {
@@ -271,10 +313,10 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
             }
             AND_WHEN("There is no borrow between words")
             {
-                auto const a = uinteger<128>::from_words(1, 1);
-                auto const b = uinteger<128>::from_words(0, 1);
-                auto const expected = uinteger<128>::from_words(1, 0);
-                auto const result = sub(a, b);
+                auto constexpr a = uinteger<128>::from_words(1, 1);
+                auto constexpr b = uinteger<128>::from_words(0, 1);
+                auto constexpr expected = uinteger<128>::from_words(1, 0);
+                auto constexpr result = sub(a, b);
 
                 THEN("No borrow is subtracted from the next word")
                 {
@@ -289,27 +331,27 @@ SCENARIO("Expanding subtraction works correctly", "[uinteger][arithmetic]")
 {
     GIVEN("A n-bit zero and a m-bit (m>n)  max")
     {
-        static const uinteger<4> zero = uinteger<4>::min();
-        static const uinteger<8> large = uinteger<8>::max();
-        static const uinteger<8> expected = uinteger<8>{1U};
+        static constexpr uinteger<4> zero = uinteger<4>::min();
+        static constexpr uinteger<8> large = uinteger<8>::max();
+        static constexpr uinteger<8> expected = uinteger<8>{1U};
 
         THEN("Subtracting max from zero should give one")
         {
-            auto const result = expanding_sub(zero, large);
+            auto constexpr result = expanding_sub(zero, large);
             REQUIRE(result == expected);
         }
     }
 
     GIVEN("A n-bit zero and a m-bit (m<n) max")
     {
-        static const uinteger<8> zero = uinteger<8>::min();
-        static const uinteger<4> large = uinteger<4>::max();
-        static const uinteger<8> expected =
+        static constexpr uinteger<8> zero = uinteger<8>::min();
+        static constexpr uinteger<4> large = uinteger<4>::max();
+        static constexpr uinteger<8> expected =
             sub(uinteger<8>{1U}, add(uinteger<8>{uinteger<4>::max()}, uinteger<8>{1U}));
 
         THEN("Subtracting max from zero should give 1-(small::max+1)")
         {
-            auto const result = expanding_sub(zero, large);
+            auto constexpr result = expanding_sub(zero, large);
             REQUIRE(result == expected);
         }
     }
@@ -320,8 +362,8 @@ SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
     GIVEN("The maximal and minimal values of uinteger<V>")
     {
 
-        static const uinteger<89> min = uinteger<89>::min();
-        static const uinteger<89> max = uinteger<89>::max();
+        static constexpr uinteger<89> min = uinteger<89>::min();
+        static constexpr uinteger<89> max = uinteger<89>::max();
 
         THEN("Bit-wise complement should yield the other one")
         {
@@ -375,7 +417,7 @@ SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
 
         THEN("Adding or subtracting min should not change the other value")
         {
-            static const uinteger<89> n{23543785U}; // randomly chosen
+            static constexpr uinteger<89> n{23543785U}; // randomly chosen
 
             CHECK(add(max, min) == max);
             CHECK(fun_add(max, min) == max);
@@ -389,8 +431,8 @@ SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
         AND_GIVEN("The uintegers zero and one")
         {
 
-            static const uinteger<89> zero = uinteger<89>::zero();
-            static const uinteger<89> one = uinteger<89>::one();
+            static constexpr uinteger<89> zero = uinteger<89>::zero();
+            static constexpr uinteger<89> one = uinteger<89>::one();
 
             THEN("min and zero should be identical")
             {
@@ -402,9 +444,9 @@ SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
 
                 // completely randomly chosen bit width
 
-                static const uinteger<89> result_zero = sub(zero, one);
-                static const uinteger<89> result_min = sub(min, one);
-                static const uinteger<89> expected = uinteger<89>::max();
+                static constexpr uinteger<89> result_zero = sub(zero, one);
+                static constexpr uinteger<89> result_min = sub(min, one);
+                static constexpr uinteger<89> expected = uinteger<89>::max();
 
                 CHECK(result_min == expected);
                 REQUIRE(result_zero == expected);
@@ -452,15 +494,14 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplica
 
     GIVEN("Two uinteger<N> a and b to be multiplied")
     {
-        uint64_t val = 1;
-        val = val << 35U;
-        auto const a = uinteger<128>::from_words(1, val);
-        auto const c = uinteger<128>::from_words(13435, 345897);
-        auto const d =
+        constexpr uint64_t val = (1UL << 35UL);
+        auto constexpr a = uinteger<128>::from_words(1, val);
+        auto constexpr c = uinteger<128>::from_words(13435, 345897);
+        auto constexpr d =
             uinteger<128>::from_words(static_cast<typename uinteger<128>::word_type>(-1),
                                       static_cast<typename uinteger<128>::word_type>(-1));
-        auto const zero = uinteger<128>::from_words(0, 0);
-        auto const one = uinteger<128>::from_words(0, 1);
+        auto constexpr zero = uinteger<128>::from_words(0, 0);
+        auto constexpr one = uinteger<128>::from_words(0, 1);
 
         const std::vector<uinteger<128>> numbers{a, c, d, one, zero};
 
@@ -813,10 +854,10 @@ SCENARIO("Bit and Word operations work correctly", "[uinteger][utility]")
     {
         THEN("All words should be correctly masked")
         {
-            const uint64_t ones = static_cast<uint64_t>(-1);
+            constexpr uint64_t ones = static_cast<uint64_t>(-1);
             uint64_t pos = 1;
             constexpr size_t width = 15;
-            auto const a = uinteger<width>::from_words(ones);
+            auto constexpr a = uinteger<width>::from_words(ones);
 
             for (auto i = 0U; i < a.word_width(); i++)
             {
@@ -841,8 +882,8 @@ SCENARIO("Bit and Word operations work correctly", "[uinteger][utility]")
         {
             THEN("The resulting uinteger<N>'s should be identical")
             {
-                const uint64_t ones = static_cast<uint64_t>(-1);
-                auto const a = uinteger<15>::from_words(ones);
+                constexpr uint64_t ones = static_cast<uint64_t>(-1);
+                auto constexpr a = uinteger<15>::from_words(ones);
                 uinteger<15> b;
                 b.set_word(0, ones);
 
@@ -874,20 +915,20 @@ SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic]")
 
         THEN("Division by zero should throw an exception")
         {
-            const uinteger<32> zero{0U};
+            constexpr uinteger<32> zero{0U};
             CHECK_THROWS_AS(div(b, zero), std::runtime_error);
             CHECK_THROWS_AS(div(a, zero), std::runtime_error);
         }
 
         THEN("Division by 1 should not change the other numerator")
         {
-            const uinteger<32> one{1U};
+            constexpr uinteger<32> one{1U};
             CHECK(div(a, one) == a);
             CHECK(div(b, one) == b);
         }
         THEN("Divison of 0 should result in 0")
         {
-            const uinteger<32> zero{0U};
+            constexpr uinteger<32> zero{0U};
 
             CHECK(div(zero, a) == zero);
             CHECK(div(zero, b) == zero);
@@ -900,7 +941,7 @@ SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic]")
             uint64_t int_res = a_large / b_large;
 
             uint32_t small_res = static_cast<uint32_t>(int_res);
-            uinteger<32> result = div(a, b);
+            const uinteger<32> result = div(a, b);
             CHECK(small_res == result.word(0));
         }
     }
@@ -910,14 +951,14 @@ SCENARIO("Computing the remainder of two uintegers works as expected", "[uintege
 {
     GIVEN("A fixed test case a=56567 and b=234")
     {
-        const uint32_t val_a = 56567;
-        const uint32_t val_b = 234;
+        constexpr uint32_t val_a = 56567;
+        constexpr uint32_t val_b = 234;
 
-        const uinteger<32> a{val_a};
-        const uinteger<32> b{val_b};
+        constexpr uinteger<32> a{val_a};
+        constexpr uinteger<32> b{val_b};
 
-        const uinteger<32> d = div(a, b);
-        const uinteger<32> m = remainder(a, b);
+        constexpr uinteger<32> d = div(a, b);
+        constexpr uinteger<32> m = remainder(a, b);
 
         const uint32_t int_div = val_a / val_b;
         const uint32_t int_mod = val_a % val_b;

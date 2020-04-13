@@ -226,14 +226,14 @@ auto approx_uint_bitmasking_mul(const uinteger<width>& opd1, const uinteger<widt
  * @return Aproximated addition of a and b
  */
 template <size_t W, size_t V>
-[[nodiscard]] uinteger<std::max(W, V)> trivial_approx_add(const uinteger<W>& a,
-                                                          const uinteger<V>& b)
+[[nodiscard]] uinteger<std::max(W, V)> trivial_approx_add(const uinteger<W> a, const uinteger<V> b)
 {
 
-    const auto word_adder = [](const typename uinteger<W>::word_type a_,
-                               const typename uinteger<V>::word_type b_) { return a_ + b_; };
+    constexpr auto word_adder = [](const typename uinteger<W>::word_type a_,
+                                   const typename uinteger<V>::word_type b_) { return a_ + b_; };
 
-    uinteger<std::max(W, V)> result = zip_with_expand<decltype(word_adder), W, V>(a, b, word_adder);
+    const uinteger<std::max(W, V)> result =
+        zip_with_expand<decltype(word_adder), W, V>(a, b, word_adder);
 
     return result;
 }
