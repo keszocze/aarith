@@ -57,6 +57,61 @@ template <size_t W, size_t V> bool constexpr operator==(const uinteger<W>& a, co
     return true;
 }
 
+/**
+ * @brief Strictly tests to aarith integers for equality
+ *
+ * This method does not only check the stored value but also tests whether the bit-widths are
+ * identical. If only a semantic comparison is to be performed, use {@see operator==} instead. If
+ * the bit widths of the operands do not match, the result is immediately determined to be false.
+ *
+ * @tparam Integer Integer type
+ * @tparam W Bitwidth of the first integer
+ * @tparam V Bitwidth of the second integer
+ * @param a First integer to compare
+ * @param b Second integer to compare
+ * @return Whether the two integers are strictly equal
+ */
+template <template <size_t> class Integer, size_t W, size_t V>
+constexpr bool strict_eq(const Integer<W>& a, const Integer<V>& b)
+{
+    // we only want to work on our own types...
+    static_assert(::aarith::is_integral_v<Integer<W>>);
+
+    if constexpr (W != V)
+    {
+        return false;
+    }
+    return a == b;
+}
+
+/**
+ * @brief Strictly compares to aarith integers for inequality
+ *
+ * This method does not only check the stored value but also tests whether the bit-widths are
+ * identical. If only a semantic comparison is to be performed, use {@see operator!=} instead. If
+ * the bit widths of the operands do not match, the result is immediately determined to be true.
+ *
+ * @tparam Integer Integer type
+ * @tparam W Bitwidth of the first integer
+ * @tparam V Bitwidth of the second integer
+ * @param a First integer to compare
+ * @param b Second integer to compare
+ * @return Whether the two integers are strictly equal
+ */
+template <template <size_t> class Integer, size_t W, size_t V>
+constexpr bool strict_not_eq(const Integer<W>& a, const Integer<V>& b)
+{
+    // we only want to work on our own types...
+    static_assert(::aarith::is_integral_v<Integer<W>>);
+
+    if constexpr (W != V)
+    {
+        return true;
+    }
+
+    return !(a == b);
+}
+
 template <size_t W, size_t V> constexpr bool operator<(const uinteger<W>& a, const uinteger<V>& b)
 {
 
