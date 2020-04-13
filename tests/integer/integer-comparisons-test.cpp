@@ -172,3 +172,83 @@ SCENARIO("Comparing two positive sintegers with different bit widths", "[uintege
         }
     }
 }
+
+SCENARIO("Determining strict (in)equality")
+{
+    GIVEN("Two  integers storing the same value")
+    {
+
+        using T = integer<8>;
+        using I = integer<9>;
+
+        WHEN("The bit widths are identical")
+        {
+
+            THEN("They should be strictly equal")
+            {
+                for (int i = -10; i < 11; ++i)
+                {
+                    T a{i};
+                    T b{i};
+
+                    const bool strictly_equal = strict_eq(a, b);
+
+                    REQUIRE(strictly_equal);
+                }
+            }
+        }
+        WHEN("The bit widths are not identical")
+        {
+            THEN("They should not be strictly equal")
+            {
+                for (int i = -10; i < 11; ++i)
+                {
+                    T a{i};
+                    I b{i};
+
+                    const bool strictly_equal = strict_eq(a, b);
+
+                    REQUIRE_FALSE(strictly_equal);
+                }
+            }
+        }
+    }
+
+    GIVEN("Two unsigned integers storing the same value")
+    {
+        using T = uinteger<8>;
+        using I = uinteger<9>;
+
+        WHEN("The bit widths are identical")
+        {
+
+            THEN("They should be strictly equal")
+            {
+                for (size_t i = 0; i < 23; ++i)
+                {
+                    T a{i};
+                    T b{i};
+
+                    const bool strictly_equal = strict_eq(a, b);
+
+                    REQUIRE(strictly_equal);
+                }
+            }
+        }
+        WHEN("The bit widths are not identical")
+        {
+            THEN("They should not be strictly equal")
+            {
+                for (size_t i = 0; i < 23; ++i)
+                {
+                    T a{i};
+                    I b{i};
+
+                    const bool strictly_equal = strict_eq(a, b);
+
+                    REQUIRE_FALSE(strictly_equal);
+                }
+            }
+        }
+    }
+}
