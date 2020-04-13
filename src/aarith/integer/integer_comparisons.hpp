@@ -71,11 +71,11 @@ template <size_t W, size_t V> bool constexpr operator==(const uinteger<W>& a, co
  * @param b Second integer to compare
  * @return Whether the two integers are strictly equal
  */
-template <template <size_t> class Integer, size_t W, size_t V>
-constexpr bool strict_eq(const Integer<W>& a, const Integer<V>& b)
+template <template <size_t, typename> class Integer, size_t W, size_t V, typename WordType>
+constexpr bool strict_eq(const Integer<W, WordType>& a, const Integer<V, WordType>& b)
 {
     // we only want to work on our own types...
-    static_assert(::aarith::is_integral_v<Integer<W>>);
+    static_assert(::aarith::is_integral_v<Integer<W, WordType>>);
 
     if constexpr (W != V)
     {
@@ -98,11 +98,11 @@ constexpr bool strict_eq(const Integer<W>& a, const Integer<V>& b)
  * @param b Second integer to compare
  * @return Whether the two integers are strictly equal
  */
-template <template <size_t> class Integer, size_t W, size_t V>
-constexpr bool strict_not_eq(const Integer<W>& a, const Integer<V>& b)
+template <template <size_t, typename> class Integer, size_t W, size_t V, typename WordType>
+constexpr bool strict_not_eq(const Integer<W, WordType>& a, const Integer<V, WordType>& b)
 {
     // we only want to work on our own types...
-    static_assert(::aarith::is_integral_v<Integer<W>>);
+    static_assert(::aarith::is_integral_v<Integer<W, WordType>>);
 
     if constexpr (W != V)
     {
