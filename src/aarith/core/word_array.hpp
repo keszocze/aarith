@@ -19,7 +19,7 @@ public:
     using bit_type = WordType;
     static_assert(Width > 0, " Width must be at least 1 (bit)");
 
-    static_assert(aarith::is_unsigned_int<WordType>,
+    static_assert(::aarith::is_unsigned_int<WordType>,
                   "Only unsigned integers can be used as word types");
 
     /*

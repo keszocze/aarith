@@ -272,7 +272,7 @@ template <size_t DestinationWidth, size_t SourceWidth>
 
 // We are only allowed to extend std with specializations
 // https://en.cppreference.com/w/cpp/language/extending_std
-template <size_t W> class std::numeric_limits<aarith::uinteger<W>>
+template <size_t W> class std::numeric_limits<::aarith::uinteger<W>>
 {
 public:
     static constexpr bool is_specialized = true;
@@ -293,7 +293,8 @@ public:
     static constexpr int radix = 2;
     static constexpr int digits = W; // TODO what happens if W > max_int?
     static constexpr int digits10 =
-        aarith::ceil<int>(std::numeric_limits<aarith::uinteger<W>>::digits * aarith::log<10, 2>()) -
+        ::aarith::ceil<int>(std::numeric_limits<::aarith::uinteger<W>>::digits *
+                            ::aarith::log<10, 2>()) -
         1;
 
     // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says
@@ -311,53 +312,53 @@ public:
 
     static constexpr bool tinyness_before = false;
 
-    static constexpr aarith::uinteger<W> min() noexcept
+    static constexpr ::aarith::uinteger<W> min() noexcept
     {
-        return aarith::uinteger<W>::zero();
+        return ::aarith::uinteger<W>::zero();
     }
 
-    static constexpr aarith::uinteger<W> lowest() noexcept
+    static constexpr ::aarith::uinteger<W> lowest() noexcept
     {
-        return aarith::uinteger<W>::zero();
+        return ::aarith::uinteger<W>::zero();
     }
 
-    static constexpr aarith::uinteger<W> max() noexcept
+    static constexpr ::aarith::uinteger<W> max() noexcept
     {
-        return aarith::uinteger<W>::max();
+        return ::aarith::uinteger<W>::max();
     }
 
-    static constexpr aarith::uinteger<W> epsilon() noexcept
+    static constexpr ::aarith::uinteger<W> epsilon() noexcept
     {
-        return aarith::uinteger<W>::zero();
+        return ::aarith::uinteger<W>::zero();
     }
 
-    static constexpr aarith::uinteger<W> round_error() noexcept
+    static constexpr ::aarith::uinteger<W> round_error() noexcept
     {
-        return aarith::uinteger<W>::zero();
+        return ::aarith::uinteger<W>::zero();
     }
 
-    static constexpr aarith::uinteger<W> infinity() noexcept
+    static constexpr ::aarith::uinteger<W> infinity() noexcept
     {
-        return aarith::uinteger<W>::zero();
+        return ::aarith::uinteger<W>::zero();
     }
 
-    static constexpr aarith::uinteger<W> quiet_NaN() noexcept
+    static constexpr ::aarith::uinteger<W> quiet_NaN() noexcept
     {
-        return aarith::uinteger<W>::zero();
+        return ::aarith::uinteger<W>::zero();
     }
 
-    static constexpr aarith::uinteger<W> signaling_NaN() noexcept
+    static constexpr ::aarith::uinteger<W> signaling_NaN() noexcept
     {
-        return aarith::uinteger<W>::zero();
+        return ::aarith::uinteger<W>::zero();
     }
 
-    static constexpr aarith::uinteger<W> denorm_min() noexcept
+    static constexpr ::aarith::uinteger<W> denorm_min() noexcept
     {
-        return aarith::uinteger<W>::min();
+        return ::aarith::uinteger<W>::min();
     }
 };
 
-template <size_t W> class std::numeric_limits<aarith::integer<W>>
+template <size_t W> class std::numeric_limits<::aarith::integer<W>>
 {
 public:
     static constexpr bool is_specialized = true;
@@ -378,7 +379,8 @@ public:
     static constexpr int radix = 2;
     static constexpr int digits = W - 1; // TODO what happens if W > max_int?
     static constexpr int digits10 =
-        aarith::ceil<int>(std::numeric_limits<aarith::integer<W>>::digits * aarith::log<10, 2>()) -
+        ::aarith::ceil<int>(std::numeric_limits<::aarith::integer<W>>::digits *
+                            ::aarith::log<10, 2>()) -
         1;
 
     // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says
@@ -396,48 +398,48 @@ public:
 
     static constexpr bool tinyness_before = false;
 
-    static constexpr aarith::integer<W> min() noexcept
+    static constexpr ::aarith::integer<W> min() noexcept
     {
-        return aarith::integer<W>::min();
+        return ::aarith::integer<W>::min();
     }
 
-    static constexpr aarith::integer<W> lowest() noexcept
+    static constexpr ::aarith::integer<W> lowest() noexcept
     {
-        return aarith::integer<W>::min();
+        return ::aarith::integer<W>::min();
     }
 
-    static constexpr aarith::integer<W> max() noexcept
+    static constexpr ::aarith::integer<W> max() noexcept
     {
-        return aarith::integer<W>::max();
+        return ::aarith::integer<W>::max();
     }
 
-    static constexpr aarith::integer<W> epsilon() noexcept
+    static constexpr ::aarith::integer<W> epsilon() noexcept
     {
-        return aarith::integer<W>::zero();
+        return ::aarith::integer<W>::zero();
     }
 
-    static constexpr aarith::integer<W> round_error() noexcept
+    static constexpr ::aarith::integer<W> round_error() noexcept
     {
-        return aarith::integer<W>::zero();
+        return ::aarith::integer<W>::zero();
     }
 
-    static constexpr aarith::integer<W> infinity() noexcept
+    static constexpr ::aarith::integer<W> infinity() noexcept
     {
-        return aarith::integer<W>::zero();
+        return ::aarith::integer<W>::zero();
     }
 
-    static constexpr aarith::integer<W> quiet_NaN() noexcept
+    static constexpr ::aarith::integer<W> quiet_NaN() noexcept
     {
-        return aarith::integer<W>::zero();
+        return ::aarith::integer<W>::zero();
     }
 
-    static constexpr aarith::integer<W> signaling_NaN() noexcept
+    static constexpr ::aarith::integer<W> signaling_NaN() noexcept
     {
-        return aarith::integer<W>::zero();
+        return ::aarith::integer<W>::zero();
     }
 
-    static constexpr aarith::integer<W> denorm_min() noexcept
+    static constexpr ::aarith::integer<W> denorm_min() noexcept
     {
-        return aarith::integer<W>::zero();
+        return ::aarith::integer<W>::zero();
     }
 };

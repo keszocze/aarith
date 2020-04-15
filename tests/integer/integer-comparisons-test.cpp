@@ -89,7 +89,7 @@ SCENARIO("Comparing two positive sintegers", "[uinteger][utility]")
         }
     }
 }
-SCENARIO("Comparing two positive sintegers with different bit widths", "[uinteger][utility]")
+SCENARIO("Comparing two positive integers with different bit widths", "[uinteger][utility]")
 {
     GIVEN("Two integer<N> a and b with a < b with different bit widths")
     {
@@ -143,7 +143,8 @@ SCENARIO("Comparing two positive sintegers with different bit widths", "[uintege
         THEN("operator< returns true")
         {
             REQUIRE(a_neg < b);
-            REQUIRE(a < b);
+            const bool foo = (a < b);
+            REQUIRE(foo);
         }
         THEN("operator<= returns true")
         {

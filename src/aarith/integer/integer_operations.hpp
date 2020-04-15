@@ -22,7 +22,7 @@ template <typename I, typename T>
     static_assert(is_integral_v<T>);
 
     // TODO do we need this assertion?
-    static_assert(aarith::same_sign<I, T>);
+    static_assert(::aarith::same_sign<I, T>);
 
     constexpr size_t res_width = std::max(I::width(), T::width()) + 1U;
 
@@ -82,8 +82,8 @@ template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(cons
 {
 
     // TODO do we need this assertion?
-    static_assert(aarith::same_sign<I, T>);
-    static_assert(aarith::same_word_type<I, T>);
+    static_assert(::aarith::same_sign<I, T>);
+    static_assert(::aarith::same_word_type<I, T>);
 
     constexpr size_t res_width = std::max(I::width(), T::width());
     const auto result{sub(width_cast<res_width>(a), width_cast<res_width>(b))};
@@ -215,18 +215,20 @@ template <typename IntegerType> IntegerType pow(const IntegerType& base, const s
  *
  * @note This function does not make any attempts to be fast or to prevent overflows!
  *
- * @note If exponent equals std::numeric_limits<IntegerType>::max(), this method throws an exception,
- * unless base equals zero
+ * @note If exponent equals std::numeric_limits<IntegerType>::max(), this method throws an
+ * exception, unless base equals zero
  *
  * @tparam IntegerType The type of integer used in the computation
  * @param base
  * @param exponent
  * @return The base to the power of the exponent
  */
-template <typename IntegerType> IntegerType pow(const IntegerType& base, const IntegerType& exponent)
+template <typename IntegerType>
+IntegerType pow(const IntegerType& base, const IntegerType& exponent)
 {
 
-    static_assert(aarith::is_integral_v<IntegerType>, "Exponentiation is only supported for aarith integers");
+    static_assert(aarith::is_integral_v<IntegerType>,
+                  "Exponentiation is only supported for aarith integers");
 
     if (exponent == IntegerType::max())
     {
