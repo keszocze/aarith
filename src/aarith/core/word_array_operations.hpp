@@ -428,7 +428,7 @@ template <class R, class F, size_t W>
 
     for (size_t i = 0; i < w.word_count(); ++i)
     {
-        result = f(w.word(i), result);
+        result = static_cast<R>(f(w.word(i), result));
     }
 
     return result;

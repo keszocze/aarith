@@ -60,7 +60,7 @@ template <class Result> constexpr Result ceil(double num)
     const size_t first_bit = first_set_bit(n);
     if (first_bit > 0)
     {
-        return 1UL << (first_bit - 1);
+        return static_cast<size_t>(1) << (first_bit - 1);
     }
     else
     {

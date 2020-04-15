@@ -22,7 +22,7 @@ template <typename I, typename T>
     static_assert(is_integral_v<T>);
 
     // TODO do we need this assertion?
-    static_assert(aarith::same_sign<I, T>);
+    static_assert(::aarith::same_sign<I, T>);
 
     constexpr size_t res_width = std::max(I::width(), T::width()) + 1U;
 
@@ -82,8 +82,8 @@ template <typename I, typename T>[[nodiscard]] auto expanding_sub(const I& a, co
 {
 
     // TODO do we need this assertion?
-    static_assert(aarith::same_sign<I, T>);
-    static_assert(aarith::same_word_type<I, T>);
+    static_assert(::aarith::same_sign<I, T>);
+    static_assert(::aarith::same_word_type<I, T>);
 
     constexpr size_t res_width = std::max(I::width(), T::width());
     const auto result{sub(width_cast<res_width>(a), width_cast<res_width>(b))};

@@ -316,8 +316,10 @@ SCENARIO("Division of signed integers", "[integer][arithmetic]")
                     const auto result64_div = n_ / m_;
                     const auto result64_rem = n_ % m_;
                     const auto result = restoring_division(n, m);
-                    CHECK(result.first.word(0) == result64_div);
-                    CHECK(result.second.word(0) == result64_rem);
+                    CHECK(result.first.word(0) ==
+                          static_cast<integer<64>::word_type>(result64_div));
+                    CHECK(result.second.word(0) ==
+                          static_cast<integer<64>::word_type>(result64_rem));
                 }
             }
         }
@@ -647,18 +649,18 @@ SCENARIO("Left/right shifting sintegers")
             THEN("It should move correctly over word boundaries")
             {
                 const auto k = (a >> 1);
-                const auto b = integer<150>(0U, 0U, (uint64_t(1) << 63U));
+                const auto b____ = integer<150>(0U, 0U, (uint64_t(1) << 63U));
                 //                std::cout << group_digits(to_binary(k), 64) << "\n";
                 //                std::cout << group_digits(to_binary(b), 64) << "\n";
-                REQUIRE(k == b);
+                REQUIRE(k == b____);
             }
 
             THEN("The it should also work when moving farther than the word width")
             {
                 const integer<150> c{12U, 0U, 0U};
                 const integer c_shifted = c >> 68;
-                const auto b = integer<150>(0U, 0U, (uint64_t(11) << 62U));
-                REQUIRE(c_shifted == b);
+                const auto b____ = integer<150>(0U, 0U, (uint64_t(11) << 62U));
+                REQUIRE(c_shifted == b____);
                 //                std::cout << group_digits(to_binary(c), 64) << "\n";
                 //                std::cout << group_digits(to_binary(c_shifted), 64) << "\n";
             }
