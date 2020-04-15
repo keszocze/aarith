@@ -30,8 +30,8 @@ compile_clang:
         - cd build
         - CC=clang-9 CXX=clang++-9 cmake ..
         - make -j 4
-        - cd tests
-        - find -name "*-test" -exec {} \;
+        - make test
+        - if !$?; then return 1; fi
 
 run_sonarqube:
     extends: .ciconf

@@ -48,7 +48,6 @@ public:
     template <size_t V> constexpr word_array(const word_array<V>& other)
     {
         static_assert(V <= Width, "Can not create a word_array from larger container");
-
         for (auto i = 0U; i < other.word_count(); ++i)
         {
             set_word(i, other.word(i));
@@ -56,6 +55,7 @@ public:
     }
     template <size_t V> constexpr word_array<Width> operator=(const word_array<V>& other)
     {
+
         static_assert(V <= Width, "Can not create a word_array from larger container");
 
         if constexpr (V == Width)
