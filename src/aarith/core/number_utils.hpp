@@ -22,6 +22,40 @@ template <class Result> constexpr Result ceil(double num)
 }
 
 /**
+ * @brief Exponentiation function
+ *
+ * @note This function does not make any attempts to be fast or to prevent overflows!
+ *
+ * @note If exponent equals std::numeric_limits<size_t>::max(), this method throws an exception,
+ * unless base equals zero
+ *
+ * @param base
+ * @param exponent
+ * @return The base to the power of the exponent
+ */
+constexpr size_t pow(const size_t base, const size_t exponent)
+{
+    if (exponent == std::numeric_limits<size_t>::max())
+    {
+        if (base == 0U)
+        {
+            return 0U;
+        }
+        else
+        {
+            throw std::runtime_error(
+                "Attempted exponentiation by std::numeric_limits<size_t>::max()");
+        }
+    }
+    size_t result = 1;
+    for (size_t i = 0U; i < exponent; ++i)
+    {
+        result = result * base;
+    }
+    return result;
+}
+
+/**
  * @brief Computes the position of the first set bit (i.e. a bit set to one) in the size_t from LSB
  * to MSB starting with index 1
  *
@@ -60,7 +94,7 @@ template <class Result> constexpr Result ceil(double num)
     const size_t first_bit = first_set_bit(n);
     if (first_bit > 0)
     {
-        return 1UL << (first_bit - 1);
+        return static_cast<size_t>(1) << (first_bit - 1);
     }
     else
     {

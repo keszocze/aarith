@@ -9,7 +9,7 @@ SCENARIO("Comparing two positive sintegers", "[uinteger][utility]")
     {
         WHEN("N <= word_width")
         {
-            const size_t TestWidth = 16;
+            constexpr size_t TestWidth = 16;
             static constexpr uint16_t number_a = 7;
             static constexpr uint16_t number_b = 23;
             const integer<TestWidth> a{number_a};
@@ -17,37 +17,44 @@ SCENARIO("Comparing two positive sintegers", "[uinteger][utility]")
 
             THEN("operator< returns true")
             {
-                REQUIRE(a < b);
+                // enforce constexpr context
+                constexpr bool comp = a < b;
+                REQUIRE(comp);
             }
             THEN("operator<= returns true")
             {
-                REQUIRE(a <= b);
+                constexpr bool comp = a <= b;
+                REQUIRE(comp);
             }
             THEN("operator> returns false")
             {
-                REQUIRE_FALSE(a > b);
+                constexpr bool comp = a > b;
+                REQUIRE_FALSE(comp);
             }
             THEN("operator>= returns false")
             {
-                REQUIRE_FALSE(a >= b);
+                constexpr bool comp = a >= b;
+                REQUIRE_FALSE(comp);
             }
             THEN("operator== returns false")
             {
-                REQUIRE_FALSE(a == b);
+                constexpr bool comp = a == b;
+                REQUIRE_FALSE(comp);
             }
             THEN("operator!= returns true")
             {
-                REQUIRE(a != b);
+                constexpr bool comp = a != b;
+                REQUIRE(comp);
             }
         }
         WHEN("N > word_width")
         {
             const size_t TestWidth = 80;
-            integer<TestWidth> const a{7, 0};
-            integer<TestWidth> const b{23, 0};
+            integer<TestWidth> constexpr a{7, 0};
+            integer<TestWidth> constexpr b{23, 0};
 
-            integer<TestWidth> const c{7, 0};
-            integer<TestWidth> const d{0, 23};
+            integer<TestWidth> constexpr c{7, 0};
+            integer<TestWidth> constexpr d{0, 23};
 
             THEN("operator< returns true")
             {
@@ -82,7 +89,7 @@ SCENARIO("Comparing two positive sintegers", "[uinteger][utility]")
         }
     }
 }
-SCENARIO("Comparing two positive sintegers with different bit widths", "[uinteger][utility]")
+SCENARIO("Comparing two positive integers with different bit widths", "[uinteger][utility]")
 {
     GIVEN("Two integer<N> a and b with a < b with different bit widths")
     {
@@ -127,16 +134,17 @@ SCENARIO("Comparing two positive sintegers with different bit widths", "[uintege
         const constexpr size_t big = 150;
         static constexpr uint16_t number_a = 7;
         static constexpr uint16_t number_b = 23;
-        const integer<small> a{number_a};
-        const integer<small> a_neg{-number_a};
-        const integer<big> b = integer<big>::from_words(number_b, 0U, 0U);
+        constexpr integer<small> a{number_a};
+        constexpr integer<small> a_neg{-number_a};
+        constexpr integer<big> b = integer<big>::from_words(number_b, 0U, 0U);
 
-        const integer<big> c_neg{-number_b};
+        constexpr integer<big> c_neg{-number_b};
 
         THEN("operator< returns true")
         {
             REQUIRE(a_neg < b);
-            REQUIRE(a < b);
+            const bool smaller = (a < b);
+            REQUIRE(smaller);
         }
         THEN("operator<= returns true")
         {
