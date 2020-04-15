@@ -14,7 +14,7 @@ namespace aarith {
  * @note Two numbers can be equal even though they have different bit widths!
  */
 template <size_t W, size_t V, class T, template <size_t, class> typename Int>
-bool areIntegersEqual(const Int<W, T>& a, const Int<V, T>& b)
+bool operator==(const Int<W, T>& a, const Int<V, T>& b)
 {
     constexpr size_t max_width = std::max(W, V);
 
@@ -30,16 +30,6 @@ bool areIntegersEqual(const Int<W, T>& a, const Int<V, T>& b)
     }
 
     return true;
-}
-
-template <size_t W, size_t V> bool operator==(const uinteger<W>& a, const uinteger<V>& b)
-{
-    return areIntegersEqual<W, V>(a, b);
-}
-
-template <size_t W, size_t V> bool operator==(const integer<W>& a, const integer<V>& b)
-{
-    return areIntegersEqual<W, V>(a, b);
 }
 
 template <size_t W, size_t V> bool operator<(const uinteger<W>& a, const uinteger<V>& b)
@@ -116,29 +106,6 @@ template <typename W, typename V> bool operator>(const W& a, const V& b)
     return b < a;
 }
 
-// template <size_t W, size_t V> bool operator==(const integer<W>& a, const integer<V>& b)
-//{
-//
-//    if (a.is_negative() != b.is_negative())
-//    {
-//        return false;
-//    }
-//
-//    constexpr size_t max_width = std::max(W, V);
-//
-//    integer<max_width> a_ = width_cast<max_width>(a);
-//    integer<max_width> b_ = width_cast<max_width>(b);
-//
-//    for (size_t i = 0U; i < integer<max_width>::word_count(); ++i)
-//    {
-//        if (a_.word(i) != b_.word(i))
-//        {
-//            return false;
-//        }
-//    }
-//
-//    return true;
-//}
 
 template <size_t W, size_t V> bool operator<(const integer<W>& a, const integer<V>& b)
 {
