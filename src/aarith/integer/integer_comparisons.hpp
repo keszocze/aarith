@@ -2,10 +2,7 @@
 
 #include <aarith/core/traits.hpp>
 #include <aarith/integer/integers.hpp>
-#include <cstdint>
 
-#include <bitset>
-#include <iostream>
 
 namespace aarith {
 
