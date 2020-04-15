@@ -17,10 +17,10 @@ SCENARIO("Casting unsigned integers to uint8_t", "[integer][unsigned][cast_opera
 
         THEN("The cast should succeed and yield the stored value")
         {
-            uint8_t a8 = to_uint8_t(a);
-            uint8_t b8 = to_uint8_t(b);
-            uint8_t c8 = to_uint8_t(c);
-            uint8_t d8 = to_uint8_t(d);
+            constexpr uint8_t a8 = to_uint8_t(a);
+            constexpr uint8_t b8 = to_uint8_t(b);
+            constexpr uint8_t c8 = to_uint8_t(c);
+            constexpr uint8_t d8 = to_uint8_t(d);
 
             REQUIRE(a8 == val);
             REQUIRE(b8 == val);
@@ -76,7 +76,7 @@ SCENARIO("Casting unsigned integers to uint8_t", "[integer][unsigned][cast_opera
 
 //                to_uint8_t(a);
 
-                CHECK_THROWS(to_uint8_t(a));
+                REQUIRE_THROWS(to_uint8_t(a));
                 //                CHECK_THROWS_AS(to_uint8_t(b), std::domain_error);
                 //                CHECK_THROWS_AS(to_uint8_t(c), std::domain_error);
                 //                CHECK_THROWS_AS(to_uint8_t(d), std::domain_error);

@@ -12,6 +12,7 @@ template <size_t W, typename T> constexpr uint8_t to_uint8_t(const uinteger<W, T
 
     if (a <= uinteger<W, T>{max})
     {
+        // this works fine as the word type is at least a uint8_t
         return static_cast<uint8_t>(a.word(0));
     }
     else
