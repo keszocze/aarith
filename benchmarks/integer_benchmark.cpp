@@ -14,13 +14,14 @@ template <typename T> void bench_int(std::string name)
 
     const steady_clock::time_point start = std::chrono::steady_clock::now();
 
-    for (auto [a, counter_a] = std::tuple<T, count_type>{std::numeric_limits<T>::min(),
-                                                         std::numeric_limits<T>::min()};
-         counter_a <= std::numeric_limits<T>::max(); ++a, ++counter_a)
+    constexpr count_type max_val = std::numeric_limits<T>::max();
+    constexpr count_type min_val = std::numeric_limits<T>::min();
+
+    for (auto [a, counter_a] = std::tuple<T, count_type>{min_val, min_val}; counter_a <= max_val;
+         ++a, ++counter_a)
     {
-        for (auto [b, counter_b] = std::tuple<T, count_type>{std::numeric_limits<T>::min(),
-                                                             std::numeric_limits<T>::min()};
-             counter_b <= std::numeric_limits<T>::max(); ++counter_b, ++b)
+        for (auto [b, counter_b] = std::tuple<T, count_type>{min_val, min_val};
+             counter_b <= max_val; ++counter_b, ++b)
         {
             const T sum = a + b;
             const T diff = a - b;
@@ -50,8 +51,9 @@ template <template <size_t> typename I, size_t W> void bench_aarith_int(std::str
     Integer a = std::numeric_limits<Integer>::min();
     count_type counter_a = std::numeric_limits<Integer>::min();
 
-//    std::cout << counter_a << "\t" << std::numeric_limits<Integer>::min() << "/" << max_val << " "
-//              << (counter_a < max_val) << "\n";
+    //    std::cout << counter_a << "\t" << std::numeric_limits<Integer>::min() << "/" << max_val <<
+    //    " "
+    //              << (counter_a < max_val) << "\n";
 
     while (counter_a <= max_val)
     {
@@ -65,7 +67,6 @@ template <template <size_t> typename I, size_t W> void bench_aarith_int(std::str
             const I<W> diff = sub(a, b);
             const I<W> prod = mul(a, b);
             const I<W> fun = add(mul(add(a, b), b), a);
-
 
             counter_b = add(counter_b, I<W + 1>::one());
             b = add(b, Integer::one());
@@ -82,12 +83,13 @@ template <template <size_t> typename I, size_t W> void bench_aarith_int(std::str
     std::cout << name << "<" << W << ">;" << dur << "\n";
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     using namespace std;
     using namespace aarith;
 
-    if (argc == 1 || (argc == 2 && std::string{argv[1]} == std::string{"small"})) {
+    if (argc == 1 || (argc == 2 && std::string{argv[1]} == std::string{"small"}))
+    {
         bench_int<int8_t>("int8");
         bench_int<uint8_t>("uint8");
         bench_int<int16_t>("int16");
@@ -107,7 +109,8 @@ int main(int argc, char *argv[])
         bench_aarith_int<integer, 8>("integer");
         bench_aarith_int<uinteger, 8>("uinteger");
     }
-    else if  (argc == 2 && std::string{argv[1]} == std::string{"large"}) {
+    else if (argc == 2 && std::string{argv[1]} == std::string{"large"})
+    {
         bench_int<int32_t>("int32");
         bench_int<uint32_t>("uint32");
 
@@ -118,18 +121,12 @@ int main(int argc, char *argv[])
         bench_aarith_int<integer, 32>("integer");
         bench_int<uint32_t>("uint32");
         bench_aarith_int<uinteger, 32>("uinteger");
-
     }
 
-    for (int i = 0; i < argc; ++i) {
+    for (int i = 0; i < argc; ++i)
+    {
         std::cout << "arg_" << i << ": " << argv[i] << "\n";
     }
-
-
-
-
-
-
 
     return 0;
 }
