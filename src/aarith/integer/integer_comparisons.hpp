@@ -14,7 +14,7 @@ namespace aarith {
  * @note Two numbers can be equal even though they have different bit widths!
  */
 template <template <size_t> typename Int, size_t W, size_t V>
-bool operator==(const Int<W>& a, const Int<V>& b)
+bool areIntegersEqual(const Int<W>& a, const Int<V>& b)
 {
 
     constexpr size_t max_width = std::max(W, V);
@@ -31,6 +31,16 @@ bool operator==(const Int<W>& a, const Int<V>& b)
     }
 
     return true;
+}
+
+template <size_t W, size_t V> bool operator==(const uinteger<W>& a, const uinteger<V>& b)
+{
+    return areIntegersEqual<uinteger, W, V>(a, b);
+}
+
+template <size_t W, size_t V> bool operator==(const integer<W>& a, const integer<V>& b)
+{
+    return areIntegersEqual<integer, W, V>(a, b);
 }
 
 template <size_t W, size_t V> bool operator<(const uinteger<W>& a, const uinteger<V>& b)
