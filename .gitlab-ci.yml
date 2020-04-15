@@ -49,9 +49,12 @@ run_tests:
             - build/tests/coverage
         expire_in: 30 minutes
     script:
-        - cd build/tests
+        - cd build
+          #        - find -name "*-test" -exec {} \;
+        - make test
+        - if !$?; then return 1; fi
+        - cd tests
         - export GCOV_PREFIX_STRIP=10
-        - find -name "*-test" -exec {} \;
         - rm -rf coverage
         - mkdir -p coverage
         - /opt/software/usr/local/bin/gcovr --gcov-executable gcov-8 -v --filter '/var/lib/gitlab-runner/builds/.+/0/keszocze/aarith' --object-directory CMakeFiles --sonarqube coverage/coverage.xml 
