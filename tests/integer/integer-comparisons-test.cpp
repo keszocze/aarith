@@ -12,8 +12,8 @@ SCENARIO("Comparing two positive sintegers", "[uinteger][utility]")
             constexpr size_t TestWidth = 16;
             static constexpr uint16_t number_a = 7;
             static constexpr uint16_t number_b = 23;
-            const integer<TestWidth> a{number_a};
-            const integer<TestWidth> b{number_b};
+            constexpr integer<TestWidth> a{number_a};
+            constexpr integer<TestWidth> b{number_b};
 
             THEN("operator< returns true")
             {

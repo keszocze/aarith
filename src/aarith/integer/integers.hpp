@@ -25,13 +25,13 @@ public:
     }
 
     template <class... Args>
-    uinteger(WordType fst, Args... args)
+    constexpr uinteger(WordType fst, Args... args)
         : word_array<Width>(fst, args...)
     {
     }
 
     template <size_t V>
-    uinteger<Width, WordType>(const uinteger<V, WordType>& other)
+    constexpr uinteger<Width, WordType>(const uinteger<V, WordType>& other)
         : word_array<Width>(width_cast<Width>(other))
     {
     }
