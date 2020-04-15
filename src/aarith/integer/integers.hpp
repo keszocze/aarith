@@ -17,32 +17,32 @@ template <size_t Width, class WordType = uint64_t>
 class uinteger : public word_array<Width, WordType>
 {
 public:
-    uinteger() = default;
+    constexpr uinteger() = default;
 
-    explicit uinteger(WordType n)
+    constexpr explicit uinteger(WordType n)
         : word_array<Width, WordType>(n)
     {
     }
 
     template <class... Args>
-    uinteger(WordType fst, Args... args)
+    constexpr uinteger(WordType fst, Args... args)
         : word_array<Width>(fst, args...)
     {
     }
 
     template <size_t V>
-    uinteger<Width, WordType>(const uinteger<V, WordType>& other)
+    constexpr uinteger<Width, WordType>(const uinteger<V, WordType>& other)
         : word_array<Width>(static_cast<const word_array<V, WordType>&>(other))
     {
     }
 
     template <size_t V>
-    uinteger<Width, WordType>(const word_array<V, WordType>& other)
+    constexpr uinteger<Width, WordType>(const word_array<V, WordType>& other)
         : word_array<Width>(other)
     {
     }
 
-    template <class... Args> static auto from_words(Args... args) -> uinteger
+    template <class... Args> static constexpr auto from_words(Args... args) -> uinteger
     {
         uinteger n;
         n.set_words(args...);
@@ -77,7 +77,8 @@ public:
 };
 
 template <size_t DestinationWidth, size_t SourceWidth>
-[[nodiscard]] auto width_cast(const uinteger<SourceWidth>& source) -> uinteger<DestinationWidth>
+[[nodiscard]] auto constexpr width_cast(const uinteger<SourceWidth>& source)
+    -> uinteger<DestinationWidth>
 {
     if constexpr (DestinationWidth == SourceWidth)
     {
@@ -115,15 +116,15 @@ template <size_t Width, class WordType = uint64_t>
 class integer : public word_array<Width, WordType>
 {
 public:
-    integer() = default;
+    constexpr integer() = default;
 
-    explicit integer(WordType n)
+    explicit constexpr integer(WordType n)
         : word_array<Width, WordType>(n)
     {
     }
 
     template <typename T, typename = std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>>>
-    explicit integer(T t)
+    explicit constexpr integer(T t)
         : word_array<Width, WordType>(static_cast<WordType>(t))
     {
         if (t < 0)
@@ -138,25 +139,25 @@ public:
 
     template <typename T, class... Args,
               typename = std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>>>
-    explicit integer(T t, Args... args)
+    explicit constexpr integer(T t, Args... args)
         : word_array<Width, WordType>(static_cast<WordType>(t), args...)
     {
     }
 
     template <class... Args>
-    integer(WordType fst, Args... args)
+    constexpr integer(WordType fst, Args... args)
         : word_array<Width>(fst, args...)
     {
     }
 
     template <size_t V>
-    integer<Width, WordType>(const integer<V, WordType>& other)
+    constexpr integer<Width, WordType>(const integer<V, WordType>& other)
         : word_array<Width>(static_cast<const word_array<V, WordType>&>(other))
     {
     }
 
     template <size_t V>
-    integer<Width, WordType>(const word_array<V, WordType>& other)
+    constexpr integer<Width, WordType>(const word_array<V, WordType>& other)
         : word_array<Width>(other)
     {
     }
@@ -201,7 +202,7 @@ public:
      * @brief Returns whether the number is negative.
      * @return Whether the number is negative
      */
-    [[nodiscard]] bool is_negative() const
+    [[nodiscard]] constexpr bool is_negative() const
     {
         return (this->msb() == 1);
     }
@@ -240,7 +241,8 @@ public:
  * @return integer with specified bit width
  */
 template <size_t DestinationWidth, size_t SourceWidth>
-[[nodiscard]] auto width_cast(const integer<SourceWidth>& source) -> integer<DestinationWidth>
+[[nodiscard]] constexpr auto width_cast(const integer<SourceWidth>& source)
+    -> integer<DestinationWidth>
 {
     word_array<DestinationWidth> result =
         width_cast<DestinationWidth>(static_cast<word_array<SourceWidth>>(source));

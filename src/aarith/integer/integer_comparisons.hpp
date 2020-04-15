@@ -14,7 +14,7 @@ namespace aarith {
  * @note Two numbers can be equal even though they have different bit widths!
  */
 template <size_t W, size_t V, class T, template <size_t, class> typename Int>
-bool operator==(const Int<W, T>& a, const Int<V, T>& b)
+constexpr bool operator==(const Int<W, T>& a, const Int<V, T>& b)
 {
     constexpr size_t max_width = std::max(W, V);
 
@@ -32,7 +32,7 @@ bool operator==(const Int<W, T>& a, const Int<V, T>& b)
     return true;
 }
 
-template <size_t W, size_t V> bool operator<(const uinteger<W>& a, const uinteger<V>& b)
+template <size_t W, size_t V> constexpr bool operator<(const uinteger<W>& a, const uinteger<V>& b)
 {
 
     using word_type = typename integer<W>::word_type;
@@ -88,26 +88,26 @@ template <size_t W, size_t V> bool operator<(const uinteger<W>& a, const uintege
     return false;
 }
 
-template <typename W, typename V> bool operator<=(const W& a, const V& b)
+template <typename W, typename V> constexpr bool operator<=(const W& a, const V& b)
 {
     static_assert(same_sign<W, V>);
     return (a < b) || (a == b);
 }
 
-template <typename W, typename V> bool operator>=(const W& a, const V& b)
+template <typename W, typename V> constexpr bool operator>=(const W& a, const V& b)
 {
     static_assert(same_sign<W, V>);
     return b <= a;
 }
 
-template <typename W, typename V> bool operator>(const W& a, const V& b)
+template <typename W, typename V> constexpr bool operator>(const W& a, const V& b)
 {
     static_assert(same_sign<W, V>);
     return b < a;
 }
 
 
-template <size_t W, size_t V> bool operator<(const integer<W>& a, const integer<V>& b)
+template <size_t W, size_t V> constexpr bool operator<(const integer<W>& a, const integer<V>& b)
 {
 
     using word_type = typename integer<W>::word_type;
