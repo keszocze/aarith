@@ -3,7 +3,6 @@
 #include <aarith/core/traits.hpp>
 #include <aarith/integer/integers.hpp>
 
-
 namespace aarith {
 
 /**
