@@ -45,6 +45,8 @@ template <template <size_t> typename I, size_t W> void bench_aarith_int(std::str
     using Integer = I<W>;
     using count_type = I<W + 1>;
     constexpr count_type max_val{std::numeric_limits<Integer>::max()};
+    constexpr count_type big_one = count_type::one();
+    constexpr I small_one = Integer::one();
 
     const steady_clock::time_point start = std::chrono::steady_clock::now();
 
@@ -68,12 +70,12 @@ template <template <size_t> typename I, size_t W> void bench_aarith_int(std::str
             const I<W> prod = mul(a, b);
             const I<W> fun = add(mul(add(a, b), b), a);
 
-            counter_b = add(counter_b, I<W + 1>::one());
-            b = add(b, Integer::one());
+            counter_b = add(counter_b, big_one);
+            b = add(b, small_one);
         }
 
-        counter_a = add(counter_a, I<W + 1>::one());
-        a = add(a, Integer::one());
+        counter_a = add(counter_a, big_one);
+        a = add(a, small_one);
     }
 
     const steady_clock::time_point end = std::chrono::steady_clock::now();
@@ -121,11 +123,6 @@ int main(int argc, char* argv[])
         bench_aarith_int<integer, 32>("integer");
         bench_int<uint32_t>("uint32");
         bench_aarith_int<uinteger, 32>("uinteger");
-    }
-
-    for (int i = 0; i < argc; ++i)
-    {
-        std::cout << "arg_" << i << ": " << argv[i] << "\n";
     }
 
     return 0;
