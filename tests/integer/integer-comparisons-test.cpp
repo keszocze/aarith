@@ -174,8 +174,7 @@ SCENARIO("Comparing two positive integers with different bit widths", "[uinteger
     }
 }
 
-SCENARIO("Investigating the comparison of max and min values",
-         "[integer][comparison][utility]")
+SCENARIO("Investigating the comparison of max and min values", "[integer][comparison][utility]")
 {
     GIVEN("integer<8>::max/min")
     {
@@ -205,7 +204,6 @@ SCENARIO("Investigating the comparison of max and min values",
 
             integer<9> min = T::min();
             integer<9> max = T::max();
-
 
             // TODO why is the copy assignment constructor not called?
             integer<9> min_;
