@@ -106,7 +106,6 @@ template <typename W, typename V> constexpr bool operator>(const W& a, const V& 
     return b < a;
 }
 
-
 template <size_t W, size_t V> constexpr bool operator<(const integer<W>& a, const integer<V>& b)
 {
 

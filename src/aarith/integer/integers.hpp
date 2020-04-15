@@ -293,7 +293,8 @@ public:
     static constexpr int radix = 2;
     static constexpr int digits = W; // TODO what happens if W > max_int?
     static constexpr int digits10 =
-        ::aarith::ceil<int>(std::numeric_limits<::aarith::uinteger<W>>::digits * ::aarith::log<10, 2>()) -
+        ::aarith::ceil<int>(std::numeric_limits<::aarith::uinteger<W>>::digits *
+                            ::aarith::log<10, 2>()) -
         1;
 
     // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says
@@ -378,7 +379,8 @@ public:
     static constexpr int radix = 2;
     static constexpr int digits = W - 1; // TODO what happens if W > max_int?
     static constexpr int digits10 =
-        ::aarith::ceil<int>(std::numeric_limits<::aarith::integer<W>>::digits * ::aarith::log<10, 2>()) -
+        ::aarith::ceil<int>(std::numeric_limits<::aarith::integer<W>>::digits *
+                            ::aarith::log<10, 2>()) -
         1;
 
     // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says
