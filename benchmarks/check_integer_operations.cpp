@@ -2,11 +2,11 @@
 
 #include <chrono>
 #include <iostream>
+#include <fstream>
 #include <string>
-#include <tuple>
 
-template <template <size_t, typename> class I, size_t W, typename WordType, typename T>
-void check_addition()
+template <template <size_t, typename> class I, size_t W, typename T, typename WordType = uint64_t>
+void check_addition(const std::string op_name)
 {
     using Integer = I<W, WordType>;
     using count_type = I<W + 1, WordType>;
@@ -17,6 +17,24 @@ void check_addition()
     Integer a = std::numeric_limits<Integer>::min();
     count_type counter_a = std::numeric_limits<Integer>::min();
     T base_a = std::numeric_limits<T>::min();
+
+    std::string filename{""};
+
+    if constexpr (::aarith::is_unsigned_v<Integer>)
+    {
+        filename += "uinteger";
+    }
+    else
+    {
+        filename += "integer";
+    }
+    filename += std::to_string(W) +"_" + op_name + ".log";
+
+//    std::cout << filename << "\n";
+
+    std::ofstream file;
+
+    file.open(filename);
 
     while (counter_a <= max_val)
     {
@@ -30,13 +48,12 @@ void check_addition()
 
             T result_base = base_a + base_b;
             Integer result_int = add(a, b);
-            std::cout << int64_t{base_a} << " + " << int64_t{base_b} << " = "
-                      << int64_t{result_base} << "\n";
-            std::cout << a << " + " << b << " = " << result_int << "\n";
 
             if (Integer{result_base} != result_int)
             {
-                std::cout << "KAPOTT!!!!\n";
+
+                file << int64_t{base_a} << ";" << int64_t{base_b} << ";" << int64_t{result_base}
+                     << ";" << a << ";" << b << ";" << result_int << "\n";
                 return;
             }
 
@@ -49,6 +66,8 @@ void check_addition()
         a = add(a, small_one);
         ++base_a;
     }
+
+    file.close();
 }
 
 int main(int argc, char* argv[])
@@ -58,9 +77,10 @@ int main(int argc, char* argv[])
 
     if (argc == 1 || (argc == 2 && std::string{argv[1]} == std::string{"small"}))
     {
-        check_addition<uinteger, 8, uint64_t, uint8_t>();
-        check_addition<uinteger, 8, uint8_t, uint8_t>();
-        check_addition<integer, 8, uint64_t, int8_t>();
+        check_addition<uinteger, 8, uint8_t>("addition");
+        check_addition<integer, 8, int8_t>("addition");
+        check_addition<uinteger, 16, uint16_t>("addition");
+        check_addition<integer, 16, int16_t>("addition");
     }
     else if (argc == 2 && std::string{argv[1]} == std::string{"large"})
     {
