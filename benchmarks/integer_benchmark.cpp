@@ -82,53 +82,54 @@ template <template <size_t> typename I, size_t W> void bench_aarith_int(std::str
     std::cout << name << "<" << W << ">;" << dur << "\n";
 }
 
-int main()
+int main(int argc, char *argv[])
 {
-
     using namespace std;
     using namespace aarith;
 
-    bench_int<int8_t>("int8");
-    bench_int<uint8_t>("uint8");
-    bench_int<int16_t>("int16");
-    bench_int<uint16_t>("uint16");
-    bench_int<int32_t>("int32");
-    bench_int<uint32_t>("uint32");
+    if (argc == 1 || (argc == 2 && std::string{argv[1]} == std::string{"small"})) {
+        bench_int<int8_t>("int8");
+        bench_int<uint8_t>("uint8");
+        bench_int<int16_t>("int16");
+        bench_int<uint16_t>("uint16");
 
-    bench_aarith_int<integer, 8>("integer");
-    bench_aarith_int<uinteger, 8>("uinteger");
-    bench_aarith_int<integer, 16>("integer");
-    bench_aarith_int<uinteger, 16>("uinteger");
-    bench_aarith_int<integer, 32>("integer");
-    bench_aarith_int<uinteger, 32>("uinteger");
+        bench_aarith_int<integer, 8>("integer");
+        bench_aarith_int<uinteger, 8>("uinteger");
+        bench_aarith_int<integer, 16>("integer");
+        bench_aarith_int<uinteger, 16>("uinteger");
 
-    bench_int<int8_t>("int8");
-    bench_int<uint8_t>("uint8");
-    bench_int<int16_t>("int16");
-    bench_int<uint16_t>("uint16");
-    bench_int<int32_t>("int32");
-    bench_int<uint32_t>("uint32");
+        bench_int<int8_t>("int8");
+        bench_aarith_int<uinteger, 16>("uinteger");
+        bench_int<uint8_t>("uint8");
+        bench_aarith_int<integer, 16>("integer");
+        bench_int<int16_t>("int16");
+        bench_int<uint16_t>("uint16");
+        bench_aarith_int<integer, 8>("integer");
+        bench_aarith_int<uinteger, 8>("uinteger");
+    }
+    else if  (argc == 2 && std::string{argv[1]} == std::string{"large"}) {
+        bench_int<int32_t>("int32");
+        bench_int<uint32_t>("uint32");
 
-    bench_aarith_int<integer, 8>("integer");
-    bench_aarith_int<uinteger, 8>("uinteger");
-    bench_aarith_int<integer, 16>("integer");
-    bench_aarith_int<uinteger, 16>("uinteger");
-    bench_aarith_int<integer, 32>("integer");
-    bench_aarith_int<uinteger, 32>("uinteger");
+        bench_aarith_int<integer, 32>("integer");
+        bench_aarith_int<uinteger, 32>("uinteger");
 
-    bench_int<int8_t>("int8");
-    bench_int<uint32_t>("uint32");
-    bench_int<int16_t>("int16");
-    bench_int<uint8_t>("uint8");
-    bench_int<int32_t>("int32");
-    bench_int<uint16_t>("uint16");
+        bench_int<int32_t>("int32");
+        bench_aarith_int<integer, 32>("integer");
+        bench_int<uint32_t>("uint32");
+        bench_aarith_int<uinteger, 32>("uinteger");
 
-    bench_aarith_int<uinteger, 8>("uinteger");
-    bench_aarith_int<integer, 16>("integer");
-    bench_aarith_int<integer, 8>("integer");
-    bench_aarith_int<uinteger, 32>("uinteger");
-    bench_aarith_int<integer, 32>("integer");
-    bench_aarith_int<uinteger, 16>("uinteger");
+    }
+
+    for (int i = 0; i < argc; ++i) {
+        std::cout << "arg_" << i << ": " << argv[i] << "\n";
+    }
+
+
+
+
+
+
 
     return 0;
 }

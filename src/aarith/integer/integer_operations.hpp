@@ -215,18 +215,20 @@ template <typename IntegerType> IntegerType pow(const IntegerType& base, const s
  *
  * @note This function does not make any attempts to be fast or to prevent overflows!
  *
- * @note If exponent equals std::numeric_limits<IntegerType>::max(), this method throws an exception,
- * unless base equals zero
+ * @note If exponent equals std::numeric_limits<IntegerType>::max(), this method throws an
+ * exception, unless base equals zero
  *
  * @tparam IntegerType The type of integer used in the computation
  * @param base
  * @param exponent
  * @return The base to the power of the exponent
  */
-template <typename IntegerType> IntegerType pow(const IntegerType& base, const IntegerType& exponent)
+template <typename IntegerType>
+IntegerType pow(const IntegerType& base, const IntegerType& exponent)
 {
 
-    static_assert(aarith::is_integral_v<IntegerType>, "Exponentiation is only supported for aarith integers");
+    static_assert(aarith::is_integral_v<IntegerType>,
+                  "Exponentiation is only supported for aarith integers");
 
     if (exponent == IntegerType::max())
     {
