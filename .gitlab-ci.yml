@@ -30,15 +30,16 @@ compile_clang:
         - cd build
         - CC=clang-9 CXX=clang++-9 cmake ..
         - make -j 4
-        - cd tests
-        - find -name "*-test" -exec {} \;
+        - make test
+        - if !$?; then return 1; fi
 
 run_sonarqube:
     extends: .ciconf
     stage: quality
     script: 
         - echo $CI_COMMIT_REF_NAME
-        - sed "s/@@BRANCH_NAME@@/${CI_COMMIT_REF_NAME}/" sonar-project.properties.in >> sonar-project.properties
+        - chmod +x scripts/mk_sonar_config.sh
+        - scripts/mk_sonar_config.sh $CI_COMMIT_REF_NAME > sonar-project.properties
         - /opt/sonar-scanner/bin/sonar-scanner
 
 run_tests:
@@ -49,9 +50,11 @@ run_tests:
             - build/tests/coverage
         expire_in: 30 minutes
     script:
-        - cd build/tests
+        - cd build
+        - make test
+        - if !$?; then return 1; fi
+        - cd tests
         - export GCOV_PREFIX_STRIP=10
-        - find -name "*-test" -exec {} \;
         - rm -rf coverage
         - mkdir -p coverage
         - /opt/software/usr/local/bin/gcovr --gcov-executable gcov-8 -v --filter '/var/lib/gitlab-runner/builds/.+/0/keszocze/aarith' --object-directory CMakeFiles --sonarqube coverage/coverage.xml 
