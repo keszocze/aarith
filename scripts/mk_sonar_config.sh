@@ -15,7 +15,7 @@ cat <<EOF
 	sonar.projectName=Aarith
 	sonar.projectVersion=0.2
 
-	sonar.sources=./src,./tests
+	sonar.sources=./src,./tests,./benchmarks
 	
 	sonar.cfamily.build-wrapper-output=./build/gcc/bw_output
 	sonar.cfamily.threads=$(nproc)
