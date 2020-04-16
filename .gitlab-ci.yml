@@ -1,3 +1,7 @@
+
+variables:
+  GIT_STRATEGY: clone
+
 stages:
     - compile
     - test
