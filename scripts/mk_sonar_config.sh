@@ -17,13 +17,15 @@ cat <<EOF
 
 	sonar.sources=./src,./tests
 	
-	sonar.cfamily.build-wrapper-output=./build/bw_output
+	sonar.cfamily.build-wrapper-output=./build/gcc/bw_output
 	sonar.cfamily.threads=$(nproc)
 
 	$(branch_config $1)
 
 	sonar.sourceEncoding=UTF-8
-	sonar.coverageReportPaths=./build/tests/coverage/coverage.xml
+	# for some reason, I can't the paths to work fine 
+	# so I am disbaling this
+#	sonar.coverageReportPaths=./build/gcc/tests/coverage/coverage.xml
 
 	sonar.host.url=https://codesignp211.informatik.uni-erlangen.de/sonarqube
 EOF

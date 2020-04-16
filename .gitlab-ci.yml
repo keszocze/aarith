@@ -1,8 +1,6 @@
-
 variables:
-  GIT_STRATEGY: fetch
-  GIT_DEPTH: 0 # might be necessary for sonar qube
-
+    GIT_DEPTH: 0
+    GIT_STRATEGY: fetch
 
 stages:
     - compile
@@ -19,36 +17,45 @@ compile_gcc:
     stage: compile
     artifacts:
         paths:
-            - build
+            - build/gcc
         expire_in: 30 minutes
 
     script:
-        - mkdir -p build/bw_output
-        - cd build
-        - CC=gcc-9 CXX=g++-9 cmake ..
+        - mkdir -p build/gcc/bw_output
+        - cd build/gcc
+        - CC=gcc-8 CXX=g++-8 cmake ../..
         - /opt/sonar-build-wrapper/build-wrapper-linux-x86-64 --out-dir bw_output make -j $(nproc) all
 
 compile_clang:
     extends: .ciconf
     stage: compile
+    artifacts:
+        paths:
+            - build/clang
     script:
-        - mkdir build
-        - cd build
-        - CC=clang-9 CXX=clang++-9 cmake ..
+        - mkdir -p build/clang
+        - cd build/clang
+        - CC=clang-9 CXX=clang++-9 cmake ../..
         - make -j $(nproc)
-        - make test
-        - if !$?; then return 1; fi
 
 run_sonarqube:
     extends: .ciconf
     stage: quality
     script: 
+        - echo $CI_COMMIT_REF_NAME
         - chmod +x scripts/mk_sonar_config.sh
         - scripts/mk_sonar_config.sh $CI_COMMIT_REF_NAME > sonar-project.properties
-        - scripts/mk_sonar_config.sh $CI_COMMIT_REF_NAME
         - /opt/sonar-scanner/bin/sonar-scanner
 
-run_tests:
+
+test_clang:
+    extends: .ciconf
+    stage: test
+    script:
+        - cd build/clang
+        - make test
+
+test_gcc:
     extends: .ciconf
     stage: test
     artifacts:
@@ -56,7 +63,7 @@ run_tests:
             - build/tests/coverage
         expire_in: 30 minutes
     script:
-        - cd build
+        - cd build/gcc
         - make test
         - if !$?; then return 1; fi
         - cd tests
