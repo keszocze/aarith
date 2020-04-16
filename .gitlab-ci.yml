@@ -1,6 +1,6 @@
 
 variables:
-  GIT_STRATEGY: clone
+  GIT_STRATEGY: fetch
   GIT_DEPTH: 0 # might be necessary for sonar qube
 
 
@@ -35,7 +35,7 @@ compile_clang:
         - mkdir build
         - cd build
         - CC=clang-9 CXX=clang++-9 cmake ..
-        - make -j 4
+        - make -j $(nproc)
         - make test
         - if !$?; then return 1; fi
 
@@ -45,6 +45,7 @@ run_sonarqube:
     script: 
         - chmod +x scripts/mk_sonar_config.sh
         - scripts/mk_sonar_config.sh $CI_COMMIT_REF_NAME > sonar-project.properties
+        - scripts/mk_sonar_config.sh $CI_COMMIT_REF_NAME
         - /opt/sonar-scanner/bin/sonar-scanner
 
 run_tests:
