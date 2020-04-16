@@ -17,9 +17,10 @@ namespace aarith {
  * @return The sum
  *
  */
-template <size_t E, size_t M>
-[[nodiscard]] auto add(const normalized_float<E, M>& lhs, const normalized_float<E, M>& rhs)
-    -> normalized_float<E, M>
+template <size_t E, size_t M, typename WordType>
+[[nodiscard]] auto add(const normalized_float<E, M, WordType>& lhs,
+                       const normalized_float<E, M, WordType>& rhs)
+    -> normalized_float<E, M, WordType>
 {
     if (abs(lhs) < abs(rhs))
     {
@@ -56,9 +57,10 @@ template <size_t E, size_t M>
  * @return The difference lhs-rhs
  *
  */
-template <size_t E, size_t M>
-[[nodiscard]] auto sub(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
-    -> normalized_float<E, M>
+template <size_t E, size_t M, typename WordType>
+[[nodiscard]] auto sub(const normalized_float<E, M, WordType> lhs,
+                       const normalized_float<E, M, WordType> rhs)
+    -> normalized_float<E, M, WordType>
 {
     if (abs(lhs) < abs(rhs))
     {
@@ -97,9 +99,10 @@ template <size_t E, size_t M>
  * @return The product lhs*rhs
  *
  */
-template <size_t E, size_t M>
-[[nodiscard]] auto mul(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
-    -> normalized_float<E, M>
+template <size_t E, size_t M, typename WordType>
+[[nodiscard]] auto mul(const normalized_float<E, M, WordType> lhs,
+                       const normalized_float<E, M, WordType> rhs)
+    -> normalized_float<E, M, WordType>
 {
     auto mproduct = expanding_mul(lhs.get_mantissa(), rhs.get_mantissa());
     mproduct = mproduct >> (M - 1);
@@ -126,9 +129,10 @@ template <size_t E, size_t M>
  * @return The quotient lhs/rhs
  *
  */
-template <size_t E, size_t M>
-[[nodiscard]] auto div(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
-    -> normalized_float<E, M>
+template <size_t E, size_t M, typename WordType>
+[[nodiscard]] auto div(const normalized_float<E, M, WordType> lhs,
+                       const normalized_float<E, M, WordType> rhs)
+    -> normalized_float<E, M, WordType>
 {
     auto dividend = width_cast<2 * M + 3>(lhs.get_mantissa());
     auto divisor = width_cast<2 * M + 3>(rhs.get_mantissa());
@@ -153,37 +157,37 @@ template <size_t E, size_t M>
 
 namespace aarith::arithmetic_operators {
 
-template <size_t E, size_t M>
-auto operator+(const normalized_float<E, M>& lhs, const normalized_float<E, M>& rhs)
-    -> normalized_float<E, M>
+template <size_t E, size_t M, typename WordType>
+auto operator+(const normalized_float<E, M, WordType>& lhs,
+               const normalized_float<E, M, WordType>& rhs) -> normalized_float<E, M, WordType>
 {
     return add(lhs, rhs);
 }
 
-template <size_t E, size_t M>
-auto operator-(const normalized_float<E, M>& lhs, const normalized_float<E, M>& rhs)
-    -> normalized_float<E, M>
+template <size_t E, size_t M, typename WordType>
+auto operator-(const normalized_float<E, M, WordType>& lhs,
+               const normalized_float<E, M, WordType>& rhs) -> normalized_float<E, M, WordType>
 {
     return sub(lhs, rhs);
 }
 
-template <size_t E, size_t M>
-auto operator*(const normalized_float<E, M>& lhs, const normalized_float<E, M>& rhs)
-    -> normalized_float<E, M>
+template <size_t E, size_t M, typename WordType>
+auto operator*(const normalized_float<E, M, WordType>& lhs,
+               const normalized_float<E, M, WordType>& rhs) -> normalized_float<E, M, WordType>
 {
     return mul(lhs, rhs);
 }
 
-template <size_t E, size_t M>
-auto operator/(const normalized_float<E, M>& lhs, const normalized_float<E, M>& rhs)
-    -> normalized_float<E, M>
+template <size_t E, size_t M, typename WordType>
+auto operator/(const normalized_float<E, M, WordType>& lhs,
+               const normalized_float<E, M, WordType>& rhs) -> normalized_float<E, M, WordType>
 {
     return div(lhs, rhs);
 }
 
-template <size_t E, size_t M>
-auto operator%(const normalized_float<E, M>& lhs, const normalized_float<E, M>& rhs)
-    -> normalized_float<E, M>
+template <size_t E, size_t M, typename WordType>
+auto operator%(const normalized_float<E, M, WordType>& lhs,
+               const normalized_float<E, M, WordType>& rhs) -> normalized_float<E, M, WordType>
 {
     return remainder(lhs, rhs);
 }

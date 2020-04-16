@@ -26,36 +26,37 @@ public:
      * Constructors etc.
      */
 
-    word_array() = default;
+    constexpr word_array() = default;
 
-    word_array(WordType w)
+    constexpr word_array(WordType w)
     {
         this->words[0] = w & word_mask(0);
     }
 
-    template <class... Args> word_array(WordType w, Args... args)
+    template <class... Args> constexpr word_array(WordType w, Args... args)
     {
         set_words(w, args...);
     }
 
-    template <class... Args> static auto from_words(Args... args) -> word_array
+    template <class... Args> static constexpr auto from_words(Args... args) -> word_array
     {
         word_array wc;
         wc.set_words(args...);
         return wc;
     }
 
-    template <size_t V> word_array(const word_array<V>& other)
+    template <size_t V, typename T> constexpr word_array(const word_array<V, T>& other)
     {
         static_assert(V <= Width, "Can not create a word_array from larger container");
-
         for (auto i = 0U; i < other.word_count(); ++i)
         {
             set_word(i, other.word(i));
         }
     }
-    template <size_t V> word_array<Width> operator=(const word_array<V>& other)
+    template <size_t V, typename T>
+    constexpr word_array<Width, T> operator=(const word_array<V, T>& other)
     {
+
         static_assert(V <= Width, "Can not create a word_array from larger container");
 
         if constexpr (V == Width)
@@ -71,7 +72,8 @@ public:
             set_word(i, other.word(i));
         }
 
-        if constexpr (word_array<Width, WordType>::word_count() > word_array<V>::word_count())
+        if constexpr (word_array<Width, WordType>::word_count() >
+                      word_array<V, WordType>::word_count())
         {
             for (size_t i = other.word_count(); i < this->word_count(); ++i)
             {
@@ -97,7 +99,7 @@ public:
         return (Width / word_size) + (Width % word_size ? 1 : 0);
     }
 
-    [[nodiscard]] static constexpr auto word_mask(size_t index) noexcept -> word_type
+    [[nodiscard]] static constexpr word_type word_mask(size_t index) noexcept
     {
 
         constexpr word_type other_masks = static_cast<word_type>(-1); // all ones, e.g. no masking
@@ -113,7 +115,7 @@ public:
         return Width;
     }
 
-    [[nodiscard]] auto word(size_t index) const -> word_type
+    [[nodiscard]] constexpr auto word(size_t index) const -> word_type
     {
         return words[index];
     }
@@ -124,7 +126,7 @@ public:
      * The most significant bit is the Width's one (i.e. the one you can get via bit(Width-1)). This
      * method is simply there for convenience.
      */
-    [[nodiscard]] auto msb() const -> bit_type
+    [[nodiscard]] constexpr auto msb() const -> bit_type
     {
         return bit(Width - 1);
     }
@@ -146,16 +148,16 @@ public:
      * @param index The index for which the bit is to be returned
      * @return  The bit at the indexed position
      */
-    auto bit(size_t index) const -> bit_type
+    auto constexpr bit(size_t index) const -> bit_type
     {
         auto const the_word = word(index / word_width());
         auto const masked_bit = the_word & (static_cast<word_type>(1) << (index % word_width()));
         return static_cast<bit_type>(masked_bit > 0 ? 1 : 0);
     }
 
-    template <size_t Count> auto bits(size_t index) const -> word_array<Count>
+    template <size_t Count> constexpr auto bits(size_t index) const -> word_array<Count, WordType>
     {
-        word_array<Count> result;
+        word_array<Count, WordType> result;
         for (auto i = 0U; i < Count; ++i)
         {
             result.set_bit(i, bit(index + i));
@@ -167,14 +169,14 @@ public:
      * Setters
      */
 
-    void set_bit(size_t index, bool value = true)
+    void constexpr set_bit(size_t index, bool value = true)
     {
-        if (index >= width())
-        {
-
-            std::string msg = gen_oob_msg(index, true);
-            throw std::out_of_range(msg);
-        }
+        //        if (index >= width())
+        //        {
+        //
+        //            std::string msg = gen_oob_msg(index, true);
+        //            throw std::out_of_range(msg);
+        //        }
         const size_t word_index = index / word_width();
         const size_t inner_word_index = index % word_width();
         word_type mask = (1ULL << inner_word_index);
@@ -202,13 +204,13 @@ public:
                  masked_word | (static_cast<word_type>(value & 1) << (index % word_width())));
     }
 
-    void set_word(const size_t index, const word_type value)
+    void constexpr set_word(const size_t index, const word_type value)
     {
-        if (index >= word_count())
-        {
-            std::string msg = gen_oob_msg(index, false);
-            throw std::out_of_range(msg);
-        }
+        //        if (index >= word_count())
+        //        {
+        //            std::string msg = gen_oob_msg(index, false);
+        //            throw std::out_of_range(msg);
+        //        }
         words[index] = value & word_mask(index);
     }
 
@@ -293,20 +295,8 @@ public:
         }
     }
 
-    /**
-     * @brief Returns the maxmimum number of elements that can be stored in this word_array
-     *
-     * This number is fixed.
-     *
-     * @return The maximum number of elements
-     */
-    constexpr size_t max_size() const noexcept
-    {
-        return word_count();
-    }
-
     // Sets the words to the given values, where the right-most argument corresponds to word 0.
-    template <class... Args> void set_words(Args... args)
+    template <class... Args> void constexpr set_words(Args... args)
     {
         set_word_recursively<0>(args...);
     }
@@ -315,9 +305,9 @@ public:
      * Constants
      */
 
-    [[nodiscard]] static constexpr word_array all_ones()
+    [[nodiscard]] static constexpr word_array<Width, WordType> all_ones()
     {
-        word_array n;
+        word_array<Width, WordType> n;
         word_type ones = ~(static_cast<word_type>(0U));
         for (size_t i = 0; i < n.word_count(); ++i)
         {
@@ -326,7 +316,7 @@ public:
         return n;
     }
 
-    [[nodiscard]] static constexpr word_array all_zeroes()
+    [[nodiscard]] static constexpr word_array<Width, WordType> all_zeroes()
     {
         return word_array{0U};
     }
@@ -335,20 +325,22 @@ public:
      * Utility stuff
      */
 
-    [[nodiscard]] bool is_zero() const noexcept
+    [[nodiscard]] bool constexpr is_zero() const noexcept
     {
-        return std::all_of(words.begin(), words.end(), [](const word_type& w) {
-            word_type zero = 0U;
-            return w == zero;
-        });
+
+        for (size_t i = 0; i < word_count(); ++i)
+        {
+            if (word(i) != word_type(0))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
-    [[nodiscard]] explicit operator bool() const noexcept
+    [[nodiscard]] explicit constexpr operator bool() const noexcept
     {
-        return std::any_of(words.begin(), words.end(), [](const word_type& w) {
-            word_type zero = 0U;
-            return w != zero;
-        });
+        return !is_zero();
     }
 
     constexpr auto begin() const noexcept
@@ -393,7 +385,7 @@ public:
 
 private:
     template <size_t index, class... Args>
-    auto set_word_recursively(word_type value, Args... args) -> size_t
+    auto constexpr set_word_recursively(word_type value, Args... args) -> size_t
     {
         static_assert(index < word_count(), "too many initializer words");
         auto const count = set_word_recursively<index + 1>(args...);
@@ -401,7 +393,7 @@ private:
         return count;
     }
 
-    template <size_t index> auto set_word_recursively(word_type value) -> size_t
+    template <size_t index> auto constexpr set_word_recursively(word_type value) -> size_t
     {
         static_assert(index < word_count(), "too many initializer words");
         words[0] = value & word_mask(0);
@@ -436,14 +428,15 @@ private:
     std::array<word_type, word_count()> words{{0}};
 };
 
-template <size_t Width> class is_word_array<word_array<Width>>
+template <size_t Width, typename T> class is_word_array<word_array<Width, T>>
 {
 public:
     static constexpr bool value = true;
 };
 
-template <size_t DestinationWidth, size_t SourceWidth>
-[[nodiscard]] auto width_cast(const word_array<SourceWidth>& source) -> word_array<DestinationWidth>
+template <size_t DestinationWidth, size_t SourceWidth, typename T>
+[[nodiscard]] auto constexpr width_cast(const word_array<SourceWidth, T>& source)
+    -> word_array<DestinationWidth, T>
 {
 
     if constexpr (SourceWidth == DestinationWidth)
@@ -453,7 +446,7 @@ template <size_t DestinationWidth, size_t SourceWidth>
     else
     {
 
-        word_array<DestinationWidth> word_container;
+        word_array<DestinationWidth, T> word_container;
         if constexpr (DestinationWidth >= SourceWidth)
         {
             for (auto i = 0U; i < source.word_count(); ++i)

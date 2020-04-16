@@ -16,7 +16,8 @@ namespace aarith {
  * @param b Right word_array
  * @return true iff the word containers are identical in every bit
  */
-template <size_t W, size_t V> bool operator==(const word_array<W>& a, const word_array<V>& b)
+template <size_t W, size_t V, typename WordType>
+constexpr bool operator==(const word_array<W, WordType>& a, const word_array<V, WordType>& b)
 {
 
     if constexpr (W != V)
@@ -25,7 +26,7 @@ template <size_t W, size_t V> bool operator==(const word_array<W>& a, const word
     }
     else
     {
-        for (auto i = 0U; i < word_array<W>::word_count(); ++i)
+        for (auto i = 0U; i < word_array<W, WordType>::word_count(); ++i)
         {
             if (a.word(i) != b.word(i))
             {
@@ -36,7 +37,7 @@ template <size_t W, size_t V> bool operator==(const word_array<W>& a, const word
     }
 }
 
-template <typename W, typename V> bool operator!=(const W& a, const V& b)
+template <typename W, typename V> constexpr bool operator!=(const W& a, const V& b)
 {
     static_assert(::aarith::is_word_array_v<W>);
     static_assert(::aarith::is_word_array_v<V>);

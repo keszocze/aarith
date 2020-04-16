@@ -12,13 +12,14 @@ SCENARIO("Performing common functional operations", "[word_array]")
     GIVEN("A word container w ")
     {
 
-        const word_array<256> w{5, 1, 2, 3};
+        constexpr word_array<256> w{5, 1, 2, 3};
 
         WHEN("Mapping the values by adding one")
         {
             THEN("All individual words should be increased by one")
             {
-                const auto result = map(w, [](word_array<256>::word_type a) { return a + 1; });
+                constexpr auto fun = [](word_array<256>::word_type a) { return a + 1; };
+                constexpr auto result = map(w, fun);
 
                 CHECK(result.word(0) == 4);
                 CHECK(result.word(1) == 3);
@@ -31,7 +32,8 @@ SCENARIO("Performing common functional operations", "[word_array]")
         {
             THEN("All individual words should be increased by one")
             {
-                const auto result = map(w, [](word_array<256>::word_type a) { return a << 2; });
+                constexpr auto fun = [](word_array<256>::word_type a) { return a << 2; };
+                constexpr auto result = map(w, fun);
 
                 CHECK(result.word(0) == 12);
                 CHECK(result.word(1) == 8);
@@ -44,26 +46,27 @@ SCENARIO("Performing common functional operations", "[word_array]")
         {
             THEN("Summing up the individual words should work fine")
             {
-                const auto f = [](const word_array<265>::word_type a, uint64_t w) { return a + w; };
-                const auto result = reduce(w, f, 0);
+                constexpr auto f = [](const word_array<265>::word_type a, uint64_t w) {
+                    return a + w;
+                };
+                constexpr auto result = reduce(w, f, 0);
                 CHECK(result == 11U);
             }
         }
 
         AND_GIVEN("Another word container v of same length")
         {
-            const word_array<256> v{8, 16, 32, 64};
+            constexpr word_array<256> v{8, 16, 32, 64};
             WHEN("Performing the zip_with operation")
             {
 
                 THEN("Element-wise addition should work as intended")
                 {
 
-                    const auto f = [](word_array<256>::word_type a, word_array<256>::word_type b) {
-                        return a + b;
-                    };
+                    constexpr auto f = [](word_array<256>::word_type a,
+                                          word_array<256>::word_type b) { return a + b; };
 
-                    const auto result = zip_with(w, v, f);
+                    constexpr auto result = zip_with(w, v, f);
 
                     for (size_t i = 0; i < w.word_count(); ++i)
                     {
@@ -72,10 +75,10 @@ SCENARIO("Performing common functional operations", "[word_array]")
                 }
                 THEN("It should be capable of modelling additions")
                 {
-                    const word_array<128> a{0, std::numeric_limits<uint64_t>::max()};
-                    const word_array<128> b{0, std::numeric_limits<uint64_t>::max()};
+                    constexpr word_array<128> a{0, std::numeric_limits<uint64_t>::max()};
+                    constexpr word_array<128> b{0, std::numeric_limits<uint64_t>::max()};
 
-                    const auto f = [carry = uint64_t(0)](uint64_t ain, uint64_t bin) mutable {
+                    constexpr auto f = [carry = uint64_t(0)](uint64_t ain, uint64_t bin) mutable {
                         uint64_t partial_sum = ain + bin;
                         uint64_t new_carry = (partial_sum < ain || partial_sum < bin) ? 1U : 0U;
 
@@ -85,9 +88,9 @@ SCENARIO("Performing common functional operations", "[word_array]")
                         return partial_sum;
                     };
 
-                    const auto result = zip_with(a, b, f);
+                    constexpr auto result = zip_with(a, b, f);
 
-                    const auto uinteger_result = add(uinteger<128>(a), uinteger<128>(b));
+                    constexpr auto uinteger_result = add(uinteger<128>(a), uinteger<128>(b));
 
                     CHECK(uinteger<192>(result) == uinteger_result);
                 }
@@ -97,10 +100,10 @@ SCENARIO("Performing common functional operations", "[word_array]")
             {
                 THEN("It should be capable of modeling addition")
                 {
-                    const word_array<128> a{0, std::numeric_limits<uint64_t>::max()};
-                    const word_array<128> b{0, std::numeric_limits<uint64_t>::max()};
+                    constexpr word_array<128> a{0, std::numeric_limits<uint64_t>::max()};
+                    constexpr word_array<128> b{0, std::numeric_limits<uint64_t>::max()};
 
-                    const auto f = [](uint64_t ain, uint64_t bin, uint64_t cin) {
+                    constexpr auto f = [](uint64_t ain, uint64_t bin, uint64_t cin) {
                         uint64_t partial_sum = ain + bin;
                         uint64_t new_carry = (partial_sum < ain || partial_sum < bin) ? 1U : 0U;
 
@@ -110,9 +113,9 @@ SCENARIO("Performing common functional operations", "[word_array]")
                         return std::make_pair(partial_sum, new_carry);
                     };
 
-                    const auto result = zip_with_state(a, b, f);
+                    constexpr auto result = zip_with_state(a, b, f);
 
-                    const auto uinteger_result = add(uinteger<128>(a), uinteger<128>(b));
+                    constexpr auto uinteger_result = add(uinteger<128>(a), uinteger<128>(b));
 
                     CHECK(uinteger<192>(result) == uinteger_result);
                 }
@@ -121,7 +124,7 @@ SCENARIO("Performing common functional operations", "[word_array]")
             {
                 THEN("The result should work out well, filling additional slots with zeroes")
                 {
-                    const auto result = trivial_approx_add<256, 256>(w, v);
+                    const auto result = trivial_approx_add<256, 256, uint64_t>(w, v);
 
                     for (size_t i = 0; i < w.word_count(); ++i)
                     {
@@ -137,8 +140,9 @@ SCENARIO("Performing common functional operations", "[word_array]")
 
                     const std::vector<uint64_t> ns{8U, 15U, 5743U, 0U};
 
-                    const auto f = [](word_array<256>::word_type a, word_array<256>::word_type b,
-                                      uint64_t m) { return a + b + m; };
+                    constexpr auto f = [](word_array<256>::word_type a,
+                                          word_array<256>::word_type b,
+                                          uint64_t m) { return a + b + m; };
 
                     for (const auto n : ns)
                     {
@@ -152,7 +156,9 @@ SCENARIO("Performing common functional operations", "[word_array]")
             {
                 THEN("The result should work out well")
                 {
-                    const auto result = trivial_approx_add<256, 256>(w, v);
+                    constexpr uinteger<256> a{w};
+                    constexpr uinteger<256> b{v};
+                    const auto result = trivial_approx_add<256, 256>(a, b);
 
                     for (size_t i = 0; i < w.word_count(); ++i)
                     {
@@ -164,7 +170,7 @@ SCENARIO("Performing common functional operations", "[word_array]")
 
         AND_GIVEN("Another word container v of different length")
         {
-            const word_array<192> v{8, 16, 64};
+            constexpr word_array<192> v{8, 16, 64};
             WHEN("Performing the zip_with operation")
             {
 
@@ -191,7 +197,9 @@ SCENARIO("Performing common functional operations", "[word_array]")
             {
                 THEN("The result should work out well, filling additional slots with zeroes")
                 {
-                    const auto result = trivial_approx_add<256, 192>(w, v);
+                    constexpr uinteger<256> a{w};
+                    constexpr uinteger<192> b{v};
+                    const auto result = trivial_approx_add<256, 192>(a, b);
 
                     for (size_t i = 0; i < w.word_count() - 1; ++i)
                     {
