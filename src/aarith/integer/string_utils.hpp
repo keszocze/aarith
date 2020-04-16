@@ -6,7 +6,8 @@
 namespace aarith {
 
 /// Convert the given uinteger value into a string representation with base 2^N.
-template <size_t N, size_t Width, typename WordType> auto to_base_2n(const uinteger<Width,WordType>& value)
+template <size_t N, size_t Width, typename WordType>
+auto to_base_2n(const uinteger<Width, WordType>& value)
 {
     static_assert(N <= 4);
     static constexpr char digits[16] = {'0', '1', '2', '3', '4', '5', '6', '7',
@@ -23,19 +24,22 @@ template <size_t N, size_t Width, typename WordType> auto to_base_2n(const uinte
 }
 
 /// Convert the given uinteger value into a hexadecimal string representation.
-template <size_t Width, typename WordType> auto to_hex(const uinteger<Width, WordType>& value) -> std::string
+template <size_t Width, typename WordType>
+auto to_hex(const uinteger<Width, WordType>& value) -> std::string
 {
     return to_base_2n<4>(value);
 }
 
 /// Convert the given uinteger value into a octal string representation.
-template <size_t Width, typename WordType> auto to_octal(const uinteger<Width,WordType>& value) -> std::string
+template <size_t Width, typename WordType>
+auto to_octal(const uinteger<Width, WordType>& value) -> std::string
 {
     return to_base_2n<3>(value);
 }
 
 /// Convert the given integer value into a hexadecimal string representation.
-template <size_t Width, typename WordType> auto to_hex(const integer<Width, WordType>& value) -> std::string
+template <size_t Width, typename WordType>
+auto to_hex(const integer<Width, WordType>& value) -> std::string
 {
 
     std::string res;
@@ -49,7 +53,8 @@ template <size_t Width, typename WordType> auto to_hex(const integer<Width, Word
 }
 
 /// Convert the given integer value into a octal string representation.
-template <size_t Width, typename WordType> auto to_octal(const integer<Width, WordType>& value) -> std::string
+template <size_t Width, typename WordType>
+auto to_octal(const integer<Width, WordType>& value) -> std::string
 {
 
     std::string res;
@@ -65,7 +70,8 @@ template <size_t Width, typename WordType> auto to_octal(const integer<Width, Wo
 /// Convert the given uinteger value into a binary coded decimal (BCD), represented within a new
 /// uinteger.
 template <size_t Width, typename WordType>
-auto to_bcd(const uinteger<Width, WordType>& num) -> uinteger<number_of_decimal_digits(Width) * 4, WordType>
+auto to_bcd(const uinteger<Width, WordType>& num)
+    -> uinteger<number_of_decimal_digits(Width) * 4, WordType>
 {
     using namespace aarith::arithmetic_operators;
 
@@ -100,13 +106,15 @@ auto to_bcd(const uinteger<Width, WordType>& num) -> uinteger<number_of_decimal_
 }
 
 /// Convert the given uinteger value into a decimal string representation.
-template <size_t Width, typename WordType> auto to_decimal(const uinteger<Width, WordType>& value) -> std::string
+template <size_t Width, typename WordType>
+auto to_decimal(const uinteger<Width, WordType>& value) -> std::string
 {
     return remove_leading_zeroes(to_hex(to_bcd(value)));
 }
 
 /// Convert the given integer value into a decimal string representation.
-template <size_t Width, typename WordType> auto to_decimal(const integer<Width, WordType>& value) -> std::string
+template <size_t Width, typename WordType>
+auto to_decimal(const integer<Width, WordType>& value) -> std::string
 {
 
     std::string res;
