@@ -6,18 +6,6 @@
 
 using namespace aarith;
 
-SCENARIO("Creating unsigned integers with different WordTypes")
-{
-    WHEN("The WordType is smaller than the bit-width")
-    {
-        using I = uinteger<16, uint8_t>;
-
-        I a{0};
-
-        REQUIRE(a == I::zero());
-    }
-}
-
 SCENARIO("Creating uintegers using the from_words method")
 {
     WHEN("The uinteger does not have a bit width as a multiple of the word width")

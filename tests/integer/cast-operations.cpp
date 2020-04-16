@@ -110,9 +110,6 @@ SCENARIO("Casting unsigned integers to uint8_t", "[integer][unsigned][conversion
                 uint8_t d8 = static_cast<uint8_t>(d);
                 uint8_t e8 = static_cast<uint8_t>(e);
 
-                //                uinteger<16,uint8_t> foo{val};
-                //                [[maybe_unused]] uint8_t f8 = static_cast<uint16_t>(foo);
-
                 uint8_t expected = static_cast<uint8_t>(val);
 
                 REQUIRE(a8 == expected);
