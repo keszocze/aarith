@@ -98,8 +98,8 @@ SCENARIO("Comparing two positive integers with different bit widths", "[uinteger
             const size_t TestWidth = 16;
             static constexpr uint16_t number_a = 7;
             static constexpr uint16_t number_b = 23;
-            const integer<TestWidth> a{number_a};
-            const integer<TestWidth + 10> b{number_b};
+            constexpr integer<TestWidth> a{number_a};
+            constexpr integer<TestWidth + 10> b{number_b};
 
             THEN("operator< returns true")
             {
@@ -143,8 +143,7 @@ SCENARIO("Comparing two positive integers with different bit widths", "[uinteger
         THEN("operator< returns true")
         {
             REQUIRE(a_neg < b);
-            const bool smaller = (a < b);
-            REQUIRE(smaller);
+            REQUIRE(a < b);
         }
         THEN("operator<= returns true")
         {
