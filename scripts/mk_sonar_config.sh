@@ -17,7 +17,7 @@ cat <<EOF
 
 	sonar.sources=./src,./tests
 	
-	sonar.cfamily.build-wrapper-output=./build/bw_output
+	sonar.cfamily.build-wrapper-output=./build/gcc/bw_output
 	sonar.cfamily.threads=$(nproc)
 
 	$(branch_config $1)
