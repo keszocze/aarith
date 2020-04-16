@@ -13,117 +13,46 @@ namespace aarith {
  *
  * @note Two numbers can be equal even though they have different bit widths!
  */
-template <size_t W, size_t V> bool constexpr operator==(const uinteger<W>& a, const uinteger<V>& b)
+template <size_t W, size_t V, class T, template <size_t, class> typename Int>
+constexpr bool operator==(const Int<W, T>& a, const Int<V, T>& b)
 {
+    constexpr size_t max_width = std::max(W, V);
 
-    // TODO remove when clang implements the stuff as constexpr
-#ifndef __clang__
-    constexpr auto min_count = std::min(a.word_count(), b.word_count());
-    constexpr auto max_count = std::max(a.word_count(), b.word_count());
-#else
-    const auto min_count = std::min(a.word_count(), b.word_count());
-    const auto max_count = std::max(a.word_count(), b.word_count());
-#endif
+    Int<max_width, T> a_ = width_cast<max_width>(a);
+    Int<max_width, T> b_ = width_cast<max_width>(b);
 
-    for (auto i = 0U; i < min_count; ++i)
+    for (size_t i = 0U; i < Int<max_width, T>::word_count(); ++i)
     {
-        if (a.word(i) != b.word(i))
+        if (a_.word(i) != b_.word(i))
         {
             return false;
-        }
-    }
-
-    if constexpr (W > V)
-    {
-        for (size_t i = min_count; i < max_count; ++i)
-        {
-            if (a.word(i) != 0U)
-            {
-                return false;
-            }
-        }
-    }
-    else
-    {
-        for (size_t i = min_count; i < max_count; ++i)
-        {
-            if (b.word(i) != 0U)
-            {
-                return false;
-            }
         }
     }
 
     return true;
 }
 
-/**
- * @brief Strictly tests to aarith integers for equality
- *
- * This method does not only check the stored value but also tests whether the bit-widths are
- * identical. If only a semantic comparison is to be performed, use {@see operator==} instead. If
- * the bit widths of the operands do not match, the result is immediately determined to be false.
- *
- * @tparam Integer Integer type
- * @tparam W Bitwidth of the first integer
- * @tparam V Bitwidth of the second integer
- * @param a First integer to compare
- * @param b Second integer to compare
- * @return Whether the two integers are strictly equal
- */
-template <template <size_t, typename> class Integer, size_t W, size_t V, typename WordType>
-constexpr bool strict_eq(const Integer<W, WordType>& a, const Integer<V, WordType>& b)
-{
-    // we only want to work on our own types...
-    static_assert(::aarith::is_integral_v<Integer<W, WordType>>);
-
-    if constexpr (W != V)
-    {
-        return false;
-    }
-    return a == b;
-}
-
-/**
- * @brief Strictly compares to aarith integers for inequality
- *
- * This method does not only check the stored value but also tests whether the bit-widths are
- * identical. If only a semantic comparison is to be performed, use {@see operator!=} instead. If
- * the bit widths of the operands do not match, the result is immediately determined to be true.
- *
- * @tparam Integer Integer type
- * @tparam W Bitwidth of the first integer
- * @tparam V Bitwidth of the second integer
- * @param a First integer to compare
- * @param b Second integer to compare
- * @return Whether the two integers are strictly equal
- */
-template <template <size_t, typename> class Integer, size_t W, size_t V, typename WordType>
-constexpr bool strict_not_eq(const Integer<W, WordType>& a, const Integer<V, WordType>& b)
-{
-    // we only want to work on our own types...
-    static_assert(::aarith::is_integral_v<Integer<W, WordType>>);
-
-    if constexpr (W != V)
-    {
-        return true;
-    }
-
-    return !(a == b);
-}
-
-template <size_t W, size_t V> constexpr bool operator<(const uinteger<W>& a, const uinteger<V>& b)
+template <size_t W, size_t V, typename WordType>
+constexpr bool operator<(const uinteger<W, WordType>& a, const uinteger<V, WordType>& b)
 {
 
-    const auto min_count = std::min(a.word_count(), b.word_count());
-    const auto max_count = std::max(a.word_count(), b.word_count());
+    using word_type = typename integer<W, WordType>::word_type;
 
-    if constexpr (W > V)
+    constexpr size_t words_W = integer<W, WordType>::word_count();
+    constexpr size_t words_V = integer<V, WordType>::word_count();
+
+    if constexpr (words_W == words_V)
     {
-        for (size_t i = max_count - 1; i >= min_count; --i)
+        for (auto i = words_W; i > 0; --i)
         {
-            auto const word_a = a.word(i);
-            if (word_a > 0U)
+            word_type const word_a = a.word(i - 1);
+            word_type const word_b = b.word(i - 1);
+
+            if (word_a < word_b)
+            {
+                return true;
+            }
+            if (word_a > word_b)
             {
                 return false;
             }
@@ -131,27 +60,29 @@ template <size_t W, size_t V> constexpr bool operator<(const uinteger<W>& a, con
     }
     else
     {
-        for (size_t i = max_count - 1; i >= min_count; --i)
+        // if there really was a performance bottleneck, we could split this into the two cases
+        // words_W < words_V and words_V < word_W and create special purpose code. currently we
+        // do not care too much about speed
+
+        const size_t max_width =
+            std::max(W, V); // TODO make constexpr the moment clang supports this
+
+        integer<max_width, WordType> a_ = width_cast<max_width>(a);
+        integer<max_width, WordType> b_ = width_cast<max_width>(b);
+
+        for (auto i = integer<max_width, WordType>::word_count(); i > 0; --i)
         {
-            auto const word_b = b.word(i);
-            if (word_b > 0U)
+            word_type const word_a = a_.word(i - 1);
+            word_type const word_b = b_.word(i - 1);
+
+            if (word_a < word_b)
             {
                 return true;
             }
-        }
-    }
-
-    for (auto i = min_count; i > 0; --i)
-    {
-        auto const word_a = a.word(i - 1);
-        auto const word_b = b.word(i - 1);
-        if (word_a < word_b)
-        {
-            return true;
-        }
-        else if (word_a > word_b)
-        {
-            return false;
+            if (word_a > word_b)
+            {
+                return false;
+            }
         }
     }
 
@@ -176,114 +107,10 @@ template <typename W, typename V> constexpr bool operator>(const W& a, const V& 
     return b < a;
 }
 
-template <size_t W, size_t V> constexpr bool operator==(const integer<W>& a, const integer<V>& b)
-{
-    // TODO remove when clang implements the stuff as constexpr
-#ifndef __clang__
-    constexpr auto min_count = std::min(a.word_count(), b.word_count());
-    constexpr auto max_count = std::max(a.word_count(), b.word_count());
-#else
-    const auto min_count = std::min(a.word_count(), b.word_count());
-    const auto max_count = std::max(a.word_count(), b.word_count());
-#endif
-
-    if (a.is_negative() != b.is_negative())
-    {
-        return false;
-    }
-
-    const bool numbers_are_negative = a.is_negative(); // we can pick either a or b
-
-    using word_type = typename integer<W>::word_type;
-
-    if constexpr (W > V)
-    {
-
-        for (size_t i = min_count; i < max_count; ++i)
-        {
-            /*
-             * We have to check whether the leading bits (within the range of the mask/the number of
-             * specified bits) consists of ones only. This is necessary for negative numbers only
-             */
-            if (numbers_are_negative)
-            {
-                const word_type mask = integer<W>::word_mask(i);
-                if (a.word(i) != mask)
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                /*
-                 * If the numbers are not negative, there is no need to check against ones (as
-                 * provided by the mask) being set as the unused bits are already correctly filled
-                 * with zeroes (at least, if the numbers are identical)
-                 */
-                if (a.word(i) != 0U)
-                {
-                    return false;
-                }
-            };
-        }
-    }
-    else
-    {
-        for (size_t i = min_count; i < max_count; ++i)
-        {
-            if (numbers_are_negative)
-            {
-                const word_type mask = integer<V>::word_mask(i);
-                if (b.word(i) != mask)
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                if (b.word(i) != 0U)
-                {
-                    return false;
-                }
-            };
-        }
-    }
-
-    for (auto i = 0U; i < min_count; ++i)
-    {
-        if (numbers_are_negative)
-        {
-            if constexpr (W > V)
-            {
-                if ((a.word(i) & b.word_mask(i)) != b.word(i))
-                {
-                    return false;
-                }
-            }
-            else
-            {
-                if (a.word(i) != (b.word(i) & a.word_mask(i)))
-                {
-                    return false;
-                }
-            }
-        }
-        else
-        {
-            if (a.word(i) != b.word(i))
-            {
-                return false;
-            }
-        }
-    }
-
-    return true;
-}
-
-template <size_t W, size_t V> constexpr bool operator<(const integer<W>& a, const integer<V>& b)
+template <size_t W, size_t V, typename WordType>
+constexpr bool operator<(const integer<W, WordType>& a, const integer<V, WordType>& b)
 {
 
-    using word_type = typename integer<W>::word_type;
     const auto min_count = std::min(a.word_count(), b.word_count());
     const auto max_count = std::max(a.word_count(), b.word_count());
 
@@ -303,7 +130,7 @@ template <size_t W, size_t V> constexpr bool operator<(const integer<W>& a, cons
     {
         for (size_t i = max_count - 1; i >= min_count; --i)
         {
-            auto const word_a = static_cast<word_type>(a.word(i));
+            auto const word_a = static_cast<WordType>(a.word(i));
             if (word_a > 0U)
             {
                 return !both_positive;
@@ -314,7 +141,7 @@ template <size_t W, size_t V> constexpr bool operator<(const integer<W>& a, cons
     {
         for (size_t i = max_count - 1; i >= min_count; --i)
         {
-            auto const word_b = static_cast<word_type>(b.word(i));
+            auto const word_b = static_cast<WordType>(b.word(i));
             if (word_b > 0U)
             {
                 return both_positive;
@@ -324,8 +151,8 @@ template <size_t W, size_t V> constexpr bool operator<(const integer<W>& a, cons
 
     for (auto i = min_count - 1; i >= 0; --i)
     {
-        auto const word_a = static_cast<word_type>(a.word(i));
-        auto const word_b = static_cast<word_type>(b.word(i));
+        auto const word_a = static_cast<WordType>(a.word(i));
+        auto const word_b = static_cast<WordType>(b.word(i));
 
         if (word_a > word_b)
         {

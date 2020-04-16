@@ -89,7 +89,7 @@ SCENARIO("Comparing two positive sintegers", "[uinteger][utility]")
         }
     }
 }
-SCENARIO("Comparing two positive sintegers with different bit widths", "[uinteger][utility]")
+SCENARIO("Comparing two positive integers with different bit widths", "[uinteger][utility]")
 {
     GIVEN("Two integer<N> a and b with a < b with different bit widths")
     {
@@ -173,114 +173,124 @@ SCENARIO("Comparing two positive sintegers with different bit widths", "[uintege
     }
 }
 
-SCENARIO("Determining strict (in)equality")
+SCENARIO("Investigating the comparison of max and min values", "[integer][comparison][utility]")
 {
-    GIVEN("Two  integers storing the same value")
+    GIVEN("integer<8>::max/min")
     {
-
         using T = integer<8>;
-        using I = integer<9>;
+        T min = T::min();
+        T max = T::max();
+        T min_from_limits = std::numeric_limits<T>::min();
+        T max_from_limits = std::numeric_limits<T>::max();
 
-        WHEN("The bit widths are identical")
+        WHEN("Comparing the integer::max/min and numeric_limits::max/min")
         {
-
-            THEN("They should be strictly equal")
+            THEN("The values should be identical")
             {
-                for (int i = -10; i < 11; ++i)
-                {
-                    T a{i};
-                    T b{i};
+                REQUIRE(min == min_from_limits);
+                REQUIRE(max == max_from_limits);
 
-                    const bool strictly_equal = strict_eq(a, b);
-                    const bool strictly_unequal = strict_not_eq(a, b);
-
-                    REQUIRE(strictly_equal);
-                    REQUIRE_FALSE(strictly_unequal);
-                }
+                REQUIRE(!(min != min_from_limits));
+                REQUIRE(!(max != max_from_limits));
             }
         }
-        WHEN("The bit widths are not identical")
+
+        WHEN("Constructing min and max value into a larger integer")
         {
-            THEN("They should not be strictly equal")
+            integer<9> min_ = T::min();
+            integer<9> max_ = T::max();
+
+            THEN("min should be negative")
             {
-                for (int i = -10; i < 11; ++i)
-                {
-                    T a{i};
-                    I b{i};
+                CHECK(min_.is_negative());
+                REQUIRE(min.is_negative());
+            }
+            AND_THEN("the values should match the values from the integers with the smaller width")
+            {
 
-                    const bool strictly_equal = strict_eq(a, b);
-                    const bool strictly_unequal = strict_not_eq(a, b);
+                CHECK(min == min_);
+                CHECK(max == max_);
 
-                    REQUIRE_FALSE(strictly_equal);
-                    REQUIRE(strictly_unequal);
-                }
+                CHECK(min_ == T::min());
+                CHECK(max_ == T::max());
+
+                CHECK(min == T::min());
+                REQUIRE(max == T::max());
+            }
+            AND_THEN("min should be smaller than max")
+            {
+                CHECK(min_ < max);
+                REQUIRE(min < max);
+            }
+        }
+
+        WHEN("Comparing these values")
+        {
+            THEN("The result should make sense")
+            {
+                REQUIRE(min < max);
+                REQUIRE(min_from_limits < max_from_limits);
+
+                REQUIRE(min <= max);
+                REQUIRE(min_from_limits <= max_from_limits);
+
+                REQUIRE(!(min > max));
+                REQUIRE(!(min_from_limits > max_from_limits));
+
+                REQUIRE(!(min >= max));
+                REQUIRE(!(min_from_limits >= max_from_limits));
+
+                REQUIRE(min != max);
+                REQUIRE(min_from_limits != max_from_limits);
+
+                REQUIRE(!(min == max));
+                REQUIRE(!(min_from_limits == max_from_limits));
             }
         }
     }
 
-    GIVEN("Two unsigned integers storing the same value")
+    GIVEN("integer<16>::max/min")
     {
-        using T = uinteger<8>;
-        using I = uinteger<9>;
+        using T = integer<16>;
+        T min = T::min();
+        T max = T::max();
 
-        WHEN("The bit widths are identical")
+        T min_from_limits = std::numeric_limits<T>::min();
+        T max_from_limits = std::numeric_limits<T>::max();
+
+        WHEN("Comparing the integer::max/min and numeric_limits::max/min")
         {
-
-            THEN("They should be strictly equal")
+            THEN("The values should be identical")
             {
-                for (size_t i = 0; i < 23; ++i)
-                {
-                    T a{i};
-                    T b{i};
+                REQUIRE(min == min_from_limits);
+                REQUIRE(max == max_from_limits);
 
-                    const bool strictly_equal = strict_eq(a, b);
-                    const bool strictly_unequal = strict_not_eq(a, b);
-
-                    REQUIRE_FALSE(strictly_unequal);
-                    REQUIRE(strictly_equal);
-                }
+                REQUIRE(!(min != min_from_limits));
+                REQUIRE(!(max != max_from_limits));
             }
         }
-        WHEN("The bit widths are not identical")
+
+        WHEN("Comparing these values")
         {
-            THEN("They should not be strictly equal")
+            THEN("The result should make sense")
             {
-                for (size_t i = 0; i < 23; ++i)
-                {
-                    T a{i};
-                    I b{i};
+                REQUIRE(min < max);
+                REQUIRE(min_from_limits < max_from_limits);
 
-                    const bool strictly_equal = strict_eq(a, b);
-                    const bool strictly_unequal = strict_not_eq(a, b);
+                REQUIRE(min <= max);
+                REQUIRE(min_from_limits <= max_from_limits);
 
-                    REQUIRE_FALSE(strictly_equal);
-                    REQUIRE(strictly_unequal);
-                }
-            }
-        }
-        WHEN("Trying to use the comparisons in a constexpr context")
-        {
-            THEN("It should compile for unsigned integers")
-            {
-                constexpr uinteger<8> a = uinteger<8>::one();
-                constexpr uinteger<9> b = uinteger<9>::one();
+                REQUIRE(!(min > max));
+                REQUIRE(!(min_from_limits > max_from_limits));
 
-                constexpr bool strictly_equal = strict_eq(a, b);
-                constexpr bool strictly_unequal = strict_not_eq(a, b);
+                REQUIRE(!(min >= max));
+                REQUIRE(!(min_from_limits >= max_from_limits));
 
-                REQUIRE_FALSE(strictly_equal);
-                REQUIRE(strictly_unequal);
-            }
-            AND_THEN("It should compile for unsigned integers")
-            {
-                constexpr integer<8> a = integer<8>::one();
-                constexpr integer<9> b = integer<9>::one();
+                REQUIRE(min != max);
+                REQUIRE(min_from_limits != max_from_limits);
 
-                constexpr bool strictly_equal = strict_eq(a, b);
-                constexpr bool strictly_unequal = strict_not_eq(a, b);
-
-                REQUIRE_FALSE(strictly_equal);
-                REQUIRE(strictly_unequal);
+                REQUIRE(!(min == max));
+                REQUIRE(!(min_from_limits == max_from_limits));
             }
         }
     }
