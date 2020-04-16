@@ -24,6 +24,33 @@ public:
     {
     }
 
+    // Constructor for unsigned ints that are *not* the WordType
+    template <typename Val, typename = std::enable_if_t<::aarith::is_unsigned_int<Val> &&
+                                                        (sizeof(Val) * 8) <= Width>>
+    constexpr explicit uinteger(Val n)
+        : word_array<Width, WordType>(0U)
+    {
+
+        constexpr size_t size_of_val = sizeof(Val) * 8;
+        constexpr size_t word_size = uinteger<Width, WordType>::word_width();
+
+        if constexpr (size_of_val <= word_size)
+        {
+            this->set_word(0, n);
+        }
+        else
+        {
+            size_t word_index = 0;
+            while (n != 0)
+            {
+                WordType part_n = static_cast<WordType>(n);
+                this->set_word(word_index, part_n);
+                n = n >> word_size;
+                ++word_index;
+            }
+        }
+    }
+
     template <class... Args>
     constexpr uinteger(WordType fst, Args... args)
         : word_array<Width, WordType>(fst, args...)
