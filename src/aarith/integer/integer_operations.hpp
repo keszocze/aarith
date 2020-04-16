@@ -18,8 +18,8 @@ template <typename I, typename T>
 [[nodiscard]] constexpr auto expanding_add(const I& a, const T& b, const bool initial_carry = false)
 {
 
-    static_assert(is_integral_v<I>);
-    static_assert(is_integral_v<T>);
+    static_assert(::aarith::is_integral_v<I>);
+    static_assert(::aarith::is_integral_v<T>);
 
     // TODO do we need this assertion?
     static_assert(::aarith::same_sign<I, T>);
@@ -60,7 +60,7 @@ template <typename I, typename T>
  */
 template <typename I>[[nodiscard]] constexpr auto sub(const I& a, const I& b) -> I
 {
-    static_assert(is_integral_v<I>);
+    static_assert(::aarith::is_integral_v<I>);
 
     auto result = expanding_add(a, ~b, true);
     return width_cast<I::width()>(result);
@@ -134,8 +134,8 @@ template <std::size_t W, std::size_t V, typename WordType>
     }
     else
     {
-        static_assert(is_integral_v<uinteger<res_width, WordType>>);
-        static_assert(is_unsigned_v<uinteger<res_width, WordType>>);
+        static_assert(::aarith::is_integral_v<uinteger<res_width, WordType>>);
+        static_assert(::aarith::is_unsigned_v<uinteger<res_width, WordType>>);
 
         const auto leading_zeroes = V - count_leading_zeroes(b);
         uinteger<res_width, WordType> a_ = width_cast<res_width>(a);
@@ -461,12 +461,12 @@ template <class IntA, class IntB>
 [[nodiscard]] constexpr auto fun_add_expand(const IntA& a, const IntB& b,
                                             const bool initial_carry = false)
 {
-    static_assert(is_integral_v<IntA>);
-    static_assert(is_integral_v<IntB>);
+    static_assert(::aarith::is_integral_v<IntA>);
+    static_assert(::aarith::is_integral_v<IntB>);
 
     // TODO do we need this assertion?
-    static_assert(same_sign<IntA, IntB>);
-    static_assert(same_word_type<IntA, IntB>);
+    static_assert(::aarith::same_sign<IntA, IntB>);
+    static_assert(::aarith::same_word_type<IntA, IntB>);
 
     constexpr size_t res_width = std::max(IntA::width(), IntB::width()) + 1U;
     using word_type = typename IntA::word_type;
@@ -673,6 +673,43 @@ constexpr auto operator-(const integer<W, WordType>& n) -> integer<W, WordType>
 }
 
 /**
+ * @brief Computes the sign of the integer.
+ *
+ * For the number zero, the function returns a signum of 0,  -1 for negative numbers and +1 for
+ * positive numbers.
+ *
+ * @tparam W The width of the integer
+ * @param n The integer
+ * @return The sign of the integer
+ */
+template <size_t W>[[nodiscard]] int8_t signum(integer<W> n)
+{
+    if (n.is_negative())
+    {
+        return -1;
+    }
+    if (n.is_zero())
+    {
+        return 0;
+    }
+    return 1;
+}
+
+/**
+ * @brief Computes the sign of the unsigned integer.
+ *
+ * For the number zero, the function returns a signum of 0 and a 1 for every other number.
+ *
+ * @tparam W The width of the unsigned integer
+ * @param n The integer
+ * @return The sign of the integer
+ */
+template <size_t W>[[nodiscard]] int8_t signum(uinteger<W> n)
+{
+    return n.is_zero() ? 0 : 1;
+}
+
+/**
  * @brief Implements the restoring division algorithm.
  *
  * @note integer<W>::min/integer<W>(-1) will return <integer<W>::min,0>, i.e. some weird
@@ -734,10 +771,22 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
         Q = -Q;
     }
 
-    integer<W, WordType> Q_cast = width_cast<W>(Q);
-    integer<W, WordType> remainder_cast = width_cast<W>(remainder_);
+    integer<W> Q_cast = width_cast<W>(Q);
+    integer<W> remainder_cast = width_cast<W>(remainder_);
 
     return std::make_pair(Q_cast, remainder_cast);
+}
+
+/**
+ * @brief Computes the distance (i.e. the absolute difference) between two integers
+ * @tparam Integer The integer type to operate on
+ * @param a First integer
+ * @param b Second integer
+ * @return The distance between the two integers
+ */
+template <typename Integer>[[nodiscard]] Integer distance(const Integer& a, const Integer& b)
+{
+    return (a <= b) ? sub(b, a) : sub(a, b);
 }
 
 /**

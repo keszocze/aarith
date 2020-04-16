@@ -6,7 +6,7 @@ namespace aarith {
 
 template <typename W>[[nodiscard]] constexpr auto operator&(const W& lhs, const W& rhs) -> W
 {
-    static_assert(is_word_array_v<W>);
+    static_assert(::aarith::is_word_array_v<W>);
     W bitwise_and;
     for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
@@ -17,7 +17,7 @@ template <typename W>[[nodiscard]] constexpr auto operator&(const W& lhs, const 
 
 template <typename W> auto constexpr operator|(const W& lhs, const W& rhs) -> W
 {
-    static_assert(is_word_array_v<W>);
+    static_assert(::aarith::is_word_array_v<W>);
     W bitwise_or;
     for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
@@ -28,7 +28,7 @@ template <typename W> auto constexpr operator|(const W& lhs, const W& rhs) -> W
 
 template <typename W> constexpr auto operator^(const W& lhs, const W& rhs) -> W
 {
-    static_assert(is_word_array_v<W>);
+    static_assert(::aarith::is_word_array_v<W>);
     W bitwise_xor;
     for (auto counter = 0U; counter < lhs.word_count(); ++counter)
     {
@@ -39,7 +39,7 @@ template <typename W> constexpr auto operator^(const W& lhs, const W& rhs) -> W
 
 template <typename W>[[nodiscard]] constexpr auto operator~(const W& rhs) -> W
 {
-    static_assert(is_word_array_v<W>);
+    static_assert(::aarith::is_word_array_v<W>);
     W bitwise_not;
     for (auto counter = 0U; counter < rhs.word_count(); ++counter)
     {
@@ -97,7 +97,7 @@ size_t first_set_bit(const word_array<Width, WordType>& value)
  */
 template <typename W>[[nodiscard]] constexpr auto operator<<(const W& lhs, const size_t rhs) -> W
 {
-    static_assert(is_word_array_v<W>);
+    static_assert(::aarith::is_word_array_v<W>);
 
     constexpr size_t width = W::width();
 
@@ -144,15 +144,15 @@ template <typename W>[[nodiscard]] constexpr auto operator<<(const W& lhs, const
 template <typename W> auto constexpr operator>>(const W& lhs, const size_t rhs) -> W
 {
 
-    static_assert(is_word_array_v<W>);
+    static_assert(::aarith::is_word_array_v<W>);
 
     /*
      * This prevents this shift operator to be chosen by the compiler when using signed integers.
      * For signed integers, the correct arithmetic right-shift will be used.
      */
-    if constexpr (is_integral_v<W>)
+    if constexpr (::aarith::is_integral_v<W>)
     {
-        static_assert(is_unsigned_v<W>);
+        static_assert(::aarith::is_unsigned_v<W>);
     }
 
     constexpr size_t width = W::width();

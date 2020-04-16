@@ -4,6 +4,7 @@
 
 #include <aarith/integer/integer_comparisons.hpp>
 #include <aarith/integer/integer_operations.hpp>
+#include <aarith/integer/integer_ranges.hpp>
 #include <aarith/integer/integers.hpp>
 
 #include <aarith/integer/string_utils.hpp>

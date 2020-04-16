@@ -167,4 +167,14 @@ constexpr bool operator<(const integer<W, WordType>& a, const integer<V, WordTyp
     return false;
 }
 
+template <typename Integer> const Integer& min(const Integer& a, const Integer& b)
+{
+    return (a < b) ? a : b;
+}
+
+template <typename Integer> const Integer& max(const Integer& a, const Integer& b)
+{
+    return (a < b) ? b : a;
+}
+
 } // namespace aarith

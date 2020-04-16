@@ -48,7 +48,7 @@ template <class Integer, class Function>
                                                     size_t bits)
 {
 
-    static_assert(is_integral_v<Integer>);
+    static_assert(::aarith::is_integral_v<Integer>);
 
     /*
      * In case of signed integers we *always* want to have the signed bit correct and, therefore,
@@ -109,7 +109,7 @@ template <typename Integer, typename Function>
 [[nodiscard]] Integer approx_operation_pre_masking(const Integer& a, const Integer b, Function fun,
                                                    const size_t bits = Integer::width())
 {
-    static_assert(is_integral_v<Integer>);
+    static_assert(::aarith::is_integral_v<Integer>);
 
     /*
      * In case of signed integers we *always* want to have the signed bit correct and, therefore,
