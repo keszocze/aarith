@@ -1,5 +1,6 @@
 variables:
     GIT_DEPTH: 0
+    GIT_STRATEGY: clone
 
 stages:
     - compile
