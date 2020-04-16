@@ -25,6 +25,13 @@ compile_gcc:
         - cd build
         - CC=gcc-8 CXX=g++-8 cmake ..
         - /opt/sonar-build-wrapper/build-wrapper-linux-x86-64 --out-dir bw_output make -j $(nproc) all
+        - make test
+        - if !$?; then return 1; fi
+        - export GCOV_PREFIX_STRIP=10
+        - rm -rf coverage
+        - mkdir -p coverage
+        - /opt/software/usr/local/bin/gcovr --gcov-executable gcov-8 -v --filter '/var/lib/gitlab-runner/builds/.+/0/keszocze/aarith' --object-directory CMakeFiles --sonarqube coverage/coverage.xml 
+        - sed -i -E "s/\/var\/lib\/gitlab-runner\/builds\/[[:alnum:]]+\/[[:digit:]]+\/keszocze\/aarith\///g" coverage/coverage.xml
         - cd ..
         - chmod +x scripts/mk_sonar_config.sh
         - scripts/mk_sonar_config.sh $CI_COMMIT_REF_NAME > sonar-project.properties
