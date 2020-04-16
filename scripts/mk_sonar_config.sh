@@ -4,7 +4,7 @@ branch_config() {
 	if [ "$1" != "development" ]; then
 		cat <<ANB
 sonar.branch.name=$(echo $*)
-	sonar.branch.target=development
+	#sonar.branch.target=development
 ANB
 	fi
 }
