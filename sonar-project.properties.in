@@ -5,7 +5,10 @@ sonar.projectName=Aarith
 sonar.projectVersion=0.1
 
 sonar.sources=./src,./tests
+
 sonar.cfamily.build-wrapper-output=./build/bw_output
+sonar.cfamily.threads=@@NPROCS@@
+
 sonar.sourceEncoding=UTF-8
 sonar.coverageReportPaths=./build/tests/coverage/coverage.xml
 

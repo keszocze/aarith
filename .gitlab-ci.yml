@@ -38,7 +38,7 @@ run_sonarqube:
     stage: quality
     script: 
         - echo $CI_COMMIT_REF_NAME
-        - sed "s/@@BRANCH_NAME@@/${CI_COMMIT_REF_NAME}/" sonar-project.properties.in >> sonar-project.properties
+        - sed -e "s/@@BRANCH_NAME@@/${CI_COMMIT_REF_NAME}/" -e "s/@@NPROCS@@/$(nproc)/" sonar-project.properties.in >> sonar-project.properties
         - /opt/sonar-scanner/bin/sonar-scanner
 
 run_tests:
