@@ -39,7 +39,7 @@ run_sonarqube:
     script: 
         - echo $CI_COMMIT_REF_NAME
         - chmod +x scripts/mk_sonar_config.sh
-        - scripts/mk_sonar_config.sh $CI_COMMINT_REF_NAME > sonar-project.properties
+        - scripts/mk_sonar_config.sh $CI_COMMIT_REF_NAME > sonar-project.properties
         - /opt/sonar-scanner/bin/sonar-scanner
 
 run_tests:
