@@ -55,7 +55,7 @@ test_clang:
         - cd build/clang
         - make test
 
-run_tests:
+test_gcc:
     extends: .ciconf
     stage: test
     artifacts:
@@ -63,7 +63,7 @@ run_tests:
             - build/tests/coverage
         expire_in: 30 minutes
     script:
-        - cd build
+        - cd build/gcc
         - make test
         - if !$?; then return 1; fi
         - cd tests
