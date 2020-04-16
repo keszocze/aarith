@@ -507,7 +507,6 @@ template <class R, class F, size_t W, size_t V>
         word_array<max> v_{v};
 
         return zip_reduce(w_, v_, f, initial_value);
-        ;
     }
 }
 
