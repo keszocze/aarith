@@ -181,7 +181,6 @@ SCENARIO("Investigating the comparison of max and min values", "[integer][compar
         using T = integer<8>;
         T min = T::min();
         T max = T::max();
-
         T min_from_limits = std::numeric_limits<T>::min();
         T max_from_limits = std::numeric_limits<T>::max();
 
@@ -199,17 +198,8 @@ SCENARIO("Investigating the comparison of max and min values", "[integer][compar
 
         WHEN("Constructing min and max value into a larger integer")
         {
-
-            std::cout << to_binary(T::min()) << "\n";
-
-            integer<9> min = T::min();
-            integer<9> max = T::max();
-
-            // TODO why is the copy assignment constructor not called?
-            integer<9> min_;
-            min_ = T::min();
-            integer<9> max_;
-            max_ = T::max();
+            integer<9> min_ = T::min();
+            integer<9> max_ = T::max();
 
             THEN("min should be negative")
             {
