@@ -37,13 +37,13 @@ template <typename T> void bench_int(std::string name)
     std::cout << name << ";" << dur << "\n";
 }
 
-template <template <size_t> typename I, size_t W> void bench_aarith_int(std::string name)
+template <template <size_t, typename > typename I, size_t W, typename WordType=uint64_t> void bench_aarith_int(std::string name)
 {
     using namespace std;
     using namespace chrono;
 
-    using Integer = I<W>;
-    using count_type = I<W + 1>;
+    using Integer = I<W, WordType>;
+    using count_type = I<W + 1, WordType>;
     constexpr count_type max_val{std::numeric_limits<Integer>::max()};
     constexpr count_type big_one = count_type::one();
     constexpr I small_one = Integer::one();
@@ -65,10 +65,10 @@ template <template <size_t> typename I, size_t W> void bench_aarith_int(std::str
 
         while (counter_b <= max_val)
         {
-            const I<W> sum = add(a, b);
-            const I<W> diff = sub(a, b);
-            const I<W> prod = mul(a, b);
-            const I<W> fun = add(mul(add(a, b), b), a);
+            const Integer sum = add(a, b);
+            const Integer diff = sub(a, b);
+            const Integer prod = mul(a, b);
+            const Integer fun = add(mul(add(a, b), b), a);
 
             counter_b = add(counter_b, big_one);
             b = add(b, small_one);
