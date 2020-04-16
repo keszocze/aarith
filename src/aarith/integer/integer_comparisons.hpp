@@ -32,13 +32,14 @@ constexpr bool operator==(const Int<W, T>& a, const Int<V, T>& b)
     return true;
 }
 
-template <size_t W, size_t V> constexpr bool operator<(const uinteger<W>& a, const uinteger<V>& b)
+template <size_t W, size_t V, typename WordType>
+constexpr bool operator<(const uinteger<W, WordType>& a, const uinteger<V, WordType>& b)
 {
 
-    using word_type = typename integer<W>::word_type;
+    using word_type = typename integer<W, WordType>::word_type;
 
-    constexpr size_t words_W = integer<W>::word_count();
-    constexpr size_t words_V = integer<V>::word_count();
+    constexpr size_t words_W = integer<W, WordType>::word_count();
+    constexpr size_t words_V = integer<V, WordType>::word_count();
 
     if constexpr (words_W == words_V)
     {
@@ -66,10 +67,10 @@ template <size_t W, size_t V> constexpr bool operator<(const uinteger<W>& a, con
         const size_t max_width =
             std::max(W, V); // TODO make constexpr the moment clang supports this
 
-        integer<max_width> a_ = width_cast<max_width>(a);
-        integer<max_width> b_ = width_cast<max_width>(b);
+        integer<max_width, WordType> a_ = width_cast<max_width>(a);
+        integer<max_width, WordType> b_ = width_cast<max_width>(b);
 
-        for (auto i = integer<max_width>::word_count(); i > 0; --i)
+        for (auto i = integer<max_width, WordType>::word_count(); i > 0; --i)
         {
             word_type const word_a = a_.word(i - 1);
             word_type const word_b = b_.word(i - 1);
@@ -106,10 +107,11 @@ template <typename W, typename V> constexpr bool operator>(const W& a, const V& 
     return b < a;
 }
 
-template <size_t W, size_t V> constexpr bool operator<(const integer<W>& a, const integer<V>& b)
+template <size_t W, size_t V, typename WordType>
+constexpr bool operator<(const integer<W, WordType>& a, const integer<V, WordType>& b)
 {
 
-    using word_type = typename integer<W>::word_type;
+    using word_type = typename integer<W, WordType>::word_type;
 
     if (a.is_negative() && !b.is_negative())
     {
@@ -123,8 +125,8 @@ template <size_t W, size_t V> constexpr bool operator<(const integer<W>& a, cons
     // from here on, the signs of the numbers are identical
     const bool both_positive = !a.is_negative();
 
-    constexpr size_t words_W = integer<W>::word_count();
-    constexpr size_t words_V = integer<V>::word_count();
+    constexpr size_t words_W = integer<W, WordType>::word_count();
+    constexpr size_t words_V = integer<V, WordType>::word_count();
 
     if constexpr (words_W == words_V)
     {
@@ -153,10 +155,10 @@ template <size_t W, size_t V> constexpr bool operator<(const integer<W>& a, cons
         const size_t max_width =
             std::max(W, V); // TODO make constexpr the moment clang supports this
 
-        integer<max_width> a_ = width_cast<max_width>(a);
-        integer<max_width> b_ = width_cast<max_width>(b);
+        integer<max_width, WordType> a_ = width_cast<max_width>(a);
+        integer<max_width, WordType> b_ = width_cast<max_width>(b);
 
-        for (auto i = integer<max_width>::word_count(); i > 0; --i)
+        for (auto i = integer<max_width, WordType>::word_count(); i > 0; --i)
         {
             word_type const word_a = a_.word(i - 1);
             word_type const word_b = b_.word(i - 1);
