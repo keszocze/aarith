@@ -3,7 +3,7 @@
 
 using namespace aarith;
 
-SCENARIO("Iterating ranges", "[integer][ranges][operation][utility]")
+SCENARIO("Iterating ranges", "[integer][signed][ranges][operation][utility]")
 {
     constexpr size_t W = 8;
     using I = integer<W>;
@@ -115,7 +115,7 @@ SCENARIO("Iterating ranges", "[integer][ranges][operation][utility]")
     }
 }
 
-SCENARIO("Reverse iterating integer ranges", "[integer][ranges][operation][utility][reverse]")
+SCENARIO("Reverse iterating integer ranges", "[integer][signed][ranges][operation][utility][reverse]")
 {
     constexpr size_t W = 8;
     using I = integer<W>;
@@ -192,7 +192,7 @@ SCENARIO("Reverse iterating integer ranges", "[integer][ranges][operation][utili
     }
 }
 
-SCENARIO("Using non-positive strides", "[integer][ranges][operation][utility]")
+SCENARIO("Using non-positive strides", "[integer][unsigned][ranges][operation][utility]")
 {
     GIVEN("Two unsigned integers")
     {
