@@ -9,8 +9,8 @@
 namespace aarith {
 
 /// Convert the given normalized_float to a string with digits to the power of 2
-template <size_t N, size_t E, size_t M>
-auto to_base_2n(const normalized_float<E, M> nf) -> std::string
+template <size_t N, size_t E, size_t M, typename WordType>
+auto to_base_2n(const normalized_float<E, M, WordType> nf) -> std::string
 {
     std::string str;
 
@@ -20,25 +20,29 @@ auto to_base_2n(const normalized_float<E, M> nf) -> std::string
 }
 
 /// Convert the given normalized_float value into a hexadecimal string representation.
-template <size_t E, size_t M> auto to_hex(const normalized_float<E, M>& value) -> std::string
+template <size_t E, size_t M, typename WordType>
+auto to_hex(const normalized_float<E, M, WordType>& value) -> std::string
 {
     return to_base_2n<4>(value);
 }
 
 /// Convert the given normalized_float value into a octal string representation.
-template <size_t E, size_t M> auto to_octal(const normalized_float<E, M>& value) -> std::string
+template <size_t E, size_t M, typename WordType>
+auto to_octal(const normalized_float<E, M, WordType>& value) -> std::string
 {
     return to_base_2n<3>(value);
 }
 
 /// Convert the given normalized_float value into a binary string representation.
-template <size_t E, size_t M> auto to_binary(const normalized_float<E, M>& value) -> std::string
+template <size_t E, size_t M, typename WordType>
+auto to_binary(const normalized_float<E, M, WordType>& value) -> std::string
 {
     return to_base_2n<1>(value);
 }
 
 /// Convert the given normalized_float to a representation that can be posted to a calculator
-template <size_t E, size_t M> auto to_compute_string(const normalized_float<E, M> nf) -> std::string
+template <size_t E, size_t M, typename WordType>
+auto to_compute_string(const normalized_float<E, M, WordType> nf) -> std::string
 {
     std::stringstream stream("");
     stream << "(-1)^" << nf.get_sign() << " * 2^(";
@@ -99,10 +103,11 @@ template <size_t E, size_t M> auto to_compute_string(const normalized_float<E, M
 }
 
 /// Convert the given normalized_float to a scientific string representation
-template <size_t E, size_t M> auto to_sci_string(const normalized_float<E, M> nf) -> std::string
+template <size_t E, size_t M, typename WordType>
+auto to_sci_string(const normalized_float<E, M, WordType> nf) -> std::string
 {
-    uinteger<M> fl_mantissa = nf.get_mantissa();
-    uinteger<24> flc_mantissa;
+    uinteger<M, WordType> fl_mantissa = nf.get_mantissa();
+    uinteger<24, WordType> flc_mantissa;
     if constexpr (M >= 24)
     {
         auto shift_mantissa = M - 24;
@@ -120,9 +125,9 @@ template <size_t E, size_t M> auto to_sci_string(const normalized_float<E, M> nf
 
     auto const exponent = sub(nf.get_exponent(), nf.get_bias());
 
-    const integer<E> s_exponent(exponent);
+    const integer<E, WordType> s_exponent(exponent);
     auto const s_abs_exponent = abs(s_exponent);
-    const uinteger<E> abs_exponent(s_abs_exponent);
+    const uinteger<E, WordType> abs_exponent(s_abs_exponent);
 
     std::stringstream str;
     str << ((nf.get_sign() == 1) ? "-" : "") << *mantissa << "E"
@@ -131,8 +136,8 @@ template <size_t E, size_t M> auto to_sci_string(const normalized_float<E, M> nf
     return str.str();
 }
 
-template <size_t E, size_t M>
-auto operator<<(std::ostream& out, const normalized_float<E, M>& value) -> std::ostream&
+template <size_t E, size_t M, typename WordType>
+auto operator<<(std::ostream& out, const normalized_float<E, M, WordType>& value) -> std::ostream&
 {
     if (out.flags() & std::ios::hex)
     {

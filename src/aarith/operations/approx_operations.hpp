@@ -48,7 +48,7 @@ template <class Integer, class Function>
                                                     size_t bits)
 {
 
-    static_assert(is_integral_v<Integer>);
+    static_assert(::aarith::is_integral_v<Integer>);
 
     /*
      * In case of signed integers we *always* want to have the signed bit correct and, therefore,
@@ -109,7 +109,7 @@ template <typename Integer, typename Function>
 [[nodiscard]] Integer approx_operation_pre_masking(const Integer& a, const Integer b, Function fun,
                                                    const size_t bits = Integer::width())
 {
-    static_assert(is_integral_v<Integer>);
+    static_assert(::aarith::is_integral_v<Integer>);
 
     /*
      * In case of signed integers we *always* want to have the signed bit correct and, therefore,
@@ -179,18 +179,19 @@ template <class Integer>
  * @param bits Number of most-significand bits to be calculated
  * @return The result of the multiplication with double the size of the inputs
  */
-template <size_t width>
-auto approx_uint_bitmasking_mul(const uinteger<width>& opd1, const uinteger<width>& opd2,
-                                const size_t bits) -> uinteger<2 * width>
+template <size_t Width, typename WordType>
+auto approx_uint_bitmasking_mul(const uinteger<Width, WordType>& opd1,
+                                const uinteger<Width, WordType>& opd2, const size_t bits)
+    -> uinteger<2 * Width, WordType>
 {
-    constexpr auto product_width = 2 * width;
+    constexpr auto product_width = 2 * Width;
 
-    auto const mask = generate_bitmask<uinteger<product_width>>(bits);
+    auto const mask = generate_bitmask<uinteger<product_width, WordType>>(bits);
 
-    uinteger<product_width> opd2_extended = width_cast<product_width, width>(opd2);
+    uinteger<product_width, WordType> opd2_extended = width_cast<product_width, Width>(opd2);
 
-    uinteger<product_width> product;
-    for (auto i = 0U; i < width; ++i)
+    uinteger<product_width, WordType> product;
+    for (auto i = 0U; i < Width; ++i)
     {
         auto const opd2_masked = opd2_extended & mask;
         product = ((opd1.bit(i) == 0) ? product : add(product, opd2_masked));
@@ -214,15 +215,15 @@ auto approx_uint_bitmasking_mul(const uinteger<width>& opd1, const uinteger<widt
  * @param b Second summand
  * @return Aproximated addition of a and b
  */
-template <size_t W, size_t V>
-[[nodiscard]] uinteger<std::max(W, V)> trivial_approx_add(const uinteger<W> a, const uinteger<V> b)
+template <size_t W, size_t V, typename WordType>
+[[nodiscard]] uinteger<std::max(W, V), WordType> trivial_approx_add(const uinteger<W, WordType> a,
+                                                                    const uinteger<V, WordType> b)
 {
 
-    constexpr auto word_adder = [](const typename uinteger<W>::word_type a_,
-                                   const typename uinteger<V>::word_type b_) { return a_ + b_; };
+    constexpr auto word_adder = [](const WordType a_, const WordType b_) { return a_ + b_; };
 
-    const uinteger<std::max(W, V)> result =
-        zip_with_expand<decltype(word_adder), W, V>(a, b, word_adder);
+    const uinteger<std::max(W, V), WordType> result =
+        zip_with_expand<decltype(word_adder), W, V, WordType>(a, b, word_adder);
 
     return result;
 }

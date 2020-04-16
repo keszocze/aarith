@@ -58,8 +58,8 @@ public:
             if (wider_exponent)
             {
                 exponent = uinteger<E, WordType>(f_exponent);
-                const auto f_bias =
-                    width_cast<E>(normalized_float<f_exponent_width, f_mantissa_width>::get_bias());
+                const auto f_bias = width_cast<E>(
+                    normalized_float<f_exponent_width, f_mantissa_width, WordType>::get_bias());
                 const auto exponent_delta = sub(get_bias(), f_bias);
                 exponent = add(exponent, exponent_delta);
             }
@@ -67,7 +67,8 @@ public:
             {
                 const auto bias = get_bias();
                 const auto exponent_delta =
-                    normalized_float<f_exponent_width, f_mantissa_width>::get_bias().word(0) -
+                    normalized_float<f_exponent_width, f_mantissa_width, WordType>::get_bias().word(
+                        0) -
                     bias.word(0);
                 f_exponent -= static_cast<decltype(f_exponent)>(exponent_delta);
                 exponent = uinteger<E, WordType>(f_exponent);
@@ -89,7 +90,7 @@ public:
         return M;
     }
 
-    static constexpr auto get_bias() -> uinteger<E>
+    static constexpr auto get_bias() -> uinteger<E, WordType>
     {
         const uinteger<E, WordType> one(1U);
         const uinteger<E, WordType> shifted = one << (E - 1);
@@ -256,7 +257,7 @@ auto rshift_and_round(const uinteger<M, WordType>& m, const size_t shift_by)
 
     if (shift_by > M)
     {
-        return uinteger<M>(0U);
+        return uinteger<M, WordType>(0U);
     }
 
     auto round = 0U;
@@ -311,7 +312,7 @@ auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<
     {
         auto shift_by = M2 - one_at - 1;
         mantissa = (mantissa << shift_by);
-        exponent = sub(exponent, uinteger<E>(shift_by));
+        exponent = sub(exponent, uinteger<E, WordType>(shift_by));
     }
 
     normalized_float<E, M2, WordType> normalized_float;
@@ -325,8 +326,8 @@ auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<
 
 template <class uint> auto find_leading_one(const uint mantissa) -> typename uint::word_type
 {
-    static_assert(is_integral_v<uint>);
-    static_assert(is_unsigned_v<uint>);
+    static_assert(::aarith::is_integral_v<uint>);
+    static_assert(::aarith::is_unsigned_v<uint>);
 
     const auto width = uint::width();
     auto one_at = width;

@@ -124,7 +124,7 @@ SCENARIO("Performing common functional operations", "[word_array]")
             {
                 THEN("The result should work out well, filling additional slots with zeroes")
                 {
-                    const auto result = trivial_approx_add<256, 256>(w, v);
+                    const auto result = trivial_approx_add<256, 256, uint64_t>(w, v);
 
                     for (size_t i = 0; i < w.word_count(); ++i)
                     {
@@ -156,7 +156,9 @@ SCENARIO("Performing common functional operations", "[word_array]")
             {
                 THEN("The result should work out well")
                 {
-                    const auto result = trivial_approx_add<256, 256>(w, v);
+                    constexpr uinteger<256> a{w};
+                    constexpr uinteger<256> b{v};
+                    const auto result = trivial_approx_add<256, 256>(a, b);
 
                     for (size_t i = 0; i < w.word_count(); ++i)
                     {
@@ -195,7 +197,9 @@ SCENARIO("Performing common functional operations", "[word_array]")
             {
                 THEN("The result should work out well, filling additional slots with zeroes")
                 {
-                    const auto result = trivial_approx_add<256, 192>(w, v);
+                    constexpr uinteger<256> a{w};
+                    constexpr uinteger<192> b{v};
+                    const auto result = trivial_approx_add<256, 192>(a, b);
 
                     for (size_t i = 0; i < w.word_count() - 1; ++i)
                     {

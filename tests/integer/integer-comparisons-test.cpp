@@ -98,8 +98,8 @@ SCENARIO("Comparing two positive integers with different bit widths", "[uinteger
             const size_t TestWidth = 16;
             static constexpr uint16_t number_a = 7;
             static constexpr uint16_t number_b = 23;
-            const integer<TestWidth> a{number_a};
-            const integer<TestWidth + 10> b{number_b};
+            constexpr integer<TestWidth> a{number_a};
+            constexpr integer<TestWidth + 10> b{number_b};
 
             THEN("operator< returns true")
             {
@@ -143,8 +143,7 @@ SCENARIO("Comparing two positive integers with different bit widths", "[uinteger
         THEN("operator< returns true")
         {
             REQUIRE(a_neg < b);
-            const bool smaller = (a < b);
-            REQUIRE(smaller);
+            REQUIRE(a < b);
         }
         THEN("operator<= returns true")
         {
@@ -181,7 +180,6 @@ SCENARIO("Investigating the comparison of max and min values", "[integer][compar
         using T = integer<8>;
         T min = T::min();
         T max = T::max();
-
         T min_from_limits = std::numeric_limits<T>::min();
         T max_from_limits = std::numeric_limits<T>::max();
 
@@ -199,17 +197,8 @@ SCENARIO("Investigating the comparison of max and min values", "[integer][compar
 
         WHEN("Constructing min and max value into a larger integer")
         {
-
-            std::cout << to_binary(T::min()) << "\n";
-
-            integer<9> min = T::min();
-            integer<9> max = T::max();
-
-            // TODO why is the copy assignment constructor not called?
-            integer<9> min_;
-            min_ = T::min();
-            integer<9> max_;
-            max_ = T::max();
+            integer<9> min_ = T::min();
+            integer<9> max_ = T::max();
 
             THEN("min should be negative")
             {
