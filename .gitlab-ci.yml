@@ -38,7 +38,8 @@ run_sonarqube:
     stage: quality
     script: 
         - echo $CI_COMMIT_REF_NAME
-        - sed -e "s/@@BRANCH_NAME@@/${CI_COMMIT_REF_NAME}/" -e "s/@@NPROCS@@/$(nproc)/" sonar-project.properties.in >> sonar-project.properties
+        - chmod +x scripts/mk_sonar_config.sh
+        - scripts/mk_sonar_config.sh $CI_COMMIT_REF_NAME > sonar-project.properties
         - /opt/sonar-scanner/bin/sonar-scanner
 
 run_tests:
@@ -50,7 +51,6 @@ run_tests:
         expire_in: 30 minutes
     script:
         - cd build
-          #        - find -name "*-test" -exec {} \;
         - make test
         - if !$?; then return 1; fi
         - cd tests
