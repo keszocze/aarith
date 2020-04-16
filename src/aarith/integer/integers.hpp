@@ -74,6 +74,24 @@ public:
         n.set_bit(0);
         return n;
     }
+
+    /*
+     * Conversion operators
+     */
+
+    /**
+     * @brief Converts to an uint8_t
+     *
+     * Note that there will be a possible loss of precision as this method simply cuts
+     * of the "overflowing" bits.
+     *
+     * @return An uint8_t storing the value of this uinteger
+     */
+    explicit constexpr operator uint8_t() const
+    {
+        // we can safely return this as the smallest WordType is uint8_t
+        return static_cast<uint8_t>(this->word(0));
+    }
 };
 
 template <size_t DestinationWidth, size_t SourceWidth>
