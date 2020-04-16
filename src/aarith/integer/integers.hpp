@@ -26,19 +26,19 @@ public:
 
     template <class... Args>
     constexpr uinteger(WordType fst, Args... args)
-        : word_array<Width>(fst, args...)
+        : word_array<Width, WordType>(fst, args...)
     {
     }
 
     template <size_t V>
     constexpr uinteger<Width, WordType>(const uinteger<V, WordType>& other)
-        : word_array<Width>(width_cast<Width>(other))
+        : word_array<Width, WordType>(width_cast<Width>(other))
     {
     }
 
     template <size_t V>
     constexpr uinteger<Width, WordType>(const word_array<V, WordType>& other)
-        : word_array<Width>(other)
+        : word_array<Width, WordType>(other)
     {
     }
 
@@ -94,9 +94,9 @@ public:
     }
 };
 
-template <size_t DestinationWidth, size_t SourceWidth>
-[[nodiscard]] auto constexpr width_cast(const uinteger<SourceWidth>& source)
-    -> uinteger<DestinationWidth>
+template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
+[[nodiscard]] auto constexpr width_cast(const uinteger<SourceWidth, WordType>& source)
+    -> uinteger<DestinationWidth, WordType>
 {
     if constexpr (DestinationWidth == SourceWidth)
     {
@@ -105,8 +105,8 @@ template <size_t DestinationWidth, size_t SourceWidth>
     else
     {
         word_array<DestinationWidth> result =
-            width_cast<DestinationWidth>(static_cast<word_array<SourceWidth>>(source));
-        return uinteger<DestinationWidth>{result};
+            width_cast<DestinationWidth>(static_cast<word_array<SourceWidth, WordType>>(source));
+        return uinteger<DestinationWidth, WordType>{result};
     }
 }
 /*
