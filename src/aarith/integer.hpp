@@ -2,7 +2,7 @@
 
 #include <aarith/core.hpp>
 
-#include <aarith/integer/cast_operations.hpp>
+#include <aarith/integer/integer_casts.hpp>
 #include <aarith/integer/integer_comparisons.hpp>
 #include <aarith/integer/integer_operations.hpp>
 #include <aarith/integer/integers.hpp>

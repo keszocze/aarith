@@ -9,7 +9,7 @@ namespace aarith {
  *
  * @note Two numbers can be equal even though they have different bit widths!
  */
-template <size_t W, size_t V, class T, template <size_t, class> typename Int>
+template <size_t W, size_t V, typename T, template <size_t, typename> typename Int>
 constexpr bool operator==(const Int<W, T>& a, const Int<V, T>& b)
 {
     constexpr size_t max_width = std::max(W, V);
@@ -28,7 +28,8 @@ constexpr bool operator==(const Int<W, T>& a, const Int<V, T>& b)
     return true;
 }
 
-template <size_t W, size_t V> constexpr bool operator<(const uinteger<W>& a, const uinteger<V>& b)
+template <size_t W, size_t V, typename WordType>
+constexpr bool operator<(const uinteger<W, WordType>& a, const uinteger<V, WordType>& b)
 {
 
     using word_type = typename integer<W>::word_type;

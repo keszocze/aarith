@@ -107,7 +107,7 @@ public:
      */
 
 private:
-    template <typename T> T generic_cast() const
+    template <typename T> constexpr T generic_cast() const
     {
         if constexpr (sizeof(T) <= sizeof(WordType))
         {
