@@ -3,6 +3,28 @@
 
 using namespace aarith;
 
+SCENARIO("Up-casting to the next larger native integer type",
+         "[integer][unsigned][conversion_operation]")
+{
+    GIVEN("An unsigned integer with 13 bidth")
+    {
+        WHEN("Castingto an uint16_t")
+        {
+            THEN("The value should be correct")
+            {
+                uint16_t val_a = GENERATE(take(5, random(0, 255)));
+
+                val_a += 1000; // shift it to leave the 8 bit range
+
+                uinteger<13> a{val_a};
+
+                REQUIRE(static_cast<uint16_t>(a) == val_a);
+                REQUIRE(narrow_cast<uint16_t>(a) == val_a);
+            }
+        }
+    }
+}
+
 SCENARIO("Casting unsigned integers to uint8_t", "[integer][unsigned][conversion_operation]")
 {
     GIVEN("An unsigned integer width bit-width <= 8")
