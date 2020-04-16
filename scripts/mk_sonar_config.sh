@@ -23,7 +23,7 @@ cat <<EOF
 	$(branch_config $1)
 
 	sonar.sourceEncoding=UTF-8
-	sonar.coverageReportPaths=./build/tests/coverage/coverage.xml
+	sonar.coverageReportPaths=./build/tests/gcc/coverage/coverage.xml
 
 	sonar.host.url=https://codesignp211.informatik.uni-erlangen.de/sonarqube
 EOF
