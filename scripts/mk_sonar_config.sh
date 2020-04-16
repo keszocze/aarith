@@ -13,7 +13,7 @@ cat <<EOF
 	sonar.projectKey=aarith
 
 	sonar.projectName=Aarith
-	sonar.projectVersion=0.1
+	sonar.projectVersion=0.2
 
 	sonar.sources=./src,./tests
 	
