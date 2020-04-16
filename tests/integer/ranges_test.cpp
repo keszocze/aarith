@@ -115,7 +115,8 @@ SCENARIO("Iterating ranges", "[integer][signed][ranges][operation][utility]")
     }
 }
 
-SCENARIO("Reverse iterating integer ranges", "[integer][signed][ranges][operation][utility][reverse]")
+SCENARIO("Reverse iterating integer ranges",
+         "[integer][signed][ranges][operation][utility][reverse]")
 {
     constexpr size_t W = 8;
     using I = integer<W>;

@@ -114,7 +114,7 @@ public:
         , end_(end)
         , stride_(stride)
     {
-        static_assert(is_integral_v<Integer>);
+        static_assert(::aarith::is_integral_v<Integer>);
 
         if (stride_ <= Integer::zero())
         {
