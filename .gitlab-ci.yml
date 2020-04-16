@@ -24,7 +24,8 @@ compile_gcc:
         - mkdir -p build/bw_output
         - cd build
         - CC=gcc-8 CXX=g++-8 cmake ..
-        - /opt/sonar-build-wrapper/build-wrapper-linux-x86-64 --out-dir bw_output make -j 4 all
+        - /opt/sonar-build-wrapper/build-wrapper-linux-x86-64 --out-dir bw_output make -j $(nproc) all
+        - cd ..
         - chmod +x scripts/mk_sonar_config.sh
         - scripts/mk_sonar_config.sh $CI_COMMIT_REF_NAME > sonar-project.properties
         - /opt/sonar-scanner/bin/sonar-scanner
