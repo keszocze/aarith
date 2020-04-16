@@ -79,6 +79,34 @@ public:
      * Conversion operators
      */
 
+private:
+    template <typename T> T generic_cast() const
+    {
+        if constexpr (sizeof(T) <= sizeof(WordType))
+        {
+            // the last word is sufficient to fill the desired target type, so we can simply
+            // make a call to the static_cast operation
+            return static_cast<T>(this->word(0));
+        }
+        else
+        {
+            constexpr size_t words_per_type = (sizeof(T)) / sizeof(WordType);
+
+            constexpr size_t use_words =
+                std::min(words_per_type, uinteger<Width, WordType>::word_count());
+
+            uint16_t result = 0;
+
+            for (size_t i = 0; i < use_words; ++i)
+            {
+                result += this->word(i) << (i * uinteger<Width, WordType>::word_width());
+            }
+
+            return result;
+        }
+    }
+
+public:
     /**
      * @brief Converts to an uint8_t
      *
@@ -91,6 +119,45 @@ public:
     {
         // we can safely return this as the smallest WordType is uint8_t
         return static_cast<uint8_t>(this->word(0));
+    }
+
+    /**
+     * @brief Converts to an uint16_t
+     *
+     * Note that there will be a possible loss of precision as this method simply cuts
+     * of the "overflowing" bits.
+     *
+     * @return An uint16_t storing the value of this uinteger
+     */
+    explicit constexpr operator uint16_t() const
+    {
+        return generic_cast<uint16_t>();
+    }
+
+    /**
+     * @brief Converts to an uint32_t
+     *
+     * Note that there will be a possible loss of precision as this method simply cuts
+     * of the "overflowing" bits.
+     *
+     * @return An uint32_t storing the value of this uinteger
+     */
+    explicit constexpr operator uint32_t() const
+    {
+        return generic_cast<uint32_t>();
+    }
+
+    /**
+     * @brief Converts to an uint64_t
+     *
+     * Note that there will be a possible loss of precision as this method simply cuts
+     * of the "overflowing" bits.
+     *
+     * @return An uint64_t storing the value of this uinteger
+     */
+    explicit constexpr operator uint64_t() const
+    {
+        return generic_cast<uint64_t>();
     }
 };
 
