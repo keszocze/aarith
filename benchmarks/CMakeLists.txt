@@ -13,7 +13,7 @@ function(add_aarith_benchmark testname)
     )
 
     add_executable(${targetname} ${AARITH_BENCH_FILES})
-    target_link_libraries(${targetname} PRIVATE aarith::Library ${AARITH_TEST_LIBS})
+    target_link_libraries(${targetname} PRIVATE aarith::Library ${AARITH_BENCH_LIBS})
 
 
     if (DEFINED AARITH_BENCH_INCLUDES)
@@ -26,4 +26,4 @@ endfunction(add_aarith_benchmark)
 
 
 add_aarith_benchmark(integer-timing FILES integer_benchmark.cpp)
-add_aarith_benchmark(integer-correctness FILES check_integer_operations.cpp)
+

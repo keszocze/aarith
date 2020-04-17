@@ -37,7 +37,8 @@ template <typename T> void bench_int(std::string name)
     std::cout << name << ";" << dur << "\n";
 }
 
-template <template <size_t, typename > typename I, size_t W, typename WordType=uint64_t> void bench_aarith_int(std::string name)
+template <template <size_t, typename> typename I, size_t W, typename WordType = uint64_t>
+void bench_aarith_int(std::string name)
 {
     using namespace std;
     using namespace chrono;
