@@ -31,7 +31,7 @@ template <size_t W, typename T> constexpr T width_min()
     }
 }
 
-template <typename T> std::string description(const std::string op_name)
+template <typename T, typename B> std::string description(const std::string op_name)
 {
     std::string filename_{""};
 
@@ -44,14 +44,14 @@ template <typename T> std::string description(const std::string op_name)
         filename_ += "integer";
     }
     filename_ +=
-        std::to_string(T::width()) + "_word" + std::to_string(T::word_width()) + "_" + op_name;
+        std::to_string(T::width()) + "_word" + std::to_string(8*sizeof(B)) + "_" + op_name;
 
     return filename_;
 }
 
-template <typename T> std::string filename(const std::string op_name)
+template <typename T, typename B> std::string filename(const std::string op_name)
 {
-    std::string filename_{description<T>(op_name)};
+    std::string filename_{description<T, B>(op_name)};
 
     filename_ += ".log";
 
@@ -85,7 +85,7 @@ void check_int_operation(const std::string op_name, const Op& fun, OpNative& fun
     NativeType native_a = native_min;
 
     std::ofstream file;
-    file.open(filename<Integer>(op_name));
+    file.open(filename<Integer, NativeType>(op_name));
 
     //    std::cout << description<Integer>(op_name) << "\t" << int64_t{native_min} << "\n";
     //    return;
@@ -122,7 +122,7 @@ void check_int_operation(const std::string op_name, const Op& fun, OpNative& fun
             }
             else
             {
-                NativeType result_base = fun_native(native_a, native_b) + 1;
+                NativeType result_base = fun_native(native_a, native_b);
                 Integer result_int = fun(a, b);
 
                 std::cout << int64_t{result_base} << ";" << result_int << "\n";
@@ -151,6 +151,6 @@ void check_int_operation(const std::string op_name, const Op& fun, OpNative& fun
 
     if (error)
     {
-        std::cout << "ERROR in " << description<Integer>(op_name) << "\n";
+        std::cout << "ERROR in " << description<Integer, NativeType>(op_name) << "\n";
     }
 }
