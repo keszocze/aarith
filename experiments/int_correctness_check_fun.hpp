@@ -107,7 +107,6 @@ void check_int_operation(const std::string op_name, const Op& fun, OpNative& fun
 
         NativeType native_b = native_min;
 
-
         while (counter_b <= max_val)
         {
 
@@ -123,8 +122,8 @@ void check_int_operation(const std::string op_name, const Op& fun, OpNative& fun
                         error = true;
 
                         std::cout << int64_t{native_a} << ";" << int64_t{native_b} << ";"
-                             << int64_t{result_base} << ";" << a << ";" << b << ";" << result_int
-                             << "\n";
+                                  << int64_t{result_base} << ";" << a << ";" << b << ";"
+                                  << result_int << "\n";
                     }
                 }
             }
@@ -137,9 +136,12 @@ void check_int_operation(const std::string op_name, const Op& fun, OpNative& fun
                 {
                     error = true;
 
+                    //                    std::cout << a.is_negative() << "\t" << b.is_negative() <<
+                    //                    "\n";
+
                     std::cout << int64_t{native_a} << ";" << int64_t{native_b} << ";"
-                         << int64_t{result_base} << ";" << a << ";" << b << ";" << result_int
-                         << "\n";
+                              << int64_t{result_base} << ";" << a << ";" << b << ";" << result_int
+                              << "\n";
                 }
             }
 

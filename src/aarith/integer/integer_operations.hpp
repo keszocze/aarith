@@ -594,15 +594,22 @@ template <size_t W, size_t V, typename WordType>
     -> integer<V + W, WordType>
 {
 
+    if (m.is_zero() || r.is_zero())
+    {
+        return integer<V + W, WordType>::zero();
+    }
+
     constexpr size_t K = W + V + 2;
 
-    integer<K, WordType> A{width_cast<W + 1>(m)};
-    integer<K, WordType> S = -A;
+    integer<W + 1, WordType> expanded_m = width_cast<W + 1>(m);
+
+    uinteger<K, WordType> A{static_cast<word_array<W + 1, WordType>>(expanded_m)};
+    uinteger<K, WordType> S{static_cast<word_array<W, WordType>>(-m)};
 
     A = A << V + 1;
     S = S << V + 1;
 
-    integer<K, WordType> P{r};
+    uinteger<K, WordType> P{static_cast<word_array<W, WordType>>(r)};
     P = P << 1;
 
     for (size_t i = 0; i < V; ++i)
@@ -613,17 +620,19 @@ template <size_t W, size_t V, typename WordType>
 
         if (snd_last_bit && !last_bit)
         {
-            P = add(P, S);
+            P = expanding_add(P, S);
         }
         if (!snd_last_bit && last_bit)
         {
-            P = add(P, A);
+            P = expanding_add(P, A);
         }
 
         P = P >> 1;
     }
 
-    return width_cast<W + V>(P >> 1);
+    auto result = width_cast<W + V>(P >> 1);
+
+    return integer<W + V, WordType>{result};
 }
 
 /**
@@ -774,7 +783,8 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
     integer<W> Q_cast = width_cast<W>(Q);
     integer<W> remainder_cast = width_cast<W>(remainder_);
 
-    if (numerator.is_negative()) {
+    if (numerator.is_negative())
+    {
         remainder_cast = -remainder_cast;
     }
 
