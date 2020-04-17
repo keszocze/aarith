@@ -24,10 +24,17 @@ template <size_t W, typename T> constexpr T width_min()
     {
         static_assert(W <= 8 * sizeof(T));
 
-        T val{1};
-        val <<= T{W - 1};
+        if constexpr (8 * sizeof(T) == W)
+        {
+            return std::numeric_limits<T>::min();
+        }
+        else
+        {
+            T val{1};
+            val <<= T{W - 1};
 
-        return -val;
+            return -val;
+        }
     }
 }
 
@@ -44,7 +51,7 @@ template <typename T, typename B> std::string description(const std::string op_n
         filename_ += "integer";
     }
     filename_ +=
-        std::to_string(T::width()) + "_word" + std::to_string(8*sizeof(B)) + "_" + op_name;
+        std::to_string(T::width()) + "_word" + std::to_string(8 * sizeof(B)) + "_" + op_name;
 
     return filename_;
 }
@@ -124,8 +131,6 @@ void check_int_operation(const std::string op_name, const Op& fun, OpNative& fun
             {
                 NativeType result_base = fun_native(native_a, native_b);
                 Integer result_int = fun(a, b);
-
-                std::cout << int64_t{result_base} << ";" << result_int << "\n";
 
                 if (Integer{result_base} != result_int)
                 {
