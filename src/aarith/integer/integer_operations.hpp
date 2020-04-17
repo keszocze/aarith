@@ -774,6 +774,10 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
     integer<W> Q_cast = width_cast<W>(Q);
     integer<W> remainder_cast = width_cast<W>(remainder_);
 
+    if (numerator.is_negative()) {
+        remainder_cast = -remainder_cast;
+    }
+
     return std::make_pair(Q_cast, remainder_cast);
 }
 

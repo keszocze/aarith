@@ -81,13 +81,13 @@ void check_int_operation(const std::string op_name, const Op& fun, OpNative& fun
     using count_type = I<W + 1, WordType>;
 
     constexpr count_type max_val{std::numeric_limits<Integer>::max()};
+
     constexpr count_type big_one = count_type::one();
     constexpr I small_one = Integer::one();
 
     Integer a = std::numeric_limits<Integer>::min();
-    count_type counter_a = std::numeric_limits<Integer>::min();
 
-    // TODO compute this correctly!
+    count_type counter_a = std::numeric_limits<Integer>::min();
     constexpr NativeType native_min = width_min<W, NativeType>();
     NativeType native_a = native_min;
 
@@ -107,6 +107,7 @@ void check_int_operation(const std::string op_name, const Op& fun, OpNative& fun
 
         NativeType native_b = native_min;
 
+
         while (counter_b <= max_val)
         {
 
@@ -121,7 +122,7 @@ void check_int_operation(const std::string op_name, const Op& fun, OpNative& fun
                     {
                         error = true;
 
-                        file << int64_t{native_a} << ";" << int64_t{native_b} << ";"
+                        std::cout << int64_t{native_a} << ";" << int64_t{native_b} << ";"
                              << int64_t{result_base} << ";" << a << ";" << b << ";" << result_int
                              << "\n";
                     }
@@ -136,7 +137,7 @@ void check_int_operation(const std::string op_name, const Op& fun, OpNative& fun
                 {
                     error = true;
 
-                    file << int64_t{native_a} << ";" << int64_t{native_b} << ";"
+                    std::cout << int64_t{native_a} << ";" << int64_t{native_b} << ";"
                          << int64_t{result_base} << ";" << a << ";" << b << ";" << result_int
                          << "\n";
                 }
