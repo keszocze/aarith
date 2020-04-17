@@ -23,7 +23,7 @@ compile_gcc:
     script:
         - mkdir -p build/gcc/bw_output
         - cd build/gcc
-        - CC=gcc-9 CXX=g++-9 cmake ../..
+        - CC=gcc-9 CXX=g++-9 cmake -DBUILD_BENCHMARKS=ON -DBUILD_EXPERIMENTS=ON ../..
         - /opt/sonar-build-wrapper/build-wrapper-linux-x86-64 --out-dir bw_output make -j 4 all
 
 compile_clang:
@@ -35,7 +35,7 @@ compile_clang:
     script:
         - mkdir -p build/clang
         - cd build/clang
-        - CC=clang-9 CXX=clang++-9 cmake ../..
+        - CC=clang-9 CXX=clang++-9 cmake -DBUILD_BENCHMARKS=ON -DBUILD_EXPERIMENTS=ON ../..
         - make -j $(nproc)
 
 run_sonarqube:
