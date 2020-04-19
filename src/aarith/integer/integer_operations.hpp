@@ -256,6 +256,23 @@ IntegerType pow(const IntegerType& base, const IntegerType& exponent)
 }
 
 /**
+ * @brief Multiplies two unsigned integers using the Karazuba algorithm
+ *
+ * This implements the karazuba multiplication algorithm (divide and conquer).
+ *
+ * @tparam W The bit width of the multiplicants
+ * @param a First multiplicant
+ * @param b Second multiplicant
+ * @return Product of a and b
+ */
+template <std::size_t W, typename WordType>
+[[nodiscard]] constexpr uinteger<W, WordType> karazuba(const uinteger<W, WordType>& a,
+                                                       const uinteger<W, WordType>& b)
+{
+    return width_cast<W>(expanding_karazuba(a, b));
+}
+
+/**
  * @brief Multiplies two unsigned integers using the Karazuba algorithm expanding the bit width so
  * that the result fits.
  *

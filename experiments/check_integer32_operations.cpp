@@ -9,12 +9,14 @@ int main()
     using UB = uint32_t;
     using B = int32_t;
 
-    using UI = uinteger<Width>;
-    using I = integer<Width>;
+    using UI = uinteger<Width, uint64_t>;
+    using I = integer<Width, uint64_t>;
 
     check_int_operation<uinteger, Width, UB, false>("addition", &::aarith::add<UI>, native_add);
     check_int_operation<uinteger, Width, UB, false>("subtraction", &::aarith::sub<UI>, native_sub);
     check_int_operation<uinteger, Width, UB, false>("mul", &::aarith::mul<UI>, native_mul);
+    check_int_operation<uinteger, Width, UB, false>(
+        "mul_karazuba", &::aarith::karazuba<Width, uint64_t>, native_mul);
     check_int_operation<uinteger, Width, UB, true>("division", &::aarith::div<UI>, native_div);
     check_int_operation<uinteger, Width, UB, true>("modulo", &::aarith::remainder<UI>, native_mod);
 

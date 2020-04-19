@@ -5,9 +5,9 @@ int main()
     using namespace std;
     using namespace aarith;
 
-    constexpr size_t Width = 8;
-    using UB = uint8_t;
-    using B = int8_t;
+    constexpr size_t Width = 24;
+    using UB = uint32_t;
+    using B = int32_t;
 
     using UI = uinteger<Width, uint64_t>;
     using I = integer<Width, uint64_t>;
