@@ -494,7 +494,7 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplica
 
     GIVEN("Two uinteger<N> a and b to be multiplied")
     {
-        constexpr uint64_t val = (1UL << 35UL);
+        constexpr uint64_t val = (static_cast<uint64_t>(1) << 35);
         auto constexpr a = uinteger<128>::from_words(1, val);
         auto constexpr c = uinteger<128>::from_words(13435, 345897);
         auto constexpr d =

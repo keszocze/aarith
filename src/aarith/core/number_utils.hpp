@@ -26,7 +26,8 @@ template <class Result> constexpr Result ceil(double num)
  *
  * @note This function does not make any attempts to be fast or to prevent overflows!
  *
- * @note If exponent equals std::numeric_limits<size_t>::max(), this method throws an exception, unless base equals zero
+ * @note If exponent equals std::numeric_limits<size_t>::max(), this method throws an exception,
+ * unless base equals zero
  *
  * @param base
  * @param exponent
@@ -34,12 +35,16 @@ template <class Result> constexpr Result ceil(double num)
  */
 constexpr size_t pow(const size_t base, const size_t exponent)
 {
-    if (exponent == std::numeric_limits<size_t>::max()) {
-        if (base == 0U) {
+    if (exponent == std::numeric_limits<size_t>::max())
+    {
+        if (base == 0U)
+        {
             return 0U;
         }
-        else {
-            throw std::runtime_error("Attempted exponentiation by std::numeric_limits<size_t>::max()");
+        else
+        {
+            throw std::runtime_error(
+                "Attempted exponentiation by std::numeric_limits<size_t>::max()");
         }
     }
     size_t result = 1;
@@ -89,7 +94,7 @@ constexpr size_t pow(const size_t base, const size_t exponent)
     const size_t first_bit = first_set_bit(n);
     if (first_bit > 0)
     {
-        return 1UL << (first_bit - 1);
+        return static_cast<size_t>(1) << (first_bit - 1);
     }
     else
     {

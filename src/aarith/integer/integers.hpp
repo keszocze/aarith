@@ -26,19 +26,19 @@ public:
 
     template <class... Args>
     constexpr uinteger(WordType fst, Args... args)
-        : word_array<Width>(fst, args...)
+        : word_array<Width, WordType>(fst, args...)
     {
     }
 
     template <size_t V>
     constexpr uinteger<Width, WordType>(const uinteger<V, WordType>& other)
-        : word_array<Width>(static_cast<const word_array<V, WordType>&>(other))
+        : word_array<Width, WordType>(width_cast<Width, V, WordType>(other))
     {
     }
 
     template <size_t V>
     constexpr uinteger<Width, WordType>(const word_array<V, WordType>& other)
-        : word_array<Width>(other)
+        : word_array<Width, WordType>(other)
     {
     }
 
@@ -76,9 +76,9 @@ public:
     }
 };
 
-template <size_t DestinationWidth, size_t SourceWidth>
-[[nodiscard]] auto constexpr width_cast(const uinteger<SourceWidth>& source)
-    -> uinteger<DestinationWidth>
+template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
+[[nodiscard]] auto constexpr width_cast(const uinteger<SourceWidth, WordType>& source)
+    -> uinteger<DestinationWidth, WordType>
 {
     if constexpr (DestinationWidth == SourceWidth)
     {
@@ -86,27 +86,28 @@ template <size_t DestinationWidth, size_t SourceWidth>
     }
     else
     {
-        word_array<DestinationWidth> result =
-            width_cast<DestinationWidth>(static_cast<word_array<SourceWidth>>(source));
-        return uinteger<DestinationWidth>{result};
+        word_array<DestinationWidth, WordType> result =
+            width_cast<DestinationWidth, SourceWidth, WordType>(
+                static_cast<word_array<SourceWidth, WordType>>(source));
+        return uinteger<DestinationWidth, WordType>{result};
     }
 }
 /*
  * Traits
  */
-template <size_t Width> class is_integral<uinteger<Width>>
+template <size_t Width, typename WordType> class is_integral<uinteger<Width, WordType>>
 {
 public:
     static constexpr bool value = true;
 };
 
-template <size_t Width> class is_unsigned<uinteger<Width>>
+template <size_t Width, typename WordType> class is_unsigned<uinteger<Width, WordType>>
 {
 public:
     static constexpr bool value = true;
 };
 
-template <size_t Width> class is_word_array<uinteger<Width>>
+template <size_t Width, typename WordType> class is_word_array<uinteger<Width, WordType>>
 {
 public:
     static constexpr bool value = true;
@@ -152,7 +153,7 @@ public:
 
     template <size_t V>
     constexpr integer<Width, WordType>(const integer<V, WordType>& other)
-        : word_array<Width>(static_cast<const word_array<V, WordType>&>(other))
+        : word_array<Width>(width_cast<Width>(other))
     {
     }
 
@@ -208,19 +209,19 @@ public:
     }
 };
 
-template <size_t Width> class is_integral<integer<Width>>
+template <size_t Width, typename WordType> class is_integral<integer<Width, WordType>>
 {
 public:
     static constexpr bool value = true;
 };
 
-template <size_t Width> class is_unsigned<integer<Width>>
+template <size_t Width, typename WordType> class is_unsigned<integer<Width, WordType>>
 {
 public:
     static constexpr bool value = false;
 };
 
-template <size_t Width> class is_word_array<integer<Width>>
+template <size_t Width, typename WordType> class is_word_array<integer<Width, WordType>>
 {
 public:
     static constexpr bool value = true;
@@ -272,7 +273,7 @@ template <size_t DestinationWidth, size_t SourceWidth>
 
 // We are only allowed to extend std with specializations
 // https://en.cppreference.com/w/cpp/language/extending_std
-template <size_t W> class std::numeric_limits<aarith::uinteger<W>>
+template <size_t W, typename WordType> class std::numeric_limits<::aarith::uinteger<W, WordType>>
 {
 public:
     static constexpr bool is_specialized = true;
@@ -293,7 +294,8 @@ public:
     static constexpr int radix = 2;
     static constexpr int digits = W; // TODO what happens if W > max_int?
     static constexpr int digits10 =
-        aarith::ceil<int>(std::numeric_limits<aarith::uinteger<W>>::digits * aarith::log<10, 2>()) -
+        ::aarith::ceil<int>(std::numeric_limits<::aarith::uinteger<W>>::digits *
+                            ::aarith::log<10, 2>()) -
         1;
 
     // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says
@@ -311,53 +313,53 @@ public:
 
     static constexpr bool tinyness_before = false;
 
-    static constexpr aarith::uinteger<W> min() noexcept
+    static constexpr ::aarith::uinteger<W, WordType> min() noexcept
     {
-        return aarith::uinteger<W>::zero();
+        return ::aarith::uinteger<W, WordType>::zero();
     }
 
-    static constexpr aarith::uinteger<W> lowest() noexcept
+    static constexpr ::aarith::uinteger<W, WordType> lowest() noexcept
     {
-        return aarith::uinteger<W>::zero();
+        return ::aarith::uinteger<W, WordType>::zero();
     }
 
-    static constexpr aarith::uinteger<W> max() noexcept
+    static constexpr ::aarith::uinteger<W, WordType> max() noexcept
     {
-        return aarith::uinteger<W>::max();
+        return ::aarith::uinteger<W, WordType>::max();
     }
 
-    static constexpr aarith::uinteger<W> epsilon() noexcept
+    static constexpr ::aarith::uinteger<W, WordType> epsilon() noexcept
     {
-        return aarith::uinteger<W>::zero();
+        return ::aarith::uinteger<W, WordType>::zero();
     }
 
-    static constexpr aarith::uinteger<W> round_error() noexcept
+    static constexpr ::aarith::uinteger<W, WordType> round_error() noexcept
     {
-        return aarith::uinteger<W>::zero();
+        return ::aarith::uinteger<W, WordType>::zero();
     }
 
-    static constexpr aarith::uinteger<W> infinity() noexcept
+    static constexpr ::aarith::uinteger<W, WordType> infinity() noexcept
     {
-        return aarith::uinteger<W>::zero();
+        return ::aarith::uinteger<W, WordType>::zero();
     }
 
-    static constexpr aarith::uinteger<W> quiet_NaN() noexcept
+    static constexpr ::aarith::uinteger<W, WordType> quiet_NaN() noexcept
     {
-        return aarith::uinteger<W>::zero();
+        return ::aarith::uinteger<W, WordType>::zero();
     }
 
-    static constexpr aarith::uinteger<W> signaling_NaN() noexcept
+    static constexpr ::aarith::uinteger<W, WordType> signaling_NaN() noexcept
     {
-        return aarith::uinteger<W>::zero();
+        return ::aarith::uinteger<W, WordType>::zero();
     }
 
-    static constexpr aarith::uinteger<W> denorm_min() noexcept
+    static constexpr ::aarith::uinteger<W, WordType> denorm_min() noexcept
     {
-        return aarith::uinteger<W>::min();
+        return ::aarith::uinteger<W, WordType>::min();
     }
 };
 
-template <size_t W> class std::numeric_limits<aarith::integer<W>>
+template <size_t W, typename WordType> class std::numeric_limits<::aarith::integer<W, WordType>>
 {
 public:
     static constexpr bool is_specialized = true;
@@ -378,7 +380,8 @@ public:
     static constexpr int radix = 2;
     static constexpr int digits = W - 1; // TODO what happens if W > max_int?
     static constexpr int digits10 =
-        aarith::ceil<int>(std::numeric_limits<aarith::integer<W>>::digits * aarith::log<10, 2>()) -
+        ::aarith::ceil<int>(std::numeric_limits<::aarith::integer<W>>::digits *
+                            ::aarith::log<10, 2>()) -
         1;
 
     // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says
@@ -396,48 +399,48 @@ public:
 
     static constexpr bool tinyness_before = false;
 
-    static constexpr aarith::integer<W> min() noexcept
+    static constexpr ::aarith::integer<W, WordType> min() noexcept
     {
-        return aarith::integer<W>::min();
+        return ::aarith::integer<W, WordType>::min();
     }
 
-    static constexpr aarith::integer<W> lowest() noexcept
+    static constexpr ::aarith::integer<W, WordType> lowest() noexcept
     {
-        return aarith::integer<W>::min();
+        return ::aarith::integer<W, WordType>::min();
     }
 
-    static constexpr aarith::integer<W> max() noexcept
+    static constexpr ::aarith::integer<W, WordType> max() noexcept
     {
-        return aarith::integer<W>::max();
+        return ::aarith::integer<W, WordType>::max();
     }
 
-    static constexpr aarith::integer<W> epsilon() noexcept
+    static constexpr ::aarith::integer<W, WordType> epsilon() noexcept
     {
-        return aarith::integer<W>::zero();
+        return ::aarith::integer<W, WordType>::zero();
     }
 
-    static constexpr aarith::integer<W> round_error() noexcept
+    static constexpr ::aarith::integer<W, WordType> round_error() noexcept
     {
-        return aarith::integer<W>::zero();
+        return ::aarith::integer<W, WordType>::zero();
     }
 
-    static constexpr aarith::integer<W> infinity() noexcept
+    static constexpr ::aarith::integer<W, WordType> infinity() noexcept
     {
-        return aarith::integer<W>::zero();
+        return ::aarith::integer<W, WordType>::zero();
     }
 
-    static constexpr aarith::integer<W> quiet_NaN() noexcept
+    static constexpr ::aarith::integer<W, WordType> quiet_NaN() noexcept
     {
-        return aarith::integer<W>::zero();
+        return ::aarith::integer<W, WordType>::zero();
     }
 
-    static constexpr aarith::integer<W> signaling_NaN() noexcept
+    static constexpr ::aarith::integer<W, WordType> signaling_NaN() noexcept
     {
-        return aarith::integer<W>::zero();
+        return ::aarith::integer<W, WordType>::zero();
     }
 
-    static constexpr aarith::integer<W> denorm_min() noexcept
+    static constexpr ::aarith::integer<W, WordType> denorm_min() noexcept
     {
-        return aarith::integer<W>::zero();
+        return ::aarith::integer<W, WordType>::zero();
     }
 };

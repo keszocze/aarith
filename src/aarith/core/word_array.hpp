@@ -19,7 +19,7 @@ public:
     using bit_type = WordType;
     static_assert(Width > 0, " Width must be at least 1 (bit)");
 
-    static_assert(aarith::is_unsigned_int<WordType>,
+    static_assert(::aarith::is_unsigned_int<WordType>,
                   "Only unsigned integers can be used as word types");
 
     /*
@@ -45,17 +45,18 @@ public:
         return wc;
     }
 
-    template <size_t V> constexpr word_array(const word_array<V>& other)
+    template <size_t V, typename T> constexpr word_array(const word_array<V, T>& other)
     {
         static_assert(V <= Width, "Can not create a word_array from larger container");
-
         for (auto i = 0U; i < other.word_count(); ++i)
         {
             set_word(i, other.word(i));
         }
     }
-    template <size_t V> constexpr word_array<Width> operator=(const word_array<V>& other)
+    template <size_t V, typename T>
+    constexpr word_array<Width, T> operator=(const word_array<V, T>& other)
     {
+
         static_assert(V <= Width, "Can not create a word_array from larger container");
 
         if constexpr (V == Width)
@@ -71,7 +72,8 @@ public:
             set_word(i, other.word(i));
         }
 
-        if constexpr (word_array<Width, WordType>::word_count() > word_array<V>::word_count())
+        if constexpr (word_array<Width, WordType>::word_count() >
+                      word_array<V, WordType>::word_count())
         {
             for (size_t i = other.word_count(); i < this->word_count(); ++i)
             {
@@ -97,7 +99,7 @@ public:
         return (Width / word_size) + (Width % word_size ? 1 : 0);
     }
 
-    [[nodiscard]] static constexpr auto word_mask(size_t index) noexcept -> word_type
+    [[nodiscard]] static constexpr word_type word_mask(size_t index) noexcept
     {
 
         constexpr word_type other_masks = static_cast<word_type>(-1); // all ones, e.g. no masking
@@ -153,9 +155,9 @@ public:
         return static_cast<bit_type>(masked_bit > 0 ? 1 : 0);
     }
 
-    template <size_t Count> constexpr auto bits(size_t index) const -> word_array<Count>
+    template <size_t Count> constexpr auto bits(size_t index) const -> word_array<Count, WordType>
     {
-        word_array<Count> result;
+        word_array<Count, WordType> result;
         for (auto i = 0U; i < Count; ++i)
         {
             result.set_bit(i, bit(index + i));
@@ -303,9 +305,9 @@ public:
      * Constants
      */
 
-    [[nodiscard]] static constexpr word_array all_ones()
+    [[nodiscard]] static constexpr word_array<Width, WordType> all_ones()
     {
-        word_array n;
+        word_array<Width, WordType> n;
         word_type ones = ~(static_cast<word_type>(0U));
         for (size_t i = 0; i < n.word_count(); ++i)
         {
@@ -314,7 +316,7 @@ public:
         return n;
     }
 
-    [[nodiscard]] static constexpr word_array all_zeroes()
+    [[nodiscard]] static constexpr word_array<Width, WordType> all_zeroes()
     {
         return word_array{0U};
     }
@@ -426,15 +428,15 @@ private:
     std::array<word_type, word_count()> words{{0}};
 };
 
-template <size_t Width> class is_word_array<word_array<Width>>
+template <size_t Width, typename T> class is_word_array<word_array<Width, T>>
 {
 public:
     static constexpr bool value = true;
 };
 
-template <size_t DestinationWidth, size_t SourceWidth>
-[[nodiscard]] auto constexpr width_cast(const word_array<SourceWidth>& source)
-    -> word_array<DestinationWidth>
+template <size_t DestinationWidth, size_t SourceWidth, typename T>
+[[nodiscard]] auto constexpr width_cast(const word_array<SourceWidth, T>& source)
+    -> word_array<DestinationWidth, T>
 {
 
     if constexpr (SourceWidth == DestinationWidth)
@@ -444,7 +446,7 @@ template <size_t DestinationWidth, size_t SourceWidth>
     else
     {
 
-        word_array<DestinationWidth> word_container;
+        word_array<DestinationWidth, T> word_container;
         if constexpr (DestinationWidth >= SourceWidth)
         {
             for (auto i = 0U; i < source.word_count(); ++i)
