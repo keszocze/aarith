@@ -72,7 +72,7 @@ template <typename Integer> class integer_range
             }
             else
             {
-                if (current == range.begin_)
+                if (current == range.start_)
                 {
                     current = std::nullopt;
                 }
@@ -80,7 +80,7 @@ template <typename Integer> class integer_range
                 {
                     const I curr = *current;
                     const I stride = range.stride_;
-                    const I dist = sub(curr, range.begin_);
+                    const I dist = sub(curr, range.start_);
 
                     if (dist >= stride)
                     {
@@ -96,11 +96,13 @@ template <typename Integer> class integer_range
             return *this;
         }
 
-        friend bool operator==(integer_iter<I> const& lhs, integer_iter<I> const& rhs)
+        friend bool operator==(integer_iter<I, IsForwardIterator> const& lhs,
+                               integer_iter<I, IsForwardIterator> const& rhs)
         {
             return (lhs.current == rhs.current) && (lhs.range == rhs.range);
         }
-        friend bool operator!=(integer_iter<I> const& lhs, integer_iter<I> const& rhs)
+        friend bool operator!=(integer_iter<I, IsForwardIterator> const& lhs,
+                               integer_iter<I, IsForwardIterator> const& rhs)
         {
             return !(lhs == rhs);
         }
@@ -144,26 +146,26 @@ public:
         return integer_iter<Integer>(*this);
     }
 
-    [[nodiscard]] integer_iter<Integer> rbegin() const
+    [[nodiscard]] integer_iter<Integer, false> rbegin() const
     {
-        return cbegin();
+        return crbegin();
     }
 
-    [[nodiscard]] integer_iter<Integer> rend() const
+    [[nodiscard]] integer_iter<Integer, false> rend() const
     {
-        return cend();
+        return crend();
     }
 
-    [[nodiscard]] integer_iter<Integer> crbegin() const
+    [[nodiscard]] integer_iter<Integer, false> crbegin() const
     {
         if (start_ > end_)
         {
-            return cend();
+            return crend();
         }
-        return integer_iter<Integer, false>(start_, *this);
+        return integer_iter<Integer, false>(end_, *this);
     }
 
-    [[nodiscard]] integer_iter<Integer> crend() const
+    [[nodiscard]] integer_iter<Integer, false> crend() const
     {
         return integer_iter<Integer, false>(*this);
     }

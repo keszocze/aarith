@@ -3,7 +3,7 @@
 
 using namespace aarith;
 
-SCENARIO("Iterating ranges")
+SCENARIO("Iterating ranges", "[integer][signed][ranges][operation][utility]")
 {
     constexpr size_t W = 8;
     using I = integer<W>;
@@ -60,16 +60,19 @@ SCENARIO("Iterating ranges")
     GIVEN("Two integers a and b with a < 0 < b")
     {
 
-        const I a{-1};
-        const I b{1};
+        const I a{-5};
+        const I b{5};
 
         WHEN("They form a range")
         {
             THEN("The iterations works fine")
             {
+
+                int k = -5;
                 for (const I i : integer_range(a, b, I{1}))
                 {
-                    std::cout << i << "\n";
+                    REQUIRE(I{k} == i);
+                    ++k;
                 }
             }
         }
@@ -84,12 +87,12 @@ SCENARIO("Iterating ranges")
             THEN("The range should be empty")
             {
 
-                std::cout << "Iterating over an empty range:\n";
-                for (const I num : integer_range(a, b))
+                size_t count = 0;
+                for ([[maybe_unused]] const I num : integer_range(a, b))
                 {
-                    std::cout << num << "\n";
+                    ++count;
                 }
-                std::cout << "\n";
+                REQUIRE(count == 0);
             }
         }
     }
@@ -101,16 +104,96 @@ SCENARIO("Iterating ranges")
         {
             THEN("There should be one value, namely a")
             {
-                for (const I num : integer_range(a, a))
+                size_t count = 0;
+                for ([[maybe_unused]] const I num : integer_range(a, a))
                 {
-                    std::cout << num << "\n";
+                    ++count;
                 }
+                REQUIRE(count == 1);
             }
         }
     }
 }
 
-SCENARIO("Using non-positive strides")
+SCENARIO("Reverse iterating integer ranges",
+         "[integer][signed][ranges][operation][utility][reverse]")
+{
+    constexpr size_t W = 8;
+    using I = integer<W>;
+    GIVEN("An integer range")
+    {
+
+        I a = I{-4};
+        I b = I{4};
+        WHEN("Using the reverse iterator")
+        {
+            AND_WHEN("Using the default stride")
+            {
+                THEN("The numbers should be correctly iterated backwards")
+                {
+                    int k = 4;
+                    const auto range = integer_range(a, b);
+
+                    for (auto iter = range.rbegin(); iter != range.rend(); ++iter)
+                    {
+                        REQUIRE(I{k} == *iter);
+                        --k;
+                    }
+                }
+            }
+            AND_WHEN("Using a stride of two")
+            {
+                THEN("The numbers should be correctly iterated backwards")
+                {
+                    int k = 4;
+                    const auto range = integer_range(a, b, I{2});
+
+                    for (auto iter = range.rbegin(); iter != range.rend(); ++iter)
+                    {
+                        REQUIRE(I{k} == *iter);
+                        k -= 2;
+                    }
+                }
+            }
+            AND_WHEN("Using a stride of three")
+            {
+                THEN("The numbers should be correctly iterated backwards and no underflow happens")
+                {
+                    std::vector<int> values{4, 1, -2};
+                    int k = 0;
+                    const auto range = integer_range(a, b, I{3});
+
+                    for (auto iter = range.rbegin(); iter != range.rend(); ++iter)
+                    {
+                        REQUIRE(I{values[k]} == *iter);
+                        ++k;
+                    }
+                }
+            }
+        }
+    }
+    GIVEN("Two non-negative integers a and b with a > b")
+    {
+        I a = I{23};
+        I b = I{13};
+        WHEN("Creating the range [a,b]")
+        {
+            THEN("The range should be empty")
+            {
+
+                size_t count = 0;
+                const auto range = integer_range(a, b);
+                for (auto iter = range.rbegin(); iter != range.rend(); ++iter)
+                {
+                    ++count;
+                }
+                REQUIRE(count == 0);
+            }
+        }
+    }
+}
+
+SCENARIO("Using non-positive strides", "[integer][unsigned][ranges][operation][utility]")
 {
     GIVEN("Two unsigned integers")
     {
@@ -126,7 +209,7 @@ SCENARIO("Using non-positive strides")
         }
     }
 
-    GIVEN("Two unsigned integers")
+    GIVEN("Two integers")
     {
         constexpr size_t W = 8;
         using I = integer<W>;

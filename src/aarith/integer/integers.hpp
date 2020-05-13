@@ -74,6 +74,15 @@ public:
         n.set_bit(0);
         return n;
     }
+
+    /**
+     * @brief Returns whether the number is negative.
+     * @return Always returns false
+     */
+    [[nodiscard]] bool constexpr is_negative() const
+    {
+        return false;
+    }
 };
 
 template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
