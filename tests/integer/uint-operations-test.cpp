@@ -327,7 +327,7 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
     }
 }
 
-SCENARIO("Expanding subtraction works correctly", "[uinteger][arithmetic]")
+SCENARIO("Expanding subtraction works correctly", "[uinteger][arithmetic][subtraction]")
 {
     GIVEN("A n-bit zero and a m-bit (m>n)  max")
     {
@@ -357,7 +357,7 @@ SCENARIO("Expanding subtraction works correctly", "[uinteger][arithmetic]")
     }
 }
 
-SCENARIO("Investigating max/min values", "[uinteger][arithmetic]")
+SCENARIO("Investigating max/min values", "[uinteger][operations]")
 {
     GIVEN("The maximal and minimal values of uinteger<V>")
     {
@@ -901,7 +901,7 @@ SCENARIO("Bit and Word operations work correctly", "[uinteger][utility]")
     }
 }
 
-SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic]")
+SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic][division]")
 {
     GIVEN("Two uinteger<N> a and b with N <= 32")
     {
@@ -947,7 +947,42 @@ SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic]")
     }
 }
 
-SCENARIO("Computing the remainder of two uintegers works as expected", "[uinteger][arithmetic]")
+SCENARIO("Computing the signum of an unsigned integer", "[uinteger][operation][utility]")
+{
+    GIVEN("The number  zero")
+    {
+        THEN("The signum should be zero")
+        {
+            REQUIRE(signum(uinteger<8>::zero()) == 0);
+            REQUIRE(signum(uinteger<1>::zero()) == 0);
+            REQUIRE(signum(uinteger<16>::zero()) == 0);
+            REQUIRE(signum(uinteger<32>::zero()) == 0);
+            REQUIRE(signum(uinteger<64>::zero()) == 0);
+            REQUIRE(signum(uinteger<128>::zero()) == 0);
+            REQUIRE(signum(uinteger<300>::zero()) == 0);
+            REQUIRE(signum(uinteger<1313>::zero()) == 0);
+        }
+    }
+    GIVEN("A non-zero number")
+    {
+        THEN("The signum should be one")
+        {
+            uint8_t val_a =
+                GENERATE(take(100, random(uint8_t(1), std::numeric_limits<uint8_t>::max())));
+
+            REQUIRE(signum(uinteger<8>{val_a}) == 1);
+            REQUIRE(signum(uinteger<16>{val_a}) == 1);
+            REQUIRE(signum(uinteger<17>{val_a}) == 1);
+            REQUIRE(signum(uinteger<32>{val_a}) == 1);
+            REQUIRE(signum(uinteger<64>{val_a}) == 1);
+            REQUIRE(signum(uinteger<128>{val_a}) == 1);
+            REQUIRE(signum(uinteger<256>{val_a, val_a}) == 1);
+        }
+    }
+}
+
+SCENARIO("Computing the remainder of two unsigned integers works as expected",
+         "[uinteger][arithmetic][remainder][division]")
 {
     GIVEN("A fixed test case a=56567 and b=234")
     {

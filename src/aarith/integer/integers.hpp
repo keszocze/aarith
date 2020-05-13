@@ -102,6 +102,15 @@ public:
         return n;
     }
 
+    /**
+     * @brief Returns whether the number is negative.
+     * @return Always returns false
+     */
+    [[nodiscard]] bool constexpr is_negative() const
+    {
+        return false;
+    }
+
     /*
      * Conversion operators
      */
