@@ -1,3 +1,5 @@
+
+
 function(add_aarith_benchmark testname)
 
     SET(targetname "${testname}-benchmark")
@@ -21,6 +23,8 @@ function(add_aarith_benchmark testname)
     endif()
 
     target_compile_options(${targetname} PRIVATE "-O3")
+    target_link_libraries(${targetname} PRIVATE benchmark::benchmark)
+    target_include_directories(${targetname} PRIVATE ${PROJECT_SOURCE_DIR}/lib/benchmark/include)
 
 endfunction(add_aarith_benchmark)
 

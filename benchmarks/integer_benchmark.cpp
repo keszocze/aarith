@@ -1,3 +1,5 @@
+#include <benchmark/benchmark.h>
+
 #include <aarith/integer.hpp>
 
 #include <chrono>
@@ -5,126 +7,410 @@
 #include <string>
 #include <tuple>
 
-template <typename T> void bench_int(std::string name)
+template <typename Op> void generic_aarithmetic(benchmark::State& state)
 {
     using namespace std;
-    using namespace chrono;
+    // TODO WTF?! why is there this double nesting?
+    using namespace aarith::aarith::arithmetic_operators;
+    using I = typename Op::Type;
 
-    using count_type = int64_t;
+    I one;
 
-    const steady_clock::time_point start = std::chrono::steady_clock::now();
-
-    constexpr count_type max_val = std::numeric_limits<T>::max();
-    constexpr count_type min_val = std::numeric_limits<T>::min();
-
-    for (auto [a, counter_a] = std::tuple<T, count_type>{min_val, min_val}; counter_a <= max_val;
-         ++a, ++counter_a)
+    if constexpr (aarith::is_integral_v<I>)
     {
-        for (auto [b, counter_b] = std::tuple<T, count_type>{min_val, min_val};
-             counter_b <= max_val; ++counter_b, ++b)
-        {
-            const T sum = a + b;
-            const T diff = a - b;
-            const T prod = a * b;
-            const T fun = ((a + b) * b) + a;
-        }
+        one = I::one();
+    }
+    else
+    {
+        one = static_cast<I>(1);
     }
 
-    const steady_clock::time_point end = std::chrono::steady_clock::now();
-    const steady_clock::duration duration = end - start;
-    const auto dur = duration_cast<std::chrono::milliseconds>(duration).count();
-
-    std::cout << name << ";" << dur << "\n";
-}
-
-template <template <size_t, typename> typename I, size_t W, typename WordType = uint64_t>
-void bench_aarith_int(std::string name)
-{
-    using namespace std;
-    using namespace chrono;
-
-    using Integer = I<W, WordType>;
-    using count_type = I<W + 1, WordType>;
-    constexpr count_type max_val{std::numeric_limits<Integer>::max()};
-    constexpr count_type big_one = count_type::one();
-    constexpr I small_one = Integer::one();
-
-    const steady_clock::time_point start = std::chrono::steady_clock::now();
-
-    Integer a = std::numeric_limits<Integer>::min();
-    count_type counter_a = std::numeric_limits<Integer>::min();
-
-    //    std::cout << counter_a << "\t" << std::numeric_limits<Integer>::min() << "/" << max_val <<
-    //    " "
-    //              << (counter_a < max_val) << "\n";
-
-    while (counter_a <= max_val)
+    for (auto _ : state)
     {
-
-        Integer b = std::numeric_limits<Integer>::min();
-        count_type counter_b = std::numeric_limits<Integer>::min();
-
-        while (counter_b <= max_val)
+        for (I a = std::numeric_limits<I>::min(); a != std::numeric_limits<I>::max(); a = a + one)
         {
-            const Integer sum = add(a, b);
-            const Integer diff = sub(a, b);
-            const Integer prod = mul(a, b);
-            const Integer fun = add(mul(add(a, b), b), a);
 
-            counter_b = add(counter_b, big_one);
-            b = add(b, small_one);
+            for (I b = std::numeric_limits<I>::min(); b != std::numeric_limits<I>::max();
+                 b = b + one)
+            {
+                benchmark::DoNotOptimize(Op::compute(a, b));
+            }
+
+            // extra run for the largest b
+            benchmark::DoNotOptimize(Op::compute(a, std::numeric_limits<I>::max()));
         }
 
-        counter_a = add(counter_a, big_one);
-        a = add(a, small_one);
+        for (I b = std::numeric_limits<I>::min(); b != std::numeric_limits<I>::max(); b = b + one)
+        {
+            benchmark::DoNotOptimize(Op::compute(std::numeric_limits<I>::max(), b));
+        }
+
+        benchmark::DoNotOptimize(
+            Op::compute(std::numeric_limits<I>::max(), std::numeric_limits<I>::max()));
     }
+}
+template <typename I> class Add
+{
+public:
+    using Type = I;
 
-    const steady_clock::time_point end = std::chrono::steady_clock::now();
-    const steady_clock::duration duration = end - start;
-    const auto dur = duration_cast<std::chrono::milliseconds>(duration).count();
+    static I compute(const I a, const I b)
+    {
+        using namespace aarith::aarith::arithmetic_operators;
+        return a + b;
+    }
+};
 
-    std::cout << name << "<" << W << ">;" << dur << "\n";
+template <typename I> class Sub
+{
+public:
+    using Type = I;
+    static I compute(const I a, const I b)
+    {
+        using namespace aarith::aarith::arithmetic_operators;
+        return a + b;
+    }
+};
+
+template <typename I> class Div
+{
+public:
+    using Type = I;
+    static I compute(const I a, const I b)
+    {
+        using namespace aarith::aarith::arithmetic_operators;
+        if (b != static_cast<I>(0))
+        {
+            return a / b;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+};
+
+template <typename I> class Mul
+{
+public:
+    using Type = I;
+    static I compute(const I a, const I b)
+    {
+        using namespace aarith::aarith::arithmetic_operators;
+        return a * b;
+    }
+};
+
+template <typename I> void scalar_product(benchmark::State& state)
+{
+    using namespace aarith::aarith::arithmetic_operators;
+    for (auto _ : state)
+    {
+        state.PauseTiming();
+        std::vector<I> v1(state.range(0));
+        std::vector<I> v2(state.range(0));
+
+        I fst = std::numeric_limits<I>::min();
+        I lst = std::numeric_limits<I>::max();
+
+        I one;
+
+        if constexpr (aarith::is_integral_v<I>)
+        {
+            one = I::one();
+        }
+        else
+        {
+            one = static_cast<I>(1);
+        }
+
+        for (size_t i = 0; i < state.range(0); ++i)
+        {
+            v1.push_back(fst);
+            v2.push_back(lst);
+
+            fst = fst + one;
+            lst = lst - one;
+        }
+        state.ResumeTiming();
+
+        I result = static_cast<I>(0);
+        auto iter1 = std::begin(v1);
+        auto iter2 = std::begin(v2);
+
+        for (; iter1 != std::end(v1); ++iter1, ++iter2)
+        {
+            benchmark::DoNotOptimize(result = result + (*iter1 * *iter2));
+        }
+    }
 }
 
-int main(int argc, char* argv[])
+int main(int argc, char** argv)
 {
-    using namespace std;
-    using namespace aarith;
 
-    if (argc == 1 || (argc == 2 && std::string{argv[1]} == std::string{"small"}))
-    {
-        bench_int<int8_t>("int8");
-        bench_int<uint8_t>("uint8");
-        bench_int<int16_t>("int16");
-        bench_int<uint16_t>("uint16");
+    // the code below has been generated using a ruby script...
 
-        bench_aarith_int<integer, 8>("integer");
-        bench_aarith_int<uinteger, 8>("uinteger");
-        bench_aarith_int<integer, 16>("integer");
-        bench_aarith_int<uinteger, 16>("uinteger");
+    benchmark::RegisterBenchmark("Add<uint8_t>", &generic_aarithmetic<Add<uint8_t>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Sub<uint8_t>", &generic_aarithmetic<Sub<uint8_t>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Mul<uint8_t>", &generic_aarithmetic<Mul<uint8_t>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Div<uint8_t>", &generic_aarithmetic<Div<uint8_t>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Add<int8_t>", &generic_aarithmetic<Add<int8_t>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Sub<int8_t>", &generic_aarithmetic<Sub<int8_t>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Mul<int8_t>", &generic_aarithmetic<Mul<int8_t>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Div<int8_t>", &generic_aarithmetic<Div<int8_t>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Add<uint16_t>", &generic_aarithmetic<Add<uint16_t>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Sub<uint16_t>", &generic_aarithmetic<Sub<uint16_t>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Mul<uint16_t>", &generic_aarithmetic<Mul<uint16_t>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Div<uint16_t>", &generic_aarithmetic<Div<uint16_t>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Add<int16_t>", &generic_aarithmetic<Add<int16_t>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Sub<int16_t>", &generic_aarithmetic<Sub<int16_t>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Mul<int16_t>", &generic_aarithmetic<Mul<int16_t>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Div<int16_t>", &generic_aarithmetic<Div<int16_t>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Add<aarith::uinteger<8>>",
+                                 &generic_aarithmetic<Add<aarith::uinteger<8>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Sub<aarith::uinteger<8>>",
+                                 &generic_aarithmetic<Sub<aarith::uinteger<8>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Mul<aarith::uinteger<8>>",
+                                 &generic_aarithmetic<Mul<aarith::uinteger<8>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Div<aarith::uinteger<8>>",
+                                 &generic_aarithmetic<Div<aarith::uinteger<8>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Add<aarith::integer<8>>",
+                                 &generic_aarithmetic<Add<aarith::integer<8>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Sub<aarith::integer<8>>",
+                                 &generic_aarithmetic<Sub<aarith::integer<8>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Mul<aarith::integer<8>>",
+                                 &generic_aarithmetic<Mul<aarith::integer<8>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Div<aarith::integer<8>>",
+                                 &generic_aarithmetic<Div<aarith::integer<8>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Add<aarith::uinteger<12>>",
+                                 &generic_aarithmetic<Add<aarith::uinteger<12>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Sub<aarith::uinteger<12>>",
+                                 &generic_aarithmetic<Sub<aarith::uinteger<12>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Mul<aarith::uinteger<12>>",
+                                 &generic_aarithmetic<Mul<aarith::uinteger<12>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Div<aarith::uinteger<12>>",
+                                 &generic_aarithmetic<Div<aarith::uinteger<12>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Add<aarith::integer<12>>",
+                                 &generic_aarithmetic<Add<aarith::integer<12>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Sub<aarith::integer<12>>",
+                                 &generic_aarithmetic<Sub<aarith::integer<12>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Mul<aarith::integer<12>>",
+                                 &generic_aarithmetic<Mul<aarith::integer<12>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Div<aarith::integer<12>>",
+                                 &generic_aarithmetic<Div<aarith::integer<12>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Add<aarith::uinteger<14>>",
+                                 &generic_aarithmetic<Add<aarith::uinteger<14>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Sub<aarith::uinteger<14>>",
+                                 &generic_aarithmetic<Sub<aarith::uinteger<14>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Mul<aarith::uinteger<14>>",
+                                 &generic_aarithmetic<Mul<aarith::uinteger<14>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Div<aarith::uinteger<14>>",
+                                 &generic_aarithmetic<Div<aarith::uinteger<14>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Add<aarith::integer<14>>",
+                                 &generic_aarithmetic<Add<aarith::integer<14>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Sub<aarith::integer<14>>",
+                                 &generic_aarithmetic<Sub<aarith::integer<14>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Mul<aarith::integer<14>>",
+                                 &generic_aarithmetic<Mul<aarith::integer<14>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Div<aarith::integer<14>>",
+                                 &generic_aarithmetic<Div<aarith::integer<14>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Add<aarith::uinteger<16>>",
+                                 &generic_aarithmetic<Add<aarith::uinteger<16>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Sub<aarith::uinteger<16>>",
+                                 &generic_aarithmetic<Sub<aarith::uinteger<16>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Mul<aarith::uinteger<16>>",
+                                 &generic_aarithmetic<Mul<aarith::uinteger<16>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Div<aarith::uinteger<16>>",
+                                 &generic_aarithmetic<Div<aarith::uinteger<16>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Add<aarith::integer<16>>",
+                                 &generic_aarithmetic<Add<aarith::integer<16>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Sub<aarith::integer<16>>",
+                                 &generic_aarithmetic<Sub<aarith::integer<16>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Mul<aarith::integer<16>>",
+                                 &generic_aarithmetic<Mul<aarith::integer<16>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Div<aarith::integer<16>>",
+                                 &generic_aarithmetic<Div<aarith::integer<16>>>)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Scalar Product<uint8_t>", &scalar_product<uint8_t>)
+        ->Range(1, std::numeric_limits<uint8_t>::max())
+        ->Repetitions(3)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Scalar Product<int8_t>", &scalar_product<int8_t>)
+        ->Range(1, std::numeric_limits<int8_t>::max())
+        ->Repetitions(3)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Scalar Product<uint16_t>", &scalar_product<uint16_t>)
+        ->Range(1, std::numeric_limits<uint16_t>::max())
+        ->Repetitions(3)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Scalar Product<int16_t>", &scalar_product<int16_t>)
+        ->Range(1, std::numeric_limits<int16_t>::max())
+        ->Repetitions(3)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Scalar Product<aarith::uinteger<8>>",
+                                 &scalar_product<aarith::uinteger<8>>)
+        ->Range(1, std::numeric_limits<int8_t>::max())
+        ->Repetitions(3)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Scalar Product<aarith::integer<8>>",
+                                 &scalar_product<aarith::integer<8>>)
+        ->Range(1, std::numeric_limits<int8_t>::max())
+        ->Repetitions(3)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Scalar Product<aarith::uinteger<16>>",
+                                 &scalar_product<aarith::uinteger<16>>)
+        ->Range(1, std::numeric_limits<int16_t>::max())
+        ->Repetitions(3)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("Scalar Product<aarith::integer<16>>",
+                                 &scalar_product<aarith::integer<16>>)
+        ->Range(1, std::numeric_limits<int16_t>::max())
+        ->Repetitions(3)
+        ->DisplayAggregatesOnly();
 
-        bench_int<int8_t>("int8");
-        bench_aarith_int<uinteger, 16>("uinteger");
-        bench_int<uint8_t>("uint8");
-        bench_aarith_int<integer, 16>("integer");
-        bench_int<int16_t>("int16");
-        bench_int<uint16_t>("uint16");
-        bench_aarith_int<integer, 8>("integer");
-        bench_aarith_int<uinteger, 8>("uinteger");
-    }
-    else if (argc == 2 && std::string{argv[1]} == std::string{"large"})
-    {
-        bench_int<int32_t>("int32");
-        bench_int<uint32_t>("uint32");
-
-        bench_aarith_int<integer, 32>("integer");
-        bench_aarith_int<uinteger, 32>("uinteger");
-
-        bench_int<int32_t>("int32");
-        bench_aarith_int<integer, 32>("integer");
-        bench_int<uint32_t>("uint32");
-        bench_aarith_int<uinteger, 32>("uinteger");
-    }
-
-    return 0;
+    benchmark::Initialize(&argc, argv);
+    benchmark::RunSpecifiedBenchmarks();
 }
