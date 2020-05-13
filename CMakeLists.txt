@@ -30,11 +30,12 @@ add_custom_target(clangformat
         COMMAND clang-format -style=file -i ${ALL_SOURCE_FILES}
         )
 
+
 if(BUILD_BENCHMARKS)
     add_subdirectory(lib/benchmark)
     add_subdirectory(benchmarks)
-
 endif()
+
 if(BUILD_EXPERIMENTS)
     add_subdirectory(experiments)
 endif()

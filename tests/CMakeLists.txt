@@ -38,6 +38,8 @@ add_aarith_test(integer-ranges FILES integer/ranges_test.cpp)
 add_aarith_test(functional-style FILES core/functional-style-test.cpp)
 add_aarith_test(number-util FILES core/number_utils-test.cpp)
 
+add_aarith_test(fau FILES uint-approx-test.cpp)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/")
 find_package(MPIR)
 if(MPIR_FOUND)
