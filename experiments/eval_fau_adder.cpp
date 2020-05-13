@@ -2,9 +2,17 @@
 #include <aarith/integer.hpp>
 #include <sstream>
 
+
+
 template <size_t width, size_t lsp_width, size_t shared_bits = 0> void eval_adder()
 {
-    // TODO add the evaluation function
+
+    using namespace aarith;
+    using I = uinteger<width>;
+
+
+
+    FAUadder<width, lsp_width, shared_bits>(a, b)
 }
 
 int main()

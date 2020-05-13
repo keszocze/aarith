@@ -3,8 +3,8 @@
 #include <aarith/core/word_array.hpp>
 #include <aarith/integer.hpp>
 #include <cstdint>
-#include <iostream>
 #include <functional>
+#include <iostream>
 
 namespace aarith {
 
@@ -125,7 +125,6 @@ template <typename Integer, typename Function>
     auto const a_masked = a & mask;
     auto const b_masked = b & mask;
 
-
     return fun(a_masked, b_masked);
 }
 
@@ -239,41 +238,32 @@ template <size_t W, size_t V, typename WordType>
     return result;
 }
 template <size_t width, size_t lsp_width, size_t shared_bits = 0>
-uinteger<width+1> FAUadder(const uinteger<width>& a, const uinteger<width>& b)
+uinteger<width + 1> FAUadder(const uinteger<width>& a, const uinteger<width>& b)
 {
 
     static_assert(shared_bits <= lsp_width);
     static_assert(lsp_width < width);
     static_assert(lsp_width > 0);
 
+    // pre-compute values to split the numbers at
     constexpr size_t lsp_index = lsp_width - 1;
-
-    const auto a_split = split<lsp_index>(a);
-    const auto b_split = split<lsp_index>(b);
-
     constexpr size_t msp_width = width - lsp_width;
+    constexpr size_t lower_shared_index = lsp_index - (shared_bits - 1);
 
-
-    const uinteger<lsp_width> a_lsp = a_split.second;
-    const uinteger<lsp_width> b_lsp = b_split.second;
-
-    const uinteger<msp_width> a_msp = a_split.first;
-    const uinteger<msp_width> b_msp = b_split.first;
+    const auto [a_msp, a_lsp] = split<lsp_index>(a);
+    const auto [b_msp, b_lsp] = split<lsp_index>(b);
 
     uinteger<lsp_width + 1> lsp_sum = expanding_add(a_lsp, b_lsp);
 
     uinteger<lsp_width> lsp = width_cast<lsp_width>(lsp_sum);
 
-
     // conditionally perform carry prediction
     bool predicted_carry = false;
     if constexpr (shared_bits > 0)
     {
-        uinteger<shared_bits> a_shared = bit_range<lsp_index, lsp_index - (shared_bits - 1)>(a);
-        uinteger<shared_bits> b_shared = bit_range<lsp_index, lsp_index - (shared_bits - 1)>(b);
-
+        uinteger<shared_bits> a_shared = bit_range<lsp_index, lower_shared_index>(a);
+        uinteger<shared_bits> b_shared = bit_range<lsp_index, lower_shared_index>(b);
         uinteger<shared_bits + 1> shared_sum = expanding_add(a_shared, b_shared);
-
         predicted_carry = shared_sum.msb();
     }
 
@@ -283,9 +273,9 @@ uinteger<width+1> FAUadder(const uinteger<width>& a, const uinteger<width>& b)
         lsp = lsp.all_ones();
     }
 
-    const uinteger<msp_width + 1> msp = expanding_add(a_msp,b_msp,predicted_carry);
+    const uinteger<msp_width + 1> msp = expanding_add(a_msp, b_msp, predicted_carry);
 
-    uinteger<width+1> result{lsp};
+    uinteger<width + 1> result{lsp};
 
     const auto extended_msp = width_cast<width + 1>(msp);
     result = add(result, extended_msp << lsp_width);

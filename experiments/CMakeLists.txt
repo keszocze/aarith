@@ -30,7 +30,4 @@ add_aarith_experiment(integer11-correctness FILES check_integer11_operations.cpp
 add_aarith_experiment(integer16-correctness FILES check_integer16_operations.cpp int_correctness_check_fun.hpp)
 add_aarith_experiment(integer24-correctness FILES check_integer24_operations.cpp int_correctness_check_fun.hpp)
 add_aarith_experiment(integer32-correctness FILES check_integer32_operations.cpp int_correctness_check_fun.hpp)
-
-
-add_executable(eval_FAU_adder eval_fau_adder.cpp)
-target_link_libraries(eval_FAU_adder aarith::Library)
+add_aarith_experiment("fau-adder" FILES eval_fau_adder.cpp)
