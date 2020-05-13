@@ -1,4 +1,3 @@
-#!/bin/bash
 
 branch_config() {
 	if [ "$1" != "development" ]; then
