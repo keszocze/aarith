@@ -146,19 +146,15 @@ SCENARIO("Casting unsigned integers to uint8_t", "[integer][unsigned][conversion
                 const uint16_t val = GENERATE(
                     take(5, random(uint16_t{max + 1}, std::numeric_limits<uint16_t>::max())));
 
-                uinteger<9> a{val};
                 uinteger<16> b{val};
                 uinteger<32> c{val};
                 uinteger<64> d{val};
                 uinteger<150> e{val};
 
-                //                narrow_cast<uint8_t>(a);
-
-                REQUIRE_THROWS(narrow_cast<uint8_t>(a));
-                //                CHECK_THROWS_AS(narrow_cast<uint8_t>(b), std::domain_error);
-                //                CHECK_THROWS_AS(narrow_cast<uint8_t>(c), std::domain_error);
-                //                CHECK_THROWS_AS(narrow_cast<uint8_t>(d), std::domain_error);
-                //                CHECK_THROWS_AS(narrow_cast<uint8_t>(e), std::domain_error);f
+                CHECK_THROWS_AS(narrow_cast<uint8_t>(b),std::domain_error);
+                CHECK_THROWS_AS(narrow_cast<uint8_t>(c), std::domain_error);
+                CHECK_THROWS_AS(narrow_cast<uint8_t>(d), std::domain_error);
+                CHECK_THROWS_AS(narrow_cast<uint8_t>(e), std::domain_error);
             }
         }
     }
@@ -294,13 +290,11 @@ SCENARIO("Casting unsigned integers to uint16_t", "[integer][unsigned][conversio
                 uinteger<64> d{val};
                 uinteger<150> e{val};
 
-                narrow_cast<B>(a);
-
-                REQUIRE_THROWS(narrow_cast<B>(a));
-                //                CHECK_THROWS_AS(narrow_cast<uint8_t>(b), std::domain_error);
-                //                CHECK_THROWS_AS(narrow_cast<uint8_t>(c), std::domain_error);
-                //                CHECK_THROWS_AS(narrow_cast<uint8_t>(d), std::domain_error);
-                //                CHECK_THROWS_AS(narrow_cast<uint8_t>(e), std::domain_error);f
+                REQUIRE_NOTHROW(narrow_cast<B>(a));
+                REQUIRE_NOTHROW(narrow_cast<B>(b));
+                CHECK_THROWS_AS(narrow_cast<uint8_t>(c), std::domain_error);
+                CHECK_THROWS_AS(narrow_cast<uint8_t>(d), std::domain_error);
+                CHECK_THROWS_AS(narrow_cast<uint8_t>(e), std::domain_error);
             }
         }
     }
@@ -431,19 +425,15 @@ SCENARIO("Casting unsigned integers with various WordTypes to uint16_t",
                 const BL val =
                     GENERATE(take(5, random(BL{max + 1}, std::numeric_limits<BL>::max())));
 
-                uinteger<9, size_t> a{val};
-                uinteger<16> b{val};
                 uinteger<32> c{val};
                 uinteger<64, uint8_t> d{val};
-                uinteger<150> e{val};
+                uinteger<64> e{val};
+                uinteger<64, uint32_t> f{val};
 
-                narrow_cast<B>(a);
-
-                REQUIRE_THROWS(narrow_cast<B>(a));
-                //                CHECK_THROWS_AS(narrow_cast<uint8_t>(b), std::domain_error);
-                //                CHECK_THROWS_AS(narrow_cast<uint8_t>(c), std::domain_error);
-                //                CHECK_THROWS_AS(narrow_cast<uint8_t>(d), std::domain_error);
-                //                CHECK_THROWS_AS(narrow_cast<uint8_t>(e), std::domain_error);f
+                CHECK_THROWS_AS(narrow_cast<uint8_t>(c), std::domain_error);
+                CHECK_THROWS_AS(narrow_cast<uint8_t>(d), std::domain_error);
+                CHECK_THROWS_AS(narrow_cast<uint8_t>(e), std::domain_error);
+                CHECK_THROWS_AS(narrow_cast<uint8_t>(f), std::domain_error);
             }
         }
     }

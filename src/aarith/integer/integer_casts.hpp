@@ -10,7 +10,7 @@ constexpr T narrow_cast(const uinteger<W, WordType>& a)
 {
     constexpr T max = std::numeric_limits<T>::max();
 
-    if (a <= uinteger<W, WordType>{max})
+    if (a <= uinteger<W,WordType>{max})
     {
         if constexpr (sizeof(T) <= sizeof(WordType))
         {
