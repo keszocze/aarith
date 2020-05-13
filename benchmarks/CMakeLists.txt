@@ -30,4 +30,4 @@ endfunction(add_aarith_benchmark)
 
 
 add_aarith_benchmark(integer-timing FILES integer_benchmark.cpp)
-
+add_aarith_benchmark(fau_adder-timing FILES fau_adder_benchmark.cpp)

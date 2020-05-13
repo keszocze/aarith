@@ -250,8 +250,13 @@ uinteger<width + 1> FAUadder(const uinteger<width>& a, const uinteger<width>& b)
     constexpr size_t msp_width = width - lsp_width;
     constexpr size_t lower_shared_index = lsp_index - (shared_bits - 1);
 
-    const auto [a_msp, a_lsp] = split<lsp_index>(a);
-    const auto [b_msp, b_lsp] = split<lsp_index>(b);
+    // structured binding, unfortunately, yields incorrect types
+    const auto a_split = split<lsp_index>(a);
+    const auto b_split = split<lsp_index>(b);
+    const uinteger<lsp_width> a_lsp = a_split.second;
+    const uinteger<lsp_width> b_lsp = b_split.second;
+    const uinteger<msp_width> a_msp = a_split.first;
+    const uinteger<msp_width> b_msp = b_split.first;
 
     uinteger<lsp_width + 1> lsp_sum = expanding_add(a_lsp, b_lsp);
 
