@@ -255,6 +255,23 @@ IntegerType pow(const IntegerType& base, const IntegerType& exponent)
 }
 
 /**
+ * @brief Multiplies two unsigned integers using the Karazuba algorithm
+ *
+ * This implements the karazuba multiplication algorithm (divide and conquer).
+ *
+ * @tparam W The bit width of the multiplicants
+ * @param a First multiplicant
+ * @param b Second multiplicant
+ * @return Product of a and b
+ */
+template <std::size_t W, typename WordType>
+[[nodiscard]] constexpr uinteger<W, WordType> karazuba(const uinteger<W, WordType>& a,
+                                                       const uinteger<W, WordType>& b)
+{
+    return width_cast<W>(expanding_karazuba(a, b));
+}
+
+/**
  * @brief Multiplies two unsigned integers using the Karazuba algorithm expanding the bit width so
  * that the result fits.
  *
@@ -267,8 +284,8 @@ IntegerType pow(const IntegerType& base, const IntegerType& exponent)
  * @return Product of a and b
  */
 template <std::size_t W, std::size_t V, typename WordType>
-[[nodiscard]] uinteger<W + V, WordType> expanding_karazuba(const uinteger<W, WordType>& a,
-                                                           const uinteger<V, WordType>& b)
+[[nodiscard]] constexpr uinteger<W + V, WordType> expanding_karazuba(const uinteger<W, WordType>& a,
+                                                                     const uinteger<V, WordType>& b)
 {
 
     constexpr std::size_t res_width = W + V;
@@ -282,7 +299,7 @@ template <std::size_t W, std::size_t V, typename WordType>
     {
         if (a.is_zero() || b.is_zero())
         {
-            return uinteger<res_width, WordType>(0U);
+            return uinteger<res_width, WordType>::zero();
         }
 
         // floor to the next value with power of 2
@@ -593,15 +610,22 @@ template <size_t W, size_t V, typename WordType>
     -> integer<V + W, WordType>
 {
 
+    if (m.is_zero() || r.is_zero())
+    {
+        return integer<V + W, WordType>::zero();
+    }
+
     constexpr size_t K = W + V + 2;
 
-    integer<K, WordType> A{width_cast<W + 1>(m)};
-    integer<K, WordType> S = -A;
+    integer<W + 1, WordType> expanded_m = width_cast<W + 1>(m);
+
+    uinteger<K, WordType> A{static_cast<word_array<W + 1, WordType>>(expanded_m)};
+    uinteger<K, WordType> S{static_cast<word_array<W, WordType>>(-m)};
 
     A = A << V + 1;
     S = S << V + 1;
 
-    integer<K, WordType> P{r};
+    uinteger<K, WordType> P{static_cast<word_array<W, WordType>>(r)};
     P = P << 1;
 
     for (size_t i = 0; i < V; ++i)
@@ -612,17 +636,19 @@ template <size_t W, size_t V, typename WordType>
 
         if (snd_last_bit && !last_bit)
         {
-            P = add(P, S);
+            P = expanding_add(P, S);
         }
         if (!snd_last_bit && last_bit)
         {
-            P = add(P, A);
+            P = expanding_add(P, A);
         }
 
         P = P >> 1;
     }
 
-    return width_cast<W + V>(P >> 1);
+    auto result = width_cast<W + V>(P >> 1);
+
+    return integer<W + V, WordType>{result};
 }
 
 /**
@@ -681,7 +707,7 @@ constexpr auto operator-(const integer<W, WordType>& n) -> integer<W, WordType>
  * @param n The integer
  * @return The sign of the integer
  */
-template <size_t W>[[nodiscard]] int8_t signum(integer<W> n)
+template <size_t W>[[nodiscard]] constexpr int8_t signum(integer<W> n)
 {
     if (n.is_negative())
     {
@@ -703,7 +729,7 @@ template <size_t W>[[nodiscard]] int8_t signum(integer<W> n)
  * @param n The integer
  * @return The sign of the integer
  */
-template <size_t W>[[nodiscard]] int8_t signum(uinteger<W> n)
+template <size_t W>[[nodiscard]] constexpr int8_t signum(uinteger<W> n)
 {
     return n.is_zero() ? 0 : 1;
 }
@@ -773,6 +799,11 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
     integer<W> Q_cast = width_cast<W>(Q);
     integer<W> remainder_cast = width_cast<W>(remainder_);
 
+    if (numerator.is_negative())
+    {
+        remainder_cast = -remainder_cast;
+    }
+
     return std::make_pair(Q_cast, remainder_cast);
 }
 
@@ -783,7 +814,8 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
  * @param b Second integer
  * @return The distance between the two integers
  */
-template <typename Integer>[[nodiscard]] Integer distance(const Integer& a, const Integer& b)
+template <typename Integer>
+[[nodiscard]] constexpr Integer distance(const Integer& a, const Integer& b)
 {
     return (a <= b) ? sub(b, a) : sub(a, b);
 }
