@@ -248,7 +248,7 @@ uinteger<width + 1> FAUadder(const uinteger<width>& a, const uinteger<width>& b)
     // pre-compute values to split the numbers at
     constexpr size_t lsp_index = lsp_width - 1;
     constexpr size_t msp_width = width - lsp_width;
-    constexpr size_t lower_shared_index = lsp_index - (shared_bits - 1);
+
 
     // structured binding, unfortunately, yields incorrect types
     const auto a_split = split<lsp_index>(a);
@@ -266,6 +266,7 @@ uinteger<width + 1> FAUadder(const uinteger<width>& a, const uinteger<width>& b)
     bool predicted_carry = false;
     if constexpr (shared_bits > 0)
     {
+        constexpr size_t lower_shared_index = lsp_index - (shared_bits - 1);
         uinteger<shared_bits> a_shared = bit_range<lsp_index, lower_shared_index>(a);
         uinteger<shared_bits> b_shared = bit_range<lsp_index, lower_shared_index>(b);
         uinteger<shared_bits + 1> shared_sum = expanding_add(a_shared, b_shared);
