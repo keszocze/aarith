@@ -24,6 +24,33 @@ public:
     {
     }
 
+    // Constructor for unsigned ints that are *not* the WordType
+    template <typename Val, typename = std::enable_if_t<::aarith::is_unsigned_int<Val> &&
+                                                        (sizeof(Val) * 8) <= Width>>
+    constexpr explicit uinteger(Val n)
+        : word_array<Width, WordType>(0U)
+    {
+
+        constexpr size_t size_of_val = sizeof(Val) * 8;
+        constexpr size_t word_size = uinteger<Width, WordType>::word_width();
+
+        if constexpr (size_of_val <= word_size)
+        {
+            this->set_word(0, n);
+        }
+        else
+        {
+            size_t word_index = 0;
+            while (n != 0)
+            {
+                WordType part_n = static_cast<WordType>(n);
+                this->set_word(word_index, part_n);
+                n = n >> word_size;
+                ++word_index;
+            }
+        }
+    }
+
     template <class... Args>
     constexpr uinteger(WordType fst, Args... args)
         : word_array<Width, WordType>(fst, args...)
@@ -82,6 +109,91 @@ public:
     [[nodiscard]] bool constexpr is_negative() const
     {
         return false;
+    }
+
+    /*
+     * Conversion operators
+     */
+
+private:
+    template <typename T> constexpr T generic_cast() const
+    {
+        if constexpr (sizeof(T) <= sizeof(WordType))
+        {
+            // the last word is sufficient to fill the desired target type, so we can simply
+            // make a call to the static_cast operation
+            return static_cast<T>(this->word(0));
+        }
+        else
+        {
+            constexpr size_t words_per_type = (sizeof(T)) / sizeof(WordType);
+
+            constexpr size_t use_words =
+                std::min(words_per_type, uinteger<Width, WordType>::word_count());
+
+            uint16_t result = 0;
+
+            for (size_t i = 0; i < use_words; ++i)
+            {
+                result += this->word(i) << (i * uinteger<Width, WordType>::word_width());
+            }
+
+            return result;
+        }
+    }
+
+public:
+    /**
+     * @brief Converts to an uint8_t
+     *
+     * Note that there will be a possible loss of precision as this method simply cuts
+     * of the "overflowing" bits.
+     *
+     * @return An uint8_t storing the value of this uinteger
+     */
+    explicit constexpr operator uint8_t() const
+    {
+        // we can safely return this as the smallest WordType is uint8_t
+        return static_cast<uint8_t>(this->word(0));
+    }
+
+    /**
+     * @brief Converts to an uint16_t
+     *
+     * Note that there will be a possible loss of precision as this method simply cuts
+     * of the "overflowing" bits.
+     *
+     * @return An uint16_t storing the value of this uinteger
+     */
+    explicit constexpr operator uint16_t() const
+    {
+        return generic_cast<uint16_t>();
+    }
+
+    /**
+     * @brief Converts to an uint32_t
+     *
+     * Note that there will be a possible loss of precision as this method simply cuts
+     * of the "overflowing" bits.
+     *
+     * @return An uint32_t storing the value of this uinteger
+     */
+    explicit constexpr operator uint32_t() const
+    {
+        return generic_cast<uint32_t>();
+    }
+
+    /**
+     * @brief Converts to an uint64_t
+     *
+     * Note that there will be a possible loss of precision as this method simply cuts
+     * of the "overflowing" bits.
+     *
+     * @return An uint64_t storing the value of this uinteger
+     */
+    explicit constexpr operator uint64_t() const
+    {
+        return generic_cast<uint64_t>();
     }
 };
 
