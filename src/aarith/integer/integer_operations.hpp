@@ -140,14 +140,12 @@ template <std::size_t W, std::size_t V, typename WordType>
         const auto leading_zeroes = V - count_leading_zeroes(b);
         uinteger<res_width, WordType> a_ = width_cast<res_width>(a);
 
-        auto bit_index = 0U;
-        while (bit_index < leading_zeroes)
+        for (auto bit_index = 0U; bit_index < leading_zeroes; ++bit_index)
         {
             if (b.bit(bit_index))
             {
                 result = add(result, a_ << bit_index);
             }
-            ++bit_index;
         }
     }
     return result;
