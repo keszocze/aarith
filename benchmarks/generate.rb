@@ -11,5 +11,5 @@ types.each { |t|
 }
 
 types.each { |t|
- puts "benchmark::RegisterBenchmark(\"Scalar Product<#{t}>\", &scalar_product<#{t}>) ->Range(1, std::numeric_limits<#{t}>::max()) ->Repetitions(3)->DisplayAggregatesOnly();"
+ puts "benchmark::RegisterBenchmark(\"Scalar Product<#{t}>\", &scalar_product<#{t}>) ->Range(1, std::numeric_limits<#{t}>::max()) ->Repetitions(5)->DisplayAggregatesOnly();"
 }

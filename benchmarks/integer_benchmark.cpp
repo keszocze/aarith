@@ -376,46 +376,46 @@ int main(int argc, char** argv)
         ->DisplayAggregatesOnly();
     benchmark::RegisterBenchmark("Scalar Product<uint8_t>", &scalar_product<uint8_t>)
         ->Range(1, std::numeric_limits<uint8_t>::max())
-        ->Repetitions(3)
+        ->Repetitions(5)
         ->Unit(benchmark::kMillisecond)
         ->DisplayAggregatesOnly();
     benchmark::RegisterBenchmark("Scalar Product<int8_t>", &scalar_product<int8_t>)
         ->Range(1, std::numeric_limits<int8_t>::max())
-        ->Repetitions(3)
+        ->Repetitions(5)
         ->Unit(benchmark::kMillisecond)
         ->DisplayAggregatesOnly();
     benchmark::RegisterBenchmark("Scalar Product<uint16_t>", &scalar_product<uint16_t>)
         ->Range(1, std::numeric_limits<uint16_t>::max())
-        ->Repetitions(3)
+        ->Repetitions(5)
         ->Unit(benchmark::kMillisecond)
         ->DisplayAggregatesOnly();
     benchmark::RegisterBenchmark("Scalar Product<int16_t>", &scalar_product<int16_t>)
         ->Range(1, std::numeric_limits<int16_t>::max())
-        ->Repetitions(3)
+        ->Repetitions(5)
         ->Unit(benchmark::kMillisecond)
         ->DisplayAggregatesOnly();
     benchmark::RegisterBenchmark("Scalar Product<aarith::uinteger<8>>",
                                  &scalar_product<aarith::uinteger<8>>)
         ->Range(1, std::numeric_limits<int8_t>::max())
-        ->Repetitions(3)
+        ->Repetitions(5)
         ->Unit(benchmark::kMillisecond)
         ->DisplayAggregatesOnly();
     benchmark::RegisterBenchmark("Scalar Product<aarith::integer<8>>",
                                  &scalar_product<aarith::integer<8>>)
         ->Range(1, std::numeric_limits<int8_t>::max())
-        ->Repetitions(3)
+        ->Repetitions(5)
         ->Unit(benchmark::kMillisecond)
         ->DisplayAggregatesOnly();
     benchmark::RegisterBenchmark("Scalar Product<aarith::uinteger<16>>",
                                  &scalar_product<aarith::uinteger<16>>)
         ->Range(1, std::numeric_limits<int16_t>::max())
-        ->Repetitions(3)
+        ->Repetitions(5)
         ->Unit(benchmark::kMillisecond)
         ->DisplayAggregatesOnly();
     benchmark::RegisterBenchmark("Scalar Product<aarith::integer<16>>",
                                  &scalar_product<aarith::integer<16>>)
         ->Range(1, std::numeric_limits<int16_t>::max())
-        ->Repetitions(3)
+        ->Repetitions(5)
         ->Unit(benchmark::kMillisecond)
         ->DisplayAggregatesOnly();
 
