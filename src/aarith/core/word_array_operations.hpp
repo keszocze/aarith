@@ -211,6 +211,16 @@ bit_range(const word_array<W, WordType>& w)
     return width_cast<(S - E) + 1, WordType>(w >> E);
 }
 
+template <size_t W, size_t V, typename WordType>
+word_array<W + V, WordType> concat(const word_array<W, WordType>& w,
+                                   const word_array<V, WordType>& v)
+{
+    word_array<W + V, WordType> result{w};
+    result = result << V;
+    result = result | word_array<W+V, WordType>{v};
+    return result;
+}
+
 /**
  * @brief Splits the word container at the given splitting point
  * @tparam S Splitting point
