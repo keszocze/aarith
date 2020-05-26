@@ -7,7 +7,7 @@
 
 #include <iostream>
 
-using nf_t = aarith::normalized_float<3, 5>;
+using nf_t = aarith::normalized_float<8, 23>;
 
 // something like this would be useful in aarith
 // using newly committed conversions here
@@ -58,6 +58,43 @@ template <size_t exp_bits, size_t man_bits> inline float to_float(nf_t x)
     return res;
 }
 
+template <size_t ES, size_t MS, size_t E, size_t M, typename WordType>
+aarith::word_array<1 + ES + MS, WordType> as_word_array(aarith::normalized_float<E, M, WordType> f)
+{
+    using namespace aarith;
+    auto e = uinteger<ES, WordType>{f.get_exponent()};
+    auto m = uinteger<MS, WordType>{f.get_mantissa()};
+    auto joined = concat(word_array(e), word_array(m));
+    auto with_sign = concat(word_array<1, WordType>{f.get_sign()}, joined);
+
+    return with_sign;
+}
+
+template <size_t E, size_t M, typename WordType>
+float to_float(aarith::normalized_float<E, M, WordType> f)
+{
+    using namespace aarith;
+
+    // TODO parametrisieren, so dass auch double bei rauspurzeln kann
+    using target_IEEE = float;
+
+
+
+    using uint_storage = float_extraction_helper::bit_cast_to_type_trait<target_IEEE>::type;
+    constexpr auto exp_width = get_exponent_width<target_IEEE>();
+    constexpr auto mantissa_width = get_mantissa_width<target_IEEE>();
+
+    // TODO das hier klappt natürlich erstmal nur, wenn man nen aarith::<8,23> reinwirft (?)
+    auto array = as_word_array<exp_width, mantissa_width>(f);
+
+    std::cout << to_binary(array) << "\n";
+
+    // @WARN läuft natürlich nur, wenn das letzte Wort des aarith floats bzw. doubles groß genug ist
+    // :&
+    float result = bit_cast<float>(static_cast<uint_storage>(array[0]));
+    return result;
+}
+
 int main()
 {
     using namespace aarith;
@@ -75,32 +112,47 @@ int main()
     const nf_t nf_a_d(number_a_d);
     const nf_t nf_b_d(number_b_d);
 
-    nf_t nf_c_f;
-    nf_t nf_c_d;
+    // some fancy calculation, whatever
+    nf_t nf_c_f = add(nf_a_f, nf_b_f);
+    nf_t nf_c_d = add(nf_a_d, nf_b_d);
+
+    std::cout << "floats: " << number_a_f << "\t" << number_b_f << "\n";
+    std::cout << "doubles: " << number_a_d << "\t" << number_b_d << "\n";
+    std::cout << "from floats: " << nf_a_f << " (" << to_binary(nf_a_f) << ")\t" << nf_b_f << " ("
+              << to_binary(nf_b_f) << ")\n";
+    std::cout << "from doubles: " << nf_a_d << "\t" << nf_b_d << "\n";
+
+    std::cout << "\n\n";
 
     std::cout << "float: " << number_a_f << " + " << number_b_f << " = "
               << (number_a_f + number_b_f) << std::endl;
-    std::cout << "normalized_float (from float): " << nf_a_f << " + " << nf_b_f << " = "
-              << add(nf_a_f, nf_b_f) << std::endl;
-    std::cout << "compute representation: " << to_compute_string(add(nf_a_f, nf_b_f)) << std::endl;
+    std::cout << "normalized_float (from float): " << nf_a_f << " + " << nf_b_f << " = " << nf_c_f
+              << std::endl;
+    std::cout << "compute representation: " << to_compute_string(nf_c_f) << std::endl;
+    std::cout << "as binary: " << to_binary(nf_c_f) << "\n";
 
     std::cout << "\n\n";
 
     std::cout << "double: " << number_a_d << " + " << number_b_d << " = "
               << (number_a_d + number_b_d) << std::endl;
-    std::cout << "normalized_float (from double): " << nf_a_d << " + " << nf_b_d << " = "
-              << add(nf_a_d, nf_b_d) << std::endl;
+    std::cout << "normalized_float (from double): " << nf_a_d << " + " << nf_b_d << " = " << nf_c_d
+              << std::endl;
     // NOTE: compute output here is still broken
-    std::cout << "compute representation: " << to_compute_string(add(nf_a_d, nf_b_d)) << std::endl;
+    std::cout << "compute representation: " << to_compute_string(nf_c_d) << std::endl;
+    std::cout << "as binary: " << to_binary(nf_c_d) << "\n";
 
-    // some fancy calculation, whatever
-    nf_c_f = add(nf_a_f, nf_b_f);
-    nf_c_d = add(nf_a_d, nf_b_d);
+    std::cout << "\n\n";
 
     // trying to access values as float again
     std::cout << "reference value: " << number_a_d + number_b_d << std::endl;
-    std::cout << "Float backconversion: " << to_float<3, 5>(nf_c_f) << std::endl;
-    std::cout << "Double backconversion: " << to_float<3, 5>(nf_c_d) << std::endl;
+    std::cout << "Float conversion: " << to_float<3, 5>(nf_c_f) << std::endl;
+    std::cout << "Double conversion: " << to_float<3, 5>(nf_c_d) << std::endl;
+
+    std::cout << "\n\n";
+
+    std::cout << to_float(nf_a_f) << "\n";
+    std::cout << to_float(nf_b_f) << "\n";
+    std::cout << to_float(nf_c_f) << "\n";
 
     return 0;
 }
