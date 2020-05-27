@@ -117,6 +117,7 @@ int main()
     std::cout << to_binary(nf_a_f) << "\n";
     std::cout << to_compute_string(nf_a_f) << "\n";
     std::cout << static_cast<float>(nf_a_f) << "\n";
+    std::cout << static_cast<double>(nf_a_f) << "\n";
     std::cout << static_cast<float>(nf_b_f) << "\n";
     std::cout << static_cast<float>(nf_c_f) << "\n";
 

@@ -239,7 +239,7 @@ private:
             as_word_array<exp_width, mant_width>()};
 
         uint_storage bitstring = static_cast<uint_storage>(array);
-        float result = bit_cast<float>(bitstring);
+        To result = bit_cast<To>(bitstring);
         return result;
     }
 
