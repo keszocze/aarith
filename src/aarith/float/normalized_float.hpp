@@ -148,43 +148,80 @@ public:
         return bit(M) == 1;
     }
 
-    template <size_t ES=E, size_t MS=M> word_array<1 + ES + MS, WordType> as_word_array() const
+    /**
+     * @brief Expands the exponent respecting the bias of the target width
+     * @tparam ES The target width of the exponent
+     * @return The exponent expanded to a width of ES
+     */
+    template <size_t ES>[[nodiscard]] uinteger<ES, WordType> constexpr expand_exponent() const
+    {
+        static_assert(ES >= E, "Expanded exponent must not be shorter than the original exponent");
+
+        using exp_type = uinteger<ES, WordType>;
+
+        const exp_type in_bias{this->get_bias()};
+        const auto out_bias = normalized_float<ES, M, WordType>::get_bias();
+        auto bias_difference = sub(out_bias, in_bias);
+
+        exp_type exponent_ = uinteger<ES, WordType>{this->get_exponent()};
+        exponent_ = add(exponent_, bias_difference);
+
+        return exponent_;
+    }
+
+    /**
+     * @brief Expands the mantissa by correctly shifting the bits in the larger uinteger
+     * @tparam MS The target width of the mantissa
+     * @return The mantissa expended to a width of MS
+     */
+    template <size_t MS>[[nodiscard]] uinteger<MS, WordType> constexpr expand_mantissa() const
+    {
+        static_assert(MS >= M, "Expanded mantissa must not be shorter than the original mantissa");
+        uinteger<MS, WordType> mantissa_{get_mantissa()};
+        mantissa_ = mantissa_ << (size_t{MS} - size_t{M});
+        return mantissa_;
+    }
+
+    /**
+     * @brief Creates a bitstring representation of the floating point number.
+     *
+     * The bitstring returned may use more bits for the exponent/mantissa than the floating point
+     * number it was created from. You can use this method to create valid IEEE 754 bitstrings.
+     *
+     * @tparam ES The number of bits to use for the exponent
+     * @tparam MS The number of bits to use for the mantissa
+     * @return IEEE-754 bitstring representation of the floating point number
+     */
+    template <size_t ES = E, size_t MS = M>
+    word_array<1 + ES + MS, WordType> constexpr as_word_array() const
     {
         using namespace aarith;
 
         static_assert(ES >= E);
         static_assert(MS >= M);
 
-        using exp_type = uinteger<ES, WordType>;
-        exp_type e = uinteger<ES, WordType>{this->get_exponent()};
-
-        const exp_type in_bias{this->get_bias()}; // directly store it in something large enough
-
-        const auto out_bias = normalized_float<ES, M, WordType>::get_bias();
-
-        auto bias_difference = sub(out_bias, in_bias);
-        e = add(e, bias_difference);
-
-        auto m = uinteger<MS, WordType>{this->get_mantissa()};
-        auto joined = concat(word_array(e), word_array(m));
+        auto joined = concat(expand_exponent<ES>(), expand_mantissa<MS>());
         auto with_sign = concat(word_array<1, WordType>{this->get_sign()}, joined);
 
         return with_sign;
     }
 
-    [[nodiscard]]
-    explicit operator float() const
+    /**
+     *
+     * @return
+     */
+    [[nodiscard]] explicit constexpr operator float() const
     {
         return generic_cast<float>();
     }
 
-    [[nodiscard]]
-    explicit operator double()  const {
+    [[nodiscard]] explicit constexpr operator double() const
+    {
         return generic_cast<double>();
     }
 
 private:
-    template <typename To>[[nodiscard]] To generic_cast() const
+    template <typename To>[[nodiscard]] constexpr To generic_cast() const
     {
 
         static_assert(std::is_floating_point<To>(), "Can only convert to float or double.");
@@ -193,19 +230,15 @@ private:
 
         using uint_storage = typename float_extraction_helper::bit_cast_to_type_trait<To>::type;
         constexpr auto exp_width = get_exponent_width<To>();
-        constexpr auto mantissa_width = get_mantissa_width<To>();
+        constexpr auto mant_width = get_mantissa_width<To>();
 
-        // TODO remove this check as soon as the as_word_array correctly fills up bits
-        //    static_assert(E == exp_width && M == mantissa_width,
-        //                  "Current code only works for 'exact' matches :(");
         static_assert(E <= exp_width, "Exponent width too large");
-        static_assert(M <= mantissa_width, "Matnissa width too large");
+        static_assert(M <= mant_width, "Mantissa width too large");
 
-        auto array = as_word_array<exp_width, mantissa_width>();
+        uinteger<1 + exp_width + mant_width, WordType> array{
+            as_word_array<exp_width, mant_width>()};
 
-        std::cout << to_binary(array) << "\n";
-
-        uint_storage bitstring = static_cast<uint_storage>(array[0]);
+        uint_storage bitstring = static_cast<uint_storage>(array);
         float result = bit_cast<float>(bitstring);
         return result;
     }
