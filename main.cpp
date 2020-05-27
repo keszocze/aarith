@@ -59,69 +59,6 @@ template <size_t exp_bits, size_t man_bits> inline float to_float(nf_t x)
     return res;
 }
 
-template <size_t ES, size_t MS, size_t E, size_t M, typename WordType>
-aarith::word_array<1 + ES + MS, WordType> as_word_array(aarith::normalized_float<E, M, WordType> f)
-{
-    using namespace aarith;
-
-    static_assert(ES >= E);
-    static_assert(MS >= M);
-
-    const auto in_bias = f.get_bias();
-
-    auto e = uinteger<ES, WordType>{f.get_exponent()};
-
-    const auto out_bias = normalized_float<ES, M, WordType>::get_bias();
-
-    auto bias_difference = sub(out_bias, decltype(out_bias)(in_bias));
-    e = add(e, bias_difference);
-
-    auto m = uinteger<MS, WordType>{f.get_mantissa()};
-    auto joined = concat(word_array(e), word_array(m));
-    auto with_sign = concat(word_array<1, WordType>{f.get_sign()}, joined);
-
-    return with_sign;
-}
-
-template <typename To, size_t E, size_t M, typename WordType>
-float to_native(aarith::normalized_float<E, M, WordType> f)
-{
-
-    static_assert(std::is_floating_point<To>(), "Can only convert to float or double.");
-
-    using namespace aarith;
-
-    using uint_storage = typename float_extraction_helper::bit_cast_to_type_trait<To>::type;
-    constexpr auto exp_width = get_exponent_width<To>();
-    constexpr auto mantissa_width = get_mantissa_width<To>();
-
-    // TODO remove this check as soon as the as_word_array correctly fills up bits
-//    static_assert(E == exp_width && M == mantissa_width,
-//                  "Current code only works for 'exact' matches :(");
-    static_assert(E <= exp_width, "Exponent width too large");
-    static_assert(M <= mantissa_width, "Matnissa width too large");
-
-    auto array = as_word_array<exp_width, mantissa_width>(f);
-
-    std::cout << to_binary(array) << "\n";
-
-    uint_storage bitstring = static_cast<uint_storage>(array[0]);
-    float result = bit_cast<float>(bitstring);
-    return result;
-}
-
-template <size_t E, size_t M, typename WordType>
-float to_float(aarith::normalized_float<E, M, WordType> f)
-{
-    return to_native<float>(f);
-}
-
-template <size_t E, size_t M, typename WordType>
-float to_double(aarith::normalized_float<E, M, WordType> f)
-{
-    return to_native<double>(f);
-}
-
 int main()
 {
     using namespace aarith;
@@ -178,9 +115,9 @@ int main()
     std::cout << "\n\n";
 
     std::cout << to_binary(nf_a_f) << "\n";
-    std::cout << to_float(nf_a_f) << "\n";
-    std::cout << to_float(nf_b_f) << "\n";
-    std::cout << to_float(nf_c_f) << "\n";
+    std::cout << static_cast<float>(nf_a_f) << "\n";
+    std::cout << static_cast<float>(nf_b_f) << "\n";
+    std::cout << static_cast<float>(nf_c_f) << "\n";
 
     return 0;
 }

@@ -148,7 +148,68 @@ public:
         return bit(M) == 1;
     }
 
+    template <size_t ES=E, size_t MS=M> word_array<1 + ES + MS, WordType> as_word_array() const
+    {
+        using namespace aarith;
+
+        static_assert(ES >= E);
+        static_assert(MS >= M);
+
+        using exp_type = uinteger<ES, WordType>;
+        exp_type e = uinteger<ES, WordType>{this->get_exponent()};
+
+        const exp_type in_bias{this->get_bias()}; // directly store it in something large enough
+
+        const auto out_bias = normalized_float<ES, M, WordType>::get_bias();
+
+        auto bias_difference = sub(out_bias, in_bias);
+        e = add(e, bias_difference);
+
+        auto m = uinteger<MS, WordType>{this->get_mantissa()};
+        auto joined = concat(word_array(e), word_array(m));
+        auto with_sign = concat(word_array<1, WordType>{this->get_sign()}, joined);
+
+        return with_sign;
+    }
+
+    [[nodiscard]]
+    explicit operator float() const
+    {
+        return generic_cast<float>();
+    }
+
+    [[nodiscard]]
+    explicit operator double()  const {
+        return generic_cast<double>();
+    }
+
 private:
+    template <typename To>[[nodiscard]] To generic_cast() const
+    {
+
+        static_assert(std::is_floating_point<To>(), "Can only convert to float or double.");
+
+        using namespace aarith;
+
+        using uint_storage = typename float_extraction_helper::bit_cast_to_type_trait<To>::type;
+        constexpr auto exp_width = get_exponent_width<To>();
+        constexpr auto mantissa_width = get_mantissa_width<To>();
+
+        // TODO remove this check as soon as the as_word_array correctly fills up bits
+        //    static_assert(E == exp_width && M == mantissa_width,
+        //                  "Current code only works for 'exact' matches :(");
+        static_assert(E <= exp_width, "Exponent width too large");
+        static_assert(M <= mantissa_width, "Matnissa width too large");
+
+        auto array = as_word_array<exp_width, mantissa_width>();
+
+        std::cout << to_binary(array) << "\n";
+
+        uint_storage bitstring = static_cast<uint_storage>(array[0]);
+        float result = bit_cast<float>(bitstring);
+        return result;
+    }
+
     bool sign_neg;
     uinteger<E, WordType> exponent;
     uinteger<M, WordType> mantissa;
