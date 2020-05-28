@@ -269,7 +269,7 @@ template <class F, size_t W, typename WordType>
  *
  * @tparam F "Catch-all" parameter for functions operating on the words of the word_array
  * @tparam W Bit width of the first word_array to operate on
- * @tparam V Bit width of the secnd word_array to operate on
+ * @tparam V Bit width of the second word_array to operate on
  * @param w The first word_array to operate on
  * @param v The second word_array to operate on
  * @param f Function of type (word_array<W>::word_type, word_array<W>::word_type) ->

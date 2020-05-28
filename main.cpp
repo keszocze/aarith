@@ -121,5 +121,18 @@ int main()
     std::cout << static_cast<float>(nf_b_f) << "\n";
     std::cout << static_cast<float>(nf_c_f) << "\n";
 
+    float fail = 0.75;
+    float weird = 0.875;
+    normalized_float<8,23> fail_nf{fail};
+
+    std::cout << fail << " == " << fail_nf << " = " << (static_cast<float>(fail_nf) == fail) << "\n";
+    std::cout << weird << " == " << fail_nf << " = " << (static_cast<float>(fail_nf) == weird) << "\n";
+
+    float losing_bit = 1.99999988079;
+    normalized_float<8,23> lost{losing_bit};
+
+    std::cout.precision(11);
+    std::cout << losing_bit << " != " << static_cast<float>(lost) << "\n";
+
     return 0;
 }

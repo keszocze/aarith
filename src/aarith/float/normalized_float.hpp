@@ -187,20 +187,26 @@ public:
      *
      * The bitstring returned may use more bits for the exponent/mantissa than the floating point
      * number it was created from. You can use this method to create valid IEEE 754 bitstrings.
-     *
+     * @param remove_hidden_bit If true, the mantissa will be shifted left once before concatenated
+     * into the bitstring.
      * @tparam ES The number of bits to use for the exponent
      * @tparam MS The number of bits to use for the mantissa
      * @return IEEE-754 bitstring representation of the floating point number
      */
     template <size_t ES = E, size_t MS = M>
-    word_array<1 + ES + MS, WordType> constexpr as_word_array() const
+    word_array<1 + ES + MS, WordType> constexpr as_word_array(const bool remove_hidden_bit=false) const
     {
         using namespace aarith;
 
         static_assert(ES >= E);
         static_assert(MS >= M);
 
-        auto joined = concat(expand_exponent<ES>(), expand_mantissa<MS>());
+        auto mantissa_ = expand_mantissa<MS>();
+        if (remove_hidden_bit) {
+            mantissa_ = mantissa_ << 1;
+        }
+
+        auto joined = concat(expand_exponent<ES>(), mantissa_);
         auto with_sign = concat(word_array<1, WordType>{this->get_sign()}, joined);
 
         return with_sign;
@@ -236,7 +242,7 @@ private:
         static_assert(M <= mant_width, "Mantissa width too large");
 
         uinteger<1 + exp_width + mant_width, WordType> array{
-            as_word_array<exp_width, mant_width>()};
+            as_word_array<exp_width, mant_width>(true)};
 
         uint_storage bitstring = static_cast<uint_storage>(array);
         To result = bit_cast<To>(bitstring);
