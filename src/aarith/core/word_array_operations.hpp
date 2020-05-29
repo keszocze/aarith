@@ -189,7 +189,7 @@ template <typename W> auto constexpr operator>>(const W& lhs, const size_t rhs) 
 }
 
 /**
- * @brief Extracts a range from the word container
+ * @brief Extracts a range from the word array
  *
  * Note that the indexing is done
  *  - zero based starting from the LSB
@@ -199,7 +199,7 @@ template <typename W> auto constexpr operator>>(const W& lhs, const size_t rhs) 
  * @tparam E  Ending index (inclusive, from left to right)
  * @tparam W Width of the word container that the range is taken from
  * @param w  Word container from which the range is taken from
- * @return Range word[S,E], including the
+ * @return Range word[E,S] inclusive
  */
 template <size_t S, size_t E, size_t W, typename WordType>
 [[nodiscard]] constexpr word_array<(S - E) + 1, WordType>
