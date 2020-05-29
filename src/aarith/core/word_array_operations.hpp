@@ -208,7 +208,7 @@ bit_range(const word_array<W, WordType>& w)
     static_assert(S < W, "Range must start within the word");
     static_assert(E <= S, "Range must be positive (i.e. this method will not reverse the word");
 
-    return width_cast<(S - E) + 1, WordType>(w >> E);
+    return width_cast<(S - E) + 1, W, WordType>(w >> E);
 }
 
 /**
