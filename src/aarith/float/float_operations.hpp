@@ -153,6 +153,27 @@ template <size_t E, size_t M, typename WordType>
     return normalize<E, rdmquotient.width(), M>(quotient);
 }
 
+/**
+ * @brief Extracts a bitstring range from the bit representation of the float
+ *
+ * Note that the indexing is done
+ *  - zero based starting from the LSB
+ *  - is inclusive (i.e. the start and end point are part of the range)
+ *
+ * @tparam Start Starting index (inclusive, from left to right)
+ * @tparam Eend  Ending index (inclusive, from left to right)
+ * @tparam E Width of the exponent
+ * @tparam M Width of the mantissa
+ * @param f  Float from which the range is taken from
+ * @return Range float[End,Start], inclusive
+ */
+template <size_t Start, size_t End, size_t E, size_t M, typename WordType>
+[[nodiscard]] constexpr word_array<(Start - End) + 1, WordType>
+bit_range(const normalized_float<E, M, WordType>& f)
+{
+    return bit_range<Start, End>(f.as_word_array());
+}
+
 } // namespace aarith
 
 namespace aarith::arithmetic_operators {
