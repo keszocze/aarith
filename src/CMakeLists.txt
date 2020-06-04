@@ -2,6 +2,7 @@ add_library(aarith INTERFACE)
 target_sources(aarith INTERFACE
 		aarith/core.hpp
 		aarith/integer.hpp
+		aarith/fixed_point.hpp
 		aarith/float.hpp
 		aarith/operations/approx_operations.hpp
 )
