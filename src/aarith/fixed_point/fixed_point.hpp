@@ -25,18 +25,51 @@ public:
      */
     fixed() = default;
 
+    [[nodiscard]] static constexpr size_t width()
+    {
+        return I + F;
+    }
+
+    [[nodiscard]] static constexpr size_t int_width()
+    {
+        return I;
+    }
+
+    [[nodiscard]] static constexpr size_t frac_width()
+    {
+        return F;
+    }
+
     /**
      * @brief Creates a fixed point number from a standard data type integral number
      * @tparam Integer The integer type used for creation of the fixed point number
      * @param i The number to be stored in the fixed point number
      */
-    template <typename Integer, typename = std::enable_if_t<std::is_integral_v<Integer>>>
-    explicit fixed(const Integer i)
+    template <typename Integer> explicit fixed(const Integer i)
     {
-        static_assert(sizeof(Integer)*8 <= I);
 
-        data = int_type{i};
-        data = data << F;
+        if constexpr (std::is_integral_v<Integer>)
+        {
+            static_assert(sizeof(Integer) * 8 <= I);
+
+            data = int_type{i};
+            data = data << F;
+        }
+        else if constexpr (::aarith::is_integral_v<Integer>)
+        {
+            static_assert(int_width() >= i.width());
+            static_assert(width() >= i.width());
+            data = i;
+            data = data << F;
+        }
+    }
+
+    template <size_t W>[[nodiscard]] static fixed from_bitstring(const word_array<W>& w)
+    {
+        static_assert(width() >= W);
+        fixed result;
+        result.data = w;
+        return result;
     }
 
     /**

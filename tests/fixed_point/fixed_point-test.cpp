@@ -6,69 +6,100 @@ using namespace aarith;
 
 SCENARIO("Constructor and extraction functions work", "[fixed point]")
 {
-    GIVEN("An integral value")
+
+    GIVEN("Random integral values")
     {
-        unsigned a = 7;
-        unsigned long b = 512;
-        unsigned long c = std::numeric_limits<unsigned long>::max();
+        int64_t n64 = GENERATE(take(
+            20, random(std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max())));
+        int32_t n32 = GENERATE(take(
+            20, random(std::numeric_limits<int32_t>::min(), std::numeric_limits<int32_t>::max())));
+        uint32_t un32 = GENERATE(take(20, random(std::numeric_limits<uint32_t>::min(),
+                                                 std::numeric_limits<uint32_t>::max())));
+        uint64_t un64 = GENERATE(take(20, random(std::numeric_limits<uint64_t>::min(),
+                                                 std::numeric_limits<uint64_t>::max())));
 
-        int l = -5;
-        int m = std::numeric_limits<int>::min();
-        int n = std::numeric_limits<int>::max();
-
-        THEN("The fixed point number should store it correctly")
+        WHEN("Using the constructor taking native data types")
         {
 
-            // TODO what happens when an usigned number is added to a signed number?
-            ufixed_point<32, 3> ufa{a};
-            ufixed_point<64, 2> ufb{b};
-            ufixed_point<64, 2> ufc{c};
+            THEN("The fixed point number should store it correctly")
+            {
+                ufixed_point<32, 4> uf32{un32};
+                ufixed_point<64, 4> uf64{un64};
 
-            fixed_point<32, 5> fl{l};
-            fixed_point<32, 5> fm{m};
-            fixed_point<32, 5> fn{n};
+                fixed_point<32, 4> f32{n32};
+                fixed_point<64, 4> f64{n64};
 
-            fixed_point<33, 2> fk{a};
-            fixed_point<65, 2> fo{b};
-            fixed_point<65, 2> fp{c};
+                fixed_point<33, 4> f33{un32};
+                fixed_point<65, 4> f65{un64};
 
-            //            std::cout << to_binary(ufa) << "\n";
-            //            std::cout << to_binary(ufb) << "\n";
-            //            std::cout << to_binary(ufc) << "\n";
+                REQUIRE(uf32.fractional_part() == uinteger<4>::zero());
+                REQUIRE(uf64.fractional_part() == uinteger<4>::zero());
+                REQUIRE(f32.fractional_part() == uinteger<4>::zero());
+                REQUIRE(f64.fractional_part() == uinteger<4>::zero());
+                REQUIRE(f33.fractional_part() == uinteger<4>::zero());
+                REQUIRE(f65.fractional_part() == uinteger<4>::zero());
 
-            //            std::cout << to_binary(fl) << "\n";
-            //            std::cout << to_binary(fm) << "\n";
-            //            std::cout << to_binary(fn) << "\n";
+                REQUIRE(uf32.integer_part() == uinteger<32>{un32});
+                REQUIRE(uf64.integer_part() == uinteger<64>{un64});
 
-            //            std::cout << to_binary(fk) << "\n";
-            //            std::cout << to_binary(fo) << "\n";
-            //            std::cout << to_binary(fp) << "\n";
+                REQUIRE(f32.integer_part() == integer<32>{n32});
+                REQUIRE(f64.integer_part() == integer<64>{n64});
+            }
+        }
+        WHEN("Using the constructor taking native data types")
+        {
+            THEN("The fixed point number should store it correctly")
+            {
 
-            REQUIRE(ufa.fractional_part() == uinteger<3>::zero());
-            REQUIRE(ufb.fractional_part() == uinteger<2>::zero());
-            REQUIRE(ufc.fractional_part() == uinteger<2>::zero());
+                uinteger<32> ui32 = uinteger<32>{un32};
+                uinteger<64> ui64 = uinteger<64>{un64};
 
-            REQUIRE(fl.fractional_part() == uinteger<5>::zero());
-            REQUIRE(fm.fractional_part() == uinteger<5>::zero());
-            REQUIRE(fn.fractional_part() == uinteger<5>::zero());
+                integer<32> i32 = integer<32>{n32};
+                integer<64> i64 = integer<64>{n64};
 
-            REQUIRE(fk.fractional_part() == uinteger<2>::zero());
-            REQUIRE(fo.fractional_part() == uinteger<2>::zero());
-            REQUIRE(fp.fractional_part() == uinteger<2>::zero());
+                ufixed_point<32, 4> uf32{un32};
+                ufixed_point<64, 4> uf64{un64};
 
-            REQUIRE(ufa.integer_part() == uinteger<32>{a});
-            REQUIRE(ufb.integer_part() == uinteger<64>{b});
-            REQUIRE(ufc.integer_part() == uinteger<64>{c});
+                fixed_point<32, 4> f32{n32};
+                fixed_point<64, 4> f64{n64};
 
-            REQUIRE(fl.integer_part() == integer<32>{l});
-            REQUIRE(fm.integer_part() == integer<32>{m});
-            REQUIRE(fn.integer_part() == integer<32>{n});
+                fixed_point<33, 4> f33{un32};
+                fixed_point<65, 4> f65{un64};
 
-            REQUIRE(fk.integer_part() == integer<33>{a});
-            REQUIRE(fo.integer_part() == integer<65>{b});
-            REQUIRE(fp.integer_part() == integer<65>{c});
+                REQUIRE(uf32.fractional_part() == uinteger<4>::zero());
+                REQUIRE(uf64.fractional_part() == uinteger<4>::zero());
+                REQUIRE(f32.fractional_part() == uinteger<4>::zero());
+                REQUIRE(f64.fractional_part() == uinteger<4>::zero());
+                REQUIRE(f33.fractional_part() == uinteger<4>::zero());
+                REQUIRE(f65.fractional_part() == uinteger<4>::zero());
+
+                REQUIRE(uf32.integer_part() == ui32);
+                REQUIRE(uf64.integer_part() == ui64);
+
+                REQUIRE(f32.integer_part() == i32);
+                REQUIRE(f64.integer_part() == i64);
+            }
         }
     }
+
+    GIVEN("A fixed unsigned aarith integer")
+    {
+        THEN("It can be used to directly set the value of the fixed point number")
+        {
+            unsigned a_ = 0b1000100;
+            unsigned int_part_ = 0b1000;
+            unsigned frac_part_ = 0b100;
+            uinteger<32> a{a_};
+            uinteger<32> int_part{int_part_};
+            uinteger<3> frac_part{frac_part_};
+            ufixed_point<32, 3> fa=ufixed_point<32,3>::from_bitstring(a);
+
+            REQUIRE(fa.integer_part() == int_part);
+            REQUIRE(fa.fractional_part() == frac_part);
+            std::cout << to_binary(fa) << "\n";
+        }
+    }
+
     GIVEN("The number zero in various bit combinations")
     {
         // TODO move this to the string utils section
