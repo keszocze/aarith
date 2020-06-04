@@ -1,6 +1,7 @@
 #pragma once
 
 namespace aarith {
+
 template <size_t I, size_t F, template <size_t, typename> typename B, typename WordType = uint64_t>
 class fixed
 {
@@ -25,31 +26,50 @@ public:
      */
     fixed() = default;
 
+    /**
+     *
+     * @return The width of the fixed point number
+     */
     [[nodiscard]] static constexpr size_t width()
     {
         return I + F;
     }
 
+    /**
+     *
+     * @return The width of the integral part of the fixed point number
+     */
     [[nodiscard]] static constexpr size_t int_width()
     {
         return I;
     }
 
+    /**
+     *
+     * @return The width of the fractional part of the fixed point number
+     */
     [[nodiscard]] static constexpr size_t frac_width()
     {
         return F;
     }
 
     /**
-     * @brief Creates a fixed point number from a standard data type integral number
+     * @brief Creates a fixed point number from an integral number (native or aarith)
+     *
+     * The value will be stored in the integer part of the fixed point. The fractional part will
+     * remain the value zero.
+     *
      * @tparam Integer The integer type used for creation of the fixed point number
      * @param i The number to be stored in the fixed point number
      */
     template <typename Integer> explicit fixed(const Integer i)
     {
+        static_assert(std::is_integral_v<Integer> || ::aarith::is_integral_v<Integer>,
+                      "no valid integer type provided for fixed point constructor");
 
         if constexpr (std::is_integral_v<Integer>)
         {
+            static_assert(sizeof(Integer) * 8 <= I + F);
             static_assert(sizeof(Integer) * 8 <= I);
 
             data = int_type{i};
@@ -57,13 +77,24 @@ public:
         }
         else if constexpr (::aarith::is_integral_v<Integer>)
         {
-            static_assert(int_width() >= i.width());
+            static_assert(I >= i.width());
             static_assert(width() >= i.width());
             data = i;
             data = data << F;
         }
     }
 
+    /**
+     * @brief Constructs a fixed point number from a given "raw" string of bits.
+     *
+     * This method can be seen as a reinterpret cast that "adds" a decimal point to a string of
+     * bits. If the provided word array is smaller than the fixed point number, zeroes are padded to
+     * the left.
+     *
+     * @tparam W The width of the word array that contains the raw data
+     * @param w The word array containing the raw data
+     * @return A fixed point number constructed from the word array
+     */
     template <size_t W>[[nodiscard]] static fixed from_bitstring(const word_array<W>& w)
     {
         static_assert(width() >= W);
@@ -135,6 +166,12 @@ using ufixed_point = fixed<I, F, uinteger, WordType>;
 
 template <size_t I, size_t F, template <size_t, class> typename B, typename WordType>
 class is_fixed_point<fixed<I, F, B, WordType>>
+{
+public:
+    static constexpr bool value = true;
+};
+
+template <size_t I, size_t F, typename WordType> class is_unsigned<fixed<I, F, uinteger, WordType>>
 {
 public:
     static constexpr bool value = true;
