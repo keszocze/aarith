@@ -36,6 +36,14 @@ public:
     static constexpr bool value = false;
 };
 
+template <typename Type> class is_fixed_point
+{
+public:
+    static constexpr bool value = false;
+};
+
+template <typename Type> inline constexpr bool is_fixed_point_v = is_fixed_point<Type>::value;
+
 template <class Type> inline constexpr bool is_float_v = is_float<Type>::value;
 
 template <typename A, typename B>
