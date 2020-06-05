@@ -629,3 +629,51 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
         }
     }
 }
+
+SCENARIO("IEEE-754 arithmetic comparison: float",
+         "[normalized_float][arithmetic][multiplication][ieee-754]")
+{
+    GIVEN("Two random floating point values")
+    {
+        float a = GENERATE(
+            take(10, random(float(1.0), std::numeric_limits<float>::max())));
+        float b = GENERATE(
+            take(10, random(float(1.0), std::numeric_limits<float>::max())));
+
+        using afloat = normalized_float<8, 23>;
+        afloat aa{a};
+        afloat ab{b};
+
+        float f_res_add = a + b;
+        float f_res_mul = a * b;
+        float f_res_sub = a - b;
+        float f_res_div = a / b;
+
+        afloat a_res_add = add(aa, ab);
+        afloat a_res_mul = mul(aa, ab);
+        afloat a_res_sub = sub(aa, ab);
+        afloat a_res_div = div(aa, ab);
+
+        CHECK(f_res_add == static_cast<float>(a_res_add));
+        CHECK(f_res_sub == static_cast<float>(a_res_sub));
+        CHECK(f_res_mul == static_cast<float>(a_res_mul));
+        REQUIRE(f_res_div == static_cast<float>(a_res_div));
+    }
+}
+//
+// TEMPLATE_TEST_CASE_SIG("IEEE-754 arithmetic comparision: addition",
+//                       "[normalized_float][arithmetic][addition][ieee-754]",
+//                       ((typename F, typename A), F, A),
+//                       (float, normalized_float<8,23>),
+//                       (double, normalized_float<11,52>)
+//                       )
+//{
+//    std::cout << "works\n";
+////    FloatType a = GENERATE(take(
+////        10, random(std::numeric_limits<FloatType>::min(),
+/// std::numeric_limits<FloatType>::max()))); /    FloatType b = GENERATE(take( /        10,
+/// random(std::numeric_limits<FloatType>::min(), std::numeric_limits<FloatType>::max())));
+////
+////    AarithFloat aa{a};
+////    AarithFloat ab{b};
+//}
