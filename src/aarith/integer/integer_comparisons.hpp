@@ -87,19 +87,19 @@ constexpr bool operator<(const uinteger<W, WordType>& a, const uinteger<V, WordT
 
 template <typename W, typename V> constexpr bool operator<=(const W& a, const V& b)
 {
-    static_assert(same_sign<W, V>);
+    static_assert(same_signedness<W, V>);
     return (a < b) || (a == b);
 }
 
 template <typename W, typename V> constexpr bool operator>=(const W& a, const V& b)
 {
-    static_assert(same_sign<W, V>);
+    static_assert(same_signedness<W, V>);
     return b <= a;
 }
 
 template <typename W, typename V> constexpr bool operator>(const W& a, const V& b)
 {
-    static_assert(same_sign<W, V>);
+    static_assert(same_signedness<W, V>);
     return b < a;
 }
 
