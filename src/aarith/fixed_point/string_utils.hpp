@@ -26,6 +26,14 @@ auto operator<<(std::ostream& out, const fixed<I, F, B, WordType>& value) -> std
     return out;
 }
 
+/**
+ * @brief Creates a string of bits representing the fixed point number using a '.' to indicate the
+ * decimal point.
+ *
+ * @tparam Fixed
+ * @param value The fixed point number to be transformed into a binary representation
+ * @return String representing the number as binary digits
+ */
 template <typename Fixed, typename = std::enable_if_t<::aarith::is_fixed_point_v<Fixed>>>
 [[nodiscard]] std::string to_binary(const Fixed& value)
 {

@@ -27,30 +27,25 @@ public:
     constexpr fixed() = default;
 
     /**
+     * @brief Copy constructor
      *
-     * @return The width of the fixed point number
+     * The fixed point number that is to be copied must not exceed the widths of the integer and
+     * fractional part. This means that there is never a los of precision. If you need/want that,
+     * use the width_cast method.
+     *
+     * @tparam IP The integer width of the fixed point to be copied
+     * @tparam FP The fractional width of the fixed point to be copied
+     * @param fp The fixed pointer number that is to be copied
      */
-    [[nodiscard]] static constexpr size_t width()
+    template <size_t IP, size_t FP> explicit constexpr fixed(const fixed<IP, FP, B, WordType>& fp)
     {
-        return I + F;
-    }
+        static_assert(IP <= I,
+                      "Can not create a fixed point number from a number with more integer bits");
+        static_assert(
+            FP <= F, "Can not create a fixed point number from a number with more fractional bits");
 
-    /**
-     *
-     * @return The width of the integral part of the fixed point number
-     */
-    [[nodiscard]] static constexpr size_t int_width()
-    {
-        return I;
-    }
-
-    /**
-     *
-     * @return The width of the fractional part of the fixed point number
-     */
-    [[nodiscard]] static constexpr size_t frac_width()
-    {
-        return F;
+        auto tmp = width_cast<I, F>(fp);
+        data = tmp.bits();
     }
 
     /**
@@ -82,6 +77,33 @@ public:
             data = i;
             data = data << F;
         }
+    }
+
+    /**
+     *
+     * @return The width of the fixed point number
+     */
+    [[nodiscard]] static constexpr size_t width()
+    {
+        return I + F;
+    }
+
+    /**
+     *
+     * @return The width of the integral part of the fixed point number
+     */
+    [[nodiscard]] static constexpr size_t int_width()
+    {
+        return I;
+    }
+
+    /**
+     *
+     * @return The width of the fractional part of the fixed point number
+     */
+    [[nodiscard]] static constexpr size_t frac_width()
+    {
+        return F;
     }
 
     /**
@@ -139,8 +161,6 @@ public:
         return bit_range<F - 1, 0>(data);
     }
 };
-
-
 
 template <size_t I, size_t F, typename WordType = uint64_t>
 using fixed_point = fixed<I, F, integer, WordType>;

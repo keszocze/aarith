@@ -26,25 +26,55 @@ bit_range(const fixed<I, F, B, WordType>& w)
     return bit_range<S, E>(w.bits);
 }
 
+/**
+ * @brief Performs an arithmetic right shift
+ * @param lhs The fixed point number that is shifted
+ * @param rhs The number of bits to shift
+ * @return
+ */
 template <size_t I, size_t F, template <size_t, typename> typename B, typename WordType = uint64_t>
-constexpr fixed<I,F,B,WordType> operator>>(const fixed<I,F,B,WordType>& lhs, const size_t rhs)
+constexpr fixed<I, F, B, WordType> operator>>(const fixed<I, F, B, WordType>& lhs, const size_t rhs)
 {
-    return fixed<I,F,B,WordType>::from_bitstring(lhs.bits() >> rhs);
+    return fixed<I, F, B, WordType>::from_bitstring(lhs.bits() >> rhs);
 }
 
+/**
+ * @brief Performs a logical left shift
+ * @param lhs The fixed point number that is shifted
+ * @param rhs The number of bits to shift
+ * @return
+ */
 template <size_t I, size_t F, template <size_t, typename> typename B, typename WordType = uint64_t>
-constexpr fixed<I,F,B,WordType> operator<<(const fixed<I,F,B,WordType>& lhs, const size_t rhs)
+constexpr fixed<I, F, B, WordType> operator<<(const fixed<I, F, B, WordType>& lhs, const size_t rhs)
 {
-    return fixed<I,F,B,WordType>::from_bitstring(lhs.bits() << rhs);
+    return fixed<I, F, B, WordType>::from_bitstring(lhs.bits() << rhs);
 }
 
+/**
+ * @brief Changes the widths of the integer and fractional part.
+ *
+ * This method simply "cuts of" bits from the left and right if the target width is smaller than
+ * the initial one. In case of signed number, cutting of bits might result in a flip of the sign.
+ * In general, there are no guarantees on the value the number stores after a  reduction of any
+ * of the widths.
+ *
+ * If the width of integer part is extended, the sign and the number (of the integer aprt) is
+ * preserved. That means that if both widths are increased (or at least not decreased), the number
+ * stored in the fixed point number remains the same and simply uses more bits.
+ *
+ * @tparam TargetI The target width of the integer part
+ * @tparam TargetF The target width of the factional part
+ * @param a The fixed point whose widhts are changed
+ * @return A fixed point number with the specified widths
+ */
 template <size_t TargetI, size_t TargetF, size_t I, size_t F, template <size_t, class> class B,
           typename WordType = uint64_t>
 constexpr auto width_cast(fixed<I, F, B, WordType> a) -> fixed<TargetI, TargetF, B, WordType>
 {
     using ret_type = fixed<TargetI, TargetF, B, WordType>;
 
-    auto fixed_i = fixed<TargetI, F, B, WordType>::from_bitstring(width_cast<TargetI + F>(a.bits()));
+    auto fixed_i =
+        fixed<TargetI, F, B, WordType>::from_bitstring(width_cast<TargetI + F>(a.bits()));
     constexpr size_t TargetW = TargetI + TargetF;
     if constexpr (TargetF > F)
     {
