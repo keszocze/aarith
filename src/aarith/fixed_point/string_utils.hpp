@@ -26,8 +26,8 @@ auto operator<<(std::ostream& out, const fixed<I, F, B, WordType>& value) -> std
     return out;
 }
 
-template <size_t I, size_t F, template <size_t, class> typename B, typename WordType>
-[[nodiscard]] std::string to_binary(const fixed<I, F, B, WordType>& value)
+template <typename Fixed, typename = std::enable_if_t<::aarith::is_fixed_point_v<Fixed>>>
+[[nodiscard]] std::string to_binary(const Fixed& value)
 {
     std::string result{to_binary(value.integer_part())};
     result += ".";
