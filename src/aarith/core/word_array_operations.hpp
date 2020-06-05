@@ -95,7 +95,8 @@ size_t first_set_bit(const word_array<Width, WordType>& value)
  * @param rhs The number of bits to shift
  * @return The shifted word_container
  */
-template <typename W>[[nodiscard]] constexpr auto operator<<(const W& lhs, const size_t rhs) -> W
+template <typename W>
+[[nodiscard]] constexpr auto operator<<(const W& lhs, const size_t rhs) -> W
 {
     static_assert(::aarith::is_word_array_v<W>);
 

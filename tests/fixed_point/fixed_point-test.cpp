@@ -102,6 +102,39 @@ SCENARIO("Constructor and extraction functions work", "[fixed point]")
 }
 
 //SCENARIO("Computing the min/max of two fixed point numbers")
+SCENARIO("Bit shifting fixed point numbers")
+{
+    GIVEN("A fixed point number")
+    {
+        unsigned u_ = 0b1000100;
+        int s_ = -255;
+        fixed_point<32, 4> s{s_};
+        ufixed_point<32, 4> u{u_};
+
+        WHEN("Shifting left")
+        {
+            THEN("The result is a correctly shifted fixed point number")
+            {
+                // TODO das hier mit constexpr zum laufen bekommen, dazu aber erst noch die
+                // entsprechenden Konstruktoren bauen
+//                                constexpr auto shift1 = s << 5;
+                //                constexpr auto shift2 = u << 5;
+                std::cout << to_binary(s) << "\t" << to_binary(s << 5) << "\n";
+                std::cout << to_binary(u) << "\t" << to_binary(u << 5) << "\n";
+            }
+        }
+        WHEN("Shifting right")
+        {
+            THEN("The result is a correctly shifted fixed point number")
+            {
+                std::cout << to_binary(u) << "\t" << to_binary(u >> 5) << "\n";
+                std::cout << to_binary(u) << "\t" << to_binary(u >> 4) << "\n";
+                std::cout << to_binary(s) << "\t" << to_binary(s >> 5) << "\n";
+                std::cout << to_binary(s) << "\t" << to_binary(s >> 4) << "\n";
+            }
+        }
+    }
+}
 //{
 //    GIVEN("Two fixed point numbers")
 //    {

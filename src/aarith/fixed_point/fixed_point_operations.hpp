@@ -26,7 +26,17 @@ bit_range(const fixed<I, F, B, WordType>& w)
     return bit_range<S, E>(w.bits);
 }
 
+template <size_t I, size_t F, template <size_t, typename> typename B, typename WordType = uint64_t>
+constexpr fixed<I,F,B,WordType> operator>>(const fixed<I,F,B,WordType>& lhs, const size_t rhs)
+{
+    return fixed<I,F,B,WordType>::from_bitstring(lhs.bits() >> rhs);
+}
 
+template <size_t I, size_t F, template <size_t, typename> typename B, typename WordType = uint64_t>
+constexpr fixed<I,F,B,WordType> operator<<(const fixed<I,F,B,WordType>& lhs, const size_t rhs)
+{
+    return fixed<I,F,B,WordType>::from_bitstring(lhs.bits() << rhs);
+}
 
 
 } // namespace aarith

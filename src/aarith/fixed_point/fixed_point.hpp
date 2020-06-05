@@ -24,7 +24,7 @@ public:
     /**
      * @brief Creates a fixed point number with value zero
      */
-    fixed() = default;
+    constexpr fixed() = default;
 
     /**
      *
@@ -62,7 +62,7 @@ public:
      * @tparam Integer The integer type used for creation of the fixed point number
      * @param i The number to be stored in the fixed point number
      */
-    template <typename Integer> explicit fixed(const Integer i)
+    template <typename Integer> explicit constexpr fixed(const Integer i)
     {
         static_assert(std::is_integral_v<Integer> || ::aarith::is_integral_v<Integer>,
                       "no valid integer type provided for fixed point constructor");
@@ -140,23 +140,7 @@ public:
     }
 };
 
-// template <size_t TargetI, size_t TargetF, size_t I, size_t F, template <size_t, class> B,
-//          typename WordType = uint46_t>
-// width_cast(fixed<I, F, B, WordType> a)->fixed<TargetI, TargetF, B, WordType>
-//{
-//}
-//
-// template <size_t I1, size_t F1, size_t I2, size_t F2, template <size_t, class> B,
-//          typename WordType = uint64_t>
-// expanding_add(fixed<I1, F1, B, WordType> a, fixed<I2, F2, B, WordType> b)
-//    ->fixed<std::max(I1, I2) + 1, std::max(F1, F2), B, WordType>
-//{
-//    // TODO größen angleichen
-//    auto tmp_result = add(a_expanded, b_expanded);
-//    // TODO reinterpret Funktion bauen (oder doch per Konstruktor? mittels "bool raw=false" extra
-//    // param?)
-//    return reinterpret<std::max(I1, I2) + 1, std::max(F1, F2)>(tmp_result);
-//}
+
 
 template <size_t I, size_t F, typename WordType = uint64_t>
 using fixed_point = fixed<I, F, integer, WordType>;
