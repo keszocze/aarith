@@ -92,7 +92,7 @@ SCENARIO("Constructor and extraction functions work", "[fixed point]")
             uinteger<32> a{a_};
             uinteger<32> int_part{int_part_};
             uinteger<3> frac_part{frac_part_};
-            ufixed_point<32, 3> fa=ufixed_point<32,3>::from_bitstring(a);
+            ufixed_point<32, 3> fa = ufixed_point<32, 3>::from_bitstring(a);
 
             REQUIRE(fa.integer_part() == int_part);
             REQUIRE(fa.fractional_part() == frac_part);
@@ -100,3 +100,28 @@ SCENARIO("Constructor and extraction functions work", "[fixed point]")
         }
     }
 }
+
+//SCENARIO("Computing the min/max of two fixed point numbers")
+//{
+//    GIVEN("Two fixed point numbers")
+//    {
+//        int64_t n64 = GENERATE(take(
+//            20, random(std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max())));
+//        int32_t n32 = GENERATE(take(
+//            20, random(std::numeric_limits<int32_t>::min(), std::numeric_limits<int32_t>::max())));
+//        fixed_point<32, 4> f32{n32};
+//        fixed_point<64, 4> f64{n64};
+//
+//        WHEN("Computing the min/max of both of them")
+//        {
+//
+//            auto fmin = min(f32,f64);
+//
+//
+//            THEN("The correct value should be chosen")
+//            {
+//                fixed_point<64,4>
+//            }
+//        }
+//    }
+//}

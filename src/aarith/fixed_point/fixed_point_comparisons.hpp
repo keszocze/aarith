@@ -25,22 +25,33 @@ constexpr bool operator<(const FixedA& a, const FixedB& b)
     return (a.bits() < b.bits());
 }
 
-template <typename FixedA, typename FixedB>
+template <typename FixedA, typename FixedB,
+          typename = std::enable_if_t<
+              ::aarith::is_fixed_point_v<FixedA>&& ::aarith::is_fixed_point_v<FixedB>>>
 constexpr bool operator<=(const FixedA& a, const FixedB& b)
 {
     return (a < b) || (a == b);
 }
 
-template <typename FixedA, typename FixedB>
+template <typename FixedA, typename FixedB,
+          typename = std::enable_if_t<
+              ::aarith::is_fixed_point_v<FixedA>&& ::aarith::is_fixed_point_v<FixedB>>>
 constexpr bool operator>=(const FixedA& a, const FixedB& b)
 {
     return b <= a;
 }
 
-template <typename FixedA, typename FixedB>
+template <typename FixedA, typename FixedB,
+          typename = std::enable_if_t<
+              ::aarith::is_fixed_point_v<FixedA>&& ::aarith::is_fixed_point_v<FixedB>>>
 constexpr bool operator>(const FixedA& a, const FixedB& b)
 {
     return (b < a);
 }
+
+//template <typename FixedA, typename FixedB> constexpr auto min(const FixedA& a, const FixedB& b)
+//{
+//    return a;
+//}
 
 } // namespace aarith
