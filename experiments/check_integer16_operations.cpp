@@ -15,8 +15,8 @@ int main()
     check_int_operation<uinteger, Width, UB, false>("addition", &::aarith::add<UI>, native_add);
     check_int_operation<uinteger, Width, UB, false>("subtraction", &::aarith::sub<UI>, native_sub);
     check_int_operation<uinteger, Width, UB, false>("mul", &::aarith::mul<UI>, native_mul);
-//    check_int_operation<uinteger, Width, UB, false>(
-//        "mul_karazuba", &::aarith::karazuba<Width, uint64_t>, native_mul);
+    //    check_int_operation<uinteger, Width, UB, false>(
+    //        "mul_karazuba", &::aarith::karazuba<Width, uint64_t>, native_mul);
     check_int_operation<uinteger, Width, UB, true>("division", &::aarith::div<UI>, native_div);
     check_int_operation<uinteger, Width, UB, true>("modulo", &::aarith::remainder<UI>, native_mod);
 

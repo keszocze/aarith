@@ -26,8 +26,20 @@ endfunction(add_aarith_experiment)
 
 
 add_aarith_experiment(integer8-correctness FILES check_integer8_operations.cpp int_correctness_check_fun.hpp)
-add_aarith_experiment(integer11-correctness FILES check_integer11_operations.cpp int_correctness_check_fun.hpp)
+
 add_aarith_experiment(integer16-correctness FILES check_integer16_operations.cpp int_correctness_check_fun.hpp)
-add_aarith_experiment(integer24-correctness FILES check_integer24_operations.cpp int_correctness_check_fun.hpp)
-add_aarith_experiment(integer32-correctness FILES check_integer32_operations.cpp int_correctness_check_fun.hpp)
+
+add_aarith_experiment(uinteger32-add-correctness FILES check_uinteger32_add.cpp int_correctness_check_fun.hpp)
+add_aarith_experiment(uinteger32-sub-correctness FILES check_uinteger32_sub.cpp int_correctness_check_fun.hpp)
+add_aarith_experiment(uinteger32-mul-correctness FILES check_uinteger32_mul.cpp int_correctness_check_fun.hpp)
+add_aarith_experiment(uinteger32-karazuba-correctness FILES check_uinteger32_karazuba.cpp int_correctness_check_fun.hpp)
+add_aarith_experiment(uinteger32-div-correctness FILES check_uinteger32_div.cpp int_correctness_check_fun.hpp)
+add_aarith_experiment(uinteger32-mod-correctness FILES check_uinteger32_mod.cpp int_correctness_check_fun.hpp)
+
+add_aarith_experiment(integer32-add-correctness FILES check_integer32_add.cpp int_correctness_check_fun.hpp)
+add_aarith_experiment(integer32-sub-correctness FILES check_integer32_sub.cpp int_correctness_check_fun.hpp)
+add_aarith_experiment(integer32-mul-correctness FILES check_integer32_mul.cpp int_correctness_check_fun.hpp)
+add_aarith_experiment(integer32-div-correctness FILES check_integer32_div.cpp int_correctness_check_fun.hpp)
+add_aarith_experiment(integer32-mod-correctness FILES check_integer32_mod.cpp int_correctness_check_fun.hpp)
+
 add_aarith_experiment("fau-adder" FILES eval_fau_adder.cpp)
