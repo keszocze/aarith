@@ -249,7 +249,6 @@ uinteger<width + 1> FAUadder(const uinteger<width>& a, const uinteger<width>& b)
     constexpr size_t lsp_index = lsp_width - 1;
     constexpr size_t msp_width = width - lsp_width;
 
-
     // structured binding, unfortunately, yields incorrect types
     const auto a_split = split<lsp_index>(a);
     const auto b_split = split<lsp_index>(b);

@@ -1,5 +1,5 @@
-#include <aarith/operations/approx_operations.hpp>
 #include <aarith/integer.hpp>
+#include <aarith/operations/approx_operations.hpp>
 #include <catch.hpp>
 #include <iostream>
 #include <sstream>
@@ -27,7 +27,8 @@ SCENARIO("Using the FAU adder", "[uinteger][arithmetic][approximate]")
                 REQUIRE(FAUadder<8, 7>(a, b) == FAUadder<8, 7>(b, a));
             }
 
-            THEN ("The FAU adder's results should never exceed the correct ones") {
+            THEN("The FAU adder's results should never exceed the correct ones")
+            {
                 REQUIRE(FAUadder<8, 1, 0>(a, b) <= expanding_add(a, b));
                 REQUIRE(FAUadder<8, 2, 1>(a, b) <= expanding_add(a, b));
                 REQUIRE(FAUadder<8, 3, 2>(a, b) <= expanding_add(a, b));
@@ -64,7 +65,6 @@ SCENARIO("Using the FAU adder", "[uinteger][arithmetic][approximate]")
                 REQUIRE(FAUadder<8, 4, 1>(a, b) <= FAUadder<8, 4, 3>(a, b));
 
                 REQUIRE(FAUadder<8, 4, 2>(a, b) <= FAUadder<8, 4, 3>(a, b));
-
 
                 REQUIRE(FAUadder<8, 5, 0>(a, b) <= FAUadder<8, 5, 1>(a, b));
                 REQUIRE(FAUadder<8, 5, 0>(a, b) <= FAUadder<8, 5, 2>(a, b));

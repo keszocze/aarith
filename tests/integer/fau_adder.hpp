@@ -7,8 +7,7 @@
 namespace aarith {
 
 template <size_t width, size_t lsp_width, size_t shared_bits = 0>
-std::tuple<uinteger<2 * width>, uinteger<2 * width>, uinteger<2 * width>>
-eval_fau_adder()
+std::tuple<uinteger<2 * width>, uinteger<2 * width>, uinteger<2 * width>> eval_fau_adder()
 {
     using namespace aarith;
     using I = uinteger<width>;

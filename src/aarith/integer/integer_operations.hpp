@@ -169,7 +169,6 @@ template <typename I>[[nodiscard]] constexpr I mul(const I& a, const I& b)
     return width_cast<I::width()>(expanding_mul(a, b));
 }
 
-
 /**
  * @brief Exponentiation function
  *
