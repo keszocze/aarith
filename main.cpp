@@ -17,12 +17,13 @@ int main()
 
     nf_t nf_a(1.5f);
     nf_t nf_b(2.5f);
+    nf_t nf_zero(0f);
     std::vector<nf_t> nf_vec;
 
     nf_vec.push_back(nf_a);
     nf_vec.push_back(nf_b);
 
-    std::cout << "A: " << nf_vec[0] << " B: " << nf_vec[0] << std::endl
-              << std::accumulate(nf_vec.begin(), nf_vec.end(), 0);
+    std::cout << "A: " << nf_vec[0] << " B: " << nf_vec[1] << std::endl
+              << std::accumulate(nf_vec.begin(), nf_vec.end(), nf_zero);
     return 0;
 }
