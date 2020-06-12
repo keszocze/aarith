@@ -3,12 +3,12 @@
 
 using namespace aarith;
 
-SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithmetic][addition]")
+SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithmetic][addition][burp]")
 {
-    GIVEN("Single precision floats (E = 8, M = 23+1)")
+    GIVEN("Single precision floats (E = 8, M = 23)")
     {
         static constexpr size_t E = 8;
-        static constexpr size_t M = 24;
+        static constexpr size_t M = 23;
 
         WHEN("The second operand is -a.")
         {
@@ -33,6 +33,7 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
 
             THEN("The result should be a")
             {
+                std::cout << to_binary(result) << " vs. " << to_binary(a) << "\n";
                 REQUIRE(result == a);
             }
         }
@@ -510,10 +511,10 @@ SCENARIO("Exact multiplication of two floating-point numbers",
 
 SCENARIO("Exact division of two floating-point numbers", "[normalized_float][arithmetic][division]")
 {
-    GIVEN("Single precision floats (E = 8, M = 23+1)")
+    GIVEN("Single precision floats (E = 8, M = 23)")
     {
         static constexpr size_t E = 8;
-        static constexpr size_t M = 24;
+        static constexpr size_t M = 23;
 
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")
@@ -633,32 +634,55 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
 SCENARIO("IEEE-754 arithmetic comparison: float",
          "[normalized_float][arithmetic][multiplication][ieee-754]")
 {
-    GIVEN("Two random floating point values")
-    {
-        float a = GENERATE(
-            take(10, random(float(1.0), std::numeric_limits<float>::max())));
-        float b = GENERATE(
-            take(10, random(float(1.0), std::numeric_limits<float>::max())));
 
-        using afloat = normalized_float<8, 23>;
-        afloat aa{a};
-        afloat ab{b};
+    GIVEN("0.5 and 0.25") {
+        float half = 0.5;
+        float quarter = 1.5;
+        float threequarter = -0.875;
+        float zero = 0.0;
 
-        float f_res_add = a + b;
-        float f_res_mul = a * b;
-        float f_res_sub = a - b;
-        float f_res_div = a / b;
+        using afloat = normalized_float<8,23>;
 
-        afloat a_res_add = add(aa, ab);
-        afloat a_res_mul = mul(aa, ab);
-        afloat a_res_sub = sub(aa, ab);
-        afloat a_res_div = div(aa, ab);
+        afloat ahalf{half};
+        afloat aquarter{quarter};
+        aquarter.set_exponent(uinteger<8>::zero());
+        afloat athreequarter{threequarter};
+        afloat azero{zero};
 
-        CHECK(f_res_add == static_cast<float>(a_res_add));
-        CHECK(f_res_sub == static_cast<float>(a_res_sub));
-        CHECK(f_res_mul == static_cast<float>(a_res_mul));
-        REQUIRE(f_res_div == static_cast<float>(a_res_div));
+        std::cout << half << " " << ahalf << "\t" << quarter << " " << aquarter << "\n";
+        std::cout << to_binary(ahalf) << "\t" << to_binary(aquarter) << "\n";
+        std::cout << to_compute_string(ahalf) << "\t" << to_compute_string(aquarter) << "\n";
+        std::cout << tcs(ahalf) << "\t" << tcs(aquarter)<< "\t" << tcs(athreequarter) << "\t" << tcs(azero) << "\n";
+//        std::cout << ahalf.get_real_exponent() << "\t" << aquarter.unbiased_exponent() << "\n";
+//        std::cout << to_binary(ahalf.get_real_exponent()) << "\t" << to_binary(aquarter.unbiased_exponent()) << "\n";
+
     }
+//    GIVEN("Two random floating point values")
+//    {
+//        float a = GENERATE(
+//            take(10, random(float(1.0), std::numeric_limits<float>::max())));
+//        float b = GENERATE(
+//            take(10, random(float(1.0), std::numeric_limits<float>::max())));
+//
+//        using afloat = normalized_float<8, 23>;
+//        afloat aa{a};
+//        afloat ab{b};
+//
+//        float f_res_add = a + b;
+//        float f_res_mul = a * b;
+//        float f_res_sub = a - b;
+//        float f_res_div = a / b;
+//
+//        afloat a_res_add = add(aa, ab);
+//        afloat a_res_mul = mul(aa, ab);
+//        afloat a_res_sub = sub(aa, ab);
+//        afloat a_res_div = div(aa, ab);
+//
+//        CHECK(f_res_add == static_cast<float>(a_res_add));
+//        CHECK(f_res_sub == static_cast<float>(a_res_sub));
+//        CHECK(f_res_mul == static_cast<float>(a_res_mul));
+//        REQUIRE(f_res_div == static_cast<float>(a_res_div));
+//    }
 }
 //
 // TEMPLATE_TEST_CASE_SIG("IEEE-754 arithmetic comparision: addition",
