@@ -17,7 +17,7 @@ int main()
 
     nf_t nf_a(1.5f);
     nf_t nf_b(2.5f);
-    nf_t nf_zero(0f);
+    nf_t nf_zero(0.0f);
     std::vector<nf_t> nf_vec;
 
     nf_vec.push_back(nf_a);
