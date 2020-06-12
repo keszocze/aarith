@@ -75,15 +75,8 @@ auto tcs(const normalized_float<E, M, WordType> nf) -> std::string
     }
 
     // print the mantissa part, here, actual computations are necessary
-    if (nf.is_normalized())
-    {
+    stream << " * (" << (nf.is_normalized() ? "1" : "0");
 
-        stream << " * (1";
-    }
-    else
-    {
-        stream << " * (0";
-    }
     const auto mantissa = nf.get_mantissa();
 
     integer<65> iM{M};
