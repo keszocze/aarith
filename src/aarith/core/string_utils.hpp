@@ -17,7 +17,17 @@ constexpr auto rounded_integer_division(T dividend, U divisor) -> decltype(T{} /
     return dividend / divisor + (dividend % divisor ? 1 : 0);
 }
 
-/// Remove all leading zeroes from a string that represents a number.
+/**
+ * @brief Removes leading zeroes from a string
+ *
+ * @note It is assumed that the string contains a number. The method works on all contents though.
+ *
+ * This method, by default, replaces empty strings with a "0".
+ *
+ * @param number The number for which leading zeroes should be removed
+ * @param can_be_empty Whether an empty string may be returned
+ * @return
+ */
 inline auto remove_leading_zeroes(const std::string& number, bool can_be_empty = false)
     -> std::string
 {
@@ -31,8 +41,16 @@ inline auto remove_leading_zeroes(const std::string& number, bool can_be_empty =
     return can_be_empty ? "" : "0";
 }
 
-/// Group digits within the given string that represents a number using the given separator.
-/// For example, `group_digits("1000", 3, '.')` yields `"1.000"`.
+/**
+ * @brief Group digits within a given string storing a number.
+ *
+ * @note It is assumed that the string contains a number. The method works on all contents though.
+ *
+ * @param number A string storing the number to be grouped
+ * @param group_size The number of digits in a group
+ * @param separator The separator to insert between the groups (default: space)
+ * @return
+ */
 inline auto group_digits(const std::string& number, size_t group_size, char separator = ' ')
     -> std::string
 {
@@ -58,7 +76,13 @@ inline auto group_digits(const std::string& number, size_t group_size, char sepa
     return result;
 }
 
-/// Convert the given uinteger value into a binary string representation
+/**
+ * @brief Converts the word array into a bitstring
+ * @tparam Width Width of the word array
+ * @tparam WordType Word type used to store the data in the word array
+ * @param value The word array
+ * @return The string of bits of the stored value
+ */
 template <size_t Width, typename WordType>
 auto to_binary(const word_array<Width, WordType>& value) -> std::string
 {
