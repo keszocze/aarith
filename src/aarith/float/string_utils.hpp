@@ -40,14 +40,79 @@ auto to_binary(const normalized_float<E, M, WordType>& value) -> std::string
     return to_base_2n<1>(value);
 }
 
+template <size_t E, size_t M, typename WordType>
+auto tcs(const normalized_float<E, M, WordType> nf) -> std::string
+{
+
+    if (nf.is_nan())
+    {
+        return "NaN";
+    }
+
+    std::stringstream stream("");
+
+    const bool neg = nf.is_negative();
+
+    // print the sign part
+    stream << (neg ? "-" : "");
+
+    if (nf.is_zero())
+    {
+        stream << "0";
+        return stream.str();
+    }
+
+    stream << (neg ? "(" : ""); // might need to add enclosing paranthesis
+
+    // print exponent
+    if (nf.is_normalized())
+    {
+        stream << "2^(" << nf.unbiased_exponent() << ")";
+    }
+    else
+    {
+        stream << "2^(" << nf.denorm_exponent() << ")";
+    }
+
+    // print the mantissa part, here, actual computations are necessary
+    if (nf.is_normalized())
+    {
+
+        stream << " * (1";
+    }
+    else
+    {
+        stream << " * (0";
+    }
+    const auto mantissa = nf.get_mantissa();
+
+    integer<65> iM{M};
+    for (int64_t i = M; i > 0; --i)
+    {
+        auto curr_bit = mantissa.bit(i);
+        if (curr_bit == 1)
+        {
+            integer<65> I{i};
+            stream << " + 2^(" << sub(I, iM) << ")";
+        }
+    }
+    stream << ")";
+
+    stream << (neg ? ")" : ""); // might need to add enclosing paranthesis
+    return stream.str();
+}
+
 /// Convert the given normalized_float to a representation that can be posted to a calculator
 template <size_t E, size_t M, typename WordType>
 auto to_compute_string(const normalized_float<E, M, WordType> nf) -> std::string
 {
+
+    // print the sign part
     std::stringstream stream("");
     stream << "(-1)^" << nf.get_sign() << " * 2^(";
     auto first = true;
 
+    // print the exponent part
     auto ones = 0U;
     auto zeroes = 0U;
     for (auto counter = E + M; counter > M; --counter)
