@@ -50,7 +50,7 @@ template <typename A, typename B>
 inline constexpr bool same_word_type = std::is_same_v<typename A::word_type, typename B::word_type>;
 
 template <typename A, typename B>
-inline constexpr bool same_sign = (is_unsigned_v<A> == is_unsigned_v<B>);
+inline constexpr bool same_signedness = (is_unsigned_v<A> == is_unsigned_v<B>);
 
 /**
  * It seems that the type traits of C++ have no reasonable concept of "unsigned integer" so we have
