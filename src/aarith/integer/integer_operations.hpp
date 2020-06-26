@@ -793,7 +793,7 @@ template <typename Integer>[[nodiscard]] Integer distance(const Integer& a, cons
  * Convenience namespace to include when code should be written the "normal" way. There is one
  * caveat though: No automatic type conversion will take place!
  */
-namespace aarith::arithmetic_operators {
+namespace arithmetic_operators {
 
 template <typename I> auto constexpr operator+(const I& lhs, const I& rhs) -> I
 {
@@ -820,6 +820,6 @@ template <typename I> auto constexpr operator%(const I& lhs, const I& rhs) -> I
     return remainder(lhs, rhs);
 }
 
-} // namespace aarith::arithmetic_operators
+} // namespace arithmetic_operators
 
 } // namespace aarith

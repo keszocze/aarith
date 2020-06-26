@@ -153,9 +153,9 @@ template <size_t E, size_t M, typename WordType>
     return normalize<E, rdmquotient.width(), M>(quotient);
 }
 
-} // namespace aarith
+//} // namespace aarith
 
-namespace aarith::arithmetic_operators {
+//namespace aarith::arithmetic_operators {
 
 template <size_t E, size_t M, typename WordType>
 auto operator+(const normalized_float<E, M, WordType>& lhs,
