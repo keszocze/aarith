@@ -69,7 +69,7 @@ constexpr fixed<I, F, B, WordType> operator<<(const fixed<I, F, B, WordType>& lh
  */
 template <size_t TargetI, size_t TargetF, size_t I, size_t F, template <size_t, class> class B,
           typename WordType = uint64_t>
-constexpr auto width_cast(fixed<I, F, B, WordType> a) -> fixed<TargetI, TargetF, B, WordType>
+constexpr auto width_cast(const fixed<I, F, B, WordType> &a) -> fixed<TargetI, TargetF, B, WordType>
 {
     using ret_type = fixed<TargetI, TargetF, B, WordType>;
 
@@ -89,17 +89,22 @@ constexpr auto width_cast(fixed<I, F, B, WordType> a) -> fixed<TargetI, TargetF,
         return ret_type::from_bitstring(width_cast<TargetW>(fixed_i.bits()));
     }
 }
-//
-// template <size_t I1, size_t F1, size_t I2, size_t F2, template <size_t, class> B,
-//          typename WordType = uint64_t>
-// expanding_add(fixed<I1, F1, B, WordType> a, fixed<I2, F2, B, WordType> b)
-//    ->fixed<std::max(I1, I2) + 1, std::max(F1, F2), B, WordType>
-//{
-//    // TODO größen angleichen
+
+template <size_t I1, size_t F1, size_t I2, size_t F2, template <size_t, typename> typename B,
+          typename WordType = uint64_t>
+auto expanding_add(const fixed<I1, F1, B, WordType> &a, const fixed<I2, F2, B, WordType> &b)
+    -> fixed<std::max(I1, I2) + 1, std::max(F1, F2), B, WordType>
+{
+
+    constexpr size_t I_expanded = std::max(I1, I2) + 1;
+    constexpr size_t F_expanded = std::max(F1, F2);
+
+    const auto a_expanded{width_cast<I_expanded,F_expanded>(a)};
+    const auto b_expanded{width_cast<I_expanded,F_expanded>(b)};
+
 //    auto tmp_result = add(a_expanded, b_expanded);
-//    // TODO reinterpret Funktion bauen (oder doch per Konstruktor? mittels "bool raw=false" extra
-//    // param?)
-//    return reinterpret<std::max(I1, I2) + 1, std::max(F1, F2)>(tmp_result);
-//}
+
+    return width_cast<I_expanded, F_expanded>(a_expanded);
+}
 
 } // namespace aarith

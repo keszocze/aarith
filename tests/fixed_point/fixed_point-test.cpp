@@ -118,14 +118,6 @@ SCENARIO("Width casting fixed point numbers")
 
             THEN("The result should be a correctly expanded fixed point number")
             {
-//                std::cout << to_binary(s) << "\n"
-//                          << to_binary(s_cast) << "\n"
-//                          << s_cast.width() << "," << s_cast.int_width() << ","
-//                          << s_cast.frac_width() << "\n";
-//                std::cout << to_binary(u) << "\n"
-//                          << to_binary(u_cast) << "\n"
-//                          << u_cast.width() << "," << u_cast.int_width() << ","
-//                          << u_cast.frac_width() << "\n";
                 REQUIRE(s_cast.int_width() == 40);
                 REQUIRE(u_cast.int_width() == 33);
                 REQUIRE(s.frac_width() == s_cast.frac_width());
@@ -140,14 +132,6 @@ SCENARIO("Width casting fixed point numbers")
 
             THEN("The result should be a correctly expanded fixed point number")
             {
-//                std::cout << to_binary(s) << "\n"
-//                          << to_binary(s_cast) << "\n"
-//                          << s_cast.width() << "," << s_cast.int_width() << ","
-//                          << s_cast.frac_width() << "\n";
-//                std::cout << to_binary(u) << "\n"
-//                          << to_binary(u_cast) << "\n"
-//                          << u_cast.width() << "," << u_cast.int_width() << ","
-//                          << u_cast.frac_width() << "\n";
                 REQUIRE(s.int_width() == s_cast.int_width());
                 REQUIRE(u.int_width() == u_cast.int_width());
                 REQUIRE(s_cast.frac_width() == 8);
@@ -162,14 +146,6 @@ SCENARIO("Width casting fixed point numbers")
 
             THEN("The result should be a correctly shrunk fixed point number")
             {
-//                std::cout << to_binary(s) << "\n"
-//                          << to_binary(s_cast) << "\n"
-//                          << s_cast.width() << "," << s_cast.int_width() << ","
-//                          << s_cast.frac_width() << "\n";
-//                std::cout << to_binary(u) << "\n"
-//                          << to_binary(u_cast) << "\n"
-//                          << u_cast.width() << "," << u_cast.int_width() << ","
-//                          << u_cast.frac_width() << "\n";
                 REQUIRE(s_cast.int_width() == 10);
                 REQUIRE(u_cast.int_width() == 10);
                 REQUIRE(s.frac_width() == s_cast.frac_width());
@@ -184,14 +160,6 @@ SCENARIO("Width casting fixed point numbers")
 
             THEN("The result should be a correctly shrunk fixed point number")
             {
-//                std::cout << to_binary(s) << "\n"
-//                          << to_binary(s_cast) << "\n"
-//                          << s_cast.width() << "," << s_cast.int_width() << ","
-//                          << s_cast.frac_width() << "\n";
-//                std::cout << to_binary(u) << "\n"
-//                          << to_binary(u_cast) << "\n"
-//                          << u_cast.width() << "," << u_cast.int_width() << ","
-//                          << u_cast.frac_width() << "\n";
                 REQUIRE(s.int_width() == s_cast.int_width());
                 REQUIRE(u.int_width() == u_cast.int_width());
                 REQUIRE(s_cast.frac_width() == 2);
@@ -206,14 +174,6 @@ SCENARIO("Width casting fixed point numbers")
 
             THEN("The result should be a correctly shrunk fixed point number")
             {
-//                std::cout << to_binary(s) << "\n"
-//                          << to_binary(s_cast) << "\n"
-//                          << s_cast.width() << "," << s_cast.int_width() << ","
-//                          << s_cast.frac_width() << "\n";
-//                std::cout << to_binary(u) << "\n"
-//                          << to_binary(u_cast) << "\n"
-//                          << u_cast.width() << "," << u_cast.int_width() << ","
-//                          << u_cast.frac_width() << "\n";
                 REQUIRE(s_cast.int_width() == 10);
                 REQUIRE(u_cast.int_width() == 10);
                 REQUIRE(s_cast.frac_width() == 2);
@@ -228,14 +188,6 @@ SCENARIO("Width casting fixed point numbers")
 
             THEN("The result should be a correctly expanded fixed point number")
             {
-//                std::cout << to_binary(s) << "\n"
-//                          << to_binary(s_cast) << "\n"
-//                          << s_cast.width() << "," << s_cast.int_width() << ","
-//                          << s_cast.frac_width() << "\n";
-//                std::cout << to_binary(u) << "\n"
-//                          << to_binary(u_cast) << "\n"
-//                          << u_cast.width() << "," << u_cast.int_width() << ","
-//                          << u_cast.frac_width() << "\n";
                 REQUIRE(s_cast.int_width() == 35);
                 REQUIRE(u_cast.int_width() == 35);
                 REQUIRE(s_cast.frac_width() == 5);

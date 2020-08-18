@@ -51,9 +51,6 @@ public:
     /**
      * @brief Creates a fixed point number from an integral number (native or aarith)
      *
-     * The value will be stored in the integer part of the fixed point. The fractional part will
-     * remain the value zero.
-     *
      * @tparam Integer The integer type used for creation of the fixed point number
      * @param i The number to be stored in the fixed point number
      */
@@ -64,7 +61,6 @@ public:
 
         if constexpr (std::is_integral_v<Integer>)
         {
-            static_assert(sizeof(Integer) * 8 <= I + F);
             static_assert(sizeof(Integer) * 8 <= I);
 
             data = int_type{i};
@@ -117,12 +113,21 @@ public:
      * @param w The word array containing the raw data
      * @return A fixed point number constructed from the word array
      */
-    template <size_t W>[[nodiscard]] static fixed from_bitstring(const word_array<W>& w)
+    template <size_t W>[[nodiscard]] static constexpr fixed from_bitstring(const word_array<W>& w)
     {
         static_assert(width() >= W);
         fixed result;
         result.data = w;
         return result;
+    }
+
+    // Example: ufixed<5,3>(7) = ufixed<5,3>(00...00111) = 0011100 = 00111.00 = 7.0
+    template <typename Int> [[nodiscard]] static constexpr fixed from_integral(const Int& n)
+    {
+        static_assert(std::is_integral_v<Int>);
+        static_assert(!std::is_signed_v<Int>);
+
+        return from_bitstring(uinteger<I+F,WordType>{n} << F);
     }
 
     /**

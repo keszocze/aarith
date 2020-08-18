@@ -19,7 +19,7 @@ constexpr bool operator<(const FixedA& a, const FixedB& b)
                   "First parameter must be an aarith fixed point number");
     static_assert(::aarith::is_fixed_point_v<FixedB>,
                   "Second parameter must be an aarith fixed point number");
-    static_assert(::aarith::same_sign<FixedA, FixedB>,
+    static_assert(::aarith::same_signedness<FixedA, FixedB>,
                   "The fixed point numbers need to have the same signedness");
 
     return (a.bits() < b.bits());
