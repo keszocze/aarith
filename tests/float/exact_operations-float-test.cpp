@@ -384,10 +384,10 @@ SCENARIO("Subtracting two floating-point numbers exactly",
 SCENARIO("Exact multiplication of two floating-point numbers",
          "[normalized_float][arithmetic][multiplication]")
 {
-    GIVEN("Single precision floats (E = 8, M = 23+1)")
+    GIVEN("Single precision floats (E = 8, M = 23)")
     {
         static constexpr size_t E = 8;
-        static constexpr size_t M = 24;
+        static constexpr size_t M = 23;
 
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")

@@ -35,8 +35,8 @@ template <size_t E, size_t M, typename WordType>
     }
 
     const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
-    const auto new_mantissa = rhs.get_mantissa() >> exponent_delta.word(0);
-    const auto mantissa_sum = expanding_add(lhs.get_mantissa(), new_mantissa);
+    const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
+    const auto mantissa_sum = expanding_add(lhs.get_full_mantissa(), new_mantissa);
 
     normalized_float<E, mantissa_sum.width()> sum;
     sum.set_sign(lhs.get_sign());
@@ -77,8 +77,8 @@ template <size_t E, size_t M, typename WordType>
     }
 
     const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
-    const auto new_mantissa = rhs.get_mantissa() >> exponent_delta.word(0);
-    const auto mantissa_sum = sub(lhs.get_mantissa(), new_mantissa);
+    const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
+    const auto mantissa_sum = sub(lhs.get_full_mantissa(), new_mantissa);
 
     normalized_float<E, mantissa_sum.width()> sum;
     sum.set_sign(lhs.get_sign());
@@ -104,8 +104,8 @@ template <size_t E, size_t M, typename WordType>
                        const normalized_float<E, M, WordType> rhs)
     -> normalized_float<E, M, WordType>
 {
-    auto mproduct = expanding_mul(lhs.get_mantissa(), rhs.get_mantissa());
-    mproduct = mproduct >> (M - 1);
+    auto mproduct = expanding_mul(lhs.get_full_mantissa(), rhs.get_full_mantissa());
+    mproduct = mproduct >> M;
     auto esum = width_cast<E>(sub(expanding_add(lhs.get_exponent(), rhs.get_exponent()),
                                   width_cast<E + 1>(lhs.get_bias())));
     auto sign = lhs.get_sign() ^ rhs.get_sign();
@@ -134,9 +134,9 @@ template <size_t E, size_t M, typename WordType>
                        const normalized_float<E, M, WordType> rhs)
     -> normalized_float<E, M, WordType>
 {
-    auto dividend = width_cast<2 * M + 3>(lhs.get_mantissa());
-    auto divisor = width_cast<2 * M + 3>(rhs.get_mantissa());
-    dividend = (dividend << M + 3);
+    auto dividend = width_cast<2 * (M + 1) + 3>(lhs.get_full_mantissa());
+    auto divisor = width_cast<2 * (M + 1) + 3>(rhs.get_full_mantissa());
+    dividend = (dividend << M + 4);
     auto mquotient = div(dividend, divisor);
     // mquotient >>= 1;
     auto rdmquotient = rshift_and_round(mquotient, 4);

@@ -53,6 +53,7 @@ public:
             f_mantissa >>= mantissa_shift;
             mantissa = uinteger<MW, WordType>(f_mantissa);
         }
+        mantissa.set_msb(true);
 
         if (f_exponent > 0)
         {
@@ -72,8 +73,24 @@ public:
                     normalized_float<f_exponent_width, f_mantissa_width, WordType>::get_bias().word(
                         0) -
                     bias.word(0);
-                f_exponent -= static_cast<decltype(f_exponent)>(exponent_delta);
-                exponent = uinteger<E, WordType>(f_exponent);
+                if (static_cast<decltype(f_exponent)>(exponent_delta) > f_exponent) 
+                {
+                    exponent = uinteger<E, WordType>::all_zeroes();
+                    const auto mshift = static_cast<decltype(f_exponent)>(exponent_delta) - f_exponent;
+                    if (MW < mshift)
+                    {
+                        mantissa = mantissa >> mshift;
+                    }
+                    else
+                    {
+                        mantissa = uinteger<MW, WordType>::all_zeroes();
+                    }
+                }
+                else 
+                {
+                    f_exponent -= static_cast<decltype(f_exponent)>(exponent_delta);
+                    exponent = uinteger<E, WordType>(f_exponent);
+                }
             }
         }
         else
@@ -185,6 +202,11 @@ public:
     void set_exponent(const uinteger<E, WordType>& set_to)
     {
         exponent = set_to;
+    }
+
+    auto get_full_mantissa() const -> uinteger<MW, WordType>
+    {
+        return mantissa;
     }
 
     auto get_mantissa() const -> uinteger<M, WordType>
@@ -476,13 +498,13 @@ auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<
     }
     else if (one_at >= M2)
     {
-        auto shift_by = one_at + 1 - M2;
+        auto shift_by = one_at - M2;
         mantissa = rshift_and_round(mantissa, shift_by);
         exponent = add(exponent, uinteger<E, WordType>(shift_by));
     }
     else
     {
-        auto shift_by = M2 - one_at - 1;
+        auto shift_by = M2 - one_at;
         mantissa = (mantissa << shift_by);
         exponent = sub(exponent, uinteger<E, WordType>(shift_by));
     }
