@@ -38,12 +38,12 @@ template <size_t E, size_t M, typename WordType>
     const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
     const auto mantissa_sum = expanding_add(lhs.get_full_mantissa(), new_mantissa);
 
-    normalized_float<E, mantissa_sum.width()> sum;
+    normalized_float<E, mantissa_sum.width()-1> sum;
     sum.set_sign(lhs.get_sign());
     sum.set_exponent(lhs.get_exponent());
     sum.set_mantissa(mantissa_sum);
 
-    return normalize<E, mantissa_sum.width(), M>(sum);
+    return normalize<E, mantissa_sum.width()-1, M>(sum);
 }
 
 /**
@@ -80,12 +80,15 @@ template <size_t E, size_t M, typename WordType>
     const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
     const auto mantissa_sum = sub(lhs.get_full_mantissa(), new_mantissa);
 
-    normalized_float<E, mantissa_sum.width()> sum;
+    normalized_float<E, mantissa_sum.width()-1> sum;
     sum.set_sign(lhs.get_sign());
-    sum.set_exponent(lhs.get_exponent());
+    if (mantissa_sum != uinteger<mantissa_sum.width()>::all_zeroes())
+    {
+        sum.set_exponent(lhs.get_exponent());
+    }
     sum.set_mantissa(mantissa_sum);
 
-    return normalize<E, mantissa_sum.width(), M>(sum);
+    return normalize<E, mantissa_sum.width()-1, M>(sum);
 }
 
 /**
@@ -110,12 +113,12 @@ template <size_t E, size_t M, typename WordType>
                                   width_cast<E + 1>(lhs.get_bias())));
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
-    normalized_float<E, mproduct.width()> product;
+    normalized_float<E, mproduct.width()-1> product;
     product.set_mantissa(mproduct);
     product.set_exponent(esum);
     product.set_sign(sign);
 
-    return normalize<E, mproduct.width(), M>(product);
+    return normalize<E, mproduct.width()-1, M>(product);
 }
 
 /**
@@ -145,12 +148,12 @@ template <size_t E, size_t M, typename WordType>
                                   width_cast<E + 1>(rhs.get_exponent())));
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
-    normalized_float<E, rdmquotient.width()> quotient;
+    normalized_float<E, rdmquotient.width()-1> quotient;
     quotient.set_mantissa(rdmquotient);
     quotient.set_exponent(esum);
     quotient.set_sign(sign);
 
-    return normalize<E, rdmquotient.width(), M>(quotient);
+    return normalize<E, rdmquotient.width()-1, M>(quotient);
 }
 
 /**

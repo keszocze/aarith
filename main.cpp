@@ -28,6 +28,11 @@ template <size_t exp_bits, size_t man_bits> inline float to_float(nf_t x)
         // set sign bit
         float_rep |= (1 << 31);
 
+    snf anf(-93.211546f);
+    snf bnf(0.f);
+
+    add(anf, bnf);
+
     uint32_t mantissa_part;
     // get them bits
     mantissa_part = static_cast<uint32_t>(x.get_mantissa());

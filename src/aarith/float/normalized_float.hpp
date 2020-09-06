@@ -53,7 +53,9 @@ public:
             f_mantissa >>= mantissa_shift;
             mantissa = uinteger<MW, WordType>(f_mantissa);
         }
-        mantissa.set_msb(true);
+        if(f_exponent > 0 ){
+            mantissa.set_msb(true);
+        }
 
         if (f_exponent > 0)
         {
@@ -214,6 +216,11 @@ public:
         return width_cast<M>(mantissa);
     }
 
+    void set_mantissa(const uinteger<MW, WordType>& set_to)
+    {
+        mantissa = set_to;
+    }
+
     void set_mantissa(const uinteger<M, WordType>& set_to)
     {
         mantissa = set_to;
@@ -372,7 +379,7 @@ auto equal_except_rounding(const normalized_float<E, M1, WordType> lhs,
 {
     if (lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent())
     {
-        if (lhs.get_mantissa() == rhs.get_mantissa())
+        if (lhs.get_full_mantissa() == rhs.get_full_mantissa())
         {
             return true;
         }
@@ -382,8 +389,8 @@ auto equal_except_rounding(const normalized_float<E, M1, WordType> lhs,
             constexpr auto offset_M1 = M1 - Min;
             constexpr auto offset_M2 = M2 - Min;
 
-            const auto m1 = lhs.get_mantissa();
-            const auto m2 = rhs.get_mantissa();
+            const auto m1 = lhs.get_full_mantissa();
+            const auto m2 = rhs.get_full_mantissa();
 
             const auto bit1 = m1.bit(offset_M1);
             const auto bit2 = m2.bit(offset_M2);
@@ -487,14 +494,14 @@ auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<
     auto denormalized = nf;
 
     auto exponent = denormalized.get_exponent();
-    auto mantissa = denormalized.get_mantissa();
+    auto mantissa = denormalized.get_full_mantissa();
 
     auto one_at = find_leading_one(mantissa);
 
-    if (one_at == M1)
+    if (one_at > M1)
     {
         exponent = uinteger<E, WordType>(0U);
-        denormalized.set_sign(0);
+      //denormalized.set_sign(0);
     }
     else if (one_at >= M2)
     {
@@ -513,7 +520,7 @@ auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<
 
     normalized_float.set_sign(denormalized.get_sign());
     normalized_float.set_exponent(exponent);
-    normalized_float.set_mantissa(width_cast<M2>(mantissa));
+    normalized_float.set_mantissa(width_cast<M2+1>(mantissa));
 
     return normalized_float;
 }
