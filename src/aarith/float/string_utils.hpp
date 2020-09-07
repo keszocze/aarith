@@ -164,18 +164,18 @@ auto to_compute_string(const normalized_float<E, M, WordType> nf) -> std::string
 template <size_t E, size_t M, typename WordType>
 auto to_sci_string(const normalized_float<E, M, WordType> nf) -> std::string
 {
-    uinteger<M, WordType> fl_mantissa = nf.get_mantissa();
-    uinteger<24, WordType> flc_mantissa;
-    if constexpr (M >= 24)
+    auto fl_mantissa = nf.get_mantissa();
+    uinteger<23, WordType> flc_mantissa;
+    if constexpr (M >= 23)
     {
-        auto shift_mantissa = M - 24;
+        auto shift_mantissa = M - 23;
         fl_mantissa = fl_mantissa >> shift_mantissa;
-        flc_mantissa = width_cast<24, M>(fl_mantissa);
+        flc_mantissa = width_cast<23, M>(fl_mantissa);
     }
     else
     {
-        auto shift_mantissa = 24 - M;
-        flc_mantissa = width_cast<24, M>(fl_mantissa);
+        auto shift_mantissa = 23 - M;
+        flc_mantissa = width_cast<23, M>(fl_mantissa);
         flc_mantissa = (flc_mantissa << shift_mantissa);
     }
     uint32_t ui_mantissa = (static_cast<uint32_t>(flc_mantissa.word(0)) & 0x7fffff) | 0x3f800000;

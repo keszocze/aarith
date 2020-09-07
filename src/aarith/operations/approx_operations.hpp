@@ -18,9 +18,14 @@ namespace aarith {
  * @param leading_ones The number of leading ones
  * @return The bit bask consisting of leading_ones ones followed by zeros
  */
-template <class Integer> auto generate_bitmask(const size_t leading_ones) -> Integer
+template <class Integer> auto generate_bitmask(size_t leading_ones) -> Integer
 {
     using word_type = typename Integer::word_type;
+
+    if (leading_ones > Integer::width())
+    {
+        leading_ones = Integer::width();
+    }
 
     const size_t bits = Integer::width() - leading_ones;
 

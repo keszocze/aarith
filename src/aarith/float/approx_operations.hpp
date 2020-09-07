@@ -37,12 +37,12 @@ template<size_t E, size_t M>
     const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
     const auto mantissa_sum = approx_expanding_add_post_masking(lhs.get_full_mantissa(),  new_mantissa, bits);
 
-    normalized_float<E, mantissa_sum.width()> sum;
+    normalized_float<E, mantissa_sum.width()-1> sum;
     sum.set_sign(lhs.get_sign());
     sum.set_exponent(lhs.get_exponent());
     sum.set_mantissa(mantissa_sum);
 
-    return normalize<E, mantissa_sum.width(), M>(sum);
+    return normalize<E, mantissa_sum.width()-1, M>(sum);
 }
 
 /**
@@ -79,12 +79,12 @@ template<size_t E, size_t M>
     const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
     const auto mantissa_sum = approx_expanding_sub_post_masking(lhs.get_full_mantissa(), new_mantissa, bits);
 
-    normalized_float<E, mantissa_sum.width()> sum;
+    normalized_float<E, mantissa_sum.width()-1> sum;
     sum.set_sign(lhs.get_sign());
     sum.set_exponent(lhs.get_exponent());
     sum.set_mantissa(mantissa_sum);
 
-    return normalize<E, mantissa_sum.width(), M>(sum);
+    return normalize<E, mantissa_sum.width()-1, M>(sum);
 }
 
 /**
@@ -104,16 +104,17 @@ template<size_t E, size_t M>
 -> normalized_float<E, M>
 {
     auto mproduct = approx_expanding_mul_post_masking(lhs.get_full_mantissa(), rhs.get_full_mantissa(), bits);
-    mproduct = mproduct >> (M-1);
-    auto esum = width_cast<E>(sub(expanding_add(lhs.get_exponent(), rhs.get_exponent()), width_cast<E+1>(lhs.get_bias())));
+    //mproduct = mproduct >> (M-1);
+    mproduct = mproduct >> (M);
+    auto esum = width_cast<E>(expanding_sub(expanding_add(lhs.get_exponent(), rhs.get_exponent()), lhs.get_bias()));
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
-    normalized_float<E, mproduct.width()> product;
+    normalized_float<E, mproduct.width()-1> product;
     product.set_mantissa(mproduct);
     product.set_exponent(esum);
     product.set_sign(sign);
 
-    return normalize<E, mproduct.width(), M>(product);
+    return normalize<E, mproduct.width()-1, M>(product);
 }
 
 /**
@@ -129,25 +130,25 @@ template<size_t E, size_t M>
  *
  */
 template<size_t E, size_t M>
-[[nodiscard]] auto anytime_div(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs, const unsigned int bits = M)
+[[nodiscard]] auto anytime_div(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs, const unsigned int bits = M+1)
 -> normalized_float<E, M>
 {
-    auto dividend = width_cast<2*M+3>(lhs.get_full_mantissa());
-    auto divisor = width_cast<2*M+3>(rhs.get_full_mantissa());
-    dividend = dividend << M+3;
-    auto mquotient = approx_div_post_masking(dividend, divisor, bits+M+3);
+    auto dividend = width_cast<2*(M+1)+3>(lhs.get_full_mantissa());
+    auto divisor = width_cast<2*(M+1)+3>(rhs.get_full_mantissa());
+    dividend = dividend << (M+1)+3;
+    auto mquotient = approx_div_post_masking(dividend, divisor, bits+(M+1)+3);
     
     auto rdmquotient = rshift_and_round(mquotient, 4);
 
-    auto esum = width_cast<E>(sub(expanding_add(lhs.get_exponent(), lhs.get_bias()), width_cast<E+1>(rhs.get_exponent())));
+    auto esum = width_cast<E>(expanding_sub(expanding_add(lhs.get_exponent(), lhs.get_bias()), rhs.get_exponent()));
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
-    normalized_float<E, rdmquotient.width()> quotient;
+    normalized_float<E, rdmquotient.width()-1> quotient;
     quotient.set_mantissa(rdmquotient);
     quotient.set_exponent(esum);
     quotient.set_sign(sign);
 
-    return normalize<E, rdmquotient.width(), M>(quotient);
+    return normalize<E, rdmquotient.width()-1, M>(quotient);
 }
 
 /**
