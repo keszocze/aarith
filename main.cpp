@@ -1,37 +1,36 @@
+#include <aarith/float/float_comparisons.hpp>
+#include <aarith/float/float_operations.hpp>
+#include <aarith/float/normalized_float.hpp>
+#include <aarith/float/string_utils.hpp>
 #include <aarith/integer.hpp>
+
 #include <bitset>
 #include <iostream>
+#include <numeric>
+#include <vector>
 
 int main()
 {
     using namespace aarith;
+//    using namespace aarith::arithmetic_operators;
+    using nf_t = normalized_float<4, 4>;
 
-//    for (int i = 0; i < 50; ++i)
-//    {
-//
-//        uint8_t u8 = 42;
-//        uinteger<8> aarith_u8{u8};
-//        std::cout << "uint8_t=" << u8 << " (as int=" << int{u8}
-//                  << ") aarith::uinteger<8>=" << aarith_u8 << "\n";
-//    }
+    nf_t nf_a(1.5f);
+    nf_t nf_b(2.5f);
+    nf_t nf_zero(0.0f);
+    std::vector<nf_t> nf_vec;
 
+    nf_vec.push_back(nf_a);
+    nf_vec.push_back(nf_b);
 
-    integer<8> larger = integer<4>{3};
+    const auto acc = std::accumulate(nf_vec.begin(), nf_vec.end(), nf_zero);
+    const auto normal = add(nf_a, nf_b );
+    const auto op = nf_a + nf_b;
 
-    integer<16> smaller = integer<32>{2};
-    integer<8> usmaller = uinteger<32>{1337};
-//
-//    std::cout << smaller << "\n";
-//    std::cout << usmaller << "\n";
+    const bool all_equal = (acc == normal) && (acc == op) && (normal == op);
 
-    int res = 1;
-    for (int i=1;i<20;++i) {
-        res *= i;
-        std::cout << i << ": " << res << "\n";
-    }
-
-
-
+    std::cout << "A: " << nf_vec[0] << " B: " << nf_vec[1] << std::endl
+              << "accumulated: " << acc  << "\t" << "add function: " << add(nf_a, nf_b) << "\t" << "plus operator: " << op << "\n";
+    std::cout << "All equal: " << all_equal << "\n";
     return 0;
-
 }
