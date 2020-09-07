@@ -1,14 +1,12 @@
 #pragma once
 
+#include <aarith/core.hpp>
 
-#include <aarith/integer/sinteger.hpp>
-#include <aarith/integer/sinteger_comparisons.hpp>
-#include <aarith/integer/sinteger_operations.hpp>
-
-
-#include <aarith/integer/uinteger.hpp>
-#include <aarith/integer/uinteger_comparisons.hpp>
-#include <aarith/integer/uinteger_operations.hpp>
+#include <aarith/integer/integer_casts.hpp>
+#include <aarith/integer/integer_comparisons.hpp>
+#include <aarith/integer/integer_operations.hpp>
+#include <aarith/integer/integer_ranges.hpp>
+#include <aarith/integer/integers.hpp>
 
 #include <aarith/integer/string_utils.hpp>
 

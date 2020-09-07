@@ -18,8 +18,8 @@ namespace aarith {
  *
  */
 template<size_t E, size_t M>
-[[nodiscard]] auto anytime_add(const normfloat<E, M> lhs, const normfloat<E, M> rhs, const unsigned int bits = M)
--> normfloat<E, M>
+[[nodiscard]] auto anytime_add(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs, const unsigned int bits = M)
+-> normalized_float<E, M>
 {
     if(abs(lhs) < abs(rhs))
     {
@@ -34,10 +34,10 @@ template<size_t E, size_t M>
     }
 
     const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
-    const auto new_mantissa = rhs.get_mantissa() >> exponent_delta.word(0);
-    const auto mantissa_sum = approx_expanding_add_post_masking(lhs.get_mantissa(),  new_mantissa, bits);
+    const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
+    const auto mantissa_sum = approx_expanding_add_post_masking(lhs.get_full_mantissa(),  new_mantissa, bits);
 
-    normfloat<E, mantissa_sum.width()> sum;
+    normalized_float<E, mantissa_sum.width()> sum;
     sum.set_sign(lhs.get_sign());
     sum.set_exponent(lhs.get_exponent());
     sum.set_mantissa(mantissa_sum);
@@ -46,7 +46,7 @@ template<size_t E, size_t M>
 }
 
 /**
- * @brief Subtraction with normfloats: lhs-rhs.
+ * @brief Subtraction with normalized_floats: lhs-rhs.
  *
  * @param lhs The minuend
  * @param rhs The subtrahend
@@ -58,8 +58,8 @@ template<size_t E, size_t M>
  *
  */
 template<size_t E, size_t M>
-[[nodiscard]] auto anytime_sub(const normfloat<E, M> lhs, const normfloat<E, M> rhs, const unsigned int bits = M)
--> normfloat<E, M>
+[[nodiscard]] auto anytime_sub(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs, const unsigned int bits = M)
+-> normalized_float<E, M>
 {
     if(abs(lhs) < abs(rhs))
     {
@@ -76,10 +76,10 @@ template<size_t E, size_t M>
     }
 
     const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
-    const auto new_mantissa = rhs.get_mantissa() >> exponent_delta.word(0);
-    const auto mantissa_sum = approx_expanding_sub_post_masking(lhs.get_mantissa(), new_mantissa, bits);
+    const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
+    const auto mantissa_sum = approx_expanding_sub_post_masking(lhs.get_full_mantissa(), new_mantissa, bits);
 
-    normfloat<E, mantissa_sum.width()> sum;
+    normalized_float<E, mantissa_sum.width()> sum;
     sum.set_sign(lhs.get_sign());
     sum.set_exponent(lhs.get_exponent());
     sum.set_mantissa(mantissa_sum);
@@ -88,7 +88,7 @@ template<size_t E, size_t M>
 }
 
 /**
- * @brief Multiplication with normfloats: lhs*rhs.
+ * @brief Multiplication with normalized_floats: lhs*rhs.
  *
  * @param lhs The multiplicand
  * @param rhs The multiplicator
@@ -100,15 +100,15 @@ template<size_t E, size_t M>
  *
  */
 template<size_t E, size_t M>
-[[nodiscard]] auto anytime_mul(const normfloat<E, M> lhs, const normfloat<E, M> rhs, const unsigned int bits = 2*M)
--> normfloat<E, M>
+[[nodiscard]] auto anytime_mul(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs, const unsigned int bits = 2*M)
+-> normalized_float<E, M>
 {
-    auto mproduct = approx_expanding_mul_post_masking(lhs.get_mantissa(), rhs.get_mantissa(), bits);
+    auto mproduct = approx_expanding_mul_post_masking(lhs.get_full_mantissa(), rhs.get_full_mantissa(), bits);
     mproduct = mproduct >> (M-1);
     auto esum = width_cast<E>(sub(expanding_add(lhs.get_exponent(), rhs.get_exponent()), width_cast<E+1>(lhs.get_bias())));
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
-    normfloat<E, mproduct.width()> product;
+    normalized_float<E, mproduct.width()> product;
     product.set_mantissa(mproduct);
     product.set_exponent(esum);
     product.set_sign(sign);
@@ -117,7 +117,7 @@ template<size_t E, size_t M>
 }
 
 /**
- * @brief Anytime division with normfloats: lhs/rhs.
+ * @brief Anytime division with normalized_floats: lhs/rhs.
  *
  * @param lhs The dividend
  * @param rhs The divisor
@@ -129,12 +129,12 @@ template<size_t E, size_t M>
  *
  */
 template<size_t E, size_t M>
-[[nodiscard]] auto anytime_div(const normfloat<E, M> lhs, const normfloat<E, M> rhs, const unsigned int bits = M)
--> normfloat<E, M>
+[[nodiscard]] auto anytime_div(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs, const unsigned int bits = M)
+-> normalized_float<E, M>
 {
-    auto dividend = width_cast<2*M+3>(lhs.get_mantissa());
-    auto divisor = width_cast<2*M+3>(rhs.get_mantissa());
-    dividend <<= M+3;
+    auto dividend = width_cast<2*M+3>(lhs.get_full_mantissa());
+    auto divisor = width_cast<2*M+3>(rhs.get_full_mantissa());
+    dividend = dividend << M+3;
     auto mquotient = approx_div_post_masking(dividend, divisor, bits+M+3);
     
     auto rdmquotient = rshift_and_round(mquotient, 4);
@@ -142,7 +142,7 @@ template<size_t E, size_t M>
     auto esum = width_cast<E>(sub(expanding_add(lhs.get_exponent(), lhs.get_bias()), width_cast<E+1>(rhs.get_exponent())));
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
-    normfloat<E, rdmquotient.width()> quotient;
+    normalized_float<E, rdmquotient.width()> quotient;
     quotient.set_mantissa(rdmquotient);
     quotient.set_exponent(esum);
     quotient.set_sign(sign);
@@ -151,7 +151,7 @@ template<size_t E, size_t M>
 }
 
 /**
- * @brief Addition of two normfloats using the FAU adder: lhs+rhs
+ * @brief Addition of two normalized_floats using the FAU adder: lhs+rhs
  *
  * @param lhs The first number that is to be summed up
  * @param rhs The second number that is to be summed up
@@ -163,14 +163,14 @@ template<size_t E, size_t M>
  *
  */
 template<size_t E, size_t M, size_t LSP, size_t SHARED>
-[[nodiscard]] auto FAU_add(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
--> normfloat<E, M>
+[[nodiscard]] auto FAU_add(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
+-> normalized_float<E, M>
 {
     return add_<E, M>(lhs, rhs, FAUadder<M, LSP, SHARED>, FAU_sub<M, LSP, SHARED>);
 }
 
 /**
- * @brief Subtraction with normfloats using the FAU adder: lhs-rhs.
+ * @brief Subtraction with normalized_floats using the FAU adder: lhs-rhs.
  *
  * @param lhs The minuend
  * @param rhs The subtrahend
@@ -182,8 +182,8 @@ template<size_t E, size_t M, size_t LSP, size_t SHARED>
  *
  */
 template<size_t E, size_t M, size_t LSP, size_t SHARED>
-[[nodiscard]] auto FAU_sub(const normfloat<E, M> lhs, const normfloat<E, M> rhs)
--> normfloat<E, M>
+[[nodiscard]] auto FAU_sub(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
+-> normalized_float<E, M>
 {
     return sub_<E, M>(lhs, rhs, FAUadder<M, LSP, SHARED>, FAU_sub<M, LSP, SHARED>);
 }

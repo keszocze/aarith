@@ -24,10 +24,10 @@ SCENARIO("Converting uintegers into strings", "[uinteger][string]")
         AND_WHEN("All numbers from 0 to 65535 are tested.")
         {
             auto i = 0U;
-            for(; i < 65536; ++i)
+            for (; i < 65536; ++i)
             {
                 uinteger<16> res(i);
-                if(std::to_string(i) != to_decimal(res))
+                if (std::to_string(i) != to_decimal(res))
                 {
                     break;
                 }
@@ -83,13 +83,13 @@ SCENARIO("Converting uintegers into strings", "[uinteger][string]")
     }
 }
 
-SCENARIO("Converting sintegers into strings", "[sinteger][string]")
+SCENARIO("Converting sintegers into strings", "[integer][string]")
 {
-    const sinteger<16> num{204};
+    const integer<16> num{204};
 
-    WHEN("Converting a sinteger into a decimal string")
+    WHEN("Converting a integer into a decimal string")
     {
-        THEN("The string represents the sinteger, both normal and in negative version")
+        THEN("The string represents the integer, both normal and in negative version")
         {
             REQUIRE(to_decimal(num) == "204");
             REQUIRE(to_decimal(-num) == "-204");
@@ -105,9 +105,9 @@ SCENARIO("Converting sintegers into strings", "[sinteger][string]")
             REQUIRE(ss.str() == "-204");
         }
     }
-    WHEN("Converting a sinteger into a hexadecimal string")
+    WHEN("Converting a integer into a hexadecimal string")
     {
-        THEN("The string represents the sinteger, both normal and in negative version")
+        THEN("The string represents the integer, both normal and in negative version")
         {
             REQUIRE(to_hex(num) == "00cc");
             REQUIRE(to_hex(-num) == "-00cc");
@@ -124,9 +124,9 @@ SCENARIO("Converting sintegers into strings", "[sinteger][string]")
             REQUIRE(ss.str() == "-00cc");
         }
     }
-    WHEN("Converting a sinteger into an octal string")
+    WHEN("Converting a integer into an octal string")
     {
-        THEN("The string represents the sinteger, both normal and in negative version")
+        THEN("The string represents the integer, both normal and in negative version")
         {
             REQUIRE(to_octal(num) == "000314");
             REQUIRE(to_octal(-num) == "-000314");
