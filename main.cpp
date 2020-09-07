@@ -6,6 +6,8 @@
 #include <aarith/float/string_utils.hpp>
 
 #include <iostream>
+#include <numeric>
+#include <vector>
 #include <string>
 
 using nf_t = aarith::normalized_float<3, 5>;
@@ -134,5 +136,27 @@ int main()
     std::cout.precision(11);
     std::cout << losing_bit << " != " << static_cast<float>(lost) << "\n";
 
+
+//    using namespace aarith::arithmetic_operators;
+    using nf_t = normalized_float<4, 4>;
+
+    nf_t nf_a(1.5f);
+    nf_t nf_b(2.5f);
+    nf_t nf_zero(0.0f);
+    std::vector<nf_t> nf_vec;
+
+    nf_vec.push_back(nf_a);
+    nf_vec.push_back(nf_b);
+
+    const auto acc = std::accumulate(nf_vec.begin(), nf_vec.end(), nf_zero);
+    const auto normal = add(nf_a, nf_b );
+    const auto op = nf_a + nf_b;
+
+    const bool all_equal = (acc == normal) && (acc == op) && (normal == op);
+
+    std::cout << "A: " << nf_vec[0] << " B: " << nf_vec[1] << std::endl
+              << "accumulated: " << acc  << "\t" << "add function: " << add(nf_a, nf_b) << "\t" << "plus operator: " << op << "\n";
+    std::cout << "All equal: " << all_equal << "\n";
+    return 0;
     return 0;
 }

@@ -174,9 +174,7 @@ bit_range(const normalized_float<E, M, WordType>& f)
     return bit_range<Start, End>(f.as_word_array());
 }
 
-} // namespace aarith
-
-namespace aarith::arithmetic_operators {
+//namespace aarith::arithmetic_operators {
 
 template <size_t E, size_t M, typename WordType>
 auto operator+(const normalized_float<E, M, WordType>& lhs,
