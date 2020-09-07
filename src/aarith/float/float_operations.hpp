@@ -155,7 +155,11 @@ template <size_t E, size_t M, typename WordType>
 
 //} // namespace aarith
 
-//namespace aarith::arithmetic_operators {
+/**
+ * Convenience namespace to include when code should be written the "normal" way. There is one
+ * caveat though: No automatic type conversion will take place!
+ */
+namespace float_operators {
 
 template <size_t E, size_t M, typename WordType>
 auto operator+(const normalized_float<E, M, WordType>& lhs,
@@ -192,4 +196,5 @@ auto operator%(const normalized_float<E, M, WordType>& lhs,
     return remainder(lhs, rhs);
 }
 
-} // namespace aarith::arithmetic_operators
+} // namespace float_operators
+} // namespace aarith
