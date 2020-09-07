@@ -15,7 +15,7 @@ auto to_base_2n(const normalized_float<E, M, WordType> nf) -> std::string
     std::string str;
 
     str = std::to_string(nf.get_sign()) + " " + to_base_2n<N>(nf.get_exponent()) + " " +
-          to_base_2n<N>(nf.get_mantissa());
+          to_base_2n<N>(nf.get_full_mantissa());
     return str;
 }
 

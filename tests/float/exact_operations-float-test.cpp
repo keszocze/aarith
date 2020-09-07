@@ -18,6 +18,9 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = add(a, b);
 
+            
+            std::cout << "result: " << to_binary(result) << std::endl;
+            std::cout << "zero: " << to_binary(normalized_float<E, M>(0.f)) << std::endl;
             THEN("The result should be 0")
             {
                 REQUIRE(result == normalized_float<E, M>(0.f));
@@ -194,10 +197,10 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
 SCENARIO("Subtracting two floating-point numbers exactly",
          "[normalized_float][arithmetic][subtraction]")
 {
-    GIVEN("Single precision floats (E = 8, M = 23+1)")
+    GIVEN("Single precision floats (E = 8, M = 23)")
     {
         static constexpr size_t E = 8;
-        static constexpr size_t M = 24;
+        static constexpr size_t M = 23;
 
         WHEN("Both operands are the same.")
         {
@@ -384,10 +387,10 @@ SCENARIO("Subtracting two floating-point numbers exactly",
 SCENARIO("Exact multiplication of two floating-point numbers",
          "[normalized_float][arithmetic][multiplication]")
 {
-    GIVEN("Single precision floats (E = 8, M = 23+1)")
+    GIVEN("Single precision floats (E = 8, M = 23)")
     {
         static constexpr size_t E = 8;
-        static constexpr size_t M = 24;
+        static constexpr size_t M = 23;
 
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")
@@ -627,6 +630,55 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
             {
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
             }
+        }
+    }
+}
+
+SCENARIO("IEEE-754 arithmetic conversion: float, double",
+         "[normalized_float][conversion][ieee-754]")
+{
+    GIVEN("A float number")
+    {
+        WHEN("The number is 0.")
+        {
+            float a = 0.f;
+
+            THEN("The normalized_float should convert back to the original number.")
+            {
+                REQUIRE(static_cast<float>(normalized_float<8, 23>(a)) == a);
+            }
+        }
+    }
+    GIVEN("A double number")
+    {
+        WHEN("The number is 0.")
+        {
+            double a = 0.;
+
+            THEN("The normalized_float should convert back to the original number.")
+            {
+                REQUIRE(static_cast<double>(normalized_float<11, 52>(a)) == a);
+            }
+        }
+    }
+    GIVEN("A random float number")
+    {
+        float a = GENERATE(
+            take(10, random(float(1.0), std::numeric_limits<float>::max())));
+
+        THEN("The normalized_float should convert back to the original number.")
+        {
+            REQUIRE(static_cast<float>(normalized_float<8, 23>(a)) == a);
+        }
+    }
+    GIVEN("A random double number")
+    {
+        double a = GENERATE(
+            take(10, random(double(1.0), std::numeric_limits<double>::max())));
+
+        THEN("The normalized_float should convert back to the original number.")
+        {
+            REQUIRE(static_cast<double>(normalized_float<11, 52>(a)) == a);
         }
     }
 }

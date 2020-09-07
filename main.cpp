@@ -11,6 +11,7 @@
 #include <string>
 
 using nf_t = aarith::normalized_float<3, 5>;
+using snf = aarith::normalized_float<8, 23>;
 
 // something like this would be useful in aarith
 // using newly committed conversions here
@@ -28,6 +29,11 @@ template <size_t exp_bits, size_t man_bits> inline float to_float(nf_t x)
     if (x.get_sign())
         // set sign bit
         float_rep |= (1 << 31);
+
+    snf anf(-93.211546f);
+    snf bnf(0.f);
+
+    add(anf, bnf);
 
     uint32_t mantissa_part;
     // get them bits
@@ -65,11 +71,24 @@ int main()
 {
     using namespace aarith;
 
+
     // We have numbers
     const float number_a_f = 0.5;
     const float number_b_f = 0.25;
+    const float number_z_f = 0.;
+    const float number_m1_f = 213.22154f;
+    const float number_m2_f = 93.211546f;
     const double number_a_d = 0.5;
     const double number_b_d = 0.25;
+    const double number_z_d = 0.;
+
+    const snf a(number_a_f);
+    const snf b(number_b_f);
+    const snf z(number_z_f);
+    const snf m1(number_m1_f);
+    const snf m2(number_m2_f);
+
+    const auto nfsum = mul(m1, m2);
 
     // we convert them to some normfloat values
     const nf_t nf_a_f(number_a_f);
