@@ -14,11 +14,11 @@ auto operator<(const normalized_float<E, M> lhs, const normalized_float<E, M> rh
     }
     else if (lhs.get_exponent() == rhs.get_exponent())
     {
-        if (lhs.get_mantissa() == rhs.get_mantissa())
+        if (lhs.get_full_mantissa() == rhs.get_full_mantissa())
         {
             return false;
         }
-        else if (lhs.get_mantissa() < rhs.get_mantissa())
+        else if (lhs.get_full_mantissa() < rhs.get_full_mantissa())
         {
             return lhs.get_sign() == 0;
         }
@@ -41,7 +41,7 @@ template <size_t E, size_t M>
 auto operator==(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
 {
     return lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent() &&
-           lhs.get_mantissa() == rhs.get_mantissa();
+           lhs.get_full_mantissa() == rhs.get_full_mantissa();
 }
 
 template <size_t E, size_t M>

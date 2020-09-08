@@ -434,9 +434,9 @@ public:
     static constexpr bool value = true;
 };
 
-template <size_t DestinationWidth, size_t SourceWidth, typename T>
-[[nodiscard]] auto constexpr width_cast(const word_array<SourceWidth, T>& source)
-    -> word_array<DestinationWidth, T>
+template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
+[[nodiscard]] auto constexpr width_cast(const word_array<SourceWidth, WordType>& source)
+    -> word_array<DestinationWidth, WordType>
 {
 
     if constexpr (SourceWidth == DestinationWidth)
@@ -446,7 +446,7 @@ template <size_t DestinationWidth, size_t SourceWidth, typename T>
     else
     {
 
-        word_array<DestinationWidth, T> word_container;
+        word_array<DestinationWidth, WordType> word_container;
         if constexpr (DestinationWidth >= SourceWidth)
         {
             for (auto i = 0U; i < source.word_count(); ++i)

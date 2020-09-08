@@ -11,6 +11,7 @@ enable_testing()
 add_subdirectory(src)
 add_subdirectory(lib/catch2)
 add_subdirectory(tests)
+add_subdirectory(examples)
 
 add_executable(aarith_main main.cpp)
 target_link_libraries(aarith_main aarith::Library)

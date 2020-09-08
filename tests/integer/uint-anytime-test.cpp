@@ -69,53 +69,54 @@ SCENARIO("Approximate product of unsigned integers with anytime bitmasking",
         static_assert(uinteger<TestWidth>::word_count() == 1);
         static constexpr uint8_t number_a = 170U;
         static constexpr uint8_t number_b = 255U;
+        // 170*255 = 43350 = 0b1010100101010110
         const uinteger<TestWidth> a{number_a};
         const uinteger<TestWidth> b{number_b};
 
         WHEN("One bit is calculated")
         {
-            auto const result = approx_uint_bitmasking_mul(a, b, 1U);
+            auto const result = approx_expanding_mul_post_masking(a, b, 1U);
 
-            REQUIRE(result.word(0) == 0);
+            REQUIRE(result.word(0) == 0b1000000000000000);
         }
         WHEN("Two bits are calculated")
         {
-            auto const result = approx_uint_bitmasking_mul(a, b, 2U);
-            auto const result_2bits = 16384U;
+            auto const result = approx_expanding_mul_post_masking(a, b, 2U);
+            auto const result_2bits = 0b1000000000000000;
 
             REQUIRE(result.word(0) == result_2bits);
         }
         WHEN("Two bits are calculated and a and b are switched")
         {
-            auto const result = approx_uint_bitmasking_mul(b, a, 2U);
-            auto const result_2bits = 16384U;
+            auto const result = approx_expanding_mul_post_masking(b, a, 2U);
+            auto const result_2bits = 0b1000000000000000;
 
             REQUIRE(result.word(0) == result_2bits);
         }
         WHEN("Eight bits are calculated")
         {
-            auto const result = approx_uint_bitmasking_mul(a, b, 8U);
-            auto const result_8bits = 42496U;
+            auto const result = approx_expanding_mul_post_masking(a, b, 8U);
+            auto const result_8bits = 0b1010100100000000;
 
             REQUIRE(result.word(0) == result_8bits);
         }
         WHEN("Eight bits are calculated and a and b are switched")
         {
-            auto const result = approx_uint_bitmasking_mul(b, a, 8U);
-            auto const result_8bits = 42496U;
+            auto const result = approx_expanding_mul_post_masking(b, a, 8U);
+            auto const result_8bits = 0b1010100100000000;
 
             REQUIRE(result.word(0) == result_8bits);
         }
         WHEN("All bits are calculated")
         {
-            auto const result = approx_uint_bitmasking_mul(a, b, 16U);
+            auto const result = approx_expanding_mul_post_masking(a, b, 16U);
             auto const result_16bits = 43350U;
 
             REQUIRE(result.word(0) == result_16bits);
         }
         WHEN("All bits are calculated and a and b are switched")
         {
-            auto const result = approx_uint_bitmasking_mul(b, a, 16U);
+            auto const result = approx_expanding_mul_post_masking(b, a, 16U);
             auto const result_16bits = 43350U;
 
             REQUIRE(result.word(0) == result_16bits);

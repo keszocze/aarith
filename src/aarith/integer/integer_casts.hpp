@@ -5,6 +5,17 @@
 
 namespace aarith {
 
+/**
+ * @brief Performs a runtime-checked conersion.
+ *
+ * @warning The conversion will throw a runtime exception of the value does not fit into the desired
+ * data type!
+ *
+ * @tparam T The type the number is to be converted to
+ * @tparam W The width of the supplied unsigned integer
+ * @param a The unsigned integer to convert into the type T
+ * @return
+ */
 template <typename T, size_t W, typename WordType>
 constexpr T narrow_cast(const uinteger<W, WordType>& a)
 {

@@ -335,6 +335,8 @@ SCENARIO("Expanding subtraction works correctly", "[uinteger][arithmetic][subtra
         static constexpr uinteger<8> large = uinteger<8>::max();
         static constexpr uinteger<8> expected = uinteger<8>{1U};
 
+        std::cout << zero << " " << large << " " << expected << std::endl;
+
         THEN("Subtracting max from zero should give one")
         {
             auto constexpr result = expanding_sub(zero, large);
