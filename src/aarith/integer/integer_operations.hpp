@@ -50,8 +50,7 @@ template <typename I, typename T>
     return sum;
 }
 
-template <typename I, typename T>
-[[nodiscard]] constexpr auto expanding_add(const I& a, const T& b)
+template <typename I, typename T>[[nodiscard]] constexpr auto expanding_add(const I& a, const T& b)
 {
 
     return expanding_add(a, b, false);
@@ -85,7 +84,8 @@ template <typename I>[[nodiscard]] constexpr auto sub(const I& a, const I& b) ->
  * @param b Subtrahend
  * @return Difference of correct bit width
  */
-//template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(const I& a, const T& b, const bool initial_borrow = false)
+// template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(const I& a, const T&
+// b, const bool initial_borrow = false)
 template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(const I& a, const T& b)
 {
 
@@ -93,7 +93,7 @@ template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(cons
     static_assert(::aarith::same_signedness<I, T>);
     static_assert(::aarith::same_word_type<I, T>);
 
-    //constexpr size_t res_width = std::max(I::width(), T::width()) + 1;
+    // constexpr size_t res_width = std::max(I::width(), T::width()) + 1;
     constexpr size_t res_width = std::max(I::width(), T::width());
     const auto result{sub(width_cast<res_width>(a), width_cast<res_width>(b))};
     /*
@@ -498,7 +498,7 @@ template <size_t Width, typename WordType>
  */
 template <size_t Width, typename WordType>
 [[nodiscard]] constexpr auto expanding_abs(const integer<Width, WordType>& n)
--> uinteger<Width, WordType>
+    -> uinteger<Width, WordType>
 {
     uinteger<Width, WordType> abs = n.is_negative() ? -n : n;
     return abs;
@@ -646,14 +646,15 @@ auto constexpr operator>>(const integer<Width, WordType>& lhs, const size_t rhs)
  */
 template <size_t W, size_t V, typename WordType>
 [[nodiscard]] constexpr auto naive_expanding_mul(const integer<W, WordType>& m,
-                                           const integer<V, WordType>& r) {
+                                                 const integer<V, WordType>& r)
+{
     const bool m_neg = m.is_negative();
     const bool r_neg = r.is_negative();
 
     const uinteger<W> m_ = m_neg ? expanding_abs(m) : uinteger<W>{m};
     const uinteger<V> r_ = r_neg ? expanding_abs(r) : uinteger<V>{r};
 
-    const integer<W+V+1> result = expanding_mul(m_, r_);
+    const integer<W + V + 1> result = expanding_mul(m_, r_);
 
     return m_neg ^ r_neg ? -result : result;
 }
@@ -671,9 +672,11 @@ template <size_t W, size_t V, typename WordType>
  * @param b Second multiplicand
  * @return Product of a and b
  */
-template <typename I>[[nodiscard]] constexpr I naive_mul(const I& a, const I& b)
+template <size_t W, typename WordType>
+[[nodiscard]] constexpr integer<W, WordType> naive_mul(const integer<W, WordType>& a,
+                                                       const integer<W, WordType>& b)
 {
-    return width_cast<I::width()>(naive_expanding_mul(a, b));
+    return width_cast<W>(naive_expanding_mul(a, b));
 }
 
 /**

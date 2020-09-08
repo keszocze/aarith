@@ -36,6 +36,10 @@ int main(int argc, char** argv)
     benchmark::RegisterBenchmark("FAU Adder n=32, m=16, p=1", &wrapper<32, 16, 1>)
         ->Unit(benchmark::kMillisecond);
 
+
+
+
+
     benchmark::Initialize(&argc, argv);
     benchmark::RunSpecifiedBenchmarks();
 }

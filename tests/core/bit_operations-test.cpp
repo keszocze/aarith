@@ -1,6 +1,7 @@
 #include <catch.hpp>
 
 #include <aarith/core.hpp>
+#include <aarith/core/string_utils.hpp>
 
 using namespace aarith;
 
@@ -297,6 +298,182 @@ SCENARIO("Left shift operator works as expected", "[word_array][bit_logic]")
             REQUIRE(result.word(0) == 0);
             REQUIRE(result.word(1) == reference);
             REQUIRE(result.word(2) == 1);
+        }
+    }
+}
+
+SCENARIO("Left shift assignent works as expected", "[word_array][bit_logic]")
+{
+    GIVEN("One word_array a and a number of shifted bits s")
+    {
+
+        const size_t TestWidth = 16;
+
+        WHEN("The result still fits the width")
+        {
+            static constexpr uint16_t number_a = 7;
+            static constexpr auto s = 4U;
+            word_array<TestWidth> a{number_a};
+
+            const auto result = a << s;
+            a <<= s;
+            REQUIRE(result.word(0) == 112);
+            REQUIRE(a.word(0) == 112);
+            REQUIRE(a == result);
+        }
+        WHEN("The result does not fit the width anymore")
+        {
+            static constexpr uint16_t number_a = 7;
+            static constexpr auto s = 14U;
+            word_array<TestWidth> a{number_a};
+
+            const auto result = a << s;
+            a <<= s;
+
+            REQUIRE(result.word(0) == 49152);
+            REQUIRE(a.word(0) == 49152);
+            REQUIRE(a == result);
+        }
+
+        WHEN("Some bits are shifted to the next word")
+        {
+            const size_t Width = 70;
+
+            static constexpr uint16_t number_a = 7;
+            static constexpr auto s = 63U;
+            word_array<Width> a{number_a};
+
+            const auto result = a << s;
+            a <<= s;
+            REQUIRE(result.word(0) == 0x8000000000000000);
+            REQUIRE(result.word(1) == 3);
+            REQUIRE(a.word(0) == 0x8000000000000000);
+            REQUIRE(a.word(1) == 3);
+            REQUIRE(a == result);
+        }
+        WHEN("The bits are shifted to the second next word")
+        {
+            const size_t Width = 130;
+
+            static constexpr uint16_t number_a = 7;
+            static constexpr auto s = 127U;
+            word_array<Width> a{number_a};
+
+            const auto result = a << s;
+            a <<= s;
+            REQUIRE(result.word(0) == 0);
+            REQUIRE(result.word(1) == 0x8000000000000000);
+            REQUIRE(result.word(2) == 3);
+            REQUIRE(a.word(0) == 0);
+            REQUIRE(a.word(1) == 0x8000000000000000);
+            REQUIRE(a.word(2) == 3);
+            REQUIRE(a == result);
+        }
+        WHEN("The bits are not shifted")
+        {
+            const size_t Width = 192;
+
+            static constexpr uint16_t number_a = 3;
+            static constexpr auto s = 0;
+            word_array<Width> a{number_a};
+
+            const auto result = a << s;
+            a <<= s;
+            REQUIRE(result.word(0) == 3);
+            REQUIRE(result.word(1) == 0);
+            REQUIRE(result.word(2) == 0);
+            REQUIRE(a.word(0) == 3);
+            REQUIRE(a.word(1) == 0);
+            REQUIRE(a.word(2) == 0);
+            REQUIRE(a == result);
+        }
+        WHEN("The bits are shifted exactly one word")
+        {
+            const size_t Width = 192;
+
+            static constexpr uint16_t number_a = 3;
+            static constexpr auto s = static_cast<size_t>(word_array<Width>::word_width());
+            word_array<Width> a{number_a};
+
+            const auto result = a << s;
+            a <<= s;
+            REQUIRE(result.word(0) == 0);
+            REQUIRE(result.word(1) == 3);
+            REQUIRE(result.word(2) == 0);
+            REQUIRE(a.word(0) == 0);
+            REQUIRE(a.word(1) == 3);
+            REQUIRE(a.word(2) == 0);
+            REQUIRE(a == result);
+        }
+        WHEN("The bits are shifted exactly two words")
+        {
+            const size_t Width = 192;
+
+            static constexpr uint16_t number_a = 3;
+            static constexpr auto s = 2 * static_cast<size_t>(word_array<Width>::word_width());
+            word_array<Width> a{number_a};
+
+            const auto result = a << s;
+            a <<= s;
+            REQUIRE(result.word(0) == 0);
+            REQUIRE(result.word(1) == 0);
+            REQUIRE(result.word(2) == 3);
+            REQUIRE(a.word(0) == 0);
+            REQUIRE(a.word(1) == 0);
+            REQUIRE(a.word(2) == 3);
+            REQUIRE(a == result);
+        }
+        WHEN("The bits are shifted exactly by word_width-1")
+        {
+            const size_t Width = 192;
+
+            static constexpr uint16_t number_a = 3;
+            static constexpr auto s = static_cast<size_t>(word_array<Width>::word_width()) - 1U;
+            word_array<Width> a{number_a};
+
+            auto reference = a.word(0) << s;
+
+            const auto result = a << s;
+            a <<= s;
+            REQUIRE(result.word(0) == reference);
+            REQUIRE(result.word(1) == 1);
+            REQUIRE(result.word(2) == 0);
+            REQUIRE(a.word(0) == reference);
+            REQUIRE(a.word(1) == 1);
+            REQUIRE(a.word(2) == 0);
+            REQUIRE(a == result);
+        }
+        WHEN("The bits are assignment shifted by 2*word_width-1")
+        {
+            const size_t Width = 192;
+
+            static constexpr uint16_t number_a = 3;
+            static constexpr auto s =
+                2U * static_cast<size_t>(word_array<Width>::word_width()) - 1U;
+            word_array<Width> a{number_a};
+            auto reference = a.word(0) << (s % (sizeof(word_array<Width>::word_width()) * 8));
+
+            //            const auto skip_words = s / a.word_width();
+            //            const auto shift_word_left = s - skip_words * a.word_width();
+            //            const auto shift_word_right = a.word_width() - shift_word_left;
+            //            std::cout << "s " << s << "\t skip_words " << skip_words << "\t sleft " <<
+            //            shift_word_left << "\t sright " << shift_word_right << "\n"; std::cout <<
+            //            group_digits(to_binary(a),64) << "\n";
+
+            const auto result = a << s;
+
+            //            std::cout << group_digits(to_binary(result),64) << "\n";
+
+            a <<= s;
+
+            //            std::cout << group_digits(to_binary(a),64) << "\n";
+            REQUIRE(result.word(0) == 0);
+            REQUIRE(result.word(1) == reference);
+            REQUIRE(result.word(2) == 1);
+            REQUIRE(a.word(0) == 0);
+            REQUIRE(a.word(1) == reference);
+            REQUIRE(a.word(2) == 1);
+            REQUIRE(a == result);
         }
     }
 }
@@ -670,27 +847,30 @@ SCENARIO("Splitting a word_array/extraction from a word_array", "[word_array],[u
     }
 }
 
-
-SCENARIO("Concatenation is associative", "[word_array][util]") {
-    GIVEN("Three different words") {
+SCENARIO("Concatenation is associative", "[word_array][util]")
+{
+    GIVEN("Three different words")
+    {
         const uint32_t n1 = GENERATE(take(100, random(std::numeric_limits<uint32_t>::max(),
-                                                     std::numeric_limits<uint32_t>::max())));
+                                                      std::numeric_limits<uint32_t>::max())));
         const uint32_t n2 = GENERATE(take(100, random(std::numeric_limits<uint32_t>::max(),
-                                                     std::numeric_limits<uint32_t>::max())));
+                                                      std::numeric_limits<uint32_t>::max())));
         const uint32_t n3 = GENERATE(take(100, random(std::numeric_limits<uint32_t>::max(),
-                                                     std::numeric_limits<uint32_t>::max())));
+                                                      std::numeric_limits<uint32_t>::max())));
 
-        const word_array<32, uint8_t> w1_8{word_array<32,uint32_t>{n1}};
+        const word_array<32, uint8_t> w1_8{word_array<32, uint32_t>{n1}};
         const word_array<32, uint64_t> w1_64{n1};
-        const word_array<32, uint8_t> w2_8{word_array<32,uint32_t>{n2}};
+        const word_array<32, uint8_t> w2_8{word_array<32, uint32_t>{n2}};
         const word_array<32, uint64_t> w2_64{n2};
-        const word_array<32, uint8_t> w3_8{word_array<32,uint32_t>{n3}};
+        const word_array<32, uint8_t> w3_8{word_array<32, uint32_t>{n3}};
         const word_array<32, uint64_t> w3_64{n3};
 
-        WHEN("Concatenating the words") {
-            THEN("The operation should be associative") {
-                REQUIRE(concat(concat(w1_8,w2_8),w3_8) == concat(w1_8,concat(w2_8,w3_8)));
-                REQUIRE(concat(concat(w1_64,w2_64),w3_64) == concat(w1_64,concat(w2_64,w3_64)));
+        WHEN("Concatenating the words")
+        {
+            THEN("The operation should be associative")
+            {
+                REQUIRE(concat(concat(w1_8, w2_8), w3_8) == concat(w1_8, concat(w2_8, w3_8)));
+                REQUIRE(concat(concat(w1_64, w2_64), w3_64) == concat(w1_64, concat(w2_64, w3_64)));
             }
         }
     }
@@ -701,8 +881,8 @@ SCENARIO("Concatenating undoes range extraction", "[word_array][util]")
     GIVEN("A word_array")
     {
         const uint32_t n = GENERATE(take(100, random(std::numeric_limits<uint32_t>::max(),
-                                                    std::numeric_limits<uint32_t>::max())));
-        const word_array<32, uint8_t> w8{word_array<32,uint32_t>{n}};
+                                                     std::numeric_limits<uint32_t>::max())));
+        const word_array<32, uint8_t> w8{word_array<32, uint32_t>{n}};
         const word_array<32, uint64_t> w64{n};
 
         WHEN("Extracting a range from including one end (i.e. basically splitting the word array)")
@@ -726,12 +906,12 @@ SCENARIO("Concatenating undoes range extraction", "[word_array][util]")
             {
 
                 const auto left8 = bit_range<31, 20>(w8);
-                const auto middle8 = bit_range<19,10>(w8);
+                const auto middle8 = bit_range<19, 10>(w8);
                 const auto right8 = bit_range<9, 0>(w8);
                 REQUIRE(concat(concat(left8, middle8), right8) == w8);
 
                 const auto left64 = bit_range<31, 20>(w64);
-                const auto middle64 = bit_range<19,10>(w64);
+                const auto middle64 = bit_range<19, 10>(w64);
                 const auto right64 = bit_range<9, 0>(w64);
                 REQUIRE(concat(concat(left64, middle64), right64) == w64);
             }

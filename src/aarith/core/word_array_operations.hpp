@@ -88,6 +88,56 @@ size_t first_set_bit(const word_array<Width, WordType>& value)
     return first_bit;
 }
 
+
+/**
+ * @brief Left-shift operator
+ * @tparam W The word_container type to work on
+ * @param lhs The word_container to be shifted
+ * @param rhs The number of bits to shift
+ * @return The shifted word_container
+ */
+template <typename W> constexpr auto operator<<=(W& lhs, const size_t rhs) -> W
+{
+
+    static_assert(::aarith::is_word_array_v<W>);
+
+    constexpr size_t width = W::width();
+    using word_type = typename W::word_type;
+
+    if (rhs >= width)
+    {
+        lhs.fill(word_type{0});
+        return lhs;
+    }
+    if (rhs == 0)
+    {
+        return lhs;
+    }
+
+    const auto skip_words = rhs / lhs.word_width();
+    const auto shift_word_left = rhs - skip_words * lhs.word_width();
+    const auto shift_word_right = lhs.word_width() - shift_word_left;
+    for (auto counter = lhs.word_count(); counter > 0; --counter)
+    {
+        if (counter + skip_words < lhs.word_count())
+        {
+            word_type new_word = lhs.word(counter) << shift_word_left;
+            if (shift_word_right < lhs.word_width())
+            {
+                new_word = new_word | (lhs.word(counter - 1) >> shift_word_right);
+            }
+            lhs.set_word(counter + skip_words, new_word);
+        }
+    }
+    word_type new_word = lhs.word(0) << shift_word_left;
+    lhs.set_word(skip_words, new_word);
+
+    for (size_t i = 0; i < skip_words; ++i) {
+        lhs.set_word(i, word_type{0});
+    }
+
+    return lhs;
+}
 /**
  * @brief Left-shift operator
  * @tparam W The word_container type to work on

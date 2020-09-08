@@ -401,6 +401,8 @@ SCENARIO("Multiplying unsigned integers", "[integer][arithmetic][multiplication]
                 const auto result8 = expanding_mul(a8, a8);
                 const auto result5 = expanding_mul(a5, a5);
 
+
+
                 CHECK(result64.width() == 128);
                 CHECK(result64 > a64);
 

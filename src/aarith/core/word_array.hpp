@@ -285,7 +285,7 @@ public:
 
     /**
      * @brief Assigns the given value value to all elements in the container.
-     * @param valuethe value to assign to the elements
+     * @param value the value to assign to the elements
      */
     constexpr void fill(const word_type& value)
     {
