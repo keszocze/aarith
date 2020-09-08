@@ -7,11 +7,13 @@
 #include <string>
 #include <tuple>
 
+using namespace std;
+using namespace aarith;
+using namespace aarith::arithmetic_operators;
+
 template <typename Op> void generic_aarithmetic(benchmark::State& state)
 {
     using namespace std;
-    // TODO WTF?! why is there this double nesting?
-    using namespace aarith::aarith::arithmetic_operators;
     using I = typename Op::Type;
 
     I one;
@@ -56,7 +58,7 @@ public:
 
     static I compute(const I a, const I b)
     {
-        using namespace aarith::aarith::arithmetic_operators;
+        using namespace aarith::arithmetic_operators;
         return a + b;
     }
 };
@@ -67,7 +69,7 @@ public:
     using Type = I;
     static I compute(const I a, const I b)
     {
-        using namespace aarith::aarith::arithmetic_operators;
+        using namespace aarith::arithmetic_operators;
         return a + b;
     }
 };
@@ -78,7 +80,7 @@ public:
     using Type = I;
     static I compute(const I a, const I b)
     {
-        using namespace aarith::aarith::arithmetic_operators;
+        using namespace aarith::arithmetic_operators;
         if (b != static_cast<I>(0))
         {
             return a / b;
@@ -96,14 +98,14 @@ public:
     using Type = I;
     static I compute(const I a, const I b)
     {
-        using namespace aarith::aarith::arithmetic_operators;
+        using namespace aarith::arithmetic_operators;
         return a * b;
     }
 };
 
 template <typename I> void scalar_product(benchmark::State& state)
 {
-    using namespace aarith::aarith::arithmetic_operators;
+    using namespace aarith::arithmetic_operators;
     for (auto _ : state)
     {
         state.PauseTiming();

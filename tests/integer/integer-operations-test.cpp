@@ -435,11 +435,13 @@ SCENARIO("Multiplying signed integers", "[integer][arithmetic][multiplication]")
                 constexpr integer<8> r{2};
 
                 const integer<8> res = mul(m, r);
+                const integer<8> res_naive = naive_mul(m,r);
 
                 int8_t mi = -16;
                 int8_t ri = 2;
 
                 int8_t resi = mi * ri;
+                CHECK(res == res_naive);
                 CHECK((uint8_t)res.word(0) == (uint8_t)resi);
             }
         }

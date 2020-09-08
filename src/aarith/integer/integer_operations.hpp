@@ -113,10 +113,10 @@ template <typename I>[[nodiscard]] I constexpr add(const I& a, const I& b)
  * the partial products everywhere where the first multiplicand has a 1 bit. The simplicity, of
  * course, comes at the cost of performance.
  *
- * @tparam W The bit width of the first multiplicant
- * @tparam V The bit width of the second multiplicant
- * @param a First multiplicant
- * @param b Second multiplicant
+ * @tparam W The bit width of the first multiplicand
+ * @tparam V The bit width of the second multiplicand
+ * @param a First multiplicand
+ * @param b Second multiplicand
  * @return Product of a and b
  */
 template <std::size_t W, std::size_t V, typename WordType>
@@ -160,8 +160,8 @@ template <std::size_t W, std::size_t V, typename WordType>
  * The result is then cropped to fit the initial bit width
  *
  * @tparam I The integer type to operate on
- * @param a First multiplicant
- * @param b Second multiplicant
+ * @param a First multiplicand
+ * @param b Second multiplicand
  * @return Product of a and b
  */
 template <typename I>[[nodiscard]] constexpr I mul(const I& a, const I& b)
@@ -457,6 +457,39 @@ template <typename I>[[nodiscard]] constexpr auto div(const I& numerator, const 
 }
 
 /**
+ * @brief Computes the absolute value of a given signed integer.
+ *
+ * @warn There is a potential loss of precision as abs(integer::min) > integer::max
+ *
+ * @tparam Width The width of the signed integer
+ * @param n The signed inter to be "absolute valued"
+ * @return The absolute value of the signed integer
+ */
+template <size_t Width, typename WordType>
+[[nodiscard]] constexpr auto abs(const integer<Width, WordType>& n) -> integer<Width, WordType>
+{
+    return n.is_negative() ? -n : n;
+}
+
+/**
+ * @brief Computes the absolute value of a given signed integer.
+ *
+ * This method returns an unsigned integer. This means that the absolute value
+ * will fit and no overflow will happen.
+ *
+ * @tparam Width The width of the signed integer
+ * @param n The signed inter to be "absolute valued"
+ * @return The absolute value of the signed integer
+ */
+template <size_t Width, typename WordType>
+[[nodiscard]] constexpr auto expanding_abs(const integer<Width, WordType>& n)
+-> uinteger<Width, WordType>
+{
+    uinteger<Width, WordType> abs = n.is_negative() ? -n : n;
+    return abs;
+}
+
+/**
  * @brief Adds two signed integers of, possibly, different bit widths.
  *
  * This is an implementation using a more functional style of programming. It is not particularly
@@ -588,6 +621,47 @@ auto constexpr operator>>(const integer<Width, WordType>& lhs, const size_t rhs)
 }
 
 /**
+ * @brief Naively multiplies two signed integers.
+ *
+ * @tparam W The bit width of the first multiplicand
+ * @tparam V The bit width of the second multiplicand
+ * @param a First multiplicand
+ * @param b Second multiplicand
+ * @return Product of a and b
+ */
+template <size_t W, size_t V, typename WordType>
+[[nodiscard]] constexpr auto naive_expanding_mul(const integer<W, WordType>& m,
+                                           const integer<V, WordType>& r) {
+    const bool m_neg = m.is_negative();
+    const bool r_neg = r.is_negative();
+
+    const uinteger<W> m_ = m_neg ? expanding_abs(m) : uinteger<W>{m};
+    const uinteger<V> r_ = r_neg ? expanding_abs(r) : uinteger<V>{r};
+
+    const integer<W+V+1> result = expanding_mul(m_, r_);
+
+    return m_neg ^ r_neg ? -result : result;
+}
+
+/**
+ * @brief Naively multiplies two integers.
+ *
+ * @note No Type conversion is performed. If the bit widths do not match, the code will not
+ * compile! Use @see expanding_mul for that.
+ *
+ * The result is then cropped to fit the initial bit width
+ *
+ * @tparam I The integer type to operate on
+ * @param a First multiplicand
+ * @param b Second multiplicand
+ * @return Product of a and b
+ */
+template <typename I>[[nodiscard]] constexpr I naive_mul(const I& a, const I& b)
+{
+    return width_cast<I::width()>(naive_expanding_mul(a, b));
+}
+
+/**
  * @brief Multiplies two signed integers.
  *
  *
@@ -595,10 +669,10 @@ auto constexpr operator>>(const integer<Width, WordType>& lhs, const size_t rhs)
  * most negative number. See https://en.wikipedia.org/wiki/Booth%27s_multiplication_algorithm
  * for details.
  *
- * @tparam W The bit width of the first multiplicant
- * @tparam V The bit width of the second multiplicant
- * @param a First multiplicant
- * @param b Second multiplicant
+ * @tparam W The bit width of the first multiplicand
+ * @tparam V The bit width of the second multiplicand
+ * @param a First multiplicand
+ * @param b Second multiplicand
  * @return Product of a and b
  */
 template <size_t W, size_t V, typename WordType>
@@ -646,39 +720,6 @@ template <size_t W, size_t V, typename WordType>
     auto result = width_cast<W + V>(P >> 1);
 
     return integer<W + V, WordType>{result};
-}
-
-/**
- * @brief Computes the absolute value of a given signed integer.
- *
- * @warn There is a potential loss of precision as abs(integer::min) > integer::max
- *
- * @tparam Width The width of the signed integer
- * @param n The signed inter to be "absolute valued"
- * @return The absolute value of the signed integer
- */
-template <size_t Width, typename WordType>
-[[nodiscard]] constexpr auto abs(const integer<Width, WordType>& n) -> integer<Width, WordType>
-{
-    return n.is_negative() ? -n : n;
-}
-
-/**
- * @brief Computes the absolute value of a given signed integer.
- *
- * This method returns an unsigned integer. This means that the absolute value
- * will fit and no overflow will happen.
- *
- * @tparam Width The width of the signed integer
- * @param n The signed inter to be "absolute valued"
- * @return The absolute value of the signed integer
- */
-template <size_t Width, typename WordType>
-[[nodiscard]] constexpr auto expanding_abs(const integer<Width, WordType>& n)
-    -> uinteger<Width, WordType>
-{
-    uinteger<Width, WordType> abs = n.is_negative() ? -n : n;
-    return abs;
 }
 
 /**
