@@ -569,15 +569,16 @@ SCENARIO("Right shift operator works as expected", "[word_array][utility]")
                 static constexpr size_t width = 256;
                 static constexpr size_t word_width = word_array<width>::word_width();
 
-                static constexpr word_array<width> a{1U};
-                static constexpr word_array<width> expected0 =
-                    word_array<width>::from_words(0U, 0U, 0U, 1U);
-                static constexpr word_array<width> expected1 =
-                    word_array<width>::from_words(0U, 0U, 1U, 0U);
-                static constexpr word_array<width> expected2 =
-                    word_array<width>::from_words(0U, 1U, 0U, 0U);
-                static constexpr word_array<width> expected3 =
+                static constexpr word_array<width> a =
                     word_array<width>::from_words(1U, 0U, 0U, 0U);
+                static constexpr word_array<width> expected0 =
+                    word_array<width>::from_words(1U, 0U, 0U, 0U);
+                static constexpr word_array<width> expected1 =
+                    word_array<width>::from_words(0U, 1U, 0U, 0U);
+                static constexpr word_array<width> expected2 =
+                    word_array<width>::from_words(0U, 0U, 1U, 0U);
+                static constexpr word_array<width> expected3 =
+                    word_array<width>::from_words(0U, 0U, 0U, 1U);
                 static constexpr word_array<width> expected4 =
                     word_array<width>::from_words(0U, 0U, 0U, 0U);
 
@@ -586,7 +587,7 @@ SCENARIO("Right shift operator works as expected", "[word_array][utility]")
 
                 for (auto i = 0U; i < expecteds.size(); ++i)
                 {
-                    word_array<width> result = a << (word_width * i);
+                    word_array<width> result = a >> (word_width * i);
                     CHECK(result == expecteds[i]);
                 }
             }
@@ -681,9 +682,7 @@ SCENARIO("Right shift assignment operator works as expected", "[word_array][util
             word_array<Width> a(0U);
             a.set_word(a.word_count() - 1, number_a);
 
-
             auto ref = number_a << 1;
-
 
             const auto result = a >> s;
             a >>= s;
@@ -726,7 +725,8 @@ SCENARIO("Right shift assignment operator works as expected", "[word_array][util
                 static constexpr size_t width = 256;
                 static constexpr size_t word_width = word_array<width>::word_width();
 
-                word_array<width> a = word_array<width>::from_words(1U, 0U, 0U, 0U);;
+                word_array<width> a = word_array<width>::from_words(1U, 0U, 0U, 0U);
+                ;
                 static constexpr word_array<width> expected1 =
                     word_array<width>::from_words(0U, 1U, 0U, 0U);
                 static constexpr word_array<width> expected2 =
@@ -744,7 +744,6 @@ SCENARIO("Right shift assignment operator works as expected", "[word_array][util
                     a >>= word_width;
                     CHECK(a == expecteds[i]);
                 }
-
             }
         }
 
