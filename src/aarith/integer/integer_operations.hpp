@@ -15,7 +15,7 @@ namespace aarith {
  * @return Sum of a and b with bit width max(I::width,T::width)+1
  */
 template <typename I, typename T>
-[[nodiscard]] constexpr auto expanding_add(const I& a, const T& b, const bool initial_carry = false)
+[[nodiscard]] constexpr auto expanding_add(const I& a, const T& b, const bool initial_carry)
 {
 
     static_assert(::aarith::is_integral_v<I>);
@@ -50,6 +50,13 @@ template <typename I, typename T>
     return sum;
 }
 
+template <typename I, typename T>
+[[nodiscard]] constexpr auto expanding_add(const I& a, const T& b)
+{
+
+    return expanding_add(a, b, false);
+}
+
 /**
  * @brief Computes the difference of two integers.
  *
@@ -78,6 +85,7 @@ template <typename I>[[nodiscard]] constexpr auto sub(const I& a, const I& b) ->
  * @param b Subtrahend
  * @return Difference of correct bit width
  */
+//template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(const I& a, const T& b, const bool initial_borrow = false)
 template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(const I& a, const T& b)
 {
 
@@ -85,8 +93,15 @@ template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(cons
     static_assert(::aarith::same_signedness<I, T>);
     static_assert(::aarith::same_word_type<I, T>);
 
+    //constexpr size_t res_width = std::max(I::width(), T::width()) + 1;
     constexpr size_t res_width = std::max(I::width(), T::width());
     const auto result{sub(width_cast<res_width>(a), width_cast<res_width>(b))};
+    /*
+    if (initial_borrow)
+    {
+        result = sub(result, width_cast<res_width>(T(1)));
+    }
+    */
 
     return result;
 }
