@@ -24,7 +24,7 @@ template<size_t E, size_t M, class Function_add, class Function_sub>
 {
     if (abs(lhs) < abs(rhs))
     {
-        return add(rhs, lhs);
+        return add_(rhs, lhs, fun_add, fun_sub);
     }
 
     if (lhs.get_sign() != rhs.get_sign())

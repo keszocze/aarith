@@ -167,7 +167,7 @@ template<size_t E, size_t M, size_t LSP, size_t SHARED>
 [[nodiscard]] auto FAU_add(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
 -> normalized_float<E, M>
 {
-    return add_<E, M>(lhs, rhs, FAUadder<M, LSP, SHARED>, FAU_sub<M, LSP, SHARED>);
+    return add_<E, M>(lhs, rhs, FAUadder<M+1, LSP, SHARED>, FAU_sub<M+1, LSP, SHARED>);
 }
 
 /**
@@ -186,7 +186,7 @@ template<size_t E, size_t M, size_t LSP, size_t SHARED>
 [[nodiscard]] auto FAU_sub(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
 -> normalized_float<E, M>
 {
-    return sub_<E, M>(lhs, rhs, FAUadder<M, LSP, SHARED>, FAU_sub<M, LSP, SHARED>);
+    return sub_<E, M>(lhs, rhs, FAUadder<M+1, LSP, SHARED>, FAU_sub<M+1, LSP, SHARED>);
 }
 
 }
