@@ -88,9 +88,8 @@ size_t first_set_bit(const word_array<Width, WordType>& value)
     return first_bit;
 }
 
-
 /**
- * @brief Left-shift operator
+ * @brief Left-shift assignment operator
  * @tparam W The word_container type to work on
  * @param lhs The word_container to be shifted
  * @param rhs The number of bits to shift
@@ -132,7 +131,8 @@ template <typename W> constexpr auto operator<<=(W& lhs, const size_t rhs) -> W
     word_type new_word = lhs.word(0) << shift_word_left;
     lhs.set_word(skip_words, new_word);
 
-    for (size_t i = 0; i < skip_words; ++i) {
+    for (size_t i = 0; i < skip_words; ++i)
+    {
         lhs.set_word(i, word_type{0});
     }
 
@@ -182,6 +182,69 @@ template <typename W>[[nodiscard]] constexpr auto operator<<(const W& lhs, const
     shifted.set_word(skip_words, new_word);
 
     return shifted;
+}
+
+/**
+ * @brief Right-shift assignment operator
+ * @tparam Width The width of the word_array
+ * @param lhs The word_array that is to be shifted
+ * @param rhs The number of bits to shift
+ * @return The shifted word_array
+ */
+template <typename W> auto constexpr operator>>=(W& lhs, const size_t rhs) -> W
+{
+
+    static_assert(::aarith::is_word_array_v<W>);
+
+    constexpr size_t width = W::width();
+    using word_type = typename W::word_type;
+
+    /*
+     * This prevents this shift operator to be chosen by the compiler when using signed integers.
+     * For signed integers, the correct arithmetic right-shift will be used.
+     */
+    if constexpr (::aarith::is_integral_v<W>)
+    {
+        static_assert(::aarith::is_unsigned_v<W>);
+    }
+
+    if (rhs >= width)
+    {
+        lhs.fill(word_type{0});
+        return lhs;
+    }
+    if (rhs == 0)
+    {
+        return lhs;
+    }
+
+    const auto skip_words = rhs / lhs.word_width();
+    const auto shift_word_right = rhs - skip_words * lhs.word_width();
+    const auto shift_word_left = lhs.word_width() - shift_word_right;
+
+    using word_type = typename W::word_type;
+
+    for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
+    {
+        word_type new_word = lhs.word(counter) >> shift_word_right;
+        if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
+        {
+            new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
+        }
+        lhs.set_word(counter - skip_words, new_word);
+    }
+
+    if (skip_words > 0)
+    {
+        word_type new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
+        lhs.set_word(lhs.word_count() - skip_words - 1, new_word);
+
+        for (size_t i = lhs.word_count() - skip_words; i < lhs.word_count(); ++i)
+        {
+            lhs.set_word(i, word_type{0});
+        }
+    }
+    return lhs;
 }
 
 /**
@@ -267,7 +330,7 @@ word_array<W + V, WordType> concat(const word_array<W, WordType>& w,
 {
     word_array<W + V, WordType> result{w};
     result = result << V;
-    result = result | word_array<W+V, WordType>{v};
+    result = result | word_array<W + V, WordType>{v};
     return result;
 }
 
