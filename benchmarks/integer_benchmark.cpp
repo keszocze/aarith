@@ -9,7 +9,7 @@
 
 using namespace std;
 using namespace aarith;
-using namespace aarith::arithmetic_operators;
+using namespace integer_operators;
 
 template <typename Op> void generic_aarithmetic(benchmark::State& state)
 {
@@ -58,7 +58,7 @@ public:
 
     static I compute(const I a, const I b)
     {
-        using namespace aarith::arithmetic_operators;
+        using namespace integer_operators;
         return a + b;
     }
 };
@@ -69,7 +69,7 @@ public:
     using Type = I;
     static I compute(const I a, const I b)
     {
-        using namespace aarith::arithmetic_operators;
+        using namespace integer_operators;
         return a + b;
     }
 };
@@ -80,7 +80,7 @@ public:
     using Type = I;
     static I compute(const I a, const I b)
     {
-        using namespace aarith::arithmetic_operators;
+        using namespace integer_operators;
         if (b != static_cast<I>(0))
         {
             return a / b;
@@ -98,7 +98,7 @@ public:
     using Type = I;
     static I compute(const I a, const I b)
     {
-        using namespace aarith::arithmetic_operators;
+        using namespace integer_operators;
         return a * b;
     }
 };
@@ -125,7 +125,7 @@ public:
 
 template <typename I> void scalar_product(benchmark::State& state)
 {
-    using namespace aarith::arithmetic_operators;
+    using namespace integer_operators;
     for (auto _ : state)
     {
         state.PauseTiming();
