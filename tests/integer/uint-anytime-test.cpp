@@ -6,9 +6,9 @@
 
 using namespace aarith;
 
-SCENARIO("Generate a bitmask for a certain number of bits", "[uinteger][utlitiy]")
+SCENARIO("Generate a bitmask for a certain number of bits", "[integer][unsigned][utility][bit_logic]")
 {
-    GIVEN("A uinteger and the length of a bitmask")
+    GIVEN("A unsigned integer and the length of a bitmask")
     {
         WHEN("The bitmask spans over only one word")
         {
@@ -61,7 +61,7 @@ SCENARIO("Generate a bitmask for a certain number of bits", "[uinteger][utlitiy]
 }
 
 SCENARIO("Approximate product of unsigned integers with anytime bitmasking",
-         "[uinteger][arithmetic]")
+         "[integer][unsigned][arithmetic][approximate]")
 {
     GIVEN("Two uintegers with width < word_width")
     {

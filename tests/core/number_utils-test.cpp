@@ -4,7 +4,7 @@
 
 using namespace aarith;
 
-SCENARIO("Finding the first set bit")
+SCENARIO("Finding the first set bit", "[word_array][utility]")
 {
     GIVEN("A power of two")
     {
@@ -21,7 +21,7 @@ SCENARIO("Finding the first set bit")
     }
 }
 
-SCENARIO("Rounding down to the largest power of two", "[core][util]")
+SCENARIO("Rounding down to the largest power of two", "[word_array][utility]")
 {
     GIVEN("A power of two")
     {

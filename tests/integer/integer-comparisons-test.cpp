@@ -3,7 +3,7 @@
 
 using namespace aarith;
 
-SCENARIO("Comparing two positive sintegers", "[uinteger][utility]")
+SCENARIO("Comparing two positive sintegers", "[integer][unsigned][utility][comparison]")
 {
     GIVEN("Two integer<N> a and b with a < b")
     {
@@ -89,7 +89,7 @@ SCENARIO("Comparing two positive sintegers", "[uinteger][utility]")
         }
     }
 }
-SCENARIO("Comparing two positive integers with different bit widths", "[uinteger][utility]")
+SCENARIO("Comparing two positive integers with different bit widths", "[integer][signed][utility][comparison]")
 {
     GIVEN("Two integer<N> a and b with a < b with different bit widths")
     {
@@ -173,7 +173,7 @@ SCENARIO("Comparing two positive integers with different bit widths", "[uinteger
     }
 }
 
-SCENARIO("Investigating the comparison of max and min values", "[integer][comparison][utility]")
+SCENARIO("Investigating the comparison of max and min values", "[integer][signed][comparison][utility]")
 {
     GIVEN("integer<8>::max/min")
     {

@@ -7,7 +7,7 @@
 
 using namespace aarith;
 
-SCENARIO("Performing common functional operations", "[word_array]")
+SCENARIO("Performing common functional operations", "[word_array][functional][utility]")
 {
     GIVEN("A word container w ")
     {

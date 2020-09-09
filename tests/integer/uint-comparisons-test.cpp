@@ -3,7 +3,7 @@
 
 using namespace aarith;
 
-SCENARIO("Comparing two uintegers", "[uinteger][utility]")
+SCENARIO("Comparing two uintegers", "[integer][unsigned][utility][comparison]")
 {
     GIVEN("Two uinteger<N> a and b with a < b")
     {
@@ -89,7 +89,7 @@ SCENARIO("Comparing two uintegers", "[uinteger][utility]")
         }
     }
 }
-SCENARIO("Comparing two uintegers with different bit widths", "[uinteger][utility]")
+SCENARIO("Comparing two uintegers with different bit widths", "[integer][unsigned][utility][comparison]")
 {
     GIVEN("Two uinteger<N> a and b with a < b with different bit widths")
     {

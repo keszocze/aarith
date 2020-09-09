@@ -32,7 +32,7 @@ SCENARIO("Counting bits in word_array", "[word_array][util]")
     }
 }
 
-SCENARIO("Casting word_containers into different width", "[word_array]")
+SCENARIO("Casting word_containers into different width", "[word_array][casting]")
 {
     GIVEN("width_cast is called")
     {
@@ -478,7 +478,7 @@ SCENARIO("Left shift assignent works as expected", "[word_array][bit_logic]")
     }
 }
 
-SCENARIO("Right shift operator works as expected", "[word_array][utility]")
+SCENARIO("Right shift operator works as expected", "[word_array][utility][bit_logic]")
 {
     GIVEN("One word_array a and a number of shifted bits s")
     {
@@ -608,7 +608,7 @@ SCENARIO("Right shift operator works as expected", "[word_array][utility]")
     }
 }
 
-SCENARIO("Right shift assignment operator works as expected", "[word_array][utility][foo]")
+SCENARIO("Right shift assignment operator works as expected", "[word_array][utility][bit_logic")
 {
     GIVEN("One word_array a and a number of shifted bits s")
     {
@@ -812,7 +812,7 @@ SCENARIO("Bitwise operations work as expected", "[word_array][bit_logic]")
     }
 }
 
-SCENARIO("Checking whether an word_array is not equal to zero/false")
+SCENARIO("Checking whether an word_array is not equal to zero/false", "[word_array][utility]")
 {
     GIVEN("An word_array<N>=0=a for various N")
     {
@@ -876,7 +876,7 @@ SCENARIO("Checking whether an word_array is not equal to zero/false")
     }
 }
 
-SCENARIO("Bit shifting is possible as constexpr")
+SCENARIO("Bit shifting is possible as constexpr","[word_array][utility][bit_logic][constexpr]")
 {
     GIVEN("A word_array of width N")
     {
@@ -976,7 +976,7 @@ SCENARIO("Bit operations are performed correctly", "[word_array][bit_logic]")
     }
 }
 
-SCENARIO("Splitting a word_array/extraction from a word_array", "[word_array],[util]")
+SCENARIO("Splitting a word_array/extraction from a word_array", "[word_array],[utility]")
 {
     GIVEN("A word_array w")
     {
@@ -1004,7 +1004,7 @@ SCENARIO("Splitting a word_array/extraction from a word_array", "[word_array],[u
     }
 }
 
-SCENARIO("Concatenation is associative", "[word_array][util]")
+SCENARIO("Concatenation is associative", "[word_array][utility]")
 {
     GIVEN("Three different words")
     {
@@ -1033,7 +1033,7 @@ SCENARIO("Concatenation is associative", "[word_array][util]")
     }
 }
 
-SCENARIO("Concatenating undoes range extraction", "[word_array][util]")
+SCENARIO("Concatenating undoes range extraction", "[word_array][utility]")
 {
     GIVEN("A word_array")
     {
@@ -1076,7 +1076,7 @@ SCENARIO("Concatenating undoes range extraction", "[word_array][util]")
     }
 }
 
-SCENARIO("Concatenating undoes splitting", "[word_array][util]")
+SCENARIO("Concatenating undoes splitting", "[word_array][utility]")
 {
     GIVEN("A word_array")
     {

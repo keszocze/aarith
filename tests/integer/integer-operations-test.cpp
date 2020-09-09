@@ -3,7 +3,7 @@
 
 using namespace aarith;
 
-SCENARIO("Arithmetic should be constexpr", "[integer][arithmetic]")
+SCENARIO("Arithmetic should be constexpr", "[integer][signed][arithmetic][constexpr]")
 {
     GIVEN("Two integers")
     {
@@ -38,7 +38,7 @@ SCENARIO("Arithmetic should be constexpr", "[integer][arithmetic]")
     }
 }
 
-SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
+SCENARIO("Adding two positive integers", "[integer][signed][arithmetic][addition]")
 {
     GIVEN("Two positive integer<N> a and b with N <= word_width")
     {
@@ -237,7 +237,7 @@ SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
     //    }
 }
 
-SCENARIO("Multiplying larger integers using the various implementations works", "[integer][arithmetic][multiplication]")
+SCENARIO("Multiplying larger integers using the various implementations works", "[integer][signed][arithmetic][multiplication]")
 {
     GIVEN("Some large integers") {
         const integer<192> a = integer<192>::from_words(1U, 0U, 0U);
@@ -287,7 +287,7 @@ SCENARIO("Multiplying larger integers using the various implementations works", 
     }
 }
 
-SCENARIO("Division of signed integers", "[integer][arithmetic][division]")
+SCENARIO("Division of signed integers", "[integer][signed][arithmetic][division]")
 {
 
     GIVEN("The number 1 << 65")
@@ -428,7 +428,7 @@ SCENARIO("Division of signed integers", "[integer][arithmetic][division]")
     }
 }
 
-SCENARIO("Multiplying unsigned integers", "[integer][arithmetic][multiplication]")
+SCENARIO("Multiplying unsigned integers", "[integer][signed][arithmetic][multiplication]")
 {
     GIVEN("The largest integer value")
     {
@@ -471,7 +471,7 @@ SCENARIO("Multiplying unsigned integers", "[integer][arithmetic][multiplication]
         }
     }
 }
-SCENARIO("Multiplying signed integers", "[integer][arithmetic][multiplication]")
+SCENARIO("Multiplying signed integers", "[integer][signed][arithmetic][multiplication]")
 {
     GIVEN("Two signed integers m and r")
     {
@@ -500,7 +500,7 @@ SCENARIO("Multiplying signed integers", "[integer][arithmetic][multiplication]")
     }
 }
 
-SCENARIO("Multiplying two integers exactly", "[integer][arithmetic][multiplication]")
+SCENARIO("Multiplying two integers exactly", "[integer][signed][arithmetic][multiplication]")
 {
 
     GIVEN("Two integer<N> a and b with N <= 32")
@@ -609,7 +609,7 @@ SCENARIO("Multiplying two integers exactly", "[integer][arithmetic][multiplicati
 }
 
 SCENARIO("Multiplication of numbers fitting in a uint64_t",
-         "[integer][arithmetic][multiplication]")
+         "[integer][signed][arithmetic][multiplication]")
 {
     GIVEN("A random number a")
     {
@@ -641,7 +641,7 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
     }
 }
 
-SCENARIO("Absolute value computation", "[integer][operations][utility]")
+SCENARIO("Absolute value computation", "[integer][signed][operations][utility]")
 {
     GIVEN("The smallest possible value")
     {
@@ -690,7 +690,7 @@ SCENARIO("Absolute value computation", "[integer][operations][utility]")
     }
 }
 
-SCENARIO("Expanding subtraction works correctly", "[integer][arithmetic][subtraction]")
+SCENARIO("Expanding subtraction works correctly", "[integer][signed][arithmetic][subtraction]")
 {
     GIVEN("A n-bit min and a m-bit (m>n)  max")
     {
@@ -720,7 +720,7 @@ SCENARIO("Expanding subtraction works correctly", "[integer][arithmetic][subtrac
     }
 }
 
-SCENARIO("Width casting of signed integers", "[integer][utility]")
+SCENARIO("Width casting of signed integers", "[integer][signed][utility][casting]")
 {
     GIVEN("A positive integer")
     {
@@ -793,7 +793,7 @@ SCENARIO("Width casting of signed integers", "[integer][utility]")
     }
 }
 
-SCENARIO("Unary minus operation", "[integer][arithmetic][utility]")
+SCENARIO("Unary minus operation", "[integer][signed][arithmetic][utility]")
 {
     GIVEN("The smallest possible value")
     {
@@ -829,7 +829,7 @@ SCENARIO("Unary minus operation", "[integer][arithmetic][utility]")
     }
 }
 
-SCENARIO("MIN/MAX Values behave as expected", "[integer][operation][utility]")
+SCENARIO("MIN/MAX Values behave as expected", "[integer][signed][operation][utility]")
 {
     GIVEN("The min and max value")
     {
@@ -856,7 +856,7 @@ SCENARIO("MIN/MAX Values behave as expected", "[integer][operation][utility]")
 
 
 
-SCENARIO("Left/right shifting sintegers", "[integer][operation][utility]")
+SCENARIO("Left/right shifting sintegers", "[integer][signed][operation][utility]")
 {
     GIVEN("A positive integer")
     {
@@ -945,7 +945,7 @@ SCENARIO("Left/right shifting sintegers", "[integer][operation][utility]")
 }
 
 
-SCENARIO("Right-shift asigning sintegers", "[integer][operation][utility]")
+SCENARIO("Right-shift asigning sintegers", "[integer][signed][operation][utility]")
 {
     GIVEN("A positive integer")
     {
@@ -1018,7 +1018,7 @@ SCENARIO("Right-shift asigning sintegers", "[integer][operation][utility]")
     }
 }
 
-SCENARIO("Computing the signum of an integer", "[integer][operation][utility]")
+SCENARIO("Computing the signum of an integer", "[integer][signed][operation][utility]")
 {
     GIVEN("The number  zero")
     {

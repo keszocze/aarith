@@ -3,7 +3,7 @@
 
 using namespace aarith;
 
-SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
+SCENARIO("Adding two uintegers exactly", "[integer][unsigned][arithmetic][addition]")
 {
     GIVEN("Two uinteger<N> a and b with N <= word_width")
     {
@@ -82,16 +82,16 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
 
     GIVEN("Two uinteger<N> a and b with N > 2*word_width")
     {
-        using uint = uinteger<129>;
-        static_assert(uint::word_count() > 2);
+        using auint = uinteger<129>;
+        static_assert(auint::word_count() > 2);
 
         WHEN("There should be a carry into the third word")
         {
-            constexpr auto a = uint::from_words(0, 0xffffffffffffffff, 0xffffffffffffffff);
+            constexpr auto a = auint::from_words(0, 0xffffffffffffffff, 0xffffffffffffffff);
             constexpr auto b = a;
             auto constexpr result = add(a, b);
             auto constexpr result_fun = fun_add(a, b);
-            constexpr auto ref = uint::from_words(1, 0xffffffffffffffff, 0xfffffffffffffffe);
+            constexpr auto ref = auint::from_words(1, 0xffffffffffffffff, 0xfffffffffffffffe);
 
             THEN("There is a carry in the third word")
             {
@@ -102,10 +102,10 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
 
         WHEN("There should be no carry into the third word")
         {
-            constexpr auto a = uint::from_words(0, 0xfffffffffffffffe, 0xffffffffffffffff);
-            constexpr auto b = uint(1U);
+            constexpr auto a = auint::from_words(0, 0xfffffffffffffffe, 0xffffffffffffffff);
+            constexpr auto b = auint(1U);
             auto constexpr result = add(a, b);
-            constexpr auto ref = uint::from_words(0, 0xffffffffffffffff, 0);
+            constexpr auto ref = auint::from_words(0, 0xffffffffffffffff, 0);
             auto constexpr result_fun = fun_add(a, b);
 
             THEN("There is no carry in the third word")
@@ -117,7 +117,7 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
     }
 }
 
-SCENARIO("Bit shifting is possible as constexpr for unsigned integers")
+SCENARIO("Bit shifting is possible as constexpr for unsigned integers", "[integer][unsigned][utility][bit_logic][constexpr]")
 {
     GIVEN("An unsigned integer of width N")
     {
@@ -158,7 +158,7 @@ SCENARIO("Bit shifting is possible as constexpr for unsigned integers")
     }
 }
 
-SCENARIO("Adding tow uintgers of different bit width", "[uinteger][arithmetic][addition]")
+SCENARIO("Adding two unsigned integers of different bit width", "[integer][unsigned][arithmetic][addition]")
 {
     GIVEN("An uinteger of bit width 128")
     {
@@ -210,7 +210,7 @@ SCENARIO("Adding tow uintgers of different bit width", "[uinteger][arithmetic][a
     }
 }
 
-SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtraction]")
+SCENARIO("Subtracting two unsigned integers exactly", "[integer][unsigned][arithmetic][subtraction]")
 {
     GIVEN("Two uinteger<N> a and b are subtracted")
     {
@@ -327,7 +327,7 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
     }
 }
 
-SCENARIO("Expanding subtraction works correctly", "[uinteger][arithmetic][subtraction]")
+SCENARIO("Expanding subtraction works correctly", "[integer][unsigned][arithmetic][subtraction]")
 {
     GIVEN("A n-bit zero and a m-bit (m>n)  max")
     {
@@ -359,7 +359,7 @@ SCENARIO("Expanding subtraction works correctly", "[uinteger][arithmetic][subtra
     }
 }
 
-SCENARIO("Investigating max/min values", "[uinteger][operations]")
+SCENARIO("Investigating max/min values", "[integer][unsigned][operations]")
 {
     GIVEN("The maximal and minimal values of uinteger<V>")
     {
@@ -457,7 +457,7 @@ SCENARIO("Investigating max/min values", "[uinteger][operations]")
     }
 }
 
-SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplication]")
+SCENARIO("Multiplying two unsigned integers exactly", "[integer][unsigned][arithmetic][multiplication]")
 {
 
     GIVEN("Two uinteger<N> a and b with N <= 32")
@@ -553,7 +553,7 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplica
 }
 
 SCENARIO("Multiplication of numbers fitting in a uint64_t",
-         "[uinteger][arithmetic][multiplication]")
+         "[integer][unsigned][arithmetic][multiplication]")
 {
     GIVEN("A random number a")
     {
@@ -578,8 +578,8 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
     }
 }
 
-SCENARIO("Multiplying two uintegers using the karazuba multiplication",
-         "[uinteger][arithmetic][multiplication]")
+SCENARIO("Multiplying two unsigned integers using the karazuba multiplication",
+         "[integer][unsigned][arithmetic][multiplication]")
 {
     GIVEN("Two uinteger<N> a and b with N <= 32")
     {
@@ -850,7 +850,7 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication",
     }
 }
 
-SCENARIO("Bit and Word operations work correctly", "[uinteger][utility]")
+SCENARIO("Bit and Word operations work correctly", "[integer][unsigned][utility][bit_logic]")
 {
     WHEN("A uinteger<N> is created using uinteger<N>::from_words")
     {
@@ -903,7 +903,7 @@ SCENARIO("Bit and Word operations work correctly", "[uinteger][utility]")
     }
 }
 
-SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic][division]")
+SCENARIO("Dividing two unsigned integers exactly", "[integer][unsigned][arithmetic][division]")
 {
     GIVEN("Two uinteger<N> a and b with N <= 32")
     {
@@ -949,7 +949,7 @@ SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic][division]")
     }
 }
 
-SCENARIO("Computing the signum of an unsigned integer", "[uinteger][operation][utility]")
+SCENARIO("Computing the signum of an unsigned integer", "[integer][unsigned]operation][utility]")
 {
     GIVEN("The number  zero")
     {
@@ -984,7 +984,7 @@ SCENARIO("Computing the signum of an unsigned integer", "[uinteger][operation][u
 }
 
 SCENARIO("Computing the remainder of two unsigned integers works as expected",
-         "[uinteger][arithmetic][remainder][division]")
+         "[integer][unsigned][arithmetic][remainder][division]")
 {
     GIVEN("A fixed test case a=56567 and b=234")
     {
