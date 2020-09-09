@@ -22,7 +22,7 @@ int main()
                                      [](const nf_t acc, const nf_t & num) {
                                          return acc + num;
                                      });
-//    const auto non_working_acc = std::accumulate(nf_vec.begin(), nf_vec.end(), nf_zero);
+    const auto non_working_acc = std::accumulate(nf_vec.begin(), nf_vec.end(), nf_zero);
 
     const auto normal = add(nf_a, nf_b );
     const auto op = nf_a + nf_b;
