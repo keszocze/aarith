@@ -1,6 +1,5 @@
 #pragma once
 
-#include <aarith/integer.hpp>
 
 #include <aarith/core/string_utils.hpp>
 

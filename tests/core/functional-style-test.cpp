@@ -1,5 +1,5 @@
 #include <aarith/core.hpp>
-#include <aarith/integer.hpp>
+#include <aarith/integer_no_operators.hpp>
 #include <aarith/operations/approx_operations.hpp>
 #include <catch.hpp>
 #include <iostream>

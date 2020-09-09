@@ -1,7 +1,7 @@
 #pragma once
 
 #include <aarith/core/word_array.hpp>
-#include <aarith/integer.hpp>
+#include <aarith/integer_no_operators.hpp>
 #include <cstdint>
 #include <iostream>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "traits.hpp"
+#include <aarith/core/traits.hpp>
 
 #include <algorithm>
 #include <array>

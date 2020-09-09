@@ -1,4 +1,4 @@
-#include <aarith/integer.hpp>
+#include <aarith/integer_no_operators.hpp>
 #include <aarith/operations/approx_operations.hpp>
 
 using namespace aarith;

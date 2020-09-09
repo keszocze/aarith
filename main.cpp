@@ -1,10 +1,4 @@
-#include <aarith/float/float_comparisons.hpp>
-#include <aarith/float/float_operations.hpp>
-#include <aarith/float/normalized_float.hpp>
-#include <aarith/float/string_utils.hpp>
-#include <aarith/integer.hpp>
-
-#include <bitset>
+#include <aarith/float.hpp>
 #include <iostream>
 #include <numeric>
 #include <vector>

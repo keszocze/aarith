@@ -1,6 +1,6 @@
 #pragma once
 
-#include <aarith/integer.hpp>
+#include <aarith/integer_no_operators.hpp>
 #include <catch.hpp>
 
 using namespace aarith;

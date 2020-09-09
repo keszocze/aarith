@@ -2,7 +2,6 @@
 
 #include <aarith/core/traits.hpp>
 #include <aarith/float/normalized_float.hpp>
-#include <aarith/integer.hpp>
 
 namespace aarith {
 
