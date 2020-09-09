@@ -38,6 +38,5 @@ int main()
     std::cout << "A: " << nf_vec[0] << " B: " << nf_vec[1] << std::endl
               << "accumulated: " << acc  << "\t" << "add function: " << add(nf_a, nf_b) << "\t" << "plus operator: " << op << "\n";
     std::cout << "All equal: " << all_equal << "\n";
-
     return 0;
 }
