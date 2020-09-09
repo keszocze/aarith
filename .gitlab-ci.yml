@@ -38,15 +38,15 @@ compile_clang:
         - CC=clang-9 CXX=clang++-9 cmake ../..
         - make -j $(nproc)
 
-run_sonarqube:
-    extends: .ciconf
-    stage: quality
-    script: 
-        - echo $CI_COMMIT_REF_NAME
-        - chmod +x scripts/mk_sonar_config.sh
-        - scripts/mk_sonar_config.sh $CI_COMMIT_REF_NAME > sonar-project.properties
-        - scripts/mk_sonar_config.sh $CI_COMMIT_REF_NAME
-        - /opt/sonar-scanner/bin/sonar-scanner
+          #run_sonarqube:
+          #    extends: .ciconf
+          #    stage: quality
+          #    script: 
+          #        - echo $CI_COMMIT_REF_NAME
+          #        - chmod +x scripts/mk_sonar_config.sh
+          #        - scripts/mk_sonar_config.sh $CI_COMMIT_REF_NAME > sonar-project.properties
+          #        - scripts/mk_sonar_config.sh $CI_COMMIT_REF_NAME
+          #        - /opt/sonar-scanner/bin/sonar-scanner
 
 
 test_clang:
