@@ -1,6 +1,7 @@
 #pragma once
 
 #include <aarith/integer.hpp>
+#include <search.h>
 
 namespace aarith {
 
@@ -578,6 +579,81 @@ template <typename I>
  * @return The shifted integer
  */
 template <size_t Width, typename WordType>
+auto constexpr operator>>=(integer<Width, WordType>& lhs, const size_t rhs)
+    -> integer<Width, WordType>
+{
+    if (rhs >= Width)
+    {
+        if (lhs.is_negative())
+        {
+            const auto max = std::numeric_limits<WordType>::max();
+            lhs.fill(max);
+            return lhs;
+        }
+        else
+        {
+            lhs.fill(WordType{0});
+            return lhs;
+        }
+    }
+
+    if (rhs == 0 || lhs.is_zero())
+    {
+        return lhs;
+    }
+
+    const auto skip_words = rhs / lhs.word_width();
+    const auto shift_word_right = rhs - skip_words * lhs.word_width();
+    const auto shift_word_left = lhs.word_width() - shift_word_right;
+
+    using word_type = typename integer<Width, WordType>::word_type;
+
+    for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
+    {
+        word_type new_word = lhs.word(counter) >> shift_word_right;
+        if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
+        {
+            new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
+        }
+
+        lhs.set_word(counter - skip_words, new_word);
+    }
+
+    if (skip_words > 0)
+    {
+        word_type new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
+        lhs.set_word(lhs.word_count() - skip_words - 1, new_word);
+
+        for (size_t i = lhs.word_count() - skip_words; i < lhs.word_count(); ++i)
+        {
+            const auto fill_word =
+                lhs.is_negative() ? std::numeric_limits<WordType>::max() : WordType{0};
+            lhs.set_word(i, fill_word);
+        }
+    }
+
+    if (lhs.is_negative())
+    {
+        for (size_t i = (Width - 1); i >= (Width - rhs); --i)
+        {
+            lhs.set_bit(i);
+        }
+    }
+
+    return lhs;
+}
+
+/**
+ * @brief Arithmetic right-shift operator
+ *
+ * This shift preserves the signedness of the integer.
+ *
+ * @tparam Width The width of the signed integer
+ * @param lhs The integer to be shifted
+ * @param rhs The number of bits to be shifted
+ * @return The shifted integer
+ */
+template <size_t Width, typename WordType>
 auto constexpr operator>>(const integer<Width, WordType>& lhs, const size_t rhs)
     -> integer<Width, WordType>
 {
@@ -738,6 +814,88 @@ template <size_t W, size_t V, typename WordType>
     auto result = width_cast<W + V>(P >> 1);
 
     return integer<W + V, WordType>{result};
+}
+
+/**
+ * @brief Multiplies two signed integers.
+ *
+ *
+ * This implements the Booth multiplication algorithm with extension to correctly handle the
+ * most negative number. See https://en.wikipedia.org/wiki/Booth%27s_multiplication_algorithm
+ * for details.
+ *
+ * @tparam W The bit width of the first multiplicand
+ * @tparam V The bit width of the second multiplicand
+ * @param a First multiplicand
+ * @param b Second multiplicand
+ * @return Product of a and b
+ */
+template <size_t W, size_t V, typename WordType>
+[[nodiscard]] constexpr auto inplace_expanding_mul(const integer<W, WordType>& m,
+                                                   const integer<V, WordType>& r)
+    -> integer<V + W, WordType>
+{
+
+    if (m.is_zero() || r.is_zero())
+    {
+        return integer<V + W, WordType>::zero();
+    }
+
+    constexpr size_t K = W + V + 2;
+
+    integer<W + 1, WordType> expanded_m = width_cast<W + 1>(m);
+
+    uinteger<K, WordType> A{static_cast<word_array<W + 1, WordType>>(expanded_m)};
+    uinteger<K, WordType> S{static_cast<word_array<W, WordType>>(-m)};
+
+    A <<= V + 1;
+    S <<= V + 1;
+
+    uinteger<K, WordType> P{static_cast<word_array<W, WordType>>(r)};
+    P = P << 1;
+
+    for (size_t i = 0; i < V; ++i)
+    {
+
+        bool last_bit = P.bit(0);
+        bool snd_last_bit = P.bit(1);
+
+        if (snd_last_bit && !last_bit)
+        {
+            P = expanding_add(P, S);
+        }
+        if (!snd_last_bit && last_bit)
+        {
+            P = expanding_add(P, A);
+        }
+
+        P >>= 1;
+    }
+
+    P >>= 1;
+    auto result = width_cast<W + V>(P);
+
+    return integer<W + V, WordType>{result};
+}
+
+/**
+ * @brief Multiplies two integers.
+ *
+ * @note No Type conversion is performed. If the bit widths do not match, the code will not
+ * compile! Use @see expanding_mul for that.
+ *
+ * The result is then cropped to fit the initial bit width
+ *
+ * @tparam I The integer type to operate on
+ * @param a First multiplicand
+ * @param b Second multiplicand
+ * @return Product of a and b
+ */
+template <size_t W, typename WordType>
+[[nodiscard]] constexpr integer<W, WordType> inplace_mul(const integer<W, WordType>& a,
+                                                         const integer<W, WordType>& b)
+{
+    return width_cast<W>(inplace_expanding_mul(a, b));
 }
 
 /**

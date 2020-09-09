@@ -7,17 +7,20 @@ aarith_types = aarith_signed_types + aarith_unsigned_types
 types = internal_types + aarith_types
 
 operations=["Add", "Sub", "Mul", "Div"]
+special_ops=["NaiveMul", "InPlaceMul"]
 
 #types.each { |t|
-aarith_signed_types.each {|t|
+aarith_types.each {|t|
     #operations.each { |op|
     ["Mul"].each { |op|
         puts "benchmark::RegisterBenchmark(\"#{op}<#{t}>\", &generic_aarithmetic<#{op}<#{t}>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();"
     }
 }
 
-aarith_unsigned_types.each { |t|
-    puts "benchmark::RegisterBenchmark(\"NaiveMul<#{t}>\", &generic_aarithmetic<NaiveMul<#{t}>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();"
+aarith_signed_types.each { |t|
+    special_ops.each { |op|
+        puts "benchmark::RegisterBenchmark(\"#{op}<#{t}>\", &generic_aarithmetic<#{op}<#{t}>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();"
+    }
 }
 
 types.each { |t|

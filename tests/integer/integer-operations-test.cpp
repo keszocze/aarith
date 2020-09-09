@@ -751,6 +751,80 @@ SCENARIO("Left/right shifting sintegers", "[integer][operation][utility]")
     }
 }
 
+
+SCENARIO("Right-shift asigning sintegers", "[integer][operation][utility]")
+{
+    GIVEN("A positive integer")
+    {
+
+        constexpr integer<150> b_{4, 4, 4};
+        constexpr integer<150> b__{2, 2, 2};
+        constexpr integer<150> b___{1, 1, 1};
+        WHEN("Right Shfiting")
+        {
+            THEN("It should behave like division by a power of two")
+            {
+                //                std::cout << group_digits(to_binary(a),64) << "\n";
+                //                std::cout << group_digits(to_binary(b), 64) << "\n";
+                //                std::cout << group_digits(to_binary(b >> 1), 64) << "\n";
+                //                std::cout << group_digits(to_binary(b >> 2), 64) << "\n";
+                //                std::cout << group_digits(to_binary(b >> 4), 64) << "\n";
+
+                integer<150> b{8, 8, 8};
+                b >>= 1;
+                REQUIRE(b == b_);
+                b >>= 1;
+                REQUIRE(b == b__);
+                b>>=1;
+                REQUIRE(b == b___);
+            }
+            THEN("It should move correctly over word boundaries")
+            {
+                integer<150> a{0U, 1U, 0U};
+                a >>= 1;
+                constexpr auto b____ = integer<150>(0U, 0U, (uint64_t(1) << 63U));
+                //                std::cout << group_digits(to_binary(k), 64) << "\n";
+                //                std::cout << group_digits(to_binary(b), 64) << "\n";
+                REQUIRE(a == b____);
+            }
+
+            THEN("The it should also work when moving farther than the word width")
+            {
+                integer<150> c{12U, 0U, 0U};
+                constexpr auto b____ = integer<150>(0U, 0U, (uint64_t(11) << 62U));
+                c >>= 68;
+                REQUIRE(c == b____);
+            }
+        }
+    }
+
+    GIVEN("The integer -1")
+    {
+        WHEN("Right shifting")
+        {
+            THEN("-1 should not be affected")
+            {
+                constexpr integer<150> minus_one(-1);
+                constexpr integer<150> shifted1 = minus_one >> 1;
+                constexpr integer<150> shifted2 = minus_one >> 22;
+                constexpr integer<150> shifted3 = minus_one >> 23;
+                constexpr integer<150> shifted4 = minus_one >> 149;
+
+                // TODO why the hell is the constexpr above working and now below?
+                const integer<150> shifted5 = minus_one >> 150;
+                const integer<150> shifted6 = minus_one >> 1151;
+
+                CHECK(shifted1 == minus_one);
+                CHECK(shifted2 == minus_one);
+                REQUIRE(shifted3 == minus_one);
+                REQUIRE(shifted4 == minus_one);
+                REQUIRE(shifted5 == minus_one);
+                REQUIRE(shifted6 == minus_one);
+            }
+        }
+    }
+}
+
 SCENARIO("Computing the signum of an integer", "[integer][operation][utility]")
 {
     GIVEN("The number  zero")

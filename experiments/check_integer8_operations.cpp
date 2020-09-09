@@ -9,20 +9,23 @@ int main()
     using UB = uint8_t;
     using B = int8_t;
 
-    using UI = uinteger<Width, uint64_t>;
-    using I = integer<Width, uint64_t>;
+    using W = uint64_t;
+    using UI = uinteger<Width, W>;
+    using I = integer<Width, W>;
 
     check_int_operation<uinteger, Width, UB, false>("addition", &::aarith::add<UI>, native_add);
     check_int_operation<uinteger, Width, UB, false>("subtraction", &::aarith::sub<UI>, native_sub);
     check_int_operation<uinteger, Width, UB, false>("mul", &::aarith::mul<UI>, native_mul);
     check_int_operation<uinteger, Width, UB, false>(
-        "mul_karazuba", &::aarith::karazuba<Width, uint64_t>, native_mul);
+        "mul_karazuba", &::aarith::karazuba<Width, W>, native_mul);
     check_int_operation<uinteger, Width, UB, true>("division", &::aarith::div<UI>, native_div);
     check_int_operation<uinteger, Width, UB, true>("modulo", &::aarith::remainder<UI>, native_mod);
 
     check_int_operation<integer, Width, B, false>("addition", &::aarith::add<I>, native_add);
     check_int_operation<integer, Width, B, false>("subtraction", &::aarith::sub<I>, native_sub);
     check_int_operation<integer, Width, B, false>("mul", &::aarith::mul<I>, native_mul);
+    check_int_operation<integer, Width, B, false>("mul_naive", &::aarith::naive_mul<Width, W>, native_mul);
+    check_int_operation<integer, Width, B, false>("mul_inplace", &::aarith::inplace_mul<Width, W>, native_mul);
     check_int_operation<integer, Width, B, true>("division", &::aarith::div<I>, native_div);
     check_int_operation<integer, Width, B, true>("modulo", &::aarith::remainder<I>, native_mod);
 
