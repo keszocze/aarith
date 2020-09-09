@@ -9,7 +9,7 @@
 
 namespace aarith {
 
-template <class F> constexpr auto get_mantissa_width()
+template <class F> constexpr size_t get_mantissa_width()
 {
     static_assert(std::is_floating_point<F>(), "F has to be float or double.");
     if constexpr (sizeof(F) == 4)
@@ -22,7 +22,7 @@ template <class F> constexpr auto get_mantissa_width()
     }
 }
 
-template <class F> constexpr auto get_exponent_width()
+template <class F> constexpr size_t get_exponent_width()
 {
     static_assert(std::is_floating_point<F>(), "F has to be float or double.");
     if constexpr (sizeof(F) == 4)
@@ -73,7 +73,7 @@ template <class F> constexpr uint8_t extract_sign(F num)
     return static_cast<uint8_t>(sign);
 }
 
-template <class F> inline constexpr auto extract_exponent(F num) -> unsigned int
+template <class F> inline constexpr auto extract_exponent(F num) -> size_t
 {
     constexpr auto exponent_width = get_exponent_width<F>();
     constexpr auto mantissa_width = get_mantissa_width<F>();
@@ -81,8 +81,9 @@ template <class F> inline constexpr auto extract_exponent(F num) -> unsigned int
     using int_type = typename float_extraction_helper::bit_cast_to_type_trait<F>::type;
 
     const int_type inum = bit_cast<int_type, F>(num);
+    constexpr int_type one(1U);
 
-    const auto exponent = (inum >> mantissa_width) & ((1U << exponent_width) - 1);
+    const auto exponent = (inum >> mantissa_width) & ((one << exponent_width) - one);
 
     return static_cast<unsigned int>(exponent);
 }
@@ -97,7 +98,9 @@ inline constexpr auto extract_mantissa(F num) ->
 
     int_type inum = bit_cast<int_type, F>(num);
 
-    const auto mantissa = (inum & ((1U << mantissa_width) - 1)) | (1U << mantissa_width);
+    constexpr int_type one(1U);
+
+    const auto mantissa = (inum & ((one << mantissa_width) - one)) | (one << mantissa_width);
 
     return static_cast<int_type>(mantissa);
 }

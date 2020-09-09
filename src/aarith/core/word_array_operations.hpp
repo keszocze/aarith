@@ -95,8 +95,7 @@ size_t first_set_bit(const word_array<Width, WordType>& value)
  * @param rhs The number of bits to shift
  * @return The shifted word_container
  */
-template <typename W>
-[[nodiscard]] constexpr auto operator<<(const W& lhs, const size_t rhs) -> W
+template <typename W>[[nodiscard]] constexpr auto operator<<(const W& lhs, const size_t rhs) -> W
 {
     static_assert(::aarith::is_word_array_v<W>);
 
@@ -212,6 +211,16 @@ bit_range(const word_array<W, WordType>& w)
     return width_cast<(S - E) + 1, W, WordType>(w >> E);
 }
 
+template <size_t W, size_t V, typename WordType>
+word_array<W + V, WordType> concat(const word_array<W, WordType>& w,
+                                   const word_array<V, WordType>& v)
+{
+    word_array<W + V, WordType> result{w};
+    result = result << V;
+    result = result | word_array<W+V, WordType>{v};
+    return result;
+}
+
 /**
  * @brief Splits the word container at the given splitting point
  * @tparam S Splitting point
@@ -260,7 +269,7 @@ template <class F, size_t W, typename WordType>
  *
  * @tparam F "Catch-all" parameter for functions operating on the words of the word_array
  * @tparam W Bit width of the first word_array to operate on
- * @tparam V Bit width of the secnd word_array to operate on
+ * @tparam V Bit width of the second word_array to operate on
  * @param w The first word_array to operate on
  * @param v The second word_array to operate on
  * @param f Function of type (word_array<W>::word_type, word_array<W>::word_type) ->

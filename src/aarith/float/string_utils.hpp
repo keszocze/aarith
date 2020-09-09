@@ -15,7 +15,7 @@ auto to_base_2n(const normalized_float<E, M, WordType> nf) -> std::string
     std::string str;
 
     str = std::to_string(nf.get_sign()) + " " + to_base_2n<N>(nf.get_exponent()) + " " +
-          to_base_2n<N>(nf.get_mantissa());
+          to_base_2n<N>(nf.get_full_mantissa());
     return str;
 }
 
@@ -40,14 +40,72 @@ auto to_binary(const normalized_float<E, M, WordType>& value) -> std::string
     return to_base_2n<1>(value);
 }
 
+template <size_t E, size_t M, typename WordType>
+auto tcs(const normalized_float<E, M, WordType> nf) -> std::string
+{
+
+    if (nf.is_nan())
+    {
+        return "NaN";
+    }
+
+    std::stringstream stream("");
+
+    const bool neg = nf.is_negative();
+
+    // print the sign part
+    stream << (neg ? "-" : "");
+
+    if (nf.is_zero())
+    {
+        stream << "0";
+        return stream.str();
+    }
+
+    stream << (neg ? "(" : ""); // might need to add enclosing paranthesis
+
+    // print exponent
+    if (nf.is_normalized())
+    {
+        stream << "2^(" << nf.unbiased_exponent() << ")";
+    }
+    else
+    {
+        stream << "2^(" << nf.denorm_exponent() << ")";
+    }
+
+    // print the mantissa part, here, actual computations are necessary
+    stream << " * (" << (nf.is_normalized() ? "1" : "0");
+
+    const auto mantissa = nf.get_mantissa();
+
+    integer<65> iM{M};
+    for (int64_t i = M; i > 0; --i)
+    {
+        auto curr_bit = mantissa.bit(i);
+        if (curr_bit == 1)
+        {
+            integer<65> I{i};
+            stream << " + 2^(" << sub(I, iM) << ")";
+        }
+    }
+    stream << ")";
+
+    stream << (neg ? ")" : ""); // might need to add enclosing paranthesis
+    return stream.str();
+}
+
 /// Convert the given normalized_float to a representation that can be posted to a calculator
 template <size_t E, size_t M, typename WordType>
 auto to_compute_string(const normalized_float<E, M, WordType> nf) -> std::string
 {
+
+    // print the sign part
     std::stringstream stream("");
     stream << "(-1)^" << nf.get_sign() << " * 2^(";
     auto first = true;
 
+    // print the exponent part
     auto ones = 0U;
     auto zeroes = 0U;
     for (auto counter = E + M; counter > M; --counter)
@@ -106,18 +164,18 @@ auto to_compute_string(const normalized_float<E, M, WordType> nf) -> std::string
 template <size_t E, size_t M, typename WordType>
 auto to_sci_string(const normalized_float<E, M, WordType> nf) -> std::string
 {
-    uinteger<M, WordType> fl_mantissa = nf.get_mantissa();
-    uinteger<24, WordType> flc_mantissa;
-    if constexpr (M >= 24)
+    auto fl_mantissa = nf.get_mantissa();
+    uinteger<23, WordType> flc_mantissa;
+    if constexpr (M >= 23)
     {
-        auto shift_mantissa = M - 24;
+        auto shift_mantissa = M - 23;
         fl_mantissa = fl_mantissa >> shift_mantissa;
-        flc_mantissa = width_cast<24, M>(fl_mantissa);
+        flc_mantissa = width_cast<23, M>(fl_mantissa);
     }
     else
     {
-        auto shift_mantissa = 24 - M;
-        flc_mantissa = width_cast<24, M>(fl_mantissa);
+        auto shift_mantissa = 23 - M;
+        flc_mantissa = width_cast<23, M>(fl_mantissa);
         flc_mantissa = (flc_mantissa << shift_mantissa);
     }
     uint32_t ui_mantissa = (static_cast<uint32_t>(flc_mantissa.word(0)) & 0x7fffff) | 0x3f800000;

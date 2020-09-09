@@ -107,6 +107,7 @@ SCENARIO("Iterating ranges", "[integer][signed][ranges][operation][utility]")
                 size_t count = 0;
                 for ([[maybe_unused]] const I num : integer_range(a, a))
                 {
+                    REQUIRE(num == a);
                     ++count;
                 }
                 REQUIRE(count == 1);

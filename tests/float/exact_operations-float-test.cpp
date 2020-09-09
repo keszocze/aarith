@@ -3,12 +3,12 @@
 
 using namespace aarith;
 
-SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithmetic][addition]")
+SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithmetic][addition][burp]")
 {
-    GIVEN("Single precision floats (E = 8, M = 23+1)")
+    GIVEN("Single precision floats (E = 8, M = 23)")
     {
         static constexpr size_t E = 8;
-        static constexpr size_t M = 24;
+        static constexpr size_t M = 23;
 
         WHEN("The second operand is -a.")
         {
@@ -18,6 +18,9 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = add(a, b);
 
+            
+            std::cout << "result: " << to_binary(result) << std::endl;
+            std::cout << "zero: " << to_binary(normalized_float<E, M>(0.f)) << std::endl;
             THEN("The result should be 0")
             {
                 REQUIRE(result == normalized_float<E, M>(0.f));
@@ -33,6 +36,7 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
 
             THEN("The result should be a")
             {
+                std::cout << to_binary(result) << " vs. " << to_binary(a) << "\n";
                 REQUIRE(result == a);
             }
         }
@@ -187,16 +191,29 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
             }
         }
+        WHEN("When one operand is a > 1 and the other is 0 < b < 1.")
+        {
+            static constexpr float number_a = 2.75f;
+            static constexpr float number_b = 0.5f;
+            const normalized_float<E, M> a{number_a};
+            const normalized_float<E, M> b{number_b};
+            const normalized_float<E, M> result = add(a, b);
+
+            THEN("It should be the correct sum.")
+            {
+                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
+            }
+        }
     }
 }
 
 SCENARIO("Subtracting two floating-point numbers exactly",
          "[normalized_float][arithmetic][subtraction]")
 {
-    GIVEN("Single precision floats (E = 8, M = 23+1)")
+    GIVEN("Single precision floats (E = 8, M = 23)")
     {
         static constexpr size_t E = 8;
-        static constexpr size_t M = 24;
+        static constexpr size_t M = 23;
 
         WHEN("Both operands are the same.")
         {
@@ -383,10 +400,10 @@ SCENARIO("Subtracting two floating-point numbers exactly",
 SCENARIO("Exact multiplication of two floating-point numbers",
          "[normalized_float][arithmetic][multiplication]")
 {
-    GIVEN("Single precision floats (E = 8, M = 23+1)")
+    GIVEN("Single precision floats (E = 8, M = 23)")
     {
         static constexpr size_t E = 8;
-        static constexpr size_t M = 24;
+        static constexpr size_t M = 23;
 
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")
@@ -505,15 +522,28 @@ SCENARIO("Exact multiplication of two floating-point numbers",
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
             }
         }
+        WHEN("When one operand is a > 1 and the other is 0 < b < 1.")
+        {
+            static constexpr float number_a = 2.75f;
+            static constexpr float number_b = 0.5f;
+            const normalized_float<E, M> a{number_a};
+            const normalized_float<E, M> b{number_b};
+            const normalized_float<E, M> result = mul(a, b);
+
+            THEN("It should be the correct product.")
+            {
+                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
+            }
+        }
     }
 }
 
 SCENARIO("Exact division of two floating-point numbers", "[normalized_float][arithmetic][division]")
 {
-    GIVEN("Single precision floats (E = 8, M = 23+1)")
+    GIVEN("Single precision floats (E = 8, M = 23)")
     {
         static constexpr size_t E = 8;
-        static constexpr size_t M = 24;
+        static constexpr size_t M = 23;
 
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")
@@ -629,3 +659,123 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
         }
     }
 }
+
+SCENARIO("IEEE-754 arithmetic conversion: float, double",
+         "[normalized_float][conversion][ieee-754]")
+{
+    GIVEN("A float number")
+    {
+        WHEN("The number is 0.")
+        {
+            float a = 0.f;
+
+            THEN("The normalized_float should convert back to the original number.")
+            {
+                REQUIRE(static_cast<float>(normalized_float<8, 23>(a)) == a);
+            }
+        }
+    }
+    GIVEN("A double number")
+    {
+        WHEN("The number is 0.")
+        {
+            double a = 0.;
+
+            THEN("The normalized_float should convert back to the original number.")
+            {
+                REQUIRE(static_cast<double>(normalized_float<11, 52>(a)) == a);
+            }
+        }
+    }
+    GIVEN("A random float number")
+    {
+        float a = GENERATE(
+            take(10, random(float(1.0), std::numeric_limits<float>::max())));
+
+        THEN("The normalized_float should convert back to the original number.")
+        {
+            REQUIRE(static_cast<float>(normalized_float<8, 23>(a)) == a);
+        }
+    }
+    GIVEN("A random double number")
+    {
+        double a = GENERATE(
+            take(10, random(double(1.0), std::numeric_limits<double>::max())));
+
+        THEN("The normalized_float should convert back to the original number.")
+        {
+            REQUIRE(static_cast<double>(normalized_float<11, 52>(a)) == a);
+        }
+    }
+}
+
+SCENARIO("IEEE-754 arithmetic comparison: float",
+         "[normalized_float][arithmetic][multiplication][ieee-754]")
+{
+
+    GIVEN("0.5 and 0.25") {
+        float half = 0.5;
+        float quarter = 1.5;
+        float threequarter = -0.875;
+        float zero = 0.0;
+
+        using afloat = normalized_float<8,23>;
+
+        afloat ahalf{half};
+        afloat aquarter{quarter};
+        aquarter.set_exponent(uinteger<8>::zero());
+        afloat athreequarter{threequarter};
+        afloat azero{zero};
+
+        std::cout << half << " " << ahalf << "\t" << quarter << " " << aquarter << "\n";
+        std::cout << to_binary(ahalf) << "\t" << to_binary(aquarter) << "\n";
+        std::cout << to_compute_string(ahalf) << "\t" << to_compute_string(aquarter) << "\n";
+        std::cout << tcs(ahalf) << "\t" << tcs(aquarter)<< "\t" << tcs(athreequarter) << "\t" << tcs(azero) << "\n";
+//        std::cout << ahalf.get_real_exponent() << "\t" << aquarter.unbiased_exponent() << "\n";
+//        std::cout << to_binary(ahalf.get_real_exponent()) << "\t" << to_binary(aquarter.unbiased_exponent()) << "\n";
+
+    }
+//    GIVEN("Two random floating point values")
+//    {
+//        float a = GENERATE(
+//            take(10, random(float(1.0), std::numeric_limits<float>::max())));
+//        float b = GENERATE(
+//            take(10, random(float(1.0), std::numeric_limits<float>::max())));
+//
+//        using afloat = normalized_float<8, 23>;
+//        afloat aa{a};
+//        afloat ab{b};
+//
+//        float f_res_add = a + b;
+//        float f_res_mul = a * b;
+//        float f_res_sub = a - b;
+//        float f_res_div = a / b;
+//
+//        afloat a_res_add = add(aa, ab);
+//        afloat a_res_mul = mul(aa, ab);
+//        afloat a_res_sub = sub(aa, ab);
+//        afloat a_res_div = div(aa, ab);
+//
+//        CHECK(f_res_add == static_cast<float>(a_res_add));
+//        CHECK(f_res_sub == static_cast<float>(a_res_sub));
+//        CHECK(f_res_mul == static_cast<float>(a_res_mul));
+//        REQUIRE(f_res_div == static_cast<float>(a_res_div));
+//    }
+}
+//
+// TEMPLATE_TEST_CASE_SIG("IEEE-754 arithmetic comparision: addition",
+//                       "[normalized_float][arithmetic][addition][ieee-754]",
+//                       ((typename F, typename A), F, A),
+//                       (float, normalized_float<8,23>),
+//                       (double, normalized_float<11,52>)
+//                       )
+//{
+//    std::cout << "works\n";
+////    FloatType a = GENERATE(take(
+////        10, random(std::numeric_limits<FloatType>::min(),
+/// std::numeric_limits<FloatType>::max()))); /    FloatType b = GENERATE(take( /        10,
+/// random(std::numeric_limits<FloatType>::min(), std::numeric_limits<FloatType>::max())));
+////
+////    AarithFloat aa{a};
+////    AarithFloat ab{b};
+//}
