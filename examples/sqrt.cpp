@@ -3,7 +3,6 @@
 #include <cmath>
 
 using namespace aarith;
-using namespace float_operators;
 
 template<size_t E, size_t M>
 auto iterative_square_root(const normalized_float<E, M> a, const unsigned int iterations)
