@@ -237,6 +237,56 @@ SCENARIO("Adding two positive integers", "[integer][arithmetic][addition]")
     //    }
 }
 
+SCENARIO("Multiplying larger integers using the various implementations works", "[integer][arithmetic][multiplication]")
+{
+    GIVEN("Some large integers") {
+        const integer<192> a = integer<192>::from_words(1U, 0U, 0U);
+        const integer<192> b = integer<192>::from_words(1U, 1U, 0U);
+        const integer<192> c = integer<192>{10};
+        const integer<192> one = integer<192>::one();
+        const integer<192> ones = integer<192>::all_ones();
+        const integer<192> zero = integer<192>::zero();
+
+        std::vector<integer<192>> numbers {a,b,c,one,ones,zero};
+
+        WHEN("Multiplying by zero") {
+            THEN("The result is zero") {
+
+                for (const auto & num: numbers) {
+                    REQUIRE(naive_mul(num,zero) == zero);
+                    REQUIRE(inplace_mul(num,zero) == zero);
+                }
+            }
+        }
+
+        WHEN("Multiplying by one") {
+            THEN("The result is unchanged") {
+                for (const auto & num: numbers) {
+                    REQUIRE(naive_mul(num,one) == num);
+                    REQUIRE(inplace_mul(num,one) == num);
+                }
+            }
+        }
+
+        WHEN("Comparing all multiplicatoin variants") {
+            THEN("The results should match") {
+                for (const auto & n: numbers) {
+                    for (const auto & m: numbers) {
+                        const auto res_normal = mul(n,m);
+                        const auto res_naive = naive_mul(n,m);
+                        const auto res_inplace = inplace_mul(n,m);
+
+                        REQUIRE(res_normal == res_naive);
+                        REQUIRE(res_naive == res_inplace);
+                        REQUIRE(res_normal == res_inplace);
+                    }
+                }
+            }
+        }
+
+    }
+}
+
 SCENARIO("Division of signed integers", "[integer][arithmetic][division]")
 {
 
@@ -662,6 +712,8 @@ SCENARIO("MIN/MAX Values behave as expected", "[integer][operation][utility]")
         }
     }
 }
+
+
 
 SCENARIO("Left/right shifting sintegers", "[integer][operation][utility]")
 {
