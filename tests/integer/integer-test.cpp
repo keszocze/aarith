@@ -76,7 +76,7 @@ SCENARIO("Casting sintegers into different width", "[integer]")
         WHEN("The source width <= destination width")
         {
             static constexpr size_t DestinationWidth = 32;
-            auto constexpr result = width_cast<DestinationWidth>(uint);
+            const integer<DestinationWidth> result{width_cast<DestinationWidth>(uint)};
 
             THEN("The result has the destination width")
             {
@@ -90,7 +90,7 @@ SCENARIO("Casting sintegers into different width", "[integer]")
         WHEN("The source width > destination width")
         {
             static constexpr size_t DestinationWidth = 8;
-            auto constexpr result = width_cast<DestinationWidth>(uint);
+            auto const result = width_cast<DestinationWidth>(uint);
 
             THEN("The result has the destination width")
             {
@@ -437,16 +437,11 @@ SCENARIO("Right shift operator works as expected", "[integer][bit-logic]")
                 static constexpr size_t word_width = integer<width>::word_width();
 
                 static constexpr integer<width> a{1U};
-                static constexpr integer<width> expected0 =
-                    integer<width>::from_words(0U, 0U, 0U, 1U);
-                static constexpr integer<width> expected1 =
-                    integer<width>::from_words(0U, 0U, 1U, 0U);
-                static constexpr integer<width> expected2 =
-                    integer<width>::from_words(0U, 1U, 0U, 0U);
-                static constexpr integer<width> expected3 =
-                    integer<width>::from_words(1U, 0U, 0U, 0U);
-                static constexpr integer<width> expected4 =
-                    integer<width>::from_words(0U, 0U, 0U, 0U);
+                static const integer<width> expected0 = integer<width>::from_words(0U, 0U, 0U, 1U);
+                static const integer<width> expected1 = integer<width>::from_words(0U, 0U, 1U, 0U);
+                static const integer<width> expected2 = integer<width>::from_words(0U, 1U, 0U, 0U);
+                static const integer<width> expected3 = integer<width>::from_words(1U, 0U, 0U, 0U);
+                static const integer<width> expected4 = integer<width>::from_words(0U, 0U, 0U, 0U);
 
                 std::vector<integer<width>> expecteds{expected0, expected1, expected2, expected3,
                                                       expected4};

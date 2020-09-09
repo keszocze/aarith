@@ -50,11 +50,11 @@ SCENARIO("Comparing two uintegers", "[uinteger][utility]")
         WHEN("N > word_width")
         {
             constexpr size_t TestWidth = 80;
-            constexpr uinteger<TestWidth> const a{7, 0};
-            constexpr uinteger<TestWidth> const b{23, 0};
+            const uinteger<TestWidth> a{7, 0};
+            const uinteger<TestWidth> b{23, 0};
 
-            constexpr uinteger<TestWidth> const c{7, 0};
-            constexpr uinteger<TestWidth> const d{0, 23};
+            const uinteger<TestWidth> c{7, 0};
+            const uinteger<TestWidth> d{0, 23};
 
             THEN("operator< returns true")
             {

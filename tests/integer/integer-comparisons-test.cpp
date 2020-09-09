@@ -180,6 +180,7 @@ SCENARIO("Investigating the comparison of max and min values", "[integer][compar
         using T = integer<8>;
         T min = T::min();
         T max = T::max();
+
         T min_from_limits = std::numeric_limits<T>::min();
         T max_from_limits = std::numeric_limits<T>::max();
 

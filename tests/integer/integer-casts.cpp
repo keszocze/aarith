@@ -151,7 +151,7 @@ SCENARIO("Casting unsigned integers to uint8_t", "[integer][unsigned][conversion
                 uinteger<64> d{val};
                 uinteger<150> e{val};
 
-                CHECK_THROWS_AS(narrow_cast<uint8_t>(b),std::domain_error);
+                CHECK_THROWS_AS(narrow_cast<uint8_t>(b), std::domain_error);
                 CHECK_THROWS_AS(narrow_cast<uint8_t>(c), std::domain_error);
                 CHECK_THROWS_AS(narrow_cast<uint8_t>(d), std::domain_error);
                 CHECK_THROWS_AS(narrow_cast<uint8_t>(e), std::domain_error);

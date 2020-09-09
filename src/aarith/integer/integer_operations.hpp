@@ -128,10 +128,10 @@ template <typename I>[[nodiscard]] I constexpr add(const I& a, const I& b)
  * the partial products everywhere where the first multiplicand has a 1 bit. The simplicity, of
  * course, comes at the cost of performance.
  *
- * @tparam W The bit width of the first multiplicant
- * @tparam V The bit width of the second multiplicant
- * @param a First multiplicant
- * @param b Second multiplicant
+ * @tparam W The bit width of the first multiplicand
+ * @tparam V The bit width of the second multiplicand
+ * @param a First multiplicand
+ * @param b Second multiplicand
  * @return Product of a and b
  */
 template <std::size_t W, std::size_t V, typename WordType>
@@ -155,14 +155,12 @@ template <std::size_t W, std::size_t V, typename WordType>
         const auto leading_zeroes = V - count_leading_zeroes(b);
         uinteger<res_width, WordType> a_ = width_cast<res_width>(a);
 
-        auto bit_index = 0U;
-        while (bit_index < leading_zeroes)
+        for (auto bit_index = 0U; bit_index < leading_zeroes; ++bit_index)
         {
             if (b.bit(bit_index))
             {
                 result = add(result, a_ << bit_index);
             }
-            ++bit_index;
         }
     }
     return result;
@@ -177,8 +175,8 @@ template <std::size_t W, std::size_t V, typename WordType>
  * The result is then cropped to fit the initial bit width
  *
  * @tparam I The integer type to operate on
- * @param a First multiplicant
- * @param b Second multiplicant
+ * @param a First multiplicand
+ * @param b Second multiplicand
  * @return Product of a and b
  */
 template <typename I>[[nodiscard]] constexpr I mul(const I& a, const I& b)
@@ -186,7 +184,6 @@ template <typename I>[[nodiscard]] constexpr I mul(const I& a, const I& b)
     return width_cast<I::width()>(expanding_mul(a, b));
 }
 
-// TODO natürlich auch für signed integer zulassen
 
 /**
  * @brief Exponentiation function
@@ -271,6 +268,23 @@ IntegerType pow(const IntegerType& base, const IntegerType& exponent)
 }
 
 /**
+ * @brief Multiplies two unsigned integers using the Karazuba algorithm
+ *
+ * This implements the karazuba multiplication algorithm (divide and conquer).
+ *
+ * @tparam W The bit width of the multiplicants
+ * @param a First multiplicant
+ * @param b Second multiplicant
+ * @return Product of a and b
+ */
+template <std::size_t W, typename WordType>
+[[nodiscard]] constexpr uinteger<W, WordType> karazuba(const uinteger<W, WordType>& a,
+                                                       const uinteger<W, WordType>& b)
+{
+    return width_cast<W>(expanding_karazuba(a, b));
+}
+
+/**
  * @brief Multiplies two unsigned integers using the Karazuba algorithm expanding the bit width so
  * that the result fits.
  *
@@ -283,8 +297,8 @@ IntegerType pow(const IntegerType& base, const IntegerType& exponent)
  * @return Product of a and b
  */
 template <std::size_t W, std::size_t V, typename WordType>
-[[nodiscard]] uinteger<W + V, WordType> expanding_karazuba(const uinteger<W, WordType>& a,
-                                                           const uinteger<V, WordType>& b)
+[[nodiscard]] constexpr uinteger<W + V, WordType> expanding_karazuba(const uinteger<W, WordType>& a,
+                                                                     const uinteger<V, WordType>& b)
 {
 
     constexpr std::size_t res_width = W + V;
@@ -298,7 +312,7 @@ template <std::size_t W, std::size_t V, typename WordType>
     {
         if (a.is_zero() || b.is_zero())
         {
-            return uinteger<res_width, WordType>(0U);
+            return uinteger<res_width, WordType>::zero();
         }
 
         // floor to the next value with power of 2
@@ -459,6 +473,39 @@ template <typename I>[[nodiscard]] constexpr auto div(const I& numerator, const 
 }
 
 /**
+ * @brief Computes the absolute value of a given signed integer.
+ *
+ * @warn There is a potential loss of precision as abs(integer::min) > integer::max
+ *
+ * @tparam Width The width of the signed integer
+ * @param n The signed inter to be "absolute valued"
+ * @return The absolute value of the signed integer
+ */
+template <size_t Width, typename WordType>
+[[nodiscard]] constexpr auto abs(const integer<Width, WordType>& n) -> integer<Width, WordType>
+{
+    return n.is_negative() ? -n : n;
+}
+
+/**
+ * @brief Computes the absolute value of a given signed integer.
+ *
+ * This method returns an unsigned integer. This means that the absolute value
+ * will fit and no overflow will happen.
+ *
+ * @tparam Width The width of the signed integer
+ * @param n The signed inter to be "absolute valued"
+ * @return The absolute value of the signed integer
+ */
+template <size_t Width, typename WordType>
+[[nodiscard]] constexpr auto expanding_abs(const integer<Width, WordType>& n)
+    -> uinteger<Width, WordType>
+{
+    uinteger<Width, WordType> abs = n.is_negative() ? -n : n;
+    return abs;
+}
+
+/**
  * @brief Adds two signed integers of, possibly, different bit widths.
  *
  * This is an implementation using a more functional style of programming. It is not particularly
@@ -532,6 +579,81 @@ template <typename I>
  * @return The shifted integer
  */
 template <size_t Width, typename WordType>
+auto constexpr operator>>=(integer<Width, WordType>& lhs, const size_t rhs)
+    -> integer<Width, WordType>
+{
+    if (rhs >= Width)
+    {
+        if (lhs.is_negative())
+        {
+            const auto max = std::numeric_limits<WordType>::max();
+            lhs.fill(max);
+            return lhs;
+        }
+        else
+        {
+            lhs.fill(WordType{0});
+            return lhs;
+        }
+    }
+
+    if (rhs == 0 || lhs.is_zero())
+    {
+        return lhs;
+    }
+
+    const auto skip_words = rhs / lhs.word_width();
+    const auto shift_word_right = rhs - skip_words * lhs.word_width();
+    const auto shift_word_left = lhs.word_width() - shift_word_right;
+
+    using word_type = typename integer<Width, WordType>::word_type;
+
+    for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
+    {
+        word_type new_word = lhs.word(counter) >> shift_word_right;
+        if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
+        {
+            new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
+        }
+
+        lhs.set_word(counter - skip_words, new_word);
+    }
+
+    if (skip_words > 0)
+    {
+        word_type new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
+        lhs.set_word(lhs.word_count() - skip_words - 1, new_word);
+
+        for (size_t i = lhs.word_count() - skip_words; i < lhs.word_count(); ++i)
+        {
+            const auto fill_word =
+                lhs.is_negative() ? std::numeric_limits<WordType>::max() : WordType{0};
+            lhs.set_word(i, fill_word);
+        }
+    }
+
+    if (lhs.is_negative())
+    {
+        for (size_t i = (Width - 1); i >= (Width - rhs); --i)
+        {
+            lhs.set_bit(i);
+        }
+    }
+
+    return lhs;
+}
+
+/**
+ * @brief Arithmetic right-shift operator
+ *
+ * This shift preserves the signedness of the integer.
+ *
+ * @tparam Width The width of the signed integer
+ * @param lhs The integer to be shifted
+ * @param rhs The number of bits to be shifted
+ * @return The shifted integer
+ */
+template <size_t Width, typename WordType>
 auto constexpr operator>>(const integer<Width, WordType>& lhs, const size_t rhs)
     -> integer<Width, WordType>
 {
@@ -590,6 +712,50 @@ auto constexpr operator>>(const integer<Width, WordType>& lhs, const size_t rhs)
 }
 
 /**
+ * @brief Naively multiplies two signed integers.
+ *
+ * @tparam W The bit width of the first multiplicand
+ * @tparam V The bit width of the second multiplicand
+ * @param a First multiplicand
+ * @param b Second multiplicand
+ * @return Product of a and b
+ */
+template <size_t W, size_t V, typename WordType>
+[[nodiscard]] constexpr auto naive_expanding_mul(const integer<W, WordType>& m,
+                                                 const integer<V, WordType>& r)
+{
+    const bool m_neg = m.is_negative();
+    const bool r_neg = r.is_negative();
+
+    const uinteger<W> m_ = m_neg ? expanding_abs(m) : uinteger<W>{m};
+    const uinteger<V> r_ = r_neg ? expanding_abs(r) : uinteger<V>{r};
+
+    const integer<W + V + 1> result = expanding_mul(m_, r_);
+
+    return m_neg ^ r_neg ? -result : result;
+}
+
+/**
+ * @brief Naively multiplies two integers.
+ *
+ * @note No Type conversion is performed. If the bit widths do not match, the code will not
+ * compile! Use @see expanding_mul for that.
+ *
+ * The result is then cropped to fit the initial bit width
+ *
+ * @tparam I The integer type to operate on
+ * @param a First multiplicand
+ * @param b Second multiplicand
+ * @return Product of a and b
+ */
+template <size_t W, typename WordType>
+[[nodiscard]] constexpr integer<W, WordType> naive_mul(const integer<W, WordType>& a,
+                                                       const integer<W, WordType>& b)
+{
+    return width_cast<W>(naive_expanding_mul(a, b));
+}
+
+/**
  * @brief Multiplies two signed integers.
  *
  *
@@ -609,15 +775,22 @@ template <size_t W, size_t V, typename WordType>
     -> integer<V + W, WordType>
 {
 
+    if (m.is_zero() || r.is_zero())
+    {
+        return integer<V + W, WordType>::zero();
+    }
+
     constexpr size_t K = W + V + 2;
 
-    integer<K, WordType> A{width_cast<W + 1>(m)};
-    integer<K, WordType> S = -A;
+    integer<W + 1, WordType> expanded_m = width_cast<W + 1>(m);
+
+    uinteger<K, WordType> A{static_cast<word_array<W + 1, WordType>>(expanded_m)};
+    uinteger<K, WordType> S{static_cast<word_array<W, WordType>>(-m)};
 
     A = A << V + 1;
     S = S << V + 1;
 
-    integer<K, WordType> P{r};
+    uinteger<K, WordType> P{static_cast<word_array<W, WordType>>(r)};
     P = P << 1;
 
     for (size_t i = 0; i < V; ++i)
@@ -628,50 +801,102 @@ template <size_t W, size_t V, typename WordType>
 
         if (snd_last_bit && !last_bit)
         {
-            P = add(P, S);
+            P = expanding_add(P, S);
         }
         if (!snd_last_bit && last_bit)
         {
-            P = add(P, A);
+            P = expanding_add(P, A);
         }
 
         P = P >> 1;
     }
 
-    return width_cast<W + V>(P >> 1);
+    auto result = width_cast<W + V>(P >> 1);
+
+    return integer<W + V, WordType>{result};
 }
 
 /**
- * @brief Computes the absolute value of a given signed integer.
+ * @brief Multiplies two signed integers.
  *
  * @warn There is a potential loss of precision as abs(integer::min) > integer::max
  *
- * @tparam Width The width of the signed integer
- * @param n The signed inter to be "absolute valued"
- * @return The absolute value of the signed integer
+ * This implements the Booth multiplication algorithm with extension to correctly handle the
+ * most negative number. See https://en.wikipedia.org/wiki/Booth%27s_multiplication_algorithm
+ * for details.
+ *
+ * @tparam W The bit width of the first multiplicand
+ * @tparam V The bit width of the second multiplicand
+ * @param a First multiplicand
+ * @param b Second multiplicand
+ * @return Product of a and b
  */
-template <size_t Width, typename WordType>
-[[nodiscard]] constexpr auto abs(const integer<Width, WordType>& n) -> integer<Width, WordType>
+template <size_t W, size_t V, typename WordType>
+[[nodiscard]] constexpr auto inplace_expanding_mul(const integer<W, WordType>& m,
+                                                   const integer<V, WordType>& r)
+    -> integer<V + W, WordType>
 {
-    return n.is_negative() ? -n : n;
+
+    if (m.is_zero() || r.is_zero())
+    {
+        return integer<V + W, WordType>::zero();
+    }
+
+    constexpr size_t K = W + V + 2;
+
+    integer<W + 1, WordType> expanded_m = width_cast<W + 1>(m);
+
+    uinteger<K, WordType> A{static_cast<word_array<W + 1, WordType>>(expanded_m)};
+    uinteger<K, WordType> S{static_cast<word_array<W, WordType>>(-m)};
+
+    A <<= V + 1;
+    S <<= V + 1;
+
+    uinteger<K, WordType> P{static_cast<word_array<W, WordType>>(r)};
+    P = P << 1;
+
+    for (size_t i = 0; i < V; ++i)
+    {
+
+        bool last_bit = P.bit(0);
+        bool snd_last_bit = P.bit(1);
+
+        if (snd_last_bit && !last_bit)
+        {
+            P = expanding_add(P, S);
+        }
+        if (!snd_last_bit && last_bit)
+        {
+            P = expanding_add(P, A);
+        }
+
+        P >>= 1;
+    }
+
+    P >>= 1;
+    auto result = width_cast<W + V>(P);
+
+    return integer<W + V, WordType>{result};
 }
 
 /**
- * @brief Computes the absolute value of a given signed integer.
+ * @brief Multiplies two integers.
  *
- * This method returns an unsigned integer. This means that the absolute value
- * will fit and no overflow will happen.
+ * @note No Type conversion is performed. If the bit widths do not match, the code will not
+ * compile! Use @see expanding_mul for that.
  *
- * @tparam Width The width of the signed integer
- * @param n The signed inter to be "absolute valued"
- * @return The absolute value of the signed integer
+ * The result is then cropped to fit the initial bit width
+ *
+ * @tparam I The integer type to operate on
+ * @param a First multiplicand
+ * @param b Second multiplicand
+ * @return Product of a and b
  */
-template <size_t Width, typename WordType>
-[[nodiscard]] constexpr auto expanding_abs(const integer<Width, WordType>& n)
-    -> uinteger<Width, WordType>
+template <size_t W, typename WordType>
+[[nodiscard]] constexpr integer<W, WordType> inplace_mul(const integer<W, WordType>& a,
+                                                         const integer<W, WordType>& b)
 {
-    uinteger<Width, WordType> abs = n.is_negative() ? -n : n;
-    return abs;
+    return width_cast<W>(inplace_expanding_mul(a, b));
 }
 
 /**
@@ -697,7 +922,7 @@ constexpr auto operator-(const integer<W, WordType>& n) -> integer<W, WordType>
  * @param n The integer
  * @return The sign of the integer
  */
-template <size_t W>[[nodiscard]] int8_t signum(integer<W> n)
+template <size_t W>[[nodiscard]] constexpr int8_t signum(integer<W> n)
 {
     if (n.is_negative())
     {
@@ -719,7 +944,7 @@ template <size_t W>[[nodiscard]] int8_t signum(integer<W> n)
  * @param n The integer
  * @return The sign of the integer
  */
-template <size_t W>[[nodiscard]] int8_t signum(uinteger<W> n)
+template <size_t W>[[nodiscard]] constexpr int8_t signum(uinteger<W> n)
 {
     return n.is_zero() ? 0 : 1;
 }
@@ -789,6 +1014,11 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
     integer<W> Q_cast = width_cast<W>(Q);
     integer<W> remainder_cast = width_cast<W>(remainder_);
 
+    if (numerator.is_negative())
+    {
+        remainder_cast = -remainder_cast;
+    }
+
     return std::make_pair(Q_cast, remainder_cast);
 }
 
@@ -799,7 +1029,8 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
  * @param b Second integer
  * @return The distance between the two integers
  */
-template <typename Integer>[[nodiscard]] Integer distance(const Integer& a, const Integer& b)
+template <typename Integer>
+[[nodiscard]] constexpr Integer distance(const Integer& a, const Integer& b)
 {
     return (a <= b) ? sub(b, a) : sub(a, b);
 }

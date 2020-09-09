@@ -222,7 +222,7 @@ template <class Integer>
 template <size_t Width, typename WordType>
 auto approx_uint_bitmasking_mul(const uinteger<Width, WordType>& opd1,
                                 const uinteger<Width, WordType>& opd2, const size_t bits)
-    -> uinteger<2 * Width, WordType>
+-> uinteger<2 * Width, WordType>
 {
     constexpr auto product_width = 2 * Width;
 

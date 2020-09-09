@@ -285,7 +285,7 @@ public:
 
     /**
      * @brief Assigns the given value value to all elements in the container.
-     * @param valuethe value to assign to the elements
+     * @param value the value to assign to the elements
      */
     constexpr void fill(const word_type& value)
     {
@@ -309,7 +309,7 @@ public:
     {
         word_array<Width, WordType> n;
         word_type ones = ~(static_cast<word_type>(0U));
-        for (size_t i = 0; i < n.word_count(); ++i)
+        for (size_t i = 0; i < word_array::word_count(); ++i)
         {
             n.set_word(i, ones);
         }

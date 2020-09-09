@@ -53,7 +53,7 @@ public:
 
     template <class... Args>
     constexpr uinteger(WordType fst, Args... args)
-        : word_array<Width, WordType>(fst, args...)
+        : word_array<Width>(fst, args...)
     {
     }
 
@@ -280,7 +280,7 @@ public:
 
     template <size_t V>
     constexpr integer<Width, WordType>(const word_array<V, WordType>& other)
-        : word_array<Width>(other)
+        : word_array<Width>(width_cast<Width>(other))
     {
     }
 
