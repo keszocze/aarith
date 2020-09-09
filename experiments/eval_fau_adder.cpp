@@ -1,5 +1,5 @@
 #include <aarith/integer.hpp>
-#include <aarith/operations/approx_operations.hpp>
+#include <aarith/integer/approx_operations.hpp>
 #include <sstream>
 
 #include "../tests/integer/fau_adder.hpp"
