@@ -1,6 +1,6 @@
 variables:
     GIT_DEPTH: 0
-    GIT_STRATEGY: fetch
+    GIT_STRATEGY: recursive
 
 stages:
     - compile
