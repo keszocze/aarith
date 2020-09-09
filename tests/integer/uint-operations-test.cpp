@@ -583,13 +583,13 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication",
 {
     GIVEN("Two uinteger<N> a and b with N <= 32")
     {
-        using uint = uinteger<32>;
+        using auint = uinteger<32>;
 
         auto au = 0xCCCCCCCC;
         auto bu = 0xAAAAAAAA;
 
-        auto a = uint(au);
-        auto b = uint(bu);
+        auto a = auint(au);
+        auto b = auint(bu);
 
         auto res = expanding_karazuba(a, b);
         auto ref = expanding_mul(a, b);

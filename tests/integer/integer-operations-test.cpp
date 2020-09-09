@@ -446,6 +446,134 @@ SCENARIO("Multiplying signed integers", "[integer][arithmetic][multiplication]")
     }
 }
 
+SCENARIO("Multiplying two integers exactly", "[integer][arithmetic][multiplication]")
+{
+
+    GIVEN("Two integer<N> a and b with N <= 32")
+    {
+
+        int32_t val_a =
+            GENERATE(0, 1, 56567, 23, static_cast<int32_t>(-4366), static_cast<int32_t>(-15654), std::numeric_limits<int32_t>::min(), std::numeric_limits<int32_t>::max());
+        int32_t val_b = GENERATE(0, 1, 56567, 23, 234, 76856, 2342353456,
+                                  static_cast<int32_t>(-4366), static_cast<int32_t>(-1457));
+
+        const integer<32> a = integer<32>::from_words(val_a);
+        const integer<32> b = integer<32>::from_words(val_b);
+
+        THEN("Multiplication should be commutative")
+        {
+            CHECK(mul(a, b) == mul(b, a));
+        }
+
+        THEN("Multiplication by 1 should not change the other multiplicand")
+        {
+            const integer<32> one{1U};
+            CHECK(mul(a, one) == a);
+            CHECK(mul(one, a) == a);
+            CHECK(mul(b, one) == b);
+            CHECK(mul(one, b) == b);
+        }
+        THEN("Multiplication by 0 should result in 0")
+        {
+            const integer<32> zero{0U};
+            CHECK(mul(a, zero) == zero);
+            CHECK(mul(zero, a) == zero);
+            CHECK(mul(b, zero) == zero);
+            CHECK(mul(zero, b) == zero);
+        }
+
+        THEN("Multiplication by -1 should negate the sign")
+        {
+            const integer<32> minus_one=integer<32>::minus_one();
+            CHECK(mul(a,minus_one).is_negative() == !a.is_negative());
+            CHECK(mul(minus_one,a).is_negative() == !a.is_negative());
+            CHECK(mul(a,minus_one) == -a);
+        }
+    }
+
+    GIVEN("Two integer<N> a and b to be multiplied")
+    {
+        constexpr int64_t val = (static_cast<int64_t>(1) << 35);
+        integer<128> constexpr a = integer<128>::from_words(1, val);
+        integer<128> constexpr c = integer<128>::from_words(13435, 345897);
+        integer<128> constexpr d =
+            integer<128>::from_words(static_cast<typename integer<128>::word_type>(-1),
+                                      static_cast<typename integer<128>::word_type>(-1));
+        integer<128> constexpr zero = integer<128>::from_words(0, 0);
+        integer<128> constexpr one = integer<128>::from_words(0, 1);
+
+        const std::vector<integer<128>> numbers{a, c, d, one, zero};
+
+        THEN("The operation should be commutative")
+        {
+            for (const integer<128>& num_a : numbers)
+            {
+                for (const integer<128>& num_b : numbers)
+                {
+                    CHECK(mul(num_a, num_b) == mul(num_b, num_a));
+                }
+            }
+        }
+
+        WHEN("One multiplicant is zero")
+        {
+
+            THEN("The result should be zero")
+            {
+                for (const integer<128>& num : numbers)
+                {
+                    CHECK(mul(num, zero) == zero);
+                    CHECK(mul(zero, num) == zero);
+                }
+            }
+        }
+        WHEN("One multiplicant is one")
+        {
+            THEN("Multiplication does not do much")
+            {
+
+                for (const integer<128>& num : numbers)
+                {
+                    CHECK(mul(num, one) == num);
+                    CHECK(mul(one, num) == num);
+                }
+            }
+        }
+        WHEN("Both multiplicands are maximum")
+        {
+            THEN("The product is 1 for the truncating multiplication")
+            {
+                REQUIRE(mul(d, d) == one);
+            }
+        }
+    }
+}
+
+SCENARIO("Multiplication of numbers fitting in a uint64_t", "[integer][arithmetic][multiplication]")
+{
+    GIVEN("A random number a")
+    {
+        int64_t val_a = GENERATE(
+            take(100, random(std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max())));
+        integer<64> a{val_a};
+        AND_GIVEN("A random number b")
+        {
+            int64_t val_b = GENERATE(
+                take(100, random(std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max())));
+            integer<64> b{val_b};
+
+            THEN("The multiplication should match its uint64_t counterpart")
+            {
+                int64_t expected = val_a * val_b;
+                integer<64> result = mul(a, b);
+
+                CHECK(expected == result.word(0));
+                REQUIRE(integer<64>{expected} == result);
+            }
+        }
+    }
+}
+
 SCENARIO("Absolute value computation", "[integer][operations][utility]")
 {
     GIVEN("The smallest possible value")
