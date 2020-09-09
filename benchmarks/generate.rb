@@ -9,20 +9,24 @@ types = internal_types + aarith_types
 operations=["Add", "Sub", "Mul", "Div"]
 special_ops=["NaiveMul", "InPlaceMul"]
 
-#types.each { |t|
-aarith_types.each {|t|
-    #operations.each { |op|
-    ["Mul"].each { |op|
-        puts "benchmark::RegisterBenchmark(\"#{op}<#{t}>\", &generic_aarithmetic<#{op}<#{t}>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();"
+def mkname(t)
+        return t.sub(/_/, '').sub('::', '').sub('>', '').sub('<', '')
+end
+
+types.each { |t| mkname(t) }
+
+types.each { |t|
+    operations.each { |op|
+        puts "benchmark::RegisterBenchmark(\"#{op}#{mkname(t)}\", &generic_aarithmetic<#{op}<#{t}>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();"
     }
 }
 
 aarith_signed_types.each { |t|
     special_ops.each { |op|
-        puts "benchmark::RegisterBenchmark(\"#{op}<#{t}>\", &generic_aarithmetic<#{op}<#{t}>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();"
+        puts "benchmark::RegisterBenchmark(\"#{op}#{mkname(t)}\", &generic_aarithmetic<#{op}<#{t}>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();"
     }
 }
 
-types.each { |t|
-# puts "benchmark::RegisterBenchmark(\"Scalar Product<#{t}>\", &scalar_product<#{t}>) ->Range(1, std::numeric_limits<#{t}>::max()) ->Repetitions(5)->DisplayAggregatesOnly();"
-}
+#types.each { |t|
+#    puts "benchmark::RegisterBenchmark(\"SP#{mkname(t)}\", &scalar_product<#{t}>) ->Range(1, std::numeric_limits<#{t}>::max()) ->Repetitions(5)->DisplayAggregatesOnly();"
+#}

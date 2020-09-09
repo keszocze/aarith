@@ -172,28 +172,72 @@ int main(int argc, char** argv)
 
     // the code below has been generated using a ruby script...
 
-
-    benchmark::RegisterBenchmark("Mul<aarith::integer<8>>", &generic_aarithmetic<Mul<aarith::integer<8>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
-benchmark::RegisterBenchmark("Mul<aarith::integer<10>>", &generic_aarithmetic<Mul<aarith::integer<10>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
-benchmark::RegisterBenchmark("Mul<aarith::integer<12>>", &generic_aarithmetic<Mul<aarith::integer<12>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
-benchmark::RegisterBenchmark("Mul<aarith::integer<14>>", &generic_aarithmetic<Mul<aarith::integer<14>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
-benchmark::RegisterBenchmark("Mul<aarith::integer<16>>", &generic_aarithmetic<Mul<aarith::integer<16>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
-benchmark::RegisterBenchmark("Mul<aarith::uinteger<8>>", &generic_aarithmetic<Mul<aarith::uinteger<8>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
-benchmark::RegisterBenchmark("Mul<aarith::uinteger<10>>", &generic_aarithmetic<Mul<aarith::uinteger<10>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
-benchmark::RegisterBenchmark("Mul<aarith::uinteger<12>>", &generic_aarithmetic<Mul<aarith::uinteger<12>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
-benchmark::RegisterBenchmark("Mul<aarith::uinteger<14>>", &generic_aarithmetic<Mul<aarith::uinteger<14>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
-benchmark::RegisterBenchmark("Mul<aarith::uinteger<16>>", &generic_aarithmetic<Mul<aarith::uinteger<16>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
-benchmark::RegisterBenchmark("NaiveMul<aarith::integer<8>>", &generic_aarithmetic<NaiveMul<aarith::integer<8>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
-benchmark::RegisterBenchmark("InPlaceMul<aarith::integer<8>>", &generic_aarithmetic<InPlaceMul<aarith::integer<8>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
-benchmark::RegisterBenchmark("NaiveMul<aarith::integer<10>>", &generic_aarithmetic<NaiveMul<aarith::integer<10>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
-benchmark::RegisterBenchmark("InPlaceMul<aarith::integer<10>>", &generic_aarithmetic<InPlaceMul<aarith::integer<10>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
-benchmark::RegisterBenchmark("NaiveMul<aarith::integer<12>>", &generic_aarithmetic<NaiveMul<aarith::integer<12>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
-benchmark::RegisterBenchmark("InPlaceMul<aarith::integer<12>>", &generic_aarithmetic<InPlaceMul<aarith::integer<12>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
-benchmark::RegisterBenchmark("NaiveMul<aarith::integer<14>>", &generic_aarithmetic<NaiveMul<aarith::integer<14>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
-benchmark::RegisterBenchmark("InPlaceMul<aarith::integer<14>>", &generic_aarithmetic<InPlaceMul<aarith::integer<14>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
-benchmark::RegisterBenchmark("NaiveMul<aarith::integer<16>>", &generic_aarithmetic<NaiveMul<aarith::integer<16>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
-benchmark::RegisterBenchmark("InPlaceMul<aarith::integer<16>>", &generic_aarithmetic<InPlaceMul<aarith::integer<16>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
-
+benchmark::RegisterBenchmark("Adduint8t", &generic_aarithmetic<Add<uint8_t>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Subuint8t", &generic_aarithmetic<Sub<uint8_t>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Muluint8t", &generic_aarithmetic<Mul<uint8_t>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Divuint8t", &generic_aarithmetic<Div<uint8_t>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Addint8t", &generic_aarithmetic<Add<int8_t>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Subint8t", &generic_aarithmetic<Sub<int8_t>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Mulint8t", &generic_aarithmetic<Mul<int8_t>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Divint8t", &generic_aarithmetic<Div<int8_t>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Adduint16t", &generic_aarithmetic<Add<uint16_t>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Subuint16t", &generic_aarithmetic<Sub<uint16_t>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Muluint16t", &generic_aarithmetic<Mul<uint16_t>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Divuint16t", &generic_aarithmetic<Div<uint16_t>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Addint16t", &generic_aarithmetic<Add<int16_t>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Subint16t", &generic_aarithmetic<Sub<int16_t>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Mulint16t", &generic_aarithmetic<Mul<int16_t>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Divint16t", &generic_aarithmetic<Div<int16_t>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Addaarithinteger8", &generic_aarithmetic<Add<aarith::integer<8>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Subaarithinteger8", &generic_aarithmetic<Sub<aarith::integer<8>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Mulaarithinteger8", &generic_aarithmetic<Mul<aarith::integer<8>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Divaarithinteger8", &generic_aarithmetic<Div<aarith::integer<8>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Addaarithinteger10", &generic_aarithmetic<Add<aarith::integer<10>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Subaarithinteger10", &generic_aarithmetic<Sub<aarith::integer<10>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Mulaarithinteger10", &generic_aarithmetic<Mul<aarith::integer<10>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Divaarithinteger10", &generic_aarithmetic<Div<aarith::integer<10>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Addaarithinteger12", &generic_aarithmetic<Add<aarith::integer<12>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Subaarithinteger12", &generic_aarithmetic<Sub<aarith::integer<12>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Mulaarithinteger12", &generic_aarithmetic<Mul<aarith::integer<12>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Divaarithinteger12", &generic_aarithmetic<Div<aarith::integer<12>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Addaarithinteger14", &generic_aarithmetic<Add<aarith::integer<14>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Subaarithinteger14", &generic_aarithmetic<Sub<aarith::integer<14>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Mulaarithinteger14", &generic_aarithmetic<Mul<aarith::integer<14>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Divaarithinteger14", &generic_aarithmetic<Div<aarith::integer<14>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Addaarithinteger16", &generic_aarithmetic<Add<aarith::integer<16>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Subaarithinteger16", &generic_aarithmetic<Sub<aarith::integer<16>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Mulaarithinteger16", &generic_aarithmetic<Mul<aarith::integer<16>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Divaarithinteger16", &generic_aarithmetic<Div<aarith::integer<16>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Addaarithuinteger8", &generic_aarithmetic<Add<aarith::uinteger<8>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Subaarithuinteger8", &generic_aarithmetic<Sub<aarith::uinteger<8>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Mulaarithuinteger8", &generic_aarithmetic<Mul<aarith::uinteger<8>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Divaarithuinteger8", &generic_aarithmetic<Div<aarith::uinteger<8>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Addaarithuinteger10", &generic_aarithmetic<Add<aarith::uinteger<10>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Subaarithuinteger10", &generic_aarithmetic<Sub<aarith::uinteger<10>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Mulaarithuinteger10", &generic_aarithmetic<Mul<aarith::uinteger<10>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Divaarithuinteger10", &generic_aarithmetic<Div<aarith::uinteger<10>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Addaarithuinteger12", &generic_aarithmetic<Add<aarith::uinteger<12>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Subaarithuinteger12", &generic_aarithmetic<Sub<aarith::uinteger<12>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Mulaarithuinteger12", &generic_aarithmetic<Mul<aarith::uinteger<12>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Divaarithuinteger12", &generic_aarithmetic<Div<aarith::uinteger<12>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Addaarithuinteger14", &generic_aarithmetic<Add<aarith::uinteger<14>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Subaarithuinteger14", &generic_aarithmetic<Sub<aarith::uinteger<14>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Mulaarithuinteger14", &generic_aarithmetic<Mul<aarith::uinteger<14>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Divaarithuinteger14", &generic_aarithmetic<Div<aarith::uinteger<14>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Addaarithuinteger16", &generic_aarithmetic<Add<aarith::uinteger<16>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Subaarithuinteger16", &generic_aarithmetic<Sub<aarith::uinteger<16>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Mulaarithuinteger16", &generic_aarithmetic<Mul<aarith::uinteger<16>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("Divaarithuinteger16", &generic_aarithmetic<Div<aarith::uinteger<16>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("NaiveMulaarithinteger8", &generic_aarithmetic<NaiveMul<aarith::integer<8>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("InPlaceMulaarithinteger8", &generic_aarithmetic<InPlaceMul<aarith::integer<8>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("NaiveMulaarithinteger10", &generic_aarithmetic<NaiveMul<aarith::integer<10>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("InPlaceMulaarithinteger10", &generic_aarithmetic<InPlaceMul<aarith::integer<10>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("NaiveMulaarithinteger12", &generic_aarithmetic<NaiveMul<aarith::integer<12>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("InPlaceMulaarithinteger12", &generic_aarithmetic<InPlaceMul<aarith::integer<12>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("NaiveMulaarithinteger14", &generic_aarithmetic<NaiveMul<aarith::integer<14>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("InPlaceMulaarithinteger14", &generic_aarithmetic<InPlaceMul<aarith::integer<14>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("NaiveMulaarithinteger16", &generic_aarithmetic<NaiveMul<aarith::integer<16>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
+benchmark::RegisterBenchmark("InPlaceMulaarithinteger16", &generic_aarithmetic<InPlaceMul<aarith::integer<16>>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();
 
 
 
