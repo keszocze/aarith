@@ -1,6 +1,7 @@
 variables:
     GIT_DEPTH: 0
     GIT_STRATEGY: recursive
+    GIT_SUBMODULE_STRATEGY: recursive
 
 stages:
     - compile
