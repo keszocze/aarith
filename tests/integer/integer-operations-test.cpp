@@ -1,4 +1,4 @@
-#include <aarith/integer_no_operators.hpp>
+#include <aarith/integer.hpp>
 #include <catch.hpp>
 
 using namespace aarith;
@@ -453,9 +453,10 @@ SCENARIO("Multiplying two integers exactly", "[integer][arithmetic][multiplicati
     {
 
         int32_t val_a =
-            GENERATE(0, 1, 56567, 23, static_cast<int32_t>(-4366), static_cast<int32_t>(-15654), std::numeric_limits<int32_t>::min(), std::numeric_limits<int32_t>::max());
+            GENERATE(0, 1, 56567, 23, static_cast<int32_t>(-4366), static_cast<int32_t>(-15654),
+                     std::numeric_limits<int32_t>::min(), std::numeric_limits<int32_t>::max());
         int32_t val_b = GENERATE(0, 1, 56567, 23, 234, 76856, 2342353456,
-                                  static_cast<int32_t>(-4366), static_cast<int32_t>(-1457));
+                                 static_cast<int32_t>(-4366), static_cast<int32_t>(-1457));
 
         const integer<32> a = integer<32>::from_words(val_a);
         const integer<32> b = integer<32>::from_words(val_b);
@@ -484,10 +485,10 @@ SCENARIO("Multiplying two integers exactly", "[integer][arithmetic][multiplicati
 
         THEN("Multiplication by -1 should negate the sign")
         {
-            const integer<32> minus_one=integer<32>::minus_one();
-            CHECK(mul(a,minus_one).is_negative() == !a.is_negative());
-            CHECK(mul(minus_one,a).is_negative() == !a.is_negative());
-            CHECK(mul(a,minus_one) == -a);
+            const integer<32> minus_one = integer<32>::minus_one();
+            CHECK(mul(a, minus_one).is_negative() == !a.is_negative());
+            CHECK(mul(minus_one, a).is_negative() == !a.is_negative());
+            CHECK(mul(a, minus_one) == -a);
         }
     }
 
@@ -498,7 +499,7 @@ SCENARIO("Multiplying two integers exactly", "[integer][arithmetic][multiplicati
         integer<128> constexpr c = integer<128>::from_words(13435, 345897);
         integer<128> constexpr d =
             integer<128>::from_words(static_cast<typename integer<128>::word_type>(-1),
-                                      static_cast<typename integer<128>::word_type>(-1));
+                                     static_cast<typename integer<128>::word_type>(-1));
         integer<128> constexpr zero = integer<128>::from_words(0, 0);
         integer<128> constexpr one = integer<128>::from_words(0, 1);
 
@@ -549,26 +550,34 @@ SCENARIO("Multiplying two integers exactly", "[integer][arithmetic][multiplicati
     }
 }
 
-SCENARIO("Multiplication of numbers fitting in a uint64_t", "[integer][arithmetic][multiplication]")
+SCENARIO("Multiplication of numbers fitting in a uint64_t",
+         "[integer][arithmetic][multiplication][fitting]")
 {
     GIVEN("A random number a")
     {
-        int64_t val_a = GENERATE(
-            take(100, random(std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max())));
+        int64_t val_a = GENERATE(take(
+            100, random(std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max())));
         integer<64> a{val_a};
         AND_GIVEN("A random number b")
         {
-            int64_t val_b = GENERATE(
-                take(100, random(std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max())));
+            int64_t val_b = GENERATE(take(100, random(std::numeric_limits<int64_t>::min(),
+                                                      std::numeric_limits<int64_t>::max())));
             integer<64> b{val_b};
 
             THEN("The multiplication should match its uint64_t counterpart")
             {
                 int64_t expected = val_a * val_b;
                 integer<64> result = mul(a, b);
+                integer<64> expected_integer{expected};
+
+                std::cout << val_a << " * " << val_b << " = " << expected << "\n";
+                std::cout << "integer<64>\t" << group_digits(to_binary(result), 16) << "\n";
+                std::cout << "int64_t\t\t" << group_digits(to_binary(expected_integer), 16) << "\n";
+                std::cout << "integer<64>\t" << to_decimal(result) << "\n";
+                std::cout << "int64_t\t\t" << to_decimal(expected_integer) << "\n";
 
                 CHECK(expected == result.word(0));
-                REQUIRE(integer<64>{expected} == result);
+                REQUIRE(expected_integer == result);
             }
         }
     }
