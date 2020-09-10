@@ -6,8 +6,9 @@ aarith_unsigned_types=["aarith::uinteger<8>", "aarith::uinteger<10>",  "aarith::
 aarith_types = aarith_signed_types + aarith_unsigned_types
 types = internal_types + aarith_types
 
-operations=["Add", "Sub", "Mul", "Div"]
-special_ops=["NaiveMul", "InPlaceMul"]
+operations=["Add", "Sub", "Mul", "Div", "Mod"]
+special_signed_ops=["NaiveMul", "InPlaceMul"]
+special_unsigned_ops=["Karazuba"]
 
 def mkname(t)
         return t.sub(/_/, '').sub('::', '').sub('>', '').sub('<', '')
@@ -22,7 +23,13 @@ types.each { |t|
 }
 
 aarith_signed_types.each { |t|
-    special_ops.each { |op|
+    special_signed_ops.each { |op|
+        puts "benchmark::RegisterBenchmark(\"#{op}#{mkname(t)}\", &generic_aarithmetic<#{op}<#{t}>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();"
+    }
+}
+
+aarith_unsigned_types.each { |t|
+    special_unsigned_ops.each { |op|
         puts "benchmark::RegisterBenchmark(\"#{op}#{mkname(t)}\", &generic_aarithmetic<#{op}<#{t}>>) ->Unit(benchmark::kMillisecond) ->Repetitions(5) ->DisplayAggregatesOnly();"
     }
 }
