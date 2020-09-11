@@ -173,7 +173,7 @@ SCENARIO("Comparing two positive integers with different bit widths", "[integer]
     }
 }
 
-SCENARIO("Investigating the comparison of max and min values", "[integer][signed][comparison][utility]")
+SCENARIO("Investigating the comparison of max and min values", "[integer][signed][comparison][utility][dinge]")
 {
     GIVEN("integer<8>::max/min")
     {
@@ -198,7 +198,7 @@ SCENARIO("Investigating the comparison of max and min values", "[integer][signed
 
         WHEN("Constructing min and max value into a larger integer")
         {
-            integer<9> min_ = T::min();
+            integer<9> min_{T::min()};
             integer<9> max_ = T::max();
 
             THEN("min should be negative")

@@ -1003,7 +1003,8 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
 {
 
 
-    using SInteger = integer<W, WordType>;
+    using Integer = integer<W, WordType>;
+    using UInteger = uinteger<W, WordType>;
     using IntOneBitMore = integer<W+1, WordType>;
     //    using LargeSInteger = integer<2 * W>;
 
@@ -1014,26 +1015,26 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
     }
     if (numerator.is_zero())
     {
-        return std::make_pair(SInteger::zero(), SInteger::zero());
+        return std::make_pair(Integer::zero(), Integer::zero());
     }
-    if (denominator == SInteger::one())
+    if (denominator == Integer::one())
     {
-        return std::make_pair(numerator, SInteger::zero());
+        return std::make_pair(numerator, Integer::zero());
     }
 
     if (numerator == denominator)
     {
-        return std::make_pair(SInteger::one(), SInteger::zero());
+        return std::make_pair(Integer::one(), Integer::zero());
     }
 
     const bool to_negate = numerator.is_negative() ^ denominator.is_negative();
 
-    const SInteger N = expanding_abs(numerator);
-    const SInteger D = expanding_abs(denominator);
+    const UInteger N = expanding_abs(numerator);
+    const UInteger D = expanding_abs(denominator);
 
     if (N < D)
     {
-        return std::make_pair(SInteger::zero(), numerator);
+        return std::make_pair(Integer::zero(), numerator);
     }
 
     const auto div_ = restoring_division(N, D);
@@ -1046,8 +1047,8 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
         Q = negate(Q);
     }
 
-    SInteger Q_cast = width_cast<W, W + 1, WordType>(Q);
-    SInteger remainder_cast = width_cast<W,W + 1, WordType>(remainder_);
+    Integer Q_cast = width_cast<W, W + 1, WordType>(Q);
+    Integer remainder_cast = width_cast<W,W + 1, WordType>(remainder_);
 
     if (numerator.is_negative())
     {
