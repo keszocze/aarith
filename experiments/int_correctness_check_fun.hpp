@@ -66,7 +66,7 @@ template <typename T, typename B> std::string filename(const std::string op_name
 }
 
 template <template <size_t, typename> class I, size_t W, typename NativeType, bool AvoidZero,
-          typename Op, typename OpNative, typename WordType = uint64_t>
+    typename WordType, typename Op, typename OpNative>
 void check_int_operation(const std::string op_name, const Op& fun, OpNative& fun_native)
 {
 

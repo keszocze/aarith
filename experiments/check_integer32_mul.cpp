@@ -8,11 +8,11 @@ int main()
     constexpr size_t Width = 32;
     using UB = uint32_t;
     using B = int32_t;
+    using WordType = uint64_t;
+    using UI = uinteger<Width, WordType>;
+    using I = integer<Width, WordType>;
 
-    using UI = uinteger<Width, uint64_t>;
-    using I = integer<Width, uint64_t>;
-
-    check_int_operation<integer, Width, B, false>("mul", &::aarith::mul<I>, native_mul);
+    check_int_operation<integer, Width, B, false, WordType>("mul", &::aarith::mul<I>, native_mul);
 
     return 0;
 }

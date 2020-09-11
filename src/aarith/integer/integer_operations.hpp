@@ -70,9 +70,9 @@ template <typename I>[[nodiscard]] constexpr auto sub(const I& a, const I& b) ->
 
     constexpr size_t W = I::width();
 
-    if constexpr (W < I::word_width())
+    if constexpr (W <= I::word_width())
     {
-        const auto result = I{a.word(0) - b.word(0)};
+        const auto result = I{static_cast<typename I::word_type>(a.word(0) - b.word(0))};
         return result;
     }
     else
@@ -132,7 +132,7 @@ template <typename I>[[nodiscard]] I constexpr add(const I& a, const I& b)
     // of the addition on the basis WordType
     if constexpr (W <= I::word_width())
     {
-        const auto result = I{a.word(0) + b.word(0)};
+        const auto result = I{static_cast<typename I::word_type>(a.word(0) + b.word(0))};
         return result;
     }
     else
@@ -209,7 +209,7 @@ template <typename I>[[nodiscard]] constexpr I mul(const I& a, const I& b)
     // of the multiplication on the basis WordType
     if constexpr (W <= I::word_width())
     {
-        const auto result = I{a.word(0) * b.word(0)};
+        const I result{static_cast<typename I::word_type>(a.word(0)*b.word(0))};
         return result;
     }
     else
@@ -760,10 +760,10 @@ template <size_t W, size_t V, typename WordType>
     const bool m_neg = m.is_negative();
     const bool r_neg = r.is_negative();
 
-    const uinteger<W> m_ = m_neg ? expanding_abs(m) : uinteger<W>{m};
-    const uinteger<V> r_ = r_neg ? expanding_abs(r) : uinteger<V>{r};
+    const uinteger<W, WordType> m_ = m_neg ? expanding_abs(m) : uinteger<W, WordType>{m};
+    const uinteger<V, WordType> r_ = r_neg ? expanding_abs(r) : uinteger<V, WordType>{r};
 
-    const integer<W + V + 1> result = expanding_mul(m_, r_);
+    const integer<W + V + 1, WordType> result = expanding_mul(m_, r_);
 
     return m_neg ^ r_neg ? -result : result;
 }
@@ -1002,7 +1002,9 @@ template <std::size_t W, std::size_t V, typename WordType>
 restoring_division(const integer<W, WordType>& numerator, const integer<V, WordType>& denominator)
 {
 
+
     using SInteger = integer<W, WordType>;
+    using IntOneBitMore = integer<W+1, WordType>;
     //    using LargeSInteger = integer<2 * W>;
 
     // Cover some special cases in order to speed everything up
@@ -1026,8 +1028,8 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
 
     const bool to_negate = numerator.is_negative() ^ denominator.is_negative();
 
-    const uinteger<W, WordType> N = expanding_abs(numerator);
-    const uinteger<W, WordType> D = expanding_abs(denominator);
+    const SInteger N = expanding_abs(numerator);
+    const SInteger D = expanding_abs(denominator);
 
     if (N < D)
     {
@@ -1036,16 +1038,16 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
 
     const auto div_ = restoring_division(N, D);
 
-    integer<W + 1, WordType> Q(div_.first);
-    integer<W + 1, WordType> remainder_(div_.second);
+    IntOneBitMore Q(div_.first);
+    IntOneBitMore remainder_(div_.second);
 
     if (to_negate)
     {
         Q = negate(Q);
     }
 
-    integer<W> Q_cast = width_cast<W>(Q);
-    integer<W> remainder_cast = width_cast<W>(remainder_);
+    SInteger Q_cast = width_cast<W, W + 1, WordType>(Q);
+    SInteger remainder_cast = width_cast<W,W + 1, WordType>(remainder_);
 
     if (numerator.is_negative())
     {

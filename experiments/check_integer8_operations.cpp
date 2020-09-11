@@ -1,7 +1,8 @@
 #include "int_correctness_check_fun.hpp"
 
-int main()
-{
+
+template <typename WordType>
+void helper() {
     using namespace std;
     using namespace aarith;
 
@@ -9,25 +10,35 @@ int main()
     using UB = uint8_t;
     using B = int8_t;
 
-    using W = uint64_t;
-    using UI = uinteger<Width, W>;
-    using I = integer<Width, W>;
+    using UI = uinteger<Width, WordType>;
+    using I = integer<Width, WordType>;
 
-    check_int_operation<uinteger, Width, UB, false>("addition", &::aarith::add<UI>, native_add);
-    check_int_operation<uinteger, Width, UB, false>("subtraction", &::aarith::sub<UI>, native_sub);
-    check_int_operation<uinteger, Width, UB, false>("mul", &::aarith::mul<UI>, native_mul);
-    check_int_operation<uinteger, Width, UB, false>(
-        "mul_karazuba", &::aarith::karazuba<Width, W>, native_mul);
-    check_int_operation<uinteger, Width, UB, true>("division", &::aarith::div<UI>, native_div);
-    check_int_operation<uinteger, Width, UB, true>("modulo", &::aarith::remainder<UI>, native_mod);
+    check_int_operation<uinteger, Width, UB, false,WordType>("addition", &::aarith::add<UI>, native_add);
+    check_int_operation<uinteger, Width, UB, false, WordType>("subtraction", &::aarith::sub<UI>, native_sub);
+    check_int_operation<uinteger, Width, UB, false, WordType>("mul", &::aarith::mul<UI>, native_mul);
+    check_int_operation<uinteger, Width, UB, false, WordType>(
+        "mul_karazuba", &::aarith::karazuba<Width, WordType>, native_mul);
+    check_int_operation<uinteger, Width, UB, true, WordType>("division", &::aarith::div<UI>, native_div);
+    check_int_operation<uinteger, Width, UB, true, WordType>("modulo", &::aarith::remainder<UI>, native_mod);
 
-    check_int_operation<integer, Width, B, false>("addition", &::aarith::add<I>, native_add);
-    check_int_operation<integer, Width, B, false>("subtraction", &::aarith::sub<I>, native_sub);
-    check_int_operation<integer, Width, B, false>("mul", &::aarith::mul<I>, native_mul);
-    check_int_operation<integer, Width, B, false>("mul_naive", &::aarith::naive_mul<Width, W>, native_mul);
-    check_int_operation<integer, Width, B, false>("mul_inplace", &::aarith::inplace_mul<Width, W>, native_mul);
-    check_int_operation<integer, Width, B, true>("division", &::aarith::div<I>, native_div);
-    check_int_operation<integer, Width, B, true>("modulo", &::aarith::remainder<I>, native_mod);
+    check_int_operation<integer, Width, B, false, WordType>("addition", &::aarith::add<I>, native_add);
+    check_int_operation<integer, Width, B, false, WordType>("subtraction", &::aarith::sub<I>, native_sub);
+    check_int_operation<integer, Width, B, false, WordType>("mul", &::aarith::mul<I>, native_mul);
+    check_int_operation<integer, Width, B, false, WordType>("mul_naive", &::aarith::naive_mul<Width, WordType>, native_mul);
+    check_int_operation<integer, Width, B, false, WordType>("mul_inplace", &::aarith::inplace_mul<Width, WordType>, native_mul);
+    check_int_operation<integer, Width, B, true, WordType>("division", &::aarith::div<I>, native_div);
+    check_int_operation<integer, Width, B, true, WordType>("modulo", &::aarith::remainder<I>, native_mod);
+}
+
+
+int main()
+{
+
+
+    helper<uint8_t>();
+    helper<uint16_t>();
+    helper<uint32_t>();
+    helper<uint64_t>();
 
     return 0;
 }
