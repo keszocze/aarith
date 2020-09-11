@@ -52,6 +52,7 @@ template <typename I, typename T>
 
 template <typename I, typename T>[[nodiscard]] constexpr auto expanding_add(const I& a, const T& b)
 {
+
     return expanding_add(a, b, false);
 }
 
@@ -116,8 +117,20 @@ template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(cons
 template <typename I>[[nodiscard]] I constexpr add(const I& a, const I& b)
 {
     constexpr size_t W = I::width();
-    const auto result = expanding_add<I, I>(a, b);
-    return width_cast<W>(result);
+    constexpr size_t WW = I::word_width();
+
+    // if the number completely fits into the word, we can simply use the default implementation
+    // of the addition on the basis WordType
+    if constexpr (W <= WW)
+    {
+        const auto result = I{a.word(0) + b.word(0)};
+        return result;
+    }
+    else
+    {
+        const auto result = expanding_add<I, I>(a, b);
+        return width_cast<W>(result);
+    }
 }
 
 /**
@@ -180,7 +193,21 @@ template <std::size_t W, std::size_t V, typename WordType>
  */
 template <typename I>[[nodiscard]] constexpr I mul(const I& a, const I& b)
 {
-    return width_cast<I::width()>(expanding_mul(a, b));
+
+    constexpr size_t W = I::width();
+    constexpr size_t WW = I::word_width();
+
+    // if the number completely fits into the word, we can simply use the default implementation
+    // of the multiplication on the basis WordType
+    if constexpr (W <= WW)
+    {
+        const auto result = I{a.word(0) * b.word(0)};
+        return result;
+    }
+    else
+    {
+        return width_cast<W>(expanding_mul(a, b));
+    }
 }
 
 /**

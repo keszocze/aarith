@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <climits>
 
 namespace aarith {
 
@@ -90,7 +91,7 @@ public:
 
     [[nodiscard]] static constexpr auto word_width() noexcept -> size_t
     {
-        return sizeof(word_type) * 8;
+        return sizeof(word_type) * CHAR_BIT;
     }
 
     [[nodiscard]] static constexpr auto word_count() noexcept -> size_t
