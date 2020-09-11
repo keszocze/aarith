@@ -45,3 +45,4 @@ add_aarith_experiment(integer32-div-correctness FILES check_integer32_div.cpp in
 add_aarith_experiment(integer32-mod-correctness FILES check_integer32_mod.cpp int_correctness_check_fun.hpp)
 
 add_aarith_experiment("fau-adder" FILES eval_fau_adder.cpp)
+add_aarith_experiment("check-against-mpir" FILES check_against_mpir.cpp INCLUDES ${MPIR_INCLUDE_DIR} LIBS ${MPIR_LIBRARIES})
