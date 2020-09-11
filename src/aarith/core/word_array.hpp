@@ -329,9 +329,10 @@ public:
     [[nodiscard]] bool constexpr is_zero() const noexcept
     {
 
+        constexpr word_type zero{0U};
         for (size_t i = 0; i < word_count(); ++i)
         {
-            if (word(i) != word_type(0))
+            if (word(i) != zero)
             {
                 return false;
             }

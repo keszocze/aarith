@@ -26,7 +26,9 @@ endfunction(add_aarith_experiment)
 
 
 add_aarith_experiment(integer8-correctness FILES check_integer8_operations.cpp int_correctness_check_fun.hpp)
-
+add_aarith_experiment(integer10-correctness FILES check_integer10_operations.cpp int_correctness_check_fun.hpp)
+add_aarith_experiment(integer12-correctness FILES check_integer12_operations.cpp int_correctness_check_fun.hpp)
+add_aarith_experiment(integer14-correctness FILES check_integer14_operations.cpp int_correctness_check_fun.hpp)
 add_aarith_experiment(integer16-correctness FILES check_integer16_operations.cpp int_correctness_check_fun.hpp)
 
 add_aarith_experiment(uinteger32-add-correctness FILES check_uinteger32_add.cpp int_correctness_check_fun.hpp)

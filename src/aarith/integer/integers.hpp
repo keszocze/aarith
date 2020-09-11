@@ -367,7 +367,7 @@ template <size_t DestinationWidth, size_t SourceWidth>
     -> integer<DestinationWidth>
 {
     word_array<DestinationWidth> result =
-        width_cast<DestinationWidth>(static_cast<word_array<SourceWidth>>(source));
+        width_cast<DestinationWidth, SourceWidth>(static_cast<word_array<SourceWidth>>(source));
     if constexpr (DestinationWidth > SourceWidth)
     {
         const bool is_negative = source.is_negative();
