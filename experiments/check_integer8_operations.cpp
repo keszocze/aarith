@@ -16,8 +16,7 @@ void helper() {
     check_int_operation<uinteger, Width, UB, false,WordType>("addition", &::aarith::add<UI>, native_add);
     check_int_operation<uinteger, Width, UB, false, WordType>("subtraction", &::aarith::sub<UI>, native_sub);
     check_int_operation<uinteger, Width, UB, false, WordType>("mul_schoolbook", &::aarith::schoolbook_mul<UI>, native_mul);
-    check_int_operation<uinteger, Width, UB, false, WordType>(
-        "mul_karazuba", &::aarith::karazuba<Width, WordType>, native_mul);
+    check_int_operation<uinteger, Width, UB, false, WordType>("mul_karazuba", &::aarith::karazuba<Width, WordType>, native_mul);
     check_int_operation<uinteger, Width, UB, true, WordType>("division", &::aarith::div<UI>, native_div);
     check_int_operation<uinteger, Width, UB, true, WordType>("modulo", &::aarith::remainder<UI>, native_mod);
 
