@@ -63,7 +63,7 @@ void aarith_mul(benchmark::State& state)
         {
             for (size_t j = 0; j < 32; ++j)
             {
-                benchmark::DoNotOptimize(aarith::integer_operators::operator*(a, b));
+                benchmark::DoNotOptimize(aarith::expanding_mul(a, b));
                 b = b + aarith::integer<1024>::one();
             }
             a = a + aarith::integer<1024>::one();
