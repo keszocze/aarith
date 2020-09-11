@@ -68,8 +68,18 @@ template <typename I>[[nodiscard]] constexpr auto sub(const I& a, const I& b) ->
 {
     static_assert(::aarith::is_integral_v<I>);
 
-    auto result = expanding_add(a, ~b, true);
-    return width_cast<I::width()>(result);
+    constexpr size_t W = I::width();
+
+    if constexpr (W < I::word_width())
+    {
+        const auto result = I{a.word(0) - b.word(0)};
+        return result;
+    }
+    else
+    {
+        auto result = expanding_add(a, ~b, true);
+        return width_cast<W>(result);
+    }
 }
 
 /**
@@ -117,11 +127,10 @@ template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(cons
 template <typename I>[[nodiscard]] I constexpr add(const I& a, const I& b)
 {
     constexpr size_t W = I::width();
-    constexpr size_t WW = I::word_width();
 
     // if the number completely fits into the word, we can simply use the default implementation
     // of the addition on the basis WordType
-    if constexpr (W <= WW)
+    if constexpr (W <= I::word_width())
     {
         const auto result = I{a.word(0) + b.word(0)};
         return result;
@@ -195,11 +204,10 @@ template <typename I>[[nodiscard]] constexpr I mul(const I& a, const I& b)
 {
 
     constexpr size_t W = I::width();
-    constexpr size_t WW = I::word_width();
 
     // if the number completely fits into the word, we can simply use the default implementation
     // of the multiplication on the basis WordType
-    if constexpr (W <= WW)
+    if constexpr (W <= I::word_width())
     {
         const auto result = I{a.word(0) * b.word(0)};
         return result;
@@ -478,7 +486,7 @@ restoring_division(const uinteger<W, WordType>& numerator, const uinteger<V, Wor
 template <typename I>
 [[nodiscard]] constexpr auto remainder(const I& numerator, const I& denominator) -> I
 {
-    return restoring_division(numerator, denominator).second;
+        return restoring_division(numerator, denominator).second;
 }
 
 /**
@@ -494,7 +502,7 @@ template <typename I>
  */
 template <typename I>[[nodiscard]] constexpr auto div(const I& numerator, const I& denominator) -> I
 {
-    return restoring_division(numerator, denominator).first;
+        return restoring_division(numerator, denominator).first;
 }
 
 /**
