@@ -12,7 +12,7 @@ using auint = uinteger<1024>;
 
 static constexpr aint aone{aint::one()};
 
-static constexpr size_t n_iter = 64;
+static constexpr size_t n_iter = 100;
 
 void aarith_add(benchmark::State& state)
 {
@@ -106,7 +106,7 @@ void mpir_sub(benchmark::State& state)
     }
 }
 
-void aarith_mul(benchmark::State& state)
+void aarith_booth(benchmark::State& state)
 {
     aint a(1), b(1);
     a = a << 1022;
@@ -119,6 +119,46 @@ void aarith_mul(benchmark::State& state)
             for (size_t j = 0; j < n_iter; ++j)
             {
                 benchmark::DoNotOptimize(booth_expanding_mul(a, b));
+                b = b + aone;
+            }
+            a = a + aone;
+        }
+    }
+}
+
+void aarith_booth_inplace(benchmark::State& state)
+{
+    aint a(1), b(1);
+    a = a << 1022;
+    b = b << 511;
+
+    for (auto _ : state)
+    {
+        for (size_t i = 0; i < n_iter; ++i)
+        {
+            for (size_t j = 0; j < n_iter; ++j)
+            {
+                benchmark::DoNotOptimize(inplace_expanding_mul(a, b));
+                b = b + aone;
+            }
+            a = a + aone;
+        }
+    }
+}
+
+void aarith_naive(benchmark::State& state)
+{
+    aint a(1), b(1);
+    a = a << 1022;
+    b = b << 511;
+
+    for (auto _ : state)
+    {
+        for (size_t i = 0; i < n_iter; ++i)
+        {
+            for (size_t j = 0; j < n_iter; ++j)
+            {
+                benchmark::DoNotOptimize(naive_expanding_mul(a, b));
                 b = b + aone;
             }
             a = a + aone;
@@ -259,7 +299,15 @@ int main(int argc, char** argv)
         ->Unit(benchmark::kMillisecond)
         ->Repetitions(5)
         ->DisplayAggregatesOnly();
-    benchmark::RegisterBenchmark("aarith_mul", &aarith_mul)
+    benchmark::RegisterBenchmark("aarith_booth_mul", &aarith_booth)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("aarith_booth_mul_inplace", &aarith_booth_inplace)
+        ->Unit(benchmark::kMillisecond)
+        ->Repetitions(5)
+        ->DisplayAggregatesOnly();
+    benchmark::RegisterBenchmark("aarith_naive_mul", &aarith_naive)
         ->Unit(benchmark::kMillisecond)
         ->Repetitions(5)
         ->DisplayAggregatesOnly();
