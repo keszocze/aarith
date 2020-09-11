@@ -209,7 +209,7 @@ template <typename I>[[nodiscard]] constexpr I mul(const I& a, const I& b)
     // of the multiplication on the basis WordType
     if constexpr (W <= I::word_width())
     {
-        const I result{static_cast<typename I::word_type>(a.word(0)*b.word(0))};
+        const I result{static_cast<typename I::word_type>(a.word(0) * b.word(0))};
         return result;
     }
     else
@@ -486,7 +486,7 @@ restoring_division(const uinteger<W, WordType>& numerator, const uinteger<V, Wor
 template <typename I>
 [[nodiscard]] constexpr auto remainder(const I& numerator, const I& denominator) -> I
 {
-        return restoring_division(numerator, denominator).second;
+    return restoring_division(numerator, denominator).second;
 }
 
 /**
@@ -502,7 +502,7 @@ template <typename I>
  */
 template <typename I>[[nodiscard]] constexpr auto div(const I& numerator, const I& denominator) -> I
 {
-        return restoring_division(numerator, denominator).first;
+    return restoring_division(numerator, denominator).first;
 }
 
 /**
@@ -1002,10 +1002,9 @@ template <std::size_t W, std::size_t V, typename WordType>
 restoring_division(const integer<W, WordType>& numerator, const integer<V, WordType>& denominator)
 {
 
-
     using Integer = integer<W, WordType>;
     using UInteger = uinteger<W, WordType>;
-    using IntOneBitMore = integer<W+1, WordType>;
+    using IntOneBitMore = integer<W + 1, WordType>;
     //    using LargeSInteger = integer<2 * W>;
 
     // Cover some special cases in order to speed everything up
@@ -1048,7 +1047,7 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
     }
 
     Integer Q_cast = width_cast<W, W + 1, WordType>(Q);
-    Integer remainder_cast = width_cast<W,W + 1, WordType>(remainder_);
+    Integer remainder_cast = width_cast<W, W + 1, WordType>(remainder_);
 
     if (numerator.is_negative())
     {
