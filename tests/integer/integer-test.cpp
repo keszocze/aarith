@@ -299,6 +299,7 @@ SCENARIO("Left shift operator works as expected", "[integer][signed][utility][bi
 
 SCENARIO("Create negative integers", "[integer][signed][bit_logic]")
 {
+    using namespace integer_operators;
     GIVEN("A int64_t negative number")
     {
         int64_t n = GENERATE(take(100, random(-922337236854775808LL, -1LL)));
@@ -319,6 +320,7 @@ SCENARIO("Create negative integers", "[integer][signed][bit_logic]")
 
             THEN("Negation works as expected")
             {
+
                 CHECK(-negative == positive);
                 CHECK(-(-negative) == negative);
                 CHECK(-(-positive) == positive);

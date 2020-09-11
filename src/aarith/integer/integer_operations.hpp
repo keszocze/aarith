@@ -33,7 +33,7 @@ template <typename I, typename T>
 
     decltype(a_) sum{0U};
 
-    word_type carry = initial_carry ? 1U : 0U;
+    word_type carry = initial_carry ? word_type{1U} : word_type{0U};
 
     for (auto i = 0U; i < sum.word_count(); ++i)
     {
@@ -50,10 +50,8 @@ template <typename I, typename T>
     return sum;
 }
 
-template <typename I, typename T>
-[[nodiscard]] constexpr auto expanding_add(const I& a, const T& b)
+template <typename I, typename T>[[nodiscard]] constexpr auto expanding_add(const I& a, const T& b)
 {
-
     return expanding_add(a, b, false);
 }
 
@@ -85,7 +83,8 @@ template <typename I>[[nodiscard]] constexpr auto sub(const I& a, const I& b) ->
  * @param b Subtrahend
  * @return Difference of correct bit width
  */
-//template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(const I& a, const T& b, const bool initial_borrow = false)
+// template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(const I& a, const T&
+// b, const bool initial_borrow = false)
 template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(const I& a, const T& b)
 {
 
@@ -93,7 +92,7 @@ template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(cons
     static_assert(::aarith::same_signedness<I, T>);
     static_assert(::aarith::same_word_type<I, T>);
 
-    //constexpr size_t res_width = std::max(I::width(), T::width()) + 1;
+    // constexpr size_t res_width = std::max(I::width(), T::width()) + 1;
     constexpr size_t res_width = std::max(I::width(), T::width());
     const auto result{sub(width_cast<res_width>(a), width_cast<res_width>(b))};
     /*
@@ -183,7 +182,6 @@ template <typename I>[[nodiscard]] constexpr I mul(const I& a, const I& b)
 {
     return width_cast<I::width()>(expanding_mul(a, b));
 }
-
 
 /**
  * @brief Exponentiation function
@@ -484,7 +482,7 @@ template <typename I>[[nodiscard]] constexpr auto div(const I& numerator, const 
 template <size_t Width, typename WordType>
 [[nodiscard]] constexpr auto abs(const integer<Width, WordType>& n) -> integer<Width, WordType>
 {
-    return n.is_negative() ? -n : n;
+    return n.is_negative() ? negate(n) : n;
 }
 
 /**
@@ -501,7 +499,7 @@ template <size_t Width, typename WordType>
 [[nodiscard]] constexpr auto expanding_abs(const integer<Width, WordType>& n)
     -> uinteger<Width, WordType>
 {
-    uinteger<Width, WordType> abs = n.is_negative() ? -n : n;
+    uinteger<Width, WordType> abs = n.is_negative() ? negate(n) : n;
     return abs;
 }
 
@@ -900,13 +898,13 @@ template <size_t W, typename WordType>
 }
 
 /**
- *
+ * @brief Negates the value
  * @tparam W The width of the signed integer
  * @param n  The signed integer whose sign is to be changed
  * @return  The negative value of the signed integer
  */
 template <size_t W, typename WordType>
-constexpr auto operator-(const integer<W, WordType>& n) -> integer<W, WordType>
+constexpr auto negate(const integer<W, WordType>& n) -> integer<W, WordType>
 {
     const integer<W, WordType> one(1U);
     return add(~n, one);
@@ -991,7 +989,7 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
         return std::make_pair(SInteger::one(), SInteger::zero());
     }
 
-    const bool negate = numerator.is_negative() ^ denominator.is_negative();
+    const bool to_negate = numerator.is_negative() ^ denominator.is_negative();
 
     const uinteger<W, WordType> N = expanding_abs(numerator);
     const uinteger<W, WordType> D = expanding_abs(denominator);
@@ -1006,9 +1004,9 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
     integer<W + 1, WordType> Q(div_.first);
     integer<W + 1, WordType> remainder_(div_.second);
 
-    if (negate)
+    if (to_negate)
     {
-        Q = -Q;
+        Q = negate(Q);
     }
 
     integer<W> Q_cast = width_cast<W>(Q);
@@ -1043,6 +1041,12 @@ namespace integer_operators {
 
 // template <typename Val, typename = std::enable_if_t<::aarith::is_unsigned_int<Val> &&
 //                                                    (sizeof(Val) * 8) <= Width>>
+
+template <typename I, typename = std::enable_if_t<is_integral<I>::value>>
+auto constexpr operator-(const I& num) -> I
+{
+    return negate(num);
+}
 
 template <typename I, typename = std::enable_if_t<is_integral<I>::value>>
 auto constexpr operator+(const I& lhs, const I& rhs) -> I
