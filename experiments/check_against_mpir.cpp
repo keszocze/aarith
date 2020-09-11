@@ -30,7 +30,7 @@ void check_add()
             for (size_t j = 0; j < n_iter; ++j)
             {
 
-                const aint result=expanding_add(a,b);
+                const auto result=expanding_add(a,b);
                 mpz_add(result_mpir, a_mpir, b_mpir);
                 mpz_init_set_str(aarith_in_mpir, to_binary(result).c_str(), 2);
 
@@ -72,20 +72,24 @@ void check_mul()
             for (size_t j = 0; j < n_iter; ++j)
             {
 
-                const aint result=expanding_mul(a,b);
+                const auto result= booth_expanding_mul(a, b);
                 mpz_mul(result_mpir, a_mpir, b_mpir);
                 mpz_init_set_str(aarith_in_mpir, to_binary(result).c_str(), 2);
 
 
                 if (mpz_cmp(result_mpir, aarith_in_mpir) != 0)
                 {
+
+
                     gmp_printf("%Zd\n", a_mpir);
                     gmp_printf("%Zd\n", b_mpir);
                     gmp_printf("%Zd\n", result_mpir);
 
                     std::cout << "\n" << to_decimal(a) << "\n" << to_decimal(b) << "\n" <<to_decimal(result) << "\n";
+                    std::cout << "i: " << i << "\tj: " << j << "\n";
                     exit(1);
                 }
+                else {std::cout << "nice\n";}
                 b = b + aone;
                 mpz_add_ui(b_mpir, b_mpir, 1);
             }
@@ -113,7 +117,7 @@ void check_div()
             for (size_t j = 0; j < n_iter; ++j)
             {
 
-                const aint result=div(a,b);
+                const auto result=div(a,b);
                 mpz_div(result_mpir, a_mpir, b_mpir);
                 mpz_init_set_str(aarith_in_mpir, to_binary(result).c_str(), 2);
 
@@ -154,7 +158,7 @@ void check_sub()
             for (size_t j = 0; j < n_iter; ++j)
             {
 
-                const aint result=expanding_sub(a,b);
+                const auto result=expanding_sub(a,b);
                 mpz_sub(result_mpir, a_mpir, b_mpir);
                 mpz_init_set_str(aarith_in_mpir, to_binary(result).c_str(), 2);
 
@@ -196,7 +200,7 @@ void check_mod()
             for (size_t j = 0; j < n_iter; ++j)
             {
 
-                const aint result=remainder(a,b);
+                const auto result=remainder(a,b);
                 mpz_mod(result_mpir, a_mpir, b_mpir);
                 mpz_init_set_str(aarith_in_mpir, to_binary(result).c_str(), 2);
 

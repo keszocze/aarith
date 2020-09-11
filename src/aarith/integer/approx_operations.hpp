@@ -123,7 +123,7 @@ template <size_t W>
                                                      const size_t bits = 2*W)
 -> uinteger<2*W>
 {
-    const auto result = expanding_mul(a,b);
+    const auto result = schoolbook_expanding_mul(a, b);
     const auto mask = generate_bitmask<uinteger<result.width()>>(bits);
 
     return result & mask;

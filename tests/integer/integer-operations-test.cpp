@@ -253,7 +253,7 @@ SCENARIO("Multiplying larger integers using the various implementations works", 
             THEN("The result is zero") {
 
                 for (const auto & num: numbers) {
-                    REQUIRE(naive_mul(num,zero) == zero);
+                    REQUIRE(naive_mul(num, zero) == zero);
                     REQUIRE(inplace_mul(num,zero) == zero);
                 }
             }
@@ -262,7 +262,7 @@ SCENARIO("Multiplying larger integers using the various implementations works", 
         WHEN("Multiplying by one") {
             THEN("The result is unchanged") {
                 for (const auto & num: numbers) {
-                    REQUIRE(naive_mul(num,one) == num);
+                    REQUIRE(naive_mul(num, one) == num);
                     REQUIRE(inplace_mul(num,one) == num);
                 }
             }
@@ -272,8 +272,8 @@ SCENARIO("Multiplying larger integers using the various implementations works", 
             THEN("The results should match") {
                 for (const auto & n: numbers) {
                     for (const auto & m: numbers) {
-                        const auto res_normal = mul(n,m);
-                        const auto res_naive = naive_mul(n,m);
+                        const auto res_normal = booth_mul(n,m);
+                        const auto res_naive = naive_mul(n, m);
                         const auto res_inplace = inplace_mul(n,m);
 
                         REQUIRE(res_normal == res_naive);
@@ -475,9 +475,6 @@ SCENARIO("Multiplying signed integers", "[integer][signed][arithmetic][multiplic
 {
     GIVEN("Two signed integers m and r")
     {
-        THEN("Then the multiplication should be done correctly")
-        {
-        }
 
         WHEN("m is the most negative number")
         {
@@ -486,8 +483,8 @@ SCENARIO("Multiplying signed integers", "[integer][signed][arithmetic][multiplic
                 constexpr integer<8> m{-16};
                 constexpr integer<8> r{2};
 
-                const integer<8> res = mul(m, r);
-                const integer<8> res_naive = naive_mul(m,r);
+                const integer<8> res = booth_mul(m, r);
+                const integer<8> res_naive = naive_mul(m, r);
 
                 int8_t mi = -16;
                 int8_t ri = 2;
@@ -637,6 +634,19 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
                 CHECK(expected == result.word(0));
                 REQUIRE(expected_integer == result);
             }
+        }
+    }
+}
+
+SCENARIO("Multiplication of larger numbers","[integer][signed][arithmetic][multiplication]") {
+    GIVEN("Two large integer numbers") {
+        using aint = integer<1024>;
+        aint a(1), b(1);
+        a = a << 1022;
+        b = b << 511;
+        THEN("The product should not be zero") {
+            const auto result = booth_expanding_mul(a, b);
+            REQUIRE(result != aint::zero());
         }
     }
 }

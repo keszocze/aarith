@@ -12,7 +12,7 @@ int main()
     using UI = uinteger<Width, WordType>;
     using I = integer<Width, WordType>;
 
-    check_int_operation<uinteger, Width, UB, false, WordType>("mul", &::aarith::mul<UI>, native_mul);
+    check_int_operation<uinteger, Width, UB, false, WordType>("mul_schoolbook", &::aarith::schoolbook_mul<UI>, native_mul);
 
     return 0;
 }

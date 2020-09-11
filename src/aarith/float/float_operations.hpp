@@ -164,7 +164,7 @@ template <size_t E, size_t M, typename WordType>
                        const normalized_float<E, M, WordType> rhs)
     -> normalized_float<E, M, WordType>
 {
-    auto mproduct = expanding_mul(lhs.get_full_mantissa(), rhs.get_full_mantissa());
+    auto mproduct = schoolbook_expanding_mul(lhs.get_full_mantissa(), rhs.get_full_mantissa());
     mproduct = mproduct >> M;
     auto esum = width_cast<E>(sub(expanding_add(lhs.get_exponent(), rhs.get_exponent()),
                                   width_cast<E + 1>(lhs.get_bias())));

@@ -592,7 +592,7 @@ SCENARIO("Multiplying two unsigned integers using the karazuba multiplication",
         auto b = auint(bu);
 
         auto res = expanding_karazuba(a, b);
-        auto ref = expanding_mul(a, b);
+        auto ref = schoolbook_expanding_mul(a, b);
 
         THEN("The result should be equal to the standard multiplication.")
         {
@@ -612,7 +612,7 @@ SCENARIO("Multiplying two unsigned integers using the karazuba multiplication",
         auto b = uintb(bu);
 
         auto res = expanding_karazuba(a, b);
-        auto ref = expanding_mul(a, b);
+        auto ref = schoolbook_expanding_mul(a, b);
 
         THEN("The result should be equal to the standard multiplication.")
         {
@@ -636,7 +636,7 @@ SCENARIO("Multiplying two unsigned integers using the karazuba multiplication",
                 auto b = uintb(bu);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -655,7 +655,7 @@ SCENARIO("Multiplying two unsigned integers using the karazuba multiplication",
                 auto b = uintb(bu);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -674,7 +674,7 @@ SCENARIO("Multiplying two unsigned integers using the karazuba multiplication",
                 auto b = uintb(bu);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -693,7 +693,7 @@ SCENARIO("Multiplying two unsigned integers using the karazuba multiplication",
                 auto b = uintb(bu);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -712,7 +712,7 @@ SCENARIO("Multiplying two unsigned integers using the karazuba multiplication",
                 auto b = uintb::from_words(0xAAAAAAAAAAAAAAAA, 0xAAAAA);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -728,7 +728,7 @@ SCENARIO("Multiplying two unsigned integers using the karazuba multiplication",
                 auto b = uintb(0U);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -744,7 +744,7 @@ SCENARIO("Multiplying two unsigned integers using the karazuba multiplication",
                 auto b = uintb::from_words(0xAAAAAAAAAAAAAAAA, 0xAAAAA);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -760,7 +760,7 @@ SCENARIO("Multiplying two unsigned integers using the karazuba multiplication",
                 auto b = uintb::from_words(0xFFFFFFFFFFFFFFFF, 0xFFFFF);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -782,7 +782,7 @@ SCENARIO("Multiplying two unsigned integers using the karazuba multiplication",
                     0xAAAAAAAAAAAAAAAA, 0xAA);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -799,7 +799,7 @@ SCENARIO("Multiplying two unsigned integers using the karazuba multiplication",
                 auto b = uintb(0U);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -819,7 +819,7 @@ SCENARIO("Multiplying two unsigned integers using the karazuba multiplication",
                     0xAAAAAAAAAAAAAAAA, 0xAA);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -839,7 +839,7 @@ SCENARIO("Multiplying two unsigned integers using the karazuba multiplication",
                     0xFFFFFFFFFFFFFFFF, 0xFF);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {

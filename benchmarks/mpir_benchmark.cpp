@@ -118,7 +118,7 @@ void aarith_mul(benchmark::State& state)
         {
             for (size_t j = 0; j < n_iter; ++j)
             {
-                benchmark::DoNotOptimize(expanding_mul(a, b));
+                benchmark::DoNotOptimize(booth_expanding_mul(a, b));
                 b = b + aone;
             }
             a = a + aone;

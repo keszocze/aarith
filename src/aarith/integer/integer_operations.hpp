@@ -1,6 +1,7 @@
 #pragma once
 #include <aarith/core/traits.hpp>
 #include <type_traits>
+#include <z3.h>
 
 namespace aarith {
 
@@ -156,8 +157,8 @@ template <typename I>[[nodiscard]] I constexpr add(const I& a, const I& b)
  * @return Product of a and b
  */
 template <std::size_t W, std::size_t V, typename WordType>
-[[nodiscard]] constexpr uinteger<W + V, WordType> expanding_mul(const uinteger<W, WordType>& a,
-                                                                const uinteger<V, WordType>& b)
+[[nodiscard]] constexpr uinteger<W + V, WordType>
+schoolbook_expanding_mul(const uinteger<W, WordType>& a, const uinteger<V, WordType>& b)
 {
 
     constexpr std::size_t res_width = W + V;
@@ -191,7 +192,7 @@ template <std::size_t W, std::size_t V, typename WordType>
  * @brief Multiplies two integers.
  *
  * @note No Type conversion is performed. If the bit widths do not match, the code will not
- * compile! Use @see expanding_mul for that.
+ * compile! Use @see booth_expanding_mul for that.
  *
  * The result is then cropped to fit the initial bit width
  *
@@ -200,7 +201,8 @@ template <std::size_t W, std::size_t V, typename WordType>
  * @param b Second multiplicand
  * @return Product of a and b
  */
-template <typename I>[[nodiscard]] constexpr I mul(const I& a, const I& b)
+template <typename I, typename = std::enable_if_t<is_integral_v<I> && is_unsigned_v<I>>>
+[[nodiscard]] constexpr I schoolbook_mul(const I& a, const I& b)
 {
 
     constexpr size_t W = I::width();
@@ -214,107 +216,8 @@ template <typename I>[[nodiscard]] constexpr I mul(const I& a, const I& b)
     }
     else
     {
-        return width_cast<W>(expanding_mul(a, b));
+        return width_cast<W>(schoolbook_expanding_mul(a, b));
     }
-}
-
-/**
- * @brief Exponentiation function
- *
- * @note This function does not make any attempts to be fast or to prevent overflows!
- *
- * @note If exponent equals std::numeric_limits<size_t>::max(), this method throws an exception,
- * unless base equals zero
- * @tparam W Bit width of the integer
- * @param base
- * @param exponent
- * @return The base to the power of the exponent
- */
-template <typename IntegerType> IntegerType pow(const IntegerType& base, const size_t exponent)
-{
-
-    if (exponent == std::numeric_limits<size_t>::max())
-    {
-        if (base.is_zero())
-        {
-            return IntegerType::zero();
-        }
-        else
-        {
-            throw std::runtime_error(
-                "Attempted exponentiation by std::numeric_limits<size_t>::max()");
-        }
-    }
-
-    IntegerType result = IntegerType::one();
-
-    for (size_t i = 0U; i <= exponent; ++i)
-    {
-        result = mul(result, base);
-    }
-    return result;
-}
-
-/**
- *
- * @brief Exponentiation function
- *
- * @note This function does not make any attempts to be fast or to prevent overflows!
- *
- * @note If exponent equals std::numeric_limits<IntegerType>::max(), this method throws an
- * exception, unless base equals zero
- *
- * @tparam IntegerType The type of integer used in the computation
- * @param base
- * @param exponent
- * @return The base to the power of the exponent
- */
-template <typename IntegerType>
-IntegerType pow(const IntegerType& base, const IntegerType& exponent)
-{
-
-    static_assert(aarith::is_integral_v<IntegerType>,
-                  "Exponentiation is only supported for aarith integers");
-
-    if (exponent == IntegerType::max())
-    {
-        if (base == IntegerType::zero())
-        {
-            return IntegerType::zero();
-        }
-        else
-        {
-            throw std::runtime_error(
-                "Attempted exponentiation by std::numeric_limits<IntegerType<W>>::max()");
-        }
-    }
-
-    IntegerType result = IntegerType::one();
-    IntegerType iter = IntegerType::zero();
-    while (iter <= exponent)
-    {
-        result = mul(result, base);
-        iter = add(iter, IntegerType::one());
-    }
-
-    return result;
-}
-
-/**
- * @brief Multiplies two unsigned integers using the Karazuba algorithm
- *
- * This implements the karazuba multiplication algorithm (divide and conquer).
- *
- * @tparam W The bit width of the multiplicants
- * @param a First multiplicant
- * @param b Second multiplicant
- * @return Product of a and b
- */
-template <std::size_t W, typename WordType>
-[[nodiscard]] constexpr uinteger<W, WordType> karazuba(const uinteger<W, WordType>& a,
-                                                       const uinteger<W, WordType>& b)
-{
-    return width_cast<W>(expanding_karazuba(a, b));
 }
 
 /**
@@ -763,7 +666,7 @@ template <size_t W, size_t V, typename WordType>
     const uinteger<W, WordType> m_ = m_neg ? expanding_abs(m) : uinteger<W, WordType>{m};
     const uinteger<V, WordType> r_ = r_neg ? expanding_abs(r) : uinteger<V, WordType>{r};
 
-    const integer<W + V + 1, WordType> result = expanding_mul(m_, r_);
+    const integer<W + V + 1, WordType> result = schoolbook_expanding_mul(m_, r_);
 
     return m_neg ^ r_neg ? -result : result;
 }
@@ -772,7 +675,7 @@ template <size_t W, size_t V, typename WordType>
  * @brief Naively multiplies two integers.
  *
  * @note No Type conversion is performed. If the bit widths do not match, the code will not
- * compile! Use @see expanding_mul for that.
+ * compile! Use @see booth_expanding_mul for that.
  *
  * The result is then cropped to fit the initial bit width
  *
@@ -785,7 +688,20 @@ template <size_t W, typename WordType>
 [[nodiscard]] constexpr integer<W, WordType> naive_mul(const integer<W, WordType>& a,
                                                        const integer<W, WordType>& b)
 {
-    return width_cast<W>(naive_expanding_mul(a, b));
+
+    using I = integer<W, WordType>;
+
+    // if the number completely fits into the word, we can simply use the default implementation
+    // of the multiplication on the basis WordType
+    if constexpr (W <= I::word_width())
+    {
+        const I result{static_cast<typename I::word_type>(a.word(0) * b.word(0))};
+        return result;
+    }
+    else
+    {
+        return width_cast<W>(naive_expanding_mul(a, b));
+    }
 }
 
 /**
@@ -803,8 +719,8 @@ template <size_t W, typename WordType>
  * @return Product of a and b
  */
 template <size_t W, size_t V, typename WordType>
-[[nodiscard]] constexpr auto expanding_mul(const integer<W, WordType>& m,
-                                           const integer<V, WordType>& r)
+[[nodiscard]] constexpr auto booth_expanding_mul(const integer<W, WordType>& m,
+                                                 const integer<V, WordType>& r)
     -> integer<V + W, WordType>
 {
 
@@ -847,6 +763,38 @@ template <size_t W, size_t V, typename WordType>
     auto result = width_cast<W + V>(P >> 1);
 
     return integer<W + V, WordType>{result};
+}
+
+/**
+ * @brief Multiplies two integers.
+ *
+ * @note No Type conversion is performed. If the bit widths do not match, the code will not
+ * compile! Use @see booth_expanding_mul for that.
+ *
+ * The result is then cropped to fit the initial bit width
+ *
+ * @tparam I The integer type to operate on
+ * @param a First multiplicand
+ * @param b Second multiplicand
+ * @return Product of a and b
+ */
+template <size_t W, typename WordType>
+[[nodiscard]] constexpr integer<W, WordType> booth_mul(const integer<W, WordType>& a,
+                                                       const integer<W, WordType>& b)
+{
+    using I = integer<W, WordType>;
+
+    // if the number completely fits into the word, we can simply use the default implementation
+    // of the multiplication on the basis WordType
+    if constexpr (W <= I::word_width())
+    {
+        const I result{static_cast<typename I::word_type>(a.word(0) * b.word(0))};
+        return result;
+    }
+    else
+    {
+        return width_cast<W>(inplace_expanding_mul(a, b));
+    }
 }
 
 /**
@@ -916,7 +864,7 @@ template <size_t W, size_t V, typename WordType>
  * @brief Multiplies two integers.
  *
  * @note No Type conversion is performed. If the bit widths do not match, the code will not
- * compile! Use @see expanding_mul for that.
+ * compile! Use @see booth_expanding_mul for that.
  *
  * The result is then cropped to fit the initial bit width
  *
@@ -929,7 +877,20 @@ template <size_t W, typename WordType>
 [[nodiscard]] constexpr integer<W, WordType> inplace_mul(const integer<W, WordType>& a,
                                                          const integer<W, WordType>& b)
 {
-    return width_cast<W>(inplace_expanding_mul(a, b));
+
+    using I = integer<W, WordType>;
+
+    // if the number completely fits into the word, we can simply use the default implementation
+    // of the multiplication on the basis WordType
+    if constexpr (W <= I::word_width())
+    {
+        const I result{static_cast<typename I::word_type>(a.word(0) * b.word(0))};
+        return result;
+    }
+    else
+    {
+        return width_cast<W>(inplace_expanding_mul(a, b));
+    }
 }
 
 /**
@@ -1057,6 +1018,130 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
     return std::make_pair(Q_cast, remainder_cast);
 }
 
+template <typename I, typename = std::enable_if_t<is_integral_v<I>>> I mul(const I& a, const I& b)
+{
+    if constexpr (is_unsigned_v<I>)
+    {
+        return schoolbook_mul(a, b);
+    }
+    else
+    {
+        return naive_mul(a, b);
+    }
+}
+
+template <typename I, typename = std::enable_if_t<is_integral_v<I>>>
+auto expanding_mul(const I& a, const I& b)
+{
+    if constexpr (is_unsigned_v<I>)
+    {
+        return schoolbook_expanding_mul(a, b);
+    }
+    else
+    {
+        return naive_expanding_mul(a, b);
+    }
+}
+
+/**
+ * @brief Exponentiation function
+ *
+ * @note This function does not make any attempts to be fast or to prevent overflows!
+ *
+ * @note If exponent equals std::numeric_limits<size_t>::max(), this method throws an exception,
+ * unless base equals zero
+ * @tparam W Bit width of the integer
+ * @param base
+ * @param exponent
+ * @return The base to the power of the exponent
+ */
+template <typename IntegerType> IntegerType pow(const IntegerType& base, const size_t exponent)
+{
+
+    if (exponent == std::numeric_limits<size_t>::max())
+    {
+        if (base.is_zero())
+        {
+            return IntegerType::zero();
+        }
+        else
+        {
+            throw std::runtime_error(
+                "Attempted exponentiation by std::numeric_limits<size_t>::max()");
+        }
+    }
+
+    IntegerType result = IntegerType::one();
+
+    for (size_t i = 0U; i <= exponent; ++i)
+    {
+        result = mul(result, base);
+    }
+    return result;
+}
+
+/**
+ *
+ * @brief Exponentiation function
+ *
+ * @note This function does not make any attempts to be fast or to prevent overflows!
+ *
+ * @note If exponent equals std::numeric_limits<IntegerType>::max(), this method throws an
+ * exception, unless base equals zero
+ *
+ * @tparam IntegerType The type of integer used in the computation
+ * @param base
+ * @param exponent
+ * @return The base to the power of the exponent
+ */
+template <typename IntegerType>
+IntegerType pow(const IntegerType& base, const IntegerType& exponent)
+{
+
+    static_assert(aarith::is_integral_v<IntegerType>,
+                  "Exponentiation is only supported for aarith integers");
+
+    if (exponent == IntegerType::max())
+    {
+        if (base == IntegerType::zero())
+        {
+            return IntegerType::zero();
+        }
+        else
+        {
+            throw std::runtime_error(
+                "Attempted exponentiation by std::numeric_limits<IntegerType<W>>::max()");
+        }
+    }
+
+    IntegerType result = IntegerType::one();
+    IntegerType iter = IntegerType::zero();
+    while (iter <= exponent)
+    {
+        result = mul(result, base);
+        iter = add(iter, IntegerType::one());
+    }
+
+    return result;
+}
+
+/**
+ * @brief Multiplies two unsigned integers using the Karazuba algorithm
+ *
+ * This implements the karazuba multiplication algorithm (divide and conquer).
+ *
+ * @tparam W The bit width of the multiplicants
+ * @param a First multiplicant
+ * @param b Second multiplicant
+ * @return Product of a and b
+ */
+template <std::size_t W, typename WordType>
+[[nodiscard]] constexpr uinteger<W, WordType> karazuba(const uinteger<W, WordType>& a,
+                                                       const uinteger<W, WordType>& b)
+{
+    return width_cast<W>(expanding_karazuba(a, b));
+}
+
 /**
  * @brief Computes the distance (i.e. the absolute difference) between two integers
  * @tparam Integer The integer type to operate on
@@ -1097,7 +1182,7 @@ auto constexpr operator-(const I& lhs, const I& rhs) -> I
     return sub(lhs, rhs);
 }
 
-template <typename I, typename = std::enable_if_t<is_integral<I>::value>>
+template <typename I, typename = std::enable_if_t<is_integral_v<I>>>
 auto constexpr operator*(const I& lhs, const I& rhs) -> I
 {
     return mul(lhs, rhs);
