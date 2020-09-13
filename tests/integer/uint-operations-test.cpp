@@ -3,7 +3,7 @@
 
 using namespace aarith;
 
-SCENARIO("Adding two uintegers exactly", "[integer][unsigned][arithmetic][addition]")
+SCENARIO("Adding two unsigned integers exactly", "[integer][unsigned][arithmetic][addition]")
 {
     GIVEN("Two uinteger<N> a and b with N <= word_width")
     {
@@ -479,18 +479,28 @@ SCENARIO("Multiplying two unsigned integers exactly", "[integer][unsigned][arith
         THEN("Multiplication by 1 should not change the other multiplicant")
         {
             const uinteger<32> one{1U};
-            CHECK(mul(a, one) == a);
-            CHECK(mul(one, a) == a);
-            CHECK(mul(b, one) == b);
-            CHECK(mul(one, b) == b);
+            CHECK(schoolbook_mul(a, one) == a);
+            CHECK(schoolbook_mul(one, a) == a);
+            CHECK(schoolbook_mul(b, one) == b);
+            CHECK(schoolbook_mul(one, b) == b);
+
+            CHECK(karazuba(a, one) == a);
+            CHECK(karazuba(one, a) == a);
+            CHECK(karazuba(b, one) == b);
+            CHECK(karazuba(one, b) == b);
         }
         THEN("Multiplication by 0 should result in 0")
         {
             const uinteger<32> zero{0U};
-            CHECK(mul(a, zero) == zero);
-            CHECK(mul(zero, a) == zero);
-            CHECK(mul(b, zero) == zero);
-            CHECK(mul(zero, b) == zero);
+            CHECK(schoolbook_mul(a, zero) == zero);
+            CHECK(schoolbook_mul(zero, a) == zero);
+            CHECK(schoolbook_mul(b, zero) == zero);
+            CHECK(schoolbook_mul(zero, b) == zero);
+
+            CHECK(karazuba(a, zero) == zero);
+            CHECK(karazuba(zero, a) == zero);
+            CHECK(karazuba(b, zero) == zero);
+            CHECK(karazuba(zero, b) == zero);
         }
     }
 
@@ -513,7 +523,8 @@ SCENARIO("Multiplying two unsigned integers exactly", "[integer][unsigned][arith
             {
                 for (const uinteger<128>& num_b : numbers)
                 {
-                    CHECK(mul(num_a, num_b) == mul(num_b, num_a));
+                    CHECK(schoolbook_mul(num_a, num_b) == schoolbook_mul(num_b, num_a));
+                    CHECK(karazuba(num_a, num_b) == karazuba(num_b, num_a));
                 }
             }
         }
@@ -525,8 +536,11 @@ SCENARIO("Multiplying two unsigned integers exactly", "[integer][unsigned][arith
             {
                 for (const uinteger<128>& num : numbers)
                 {
-                    CHECK(mul(num, zero) == zero);
-                    CHECK(mul(zero, num) == zero);
+                    CHECK(schoolbook_mul(num, zero) == zero);
+                    CHECK(schoolbook_mul(zero, num) == zero);
+
+                    CHECK(karazuba(num, zero) == zero);
+                    CHECK(karazuba(zero, num) == zero);
                 }
             }
         }
@@ -537,8 +551,11 @@ SCENARIO("Multiplying two unsigned integers exactly", "[integer][unsigned][arith
 
                 for (const uinteger<128>& num : numbers)
                 {
-                    CHECK(mul(num, one) == num);
-                    CHECK(mul(one, num) == num);
+                    CHECK(schoolbook_mul(num, one) == num);
+                    CHECK(schoolbook_mul(one, num) == num);
+
+                    CHECK(karazuba(num, one) == num);
+                    CHECK(karazuba(one, num) == num);
                 }
             }
         }
@@ -546,7 +563,8 @@ SCENARIO("Multiplying two unsigned integers exactly", "[integer][unsigned][arith
         {
             THEN("The product is 1 for the truncating multiplication")
             {
-                REQUIRE(mul(d, d) == one);
+                REQUIRE(schoolbook_mul(d, d) == one);
+                REQUIRE(karazuba(d, d) == one);
             }
         }
     }
@@ -569,10 +587,14 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
             THEN("The multiplication should match its uint64_t counterpart")
             {
                 uint64_t expected = val_a * val_b;
-                uinteger<64> result = mul(a, b);
+                uinteger<64> result = schoolbook_mul(a, b);
+                uinteger<64> resultk = karazuba(a, b);
 
                 CHECK(expected == result.word(0));
                 REQUIRE(uinteger<64>{expected} == result);
+
+                CHECK(expected == resultk.word(0));
+                REQUIRE(uinteger<64>{expected} == resultk);
             }
         }
     }

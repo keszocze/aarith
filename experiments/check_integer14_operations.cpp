@@ -25,7 +25,7 @@ void helper() {
     check_int_operation<integer, Width, B, false, WordType>("subtraction", &::aarith::sub<I>, native_sub);
     check_int_operation<integer, Width, B, false, WordType>("mul_booth", &::aarith::booth_mul<Width, WordType>, native_mul);
     check_int_operation<integer, Width, B, false, WordType>("mul_naive", &::aarith::naive_mul<Width, WordType>, native_mul);
-    check_int_operation<integer, Width, B, false, WordType>("mul_inplace", &::aarith::inplace_mul<Width, WordType>, native_mul);
+    check_int_operation<integer, Width, B, false, WordType>("mul_inplace", &::aarith::booth_inplace_mul<Width, WordType>, native_mul);
     check_int_operation<integer, Width, B, true, WordType>("division", &::aarith::div<I>, native_div);
     check_int_operation<integer, Width, B, true, WordType>("modulo", &::aarith::remainder<I>, native_mod);
 }

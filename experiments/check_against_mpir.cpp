@@ -10,7 +10,7 @@ using auint = uinteger<1024>;
 
 static constexpr aint aone{aint::one()};
 
-static constexpr size_t n_iter = 64;
+static constexpr size_t n_iter = 150;
 
 void check_add()
 {
@@ -38,6 +38,7 @@ void check_add()
                 if (mpz_cmp(result_mpir, aarith_in_mpir) != 0)
                 {
 
+                    std::cout << "Addition failed:\n";
                     gmp_printf("%Zd\n", a_mpir);
                     gmp_printf("%Zd\n", b_mpir);
                     gmp_printf("%Zd\n", result_mpir);
@@ -80,7 +81,7 @@ void check_mul()
                 if (mpz_cmp(result_mpir, aarith_in_mpir) != 0)
                 {
 
-
+                    std::cout << "Multiplication failed:\n";
                     gmp_printf("%Zd\n", a_mpir);
                     gmp_printf("%Zd\n", b_mpir);
                     gmp_printf("%Zd\n", result_mpir);
@@ -124,6 +125,7 @@ void check_div()
 
                 if (mpz_cmp(result_mpir, aarith_in_mpir) != 0)
                 {
+                    std::cout << "Division failed:\n";
                     gmp_printf("%Zd\n", a_mpir);
                     gmp_printf("%Zd\n", b_mpir);
                     gmp_printf("%Zd\n", result_mpir);
@@ -165,6 +167,9 @@ void check_sub()
 
                 if (mpz_cmp(result_mpir, aarith_in_mpir) != 0)
                 {
+
+                    std::cout << "Subtraction failed:\n";
+
                     gmp_printf("%Zd\n", a_mpir);
                     gmp_printf("%Zd\n", b_mpir);
                     gmp_printf("%Zd\n", result_mpir);
@@ -207,6 +212,8 @@ void check_mod()
 
                 if (mpz_cmp(result_mpir, aarith_in_mpir) != 0)
                 {
+
+                    std::cout << "Modulo failed:\n";
                     gmp_printf("%Zd\n", a_mpir);
                     gmp_printf("%Zd\n", b_mpir);
                     gmp_printf("%Zd\n", result_mpir);
@@ -226,9 +233,9 @@ void check_mod()
 
 int main()
 {
-    check_add();
-    check_sub();
-    check_div();
-    check_mod();
+//    check_add();
+//    check_sub();
+//    check_div();
+//    check_mod();
     check_mul();
 }

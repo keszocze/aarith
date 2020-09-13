@@ -136,7 +136,7 @@ public:
      * @brief Sets the value of the most significant bit (MSB)
      * @param b The value the MSB is set to
      */
-    void set_msb(const bool b)
+    void constexpr set_msb(const bool b)
     {
         set_bit(Width - 1, b);
     }

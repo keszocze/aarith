@@ -51,6 +51,7 @@ template <typename Op> void generic_aarithmetic(benchmark::State& state)
             Op::compute(std::numeric_limits<I>::max(), std::numeric_limits<I>::max()));
     }
 }
+
 template <typename I> class Add
 {
 public:
@@ -150,7 +151,7 @@ public:
     using Type = I;
     static I compute(const I a, const I b)
     {
-        return inplace_mul(a, b);
+        return booth_inplace_mul(a, b);
     }
 };
 

@@ -12,7 +12,9 @@ int main()
     using UI = uinteger<Width, WordType>;
     using I = integer<Width, WordType>;
 
+    check_int_operation<integer, Width, B, false, WordType>("mul_booth", &::aarith::naive_mul<Width, WordType>, native_mul);
     check_int_operation<integer, Width, B, false, WordType>("mul_booth", &::aarith::booth_mul<Width, WordType>, native_mul);
+    check_int_operation<integer, Width, B, false, WordType>("mul_booth", &::aarith::booth_inplace_mul<Width, WordType>, native_mul);
 
     return 0;
 }

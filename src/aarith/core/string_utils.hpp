@@ -87,7 +87,7 @@ template <size_t Width, typename WordType>
 auto to_binary(const word_array<Width, WordType>& value) -> std::string
 {
     std::string result;
-    for (auto i = Width; i > 0; --i)
+    for (size_t i = Width; i > 0; --i)
     {
         result += value.bit(i - 1) ? '1' : '0';
     }

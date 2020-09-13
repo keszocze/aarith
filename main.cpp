@@ -19,11 +19,6 @@ int main()
     using nf_t = normalized_float<4, 4>;
 
 
-    std::cout << "div by zero: " << (5 / 0) << "\n";
-    std::cout << "mod by zero: " << (5 % 0) << "\n";
-
-
-
     nf_t nf_a(1.5f);
     nf_t nf_b(2.5f);
     nf_t nf_zero(0.0f);

@@ -237,9 +237,11 @@ SCENARIO("Adding two positive integers", "[integer][signed][arithmetic][addition
     //    }
 }
 
-SCENARIO("Multiplying larger integers using the various implementations works", "[integer][signed][arithmetic][multiplication]")
+SCENARIO("Multiplying larger integers using the various implementations works",
+         "[integer][signed][arithmetic][multiplication]")
 {
-    GIVEN("Some large integers") {
+    GIVEN("Some large integers")
+    {
         const integer<192> a = integer<192>::from_words(1U, 0U, 0U);
         const integer<192> b = integer<192>::from_words(1U, 1U, 0U);
         const integer<192> c = integer<192>{10};
@@ -247,34 +249,46 @@ SCENARIO("Multiplying larger integers using the various implementations works", 
         const integer<192> ones = integer<192>::all_ones();
         const integer<192> zero = integer<192>::zero();
 
-        std::vector<integer<192>> numbers {a,b,c,one,ones,zero};
+        std::vector<integer<192>> numbers{a, b, c, one, ones, zero};
 
-        WHEN("Multiplying by zero") {
-            THEN("The result is zero") {
+        WHEN("Multiplying by zero")
+        {
+            THEN("The result is zero")
+            {
 
-                for (const auto & num: numbers) {
+                for (const auto& num : numbers)
+                {
+                    REQUIRE(booth_mul(num, zero) == zero);
                     REQUIRE(naive_mul(num, zero) == zero);
-                    REQUIRE(inplace_mul(num,zero) == zero);
+                    REQUIRE(booth_inplace_mul(num, zero) == zero);
                 }
             }
         }
 
-        WHEN("Multiplying by one") {
-            THEN("The result is unchanged") {
-                for (const auto & num: numbers) {
+        WHEN("Multiplying by one")
+        {
+            THEN("The result is unchanged")
+            {
+                for (const auto& num : numbers)
+                {
                     REQUIRE(naive_mul(num, one) == num);
-                    REQUIRE(inplace_mul(num,one) == num);
+                    REQUIRE(booth_mul(num,one) == num);
+                    REQUIRE(booth_inplace_mul(num, one) == num);
                 }
             }
         }
 
-        WHEN("Comparing all multiplicatoin variants") {
-            THEN("The results should match") {
-                for (const auto & n: numbers) {
-                    for (const auto & m: numbers) {
-                        const auto res_normal = booth_mul(n,m);
+        WHEN("Comparing all multiplication variants")
+        {
+            THEN("The results should match")
+            {
+                for (const auto& n : numbers)
+                {
+                    for (const auto& m : numbers)
+                    {
+                        const auto res_normal = booth_mul(n, m);
                         const auto res_naive = naive_mul(n, m);
-                        const auto res_inplace = inplace_mul(n,m);
+                        const auto res_inplace = booth_inplace_mul(n, m);
 
                         REQUIRE(res_normal == res_naive);
                         REQUIRE(res_naive == res_inplace);
@@ -283,7 +297,6 @@ SCENARIO("Multiplying larger integers using the various implementations works", 
                 }
             }
         }
-
     }
 }
 
@@ -452,6 +465,15 @@ SCENARIO("Multiplying unsigned integers", "[integer][signed][arithmetic][multipl
                 const auto result5 = expanding_mul(a5, a5);
 
 
+                const auto result64k = expanding_karazuba(a64, a64);
+                const auto result32k = expanding_karazuba(a32, a32);
+                const auto result8k = expanding_karazuba(a8, a8);
+                const auto result5k = expanding_karazuba(a5, a5);
+
+                CHECK(result64 == result64k);
+                CHECK(result32 == result32k);
+                CHECK(result8 == result8k);
+                CHECK(result5 == result5k);
 
                 CHECK(result64.width() == 128);
                 CHECK(result64 > a64);
@@ -471,11 +493,53 @@ SCENARIO("Multiplying unsigned integers", "[integer][signed][arithmetic][multipl
         }
     }
 }
-SCENARIO("Multiplying signed integers", "[integer][signed][arithmetic][multiplication]")
+SCENARIO("Multiplying signed integers using Booth's algorithm",
+         "[integer][signed][arithmetic][multiplication]")
 {
     GIVEN("Two signed integers m and r")
     {
 
+        WHEN("The numbers are the example from Wikipedia")
+        {
+            AND_WHEN("It is the 'normal' example")
+            {
+                THEN("The result should be correct")
+                {
+                    using T = integer<4>;
+                    using R = integer<8>;
+                    constexpr T m{3U};
+                    constexpr T r{-4};
+
+                    static constexpr auto res = booth_expanding_mul(m, r);
+                    static constexpr auto res_naive = naive_expanding_mul(m, r);
+                    static constexpr auto res_inplace = booth_inplace_expanding_mul(m, r);
+
+                    static constexpr R expected{-12};
+                    CHECK(res == expected);
+                    CHECK(res == res_inplace);
+                    REQUIRE(res == res_naive);
+                }
+            }
+            AND_WHEN("The example involves the most negative number")
+            {
+                THEN("The result should still be correct")
+                {
+                    using T = integer<4>;
+                    using R = integer<8>;
+                    constexpr T m{-8};
+                    constexpr T r{2U};
+
+                    static constexpr auto res = booth_expanding_mul(m, r);
+                    static constexpr auto res_naive = naive_expanding_mul(m, r);
+                    static constexpr auto res_inplace = booth_inplace_expanding_mul(m, r);
+
+                    static constexpr R expected{-16};
+                    CHECK(res == expected);
+                    CHECK(res == res_inplace);
+                    REQUIRE(res == res_naive);
+                }
+            }
+        }
         WHEN("m is the most negative number")
         {
             THEN("The algorithm should still work")
@@ -485,12 +549,14 @@ SCENARIO("Multiplying signed integers", "[integer][signed][arithmetic][multiplic
 
                 const integer<8> res = booth_mul(m, r);
                 const integer<8> res_naive = naive_mul(m, r);
+                const integer<8> res_inplace = booth_inplace_mul(m, r);
 
                 int8_t mi = -16;
                 int8_t ri = 2;
 
                 int8_t resi = mi * ri;
                 CHECK(res == res_naive);
+                CHECK(res == res_inplace);
                 CHECK((uint8_t)res.word(0) == (uint8_t)resi);
             }
         }
@@ -506,8 +572,8 @@ SCENARIO("Multiplying two integers exactly", "[integer][signed][arithmetic][mult
         int32_t val_a =
             GENERATE(0, 1, 56567, 23, static_cast<int32_t>(-4366), static_cast<int32_t>(-15654),
                      std::numeric_limits<int32_t>::min(), std::numeric_limits<int32_t>::max());
-        int32_t val_b = GENERATE( 1, 56567, 23, 234, 76856, 2342353456,
-                                 static_cast<int32_t>(-4366), static_cast<int32_t>(-1457));
+        int32_t val_b = GENERATE(1, 56567, 23, 234, 76856, 2342353456, static_cast<int32_t>(-4366),
+                                 static_cast<int32_t>(-1457));
 
         const integer<32> a = integer<32>::from_words(val_a);
         const integer<32> b = integer<32>::from_words(val_b);
@@ -520,30 +586,67 @@ SCENARIO("Multiplying two integers exactly", "[integer][signed][arithmetic][mult
         THEN("Multiplication by 1 should not change the other multiplicand")
         {
             const integer<32> one{1U};
-            CHECK(mul(a, one) == a);
-            CHECK(mul(one, a) == a);
-            CHECK(mul(b, one) == b);
-            CHECK(mul(one, b) == b);
+            CHECK(naive_mul(a, one) == a);
+            CHECK(naive_mul(one, a) == a);
+            CHECK(naive_mul(b, one) == b);
+            CHECK(naive_mul(one, b) == b);
+
+            CHECK(booth_mul(a, one) == a);
+            CHECK(booth_mul(one, a) == a);
+            CHECK(booth_mul(b, one) == b);
+            CHECK(booth_mul(one, b) == b);
+
+            CHECK(booth_inplace_mul(a, one) == a);
+            CHECK(booth_inplace_mul(one, a) == a);
+            CHECK(booth_inplace_mul(b, one) == b);
+            CHECK(booth_inplace_mul(one, b) == b);
         }
         THEN("Multiplication by 0 should result in 0")
         {
             const integer<32> zero{0U};
-            CHECK(mul(a, zero) == zero);
-            CHECK(mul(zero, a) == zero);
-            CHECK(mul(b, zero) == zero);
-            CHECK(mul(zero, b) == zero);
+            CHECK(naive_mul(a, zero) == zero);
+            CHECK(naive_mul(zero, a) == zero);
+            CHECK(naive_mul(b, zero) == zero);
+            CHECK(naive_mul(zero, b) == zero);
+
+            CHECK(booth_mul(a, zero) == zero);
+            CHECK(booth_mul(zero, a) == zero);
+            CHECK(booth_mul(b, zero) == zero);
+            CHECK(booth_mul(zero, b) == zero);
+
+            CHECK(booth_inplace_mul(a, zero) == zero);
+            CHECK(booth_inplace_mul(zero, a) == zero);
+            CHECK(booth_inplace_mul(b, zero) == zero);
+            CHECK(booth_inplace_mul(zero, b) == zero);
         }
 
         THEN("Multiplication by -1 should negate the sign")
         {
             const integer<32> minus_one = integer<32>::minus_one();
 
-            const integer<32> mul_res1 = mul(b,minus_one);
-            const integer<32> mul_res2 = mul(minus_one,b);
+            const integer<32> mul_res1 = naive_mul(b, minus_one);
+            const integer<32> mul_res2 = naive_mul(minus_one, b);
+
+            const integer<32> mul_res1b = booth_mul(b, minus_one);
+            const integer<32> mul_res2b = booth_mul(minus_one, b);
+
+            const integer<32> mul_res1i = booth_inplace_mul(b, minus_one);
+            const integer<32> mul_res2i = booth_inplace_mul(minus_one, b);
 
             CHECK(mul_res1.is_negative() == !b.is_negative());
             CHECK(mul_res2.is_negative() == !b.is_negative());
+            CHECK(mul_res1 == mul_res2);
             CHECK(mul_res1 == -b);
+
+            CHECK(mul_res1b.is_negative() == !b.is_negative());
+            CHECK(mul_res2b.is_negative() == !b.is_negative());
+            CHECK(mul_res1b == mul_res2b);
+            CHECK(mul_res1b == -b);
+
+            CHECK(mul_res1i.is_negative() == !b.is_negative());
+            CHECK(mul_res2i.is_negative() == !b.is_negative());
+            CHECK(mul_res1i == mul_res2i);
+            CHECK(mul_res1i == -b);
         }
     }
 
@@ -566,7 +669,9 @@ SCENARIO("Multiplying two integers exactly", "[integer][signed][arithmetic][mult
             {
                 for (const integer<128>& num_b : numbers)
                 {
-                    CHECK(mul(num_a, num_b) == mul(num_b, num_a));
+                    CHECK(naive_mul(num_a, num_b) == naive_mul(num_b, num_a));
+                    CHECK(booth_mul(num_a, num_b) == booth_mul(num_b, num_a));
+                    CHECK(booth_inplace_mul(num_a, num_b) == booth_inplace_mul(num_b, num_a));
                 }
             }
         }
@@ -578,8 +683,14 @@ SCENARIO("Multiplying two integers exactly", "[integer][signed][arithmetic][mult
             {
                 for (const integer<128>& num : numbers)
                 {
-                    CHECK(mul(num, zero) == zero);
-                    CHECK(mul(zero, num) == zero);
+                    CHECK(naive_mul(num, zero) == zero);
+                    CHECK(naive_mul(zero, num) == zero);
+
+                    CHECK(booth_mul(num, zero) == zero);
+                    CHECK(booth_mul(zero, num) == zero);
+
+                    CHECK(booth_inplace_mul(num, zero) == zero);
+                    CHECK(booth_inplace_mul(zero, num) == zero);
                 }
             }
         }
@@ -590,8 +701,14 @@ SCENARIO("Multiplying two integers exactly", "[integer][signed][arithmetic][mult
 
                 for (const integer<128>& num : numbers)
                 {
-                    CHECK(mul(num, one) == num);
-                    CHECK(mul(one, num) == num);
+                    CHECK(naive_mul(num, one) == num);
+                    CHECK(naive_mul(one, num) == num);
+
+                    CHECK(booth_mul(num, one) == num);
+                    CHECK(booth_mul(one, num) == num);
+
+                    CHECK(booth_inplace_mul(num, one) == num);
+                    CHECK(booth_inplace_mul(one, num) == num);
                 }
             }
         }
@@ -599,7 +716,9 @@ SCENARIO("Multiplying two integers exactly", "[integer][signed][arithmetic][mult
         {
             THEN("The product is 1 for the truncating multiplication")
             {
-                REQUIRE(mul(d, d) == one);
+                REQUIRE(naive_mul(d, d) == one);
+                REQUIRE(booth_mul(d, d) == one);
+                REQUIRE(booth_inplace_mul(d, d) == one);
             }
         }
     }
@@ -622,31 +741,72 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
             THEN("The multiplication should match its uint64_t counterpart")
             {
                 int64_t expected = val_a * val_b;
-                integer<64> result = mul(a, b);
-                integer<64> expected_integer{expected};
 
-//                std::cout << val_a << " * " << val_b << " = " << expected << "\n";
-//                std::cout << "integer<64>\t" << group_digits(to_binary(result), 16) << "\n";
-//                std::cout << "int64_t\t\t" << group_digits(to_binary(expected_integer), 16) << "\n";
-//                std::cout << "integer<64>\t" << to_decimal(result) << "\n";
-//                std::cout << "int64_t\t\t" << to_decimal(expected_integer) << "\n";
+                integer<64> result = naive_mul(a, b);
+                integer<64> resultb = booth_mul(a, b);
+                integer<64> resulti = booth_inplace_mul(a, b);
+
+                integer<64> expected_integer{expected};
 
                 CHECK(expected == result.word(0));
                 REQUIRE(expected_integer == result);
+
+                CHECK(expected == resultb.word(0));
+                REQUIRE(expected_integer == resultb);
+
+                CHECK(expected == resulti.word(0));
+                REQUIRE(expected_integer == resulti);
             }
         }
     }
 }
 
-SCENARIO("Multiplication of larger numbers","[integer][signed][arithmetic][multiplication]") {
-    GIVEN("Two large integer numbers") {
+SCENARIO("Multiplication of larger numbers", "[integer][signed][arithmetic][multiplication]")
+{
+
+    GIVEN("Two large integer numbers")
+    {
         using aint = integer<1024>;
-        aint a(1), b(1);
+        using aintR = integer<2048>;
+
+        using I = integer<128>;
+        using IR = integer<256>;
+
+
+        I a_ = I::one();
+        I b_ = I::one();
+
+        a_ = a_ << 126;
+        b_ = b_ << 63;
+        static constexpr IR expected128{IR::one() << (126+63)};
+
+        aint a = aint::one();
+        aint b = aint::one();
         a = a << 1022;
         b = b << 511;
-        THEN("The product should not be zero") {
-            const auto result = booth_expanding_mul(a, b);
-            REQUIRE(result != aint::zero());
+        static constexpr aintR expected1024{aintR::one() << (1022+511)};
+
+        THEN("The product should be correct")
+        {
+            const auto result_booth = booth_expanding_mul(a, b);
+            const auto result_naive = naive_expanding_mul(a, b);
+            const auto result_inplace = booth_inplace_expanding_mul(a, b);
+
+            const auto result_booth_ = booth_expanding_mul(a_, b_);
+            const auto result_naive_ = naive_expanding_mul(a_, b_);
+            const auto result_inplace_ = booth_inplace_expanding_mul(a_, b_);
+
+            CHECK(result_booth == result_naive);
+            CHECK(result_naive == result_inplace);
+            CHECK(result_booth == result_inplace);
+            CHECK(result_booth == expected1024);
+
+            CHECK(result_booth_ == result_naive_);
+            CHECK(result_booth_ == result_inplace_);
+            CHECK(result_booth_ == expected128);
+
+            REQUIRE(result_booth_ != I::zero()); // test case coming from a found bug
+            REQUIRE(result_booth != aint::zero()); // test case coming from a found bug
         }
     }
 }
@@ -864,9 +1024,7 @@ SCENARIO("MIN/MAX Values behave as expected", "[integer][signed][operation][util
     }
 }
 
-
-
-SCENARIO("Left/right shifting sintegers", "[integer][signed][operation][utility]")
+SCENARIO("Left/right shifting signed integers", "[integer][signed][operation][utility]")
 {
     GIVEN("A positive integer")
     {
@@ -954,8 +1112,7 @@ SCENARIO("Left/right shifting sintegers", "[integer][signed][operation][utility]
     }
 }
 
-
-SCENARIO("Right-shift asigning sintegers", "[integer][signed][operation][utility]")
+SCENARIO("Right-shift asigning signed integers", "[integer][signed][operation][utility]")
 {
     GIVEN("A positive integer")
     {
@@ -978,7 +1135,7 @@ SCENARIO("Right-shift asigning sintegers", "[integer][signed][operation][utility
                 REQUIRE(b == b_);
                 b >>= 1;
                 REQUIRE(b == b__);
-                b>>=1;
+                b >>= 1;
                 REQUIRE(b == b___);
             }
             THEN("It should move correctly over word boundaries")

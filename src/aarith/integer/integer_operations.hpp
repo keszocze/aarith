@@ -666,7 +666,7 @@ template <size_t W, size_t V, typename WordType>
     const uinteger<W, WordType> m_ = m_neg ? expanding_abs(m) : uinteger<W, WordType>{m};
     const uinteger<V, WordType> r_ = r_neg ? expanding_abs(r) : uinteger<V, WordType>{r};
 
-    const integer<W + V + 1, WordType> result = schoolbook_expanding_mul(m_, r_);
+    const integer<W + V, WordType> result = schoolbook_expanding_mul(m_, r_);
 
     return m_neg ^ r_neg ? -result : result;
 }
@@ -712,57 +712,70 @@ template <size_t W, typename WordType>
  * most negative number. See https://en.wikipedia.org/wiki/Booth%27s_multiplication_algorithm
  * for details.
  *
- * @tparam W The bit width of the first multiplicant
- * @tparam V The bit width of the second multiplicant
- * @param a First multiplicant
- * @param b Second multiplicant
- * @return Product of a and b
+ * @tparam x The bit width of the first multiplicant
+ * @tparam y The bit width of the second multiplicant
+ * @param m Multiplicand
+ * @param r Multiplier
+ * @return Product of m and r
  */
-template <size_t W, size_t V, typename WordType>
-[[nodiscard]] constexpr auto booth_expanding_mul(const integer<W, WordType>& m,
-                                                 const integer<V, WordType>& r)
-    -> integer<V + W, WordType>
+template <size_t x, size_t y, typename WordType>
+[[nodiscard]] constexpr auto booth_expanding_mul(const integer<x, WordType>& m, const integer<y, WordType>& r)
+    -> integer<y + x, WordType>
 {
 
     if (m.is_zero() || r.is_zero())
     {
-        return integer<V + W, WordType>::zero();
+        return integer<y + x, WordType>::zero();
     }
 
-    constexpr size_t K = W + V + 2;
+    constexpr size_t K = x + y + 2;
 
-    integer<W + 1, WordType> expanded_m = width_cast<W + 1>(m);
+    integer<x + 1, WordType> expanded_m = width_cast<x + 1>(m);
 
-    uinteger<K, WordType> A{static_cast<word_array<W + 1, WordType>>(expanded_m)};
-    uinteger<K, WordType> S{static_cast<word_array<W, WordType>>(-m)};
+//    std::cout << "expanded m: " << to_binary(expanded_m) << "\n";
 
-    A = A << V + 1;
-    S = S << V + 1;
+    uinteger<K, WordType> A{static_cast<word_array<x + 1, WordType>>(expanded_m)};
+    uinteger<K, WordType> S{static_cast<word_array<x + 1, WordType>>(-expanded_m)};
 
-    uinteger<K, WordType> P{static_cast<word_array<W, WordType>>(r)};
+    A = A << y + 1;
+    S = S << y + 1;
+
+    uinteger<K, WordType> P{static_cast<word_array<x, WordType>>(r)};
     P = P << 1;
 
-    for (size_t i = 0; i < V; ++i)
+//    std::cout << "A: " << to_binary(A) << "\n";
+//    std::cout << "S: " << to_binary(S) << "\n";
+//    std::cout << "P: " << to_binary(P) << "\n\n";
+    for (size_t i = 0; i < y; ++i)
     {
 
         bool last_bit = P.bit(0);
         bool snd_last_bit = P.bit(1);
 
+//        std::cout << "P_pre_" << i << ": " << to_binary(P) << "\n";
+
         if (snd_last_bit && !last_bit)
         {
-            P = expanding_add(P, S);
+            P = add(P, S);
         }
         if (!snd_last_bit && last_bit)
         {
-            P = expanding_add(P, A);
+            P = add(P, A);
         }
 
+        const bool prefix_minus = P.msb();
         P = P >> 1;
+        if (prefix_minus)
+        {
+            P.set_msb(true);
+        }
+
+//        std::cout << "P_pos_" << i << ": " << to_binary(P) << "\n";
     }
 
-    auto result = width_cast<W + V>(P >> 1);
+    auto result = width_cast<x + y>(P >> 1);
 
-    return integer<W + V, WordType>{result};
+    return integer<x + y, WordType>{result};
 }
 
 /**
@@ -793,72 +806,78 @@ template <size_t W, typename WordType>
     }
     else
     {
-        return width_cast<W>(inplace_expanding_mul(a, b));
+        return width_cast<W>(booth_expanding_mul(a, b));
     }
 }
 
 /**
  * @brief Multiplies two signed integers.
  *
- * @warn There is a potential loss of precision as abs(integer::min) > integer::max
  *
  * This implements the Booth multiplication algorithm with extension to correctly handle the
  * most negative number. See https://en.wikipedia.org/wiki/Booth%27s_multiplication_algorithm
  * for details.
  *
- * @tparam W The bit width of the first multiplicand
- * @tparam V The bit width of the second multiplicand
- * @param a First multiplicand
- * @param b Second multiplicand
- * @return Product of a and b
+ * @tparam x The bit width of the first multiplicant
+ * @tparam y The bit width of the second multiplicant
+ * @param m Multiplicand
+ * @param r Multiplier
+ * @return Product of m and r
  */
-template <size_t W, size_t V, typename WordType>
-[[nodiscard]] constexpr auto inplace_expanding_mul(const integer<W, WordType>& m,
-                                                   const integer<V, WordType>& r)
-    -> integer<V + W, WordType>
-{
-
-    if (m.is_zero() || r.is_zero())
-    {
-        return integer<V + W, WordType>::zero();
-    }
-
-    constexpr size_t K = W + V + 2;
-
-    integer<W + 1, WordType> expanded_m = width_cast<W + 1>(m);
-
-    uinteger<K, WordType> A{static_cast<word_array<W + 1, WordType>>(expanded_m)};
-    uinteger<K, WordType> S{static_cast<word_array<W, WordType>>(-m)};
-
-    A <<= V + 1;
-    S <<= V + 1;
-
-    uinteger<K, WordType> P{static_cast<word_array<W, WordType>>(r)};
-    P = P << 1;
-
-    for (size_t i = 0; i < V; ++i)
+    template <size_t x, size_t y, typename WordType>
+    [[nodiscard]] constexpr auto booth_inplace_expanding_mul(const integer<x, WordType>& m, const integer<y, WordType>& r)
+    -> integer<y + x, WordType>
     {
 
-        bool last_bit = P.bit(0);
-        bool snd_last_bit = P.bit(1);
-
-        if (snd_last_bit && !last_bit)
+        if (m.is_zero() || r.is_zero())
         {
-            P = expanding_add(P, S);
+            return integer<y + x, WordType>::zero();
         }
-        if (!snd_last_bit && last_bit)
+
+        constexpr size_t K = x + y + 2;
+
+        integer<x + 1, WordType> expanded_m = width_cast<x + 1>(m);
+
+
+        uinteger<K, WordType> A{static_cast<word_array<x + 1, WordType>>(expanded_m)};
+        uinteger<K, WordType> S{static_cast<word_array<x + 1, WordType>>(-expanded_m)};
+
+        A <<= y + 1;
+        S <<= y + 1;
+
+        uinteger<K, WordType> P{static_cast<word_array<x, WordType>>(r)};
+        P <<= 1;
+
+        for (size_t i = 0; i < y; ++i)
         {
-            P = expanding_add(P, A);
+
+            bool last_bit = P.bit(0);
+            bool snd_last_bit = P.bit(1);
+
+
+            if (snd_last_bit && !last_bit)
+            {
+                P = add(P, S);
+            }
+            if (!snd_last_bit && last_bit)
+            {
+                P = add(P, A);
+            }
+
+            const bool prefix_minus = P.msb();
+            P >>= 1;
+            if (prefix_minus)
+            {
+                P.set_msb(true);
+            }
+
         }
 
         P >>= 1;
+        auto result = width_cast<x + y>(P);
+
+        return integer<x + y, WordType>{result};
     }
-
-    P >>= 1;
-    auto result = width_cast<W + V>(P);
-
-    return integer<W + V, WordType>{result};
-}
 
 /**
  * @brief Multiplies two integers.
@@ -874,7 +893,7 @@ template <size_t W, size_t V, typename WordType>
  * @return Product of a and b
  */
 template <size_t W, typename WordType>
-[[nodiscard]] constexpr integer<W, WordType> inplace_mul(const integer<W, WordType>& a,
+[[nodiscard]] constexpr integer<W, WordType> booth_inplace_mul(const integer<W, WordType>& a,
                                                          const integer<W, WordType>& b)
 {
 
@@ -889,7 +908,7 @@ template <size_t W, typename WordType>
     }
     else
     {
-        return width_cast<W>(inplace_expanding_mul(a, b));
+        return width_cast<W>(booth_inplace_expanding_mul(a, b));
     }
 }
 

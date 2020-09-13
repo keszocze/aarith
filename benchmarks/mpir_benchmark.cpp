@@ -138,7 +138,7 @@ void aarith_booth_inplace(benchmark::State& state)
         {
             for (size_t j = 0; j < n_iter; ++j)
             {
-                benchmark::DoNotOptimize(inplace_expanding_mul(a, b));
+                benchmark::DoNotOptimize(booth_inplace_expanding_mul(a, b));
                 b = b + aone;
             }
             a = a + aone;
