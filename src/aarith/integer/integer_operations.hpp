@@ -1,7 +1,6 @@
 #pragma once
 #include <aarith/core/traits.hpp>
 #include <type_traits>
-#include <z3.h>
 
 namespace aarith {
 
