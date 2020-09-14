@@ -55,9 +55,9 @@ if(MPIR_FOUND)
   #target_include_directories(mpfr-comparison PRIVATE ${MPFR_INCLUDE_DIR})
   target_include_directories(mpir-comparison PRIVATE ${PROJECT_SOURCE_DIR}/lib/benchmark/include ${MPIR_INCLUDE_DIR})
   target_link_libraries(mpir-comparison PRIVATE aarith::Library benchmark::benchmark ${MPIR_LIBRARIES})
-  message(-- MPIR found: Building MPIR benchmarks)
+  message(STATUS "MPIR found: Building MPIR benchmarks")
 else()
-    message("-- Could not find MPIR: Not building MPIR benchmarks")
+    message(STATUS "Could not find MPIR: Not building MPIR benchmarks")
 endif()
 
 

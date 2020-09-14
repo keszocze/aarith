@@ -45,9 +45,9 @@ add_aarith_test(fau FILES uint-approx-test.cpp)
 
 if(MPIR_FOUND)
   add_aarith_test(uint-random FILES integer/uint-random-test.cpp LIBS ${MPIR_LIBRARIES} INCLUDES ${MPIR_INCLUDE_DIR})
-  message("-- MPIR found: Building MPIR tests")
+  message(STATUS "MPIR found: Building MPIR tests")
 else()
-  message("-- Could not find MPIR: not building MPIR tests")
+  message(STATUS "Could not find MPIR: not building MPIR tests")
 endif()
 
 
