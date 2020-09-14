@@ -5,7 +5,9 @@ project(aarith)
 option(BUILD_BENCHMARKS "build benchmarks" OFF)
 option(BUILD_EXPERIMENTS "build experiments" OFF)
 
-
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/lib")
+find_package(MPIR)
+find_package(MPFR)
 
 include(TargetWarnings.cmake)
 enable_testing()

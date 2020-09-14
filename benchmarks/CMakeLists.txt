@@ -49,10 +49,15 @@ add_aarith_benchmark(fau_adder-timing FILES fau_adder_benchmark.cpp)
   #message(STATUS "MPFR not found, not building MPFR benchmarks")
 #endif()
 
-#if(MPIR_FOUND)
+if(MPIR_FOUND)
   add_executable(mpir-comparison   mpir_benchmark.cpp  )
   target_compile_options(mpir-comparison PRIVATE "-O3")
   #target_include_directories(mpfr-comparison PRIVATE ${MPFR_INCLUDE_DIR})
   target_include_directories(mpir-comparison PRIVATE ${PROJECT_SOURCE_DIR}/lib/benchmark/include ${MPIR_INCLUDE_DIR})
   target_link_libraries(mpir-comparison PRIVATE aarith::Library benchmark::benchmark ${MPIR_LIBRARIES})
-#endif()
+  message(-- MPIR found: Building MPIR benchmarks)
+else()
+    message("-- Could not find MPIR: Not building MPIR benchmarks")
+endif()
+
+

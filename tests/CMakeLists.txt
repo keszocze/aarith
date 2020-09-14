@@ -41,12 +41,13 @@ add_aarith_test(integer-cast FILES integer/integer-casts.cpp)
 
 add_aarith_test(fau FILES uint-approx-test.cpp)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/")
-find_package(MPIR)
+
+
 if(MPIR_FOUND)
   add_aarith_test(uint-random FILES integer/uint-random-test.cpp LIBS ${MPIR_LIBRARIES} INCLUDES ${MPIR_INCLUDE_DIR})
+  message("-- MPIR found: Building MPIR tests")
 else()
-  message(WARNING "Could not find MPIR; not building coverage test")
+  message("-- Could not find MPIR: not building MPIR tests")
 endif()
 
 
