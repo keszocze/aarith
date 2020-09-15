@@ -1,7 +1,6 @@
 #pragma once
 
 #include <aarith/core/string_utils.hpp>
-#include <aarith/integer.hpp>
 
 namespace aarith {
 
@@ -73,8 +72,6 @@ template <size_t Width, typename WordType>
 auto to_bcd(const uinteger<Width, WordType>& num)
     -> uinteger<number_of_decimal_digits(Width) * 4, WordType>
 {
-    using namespace aarith::arithmetic_operators;
-
     constexpr auto bcd_digits = number_of_decimal_digits(Width);
     constexpr auto bcd_width = bcd_digits * 4;
 
@@ -90,7 +87,7 @@ auto to_bcd(const uinteger<Width, WordType>& num)
             auto masked = bcd & mask;
             if (masked > four)
             {
-                bcd = bcd + three;
+                bcd = add(bcd, three);
             }
 
             three = (three << 4);

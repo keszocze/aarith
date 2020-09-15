@@ -1,6 +1,7 @@
 #include <catch.hpp>
 
 #include <aarith/core.hpp>
+#include <aarith/core/string_utils.hpp>
 
 using namespace aarith;
 
@@ -31,7 +32,7 @@ SCENARIO("Counting bits in word_array", "[word_array][util]")
     }
 }
 
-SCENARIO("Casting word_containers into different width", "[word_array]")
+SCENARIO("Casting word_containers into different width", "[word_array][casting]")
 {
     GIVEN("width_cast is called")
     {
@@ -301,7 +302,183 @@ SCENARIO("Left shift operator works as expected", "[word_array][bit_logic]")
     }
 }
 
-SCENARIO("Right shift operator works as expected", "[word_array][utility]")
+SCENARIO("Left shift assignent works as expected", "[word_array][bit_logic]")
+{
+    GIVEN("One word_array a and a number of shifted bits s")
+    {
+
+        const size_t TestWidth = 16;
+
+        WHEN("The result still fits the width")
+        {
+            static constexpr uint16_t number_a = 7;
+            static constexpr auto s = 4U;
+            word_array<TestWidth> a{number_a};
+
+            const auto result = a << s;
+            a <<= s;
+            REQUIRE(result.word(0) == 112);
+            REQUIRE(a.word(0) == 112);
+            REQUIRE(a == result);
+        }
+        WHEN("The result does not fit the width anymore")
+        {
+            static constexpr uint16_t number_a = 7;
+            static constexpr auto s = 14U;
+            word_array<TestWidth> a{number_a};
+
+            const auto result = a << s;
+            a <<= s;
+
+            REQUIRE(result.word(0) == 49152);
+            REQUIRE(a.word(0) == 49152);
+            REQUIRE(a == result);
+        }
+
+        WHEN("Some bits are shifted to the next word")
+        {
+            const size_t Width = 70;
+
+            static constexpr uint16_t number_a = 7;
+            static constexpr auto s = 63U;
+            word_array<Width> a{number_a};
+
+            const auto result = a << s;
+            a <<= s;
+            REQUIRE(result.word(0) == 0x8000000000000000);
+            REQUIRE(result.word(1) == 3);
+            REQUIRE(a.word(0) == 0x8000000000000000);
+            REQUIRE(a.word(1) == 3);
+            REQUIRE(a == result);
+        }
+        WHEN("The bits are shifted to the second next word")
+        {
+            const size_t Width = 130;
+
+            static constexpr uint16_t number_a = 7;
+            static constexpr auto s = 127U;
+            word_array<Width> a{number_a};
+
+            const auto result = a << s;
+            a <<= s;
+            REQUIRE(result.word(0) == 0);
+            REQUIRE(result.word(1) == 0x8000000000000000);
+            REQUIRE(result.word(2) == 3);
+            REQUIRE(a.word(0) == 0);
+            REQUIRE(a.word(1) == 0x8000000000000000);
+            REQUIRE(a.word(2) == 3);
+            REQUIRE(a == result);
+        }
+        WHEN("The bits are not shifted")
+        {
+            const size_t Width = 192;
+
+            static constexpr uint16_t number_a = 3;
+            static constexpr auto s = 0;
+            word_array<Width> a{number_a};
+
+            const auto result = a << s;
+            a <<= s;
+            REQUIRE(result.word(0) == 3);
+            REQUIRE(result.word(1) == 0);
+            REQUIRE(result.word(2) == 0);
+            REQUIRE(a.word(0) == 3);
+            REQUIRE(a.word(1) == 0);
+            REQUIRE(a.word(2) == 0);
+            REQUIRE(a == result);
+        }
+        WHEN("The bits are shifted exactly one word")
+        {
+            const size_t Width = 192;
+
+            static constexpr uint16_t number_a = 3;
+            static constexpr auto s = static_cast<size_t>(word_array<Width>::word_width());
+            word_array<Width> a{number_a};
+
+            const auto result = a << s;
+            a <<= s;
+            REQUIRE(result.word(0) == 0);
+            REQUIRE(result.word(1) == 3);
+            REQUIRE(result.word(2) == 0);
+            REQUIRE(a.word(0) == 0);
+            REQUIRE(a.word(1) == 3);
+            REQUIRE(a.word(2) == 0);
+            REQUIRE(a == result);
+        }
+        WHEN("The bits are shifted exactly two words")
+        {
+            const size_t Width = 192;
+
+            static constexpr uint16_t number_a = 3;
+            static constexpr auto s = 2 * static_cast<size_t>(word_array<Width>::word_width());
+            word_array<Width> a{number_a};
+
+            const auto result = a << s;
+            a <<= s;
+            REQUIRE(result.word(0) == 0);
+            REQUIRE(result.word(1) == 0);
+            REQUIRE(result.word(2) == 3);
+            REQUIRE(a.word(0) == 0);
+            REQUIRE(a.word(1) == 0);
+            REQUIRE(a.word(2) == 3);
+            REQUIRE(a == result);
+        }
+        WHEN("The bits are shifted exactly by word_width-1")
+        {
+            const size_t Width = 192;
+
+            static constexpr uint16_t number_a = 3;
+            static constexpr auto s = static_cast<size_t>(word_array<Width>::word_width()) - 1U;
+            word_array<Width> a{number_a};
+
+            auto reference = a.word(0) << s;
+
+            const auto result = a << s;
+            a <<= s;
+            REQUIRE(result.word(0) == reference);
+            REQUIRE(result.word(1) == 1);
+            REQUIRE(result.word(2) == 0);
+            REQUIRE(a.word(0) == reference);
+            REQUIRE(a.word(1) == 1);
+            REQUIRE(a.word(2) == 0);
+            REQUIRE(a == result);
+        }
+        WHEN("The bits are assignment shifted by 2*word_width-1")
+        {
+            const size_t Width = 192;
+
+            static constexpr uint16_t number_a = 3;
+            static constexpr auto s =
+                2U * static_cast<size_t>(word_array<Width>::word_width()) - 1U;
+            word_array<Width> a{number_a};
+            auto reference = a.word(0) << (s % (sizeof(word_array<Width>::word_width()) * 8));
+
+            //            const auto skip_words = s / a.word_width();
+            //            const auto shift_word_left = s - skip_words * a.word_width();
+            //            const auto shift_word_right = a.word_width() - shift_word_left;
+            //            std::cout << "s " << s << "\t skip_words " << skip_words << "\t sleft " <<
+            //            shift_word_left << "\t sright " << shift_word_right << "\n"; std::cout <<
+            //            group_digits(to_binary(a),64) << "\n";
+
+            const auto result = a << s;
+
+            //            std::cout << group_digits(to_binary(result),64) << "\n";
+
+            a <<= s;
+
+            //            std::cout << group_digits(to_binary(a),64) << "\n";
+            REQUIRE(result.word(0) == 0);
+            REQUIRE(result.word(1) == reference);
+            REQUIRE(result.word(2) == 1);
+            REQUIRE(a.word(0) == 0);
+            REQUIRE(a.word(1) == reference);
+            REQUIRE(a.word(2) == 1);
+            REQUIRE(a == result);
+        }
+    }
+}
+
+SCENARIO("Right shift operator works as expected", "[word_array][utility][bit_logic]")
 {
     GIVEN("One word_array a and a number of shifted bits s")
     {
@@ -392,15 +569,16 @@ SCENARIO("Right shift operator works as expected", "[word_array][utility]")
                 static constexpr size_t width = 256;
                 static constexpr size_t word_width = word_array<width>::word_width();
 
-                static constexpr word_array<width> a{1U};
-                static constexpr word_array<width> expected0 =
-                    word_array<width>::from_words(0U, 0U, 0U, 1U);
-                static constexpr word_array<width> expected1 =
-                    word_array<width>::from_words(0U, 0U, 1U, 0U);
-                static constexpr word_array<width> expected2 =
-                    word_array<width>::from_words(0U, 1U, 0U, 0U);
-                static constexpr word_array<width> expected3 =
+                static constexpr word_array<width> a =
                     word_array<width>::from_words(1U, 0U, 0U, 0U);
+                static constexpr word_array<width> expected0 =
+                    word_array<width>::from_words(1U, 0U, 0U, 0U);
+                static constexpr word_array<width> expected1 =
+                    word_array<width>::from_words(0U, 1U, 0U, 0U);
+                static constexpr word_array<width> expected2 =
+                    word_array<width>::from_words(0U, 0U, 1U, 0U);
+                static constexpr word_array<width> expected3 =
+                    word_array<width>::from_words(0U, 0U, 0U, 1U);
                 static constexpr word_array<width> expected4 =
                     word_array<width>::from_words(0U, 0U, 0U, 0U);
 
@@ -409,7 +587,7 @@ SCENARIO("Right shift operator works as expected", "[word_array][utility]")
 
                 for (auto i = 0U; i < expecteds.size(); ++i)
                 {
-                    word_array<width> result = a << (word_width * i);
+                    word_array<width> result = a >> (word_width * i);
                     CHECK(result == expecteds[i]);
                 }
             }
@@ -425,6 +603,162 @@ SCENARIO("Right shift operator works as expected", "[word_array][utility]")
                 const word_array<w> result = a << w;
 
                 CHECK(expected == result);
+            }
+        }
+    }
+}
+
+SCENARIO("Right shift assignment operator works as expected", "[word_array][utility][bit_logic")
+{
+    GIVEN("One word_array a and a number of shifted bits s")
+    {
+        WHEN("The bits are not shifted")
+        {
+            const size_t Width = 192;
+
+            typename word_array<Width>::word_type number_a = 3;
+            number_a <<= word_array<Width>::word_width() - 2;
+            static constexpr auto s = 0;
+            word_array<Width> a(0U);
+            a.set_word(a.word_count() - 1, number_a);
+
+            const auto result = a >> s;
+            a >>= s;
+            REQUIRE(result.word(a.word_count() - 3) == 0);
+            REQUIRE(result.word(a.word_count() - 2) == 0);
+            REQUIRE(result.word(a.word_count() - 1) == number_a);
+            REQUIRE(a.word(a.word_count() - 3) == 0);
+            REQUIRE(a.word(a.word_count() - 2) == 0);
+            REQUIRE(a.word(a.word_count() - 1) == number_a);
+            REQUIRE(a == result);
+        }
+        WHEN("The bits are shifted exactly one word")
+        {
+            const size_t Width = 192;
+
+            typename word_array<Width>::word_type number_a = 3;
+            number_a <<= word_array<Width>::word_width() - 2;
+            static constexpr auto s = static_cast<size_t>(word_array<Width>::word_width());
+            word_array<Width> a(0U);
+            a.set_word(a.word_count() - 1, number_a);
+
+            const auto result = a >> s;
+            a >>= s;
+            REQUIRE(result.word(a.word_count() - 3) == 0);
+            REQUIRE(result.word(a.word_count() - 2) == number_a);
+            REQUIRE(result.word(a.word_count() - 1) == 0);
+            REQUIRE(result.word(a.word_count() - 3) == 0);
+            REQUIRE(result.word(a.word_count() - 2) == number_a);
+            REQUIRE(result.word(a.word_count() - 1) == 0);
+            REQUIRE(a == result);
+        }
+        WHEN("The bits are shifted exactly two words")
+        {
+            const size_t Width = 192;
+
+            typename word_array<Width>::word_type number_a = 3;
+            number_a <<= word_array<Width>::word_width() - 2;
+            static constexpr auto s = 2 * static_cast<size_t>(word_array<Width>::word_width());
+            word_array<Width> a(0U);
+            a.set_word(a.word_count() - 1, number_a);
+
+            const auto result = a >> s;
+            a >>= s;
+            REQUIRE(result.word(a.word_count() - 3) == number_a);
+            REQUIRE(result.word(a.word_count() - 2) == 0);
+            REQUIRE(result.word(a.word_count() - 1) == 0);
+            REQUIRE(result.word(a.word_count() - 3) == number_a);
+            REQUIRE(result.word(a.word_count() - 2) == 0);
+            REQUIRE(result.word(a.word_count() - 1) == 0);
+            REQUIRE(a == result);
+        }
+        WHEN("The bits are shifted exactly by word_width-1")
+        {
+            const size_t Width = 192;
+
+            typename word_array<Width>::word_type number_a = 3;
+            number_a <<= word_array<Width>::word_width() - 2;
+            static constexpr auto s = static_cast<size_t>(word_array<Width>::word_width()) - 1;
+            word_array<Width> a(0U);
+            a.set_word(a.word_count() - 1, number_a);
+
+            auto ref = number_a << 1;
+
+            const auto result = a >> s;
+            a >>= s;
+
+            REQUIRE(result.word(a.word_count() - 3) == 0);
+            REQUIRE(result.word(a.word_count() - 2) == ref);
+            REQUIRE(result.word(a.word_count() - 1) == 1);
+            REQUIRE(result.word(a.word_count() - 3) == 0);
+            REQUIRE(result.word(a.word_count() - 2) == ref);
+            REQUIRE(result.word(a.word_count() - 1) == 1);
+            REQUIRE(a == result);
+        }
+        WHEN("The bits are shifted by 2*word_width-1")
+        {
+            const size_t Width = 192;
+
+            typename word_array<Width>::word_type number_a = 3;
+            number_a <<= word_array<Width>::word_width() - 2;
+            static constexpr auto s = 2 * static_cast<size_t>(word_array<Width>::word_width()) - 1;
+            word_array<Width> a(0U);
+            a.set_word(a.word_count() - 1, number_a);
+
+            auto ref = number_a << 1;
+
+            const auto result = a >> s;
+            a >>= s;
+            REQUIRE(result.word(a.word_count() - 3) == ref);
+            REQUIRE(result.word(a.word_count() - 2) == 1);
+            REQUIRE(result.word(a.word_count() - 1) == 0);
+            REQUIRE(result.word(a.word_count() - 3) == ref);
+            REQUIRE(result.word(a.word_count() - 2) == 1);
+            REQUIRE(result.word(a.word_count() - 1) == 0);
+            REQUIRE(a == result);
+        }
+        WHEN("The shift amount is a multiple of the word width")
+        {
+
+            THEN("The result should still be correct")
+            {
+                static constexpr size_t width = 256;
+                static constexpr size_t word_width = word_array<width>::word_width();
+
+                word_array<width> a = word_array<width>::from_words(1U, 0U, 0U, 0U);
+                ;
+                static constexpr word_array<width> expected1 =
+                    word_array<width>::from_words(0U, 1U, 0U, 0U);
+                static constexpr word_array<width> expected2 =
+                    word_array<width>::from_words(0U, 0U, 1U, 0U);
+                static constexpr word_array<width> expected3 =
+                    word_array<width>::from_words(0U, 0U, 0U, 1U);
+                static constexpr word_array<width> expected4 =
+                    word_array<width>::from_words(0U, 0U, 0U, 0U);
+
+                std::vector<word_array<width>> expecteds{expected1, expected2, expected3,
+                                                         expected4};
+
+                for (auto i = 0U; i < expecteds.size(); ++i)
+                {
+                    a >>= word_width;
+                    CHECK(a == expecteds[i]);
+                }
+            }
+        }
+
+        AND_WHEN("The shift amount is the integer width")
+        {
+            THEN("The result should still be correct")
+            {
+                constexpr size_t w = 128;
+                word_array<w> a{1U};
+                constexpr word_array<w> expected;
+                const word_array<w> result = a >> w;
+
+                a >>= w;
+                CHECK(expected == result);
+                REQUIRE(a == result);
             }
         }
     }
@@ -478,7 +812,7 @@ SCENARIO("Bitwise operations work as expected", "[word_array][bit_logic]")
     }
 }
 
-SCENARIO("Checking whether an word_array is not equal to zero/false")
+SCENARIO("Checking whether an word_array is not equal to zero/false", "[word_array][utility]")
 {
     GIVEN("An word_array<N>=0=a for various N")
     {
@@ -542,7 +876,7 @@ SCENARIO("Checking whether an word_array is not equal to zero/false")
     }
 }
 
-SCENARIO("Bit shifting is possible as constexpr")
+SCENARIO("Bit shifting is possible as constexpr","[word_array][utility][bit_logic][constexpr]")
 {
     GIVEN("A word_array of width N")
     {
@@ -642,7 +976,7 @@ SCENARIO("Bit operations are performed correctly", "[word_array][bit_logic]")
     }
 }
 
-SCENARIO("Splitting a word_array/extraction from a word_array", "[word_array],[util]")
+SCENARIO("Splitting a word_array/extraction from a word_array", "[word_array],[utility]")
 {
     GIVEN("A word_array w")
     {
@@ -670,39 +1004,42 @@ SCENARIO("Splitting a word_array/extraction from a word_array", "[word_array],[u
     }
 }
 
-
-SCENARIO("Concatenation is associative", "[word_array][util]") {
-    GIVEN("Three different words") {
+SCENARIO("Concatenation is associative", "[word_array][utility]")
+{
+    GIVEN("Three different words")
+    {
         const uint32_t n1 = GENERATE(take(100, random(std::numeric_limits<uint32_t>::max(),
-                                                     std::numeric_limits<uint32_t>::max())));
+                                                      std::numeric_limits<uint32_t>::max())));
         const uint32_t n2 = GENERATE(take(100, random(std::numeric_limits<uint32_t>::max(),
-                                                     std::numeric_limits<uint32_t>::max())));
+                                                      std::numeric_limits<uint32_t>::max())));
         const uint32_t n3 = GENERATE(take(100, random(std::numeric_limits<uint32_t>::max(),
-                                                     std::numeric_limits<uint32_t>::max())));
+                                                      std::numeric_limits<uint32_t>::max())));
 
-        const word_array<32, uint8_t> w1_8{word_array<32,uint32_t>{n1}};
+        const word_array<32, uint8_t> w1_8{word_array<32, uint32_t>{n1}};
         const word_array<32, uint64_t> w1_64{n1};
-        const word_array<32, uint8_t> w2_8{word_array<32,uint32_t>{n2}};
+        const word_array<32, uint8_t> w2_8{word_array<32, uint32_t>{n2}};
         const word_array<32, uint64_t> w2_64{n2};
-        const word_array<32, uint8_t> w3_8{word_array<32,uint32_t>{n3}};
+        const word_array<32, uint8_t> w3_8{word_array<32, uint32_t>{n3}};
         const word_array<32, uint64_t> w3_64{n3};
 
-        WHEN("Concatenating the words") {
-            THEN("The operation should be associative") {
-                REQUIRE(concat(concat(w1_8,w2_8),w3_8) == concat(w1_8,concat(w2_8,w3_8)));
-                REQUIRE(concat(concat(w1_64,w2_64),w3_64) == concat(w1_64,concat(w2_64,w3_64)));
+        WHEN("Concatenating the words")
+        {
+            THEN("The operation should be associative")
+            {
+                REQUIRE(concat(concat(w1_8, w2_8), w3_8) == concat(w1_8, concat(w2_8, w3_8)));
+                REQUIRE(concat(concat(w1_64, w2_64), w3_64) == concat(w1_64, concat(w2_64, w3_64)));
             }
         }
     }
 }
 
-SCENARIO("Concatenating undoes range extraction", "[word_array][util]")
+SCENARIO("Concatenating undoes range extraction", "[word_array][utility]")
 {
     GIVEN("A word_array")
     {
         const uint32_t n = GENERATE(take(100, random(std::numeric_limits<uint32_t>::max(),
-                                                    std::numeric_limits<uint32_t>::max())));
-        const word_array<32, uint8_t> w8{word_array<32,uint32_t>{n}};
+                                                     std::numeric_limits<uint32_t>::max())));
+        const word_array<32, uint8_t> w8{word_array<32, uint32_t>{n}};
         const word_array<32, uint64_t> w64{n};
 
         WHEN("Extracting a range from including one end (i.e. basically splitting the word array)")
@@ -726,12 +1063,12 @@ SCENARIO("Concatenating undoes range extraction", "[word_array][util]")
             {
 
                 const auto left8 = bit_range<31, 20>(w8);
-                const auto middle8 = bit_range<19,10>(w8);
+                const auto middle8 = bit_range<19, 10>(w8);
                 const auto right8 = bit_range<9, 0>(w8);
                 REQUIRE(concat(concat(left8, middle8), right8) == w8);
 
                 const auto left64 = bit_range<31, 20>(w64);
-                const auto middle64 = bit_range<19,10>(w64);
+                const auto middle64 = bit_range<19, 10>(w64);
                 const auto right64 = bit_range<9, 0>(w64);
                 REQUIRE(concat(concat(left64, middle64), right64) == w64);
             }
@@ -739,7 +1076,7 @@ SCENARIO("Concatenating undoes range extraction", "[word_array][util]")
     }
 }
 
-SCENARIO("Concatenating undoes splitting", "[word_array][util]")
+SCENARIO("Concatenating undoes splitting", "[word_array][utility]")
 {
     GIVEN("A word_array")
     {

@@ -3,7 +3,6 @@
 #include <random>
 #include <stdexcept>
 
-#include <aarith/integer.hpp>
 
 namespace aarith {
 
@@ -40,7 +39,7 @@ public:
         }
         // Modulo is slightly biased towards smaller numbers. Possible fix: e.g. use "Java's
         // algorithm.
-        using namespace aarith::arithmetic_operators;
+        using namespace aarith::integer_operators;
         return the_params.a + (uint % length);
     }
 
@@ -61,7 +60,7 @@ public:
             throw std::logic_error{"uniform_uinteger_distribution: a must be <= b"};
         }
         the_params = params;
-        using namespace aarith::arithmetic_operators;
+        using namespace aarith::integer_operators;
         length = the_params.b - the_params.a;
     }
 

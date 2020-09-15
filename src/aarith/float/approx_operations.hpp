@@ -1,7 +1,7 @@
 #pragma once
 
-#include <aarith/operations/approx_operations.hpp>
 #include <aarith/float.hpp>
+#include <aarith/integer/approx_operations.hpp>
 
 namespace aarith {
 

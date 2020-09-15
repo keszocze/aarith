@@ -1,7 +1,9 @@
 #pragma once
 
 #include <aarith/core/word_array.hpp>
-#include <aarith/integer.hpp>
+#include <aarith/core/word_array_operations.hpp>
+#include <aarith/integer/integers.hpp>
+#include <aarith/integer/integer_operations.hpp>
 #include <cstdint>
 #include <iostream>
 
@@ -121,7 +123,7 @@ template <size_t W>
                                                      const size_t bits = 2*W)
 -> uinteger<2*W>
 {
-    const auto result = expanding_mul(a,b);
+    const auto result = schoolbook_expanding_mul(a, b);
     const auto mask = generate_bitmask<uinteger<result.width()>>(bits);
 
     return result & mask;
@@ -220,7 +222,7 @@ template <class Integer>
 template <size_t Width, typename WordType>
 auto approx_uint_bitmasking_mul(const uinteger<Width, WordType>& opd1,
                                 const uinteger<Width, WordType>& opd2, const size_t bits)
-    -> uinteger<2 * Width, WordType>
+-> uinteger<2 * Width, WordType>
 {
     constexpr auto product_width = 2 * Width;
 

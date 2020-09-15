@@ -268,19 +268,19 @@ public:
 
     template <class... Args>
     constexpr integer(WordType fst, Args... args)
-        : word_array<Width>(fst, args...)
+        : word_array<Width, WordType>(fst, args...)
     {
     }
 
     template <size_t V>
-    constexpr integer<Width, WordType>(const integer<V, WordType>& other)
-        : word_array<Width>(width_cast<Width>(other))
+     constexpr integer<Width, WordType>(const integer<V, WordType>& other)
+        : word_array<Width, WordType>(width_cast<Width, V, WordType>(other))
     {
     }
 
     template <size_t V>
     constexpr integer<Width, WordType>(const word_array<V, WordType>& other)
-        : word_array<Width>(other)
+        : word_array<Width, WordType>(width_cast<Width, V, WordType>(other))
     {
     }
 
@@ -362,12 +362,12 @@ public:
  * @param source The integer that whose width is changed
  * @return integer with specified bit width
  */
-template <size_t DestinationWidth, size_t SourceWidth>
-[[nodiscard]] constexpr auto width_cast(const integer<SourceWidth>& source)
-    -> integer<DestinationWidth>
+template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
+[[nodiscard]] constexpr auto width_cast(const integer<SourceWidth, WordType>& source)
+    -> integer<DestinationWidth, WordType>
 {
-    word_array<DestinationWidth> result =
-        width_cast<DestinationWidth>(static_cast<word_array<SourceWidth>>(source));
+    word_array<DestinationWidth, WordType> result =
+        width_cast<DestinationWidth, SourceWidth, WordType>(static_cast<word_array<SourceWidth, WordType>>(source));
     if constexpr (DestinationWidth > SourceWidth)
     {
         const bool is_negative = source.is_negative();
@@ -380,11 +380,11 @@ template <size_t DestinationWidth, size_t SourceWidth>
                 result.set_bit(i);
             }
         }
-        return integer<DestinationWidth>{result};
+        return integer<DestinationWidth, WordType>{result};
     }
     else
     {
-        return integer<DestinationWidth>{result};
+        return integer<DestinationWidth, WordType>{result};
     }
 }
 

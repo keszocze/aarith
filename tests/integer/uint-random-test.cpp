@@ -1,5 +1,5 @@
 #include "gen_uinteger.hpp"
-#include <aarith/integer.hpp>
+#include <aarith/integer_no_operators.hpp>
 
 #include <catch.hpp>
 #include <iostream>

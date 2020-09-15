@@ -1,11 +1,11 @@
-#include <aarith/integer.hpp>
+#include <aarith/integer_no_operators.hpp>
 
 #include <catch.hpp>
 #include <sstream>
 
 using namespace aarith;
 
-SCENARIO("Converting uintegers into strings", "[uinteger][string]")
+SCENARIO("Converting unsigned integers into strings", "[integer][unsigned][string][utility]")
 {
     const uinteger<16> uint{static_cast<uint16_t>(204)};
 
@@ -83,8 +83,9 @@ SCENARIO("Converting uintegers into strings", "[uinteger][string]")
     }
 }
 
-SCENARIO("Converting sintegers into strings", "[integer][string]")
+SCENARIO("Converting sintegers into strings", "[integer][signed][string][utility]")
 {
+    using namespace integer_operators;
     const integer<16> num{204};
 
     WHEN("Converting a integer into a decimal string")
@@ -145,7 +146,7 @@ SCENARIO("Converting sintegers into strings", "[integer][string]")
     }
 }
 
-SCENARIO("Grouping digits in string representations", "[utilities][string]")
+SCENARIO("Grouping digits in string representations", "[utility][string]")
 {
     GIVEN("group_digits is called")
     {
@@ -173,7 +174,7 @@ SCENARIO("Grouping digits in string representations", "[utilities][string]")
     }
 }
 
-SCENARIO("Removing leading zeroes from string representations", "[utilities][string]")
+SCENARIO("Removing leading zeroes from string representations", "[utility][string]")
 {
     GIVEN("remove_leading_zeroes() is called")
     {

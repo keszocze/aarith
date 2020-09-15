@@ -1,9 +1,9 @@
-#include <aarith/integer.hpp>
+#include <aarith/integer_no_operators.hpp>
 #include <catch.hpp>
 
 using namespace aarith;
 
-SCENARIO("Comparing two positive sintegers", "[uinteger][utility]")
+SCENARIO("Comparing two positive sintegers", "[integer][unsigned][utility][comparison]")
 {
     GIVEN("Two integer<N> a and b with a < b")
     {
@@ -89,7 +89,7 @@ SCENARIO("Comparing two positive sintegers", "[uinteger][utility]")
         }
     }
 }
-SCENARIO("Comparing two positive integers with different bit widths", "[uinteger][utility]")
+SCENARIO("Comparing two positive integers with different bit widths", "[integer][signed][utility][comparison]")
 {
     GIVEN("Two integer<N> a and b with a < b with different bit widths")
     {
@@ -173,13 +173,14 @@ SCENARIO("Comparing two positive integers with different bit widths", "[uinteger
     }
 }
 
-SCENARIO("Investigating the comparison of max and min values", "[integer][comparison][utility]")
+SCENARIO("Investigating the comparison of max and min values", "[integer][signed][comparison][utility][dinge]")
 {
     GIVEN("integer<8>::max/min")
     {
         using T = integer<8>;
         T min = T::min();
         T max = T::max();
+
         T min_from_limits = std::numeric_limits<T>::min();
         T max_from_limits = std::numeric_limits<T>::max();
 
@@ -197,7 +198,7 @@ SCENARIO("Investigating the comparison of max and min values", "[integer][compar
 
         WHEN("Constructing min and max value into a larger integer")
         {
-            integer<9> min_ = T::min();
+            integer<9> min_{T::min()};
             integer<9> max_ = T::max();
 
             THEN("min should be negative")

@@ -1,13 +1,13 @@
 #include <aarith/core.hpp>
-#include <aarith/integer.hpp>
-#include <aarith/operations/approx_operations.hpp>
+#include <aarith/integer/approx_operations.hpp>
+#include <aarith/integer_no_operators.hpp>
 #include <catch.hpp>
 #include <iostream>
 #include <sstream>
 
 using namespace aarith;
 
-SCENARIO("Performing common functional operations", "[word_array]")
+SCENARIO("Performing common functional operations", "[word_array][functional][utility]")
 {
     GIVEN("A word container w ")
     {
