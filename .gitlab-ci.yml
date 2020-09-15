@@ -38,7 +38,7 @@ compile_clang:
     script:
         - mkdir -p build/clang
         - cd build/clang
-        - CC=clang-9 CXX=clang++-9 cmake ${BUILD_PARAMS} ${MPIR_PARAMS} ./..
+        - CC=clang-9 CXX=clang++-9 cmake ${BUILD_PARAMS} ${MPIR_PARAMS} ../..
         - make -j $(nproc)
 
 run_sonarqube:
