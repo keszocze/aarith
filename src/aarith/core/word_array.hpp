@@ -1,6 +1,6 @@
 #pragma once
 
-#include "traits.hpp"
+#include <aarith/core/traits.hpp>
 
 #include <algorithm>
 #include <array>
@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <string>
 #include <type_traits>
+#include <climits>
 
 namespace aarith {
 
@@ -90,7 +91,7 @@ public:
 
     [[nodiscard]] static constexpr auto word_width() noexcept -> size_t
     {
-        return sizeof(word_type) * 8;
+        return sizeof(word_type) * CHAR_BIT;
     }
 
     [[nodiscard]] static constexpr auto word_count() noexcept -> size_t
@@ -135,7 +136,7 @@ public:
      * @brief Sets the value of the most significant bit (MSB)
      * @param b The value the MSB is set to
      */
-    void set_msb(const bool b)
+    void constexpr set_msb(const bool b)
     {
         set_bit(Width - 1, b);
     }
@@ -285,7 +286,7 @@ public:
 
     /**
      * @brief Assigns the given value value to all elements in the container.
-     * @param valuethe value to assign to the elements
+     * @param value the value to assign to the elements
      */
     constexpr void fill(const word_type& value)
     {
@@ -309,7 +310,7 @@ public:
     {
         word_array<Width, WordType> n;
         word_type ones = ~(static_cast<word_type>(0U));
-        for (size_t i = 0; i < n.word_count(); ++i)
+        for (size_t i = 0; i < word_array::word_count(); ++i)
         {
             n.set_word(i, ones);
         }
@@ -328,9 +329,10 @@ public:
     [[nodiscard]] bool constexpr is_zero() const noexcept
     {
 
+        constexpr word_type zero{0U};
         for (size_t i = 0; i < word_count(); ++i)
         {
-            if (word(i) != word_type(0))
+            if (word(i) != zero)
             {
                 return false;
             }

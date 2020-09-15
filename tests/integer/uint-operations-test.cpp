@@ -1,9 +1,9 @@
-#include <aarith/integer.hpp>
+#include <aarith/integer_no_operators.hpp>
 #include <catch.hpp>
 
 using namespace aarith;
 
-SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
+SCENARIO("Adding two unsigned integers exactly", "[integer][unsigned][arithmetic][addition]")
 {
     GIVEN("Two uinteger<N> a and b with N <= word_width")
     {
@@ -82,16 +82,16 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
 
     GIVEN("Two uinteger<N> a and b with N > 2*word_width")
     {
-        using uint = uinteger<129>;
-        static_assert(uint::word_count() > 2);
+        using auint = uinteger<129>;
+        static_assert(auint::word_count() > 2);
 
         WHEN("There should be a carry into the third word")
         {
-            constexpr auto a = uint::from_words(0, 0xffffffffffffffff, 0xffffffffffffffff);
+            constexpr auto a = auint::from_words(0, 0xffffffffffffffff, 0xffffffffffffffff);
             constexpr auto b = a;
             auto constexpr result = add(a, b);
             auto constexpr result_fun = fun_add(a, b);
-            constexpr auto ref = uint::from_words(1, 0xffffffffffffffff, 0xfffffffffffffffe);
+            constexpr auto ref = auint::from_words(1, 0xffffffffffffffff, 0xfffffffffffffffe);
 
             THEN("There is a carry in the third word")
             {
@@ -102,10 +102,10 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
 
         WHEN("There should be no carry into the third word")
         {
-            constexpr auto a = uint::from_words(0, 0xfffffffffffffffe, 0xffffffffffffffff);
-            constexpr auto b = uint(1U);
+            constexpr auto a = auint::from_words(0, 0xfffffffffffffffe, 0xffffffffffffffff);
+            constexpr auto b = auint(1U);
             auto constexpr result = add(a, b);
-            constexpr auto ref = uint::from_words(0, 0xffffffffffffffff, 0);
+            constexpr auto ref = auint::from_words(0, 0xffffffffffffffff, 0);
             auto constexpr result_fun = fun_add(a, b);
 
             THEN("There is no carry in the third word")
@@ -117,7 +117,7 @@ SCENARIO("Adding two uintegers exactly", "[uinteger][arithmetic][addition]")
     }
 }
 
-SCENARIO("Bit shifting is possible as constexpr for unsigned integers")
+SCENARIO("Bit shifting is possible as constexpr for unsigned integers", "[integer][unsigned][utility][bit_logic][constexpr]")
 {
     GIVEN("An unsigned integer of width N")
     {
@@ -158,7 +158,7 @@ SCENARIO("Bit shifting is possible as constexpr for unsigned integers")
     }
 }
 
-SCENARIO("Adding tow uintgers of different bit width", "[uinteger][arithmetic][addition]")
+SCENARIO("Adding two unsigned integers of different bit width", "[integer][unsigned][arithmetic][addition]")
 {
     GIVEN("An uinteger of bit width 128")
     {
@@ -210,7 +210,7 @@ SCENARIO("Adding tow uintgers of different bit width", "[uinteger][arithmetic][a
     }
 }
 
-SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtraction]")
+SCENARIO("Subtracting two unsigned integers exactly", "[integer][unsigned][arithmetic][subtraction]")
 {
     GIVEN("Two uinteger<N> a and b are subtracted")
     {
@@ -327,7 +327,7 @@ SCENARIO("Subtracting two uintegers exactly", "[uinteger][arithmetic][subtractio
     }
 }
 
-SCENARIO("Expanding subtraction works correctly", "[uinteger][arithmetic][subtraction]")
+SCENARIO("Expanding subtraction works correctly", "[integer][unsigned][arithmetic][subtraction]")
 {
     GIVEN("A n-bit zero and a m-bit (m>n)  max")
     {
@@ -359,7 +359,7 @@ SCENARIO("Expanding subtraction works correctly", "[uinteger][arithmetic][subtra
     }
 }
 
-SCENARIO("Investigating max/min values", "[uinteger][operations]")
+SCENARIO("Investigating max/min values", "[integer][unsigned][operations]")
 {
     GIVEN("The maximal and minimal values of uinteger<V>")
     {
@@ -457,7 +457,7 @@ SCENARIO("Investigating max/min values", "[uinteger][operations]")
     }
 }
 
-SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplication]")
+SCENARIO("Multiplying two unsigned integers exactly", "[integer][unsigned][arithmetic][multiplication]")
 {
 
     GIVEN("Two uinteger<N> a and b with N <= 32")
@@ -479,18 +479,28 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplica
         THEN("Multiplication by 1 should not change the other multiplicant")
         {
             const uinteger<32> one{1U};
-            CHECK(mul(a, one) == a);
-            CHECK(mul(one, a) == a);
-            CHECK(mul(b, one) == b);
-            CHECK(mul(one, b) == b);
+            CHECK(schoolbook_mul(a, one) == a);
+            CHECK(schoolbook_mul(one, a) == a);
+            CHECK(schoolbook_mul(b, one) == b);
+            CHECK(schoolbook_mul(one, b) == b);
+
+            CHECK(karazuba(a, one) == a);
+            CHECK(karazuba(one, a) == a);
+            CHECK(karazuba(b, one) == b);
+            CHECK(karazuba(one, b) == b);
         }
         THEN("Multiplication by 0 should result in 0")
         {
             const uinteger<32> zero{0U};
-            CHECK(mul(a, zero) == zero);
-            CHECK(mul(zero, a) == zero);
-            CHECK(mul(b, zero) == zero);
-            CHECK(mul(zero, b) == zero);
+            CHECK(schoolbook_mul(a, zero) == zero);
+            CHECK(schoolbook_mul(zero, a) == zero);
+            CHECK(schoolbook_mul(b, zero) == zero);
+            CHECK(schoolbook_mul(zero, b) == zero);
+
+            CHECK(karazuba(a, zero) == zero);
+            CHECK(karazuba(zero, a) == zero);
+            CHECK(karazuba(b, zero) == zero);
+            CHECK(karazuba(zero, b) == zero);
         }
     }
 
@@ -513,7 +523,8 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplica
             {
                 for (const uinteger<128>& num_b : numbers)
                 {
-                    CHECK(mul(num_a, num_b) == mul(num_b, num_a));
+                    CHECK(schoolbook_mul(num_a, num_b) == schoolbook_mul(num_b, num_a));
+                    CHECK(karazuba(num_a, num_b) == karazuba(num_b, num_a));
                 }
             }
         }
@@ -525,8 +536,11 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplica
             {
                 for (const uinteger<128>& num : numbers)
                 {
-                    CHECK(mul(num, zero) == zero);
-                    CHECK(mul(zero, num) == zero);
+                    CHECK(schoolbook_mul(num, zero) == zero);
+                    CHECK(schoolbook_mul(zero, num) == zero);
+
+                    CHECK(karazuba(num, zero) == zero);
+                    CHECK(karazuba(zero, num) == zero);
                 }
             }
         }
@@ -537,8 +551,11 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplica
 
                 for (const uinteger<128>& num : numbers)
                 {
-                    CHECK(mul(num, one) == num);
-                    CHECK(mul(one, num) == num);
+                    CHECK(schoolbook_mul(num, one) == num);
+                    CHECK(schoolbook_mul(one, num) == num);
+
+                    CHECK(karazuba(num, one) == num);
+                    CHECK(karazuba(one, num) == num);
                 }
             }
         }
@@ -546,14 +563,15 @@ SCENARIO("Multiplying two uintegers exactly", "[uinteger][arithmetic][multiplica
         {
             THEN("The product is 1 for the truncating multiplication")
             {
-                REQUIRE(mul(d, d) == one);
+                REQUIRE(schoolbook_mul(d, d) == one);
+                REQUIRE(karazuba(d, d) == one);
             }
         }
     }
 }
 
 SCENARIO("Multiplication of numbers fitting in a uint64_t",
-         "[uinteger][arithmetic][multiplication]")
+         "[integer][unsigned][arithmetic][multiplication]")
 {
     GIVEN("A random number a")
     {
@@ -569,30 +587,34 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
             THEN("The multiplication should match its uint64_t counterpart")
             {
                 uint64_t expected = val_a * val_b;
-                uinteger<64> result = mul(a, b);
+                uinteger<64> result = schoolbook_mul(a, b);
+                uinteger<64> resultk = karazuba(a, b);
 
                 CHECK(expected == result.word(0));
                 REQUIRE(uinteger<64>{expected} == result);
+
+                CHECK(expected == resultk.word(0));
+                REQUIRE(uinteger<64>{expected} == resultk);
             }
         }
     }
 }
 
-SCENARIO("Multiplying two uintegers using the karazuba multiplication",
-         "[uinteger][arithmetic][multiplication]")
+SCENARIO("Multiplying two unsigned integers using the karazuba multiplication",
+         "[integer][unsigned][arithmetic][multiplication]")
 {
     GIVEN("Two uinteger<N> a and b with N <= 32")
     {
-        using uint = uinteger<32>;
+        using auint = uinteger<32>;
 
         auto au = 0xCCCCCCCC;
         auto bu = 0xAAAAAAAA;
 
-        auto a = uint(au);
-        auto b = uint(bu);
+        auto a = auint(au);
+        auto b = auint(bu);
 
         auto res = expanding_karazuba(a, b);
-        auto ref = expanding_mul(a, b);
+        auto ref = schoolbook_expanding_mul(a, b);
 
         THEN("The result should be equal to the standard multiplication.")
         {
@@ -612,7 +634,7 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication",
         auto b = uintb(bu);
 
         auto res = expanding_karazuba(a, b);
-        auto ref = expanding_mul(a, b);
+        auto ref = schoolbook_expanding_mul(a, b);
 
         THEN("The result should be equal to the standard multiplication.")
         {
@@ -636,7 +658,7 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication",
                 auto b = uintb(bu);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -655,7 +677,7 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication",
                 auto b = uintb(bu);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -674,7 +696,7 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication",
                 auto b = uintb(bu);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -693,7 +715,7 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication",
                 auto b = uintb(bu);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -712,7 +734,7 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication",
                 auto b = uintb::from_words(0xAAAAAAAAAAAAAAAA, 0xAAAAA);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -728,7 +750,7 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication",
                 auto b = uintb(0U);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -744,7 +766,7 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication",
                 auto b = uintb::from_words(0xAAAAAAAAAAAAAAAA, 0xAAAAA);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -760,7 +782,7 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication",
                 auto b = uintb::from_words(0xFFFFFFFFFFFFFFFF, 0xFFFFF);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -782,7 +804,7 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication",
                     0xAAAAAAAAAAAAAAAA, 0xAA);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -799,7 +821,7 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication",
                 auto b = uintb(0U);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -819,7 +841,7 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication",
                     0xAAAAAAAAAAAAAAAA, 0xAA);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -839,7 +861,7 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication",
                     0xFFFFFFFFFFFFFFFF, 0xFF);
 
                 auto res = expanding_karazuba(a, b);
-                auto ref = expanding_mul(a, b);
+                auto ref = schoolbook_expanding_mul(a, b);
 
                 THEN("The result should be equal to the standard multiplication.")
                 {
@@ -850,7 +872,7 @@ SCENARIO("Multiplying two uintegers using the karazuba multiplication",
     }
 }
 
-SCENARIO("Bit and Word operations work correctly", "[uinteger][utility]")
+SCENARIO("Bit and Word operations work correctly", "[integer][unsigned][utility][bit_logic]")
 {
     WHEN("A uinteger<N> is created using uinteger<N>::from_words")
     {
@@ -903,7 +925,7 @@ SCENARIO("Bit and Word operations work correctly", "[uinteger][utility]")
     }
 }
 
-SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic][division]")
+SCENARIO("Dividing two unsigned integers exactly", "[integer][unsigned][arithmetic][division]")
 {
     GIVEN("Two uinteger<N> a and b with N <= 32")
     {
@@ -949,7 +971,7 @@ SCENARIO("Dividing two uintegers exactly", "[uinteger][arithmetic][division]")
     }
 }
 
-SCENARIO("Computing the signum of an unsigned integer", "[uinteger][operation][utility]")
+SCENARIO("Computing the signum of an unsigned integer", "[integer][unsigned]operation][utility]")
 {
     GIVEN("The number  zero")
     {
@@ -984,7 +1006,7 @@ SCENARIO("Computing the signum of an unsigned integer", "[uinteger][operation][u
 }
 
 SCENARIO("Computing the remainder of two unsigned integers works as expected",
-         "[uinteger][arithmetic][remainder][division]")
+         "[integer][unsigned][arithmetic][remainder][division]")
 {
     GIVEN("A fixed test case a=56567 and b=234")
     {

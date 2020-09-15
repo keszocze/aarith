@@ -1,10 +1,10 @@
-#include <aarith/integer.hpp>
+#include <aarith/integer_no_operators.hpp>
 #include <catch.hpp>
 
 using namespace aarith;
 
 SCENARIO("Up-casting to the next larger native integer type",
-         "[integer][unsigned][conversion_operation]")
+         "[integer][unsigned][casting]")
 {
     GIVEN("An unsigned integer with 13 bidth")
     {
@@ -25,7 +25,7 @@ SCENARIO("Up-casting to the next larger native integer type",
     }
 }
 
-SCENARIO("Casting unsigned integers to uint8_t", "[integer][unsigned][conversion_operation]")
+SCENARIO("Casting unsigned integers to uint8_t", "[integer][unsigned][casting]")
 {
     GIVEN("An unsigned integer width bit-width <= 8")
     {
@@ -151,7 +151,7 @@ SCENARIO("Casting unsigned integers to uint8_t", "[integer][unsigned][conversion
                 uinteger<64> d{val};
                 uinteger<150> e{val};
 
-                CHECK_THROWS_AS(narrow_cast<uint8_t>(b),std::domain_error);
+                CHECK_THROWS_AS(narrow_cast<uint8_t>(b), std::domain_error);
                 CHECK_THROWS_AS(narrow_cast<uint8_t>(c), std::domain_error);
                 CHECK_THROWS_AS(narrow_cast<uint8_t>(d), std::domain_error);
                 CHECK_THROWS_AS(narrow_cast<uint8_t>(e), std::domain_error);
@@ -160,7 +160,7 @@ SCENARIO("Casting unsigned integers to uint8_t", "[integer][unsigned][conversion
     }
 }
 
-SCENARIO("Casting unsigned integers to uint16_t", "[integer][unsigned][conversion_operation]")
+SCENARIO("Casting unsigned integers to uint16_t", "[integer][unsigned][casting]")
 {
     using B = uint16_t;
     using BL = uint32_t;
@@ -301,7 +301,7 @@ SCENARIO("Casting unsigned integers to uint16_t", "[integer][unsigned][conversio
 }
 
 SCENARIO("Casting unsigned integers with various WordTypes to uint16_t",
-         "[integer][unsigned][conversion_operation]")
+         "[integer][unsigned][casting]")
 {
     using B = uint16_t;
     using BL = uint32_t;

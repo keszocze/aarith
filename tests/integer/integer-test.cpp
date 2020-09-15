@@ -1,4 +1,4 @@
-#include <aarith/integer.hpp>
+#include <aarith/integer_no_operators.hpp>
 
 #include <bitset>
 #include <catch.hpp>
@@ -6,7 +6,7 @@
 
 using namespace aarith;
 
-SCENARIO("Bit shifting is possible as constexpr for signed integers")
+SCENARIO("Bit shifting is possible as constexpr for signed integers","[integer][signed][utility][constexpr][bit_logic]")
 {
     GIVEN("A signed integer of width N")
     {
@@ -47,7 +47,7 @@ SCENARIO("Bit shifting is possible as constexpr for signed integers")
     }
 }
 
-SCENARIO("Testing various operations for constexpr'nes")
+SCENARIO("Testing various operations for constexpr'nes", "[integer][signed][constexpr]")
 {
     GIVEN("A signed integer")
     {
@@ -65,7 +65,7 @@ SCENARIO("Testing various operations for constexpr'nes")
     }
 }
 
-SCENARIO("Casting sintegers into different width", "[integer]")
+SCENARIO("Casting integers into different width", "[integer][signed][casting]")
 {
     GIVEN("width_cast is called")
     {
@@ -76,7 +76,7 @@ SCENARIO("Casting sintegers into different width", "[integer]")
         WHEN("The source width <= destination width")
         {
             static constexpr size_t DestinationWidth = 32;
-            auto constexpr result = width_cast<DestinationWidth>(uint);
+            const integer<DestinationWidth> result{width_cast<DestinationWidth>(uint)};
 
             THEN("The result has the destination width")
             {
@@ -90,7 +90,7 @@ SCENARIO("Casting sintegers into different width", "[integer]")
         WHEN("The source width > destination width")
         {
             static constexpr size_t DestinationWidth = 8;
-            auto constexpr result = width_cast<DestinationWidth>(uint);
+            auto const result = width_cast<DestinationWidth>(uint);
 
             THEN("The result has the destination width")
             {
@@ -104,7 +104,7 @@ SCENARIO("Casting sintegers into different width", "[integer]")
     }
 }
 
-SCENARIO("Copy constructor of sintegers with various bit widths", "[integer][utility]")
+SCENARIO("Copy constructor of integers with various bit widths", "[integer][signed][utility]")
 {
     GIVEN("An integer<N> a")
     {
@@ -174,7 +174,7 @@ SCENARIO("Copy constructor of sintegers with various bit widths", "[integer][uti
     }
 }
 
-SCENARIO("Left shift operator works as expected", "[integer][bit_logic]")
+SCENARIO("Left shift operator works as expected", "[integer][signed][utility][bit_logic]")
 {
     GIVEN("One integer a and a number of shifted bits s")
     {
@@ -297,8 +297,9 @@ SCENARIO("Left shift operator works as expected", "[integer][bit_logic]")
     }
 }
 
-SCENARIO("Create negative sintegers", "[integer][bit_logic]")
+SCENARIO("Create negative integers", "[integer][signed][bit_logic]")
 {
+    using namespace integer_operators;
     GIVEN("A int64_t negative number")
     {
         int64_t n = GENERATE(take(100, random(-922337236854775808LL, -1LL)));
@@ -319,6 +320,7 @@ SCENARIO("Create negative sintegers", "[integer][bit_logic]")
 
             THEN("Negation works as expected")
             {
+
                 CHECK(-negative == positive);
                 CHECK(-(-negative) == negative);
                 CHECK(-(-positive) == positive);
@@ -334,7 +336,7 @@ SCENARIO("Create negative sintegers", "[integer][bit_logic]")
     }
 }
 
-SCENARIO("Right shift operator works as expected", "[integer][bit-logic]")
+SCENARIO("Right shift operator works as expected", "[integer][signed][bit_logic]")
 {
     GIVEN("One positive integer a and a number of shifted bits s")
     {
@@ -437,16 +439,11 @@ SCENARIO("Right shift operator works as expected", "[integer][bit-logic]")
                 static constexpr size_t word_width = integer<width>::word_width();
 
                 static constexpr integer<width> a{1U};
-                static constexpr integer<width> expected0 =
-                    integer<width>::from_words(0U, 0U, 0U, 1U);
-                static constexpr integer<width> expected1 =
-                    integer<width>::from_words(0U, 0U, 1U, 0U);
-                static constexpr integer<width> expected2 =
-                    integer<width>::from_words(0U, 1U, 0U, 0U);
-                static constexpr integer<width> expected3 =
-                    integer<width>::from_words(1U, 0U, 0U, 0U);
-                static constexpr integer<width> expected4 =
-                    integer<width>::from_words(0U, 0U, 0U, 0U);
+                static const integer<width> expected0 = integer<width>::from_words(0U, 0U, 0U, 1U);
+                static const integer<width> expected1 = integer<width>::from_words(0U, 0U, 1U, 0U);
+                static const integer<width> expected2 = integer<width>::from_words(0U, 1U, 0U, 0U);
+                static const integer<width> expected3 = integer<width>::from_words(1U, 0U, 0U, 0U);
+                static const integer<width> expected4 = integer<width>::from_words(0U, 0U, 0U, 0U);
 
                 std::vector<integer<width>> expecteds{expected0, expected1, expected2, expected3,
                                                       expected4};
@@ -474,7 +471,7 @@ SCENARIO("Right shift operator works as expected", "[integer][bit-logic]")
     }
 }
 
-SCENARIO("Logical AND works as expected", "[integer][arithmetic]")
+SCENARIO("Logical AND works as expected", "[integer][signed][bit_logic][utility]]")
 {
     GIVEN("Two sintegers")
     {
@@ -494,7 +491,7 @@ SCENARIO("Logical AND works as expected", "[integer][arithmetic]")
     }
 }
 
-SCENARIO("Logical OR works as expected", "[integer][arithmetic]")
+SCENARIO("Logical OR works as expected", "[integer][signed][bit_logic][utility]")
 {
     GIVEN("Two sintegers")
     {
@@ -514,7 +511,7 @@ SCENARIO("Logical OR works as expected", "[integer][arithmetic]")
     }
 }
 
-SCENARIO("Logical NOT works as expected", "[integer][arithmetic]")
+SCENARIO("Logical NOT works as expected", "[integer][signed][bit_logic][utility]")
 {
     GIVEN("One sintegers")
     {
@@ -532,7 +529,7 @@ SCENARIO("Logical NOT works as expected", "[integer][arithmetic]")
     }
 }
 
-SCENARIO("Checking whether an integer is not equal to zero/false")
+SCENARIO("Checking whether an integer is not equal to zero/false", "[integer][signed][utility]")
 {
     GIVEN("An integer<N>=0=a for various N")
     {
@@ -596,7 +593,7 @@ SCENARIO("Checking whether an integer is not equal to zero/false")
     }
 }
 
-SCENARIO("Using the for loop operation feature from ")
+SCENARIO("Using the for loop operation feature", "[integer][signed][utility]")
 {
     GIVEN("An unsigned integer")
     {
@@ -685,7 +682,7 @@ SCENARIO("Using the for loop operation feature from ")
     }
 }
 
-SCENARIO("Bit operations are performed correctly", "[integer][bit]")
+SCENARIO("Bit operations are performed correctly", "[integer][signed][bit_logic]")
 {
     GIVEN("An integer<N> n")
     {
@@ -743,7 +740,7 @@ SCENARIO("Bit operations are performed correctly", "[integer][bit]")
     }
 }
 
-SCENARIO("std::numeric_limits gets instantiated correctly", "[integer][utility]")
+SCENARIO("std::numeric_limits gets instantiated correctly", "[integer][signed][utility]")
 {
     GIVEN("The bit width of 32")
     {

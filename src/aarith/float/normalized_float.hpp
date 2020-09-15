@@ -2,7 +2,7 @@
 
 #include <aarith/core/traits.hpp>
 #include <aarith/float/float_utils.hpp>
-#include <aarith/integer.hpp>
+#include <aarith/integer_no_operators.hpp>
 #include <cstdint>
 #include <iostream>
 #include <string>

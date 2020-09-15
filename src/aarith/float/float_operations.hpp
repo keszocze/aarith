@@ -2,7 +2,6 @@
 
 #include <aarith/core/traits.hpp>
 #include <aarith/float/normalized_float.hpp>
-#include <aarith/integer.hpp>
 
 namespace aarith {
 
@@ -18,9 +17,9 @@ namespace aarith {
  * @return The sum
  *
  */
-template<size_t E, size_t M, class Function_add, class Function_sub>
-[[nodiscard]] auto add_(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs, Function_add fun_add, Function_sub fun_sub)
--> normalized_float<E, M>
+template <size_t E, size_t M, class Function_add, class Function_sub>
+[[nodiscard]] auto add_(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs,
+                        Function_add fun_add, Function_sub fun_sub) -> normalized_float<E, M>
 {
     if (abs(lhs) < abs(rhs))
     {
@@ -36,14 +35,14 @@ template<size_t E, size_t M, class Function_add, class Function_sub>
 
     const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
     const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
-    const auto mantissa_sum = fun_add(lhs.get_full_mantissa(),  new_mantissa);
+    const auto mantissa_sum = fun_add(lhs.get_full_mantissa(), new_mantissa);
 
-    normalized_float<E, mantissa_sum.width()-1> sum;
+    normalized_float<E, mantissa_sum.width() - 1> sum;
     sum.set_sign(lhs.get_sign());
     sum.set_exponent(lhs.get_exponent());
     sum.set_mantissa(mantissa_sum);
 
-    return normalize<E, mantissa_sum.width()-1, M>(sum);
+    return normalize<E, mantissa_sum.width() - 1, M>(sum);
 }
 
 /**
@@ -58,9 +57,9 @@ template<size_t E, size_t M, class Function_add, class Function_sub>
  * @return The difference lhs-rhs
  *
  */
-template<size_t E, size_t M, class Function_add, class Function_sub>
-[[nodiscard]] auto sub_(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs, Function_add fun_add, Function_sub fun_sub)
-    -> normalized_float<E, M>
+template <size_t E, size_t M, class Function_add, class Function_sub>
+[[nodiscard]] auto sub_(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs,
+                        Function_add fun_add, Function_sub fun_sub) -> normalized_float<E, M>
 {
     if (abs(lhs) < abs(rhs))
     {
@@ -80,7 +79,7 @@ template<size_t E, size_t M, class Function_add, class Function_sub>
     const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
     const auto mantissa_sum = fun_sub(lhs.get_full_mantissa(), new_mantissa);
 
-    normalized_float<E, mantissa_sum.width()-1> sum;
+    normalized_float<E, mantissa_sum.width() - 1> sum;
     sum.set_sign(lhs.get_sign());
     if (mantissa_sum != uinteger<mantissa_sum.width()>::all_zeroes())
     {
@@ -88,7 +87,7 @@ template<size_t E, size_t M, class Function_add, class Function_sub>
     }
     sum.set_mantissa(mantissa_sum);
 
-    return normalize<E, mantissa_sum.width()-1, M>(sum);
+    return normalize<E, mantissa_sum.width() - 1, M>(sum);
 }
 
 /**
@@ -102,15 +101,24 @@ template<size_t E, size_t M, class Function_add, class Function_sub>
  * @return The sum
  *
  */
-template<size_t E, size_t M>
+template <size_t E, size_t M>
 [[nodiscard]] auto add(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
--> normalized_float<E, M>
+    -> normalized_float<E, M>
 {
-    //return add_<E, M, class aarith::uinteger<M+1, long unsigned int> (*)(const class aarith::uinteger<M+1>&, const class aarith::uinteger<M+1>&, const bool)>(lhs, rhs, expanding_add<M+1, M+1>, expanding_sub<M+1, M+1>);
-    return add_<E, M, class aarith::uinteger<M+2, uint64_t> (*)(const aarith::uinteger<M+1, uint64_t>&, const aarith::uinteger<M+1, uint64_t>&),
-                      class aarith::uinteger<M+1, uint64_t> (*)(const aarith::uinteger<M+1, uint64_t>&, const aarith::uinteger<M+1, uint64_t>&)>(lhs, rhs, expanding_add<uinteger<M+1>, uinteger<M+1>>, expanding_sub<uinteger<M+1>, uinteger<M+1>>);
-    
-    //return add_<E, M>(lhs, rhs, expanding_add<uinteger<M+1>, uinteger<M+1>>, expanding_sub<uinteger<M+1>, uinteger<M+1>>);
+    // return add_<E, M, class aarith::uinteger<M+1, long unsigned int> (*)(const class
+    // aarith::uinteger<M+1>&, const class aarith::uinteger<M+1>&, const bool)>(lhs, rhs,
+    // expanding_add<M+1, M+1>, expanding_sub<M+1, M+1>);
+    return add_<
+        E, M,
+        class aarith::uinteger<M + 2, uint64_t> (*)(const aarith::uinteger<M + 1, uint64_t>&,
+                                                    const aarith::uinteger<M + 1, uint64_t>&),
+        class aarith::uinteger<M + 1, uint64_t> (*)(const aarith::uinteger<M + 1, uint64_t>&,
+                                                    const aarith::uinteger<M + 1, uint64_t>&)>(
+        lhs, rhs, expanding_add<uinteger<M + 1>, uinteger<M + 1>>,
+        expanding_sub<uinteger<M + 1>, uinteger<M + 1>>);
+
+    // return add_<E, M>(lhs, rhs, expanding_add<uinteger<M+1>, uinteger<M+1>>,
+    // expanding_sub<uinteger<M+1>, uinteger<M+1>>);
 }
 
 /**
@@ -124,13 +132,20 @@ template<size_t E, size_t M>
  * @return The difference lhs-rhs
  *
  */
-template<size_t E, size_t M>
+template <size_t E, size_t M>
 [[nodiscard]] auto sub(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
--> normalized_float<E, M>
+    -> normalized_float<E, M>
 {
-  //return sub_<E, M>(lhs, rhs, expanding_add<uinteger<M+1>, uinteger<M+1>>, expanding_sub<uinteger<M+1>, uinteger<M+1>>);
-    return sub_<E, M, class aarith::uinteger<M+2, uint64_t> (*)(const aarith::uinteger<M+1, uint64_t>&, const aarith::uinteger<M+1, uint64_t>&),
-                      class aarith::uinteger<M+1, uint64_t> (*)(const aarith::uinteger<M+1, uint64_t>&, const aarith::uinteger<M+1, uint64_t>&)>(lhs, rhs, expanding_add<uinteger<M+1>, uinteger<M+1>>, expanding_sub<uinteger<M+1>, uinteger<M+1>>);
+    // return sub_<E, M>(lhs, rhs, expanding_add<uinteger<M+1>, uinteger<M+1>>,
+    // expanding_sub<uinteger<M+1>, uinteger<M+1>>);
+    return sub_<
+        E, M,
+        class aarith::uinteger<M + 2, uint64_t> (*)(const aarith::uinteger<M + 1, uint64_t>&,
+                                                    const aarith::uinteger<M + 1, uint64_t>&),
+        class aarith::uinteger<M + 1, uint64_t> (*)(const aarith::uinteger<M + 1, uint64_t>&,
+                                                    const aarith::uinteger<M + 1, uint64_t>&)>(
+        lhs, rhs, expanding_add<uinteger<M + 1>, uinteger<M + 1>>,
+        expanding_sub<uinteger<M + 1>, uinteger<M + 1>>);
 }
 
 /**
@@ -149,18 +164,18 @@ template <size_t E, size_t M, typename WordType>
                        const normalized_float<E, M, WordType> rhs)
     -> normalized_float<E, M, WordType>
 {
-    auto mproduct = expanding_mul(lhs.get_full_mantissa(), rhs.get_full_mantissa());
+    auto mproduct = schoolbook_expanding_mul(lhs.get_full_mantissa(), rhs.get_full_mantissa());
     mproduct = mproduct >> M;
     auto esum = width_cast<E>(sub(expanding_add(lhs.get_exponent(), rhs.get_exponent()),
                                   width_cast<E + 1>(lhs.get_bias())));
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
-    normalized_float<E, mproduct.width()-1> product;
+    normalized_float<E, mproduct.width() - 1> product;
     product.set_mantissa(mproduct);
     product.set_exponent(esum);
     product.set_sign(sign);
 
-    return normalize<E, mproduct.width()-1, M>(product);
+    return normalize<E, mproduct.width() - 1, M>(product);
 }
 
 /**
@@ -190,12 +205,12 @@ template <size_t E, size_t M, typename WordType>
                                   width_cast<E + 1>(rhs.get_exponent())));
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
-    normalized_float<E, rdmquotient.width()-1> quotient;
+    normalized_float<E, rdmquotient.width() - 1> quotient;
     quotient.set_mantissa(rdmquotient);
     quotient.set_exponent(esum);
     quotient.set_sign(sign);
 
-    return normalize<E, rdmquotient.width()-1, M>(quotient);
+    return normalize<E, rdmquotient.width() - 1, M>(quotient);
 }
 
 /**
@@ -219,7 +234,7 @@ bit_range(const normalized_float<E, M, WordType>& f)
     return bit_range<Start, End>(f.as_word_array());
 }
 
-//namespace aarith::exact_operators {
+namespace float_operators {
 
 template <size_t E, size_t M, typename WordType>
 auto operator+(const normalized_float<E, M, WordType>& lhs,
@@ -256,4 +271,5 @@ auto operator%(const normalized_float<E, M, WordType>& lhs,
     return remainder(lhs, rhs);
 }
 
+} // namespace float_operators
 } // namespace aarith

@@ -1,9 +1,8 @@
 #pragma once
 
-#pragma once
 
-#include "traits.hpp"
-#include "word_array.hpp"
+#include <aarith/core/traits.hpp>
+#include <aarith/core/word_array.hpp>
 #include <cstdint>
 
 namespace aarith {

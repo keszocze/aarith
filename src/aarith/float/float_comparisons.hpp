@@ -1,6 +1,6 @@
 #pragma once
 
-#include "normalized_float.hpp"
+#include <aarith/float/normalized_float.hpp>
 #include <cstdint>
 
 namespace aarith {

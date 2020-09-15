@@ -1,9 +1,9 @@
-#include <aarith/integer.hpp>
+#include <aarith/integer_no_operators.hpp>
 #include <catch.hpp>
 
 using namespace aarith;
 
-SCENARIO("Comparing two uintegers", "[uinteger][utility]")
+SCENARIO("Comparing two uintegers", "[integer][unsigned][utility][comparison]")
 {
     GIVEN("Two uinteger<N> a and b with a < b")
     {
@@ -50,11 +50,11 @@ SCENARIO("Comparing two uintegers", "[uinteger][utility]")
         WHEN("N > word_width")
         {
             constexpr size_t TestWidth = 80;
-            constexpr uinteger<TestWidth> const a{7, 0};
-            constexpr uinteger<TestWidth> const b{23, 0};
+            const uinteger<TestWidth> a{7, 0};
+            const uinteger<TestWidth> b{23, 0};
 
-            constexpr uinteger<TestWidth> const c{7, 0};
-            constexpr uinteger<TestWidth> const d{0, 23};
+            const uinteger<TestWidth> c{7, 0};
+            const uinteger<TestWidth> d{0, 23};
 
             THEN("operator< returns true")
             {
@@ -89,7 +89,7 @@ SCENARIO("Comparing two uintegers", "[uinteger][utility]")
         }
     }
 }
-SCENARIO("Comparing two uintegers with different bit widths", "[uinteger][utility]")
+SCENARIO("Comparing two uintegers with different bit widths", "[integer][unsigned][utility][comparison]")
 {
     GIVEN("Two uinteger<N> a and b with a < b with different bit widths")
     {

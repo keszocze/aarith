@@ -1,4 +1,4 @@
-#include <aarith/integer.hpp>
+#include <aarith/integer_no_operators.hpp>
 
 #include <catch.hpp>
 #include <iostream>
@@ -6,7 +6,7 @@
 
 using namespace aarith;
 
-SCENARIO("Creating uintegers using the from_words method")
+SCENARIO("Creating uintegers using the from_words method", "[integer][unsigned][utility]")
 {
     WHEN("The uinteger does not have a bit width as a multiple of the word width")
     {
@@ -29,7 +29,7 @@ SCENARIO("Creating uintegers using the from_words method")
     }
 }
 
-SCENARIO("Casting uintegers into different width", "[uinteger]")
+SCENARIO("Casting uintegers into different width", "[integer][unsigned][casting]")
 {
     GIVEN("width_cast is called")
     {
@@ -68,7 +68,7 @@ SCENARIO("Casting uintegers into different width", "[uinteger]")
     }
 }
 
-SCENARIO("Copy constructor of uintegers with various bit widths", "[uinteger][utility]")
+SCENARIO("Copy constructor of unsigned integers with various bit widths", "[integer][unsigned][utility]")
 {
     GIVEN("An uinteger<N> a")
     {
@@ -140,7 +140,7 @@ SCENARIO("Copy constructor of uintegers with various bit widths", "[uinteger][ut
     }
 }
 
-SCENARIO("Calculating the word_masks of uintegers", "[uinteger][utility]")
+SCENARIO("Calculating the word_masks of unsigned integers", "[integer][unsigned][utility]")
 {
     // The tests all assume that uinteger uses 64-bit words.
     static_assert(uinteger<64>::word_width() == 64);
@@ -184,7 +184,7 @@ SCENARIO("Calculating the word_masks of uintegers", "[uinteger][utility]")
     }
 }
 
-SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
+SCENARIO("Left shift operator works as expected", "[integer][unsigned][utility][bit_logic]")
 {
     GIVEN("One uinteger a and a number of shifted bits s")
     {
@@ -307,7 +307,7 @@ SCENARIO("Left shift operator works as expected", "[uinteger][utility]")
     }
 }
 
-SCENARIO("Right shift operator works as expected", "[uinteger][utility]")
+SCENARIO("Right shift operator works as expected", "[integer][unsigned][utility][bit_logic]")
 {
     GIVEN("One uinteger a and a number of shifted bits s")
     {
@@ -436,7 +436,7 @@ SCENARIO("Right shift operator works as expected", "[uinteger][utility]")
     }
 }
 
-SCENARIO("Logical AND works as expected", "[uinteger][arithmetic]")
+SCENARIO("Logical AND works as expected", "[integer][unsigned][bit_logic]")
 {
     GIVEN("Two uintegers")
     {
@@ -456,7 +456,7 @@ SCENARIO("Logical AND works as expected", "[uinteger][arithmetic]")
     }
 }
 
-SCENARIO("Logical OR works as expected", "[uinteger][arithmetic]")
+SCENARIO("Logical OR works as expected", "[integer][unsigned][bit_logic]")
 {
     GIVEN("Two uintegers")
     {
@@ -476,7 +476,7 @@ SCENARIO("Logical OR works as expected", "[uinteger][arithmetic]")
     }
 }
 
-SCENARIO("Logical NOT works as expected", "[uinteger][arithmetic]")
+SCENARIO("Logical NOT works as expected", "[integer][unsigned][bit_logic]")
 {
     GIVEN("One uintegers")
     {
@@ -494,7 +494,7 @@ SCENARIO("Logical NOT works as expected", "[uinteger][arithmetic]")
     }
 }
 
-SCENARIO("Checking whether an uinteger is not equal to zero/false")
+SCENARIO("Checking whether an unsigned integer is not equal to zero/false", "[integer][unsigned][utility]")
 {
     GIVEN("An uinteger<N>=0=a for various N")
     {
@@ -559,7 +559,7 @@ SCENARIO("Checking whether an uinteger is not equal to zero/false")
 }
 
 SCENARIO("Using the for loop operation feature from the word_array base class",
-         "[uinteger][utility]")
+         "[integer][unsigned][utility]")
 {
     GIVEN("An unsigned integer")
     {
@@ -648,7 +648,7 @@ SCENARIO("Using the for loop operation feature from the word_array base class",
     }
 }
 
-SCENARIO("Bit operations are performed correctly", "[uinteger][bit]")
+SCENARIO("Bit operations are performed correctly", "[integer][unsigned][bit_logic][utility]")
 {
     GIVEN("An uinteger<N> n")
     {
@@ -707,7 +707,7 @@ SCENARIO("Bit operations are performed correctly", "[uinteger][bit]")
     }
 }
 
-SCENARIO("std::numeric_limits gets instantiated correctly", "[uinteger][utility]")
+SCENARIO("std::numeric_limits gets instantiated correctly", "[integer][unsigned][utility]")
 {
     GIVEN("The bit width of 32")
     {
