@@ -24,7 +24,7 @@ compile_gcc:
     script:
         - mkdir -p build/gcc/bw_output
         - cd build/gcc
-        - CC=gcc-9 CXX=g++-9 cmake -DBUILD_BENCHMARKS=ON -DBUILD_EXPERIMENTS=ON -DBENCHMARK_ENABLE_GTEST_TESTS=OFF  -DBENCHMARK_ENABLE_TESTING=OFF -DMPIR_INCLUDE_DIR=/mnt/studproj/usr/include -DMPIR_LIBRARIES=/mnt/studproj/usr/lib/libmpir.a  ../..
+        - CC=gcc-9 CXX=g++-9 cmake -DBUILD_BENCHMARKS=ON -DBUILD_EXPERIMENTS=ON -DBENCHMARK_ENABLE_GTEST_TESTS=OFF  -DBENCHMARK_ENABLE_TESTING=OFF -DMPIR_INCLUDE_DIR=/usr/local/x86_64-pc-linux/include -DMPIR_LIBRARIES=/usr/local/x86_64-pc-linux/lib/libmpir.a  ../..
         - /opt/sonar-build-wrapper/build-wrapper-linux-x86-64 --out-dir bw_output make -j 4 all
 
 compile_clang:
