@@ -13,6 +13,10 @@
         (1024, uint16_t), (1024, uint32_t), (1024, uint64_t), (1025, uint8_t), (1025, uint16_t),   \
         (1025, uint32_t)
 
+#define AARITH_INT_TEST_TEMPLATE_LARGE_PARAM_RANGE                                                 \
+    (1024, uint8_t), (1024, uint16_t), (1024, uint32_t), (1024, uint64_t), (1025, uint8_t),        \
+        (1025, uint16_t), (1025, uint32_t), (5000, uint8_t), (5000, uint16_t), (5000, uint32_t)
+
 #define AARITH_INT_NATIVE_BITWIDTHS_SMALL 8, 16
 #define AARITH_INT_NATIVE_BITWIDTHS 8, 16, 32, 64
 #define AARITH_INT_NATIVE_TYPES_SMALL uint8_t, int8_t, uint16_t, int16_t
