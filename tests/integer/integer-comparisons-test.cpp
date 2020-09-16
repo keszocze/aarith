@@ -1,95 +1,56 @@
 #include <aarith/integer_no_operators.hpp>
 #include <catch.hpp>
 
+#include "test_util.hpp"
+
 using namespace aarith;
 
-SCENARIO("Comparing two positive sintegers", "[integer][unsigned][utility][comparison]")
+TEMPLATE_TEST_CASE_SIG("Comparing two positive signed integers (template based)",
+                       "[integer][signed][utility][comparison]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
-    GIVEN("Two integer<N> a and b with a < b")
+    using I = integer<W, WordType>;
+
+    GIVEN("Two a and b with a < b")
     {
-        WHEN("N <= word_width")
-        {
-            constexpr size_t TestWidth = 16;
-            static constexpr uint16_t number_a = 7;
-            static constexpr uint16_t number_b = 23;
-            constexpr integer<TestWidth> a{number_a};
-            constexpr integer<TestWidth> b{number_b};
+        I a{I::zero()};
+        I b{I::max()};
 
-            THEN("operator< returns true")
-            {
-                // enforce constexpr context
-                constexpr bool comp = a < b;
-                REQUIRE(comp);
-            }
-            THEN("operator<= returns true")
-            {
-                constexpr bool comp = a <= b;
-                REQUIRE(comp);
-            }
-            THEN("operator> returns false")
-            {
-                constexpr bool comp = a > b;
-                REQUIRE_FALSE(comp);
-            }
-            THEN("operator>= returns false")
-            {
-                constexpr bool comp = a >= b;
-                REQUIRE_FALSE(comp);
-            }
-            THEN("operator== returns false")
-            {
-                constexpr bool comp = a == b;
-                REQUIRE_FALSE(comp);
-            }
-            THEN("operator!= returns true")
-            {
-                constexpr bool comp = a != b;
-                REQUIRE(comp);
-            }
+        THEN("operator< returns true")
+        {
+            bool comp = a < b;
+            REQUIRE(comp);
         }
-        WHEN("N > word_width")
+        THEN("operator<= returns true")
         {
-            const size_t TestWidth = 80;
-            integer<TestWidth> constexpr a{7, 0};
-            integer<TestWidth> constexpr b{23, 0};
-
-            integer<TestWidth> constexpr c{7, 0};
-            integer<TestWidth> constexpr d{0, 23};
-
-            THEN("operator< returns true")
-            {
-                REQUIRE(a < b);
-                REQUIRE_FALSE(c < d);
-            }
-            THEN("operator<= returns true")
-            {
-                REQUIRE(a <= b);
-                REQUIRE_FALSE(c <= d);
-            }
-            THEN("operator> returns false")
-            {
-                REQUIRE_FALSE(a > b);
-                REQUIRE(c > d);
-            }
-            THEN("operator>= returns false")
-            {
-                REQUIRE_FALSE(a >= b);
-                REQUIRE(c >= d);
-            }
-            THEN("operator== returns false")
-            {
-                REQUIRE_FALSE(a == b);
-                REQUIRE_FALSE(c == d);
-            }
-            THEN("operator!= returns true")
-            {
-                REQUIRE(a != b);
-                REQUIRE(c != d);
-            }
+            bool comp = a <= b;
+            REQUIRE(comp);
+        }
+        THEN("operator> returns false")
+        {
+            bool comp = a > b;
+            REQUIRE_FALSE(comp);
+        }
+        THEN("operator>= returns false")
+        {
+            bool comp = a >= b;
+            REQUIRE_FALSE(comp);
+        }
+        THEN("operator== returns false")
+        {
+            bool comp = a == b;
+            REQUIRE_FALSE(comp);
+        }
+        THEN("operator!= returns true")
+        {
+            bool comp = a != b;
+            REQUIRE(comp);
         }
     }
 }
-SCENARIO("Comparing two positive integers with different bit widths", "[integer][signed][utility][comparison]")
+
+SCENARIO("Comparing two positive integers with different bit widths",
+         "[integer][signed][utility][comparison]")
 {
     GIVEN("Two integer<N> a and b with a < b with different bit widths")
     {
@@ -173,7 +134,8 @@ SCENARIO("Comparing two positive integers with different bit widths", "[integer]
     }
 }
 
-SCENARIO("Investigating the comparison of max and min values", "[integer][signed][comparison][utility][dinge]")
+SCENARIO("Investigating the comparison of max and min values",
+         "[integer][signed][comparison][utility][dinge]")
 {
     GIVEN("integer<8>::max/min")
     {
@@ -296,3 +258,5 @@ SCENARIO("Investigating the comparison of max and min values", "[integer][signed
         }
     }
 }
+
+

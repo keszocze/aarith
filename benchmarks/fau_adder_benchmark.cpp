@@ -6,8 +6,8 @@
 template <size_t width, size_t lsp_width, size_t shared_bits = 0>
 void wrapper(benchmark::State& state)
 {
-    using T = std::tuple<aarith::uinteger<2 * width>, aarith::uinteger<2 * width>,
-                         aarith::uinteger<2 * width>>;
+    using ResultType = aarith::uinteger<2 * width>;
+    using T = std::tuple<ResultType, ResultType, ResultType>;
 
     T res;
 
@@ -35,10 +35,6 @@ int main(int argc, char** argv)
         ->Unit(benchmark::kMillisecond);
     benchmark::RegisterBenchmark("FAU Adder n=32, m=16, p=1", &wrapper<32, 16, 1>)
         ->Unit(benchmark::kMillisecond);
-
-
-
-
 
     benchmark::Initialize(&argc, argv);
     benchmark::RunSpecifiedBenchmarks();

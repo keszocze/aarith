@@ -250,6 +250,7 @@ auto operator-(const normalized_float<E, M, WordType>& lhs,
     return sub(lhs, rhs);
 }
 
+
 template <size_t E, size_t M, typename WordType>
 auto operator*(const normalized_float<E, M, WordType>& lhs,
                const normalized_float<E, M, WordType>& rhs) -> normalized_float<E, M, WordType>
