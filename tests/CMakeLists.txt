@@ -25,7 +25,7 @@ endfunction(add_aarith_test)
 
 
 
-add_aarith_test(uint-general FILES integer/uint-test.cpp)
+add_aarith_test(uint-general FILES integer/uint-test.cpp integer/uint-random-generation-test.cpp)
 add_aarith_test(uint-operations FILES integer/uint-operations-test.cpp)
 add_aarith_test(uint-anytime FILES integer/uint-anytime-test.cpp)
 add_aarith_test(uint-comparisons FILES integer/uint-comparisons-test.cpp)

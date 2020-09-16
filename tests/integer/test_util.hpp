@@ -13,3 +13,8 @@
         (1024, uint16_t), (1024, uint32_t), (1024, uint64_t), (1025, uint8_t), (1025, uint16_t),   \
         (1025, uint32_t)
 
+#define AARITH_INT_NATIVE_BITWIDTHS_SMALL 8, 16
+#define AARITH_INT_NATIVE_BITWIDTHS 8, 16, 32, 64
+#define AARITH_INT_NATIVE_TYPES_SMALL uint8_t, int8_t, uint16_t, int16_t
+#define AARITH_INT_NATIVE_TYPES                                                                    \
+    uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, uint64_t, int64_t

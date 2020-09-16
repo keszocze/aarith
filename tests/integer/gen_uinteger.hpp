@@ -10,6 +10,8 @@ class UIntegerGenerator : public Catch::Generators::IGenerator<uinteger<BitWidth
 {
 public:
     using I = uinteger<BitWidth, WordType>;
+
+
     explicit UIntegerGenerator(const I& min_val, const I& max_val)
         : rng{std::random_device{}()}
         , random_number(min_val, max_val)
