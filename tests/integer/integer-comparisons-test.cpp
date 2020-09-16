@@ -11,7 +11,7 @@ TEMPLATE_TEST_CASE_SIG("Comparing two positive signed integers of same bit width
 {
     using I = integer<W, WordType>;
 
-    GIVEN("Two a and b with TestTypea < b")
+    GIVEN("Two a and b with a < b")
     {
         I a{I::zero()};
         I b{I::max()};

@@ -1,7 +1,131 @@
+#include "gen_uinteger.hpp"
+#include "test_util.hpp"
 #include <aarith/integer_no_operators.hpp>
 #include <catch.hpp>
 
 using namespace aarith;
+
+TEMPLATE_TEST_CASE_SIG("Unsigned integer addition is commutative",
+                       "[integer][signed][arithmetic][addition]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+    using R = uinteger<2 * W, WordType>;
+
+    I a = GENERATE(take(10, random_uinteger<W, WordType>()));
+    I b = GENERATE(take(10, random_uinteger<W, WordType>()));
+
+    WHEN("Computing with extended bit widths")
+    {
+        R res_a_b{expanding_add(a, b)};
+        R res_b_a{expanding_add(a, b)};
+        THEN("The results should match")
+        {
+            REQUIRE(res_a_b == res_b_a);
+        }
+    }
+    WHEN("Computing with truncation")
+    {
+        I res_a_b{add(a, b)};
+        I res_b_a{add(a, b)};
+        THEN("The results should match")
+        {
+            REQUIRE(res_a_b == res_b_a);
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
+                       "[integer][signed][arithmetic][addition]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+    I a = GENERATE(take(100, random_uinteger<W, WordType>()));
+    REQUIRE(add(a, I::zero()) == a);
+    REQUIRE(expanding_add(a, I::zero()) == a);
+}
+
+
+
+TEMPLATE_TEST_CASE_SIG("Unsigned integer multiplication is commutative",
+                       "[integer][signed][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+    using R = uinteger<2 * W, WordType>;
+
+    I a = GENERATE(take(10, random_uinteger<W, WordType>()));
+    I b = GENERATE(take(10, random_uinteger<W, WordType>()));
+
+    WHEN("Computing with extended bit widths")
+    {
+        R res_a_b_school{schoolbook_expanding_mul(a, b)};
+        R res_b_a_school{schoolbook_expanding_mul(a, b)};
+        R res_a_b_kara{expanding_karazuba(a, b)};
+        R res_b_a_kara{expanding_karazuba(a, b)};
+        THEN("The the flipped results should match")
+        {
+            REQUIRE(res_a_b_school == res_b_a_school);
+            REQUIRE(res_a_b_kara == res_b_a_kara);
+        }
+        AND_THEN("The results of the different methods should match") {
+            REQUIRE(res_a_b_school == res_a_b_kara);
+        }
+    }
+
+    WHEN("Computing with truncation")
+    {
+        I res_a_b_school{schoolbook_mul(a, b)};
+        I res_b_a_school{schoolbook_mul(a, b)};
+        I res_a_b_kara{karazuba(a, b)};
+        I res_b_a_kara{karazuba(a, b)};
+        THEN("The the flipped results should match")
+        {
+            REQUIRE(res_a_b_school == res_b_a_school);
+            REQUIRE(res_a_b_kara == res_b_a_kara);
+        }
+        AND_THEN("The results of the different methods should match") {
+            REQUIRE(res_a_b_school == res_a_b_kara);
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("One is the neutral element of the multiplication",
+                       "[integer][signed][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+    I a = GENERATE(take(100, random_uinteger<W, WordType>()));
+    REQUIRE(schoolbook_mul(a, I::one()) == a);
+    REQUIRE(schoolbook_expanding_mul(a, I::one()) == a);
+    REQUIRE(karazuba(a, I::one()) == a);
+    REQUIRE(expanding_karazuba(a, I::one()) == a);
+}
+
+
+TEMPLATE_TEST_CASE_SIG("Zero makes the multiplication result zero",
+                       "[integer][signed][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+    using R = uinteger<2*W, WordType>;
+    I a = GENERATE(take(100, random_uinteger<W, WordType>()));
+    REQUIRE(schoolbook_mul(a, I::zero()) == I::zero());
+    REQUIRE(schoolbook_expanding_mul(a, I::zero()) == R::zero());
+    REQUIRE(karazuba(a, I::zero()) == I::zero());
+    REQUIRE(expanding_karazuba(a, I::zero()) == R::zero());
+}
+
+
+TEMPLATE_TEST_CASE_SIG("Multiplying the max value with truncation yields 1",
+                       "[integer][signed][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+    I a{I::max()};
+    REQUIRE(schoolbook_mul(a, a) == I::one());
+    REQUIRE(karazuba(a, a) == I::one());
+}
 
 SCENARIO("Adding two unsigned integers exactly", "[integer][unsigned][arithmetic][addition]")
 {
@@ -117,7 +241,8 @@ SCENARIO("Adding two unsigned integers exactly", "[integer][unsigned][arithmetic
     }
 }
 
-SCENARIO("Bit shifting is possible as constexpr for unsigned integers", "[integer][unsigned][utility][bit_logic][constexpr]")
+SCENARIO("Bit shifting is possible as constexpr for unsigned integers",
+         "[integer][unsigned][utility][bit_logic][constexpr]")
 {
     GIVEN("An unsigned integer of width N")
     {
@@ -158,7 +283,8 @@ SCENARIO("Bit shifting is possible as constexpr for unsigned integers", "[intege
     }
 }
 
-SCENARIO("Adding two unsigned integers of different bit width", "[integer][unsigned][arithmetic][addition]")
+SCENARIO("Adding two unsigned integers of different bit width",
+         "[integer][unsigned][arithmetic][addition]")
 {
     GIVEN("An uinteger of bit width 128")
     {
@@ -190,7 +316,7 @@ SCENARIO("Adding two unsigned integers of different bit width", "[integer][unsig
             REQUIRE(result1 == result2);
         }
     }
-    GIVEN("An uinteger consisting of zeros only")
+    GIVEN("An unsigned integer consisting of zeros only")
     {
         static constexpr uint64_t ones = static_cast<uint64_t>(-1);
         static constexpr uinteger<128> large = uinteger<128>::from_words(ones, ones);
@@ -210,7 +336,8 @@ SCENARIO("Adding two unsigned integers of different bit width", "[integer][unsig
     }
 }
 
-SCENARIO("Subtracting two unsigned integers exactly", "[integer][unsigned][arithmetic][subtraction]")
+SCENARIO("Subtracting two unsigned integers exactly",
+         "[integer][unsigned][arithmetic][subtraction]")
 {
     GIVEN("Two uinteger<N> a and b are subtracted")
     {
@@ -457,7 +584,8 @@ SCENARIO("Investigating max/min values", "[integer][unsigned][operations]")
     }
 }
 
-SCENARIO("Multiplying two unsigned integers exactly", "[integer][unsigned][arithmetic][multiplication]")
+SCENARIO("Multiplying two unsigned integers exactly",
+         "[integer][unsigned][arithmetic][multiplication]")
 {
 
     GIVEN("Two uinteger<N> a and b with N <= 32")
@@ -529,7 +657,7 @@ SCENARIO("Multiplying two unsigned integers exactly", "[integer][unsigned][arith
             }
         }
 
-        WHEN("One multiplicant is zero")
+        WHEN("One multiplicand is zero")
         {
 
             THEN("The result should be zero")
