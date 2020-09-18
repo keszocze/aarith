@@ -84,6 +84,26 @@ TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the subtraction",
     REQUIRE(expanding_sub(a, I::zero()) == a);
 }
 
+TEMPLATE_TEST_CASE_SIG("Addition wraps around correctly",
+                       "[integer][unsigned][arithmetic][addition]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+
+    static constexpr I zero = I::zero();
+    static constexpr I one = I::one();
+    static constexpr I max_val = I::max();
+
+    WHEN("Adding one to max")
+    {
+        THEN("The result should be zero")
+        {
+            REQUIRE(expanding_add(max_val, one) == zero);
+            REQUIRE(add(max_val, one) == zero);
+        }
+    }
+}
+
 TEMPLATE_TEST_CASE_SIG("Expanding subtraction wraps around correctly for different bit-widths",
                        "[integer][unsigned][arithmetic][subtraction]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
@@ -137,9 +157,9 @@ TEMPLATE_TEST_CASE_SIG("Subtraction wraps around correctly",
         }
     }
 
-    WHEN("Subtracting max from zero")
+    WHEN("Subtracting one from zero")
     {
-        THEN("The result should be one")
+        THEN("The result should be max")
         {
             auto constexpr result = expanding_sub(zero, one);
             REQUIRE(result == max_val);
@@ -554,13 +574,16 @@ SCENARIO("Subtracting two unsigned integers exactly",
     }
 }
 
-SCENARIO("Investigating max/min values", "[integer][unsigned][operations]")
+
+TEMPLATE_TEST_CASE_SIG("Investigating max/min values", "[integer][unsigned][operations]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
+    using I = uinteger<W, WordType>;
     GIVEN("The maximal and minimal values of uinteger<V>")
     {
 
-        static constexpr uinteger<89> min = uinteger<89>::min();
-        static constexpr uinteger<89> max = uinteger<89>::max();
+        static constexpr I min = I::min();
+        static constexpr I max = I::max();
 
         THEN("Bit-wise complement should yield the other one")
         {
@@ -570,201 +593,42 @@ SCENARIO("Investigating max/min values", "[integer][unsigned][operations]")
 
         THEN("uinteger::min and uinteger::lowest are the same")
         {
-            REQUIRE(uinteger<89>::min() == std::numeric_limits<uinteger<89>>::lowest());
+            REQUIRE(min == std::numeric_limits<I>::lowest());
         }
 
         WHEN("Adding to max value")
         {
-            const uint64_t a_ = GENERATE(
-                take(100, random(static_cast<uint64_t>(1), std::numeric_limits<uint64_t>::max())));
-            const uinteger<89> a{a_};
-            const uinteger<89> expected_trunc{a_ - 1};
+            const I a = GENERATE(take(10, random_uinteger<W, WordType>()));
+            const I expected_trunc{sub(a, I::one())};
 
             THEN("Truncating addition is overflow modulo 2")
             {
-                uinteger<89> result = add(max, a);
-                const auto result_fun = fun_add(max, a);
-                REQUIRE(result_fun == result);
+                I result = add(max, a);
                 REQUIRE(result == expected_trunc);
             }
 
             THEN("Expanding addition has the highest bet set and is modulo 2 otherwise")
             {
-                uinteger<90> result = expanding_add(max, a);
-                uinteger<90> result_fun = fun_add_expand(max, a);
-                CHECK(result_fun == result);
-                CHECK(result.bit(89));
-                REQUIRE(width_cast<89>(result) == expected_trunc);
+                uinteger<W+10, WordType> result = expanding_add(max, a);
+                CHECK(result.bit(W));
+                REQUIRE(width_cast<W>(result) == expected_trunc);
             }
         }
 
-        WHEN("Subracting from min value")
+        WHEN("Subtracting from min value")
         {
-            const uint64_t a_ = GENERATE(
-                take(100, random(static_cast<uint64_t>(0), std::numeric_limits<uint64_t>::max())));
-            const uinteger<89> a{a_};
+            const I a = GENERATE(take(10, random_uinteger<W, WordType>()));
 
             THEN("Truncating subtraction is underflow modulo 2")
             {
-                const uinteger<89> expected = sub(uinteger<89>::max(), uinteger<89>{a_ - 1});
-                uinteger<89> result = sub(min, a);
+                const I expected = sub(I::max(), I{sub(a, I::one())});
+                I result = sub(min, a);
                 REQUIRE(result == expected);
             }
         }
-
-        THEN("Adding or subtracting min should not change the other value")
-        {
-            static constexpr uinteger<89> n{23543785U}; // randomly chosen
-
-            CHECK(add(max, min) == max);
-            CHECK(fun_add(max, min) == max);
-
-            CHECK(add(n, min) == n);
-            CHECK(fun_add(n, min) == n);
-            CHECK(sub(max, min) == max);
-            REQUIRE(sub(n, min) == n);
-        }
-
-        AND_GIVEN("The uintegers zero and one")
-        {
-
-            static constexpr uinteger<89> zero = uinteger<89>::zero();
-            static constexpr uinteger<89> one = uinteger<89>::one();
-
-            THEN("min and zero should be identical")
-            {
-                REQUIRE(zero == min);
-            }
-
-            THEN("Subtracting one from zero/min yields the maximal value")
-            {
-
-                // completely randomly chosen bit width
-
-                static constexpr uinteger<89> result_zero = sub(zero, one);
-                static constexpr uinteger<89> result_min = sub(min, one);
-                static constexpr uinteger<89> expected = uinteger<89>::max();
-
-                CHECK(result_min == expected);
-                REQUIRE(result_zero == expected);
-            }
-        }
     }
 }
 
-SCENARIO("Multiplying two unsigned integers exactly",
-         "[integer][unsigned][arithmetic][multiplication]")
-{
-
-    GIVEN("Two uinteger<N> a and b with N <= 32")
-    {
-
-        uint32_t val_a =
-            GENERATE(0, 1, 56567, 23, static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
-        uint32_t val_b = GENERATE(0, 1, 56567, 23, 234, 76856, 2342353456,
-                                  static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
-
-        const uinteger<32> a = uinteger<32>::from_words(val_a);
-        const uinteger<32> b = uinteger<32>::from_words(val_b);
-
-        THEN("Multiplication should be commutative")
-        {
-            CHECK(mul(a, b) == mul(b, a));
-        }
-
-        THEN("Multiplication by 1 should not change the other multiplicant")
-        {
-            const uinteger<32> one{1U};
-            CHECK(schoolbook_mul(a, one) == a);
-            CHECK(schoolbook_mul(one, a) == a);
-            CHECK(schoolbook_mul(b, one) == b);
-            CHECK(schoolbook_mul(one, b) == b);
-
-            CHECK(karazuba(a, one) == a);
-            CHECK(karazuba(one, a) == a);
-            CHECK(karazuba(b, one) == b);
-            CHECK(karazuba(one, b) == b);
-        }
-        THEN("Multiplication by 0 should result in 0")
-        {
-            const uinteger<32> zero{0U};
-            CHECK(schoolbook_mul(a, zero) == zero);
-            CHECK(schoolbook_mul(zero, a) == zero);
-            CHECK(schoolbook_mul(b, zero) == zero);
-            CHECK(schoolbook_mul(zero, b) == zero);
-
-            CHECK(karazuba(a, zero) == zero);
-            CHECK(karazuba(zero, a) == zero);
-            CHECK(karazuba(b, zero) == zero);
-            CHECK(karazuba(zero, b) == zero);
-        }
-    }
-
-    GIVEN("Two uinteger<N> a and b to be multiplied")
-    {
-        constexpr uint64_t val = (static_cast<uint64_t>(1) << 35);
-        auto constexpr a = uinteger<128>::from_words(1, val);
-        auto constexpr c = uinteger<128>::from_words(13435, 345897);
-        auto constexpr d =
-            uinteger<128>::from_words(static_cast<typename uinteger<128>::word_type>(-1),
-                                      static_cast<typename uinteger<128>::word_type>(-1));
-        auto constexpr zero = uinteger<128>::from_words(0, 0);
-        auto constexpr one = uinteger<128>::from_words(0, 1);
-
-        const std::vector<uinteger<128>> numbers{a, c, d, one, zero};
-
-        THEN("The operation should be commutative")
-        {
-            for (const uinteger<128>& num_a : numbers)
-            {
-                for (const uinteger<128>& num_b : numbers)
-                {
-                    CHECK(schoolbook_mul(num_a, num_b) == schoolbook_mul(num_b, num_a));
-                    CHECK(karazuba(num_a, num_b) == karazuba(num_b, num_a));
-                }
-            }
-        }
-
-        WHEN("One multiplicand is zero")
-        {
-
-            THEN("The result should be zero")
-            {
-                for (const uinteger<128>& num : numbers)
-                {
-                    CHECK(schoolbook_mul(num, zero) == zero);
-                    CHECK(schoolbook_mul(zero, num) == zero);
-
-                    CHECK(karazuba(num, zero) == zero);
-                    CHECK(karazuba(zero, num) == zero);
-                }
-            }
-        }
-        WHEN("One multiplicant is one")
-        {
-            THEN("Multiplication does not do much")
-            {
-
-                for (const uinteger<128>& num : numbers)
-                {
-                    CHECK(schoolbook_mul(num, one) == num);
-                    CHECK(schoolbook_mul(one, num) == num);
-
-                    CHECK(karazuba(num, one) == num);
-                    CHECK(karazuba(one, num) == num);
-                }
-            }
-        }
-        WHEN("Both multiplicands are maximum")
-        {
-            THEN("The product is 1 for the truncating multiplication")
-            {
-                REQUIRE(schoolbook_mul(d, d) == one);
-                REQUIRE(karazuba(d, d) == one);
-            }
-        }
-    }
-}
 
 SCENARIO("Multiplication of numbers fitting in a uint64_t",
          "[integer][unsigned][arithmetic][multiplication]")
@@ -1167,36 +1031,30 @@ SCENARIO("Dividing two unsigned integers exactly", "[integer][unsigned][arithmet
     }
 }
 
-SCENARIO("Computing the signum of an unsigned integer", "[integer][unsigned]operation][utility]")
+TEMPLATE_TEST_CASE_SIG("Computing the signum of an unsigned integer",
+                       "[integer][unsigned]operation][utility]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
+    using I = uinteger<W, WordType>;
     GIVEN("The number  zero")
     {
-        THEN("The signum should be zero")
+        WHEN("Determining the signum")
         {
-            REQUIRE(signum(uinteger<8>::zero()) == 0);
-            REQUIRE(signum(uinteger<1>::zero()) == 0);
-            REQUIRE(signum(uinteger<16>::zero()) == 0);
-            REQUIRE(signum(uinteger<32>::zero()) == 0);
-            REQUIRE(signum(uinteger<64>::zero()) == 0);
-            REQUIRE(signum(uinteger<128>::zero()) == 0);
-            REQUIRE(signum(uinteger<300>::zero()) == 0);
-            REQUIRE(signum(uinteger<1313>::zero()) == 0);
+            THEN("The signum should be zero")
+            {
+                REQUIRE(signum(I::zero()) == 0);
+            }
         }
     }
     GIVEN("A non-zero number")
     {
-        THEN("The signum should be one")
+        WHEN("Determining the signum")
         {
-            uint8_t val_a =
-                GENERATE(take(100, random(uint8_t(1), std::numeric_limits<uint8_t>::max())));
-
-            REQUIRE(signum(uinteger<8>{val_a}) == 1);
-            REQUIRE(signum(uinteger<16>{val_a}) == 1);
-            REQUIRE(signum(uinteger<17>{val_a}) == 1);
-            REQUIRE(signum(uinteger<32>{val_a}) == 1);
-            REQUIRE(signum(uinteger<64>{val_a}) == 1);
-            REQUIRE(signum(uinteger<128>{val_a}) == 1);
-            REQUIRE(signum(uinteger<256>{val_a, val_a}) == 1);
+            THEN("The signum should be one")
+            {
+                const I a = GENERATE(take(10, random_uinteger<W, WordType>(I::one(), I::max())));
+                REQUIRE(signum(a) == 1);
+            }
         }
     }
 }
