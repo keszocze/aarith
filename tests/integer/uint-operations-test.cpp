@@ -18,7 +18,7 @@ TEMPLATE_TEST_CASE_SIG("Unsigned integer addition is commutative",
     WHEN("Computing with extended bit widths")
     {
         R res_a_b{expanding_add(a, b)};
-        R res_b_a{expanding_add(a, b)};
+        R res_b_a{expanding_add(b, a)};
         THEN("The results should match")
         {
             REQUIRE(res_a_b == res_b_a);
@@ -35,6 +35,35 @@ TEMPLATE_TEST_CASE_SIG("Unsigned integer addition is commutative",
     }
 }
 
+TEMPLATE_TEST_CASE_SIG(
+    "Unsigned integer addition is commutative for addends with different bit widths",
+    "[integer][signed][arithmetic][addition]", AARITH_INT_TEST_SIGNATURE,
+    AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+    using ISmall = uinteger<W - 2, WordType>;
+    using ILarge = uinteger<W + I::word_width() + 3, WordType>;
+
+    I a = GENERATE(take(5, random_uinteger<W, WordType>()));
+    ISmall b = GENERATE(take(5, random_uinteger<W - 2, WordType>()));
+    ILarge c = GENERATE(take(5, random_uinteger<W + I::word_width() + 3, WordType>()));
+
+    WHEN("Using different bit-widths")
+    {
+
+        const auto res_a_b{expanding_add(a, b)};
+        const auto res_b_a{expanding_add(a, b)};
+
+        const auto res_a_c{expanding_add(a, c)};
+        const auto res_c_a{expanding_add(c, a)};
+        THEN("The results should match")
+        {
+            REQUIRE(res_a_b == res_b_a);
+            REQUIRE(res_a_c == res_c_a);
+        }
+    }
+}
+
 TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
                        "[integer][signed][arithmetic][addition]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
@@ -45,7 +74,78 @@ TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
     REQUIRE(expanding_add(a, I::zero()) == a);
 }
 
+TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the subtraction",
+                       "[integer][signed][arithmetic][subtraction]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+    I a = GENERATE(take(100, random_uinteger<W, WordType>()));
+    REQUIRE(sub(a, I::zero()) == a);
+    REQUIRE(expanding_sub(a, I::zero()) == a);
+}
 
+TEMPLATE_TEST_CASE_SIG("Expanding subtraction wraps around correctly for different bit-widths",
+                       "[integer][unsigned][arithmetic][subtraction]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+    using LargeI = uinteger<2 * W + 6, WordType>;
+
+    GIVEN("A n-bit zero and a m-bit (m>n)  max")
+    {
+        static constexpr I zero = I::zero();
+        static constexpr LargeI max_val = LargeI::max();
+        static constexpr LargeI expected = LargeI::one();
+
+        THEN("Subtracting max from zero should give one")
+        {
+            auto constexpr result = expanding_sub(zero, max_val);
+            REQUIRE(result == expected);
+        }
+    }
+
+    GIVEN("A n-bit zero and a m-bit (m<n) max")
+    {
+        static constexpr LargeI zero = LargeI::zero();
+        static constexpr I large = I::max();
+        static constexpr LargeI expected = sub(LargeI::one(), add(LargeI{I::max()}, LargeI::one()));
+
+        THEN("Subtracting max from zero should give 1-(small::max+1)")
+        {
+            auto constexpr result = expanding_sub(zero, large);
+            REQUIRE(result == expected);
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Subtraction wraps around correctly",
+                       "[integer][unsigned][arithmetic][subtraction]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+
+    static constexpr I zero = I::zero();
+    static constexpr I one = I::one();
+    static constexpr I max_val = I::max();
+
+    WHEN("Subtracting max from zero")
+    {
+        THEN("The result should be one")
+        {
+            auto constexpr result = expanding_sub(zero, max_val);
+            REQUIRE(result == one);
+        }
+    }
+
+    WHEN("Subtracting max from zero")
+    {
+        THEN("The result should be one")
+        {
+            auto constexpr result = expanding_sub(zero, one);
+            REQUIRE(result == max_val);
+        }
+    }
+}
 
 TEMPLATE_TEST_CASE_SIG("Unsigned integer multiplication is commutative",
                        "[integer][signed][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
@@ -60,15 +160,16 @@ TEMPLATE_TEST_CASE_SIG("Unsigned integer multiplication is commutative",
     WHEN("Computing with extended bit widths")
     {
         R res_a_b_school{schoolbook_expanding_mul(a, b)};
-        R res_b_a_school{schoolbook_expanding_mul(a, b)};
+        R res_b_a_school{schoolbook_expanding_mul(b, a)};
         R res_a_b_kara{expanding_karazuba(a, b)};
-        R res_b_a_kara{expanding_karazuba(a, b)};
+        R res_b_a_kara{expanding_karazuba(b, a)};
         THEN("The the flipped results should match")
         {
             REQUIRE(res_a_b_school == res_b_a_school);
             REQUIRE(res_a_b_kara == res_b_a_kara);
         }
-        AND_THEN("The results of the different methods should match") {
+        AND_THEN("The results of the different methods should match")
+        {
             REQUIRE(res_a_b_school == res_a_b_kara);
         }
     }
@@ -76,15 +177,16 @@ TEMPLATE_TEST_CASE_SIG("Unsigned integer multiplication is commutative",
     WHEN("Computing with truncation")
     {
         I res_a_b_school{schoolbook_mul(a, b)};
-        I res_b_a_school{schoolbook_mul(a, b)};
+        I res_b_a_school{schoolbook_mul(b, a)};
         I res_a_b_kara{karazuba(a, b)};
-        I res_b_a_kara{karazuba(a, b)};
+        I res_b_a_kara{karazuba(b, a)};
         THEN("The the flipped results should match")
         {
             REQUIRE(res_a_b_school == res_b_a_school);
             REQUIRE(res_a_b_kara == res_b_a_kara);
         }
-        AND_THEN("The results of the different methods should match") {
+        AND_THEN("The results of the different methods should match")
+        {
             REQUIRE(res_a_b_school == res_a_b_kara);
         }
     }
@@ -102,20 +204,18 @@ TEMPLATE_TEST_CASE_SIG("One is the neutral element of the multiplication",
     REQUIRE(expanding_karazuba(a, I::one()) == a);
 }
 
-
 TEMPLATE_TEST_CASE_SIG("Zero makes the multiplication result zero",
                        "[integer][signed][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = uinteger<W, WordType>;
-    using R = uinteger<2*W, WordType>;
+    using R = uinteger<2 * W, WordType>;
     I a = GENERATE(take(100, random_uinteger<W, WordType>()));
     REQUIRE(schoolbook_mul(a, I::zero()) == I::zero());
     REQUIRE(schoolbook_expanding_mul(a, I::zero()) == R::zero());
     REQUIRE(karazuba(a, I::zero()) == I::zero());
     REQUIRE(expanding_karazuba(a, I::zero()) == R::zero());
 }
-
 
 TEMPLATE_TEST_CASE_SIG("Multiplying the max value with truncation yields 1",
                        "[integer][signed][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
@@ -450,38 +550,6 @@ SCENARIO("Subtracting two unsigned integers exactly",
                     REQUIRE(result == expected);
                 }
             }
-        }
-    }
-}
-
-SCENARIO("Expanding subtraction works correctly", "[integer][unsigned][arithmetic][subtraction]")
-{
-    GIVEN("A n-bit zero and a m-bit (m>n)  max")
-    {
-        static constexpr uinteger<4> zero = uinteger<4>::min();
-        static constexpr uinteger<8> large = uinteger<8>::max();
-        static constexpr uinteger<8> expected = uinteger<8>{1U};
-
-        std::cout << zero << " " << large << " " << expected << std::endl;
-
-        THEN("Subtracting max from zero should give one")
-        {
-            auto constexpr result = expanding_sub(zero, large);
-            REQUIRE(result == expected);
-        }
-    }
-
-    GIVEN("A n-bit zero and a m-bit (m<n) max")
-    {
-        static constexpr uinteger<8> zero = uinteger<8>::min();
-        static constexpr uinteger<4> large = uinteger<4>::max();
-        static constexpr uinteger<8> expected =
-            sub(uinteger<8>{1U}, add(uinteger<8>{uinteger<4>::max()}, uinteger<8>{1U}));
-
-        THEN("Subtracting max from zero should give 1-(small::max+1)")
-        {
-            auto constexpr result = expanding_sub(zero, large);
-            REQUIRE(result == expected);
         }
     }
 }
