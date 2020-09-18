@@ -44,6 +44,7 @@ compile_clang:
 run_sonarqube:
   extends: .ciconf
   stage: quality
+  needs: ["test_gcc"]
   script:
       - echo $CI_COMMIT_REF_NAME
       - chmod +x scripts/mk_sonar_config.sh
@@ -55,6 +56,7 @@ run_sonarqube:
 test_clang:
     extends: .ciconf
     stage: test
+    needs : ["compile_clang"]
     script:
         - cd build/clang
         - make test
@@ -62,10 +64,11 @@ test_clang:
 test_gcc:
     extends: .ciconf
     stage: test
+    needs: ["compile_gcc"]
     artifacts:
         paths:
             - build/tests/coverage
-        expire_in: 30 minutes
+        expire_in: 180 minutes
     script:
         - cd build/gcc
         - make test
