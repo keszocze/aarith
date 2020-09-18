@@ -79,18 +79,18 @@ TEMPLATE_TEST_CASE_SIG("Large number addition match those of MPIR",
 
 }
 
-TEMPLATE_TEST_CASE_SIG("Large number multiplication match those of MPIR",
-                       "[integer][signed][arithmetic][multiplication][mpir]", AARITH_INT_TEST_SIGNATURE,
-                       AARITH_INT_TEST_TEMPLATE_LARGE_PARAM_RANGE)
-{
-    using I = uinteger<W, WordType>;
-    const I lhs =
-        GENERATE(take(4, random_uinteger<W, WordType>()));
-    const I rhs =
-        GENERATE(take(4, random_uinteger<W, WordType>()));
-    const I result_school = schoolbook_mul(lhs, rhs);
-    const I result_kara = karazuba(lhs, rhs);
-    REQUIRE(is_uint_add_correct<W, WordType>(lhs, rhs, result_school));
-    REQUIRE(is_uint_add_correct<W, WordType>(lhs, rhs, result_kara));
-
-}
+//TEMPLATE_TEST_CASE_SIG("Large number multiplication match those of MPIR",
+//                       "[integer][signed][arithmetic][multiplication][mpir]", AARITH_INT_TEST_SIGNATURE,
+//                       AARITH_INT_TEST_TEMPLATE_LARGE_PARAM_RANGE)
+//{
+//    using I = uinteger<W, WordType>;
+//    const I lhs =
+//        GENERATE(take(4, random_uinteger<W, WordType>()));
+//    const I rhs =
+//        GENERATE(take(4, random_uinteger<W, WordType>()));
+//    const I result_school = schoolbook_mul(lhs, rhs);
+//    const I result_kara = karazuba(lhs, rhs);
+//    REQUIRE(is_uint_add_correct<W, WordType>(lhs, rhs, result_school));
+//    REQUIRE(is_uint_add_correct<W, WordType>(lhs, rhs, result_kara));
+//
+//}
