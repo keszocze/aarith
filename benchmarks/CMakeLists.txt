@@ -14,7 +14,7 @@ function(add_aarith_benchmark testname)
             ${ARGN}
     )
 
-    add_executable(${targetname} ${AARITH_BENCH_FILES})to_binary(
+    add_executable(${targetname} ${AARITH_BENCH_FILES})
     target_link_libraries(${targetname} PRIVATE aarith::Library ${AARITH_BENCH_LIBS})
 
 
