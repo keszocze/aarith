@@ -98,7 +98,6 @@ TEMPLATE_TEST_CASE_SIG("Addition wraps around correctly",
     {
         THEN("The result should be zero")
         {
-            REQUIRE(expanding_add(max_val, one) == zero);
             REQUIRE(add(max_val, one) == zero);
         }
     }
@@ -598,7 +597,7 @@ TEMPLATE_TEST_CASE_SIG("Investigating max/min values", "[integer][unsigned][oper
 
         WHEN("Adding to max value")
         {
-            const I a = GENERATE(take(10, random_uinteger<W, WordType>()));
+            const I a = GENERATE(take(10, random_uinteger<W, WordType>(I::one(), I::max())));
             const I expected_trunc{sub(a, I::one())};
 
             THEN("Truncating addition is overflow modulo 2")
@@ -607,9 +606,14 @@ TEMPLATE_TEST_CASE_SIG("Investigating max/min values", "[integer][unsigned][oper
                 REQUIRE(result == expected_trunc);
             }
 
-            THEN("Expanding addition has the highest bet set and is modulo 2 otherwise")
+            THEN("Expanding addition has the highest bit set and is modulo 2 otherwise")
             {
                 uinteger<W+10, WordType> result = expanding_add(max, a);
+                const auto bit_set = result.bit(W);
+                if (!bit_set) {
+                    std::cout << max << "+" << a << "=" << result << "\n";
+                    std::cout << to_binary(max) << "+" << to_binary(a) << "=" << to_binary(result) << "\n";
+                }
                 CHECK(result.bit(W));
                 REQUIRE(width_cast<W>(result) == expected_trunc);
             }

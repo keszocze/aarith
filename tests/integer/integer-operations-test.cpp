@@ -43,7 +43,7 @@ SCENARIO("Adding two positive integers", "[integer][signed][arithmetic][addition
     GIVEN("Two positive integer<N> a and b with N <= word_width")
     {
         static constexpr size_t TestWidth = 16;
-        static_assert(integer<TestWidth>::word_count() == 1);
+        static_assert(1 == integer<TestWidth>::word_count());
 
         WHEN("The result a+b still fits into N bits")
         {
@@ -219,22 +219,6 @@ SCENARIO("Adding two positive integers", "[integer][signed][arithmetic][addition
             REQUIRE(sum150.is_negative());
         }
     }
-    //    GIVEN("A positive integer and a negative integer with smaller absolute value")
-    //    {
-    //        const integer<192> a = integer<192>::from_words(1U, 0U, 0U);
-    //
-    //        const integer<64> b{-1};
-    //
-    //        WHEN("Adding both numbers")
-    //        {
-    //            const auto result = expanding_add(a, b);
-    //
-    //            std::cout << group_digits(to_binary(a), 64) << "\n";
-    //            std::cout << group_digits(to_binary(b), 64) << "\n";
-    //            std::cout << group_digits(to_binary(width_cast<192>(b)), 64) << "\n";
-    //            std::cout << group_digits(to_binary(result), 64) << "\n";
-    //        }
-    //    }
 }
 
 SCENARIO("Multiplying larger integers using the various implementations works",
@@ -1030,9 +1014,9 @@ SCENARIO("Left/right shifting signed integers", "[integer][signed][operation][ut
     {
         constexpr integer<150> a{0U, 1U, 0U};
         constexpr integer<150> b{8, 8, 8};
-        constexpr integer<150> b_{4, 4, 4};
-        constexpr integer<150> b__{2, 2, 2};
-        constexpr integer<150> b___{1, 1, 1};
+        constexpr integer<150> bs1{4, 4, 4};
+        constexpr integer<150> bs2{2, 2, 2};
+        constexpr integer<150> bs3{1, 1, 1};
         WHEN("Right Shfiting")
         {
             THEN("It should behave like division by a power of two")
@@ -1043,27 +1027,27 @@ SCENARIO("Left/right shifting signed integers", "[integer][signed][operation][ut
                 //                std::cout << group_digits(to_binary(b >> 2), 64) << "\n";
                 //                std::cout << group_digits(to_binary(b >> 4), 64) << "\n";
 
-                REQUIRE((b >> 1) == b_);
-                REQUIRE((b >> 2) == b__);
-                REQUIRE((b_ >> 1) == b__);
-                REQUIRE((b >> 3) == b___);
-                REQUIRE((b__ >> 1) == b___);
+                REQUIRE((b >> 1) == bs1);
+                REQUIRE((b >> 2) == bs2);
+                REQUIRE((bs1 >> 1) == bs2);
+                REQUIRE((b >> 3) == bs3);
+                REQUIRE((bs2 >> 1) == bs3);
             }
             THEN("It should move correctly over word boundaries")
             {
                 constexpr auto k = (a >> 1);
-                constexpr auto b____ = integer<150>(0U, 0U, (uint64_t(1) << 63U));
+                constexpr auto bs4 = integer<150>(0U, 0U, (uint64_t(1) << 63U));
                 //                std::cout << group_digits(to_binary(k), 64) << "\n";
                 //                std::cout << group_digits(to_binary(b), 64) << "\n";
-                REQUIRE(k == b____);
+                REQUIRE(k == bs4);
             }
 
             THEN("The it should also work when moving farther than the word width")
             {
                 constexpr integer<150> c{12U, 0U, 0U};
                 constexpr integer c_shifted = c >> 68;
-                constexpr auto b____ = integer<150>(0U, 0U, (uint64_t(11) << 62U));
-                REQUIRE(c_shifted == b____);
+                constexpr auto bs5 = integer<150>(0U, 0U, (uint64_t(11) << 62U));
+                REQUIRE(c_shifted == bs5);
                 //                std::cout << group_digits(to_binary(c), 64) << "\n";
                 //                std::cout << group_digits(to_binary(c_shifted), 64) << "\n";
             }
@@ -1073,12 +1057,12 @@ SCENARIO("Left/right shifting signed integers", "[integer][signed][operation][ut
             THEN("It should behave like multiplication by a power of two")
             {
 
-                constexpr integer<150> _b___ = b___ << 1;
-                constexpr integer<150> __b___ = b___ << 2;
-                constexpr integer<150> ___b___ = b___ << 3;
-                REQUIRE(_b___ == b__);
-                REQUIRE(__b___ == b_);
-                REQUIRE(___b___ == b);
+                constexpr integer<150> l1s3 = bs3 << 1;
+                constexpr integer<150> l2s3 = bs3 << 2;
+                constexpr integer<150> l3s3 = bs3 << 3;
+                REQUIRE(l1s3 == bs2);
+                REQUIRE(l2s3 == bs1);
+                REQUIRE(l3s3 == b);
                 //                        REQUIRE((b___<<2) == b_);
                 //                        REQUIRE((b___<<3) == b);
             }
@@ -1117,9 +1101,9 @@ SCENARIO("Right-shift asigning signed integers", "[integer][signed][operation][u
     GIVEN("A positive integer")
     {
 
-        constexpr integer<150> b_{4, 4, 4};
-        constexpr integer<150> b__{2, 2, 2};
-        constexpr integer<150> b___{1, 1, 1};
+        constexpr integer<150> bs1{4, 4, 4};
+        constexpr integer<150> bs2{2, 2, 2};
+        constexpr integer<150> bs3{1, 1, 1};
         WHEN("Right Shfiting")
         {
             THEN("It should behave like division by a power of two")
@@ -1132,28 +1116,28 @@ SCENARIO("Right-shift asigning signed integers", "[integer][signed][operation][u
 
                 integer<150> b{8, 8, 8};
                 b >>= 1;
-                REQUIRE(b == b_);
+                REQUIRE(b == bs1);
                 b >>= 1;
-                REQUIRE(b == b__);
+                REQUIRE(b == bs2);
                 b >>= 1;
-                REQUIRE(b == b___);
+                REQUIRE(b == bs3);
             }
             THEN("It should move correctly over word boundaries")
             {
                 integer<150> a{0U, 1U, 0U};
                 a >>= 1;
-                constexpr auto b____ = integer<150>(0U, 0U, (uint64_t(1) << 63U));
+                constexpr auto bs4 = integer<150>(0U, 0U, (uint64_t(1) << 63U));
                 //                std::cout << group_digits(to_binary(k), 64) << "\n";
                 //                std::cout << group_digits(to_binary(b), 64) << "\n";
-                REQUIRE(a == b____);
+                REQUIRE(a == bs4);
             }
 
             THEN("The it should also work when moving farther than the word width")
             {
                 integer<150> c{12U, 0U, 0U};
-                constexpr auto b____ = integer<150>(0U, 0U, (uint64_t(11) << 62U));
+                constexpr auto bs4 = integer<150>(0U, 0U, (uint64_t(11) << 62U));
                 c >>= 68;
-                REQUIRE(c == b____);
+                REQUIRE(c == bs4);
             }
         }
     }

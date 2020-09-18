@@ -19,21 +19,23 @@ void wrapper(benchmark::State& state)
 
 int main(int argc, char** argv)
 {
-    // TODO runs super fast -> something is weirdly optimized away
+
+    constexpr size_t repetitions = 5;
     using namespace aarith;
-    benchmark::RegisterBenchmark("FAU Adder n=8, m=4, p=1", &wrapper<8, 4, 1>)
+
+    benchmark::RegisterBenchmark("FAU Adder n=8, m=4, p=1", &::wrapper<8, 4, 1>)
         ->Unit(benchmark::kMillisecond)
         ->DisplayAggregatesOnly()
-        ->Repetitions(5);
-    benchmark::RegisterBenchmark("FAU Adder n=8, m=4, p=3", &wrapper<8, 4, 3>)
+        ->Repetitions(repetitions);
+    benchmark::RegisterBenchmark("FAU Adder n=8, m=4, p=3", &::wrapper<8, 4, 3>)
         ->Unit(benchmark::kMillisecond)
         ->DisplayAggregatesOnly()
-        ->Repetitions(5);
-    benchmark::RegisterBenchmark("FAU Adder n=16, m=8, p=1", &wrapper<16, 8, 1>)
+        ->Repetitions(repetitions);
+    benchmark::RegisterBenchmark("FAU Adder n=16, m=8, p=1", &::wrapper<16, 8, 1>)
         ->Unit(benchmark::kMillisecond);
-    benchmark::RegisterBenchmark("FAU Adder n=16, m=8, p=3", &wrapper<16, 8, 3>)
+    benchmark::RegisterBenchmark("FAU Adder n=16, m=8, p=3", &::wrapper<16, 8, 3>)
         ->Unit(benchmark::kMillisecond);
-    benchmark::RegisterBenchmark("FAU Adder n=32, m=16, p=1", &wrapper<32, 16, 1>)
+    benchmark::RegisterBenchmark("FAU Adder n=32, m=16, p=1", &::wrapper<32, 16, 1>)
         ->Unit(benchmark::kMillisecond);
 
     benchmark::Initialize(&argc, argv);
