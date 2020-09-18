@@ -718,7 +718,8 @@ template <size_t W, typename WordType>
  * @return Product of m and r
  */
 template <size_t x, size_t y, typename WordType>
-[[nodiscard]] constexpr auto booth_expanding_mul(const integer<x, WordType>& m, const integer<y, WordType>& r)
+[[nodiscard]] constexpr auto booth_expanding_mul(const integer<x, WordType>& m,
+                                                 const integer<y, WordType>& r)
     -> integer<y + x, WordType>
 {
 
@@ -731,7 +732,7 @@ template <size_t x, size_t y, typename WordType>
 
     integer<x + 1, WordType> expanded_m = width_cast<x + 1>(m);
 
-//    std::cout << "expanded m: " << to_binary(expanded_m) << "\n";
+    //    std::cout << "expanded m: " << to_binary(expanded_m) << "\n";
 
     uinteger<K, WordType> A{static_cast<word_array<x + 1, WordType>>(expanded_m)};
     uinteger<K, WordType> S{static_cast<word_array<x + 1, WordType>>(-expanded_m)};
@@ -742,16 +743,16 @@ template <size_t x, size_t y, typename WordType>
     uinteger<K, WordType> P{static_cast<word_array<x, WordType>>(r)};
     P = P << 1;
 
-//    std::cout << "A: " << to_binary(A) << "\n";
-//    std::cout << "S: " << to_binary(S) << "\n";
-//    std::cout << "P: " << to_binary(P) << "\n\n";
+    //    std::cout << "A: " << to_binary(A) << "\n";
+    //    std::cout << "S: " << to_binary(S) << "\n";
+    //    std::cout << "P: " << to_binary(P) << "\n\n";
     for (size_t i = 0; i < y; ++i)
     {
 
         bool last_bit = P.bit(0);
         bool snd_last_bit = P.bit(1);
 
-//        std::cout << "P_pre_" << i << ": " << to_binary(P) << "\n";
+        //        std::cout << "P_pre_" << i << ": " << to_binary(P) << "\n";
 
         if (snd_last_bit && !last_bit)
         {
@@ -769,7 +770,7 @@ template <size_t x, size_t y, typename WordType>
             P.set_msb(true);
         }
 
-//        std::cout << "P_pos_" << i << ": " << to_binary(P) << "\n";
+        //        std::cout << "P_pos_" << i << ": " << to_binary(P) << "\n";
     }
 
     auto result = width_cast<x + y>(P >> 1);
@@ -823,60 +824,58 @@ template <size_t W, typename WordType>
  * @param r Multiplier
  * @return Product of m and r
  */
-    template <size_t x, size_t y, typename WordType>
-    [[nodiscard]] constexpr auto booth_inplace_expanding_mul(const integer<x, WordType>& m, const integer<y, WordType>& r)
+template <size_t x, size_t y, typename WordType>
+[[nodiscard]] constexpr auto booth_inplace_expanding_mul(const integer<x, WordType>& m,
+                                                         const integer<y, WordType>& r)
     -> integer<y + x, WordType>
+{
+
+    if (m.is_zero() || r.is_zero())
+    {
+        return integer<y + x, WordType>::zero();
+    }
+
+    constexpr size_t K = x + y + 2;
+
+    integer<x + 1, WordType> expanded_m = width_cast<x + 1>(m);
+
+    uinteger<K, WordType> A{static_cast<word_array<x + 1, WordType>>(expanded_m)};
+    uinteger<K, WordType> S{static_cast<word_array<x + 1, WordType>>(-expanded_m)};
+
+    A <<= y + 1;
+    S <<= y + 1;
+
+    uinteger<K, WordType> P{static_cast<word_array<x, WordType>>(r)};
+    P <<= 1;
+
+    for (size_t i = 0; i < y; ++i)
     {
 
-        if (m.is_zero() || r.is_zero())
+        bool last_bit = P.bit(0);
+        bool snd_last_bit = P.bit(1);
+
+        if (snd_last_bit && !last_bit)
         {
-            return integer<y + x, WordType>::zero();
+            P = add(P, S);
+        }
+        if (!snd_last_bit && last_bit)
+        {
+            P = add(P, A);
         }
 
-        constexpr size_t K = x + y + 2;
-
-        integer<x + 1, WordType> expanded_m = width_cast<x + 1>(m);
-
-
-        uinteger<K, WordType> A{static_cast<word_array<x + 1, WordType>>(expanded_m)};
-        uinteger<K, WordType> S{static_cast<word_array<x + 1, WordType>>(-expanded_m)};
-
-        A <<= y + 1;
-        S <<= y + 1;
-
-        uinteger<K, WordType> P{static_cast<word_array<x, WordType>>(r)};
-        P <<= 1;
-
-        for (size_t i = 0; i < y; ++i)
-        {
-
-            bool last_bit = P.bit(0);
-            bool snd_last_bit = P.bit(1);
-
-
-            if (snd_last_bit && !last_bit)
-            {
-                P = add(P, S);
-            }
-            if (!snd_last_bit && last_bit)
-            {
-                P = add(P, A);
-            }
-
-            const bool prefix_minus = P.msb();
-            P >>= 1;
-            if (prefix_minus)
-            {
-                P.set_msb(true);
-            }
-
-        }
-
+        const bool prefix_minus = P.msb();
         P >>= 1;
-        auto result = width_cast<x + y>(P);
-
-        return integer<x + y, WordType>{result};
+        if (prefix_minus)
+        {
+            P.set_msb(true);
+        }
     }
+
+    P >>= 1;
+    auto result = width_cast<x + y>(P);
+
+    return integer<x + y, WordType>{result};
+}
 
 /**
  * @brief Multiplies two integers.
@@ -893,7 +892,7 @@ template <size_t W, typename WordType>
  */
 template <size_t W, typename WordType>
 [[nodiscard]] constexpr integer<W, WordType> booth_inplace_mul(const integer<W, WordType>& a,
-                                                         const integer<W, WordType>& b)
+                                                               const integer<W, WordType>& b)
 {
 
     using I = integer<W, WordType>;
@@ -931,20 +930,24 @@ constexpr auto negate(const integer<W, WordType>& n) -> integer<W, WordType>
  * positive numbers.
  *
  * @tparam W The width of the integer
+ * @tparam WordType The word type to store the data in
  * @param n The integer
  * @return The sign of the integer
  */
-template <size_t W>[[nodiscard]] constexpr int8_t signum(integer<W> n)
+template <size_t W, typename WordType>[[nodiscard]] constexpr int8_t signum(integer<W, WordType> n)
 {
-    if (n.is_negative())
-    {
-        return -1;
-    }
     if (n.is_zero())
     {
         return 0;
     }
-    return 1;
+    if (n.is_negative())
+    {
+        return -1;
+    }
+    else
+    {
+        return 1;
+    }
 }
 
 /**
@@ -956,7 +959,7 @@ template <size_t W>[[nodiscard]] constexpr int8_t signum(integer<W> n)
  * @param n The integer
  * @return The sign of the integer
  */
-template <size_t W>[[nodiscard]] constexpr int8_t signum(uinteger<W> n)
+template <size_t W, typename WordType>[[nodiscard]] constexpr int8_t signum(uinteger<W, WordType> n)
 {
     return n.is_zero() ? 0 : 1;
 }
