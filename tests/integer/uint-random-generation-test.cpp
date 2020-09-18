@@ -65,7 +65,7 @@ TEMPLATE_TEST_CASE_SIG("The generated numbers are in the given range",
     REQUIRE(gen.get() >= lower);
     REQUIRE(gen.get() < upper);
 
-    for ([[maybe_unused]] int i = 0; i < 100; ++i)
+    for ([[maybe_unused]] int i = 0; i < 1000; ++i)
     {
         gen.next();
         REQUIRE(gen.get() >= lower);
