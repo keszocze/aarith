@@ -1,6 +1,6 @@
 variables:
     GIT_DEPTH: 0
-    GIT_STRATEGY: fetch
+    GIT_STRATEGY: recursive
     GIT_SUBMODULE_STRATEGY: recursive
     MPIR_PARAMS: "-DMPIR_INCLUDE_DIR=/opt/software/usr/local/include -DMPIR_LIBRARIES=/opt/software/usr/local/lib/libmpir.a"
     BUILD_PARAMS: "-DBUILD_BENCHMARKS=ON -DBUILD_TESTS=ON -DUSE_FULL_RANGE_IN_TESTS=OFF -DBUILD_EXAMPLES=ON -DBUILD_EXPERIMENTS=ON -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -DBENCHMARK_ENABLE_TESTING=OFF"
@@ -21,7 +21,7 @@ compile_gcc:
     artifacts:
         paths:
             - build/gcc
-        expire_in: 240 minutes
+        expire_in: 30 minutes
 
     script:
         - mkdir -p build/gcc/bw_output
@@ -35,7 +35,7 @@ compile_clang:
     artifacts:
         paths:
             - build/clang
-        expire_in: 240 minutes
+        expire_in: 30 minutes
     script:
         - mkdir -p build/clang
         - cd build/clang
@@ -45,7 +45,8 @@ compile_clang:
 run_sonarqube:
   extends: .ciconf
   stage: quality
-  needs: ["test_gcc"]
+  dependencies:
+      - test_gcc
   script:
       - echo $CI_COMMIT_REF_NAME
       - chmod +x scripts/mk_sonar_config.sh
@@ -57,7 +58,8 @@ run_sonarqube:
 test_clang:
     extends: .ciconf
     stage: test
-#    needs : ["compile_clang"]
+    dependencies:
+        - compile_clang
     script:
         - cd build/clang
         - make test
@@ -65,11 +67,12 @@ test_clang:
 test_gcc:
     extends: .ciconf
     stage: test
-   # needs: ["compile_gcc"]
+    dependencies:
+        - compile_gcc
     artifacts:
         paths:
             - build/tests/coverage
-        expire_in: 240 minutes
+        expire_in: 30 minutes
     script:
         - cd build/gcc
         - make test
