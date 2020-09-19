@@ -13,15 +13,11 @@ template <size_t BitWidth, typename WordType = uint64_t> class uniform_uinteger_
 public:
     using result_type = uinteger<BitWidth, WordType>;
 
-    struct param_type
-    {
-        result_type min, max;
-    };
 
-    explicit uniform_uinteger_distribution(const result_type& a = result_type::min(),
-                                           const result_type& b = result_type::max())
+    explicit uniform_uinteger_distribution(const result_type& min = result_type::min(),
+                                           const result_type& max = result_type::max()): min(min), max(max), length(sub(max,min))
     {
-        param(param_type{a, b});
+        static_assert(min <= max, "uniform_uinteger_distribution: a must be <= b");
     }
 
     template <class Generator> auto operator()(Generator& g) -> result_type
@@ -34,7 +30,7 @@ public:
         // Modulo is slightly biased towards smaller numbers. Possible fix: e.g. use "Java's
         // algorithm.
         using namespace aarith::integer_operators;
-        return the_params.min + (uint % length);
+        return min + (uint % length);
     }
 
     void reset()
@@ -42,34 +38,10 @@ public:
         random_word.reset();
     }
 
-    auto param() const -> param_type
-    {
-        return the_params;
-    }
-
-    void param(const param_type& params)
-    {
-        if (params.min > params.max)
-        {
-            throw std::logic_error{"uniform_uinteger_distribution: a must be <= b"};
-        }
-        the_params = params;
-        using namespace aarith::integer_operators;
-        length = the_params.max - the_params.min;
-    }
-
-    auto min() const -> result_type
-    {
-        return the_params.min;
-    }
-
-    auto max() const -> result_type
-    {
-        return the_params.max;
-    }
 
 private:
-    param_type the_params;
+    result_type min;
+    result_type max;
     result_type length;
     std::uniform_int_distribution<WordType> random_word{std::numeric_limits<WordType>::min(),
                                                         std::numeric_limits<WordType>::max()};
@@ -90,7 +62,7 @@ public:
         {
             array.set_word(i, random_word(g));
         }
-        return result_type {array};
+        return result_type{array};
     }
 
     virtual void reset()
