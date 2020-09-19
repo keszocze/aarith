@@ -57,6 +57,8 @@ run_sonarqube:
 test_clang:
     extends: .ciconf
     stage: test
+    variables:
+        GIT_STRATEGY: none
     dependencies:
         - compile_clang
     script:
