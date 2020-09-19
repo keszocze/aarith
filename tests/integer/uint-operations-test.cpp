@@ -9,7 +9,6 @@ TEMPLATE_TEST_CASE_SIG("Unsigned integer addition is commutative",
                        "[integer][signed][arithmetic][addition]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
-
     using I = uinteger<W, WordType>;
     using R = uinteger<2 * W, WordType>;
 
