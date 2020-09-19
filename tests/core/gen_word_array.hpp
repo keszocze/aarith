@@ -11,7 +11,6 @@ class WordArrayGenerator : public Catch::Generators::IGenerator<word_array<BitWi
 public:
     using I = word_array<BitWidth, WordType>;
 
-
     explicit WordArrayGenerator()
         : rng{std::random_device{}()}
         , random_array()
@@ -37,8 +36,11 @@ private:
 };
 
 template <size_t BitWidth, typename WordType = uint64_t>
-auto random_word_array() {
-    return random_word_array<BitWidth,WordType>();
+auto random_word_array() -> Catch::Generators::GeneratorWrapper<word_array<BitWidth, WordType>>
+{
+    return Catch::Generators::GeneratorWrapper<word_array<BitWidth, WordType>>(
+        std::unique_ptr<Catch::Generators::IGenerator<word_array<BitWidth, WordType>>>(
+            new WordArrayGenerator<BitWidth, WordType>()));
 }
 
 } // namespace aarith
