@@ -8,8 +8,8 @@ using namespace aarith;
 // This test basically checks that the thing compiles...
 TEMPLATE_TEST_CASE_SIG("Generating ten word_arrays yields ten different results",
                        "[word_array][utility][random]",
-                       ((size_t W, typename WordType, size_t Num), W, WordType, Num),
-                       (8, uint8_t, 15), (8, uint16_t, 15), (12,uint32_t,5000))
+                       ((size_t W, typename WordType), W, WordType),
+                       (8, uint8_t), (8, uint16_t), (12,uint32_t))
 {
     using I = word_array<W, WordType>;
 
@@ -19,11 +19,12 @@ TEMPLATE_TEST_CASE_SIG("Generating ten word_arrays yields ten different results"
 
     I last = gen.get();
 
-    for ([[maybe_unused]] int i = 0; i < 10; ++i)
+    for ([[maybe_unused]] int i = 0; i < 100; ++i)
     {
         gen.next();
         I curr = gen.get();
 //        REQUIRE(last != curr);
+//        std::cout << curr << "\n";
         REQUIRE(true);
         last = curr;
     }

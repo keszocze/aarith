@@ -76,6 +76,7 @@ test_gcc:
         expire_in: 30 minutes
     script:
         - cd build/gcc
+        - cmake ../..
         - pwd
         - ls .
         - ls tests
