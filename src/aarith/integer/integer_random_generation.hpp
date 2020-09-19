@@ -13,11 +13,16 @@ template <size_t BitWidth, typename WordType = uint64_t> class uniform_uinteger_
 public:
     using result_type = uinteger<BitWidth, WordType>;
 
-
     explicit uniform_uinteger_distribution(const result_type& min = result_type::min(),
-                                           const result_type& max = result_type::max()): min(min), max(max), length(sub(max,min))
+                                           const result_type& max = result_type::max())
+        : min(min)
+        , max(max)
+        , length(sub(max, min))
     {
-        static_assert(min <= max, "uniform_uinteger_distribution: a must be <= b");
+        if (!(min <= max))
+        {
+            throw std::runtime_error("uniform_uinteger_distribution: a must be <= b");
+        }
     }
 
     template <class Generator> auto operator()(Generator& g) -> result_type
@@ -37,7 +42,6 @@ public:
     {
         random_word.reset();
     }
-
 
 private:
     result_type min;
