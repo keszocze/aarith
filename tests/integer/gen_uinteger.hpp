@@ -19,7 +19,7 @@ public:
     {
     }
 
-    auto get() const -> const uinteger<BitWidth, WordType>& override
+    auto get() const -> const I& override
     {
         return current_number;
     }
@@ -33,7 +33,7 @@ public:
 private:
     std::minstd_rand rng;
     uniform_uinteger_distribution<BitWidth, WordType> random_number;
-    uinteger<BitWidth, WordType> current_number;
+    I current_number;
 };
 
 template <size_t BitWidth, typename WordType = uint64_t>
