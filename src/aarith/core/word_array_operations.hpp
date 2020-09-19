@@ -637,4 +637,6 @@ template <class R, class F, size_t W, size_t V, typename WordType>
     }
 }
 
+
+
 } // namespace aarith
