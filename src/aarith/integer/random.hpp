@@ -56,7 +56,7 @@ public:
         }
         the_params = params;
         using namespace aarith::integer_operators;
-        length = the_params.min - the_params.max;
+        length = the_params.max - the_params.min;
         std::cout << "length: " << length << "\n";
         std::cout << the_params.min << " - " << the_params.max << "\n";
     }

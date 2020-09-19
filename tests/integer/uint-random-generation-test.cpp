@@ -105,14 +105,3 @@ TEMPLATE_TEST_CASE_SIG("Generating two numbers with constraints works",
         REQUIRE(a < a_);
     }
 }
-
-SCENARIO("Lenght of the random number generator", "[checking]") {
-    constexpr size_t W = 8;
-//    using I = uinteger<W, uint64_t>;
-
-    uniform_uinteger_distribution<W, uint64_t> uud;
-
-
-
-
-}
