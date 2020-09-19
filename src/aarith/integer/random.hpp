@@ -19,12 +19,7 @@ public:
         result_type min, max;
     };
 
-    uniform_uinteger_distribution()
-        : uniform_uinteger_distribution{result_type::min()}
-    {
-    }
-
-    explicit uniform_uinteger_distribution(const result_type& a = result_type::minx(),
+    explicit uniform_uinteger_distribution(const result_type& a = result_type::min(),
                                            const result_type& b = result_type::max())
     {
         param(param_type{a, b});
