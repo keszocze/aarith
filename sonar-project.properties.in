@@ -8,7 +8,6 @@ sonar.sources=./src
 sonar.cfamily.build-wrapper-output=./build/bw_output
 sonar.sourceEncoding=UTF-8
 sonar.coverageReportPaths=./build/tests/coverage/coverage.xml
-sonar.exclusions=./benchmarks, ./experiments
 
 sonar.branch.name=@@BRANCH_NAME@@
 sonar.cfamily.cache.enabled=false
