@@ -574,9 +574,8 @@ SCENARIO("Subtracting two unsigned integers exactly",
     }
 }
 
-
-TEMPLATE_TEST_CASE_SIG("Investigating max/min values", "[integer][unsigned][operations]", AARITH_INT_TEST_SIGNATURE,
-                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+TEMPLATE_TEST_CASE_SIG("Investigating max/min values", "[integer][unsigned][operations]",
+                       AARITH_INT_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = uinteger<W, WordType>;
     GIVEN("The maximal and minimal values of uinteger<V>")
@@ -609,11 +608,13 @@ TEMPLATE_TEST_CASE_SIG("Investigating max/min values", "[integer][unsigned][oper
 
             THEN("Expanding addition has the highest bit set and is modulo 2 otherwise")
             {
-                uinteger<W+10, WordType> result = expanding_add(max, a);
+                uinteger<W + 10, WordType> result = expanding_add(max, a);
                 const auto bit_set = result.bit(W);
-                if (!bit_set) {
+                if (!bit_set)
+                {
                     std::cout << max << "+" << a << "=" << result << "\n";
-                    std::cout << to_binary(max) << "+" << to_binary(a) << "=" << to_binary(result) << "\n";
+                    std::cout << to_binary(max) << "+" << to_binary(a) << "=" << to_binary(result)
+                              << "\n";
                 }
                 CHECK(result.bit(W));
                 REQUIRE(width_cast<W>(result) == expected_trunc);
@@ -633,7 +634,6 @@ TEMPLATE_TEST_CASE_SIG("Investigating max/min values", "[integer][unsigned][oper
         }
     }
 }
-
 
 SCENARIO("Multiplication of numbers fitting in a uint64_t",
          "[integer][unsigned][arithmetic][multiplication]")
@@ -665,7 +665,7 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
     }
 }
 
-SCENARIO("Multiplying two unsigned integers using the karazuba multiplication",
+SCENARIO("Multiplying two unsigned integers using the karatsuba multiplication",
          "[integer][unsigned][arithmetic][multiplication]")
 {
     GIVEN("Two uinteger<N> a and b with N <= 32")
@@ -990,6 +990,49 @@ SCENARIO("Bit and Word operations work correctly", "[integer][unsigned][utility]
     }
 }
 
+TEMPLATE_TEST_CASE_SIG("Invariants for the unsigned integer division",
+                       "[integer][unsigned][arithmetic][division]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+
+    GIVEN("A non-zero number")
+    {
+
+        const I a = GENERATE(take(50, random_uinteger<W, WordType>(I::one(), I::max())));
+
+        WHEN("Dividing the number by itself")
+        {
+            THEN("The result should be 1")
+            {
+                REQUIRE(div(a,a) == I::one());
+            }
+        }
+        WHEN("Dividing the number by one")
+        {
+            THEN("The result should be the number itself")
+            {
+                REQUIRE(div(a,I::one()) == a);
+            }
+        }
+        WHEN("Dividing the number by a larger number")
+        {
+            THEN("The result should be zero")
+            {
+                // Addind one is safe as I::max() will not be returned by the generator
+                REQUIRE(div(a,add(a, I::one())) == I::zero());
+            }
+        }
+        WHEN("Dividing the number by zero")
+        {
+            THEN("A runtime exception should be thrown")
+            {
+                REQUIRE_THROWS_AS(div(a,I::zero()), std::runtime_error);
+            }
+        }
+    }
+}
+
 SCENARIO("Dividing two unsigned integers exactly", "[integer][unsigned][arithmetic][division]")
 {
     GIVEN("Two uinteger<N> a and b with N <= 32")
@@ -1037,7 +1080,7 @@ SCENARIO("Dividing two unsigned integers exactly", "[integer][unsigned][arithmet
 }
 
 TEMPLATE_TEST_CASE_SIG("Computing the signum of an unsigned integer",
-                       "[integer][unsigned]operation][utility]", AARITH_INT_TEST_SIGNATURE,
+                       "[integer][unsigned][operation][utility]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = uinteger<W, WordType>;
@@ -1057,11 +1100,45 @@ TEMPLATE_TEST_CASE_SIG("Computing the signum of an unsigned integer",
         {
             THEN("The signum should be one")
             {
-                const I a = GENERATE(take(10, random_uinteger<W, WordType>(I::one(), I::max())));
+                const I a = GENERATE(take(50, random_uinteger<W, WordType>(I::one(), I::max())));
                 REQUIRE(signum(a) == 1);
             }
         }
     }
+}
+
+TEMPLATE_TEST_CASE_SIG("Invariants for computing the remainder",
+         "[integer][unsigned][arithmetic][remainder][division]", AARITH_INT_TEST_SIGNATURE,
+         AARITH_INT_TEST_TEMPLATE_PARAM_RANGE) {
+    using I = uinteger<W, WordType>;
+
+    GIVEN("A non-zero number")
+    {
+
+        const I a = GENERATE(take(50, random_uinteger<W, WordType>(I::one(), I::max())));
+
+        THEN("Computing the remainder of division by zero should throw an exception")
+        {
+
+            CHECK_THROWS_AS(remainder(a, I::zero()), std::runtime_error);
+        }
+
+        THEN("A remainder when dividing by 1 should yield zero")
+        {
+            CHECK(remainder(a, I::one()) == I::zero());
+        }
+        THEN("Computing the remainder with itself should yield zero")
+        {
+
+            CHECK(remainder(a, a) == I::zero());
+        }
+        THEN("Computing the remainder of zero should yield zero")
+        {
+
+            CHECK(remainder(I::zero(), a) == I::zero());
+        }
+    }
+
 }
 
 SCENARIO("Computing the remainder of two unsigned integers works as expected",
@@ -1083,33 +1160,6 @@ SCENARIO("Computing the remainder of two unsigned integers works as expected",
 
         CHECK(int_div == d.word(0));
         REQUIRE(int_mod == m.word(0));
-    }
-
-    GIVEN("An uinteger<N> a")
-    {
-
-        const size_t width = 150;
-        auto val_a = GENERATE(take(100, random(1U, 10000000U)));
-
-        uinteger<width> a{val_a};
-        const uinteger<width> zero{0U};
-        const uinteger<width> one{1U};
-
-        THEN("Computing the remainder of division by zero should trhow an exception")
-        {
-
-            CHECK_THROWS_AS(remainder(a, zero), std::runtime_error);
-        }
-
-        THEN("A remainder when dividing by 1 should yield zero")
-        {
-            CHECK(remainder(a, one) == zero);
-        }
-        THEN("Computing the remainder of zero should yield 0")
-        {
-
-            CHECK(remainder(zero, a) == zero);
-        }
     }
 
     GIVEN("Two uinteger<N> a and b with N <= 32")
