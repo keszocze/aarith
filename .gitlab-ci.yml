@@ -76,6 +76,8 @@ test_gcc:
         expire_in: 30 minutes
     script:
         - cd build/gcc
+        - ls .
+        - ls ..
         - make test
         - if !$?; then return 1; fi
         - cd tests

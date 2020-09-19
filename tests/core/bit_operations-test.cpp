@@ -3,34 +3,10 @@
 #include <aarith/core.hpp>
 #include <aarith/core/string_utils.hpp>
 
+#include "../test-signature-ranges.hpp"
+#include "gen_word_array.hpp"
+
 using namespace aarith;
-
-SCENARIO("Counting bits in word_array", "[word_array][util]")
-{
-    WHEN("Multiple word_containers are given")
-    {
-        THEN("The leading zeroe index should be computed correctly")
-        {
-            constexpr word_array<64> a_zero{0U};
-            constexpr word_array<64> a_one{1U};
-            constexpr word_array<32> b_zero{0U};
-            constexpr word_array<32> b_one{1U};
-            constexpr word_array<15> c_zero{0U};
-            constexpr word_array<15> c_one{1U};
-            constexpr word_array<150> d_zero{0U};
-            constexpr word_array<150> d_one{1U};
-
-            CHECK(count_leading_zeroes(a_zero) == 64);
-            CHECK(count_leading_zeroes(b_zero) == 32);
-            CHECK(count_leading_zeroes(c_zero) == 15);
-            CHECK(count_leading_zeroes(d_zero) == 150);
-            CHECK(count_leading_zeroes(a_one) == 64 - 1);
-            CHECK(count_leading_zeroes(b_one) == 32 - 1);
-            CHECK(count_leading_zeroes(c_one) == 15 - 1);
-            CHECK(count_leading_zeroes(d_one) == 150 - 1);
-        }
-    }
-}
 
 SCENARIO("Casting word_containers into different width", "[word_array][casting]")
 {
@@ -129,50 +105,6 @@ SCENARIO("Copy constructor of word_containers with various bit widths", "[word_a
                     CHECK(a.word(2) == 0U);
                 }
             }
-        }
-    }
-}
-
-SCENARIO("Calculating the word_masks of word_containers", "[word_array][bit_logic]")
-{
-    // The tests all assume that word_array uses 64-bit words.
-    static_assert(word_array<64>::word_width() == 64);
-
-    GIVEN("A word_array<N> where N < word_width")
-    {
-        constexpr word_array<32> uint;
-        THEN("The mask is correct")
-        {
-            REQUIRE(uint.word_mask(0) == 0xffffffff);
-        }
-    }
-    GIVEN("A word_array<N> where N == word_width")
-    {
-        constexpr word_array<64> uint;
-        THEN("The mask is all 1s")
-        {
-            REQUIRE(uint.word_mask(0) == 0xffffffffffffffff);
-        }
-    }
-    GIVEN("A word_array<N> where N > word_width and N % word_width != 0")
-    {
-        constexpr word_array<96> uint;
-        THEN("All masks except the last are all 1s")
-        {
-            REQUIRE(uint.word_mask(0) == 0xffffffffffffffff);
-        }
-        THEN("The last mask is all ones up to the correct bit")
-        {
-            REQUIRE(uint.word_mask(1) == 0xffffffff);
-        }
-    }
-    GIVEN("A word_array<N> where N > word_width and N % word_width == 0")
-    {
-        constexpr word_array<128> uint;
-        THEN("All masks are all 1s")
-        {
-            REQUIRE(uint.word_mask(0) == 0xffffffffffffffff);
-            REQUIRE(uint.word_mask(1) == 0xffffffffffffffff);
         }
     }
 }
@@ -302,7 +234,7 @@ SCENARIO("Left shift operator works as expected", "[word_array][bit_logic]")
     }
 }
 
-SCENARIO("Left shift assignent works as expected", "[word_array][bit_logic]")
+SCENARIO("Left shift assignment works as expected", "[word_array][bit_logic]")
 {
     GIVEN("One word_array a and a number of shifted bits s")
     {
@@ -764,119 +696,59 @@ SCENARIO("Right shift assignment operator works as expected", "[word_array][util
     }
 }
 
-SCENARIO("Bitwise operations work as expected", "[word_array][bit_logic]")
+TEMPLATE_TEST_CASE_SIG("Bitwise operations work as expected", "[word_array][bit_logic]",
+                       AARITH_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
 {
-    GIVEN("A word container a")
+    GIVEN("An word_array a")
     {
 
-        const size_t Width = 64;
-        static constexpr uint16_t number_a = 7;
-        constexpr word_array<Width> a{number_a};
+        using I = word_array<W, WordType>;
+        I a = GENERATE(take(10, random_word_array<W, WordType>()));
 
         WHEN("Negating the word container")
         {
 
             THEN("The result should match the NOT of the underlying WordType")
             {
-                constexpr auto result = ~a;
-                constexpr auto result_ref = ~number_a;
-                REQUIRE(result.word(0) == result_ref);
+                const auto result = ~a;
+                for (size_t i=0; i < a.word_count(); ++i) {
+                    REQUIRE(result.word(i) == (~a.word(i) & a.word_mask(i)));
+                }
             }
         }
 
         AND_GIVEN("Another word container b")
         {
-            static constexpr uint16_t number_b = 14;
-            constexpr word_array<Width> b{number_b};
 
+            I b = GENERATE(take(10, random_word_array<W, WordType>()));
             THEN("Bitwise AND should work as expected")
             {
-                constexpr auto result = a & b;
-                constexpr auto result_ref = number_a & number_b;
-                REQUIRE(result.word(0) == result_ref);
+                const auto result = a & b;
+                for (size_t i=0; i < a.word_count(); ++i) {
+                    REQUIRE(result.word(i) == ((a.word(i) & b.word(i)) & a.word_mask(i)));
+                }
             }
 
             AND_THEN("Bitwise OR should work as expected")
             {
-                constexpr auto result = a | b;
-                constexpr auto result_ref = number_a | number_b;
-                REQUIRE(result.word(0) == result_ref);
+                const auto result = a | b;
+                for (size_t i=0; i < a.word_count(); ++i) {
+                    REQUIRE(result.word(i) == ((a.word(i) | b.word(i)) & a.word_mask(i)));
+                }
             }
             AND_THEN("Bitwise XOR should work as expected")
             {
-                constexpr auto result = a ^ b;
-                constexpr auto result_ref = number_a ^ number_b;
-                REQUIRE(result.word(0) == result_ref);
+                const auto result = a ^ b;
+                for (size_t i=0; i < a.word_count(); ++i) {
+                    REQUIRE(result.word(i) == ((a.word(i) ^ b.word(i)) & a.word_mask(i)));
+                }
             }
         }
+
     }
 }
 
-SCENARIO("Checking whether an word_array is not equal to zero/false", "[word_array][utility]")
-{
-    GIVEN("An word_array<N>=0=a for various N")
-    {
-        THEN("a.is_zero() should be true")
-        {
-
-            const uint8_t zero = 0U;
-
-            CHECK(word_array<64>{zero}.is_zero());
-            CHECK(word_array<128>{zero}.is_zero());
-            CHECK(word_array<150>{zero}.is_zero());
-            CHECK(word_array<32>{zero}.is_zero());
-            CHECK(word_array<23>{zero}.is_zero());
-            CHECK(word_array<256>{zero}.is_zero());
-            CHECK(word_array<1337>{zero}.is_zero());
-            CHECK(word_array<8>{zero}.is_zero());
-        }
-        THEN("a should evaluate to false in a Boolean context")
-        {
-
-            const uint8_t zero = 0U;
-
-            CHECK_FALSE(word_array<64>{zero});
-            CHECK_FALSE(word_array<128>{zero});
-            CHECK_FALSE(word_array<150>{zero});
-            CHECK_FALSE(word_array<32>{zero});
-            CHECK_FALSE(word_array<23>{zero});
-            CHECK_FALSE(word_array<256>{zero});
-            CHECK_FALSE(word_array<1337>{zero});
-            CHECK_FALSE(word_array<8>{zero});
-        }
-    }
-
-    GIVEN("A non-zero word_array")
-    {
-
-        uint64_t val = GENERATE(1, 2, 4, 5567868, 234, 21, 45, 56768);
-        const word_array<64> a{val};
-        const word_array<128> b = word_array<128>::from_words(val, 0U);
-        const word_array<128> c = word_array<128>::from_words(val, val);
-
-        const word_array<150> d = word_array<150>::from_words(val, 0U, 0U);
-        const word_array<256> e = word_array<256>::from_words(val, val, 0U, 0U);
-
-        THEN("is_zero should correctly return this fact")
-        {
-            CHECK_FALSE(a.is_zero());
-            CHECK_FALSE(b.is_zero());
-            CHECK_FALSE(c.is_zero());
-            CHECK_FALSE(d.is_zero());
-            CHECK_FALSE(e.is_zero());
-        }
-        THEN("The integer should evaluate to true in a Boolean context")
-        {
-            CHECK(a);
-            CHECK(b);
-            CHECK(c);
-            CHECK(d);
-            CHECK(e);
-        }
-    }
-}
-
-SCENARIO("Bit shifting is possible as constexpr","[word_array][utility][bit_logic][constexpr]")
+SCENARIO("Bit shifting is possible as constexpr", "[word_array][utility][bit_logic][constexpr]")
 {
     GIVEN("A word_array of width N")
     {
@@ -917,62 +789,55 @@ SCENARIO("Bit shifting is possible as constexpr","[word_array][utility][bit_logi
     }
 }
 
-SCENARIO("Bit operations are performed correctly", "[word_array][bit_logic]")
+TEMPLATE_TEST_CASE_SIG("Bit operations are performed correctly", "[word_array][bit_logic]",
+                       AARITH_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
 {
-    GIVEN("An word_array<N> n")
+    GIVEN("An word_array<N> w")
     {
-        // TODO Understand how to generate various bit widths
-        auto val =
-            GENERATE(0, 56567, 23, static_cast<uint64_t>(-4354566), static_cast<uint64_t>(-1));
-        const word_array<150> n = word_array<150>::from_words(2 * val, val);
+
+        using I = word_array<W, WordType>;
+        I w = GENERATE(take(10, random_word_array<W, WordType>()));
+
         WHEN("One zero word is prepended")
         {
-            const auto prepended_n = width_cast<214>(n);
+            const auto prepended_w = width_cast<W + I::word_width()>(w);
             THEN("The result should have one additional word")
             {
-
-                CHECK(prepended_n.word_count() == n.word_count() + 1);
+                CHECK(prepended_w.word_count() == w.word_count() + 1);
             }
             THEN("The prepended word should equal zero and the other values should have been "
                  "copied")
             {
-                for (auto i = 0U; i < n.word_count(); ++i)
+                for (auto i = 0U; i < w.word_count(); ++i)
                 {
-                    CHECK(prepended_n.word(i) == n.word(i));
+                    CHECK(prepended_w.word(i) == w.word(i));
                 }
-                for (auto i = n.word_count(); i < prepended_n.word_count(); ++i)
-                {
-                    CHECK(prepended_n.word(n.word_count()) == static_cast<uint64_t>(0));
-                }
+                CHECK(prepended_w.word(w.word_count()) == static_cast<WordType>(0U));
             }
         }
         WHEN("The size is doubled")
         {
-            const auto doubled = width_cast<300>(n);
+            const auto doubled = width_cast<2 * W>(w);
             THEN("The result should have twice the bits of the original word_array")
             {
-                CHECK(doubled.width() == 2 * n.width());
+                CHECK(doubled.width() == 2 * w.width());
             }
             THEN("The result must have twice or twice minus one the number of words")
             {
                 const auto two_n_words = doubled.word_count();
-                const auto n_words = n.word_count();
+                const auto n_words = w.word_count();
                 CHECK(((two_n_words == 2 * n_words) || (two_n_words == (2 * n_words) - 1)));
             }
             THEN("The prepended words should equal zero and the other values should have been "
                  "copied")
             {
 
-                for (auto i = 0U; i < n.word_count(); ++i)
+                for (auto i = 0U; i < w.word_count(); ++i)
                 {
-                    CHECK(doubled.word(i) == n.word(i));
+                    CHECK(doubled.word(i) == w.word(i));
                 }
-                for (auto i = n.word_count(); i < doubled.word_count(); ++i)
-                {
-                    CHECK(doubled.word(n.word_count()) == static_cast<uint64_t>(0));
-                }
+                CHECK(doubled.word(w.word_count()) == static_cast<WordType>(0U));
             }
         }
     }
 }
-
