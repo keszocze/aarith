@@ -28,6 +28,7 @@ compile_gcc:
         - cd build/gcc
         - CC=gcc-9 CXX=g++-9 cmake ${BUILD_PARAMS} ${MPIR_PARAMS}  ../..
         - /opt/sonar-build-wrapper/build-wrapper-linux-x86-64 --out-dir bw_output make -j $(nproc) all
+        - ls build/gcc
 
 compile_clang:
     extends: .ciconf
