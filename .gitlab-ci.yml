@@ -21,7 +21,7 @@ compile_gcc:
     artifacts:
         paths:
             - build/gcc
-        expire_in: 120 minutes
+        expire_in: 240 minutes
 
     script:
         - mkdir -p build/gcc/bw_output
@@ -35,6 +35,7 @@ compile_clang:
     artifacts:
         paths:
             - build/clang
+        expire_in: 240 minutes
     script:
         - mkdir -p build/clang
         - cd build/clang
@@ -68,7 +69,7 @@ test_gcc:
     artifacts:
         paths:
             - build/tests/coverage
-        expire_in: 180 minutes
+        expire_in: 240 minutes
     script:
         - cd build/gcc
         - make test
