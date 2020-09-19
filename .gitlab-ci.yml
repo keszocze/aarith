@@ -27,7 +27,7 @@ compile_gcc:
         - mkdir -p build/gcc/bw_output
         - cd build/gcc
         - CC=gcc-9 CXX=g++-9 cmake ${BUILD_PARAMS} ${MPIR_PARAMS}  ../..
-        - /opt/sonar-build-wrapper/build-wrapper-linux-x86-64 --out-dir bw_output make -j 4 all
+        - /opt/sonar-build-wrapper/build-wrapper-linux-x86-64 --out-dir bw_output make -j $(nproc) all
 
 compile_clang:
     extends: .ciconf
@@ -57,7 +57,7 @@ run_sonarqube:
 test_clang:
     extends: .ciconf
     stage: test
-    needs : ["compile_clang"]
+#    needs : ["compile_clang"]
     script:
         - cd build/clang
         - make test
@@ -65,7 +65,7 @@ test_clang:
 test_gcc:
     extends: .ciconf
     stage: test
-    needs: ["compile_gcc"]
+   # needs: ["compile_gcc"]
     artifacts:
         paths:
             - build/tests/coverage
