@@ -27,6 +27,7 @@ add_aarith_test(core-functional-style FILES core/functional-style-test.cpp)
 add_aarith_test(core-number-util FILES core/number_utils-test.cpp)
 add_aarith_test(word_array-generation FILES core/word_array-generation-test.cpp)
 add_aarith_test(word_array-bit-operations FILES core/bit_operations-test.cpp)
+add_aarith_test(word_array-extraction FILES core/word_array-extraction-test.cpp)
 
 
 add_aarith_test(uint-general FILES integer/uint-test.cpp)

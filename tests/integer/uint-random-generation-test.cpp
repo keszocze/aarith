@@ -1,8 +1,8 @@
 #include <aarith/integer_no_operators.hpp>
 #include <catch.hpp>
 
+#include "../test-signature-ranges.hpp"
 #include "gen_uinteger.hpp"
-#include "test_util.hpp"
 
 using namespace aarith;
 

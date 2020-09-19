@@ -1,5 +1,5 @@
+#include "../test-signature-ranges.hpp"
 #include "gen_uinteger.hpp"
-#include "test_util.hpp"
 #include <aarith/integer_no_operators.hpp>
 
 #include <catch.hpp>
@@ -66,8 +66,8 @@ template <size_t BitWidth, typename WordType> void test_uint_add()
 }
 
 TEMPLATE_TEST_CASE_SIG("Large number addition match those of MPIR",
-                       "[integer][unsigned][arithmetic][addition][mpir]", AARITH_INT_TEST_SIGNATURE,
-                       AARITH_INT_TEST_TEMPLATE_LARGE_PARAM_RANGE)
+                       "[integer][unsigned][arithmetic][addition][mpir]", AARITH_TEST_SIGNATURE,
+                       AARITH_TEST_TEMPLATE_LARGE_PARAM_RANGE)
 {
     using I = uinteger<W, WordType>;
     const I lhs =
