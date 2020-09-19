@@ -23,6 +23,10 @@ function(add_aarith_test testname)
 endfunction(add_aarith_test)
 
 
+add_aarith_test(core-functional-style FILES core/functional-style-test.cpp)
+add_aarith_test(core-number-util FILES core/number_utils-test.cpp)
+add_aarith_test(word_array-generation FILES core/word_array-generation-test.cpp)
+add_aarith_test(word_array-bit-operations FILES core/bit_operations-test.cpp)
 
 
 add_aarith_test(uint-general FILES integer/uint-test.cpp)
@@ -30,18 +34,17 @@ add_aarith_test(uint-random-generation FILES integer/uint-random-generation-test
 add_aarith_test(uint-operations FILES integer/uint-operations-test.cpp)
 add_aarith_test(uint-anytime FILES integer/uint-anytime-test.cpp)
 add_aarith_test(uint-comparisons FILES integer/uint-comparisons-test.cpp)
-add_aarith_test(float-operations FILES float/exact_operations-float-test.cpp)
+
 add_aarith_test(string_utils FILES integer/string_utils-test.cpp)
-add_aarith_test(util FILES integer/string_utils-test.cpp)
-add_aarith_test(bit-operations FILES core/bit_operations-test.cpp)
-add_aarith_test(integer FILES integer/integer-test.cpp integer/integer-operations-test.cpp integer/integer-comparisons-test.cpp)
+add_aarith_test(integer-general FILES integer/integer-test.cpp)
+add_aarith_test(integer-operations FILES integer/integer-operations-test.cpp)
+add_aarith_test(integer-comparisons FILES integer/integer-comparisons-test.cpp)
 add_aarith_test(integer-ranges FILES integer/ranges_test.cpp)
-add_aarith_test(functional-style FILES core/functional-style-test.cpp)
-add_aarith_test(number-util FILES core/number_utils-test.cpp)
-add_aarith_test(word_array-generation FILES core/word_array-generation-test.cpp)
 add_aarith_test(integer-cast FILES integer/integer-casts.cpp)
 
-add_aarith_test(fau FILES uint-approx-test.cpp)
+add_aarith_test(float-operations FILES float/exact_operations-float-test.cpp)
+
+add_aarith_test(fau-adder FILES uint-approx-test.cpp)
 
 
 
