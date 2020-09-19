@@ -14,7 +14,6 @@ stages:
     only:
         variables:
             - $CI_PROJECT_NAMESPACE == "keszocze"
-executable
 compile_gcc:
     extends: .ciconf
     stage: compile
