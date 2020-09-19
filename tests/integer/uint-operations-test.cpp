@@ -998,7 +998,7 @@ TEMPLATE_TEST_CASE_SIG("Invariants for the unsigned integer division",
     GIVEN("A non-zero number")
     {
 
-        const I a = GENERATE(take(50, random_uinteger<W, WordType>(I::one(), I::max())));
+        const I a = GENERATE(take(10, random_uinteger<W, WordType>(I::one(), I::max())));
 
         WHEN("Dividing the number by itself")
         {
@@ -1099,7 +1099,7 @@ TEMPLATE_TEST_CASE_SIG("Computing the signum of an unsigned integer",
         {
             THEN("The signum should be one")
             {
-                const I a = GENERATE(take(50, random_uinteger<W, WordType>(I::one(), I::max())));
+                const I a = GENERATE(take(10, random_uinteger<W, WordType>(I::one(), I::max())));
                 REQUIRE(signum(a) == 1);
             }
         }
@@ -1114,7 +1114,7 @@ TEMPLATE_TEST_CASE_SIG("Invariants for computing the remainder",
     GIVEN("A non-zero number")
     {
 
-        const I a = GENERATE(take(50, random_uinteger<W, WordType>(I::one(), I::max())));
+        const I a = GENERATE(take(10, random_uinteger<W, WordType>(I::one(), I::max())));
 
         THEN("Computing the remainder of division by zero should throw an exception")
         {
