@@ -12,7 +12,7 @@ public:
     using I = uinteger<BitWidth, WordType>;
 
 
-    explicit UIntegerGenerator(const I& min_val, const I& max_val)
+    explicit UIntegerGenerator(const I& min_val= I::min(), const I& max_val=I::max())
         : rng{std::random_device{}()}
         , random_number(min_val, max_val)
         , current_number(random_number(rng))
