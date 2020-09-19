@@ -51,6 +51,11 @@ else()
 endif()
 
 
+if (USE_FULL_RANGE_IN_TESTS)
+  add_compile_definitions(AARITH_USE_FULL_RANGE)
+endif()
+
+
 ## coverage
 
 set(BUILD_COVERAGE_DATA TRUE)
