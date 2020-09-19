@@ -1,5 +1,5 @@
 #include "../test-signature-ranges.hpp"
-#include "gen_uinteger.hpp"
+#include "gen_integer.hpp"
 #include <aarith/integer_no_operators.hpp>
 
 #include <catch.hpp>

@@ -2,7 +2,7 @@
 #include <catch.hpp>
 
 #include "../test-signature-ranges.hpp"
-#include "gen_uinteger.hpp"
+#include "gen_integer.hpp"
 
 using namespace aarith;
 

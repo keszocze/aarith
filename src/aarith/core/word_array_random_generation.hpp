@@ -13,10 +13,6 @@ template <size_t BitWidth, typename WordType = uint64_t> class uniform_word_arra
 public:
     using result_type = word_array<BitWidth, WordType>;
 
-    explicit uniform_word_array_distribution()
-    {
-    }
-
     template <class Generator> auto operator()(Generator& g) -> result_type
     {
         result_type array;
@@ -27,7 +23,7 @@ public:
         return array;
     }
 
-    void reset()
+    virtual void reset()
     {
         random_word.reset();
     }
