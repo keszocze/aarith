@@ -1228,11 +1228,14 @@ TEMPLATE_TEST_CASE_SIG("Unary minus operation", "[integer][signed][arithmetic][u
         const I a = GENERATE(take(20, random_integer<W, WordType>()));
         THEN("Unary minus is self-inverse")
         {
-            REQUIRE(-(-a) == a);
+            if (a != I::min())
+            {
+                REQUIRE(-(-a) == a);
+            }
         }
         THEN("Unary minus changes the sign")
         {
-            if (a != I::zero())
+            if (a != I::zero() && a != I::min())
             {
                 REQUIRE(signum(-a) == -signum(a));
             }
