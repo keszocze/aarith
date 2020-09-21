@@ -517,6 +517,9 @@ template <size_t Width, typename WordType>
 auto constexpr operator>>=(integer<Width, WordType>& lhs, const size_t rhs)
     -> integer<Width, WordType>
 {
+
+    const int lhs_was_negative = lhs.is_negative();
+
     if (rhs >= Width)
     {
         if (lhs.is_negative())
@@ -567,8 +570,9 @@ auto constexpr operator>>=(integer<Width, WordType>& lhs, const size_t rhs)
         }
     }
 
-    if (lhs.is_negative())
+    if (lhs_was_negative)
     {
+
         for (size_t i = (Width - 1); i >= (Width - rhs); --i)
         {
             lhs.set_bit(i);

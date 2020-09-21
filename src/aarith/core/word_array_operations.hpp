@@ -1,5 +1,6 @@
 #pragma once
 
+#include <aarith/core/traits.hpp>
 #include <aarith/core/word_array.hpp>
 
 namespace aarith {
@@ -145,9 +146,9 @@ template <typename W> constexpr auto operator<<=(W& lhs, const size_t rhs) -> W
  * @param rhs The number of bits to shift
  * @return The shifted word_container
  */
-template <typename W>[[nodiscard]] constexpr auto operator<<(const W& lhs, const size_t rhs) -> W
+template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
+[[nodiscard]] constexpr auto operator<<(const W& lhs, const size_t rhs) -> W
 {
-    static_assert(::aarith::is_word_array_v<W>);
 
     constexpr size_t width = W::width();
 
@@ -191,22 +192,15 @@ template <typename W>[[nodiscard]] constexpr auto operator<<(const W& lhs, const
  * @param rhs The number of bits to shift
  * @return The shifted word_array
  */
-template <typename W> auto constexpr operator>>=(W& lhs, const size_t rhs) -> W
+template <typename W,
+          typename = std::enable_if_t<is_word_array_v<W> || (is_integral_v<W> && is_unsigned_v<W>)>>
+auto constexpr operator>>=(W& lhs, const size_t rhs) -> W
 {
 
     static_assert(::aarith::is_word_array_v<W>);
 
     constexpr size_t width = W::width();
     using word_type = typename W::word_type;
-
-    /*
-     * This prevents this shift operator to be chosen by the compiler when using signed integers.
-     * For signed integers, the correct arithmetic right-shift will be used.
-     */
-    if constexpr (::aarith::is_integral_v<W>)
-    {
-        static_assert(::aarith::is_unsigned_v<W>);
-    }
 
     if (rhs >= width)
     {
@@ -636,7 +630,5 @@ template <class R, class F, size_t W, size_t V, typename WordType>
         return zip_reduce(w_, v_, f, initial_value);
     }
 }
-
-
 
 } // namespace aarith
