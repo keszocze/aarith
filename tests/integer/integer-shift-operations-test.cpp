@@ -6,7 +6,7 @@
 using namespace aarith;
 
 TEMPLATE_TEST_CASE_SIG("Left/right shifting signed integers",
-                       "[integer][signed][operation][utility][foo]", AARITH_TEST_SIGNATURE,
+                       "[integer][signed][operation][utility]", AARITH_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = integer<W, WordType>;
@@ -126,7 +126,6 @@ TEMPLATE_TEST_CASE_SIG("Left/right shifting signed integers",
                 for (size_t s : {1, 22, 23, 149, 150, 1151})
                 {
                     min_one >>= s;
-                    std::cout << min_one << "\t" << to_binary(min_one) << "\n";
                     REQUIRE(min_one == minus_one);
                 }
                 CHECK(shifted1 == minus_one);

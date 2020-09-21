@@ -99,19 +99,11 @@ template <typename I>[[nodiscard]] constexpr auto sub(const I& a, const I& b) ->
 template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(const I& a, const T& b)
 {
 
-    // TODO do we need this assertion?
     static_assert(::aarith::same_signedness<I, T>);
     static_assert(::aarith::same_word_type<I, T>);
 
-    // constexpr size_t res_width = std::max(I::width(), T::width()) + 1;
     constexpr size_t res_width = std::max(I::width(), T::width());
     const auto result{sub(width_cast<res_width>(a), width_cast<res_width>(b))};
-    /*
-    if (initial_borrow)
-    {
-        result = sub(result, width_cast<res_width>(T(1)));
-    }
-    */
 
     return result;
 }
@@ -1043,7 +1035,7 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
     return std::make_pair(Q_cast, remainder_cast);
 }
 
-template <typename I, typename = std::enable_if_t<is_integral_v<I>>> I mul(const I& a, const I& b)
+template <typename I, typename = std::enable_if_t<is_integral_v<I>>> constexpr I mul(const I& a, const I& b)
 {
     if constexpr (is_unsigned_v<I>)
     {
@@ -1056,7 +1048,7 @@ template <typename I, typename = std::enable_if_t<is_integral_v<I>>> I mul(const
 }
 
 template <typename I, typename = std::enable_if_t<is_integral_v<I>>>
-auto expanding_mul(const I& a, const I& b)
+auto constexpr expanding_mul(const I& a, const I& b)
 {
     if constexpr (is_unsigned_v<I>)
     {
