@@ -46,6 +46,8 @@ run_sonarqube:
   stage: quality
   dependencies:
       - test_gcc
+  needs:
+      - test_gcc
   script:
       - echo $CI_COMMIT_REF_NAME
       - chmod +x scripts/mk_sonar_config.sh
@@ -61,6 +63,8 @@ test_clang:
         GIT_STRATEGY: none
     dependencies:
         - compile_clang
+    needs:
+        - compile_clang
     script:
         - cd build/clang
         - rm CMakeCache.txt
@@ -69,7 +73,11 @@ test_clang:
 test_gcc:
     extends: .ciconf
     stage: test
+    variables:
+        GIT_STRATEGY: none
     dependencies:
+        - compile_gcc
+    needs:
         - compile_gcc
     artifacts:
         paths:
@@ -84,5 +92,5 @@ test_gcc:
         - export GCOV_PREFIX_STRIP=10
         - rm -rf coverage
         - mkdir -p coverage
-        - /opt/software/usr/local/bin/gcovr --gcov-executable gcov-8 -v --filter '/var/lib/gitlab-runner/builds/.+/0/keszocze/aarith' --object-directory CMakeFiles --sonarqube coverage/coverage.xml 
+        - /opt/software/usr/local/bin/gcovr --gcov-executable gcov-8 -v --filter '/var/lib/gitlab-runner/builds/.+/0/keszocze/aarith' --object-directory CMakeFiles --sonarqube coverage/coverage.xml
         - sed -i -E "s/\/var\/lib\/gitlab-runner\/builds\/[[:alnum:]]+\/[[:digit:]]+\/keszocze\/aarith\///g" coverage/coverage.xml
