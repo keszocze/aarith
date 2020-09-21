@@ -1008,95 +1008,9 @@ SCENARIO("MIN/MAX Values behave as expected", "[integer][signed][operation][util
     }
 }
 
-SCENARIO("Left/right shifting signed integers", "[integer][signed][operation][utility]")
-{
-    GIVEN("A positive integer")
-    {
-        constexpr integer<150> a{0U, 1U, 0U};
-        constexpr integer<150> b{8, 8, 8};
-        constexpr integer<150> bs1{4, 4, 4};
-        constexpr integer<150> bs2{2, 2, 2};
-        constexpr integer<150> bs3{1, 1, 1};
-        WHEN("Right Shfiting")
-        {
-            THEN("It should behave like division by a power of two")
-            {
-                //                std::cout << group_digits(to_binary(a),64) << "\n";
-                //                std::cout << group_digits(to_binary(b), 64) << "\n";
-                //                std::cout << group_digits(to_binary(b >> 1), 64) << "\n";
-                //                std::cout << group_digits(to_binary(b >> 2), 64) << "\n";
-                //                std::cout << group_digits(to_binary(b >> 4), 64) << "\n";
 
-                REQUIRE((b >> 1) == bs1);
-                REQUIRE((b >> 2) == bs2);
-                REQUIRE((bs1 >> 1) == bs2);
-                REQUIRE((b >> 3) == bs3);
-                REQUIRE((bs2 >> 1) == bs3);
-            }
-            THEN("It should move correctly over word boundaries")
-            {
-                constexpr auto k = (a >> 1);
-                constexpr auto bs4 = integer<150>(0U, 0U, (uint64_t(1) << 63U));
-                //                std::cout << group_digits(to_binary(k), 64) << "\n";
-                //                std::cout << group_digits(to_binary(b), 64) << "\n";
-                REQUIRE(k == bs4);
-            }
 
-            THEN("The it should also work when moving farther than the word width")
-            {
-                constexpr integer<150> c{12U, 0U, 0U};
-                constexpr integer c_shifted = c >> 68;
-                constexpr auto bs5 = integer<150>(0U, 0U, (uint64_t(11) << 62U));
-                REQUIRE(c_shifted == bs5);
-                //                std::cout << group_digits(to_binary(c), 64) << "\n";
-                //                std::cout << group_digits(to_binary(c_shifted), 64) << "\n";
-            }
-        }
-        WHEN("Left Shifting")
-        {
-            THEN("It should behave like multiplication by a power of two")
-            {
-
-                constexpr integer<150> l1s3 = bs3 << 1;
-                constexpr integer<150> l2s3 = bs3 << 2;
-                constexpr integer<150> l3s3 = bs3 << 3;
-                REQUIRE(l1s3 == bs2);
-                REQUIRE(l2s3 == bs1);
-                REQUIRE(l3s3 == b);
-                //                        REQUIRE((b___<<2) == b_);
-                //                        REQUIRE((b___<<3) == b);
-            }
-        }
-    }
-
-    GIVEN("The integer -1")
-    {
-        WHEN("Right shifting")
-        {
-            THEN("-1 should not be affected")
-            {
-                constexpr integer<150> minus_one(-1);
-                constexpr integer<150> shifted1 = minus_one >> 1;
-                constexpr integer<150> shifted2 = minus_one >> 22;
-                constexpr integer<150> shifted3 = minus_one >> 23;
-                constexpr integer<150> shifted4 = minus_one >> 149;
-
-                // TODO why the hell is the constexpr above working and now below?
-                const integer<150> shifted5 = minus_one >> 150;
-                const integer<150> shifted6 = minus_one >> 1151;
-
-                CHECK(shifted1 == minus_one);
-                CHECK(shifted2 == minus_one);
-                REQUIRE(shifted3 == minus_one);
-                REQUIRE(shifted4 == minus_one);
-                REQUIRE(shifted5 == minus_one);
-                REQUIRE(shifted6 == minus_one);
-            }
-        }
-    }
-}
-
-SCENARIO("Right-shift asigning signed integers", "[integer][signed][operation][utility]")
+SCENARIO("Right-shift assigning signed integers", "[integer][signed][operation][utility]")
 {
     GIVEN("A positive integer")
     {
