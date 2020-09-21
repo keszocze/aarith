@@ -495,6 +495,7 @@ template <typename I>
     return width_cast<I::width()>(fun_add_expand(a, b, initial_carry));
 }
 
+
 /**
  * @brief Arithmetic right-shift operator
  *
@@ -509,69 +510,71 @@ template <size_t Width, typename WordType>
 auto constexpr operator>>=(integer<Width, WordType>& lhs, const size_t rhs)
     -> integer<Width, WordType>
 {
-
-    const int lhs_was_negative = lhs.is_negative();
-
-    if (rhs >= Width)
-    {
-        if (lhs.is_negative())
-        {
-            const auto max = std::numeric_limits<WordType>::max();
-            lhs.fill(max);
-            return lhs;
-        }
-        else
-        {
-            lhs.fill(WordType{0});
-            return lhs;
-        }
-    }
-
-    if (rhs == 0 || lhs.is_zero())
-    {
-        return lhs;
-    }
-
-    const auto skip_words = rhs / lhs.word_width();
-    const auto shift_word_right = rhs - skip_words * lhs.word_width();
-    const auto shift_word_left = lhs.word_width() - shift_word_right;
-
-    using word_type = typename integer<Width, WordType>::word_type;
-
-    for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
-    {
-        word_type new_word = lhs.word(counter) >> shift_word_right;
-        if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
-        {
-            new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
-        }
-
-        lhs.set_word(counter - skip_words, new_word);
-    }
-
-    if (skip_words > 0)
-    {
-        word_type new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
-        lhs.set_word(lhs.word_count() - skip_words - 1, new_word);
-
-        for (size_t i = lhs.word_count() - skip_words; i < lhs.word_count(); ++i)
-        {
-            const auto fill_word =
-                lhs.is_negative() ? std::numeric_limits<WordType>::max() : WordType{0};
-            lhs.set_word(i, fill_word);
-        }
-    }
-
-    if (lhs_was_negative)
-    {
-
-        for (size_t i = (Width - 1); i >= (Width - rhs); --i)
-        {
-            lhs.set_bit(i);
-        }
-    }
-
+    arithmetic_right_shift(lhs, rhs);
     return lhs;
+
+//    const bool lhs_was_negative = lhs.is_negative();
+//
+//    if (rhs >= Width)
+//    {
+//        if (lhs.is_negative())
+//        {
+//            const auto max = std::numeric_limits<WordType>::max();
+//            lhs.fill(max);
+//            return lhs;
+//        }
+//        else
+//        {
+//            lhs.fill(WordType{0});
+//            return lhs;
+//        }
+//    }
+//
+//    if (rhs == 0 || lhs.is_zero())
+//    {
+//        return lhs;
+//    }
+//
+//    const auto skip_words = rhs / lhs.word_width();
+//    const auto shift_word_right = rhs - skip_words * lhs.word_width();
+//    const auto shift_word_left = lhs.word_width() - shift_word_right;
+//
+//    using word_type = typename integer<Width, WordType>::word_type;
+//
+//    for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
+//    {
+//        word_type new_word = lhs.word(counter) >> shift_word_right;
+//        if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
+//        {
+//            new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
+//        }
+//
+//        lhs.set_word(counter - skip_words, new_word);
+//    }
+//
+//    if (skip_words > 0)
+//    {
+//        word_type new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
+//        lhs.set_word(lhs.word_count() - skip_words - 1, new_word);
+//
+//        for (size_t i = lhs.word_count() - skip_words; i < lhs.word_count(); ++i)
+//        {
+//            const auto fill_word =
+//                lhs.is_negative() ? std::numeric_limits<WordType>::max() : WordType{0};
+//            lhs.set_word(i, fill_word);
+//        }
+//    }
+//
+//    if (lhs_was_negative)
+//    {
+//
+//        for (size_t i = (Width - 1); i >= (Width - rhs); --i)
+//        {
+//            lhs.set_bit(i);
+//        }
+//    }
+//
+//    return lhs;
 }
 
 /**
@@ -588,57 +591,8 @@ template <size_t Width, typename WordType>
 auto constexpr operator>>(const integer<Width, WordType>& lhs, const size_t rhs)
     -> integer<Width, WordType>
 {
-    if (rhs >= Width)
-    {
-        if (lhs.is_negative())
-        {
-            return integer<Width, WordType>::all_ones();
-        }
-        else
-        {
-            return integer<Width, WordType>::zero();
-        }
-    }
-    if (rhs == 0)
-    {
-        return lhs;
-    }
-
-    integer<Width, WordType> shifted;
-
-    if (lhs.is_zero())
-    {
-        shifted = integer<Width, WordType>::all_ones();
-    }
-
-    const auto skip_words = rhs / lhs.word_width();
-    const auto shift_word_right = rhs - skip_words * lhs.word_width();
-    const auto shift_word_left = lhs.word_width() - shift_word_right;
-
-    using word_type = typename integer<Width, WordType>::word_type;
-
-    for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
-    {
-        word_type new_word = lhs.word(counter) >> shift_word_right;
-        if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
-        {
-            new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
-        }
-
-        shifted.set_word(counter - skip_words, new_word);
-    }
-    word_type new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
-
-    shifted.set_word(lhs.word_count() - skip_words - 1, new_word);
-
-    if (lhs.is_negative())
-    {
-        for (size_t i = (Width - 1); i >= (Width - rhs); --i)
-        {
-            shifted.set_bit(i);
-        }
-    }
-
+    integer<Width, WordType> shifted{lhs};
+    shifted >>= rhs;
     return shifted;
 }
 
