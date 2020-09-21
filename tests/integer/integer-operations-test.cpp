@@ -781,7 +781,10 @@ TEMPLATE_TEST_CASE_SIG("Invariants for the signed integer division",
         {
             THEN("The result should be 1")
             {
-                REQUIRE(div(a, a) == I::one());
+                if (a != I::zero())
+                {
+                    REQUIRE(div(a, a) == I::one());
+                }
             }
         }
         WHEN("Dividing the number by one")

@@ -63,7 +63,8 @@ test_clang:
         - compile_clang
     script:
         - cd build/clang
-        - make test
+        - rm CMakeCache.txt
+        - make CTEST_OUTPUT_ON_FAILURE=1 test
 
 test_gcc:
     extends: .ciconf
@@ -77,7 +78,7 @@ test_gcc:
     script:
         - cd build/gcc
         - rm CMakeCache.txt
-        - make test
+        - make CTEST_OUTPUT_ON_FAILURE=1 test
         - if !$?; then return 1; fi
         - cd tests
         - export GCOV_PREFIX_STRIP=10
