@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.13)
 project(aarith)
 option(BUILD_BENCHMARKS "build benchmarks" OFF)
 option(BUILD_EXPERIMENTS "build experiments" OFF)
+option(BUILD_CORRECTNESS_EXPERIMENTS "build correctness experiments" OFF)
 option(BUILD_TESTS "build tests" ON)
 option(BUILD_EXAMPLES "build examples" ON)
 
@@ -11,7 +12,9 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/lib")
 find_package(MPIR)
 find_package(MPFR)
 
-include(TargetWarnings.cmake)
+include(cmake/TargetWarnings.cmake)
+include(cmake/Tests.cmake)
+include(cmake/Experiments.cmake)
 enable_testing()
 
 add_subdirectory(src)
@@ -52,4 +55,8 @@ endif()
 
 if(BUILD_EXPERIMENTS)
     add_subdirectory(experiments)
+endif()
+
+if(BUILD_CORRECTNESS_EXPERIMENTS)
+    add_subdirectory(tests/correctness)
 endif()

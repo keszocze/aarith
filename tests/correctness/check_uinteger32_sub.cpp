@@ -7,12 +7,10 @@ int main()
 
     constexpr size_t Width = 32;
     using UB = uint32_t;
-    using B = int32_t;
     using WordType = uint64_t;
     using UI = uinteger<Width, WordType>;
-    using I = integer<Width, WordType>;
 
-    check_int_operation<uinteger, Width, UB, false, WordType>("mul_schoolbook", &::aarith::schoolbook_mul<UI>, native_mul);
+    check_int_operation<uinteger, Width, UB, false, WordType>("subtraction", &::aarith::sub<UI>, native_sub);
 
     return 0;
 }

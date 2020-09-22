@@ -233,9 +233,9 @@ void check_mod()
 
 int main()
 {
-//    check_add();
-//    check_sub();
-//    check_div();
-//    check_mod();
+    check_add();
+    check_sub();
+    check_div();
+    check_mod();
     check_mul();
 }
