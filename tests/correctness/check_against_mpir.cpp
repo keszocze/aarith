@@ -5,45 +5,46 @@
 #include <iostream>
 #include <string>
 using namespace aarith;
-using aint = integer<1024>;
-using auint = uinteger<1024>;
 
-static constexpr aint aone{aint::one()};
+static constexpr size_t n_iter = 5;
 
-static constexpr size_t n_iter = 150;
-
-void check_add()
+template <size_t W> void check_add()
 {
-    aint a(1), b(1);
-    a = a << 1022;
-    b = b << 511;
+    using I = integer<W>;
+    static constexpr I aone{I::one()};
+    I a{-50};
+    I b = mul(div(I::max(), I{3}), I{2});
 
     mpz_t a_mpir, b_mpir, result_mpir, aarith_in_mpir;
-    mpz_init_set_str(a_mpir, to_binary(a).c_str(), 2);
-    mpz_init_set_str(b_mpir, to_binary(b).c_str(), 2);
+    mpz_init_set_str(a_mpir, to_decimal(a).c_str(), 10);
+    mpz_init_set_str(b_mpir, to_decimal(b).c_str(), 10);
     mpz_init_set_str(result_mpir, "0", 2);
     mpz_init_set_str(aarith_in_mpir, "0", 2);
 
+    std::cout << "Checking addition for a bit-width of " << W << "..." << std::flush;
+
     {
-        for (size_t i = 0; i < n_iter; ++i)
+        for (size_t i = 0; i < n_iter + 1; ++i)
         {
             for (size_t j = 0; j < n_iter; ++j)
             {
 
-                const auto result=expanding_add(a,b);
+                const auto result = expanding_add(a, b);
                 mpz_add(result_mpir, a_mpir, b_mpir);
-                mpz_init_set_str(aarith_in_mpir, to_binary(result).c_str(), 2);
-
+                mpz_init_set_str(aarith_in_mpir, to_decimal(result).c_str(), 10);
 
                 if (mpz_cmp(result_mpir, aarith_in_mpir) != 0)
                 {
-
                     std::cout << "Addition failed:\n";
-                    gmp_printf("%Zd\n", a_mpir);
-                    gmp_printf("%Zd\n", b_mpir);
-                    gmp_printf("%Zd\n", result_mpir);
+                    std::cout << "MPIR:\n";
+                    gmp_printf("\ta: %Zd\n", a_mpir);
+                    gmp_printf("\tb: %Zd\n", b_mpir);
+                    gmp_printf("\ta+b: %Zd\n", result_mpir);
 
-                    std::cout << "\n" << to_decimal(a) << "\n" << to_decimal(b) << "\n" <<to_decimal(result) << "\n";
+                    std::cout << "\naarith:\n"
+                              << "\ta: " << to_decimal(a) << "\n"
+                              << "\tb: " << to_decimal(b) << "\n"
+                              << "\ta+b: " << to_decimal(result) << "\n";
                     exit(1);
                 }
                 b = b + aone;
@@ -53,19 +54,23 @@ void check_add()
             mpz_add_ui(a_mpir, a_mpir, 1);
         }
     }
-}
 
-void check_mul()
+    std::cout << "\t done." << std::endl;
+}
+template <size_t W> void check_mul()
 {
-    aint a(1), b(1);
-    a = a << 1022;
-    b = b << 511;
+    using I = integer<W>;
+    static constexpr I aone{I::one()};
+    I a{-50};
+    I b = mul(div(I::max(), I{3}), I{2});
 
     mpz_t a_mpir, b_mpir, result_mpir, aarith_in_mpir;
-    mpz_init_set_str(a_mpir, to_binary(a).c_str(), 2);
-    mpz_init_set_str(b_mpir, to_binary(b).c_str(), 2);
+    mpz_init_set_str(a_mpir, to_decimal(a).c_str(), 10);
+    mpz_init_set_str(b_mpir, to_decimal(b).c_str(), 10);
     mpz_init_set_str(result_mpir, "0", 2);
     mpz_init_set_str(aarith_in_mpir, "0", 2);
+
+    std::cout << "Checking multiplication for a bit-width of " << W << "..." << std::flush;
 
     {
         for (size_t i = 0; i < n_iter; ++i)
@@ -73,24 +78,24 @@ void check_mul()
             for (size_t j = 0; j < n_iter; ++j)
             {
 
-                const auto result= booth_expanding_mul(a, b);
+                const auto result = booth_expanding_mul(a, b);
                 mpz_mul(result_mpir, a_mpir, b_mpir);
-                mpz_init_set_str(aarith_in_mpir, to_binary(result).c_str(), 2);
-
+                mpz_init_set_str(aarith_in_mpir, to_decimal(result).c_str(), 10);
 
                 if (mpz_cmp(result_mpir, aarith_in_mpir) != 0)
                 {
-
                     std::cout << "Multiplication failed:\n";
-                    gmp_printf("%Zd\n", a_mpir);
-                    gmp_printf("%Zd\n", b_mpir);
-                    gmp_printf("%Zd\n", result_mpir);
+                    std::cout << "MPIR:\n";
+                    gmp_printf("\ta: %Zd\n", a_mpir);
+                    gmp_printf("\tb: %Zd\n", b_mpir);
+                    gmp_printf("\ta*b: %Zd\n", result_mpir);
 
-                    std::cout << "\n" << to_decimal(a) << "\n" << to_decimal(b) << "\n" <<to_decimal(result) << "\n";
-                    std::cout << "i: " << i << "\tj: " << j << "\n";
+                    std::cout << "\naarith:\n"
+                              << "\ta: " << to_decimal(a) << "\n"
+                              << "\tb: " << to_decimal(b) << "\n"
+                              << "\ta*b: " << to_decimal(result) << "\n";
                     exit(1);
                 }
-                else {std::cout << "nice\n";}
                 b = b + aone;
                 mpz_add_ui(b_mpir, b_mpir, 1);
             }
@@ -98,19 +103,93 @@ void check_mul()
             mpz_add_ui(a_mpir, a_mpir, 1);
         }
     }
+    std::cout << "\t done." << std::endl;
 }
-
-void check_div()
+template <size_t W> void check_div()
 {
-    aint a(1), b(1);
-    a = a << 1022;
-    b = b << 511;
+    using I = integer<W>;
+    static constexpr I aone{I::one()};
+    I a{-50};
+    I b = mul(div(I::max(), I{3}), I{2});
 
     mpz_t a_mpir, b_mpir, result_mpir, aarith_in_mpir;
-    mpz_init_set_str(a_mpir, to_binary(a).c_str(), 2);
-    mpz_init_set_str(b_mpir, to_binary(b).c_str(), 2);
+    mpz_init_set_str(a_mpir, to_decimal(a).c_str(), 10);
+    mpz_init_set_str(b_mpir, to_decimal(b).c_str(), 10);
     mpz_init_set_str(result_mpir, "0", 2);
     mpz_init_set_str(aarith_in_mpir, "0", 2);
+
+    std::cout << "Checking division for a bit-width of " << W << "..." << std::flush;
+    {
+        for (size_t i = 0; i < n_iter; ++i)
+        {
+            for (size_t j = 0; j < n_iter; ++j)
+            {
+
+                {
+                    const auto result = div(a, b);
+                    mpz_tdiv_q(result_mpir, a_mpir, b_mpir);
+                    mpz_init_set_str(aarith_in_mpir, to_decimal(result).c_str(), 10);
+
+                    if (mpz_cmp(result_mpir, aarith_in_mpir) != 0)
+                    {
+                        std::cout << "Division failed:\n";
+                        std::cout << "MPIR:\n";
+                        gmp_printf("\ta: %Zd\n", a_mpir);
+                        gmp_printf("\tb: %Zd\n", b_mpir);
+                        gmp_printf("\ta/b: %Zd\n", result_mpir);
+
+                        std::cout << "\naarith:\n"
+                                  << "\ta: " << to_decimal(a) << "\n"
+                                  << "\tb: " << to_decimal(b) << "\n"
+                                  << "\ta/b: " << to_decimal(result) << "\n";
+                        exit(1);
+                    }
+                }
+                {
+                    const auto result = div(b, a);
+                    mpz_tdiv_q(result_mpir, b_mpir, a_mpir);
+                    mpz_init_set_str(aarith_in_mpir, to_decimal(result).c_str(), 10);
+
+                    if (mpz_cmp(result_mpir, aarith_in_mpir) != 0)
+                    {
+                        std::cout << "Division failed:\n";
+                        std::cout << "MPIR:\n";
+                        gmp_printf("\ta: %Zd\n", a_mpir);
+                        gmp_printf("\tb: %Zd\n", b_mpir);
+                        gmp_printf("\tb/a: %Zd\n", result_mpir);
+
+                        std::cout << "\naarith:\n"
+                                  << "\ta: " << to_decimal(a) << "\n"
+                                  << "\tb: " << to_decimal(b) << "\n"
+                                  << "\tb/a: " << to_decimal(result) << "\n";
+                        exit(1);
+                    }
+                }
+                b = b + aone;
+                mpz_add_ui(b_mpir, b_mpir, 1);
+            }
+            a = a + aone;
+            mpz_add_ui(a_mpir, a_mpir, 1);
+        }
+    }
+    std::cout << "\t done." << std::endl;
+}
+
+template <size_t W> void check_sub()
+{
+
+    using I = integer<W>;
+    static constexpr I aone{I::one()};
+    I a{-50};
+    I b = mul(div(I::max(), I{3}), I{2});
+
+    mpz_t a_mpir, b_mpir, result_mpir, aarith_in_mpir;
+    mpz_init_set_str(a_mpir, to_decimal(a).c_str(), 10);
+    mpz_init_set_str(b_mpir, to_decimal(b).c_str(), 10);
+    mpz_init_set_str(result_mpir, "0", 2);
+    mpz_init_set_str(aarith_in_mpir, "0", 2);
+
+    std::cout << "Checking subtraction for a bit-width of " << W << "..." << std::flush;
 
     {
         for (size_t i = 0; i < n_iter; ++i)
@@ -118,20 +197,45 @@ void check_div()
             for (size_t j = 0; j < n_iter; ++j)
             {
 
-                const auto result=div(a,b);
-                mpz_div(result_mpir, a_mpir, b_mpir);
-                mpz_init_set_str(aarith_in_mpir, to_binary(result).c_str(), 2);
-
-
-                if (mpz_cmp(result_mpir, aarith_in_mpir) != 0)
                 {
-                    std::cout << "Division failed:\n";
-                    gmp_printf("%Zd\n", a_mpir);
-                    gmp_printf("%Zd\n", b_mpir);
-                    gmp_printf("%Zd\n", result_mpir);
+                    const auto result = expanding_sub(a, b);
+                    mpz_sub(result_mpir, a_mpir, b_mpir);
+                    mpz_init_set_str(aarith_in_mpir, to_decimal(result).c_str(), 10);
 
-                    std::cout << "\n" << to_decimal(a) << "\n" << to_decimal(b) << "\n" <<to_decimal(result) << "\n";
-                    exit(1);
+                    if (mpz_cmp(result_mpir, aarith_in_mpir) != 0)
+                    {
+                        std::cout << "Subtraction failed:\n";
+                        std::cout << "MPIR:\n";
+                        gmp_printf("\ta: %Zd\n", a_mpir);
+                        gmp_printf("\tb: %Zd\n", b_mpir);
+                        gmp_printf("\ta-b: %Zd\n", result_mpir);
+
+                        std::cout << "\naarith:\n"
+                                  << "\ta: " << to_decimal(a) << "\n"
+                                  << "\tb: " << to_decimal(b) << "\n"
+                                  << "\ta-b: " << to_decimal(result) << "\n";
+                        exit(1);
+                    }
+                }
+                {
+                    const auto result = expanding_sub(b, a);
+                    mpz_sub(result_mpir, b_mpir, a_mpir);
+                    mpz_init_set_str(aarith_in_mpir, to_decimal(result).c_str(), 10);
+
+                    if (mpz_cmp(result_mpir, aarith_in_mpir) != 0)
+                    {
+                        std::cout << "Subtraction failed:\n";
+                        std::cout << "MPIR:\n";
+                        gmp_printf("\ta: %Zd\n", a_mpir);
+                        gmp_printf("\tb: %Zd\n", b_mpir);
+                        gmp_printf("\tb-a: %Zd\n", result_mpir);
+
+                        std::cout << "\naarith:\n"
+                                  << "\ta: " << to_decimal(a) << "\n"
+                                  << "\tb: " << to_decimal(b) << "\n"
+                                  << "\tb-a: " << to_decimal(result) << "\n";
+                        exit(1);
+                    }
                 }
                 b = b + aone;
                 mpz_add_ui(b_mpir, b_mpir, 1);
@@ -140,19 +244,23 @@ void check_div()
             mpz_add_ui(a_mpir, a_mpir, 1);
         }
     }
+    std::cout << "\t done." << std::endl;
 }
 
-void check_sub()
+template <size_t W> void check_mod()
 {
-    aint a(1), b(1);
-    a = a << 1022;
-    b = b << 511;
+    using I = integer<W>;
+    static constexpr I aone{I::one()};
+    I a{-50};
+    I b = mul(div(I::max(), I{3}), I{2});
 
     mpz_t a_mpir, b_mpir, result_mpir, aarith_in_mpir;
-    mpz_init_set_str(a_mpir, to_binary(a).c_str(), 2);
-    mpz_init_set_str(b_mpir, to_binary(b).c_str(), 2);
+    mpz_init_set_str(a_mpir, to_decimal(a).c_str(), 10);
+    mpz_init_set_str(b_mpir, to_decimal(b).c_str(), 10);
     mpz_init_set_str(result_mpir, "0", 2);
     mpz_init_set_str(aarith_in_mpir, "0", 2);
+
+    std::cout << "Checking modulo for a bit-width of " << W << "..." << std::flush;
 
     {
         for (size_t i = 0; i < n_iter; ++i)
@@ -160,22 +268,45 @@ void check_sub()
             for (size_t j = 0; j < n_iter; ++j)
             {
 
-                const auto result=expanding_sub(a,b);
-                mpz_sub(result_mpir, a_mpir, b_mpir);
-                mpz_init_set_str(aarith_in_mpir, to_binary(result).c_str(), 2);
-
-
-                if (mpz_cmp(result_mpir, aarith_in_mpir) != 0)
                 {
+                    const auto result = remainder(a, b);
+                    mpz_tdiv_r(result_mpir, a_mpir, b_mpir);
+                    mpz_init_set_str(aarith_in_mpir, to_decimal(result).c_str(), 10);
 
-                    std::cout << "Subtraction failed:\n";
+                    if (mpz_cmp(result_mpir, aarith_in_mpir) != 0)
+                    {
+                        std::cout << "Modulo failed:\n";
+                        std::cout << "MPIR:\n";
+                        gmp_printf("\ta: %Zd\n", a_mpir);
+                        gmp_printf("\tb: %Zd\n", b_mpir);
+                        gmp_printf("\ta/b: %Zd\n", result_mpir);
 
-                    gmp_printf("%Zd\n", a_mpir);
-                    gmp_printf("%Zd\n", b_mpir);
-                    gmp_printf("%Zd\n", result_mpir);
+                        std::cout << "\naarith:\n"
+                                  << "\ta: " << to_decimal(a) << "\n"
+                                  << "\tb: " << to_decimal(b) << "\n"
+                                  << "\ta/b: " << to_decimal(result) << "\n";
+                        exit(1);
+                    }
+                }
+                {
+                    const auto result = remainder(b, a);
+                    mpz_tdiv_r(result_mpir, b_mpir, a_mpir);
+                    mpz_init_set_str(aarith_in_mpir, to_decimal(result).c_str(), 10);
 
-                    std::cout << "\n" << to_decimal(a) << "\n" << to_decimal(b) << "\n" <<to_decimal(result) << "\n";
-                    exit(1);
+                    if (mpz_cmp(result_mpir, aarith_in_mpir) != 0)
+                    {
+                        std::cout << "Modulo failed:\n";
+                        std::cout << "MPIR:\n";
+                        gmp_printf("\ta: %Zd\n", a_mpir);
+                        gmp_printf("\tb: %Zd\n", b_mpir);
+                        gmp_printf("\tb%a: %Zd\n", result_mpir);
+
+                        std::cout << "\naarith:\n"
+                                  << "\ta: " << to_decimal(a) << "\n"
+                                  << "\tb: " << to_decimal(b) << "\n"
+                                  << "\tb%a: " << to_decimal(result) << "\n";
+                        exit(1);
+                    }
                 }
                 b = b + aone;
                 mpz_add_ui(b_mpir, b_mpir, 1);
@@ -184,58 +315,33 @@ void check_sub()
             mpz_add_ui(a_mpir, a_mpir, 1);
         }
     }
+    std::cout << "\t done." << std::endl;
 }
-
-
-void check_mod()
-{
-    aint a(1), b(1);
-    a = a << 1022;
-    b = b << 511;
-
-    mpz_t a_mpir, b_mpir, result_mpir, aarith_in_mpir;
-    mpz_init_set_str(a_mpir, to_binary(a).c_str(), 2);
-    mpz_init_set_str(b_mpir, to_binary(b).c_str(), 2);
-    mpz_init_set_str(result_mpir, "0", 2);
-    mpz_init_set_str(aarith_in_mpir, "0", 2);
-
-    {
-        for (size_t i = 0; i < n_iter; ++i)
-        {
-            for (size_t j = 0; j < n_iter; ++j)
-            {
-
-                const auto result=remainder(a,b);
-                mpz_mod(result_mpir, a_mpir, b_mpir);
-                mpz_init_set_str(aarith_in_mpir, to_binary(result).c_str(), 2);
-
-
-                if (mpz_cmp(result_mpir, aarith_in_mpir) != 0)
-                {
-
-                    std::cout << "Modulo failed:\n";
-                    gmp_printf("%Zd\n", a_mpir);
-                    gmp_printf("%Zd\n", b_mpir);
-                    gmp_printf("%Zd\n", result_mpir);
-
-                    std::cout << "\n" << to_decimal(a) << "\n" << to_decimal(b) << "\n" <<to_decimal(result) << "\n";
-                    exit(1);
-                }
-                b = b + aone;
-                mpz_add_ui(b_mpir, b_mpir, 1);
-            }
-            a = a + aone;
-            mpz_add_ui(a_mpir, a_mpir, 1);
-        }
-    }
-}
-
 
 int main()
 {
-    check_add();
-    check_sub();
-    check_div();
-    check_mod();
-    check_mul();
+    check_add<128>();
+    check_add<256>();
+    check_add<512>();
+    check_add<1024>();
+
+    check_sub<128>();
+    check_sub<256>();
+    check_sub<512>();
+    check_sub<1024>();
+
+    check_mul<128>();
+    check_mul<256>();
+    check_mul<512>();
+    check_mul<1024>();
+
+    check_div<128>();
+    check_div<256>();
+    check_div<512>();
+    check_div<1024>();
+
+    check_mod<128>();
+    check_mod<256>();
+    check_mod<512>();
+    check_mod<1024>();
 }
