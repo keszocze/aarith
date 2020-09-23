@@ -85,7 +85,7 @@ template <class F> inline constexpr auto extract_exponent(F num) -> size_t
 
     const auto exponent = (inum >> mantissa_width) & ((one << exponent_width) - one);
 
-    return static_cast<unsigned int>(exponent);
+    return static_cast<size_t>(exponent);
 }
 
 template <class F>
