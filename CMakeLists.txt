@@ -15,6 +15,7 @@ find_package(MPFR)
 include(cmake/TargetWarnings.cmake)
 include(cmake/Tests.cmake)
 include(cmake/Experiments.cmake)
+include(cmake/Benchmarks.cmake)
 enable_testing()
 
 add_subdirectory(src)
