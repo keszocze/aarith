@@ -40,7 +40,7 @@ auto to_binary(const normalized_float<E, M, WordType>& value) -> std::string
 }
 
 template <size_t E, size_t M, typename WordType>
-auto tcs(const normalized_float<E, M, WordType> nf) -> std::string
+auto to_compute_string(const normalized_float<E, M, WordType> nf) -> std::string
 {
 
     if (nf.is_nan())
@@ -94,70 +94,7 @@ auto tcs(const normalized_float<E, M, WordType> nf) -> std::string
     return stream.str();
 }
 
-/// Convert the given normalized_float to a representation that can be posted to a calculator
-template <size_t E, size_t M, typename WordType>
-auto to_compute_string(const normalized_float<E, M, WordType> nf) -> std::string
-{
 
-    // print the sign part
-    std::stringstream stream("");
-    stream << "(-1)^" << nf.get_sign() << " * 2^(";
-    auto first = true;
-
-    // print the exponent part
-    auto ones = 0U;
-    auto zeroes = 0U;
-    for (auto counter = E + M; counter > M; --counter)
-    {
-        if (nf.bit(counter - 1) == 0)
-        {
-            zeroes++;
-        }
-        else
-        {
-            ones++;
-        }
-    }
-
-    if (ones < zeroes)
-    {
-        for (auto counter = E + M; counter > M; --counter)
-        {
-            stream << ((nf.bit(counter - 1) == 1 && !first) ? " + " : "")
-                   << ((nf.bit(counter - 1) == 1) ? (("2^") + std::to_string(counter - M - 1))
-                                                  : "");
-            first &= nf.bit(counter - 1) == 0;
-        }
-        stream << " - (2^" << (E - 1) << " - 1)";
-    }
-    else
-    {
-        for (auto counter = E + M; counter > M; --counter)
-        {
-            stream << ((nf.bit(counter - 1) == 0 && !first) ? " - " : "")
-                   << ((nf.bit(counter - 1) == 1)
-                           ? ((counter == E + M) ? (("2^") + std::to_string(counter - M - 1)) : "")
-                           : ((counter == E + M) ? ("0")
-                                                 : ("2^" + std::to_string(counter - M - 1))));
-            first = false;
-        }
-    }
-
-    stream << ") * (";
-    first = true;
-    for (auto counter = M; counter > 0; --counter)
-    {
-        if (nf.bit(counter - 1) == 1)
-        {
-            stream << (first ? "" : " + ") << "2^(" << std::to_string(static_cast<int>(counter - M))
-                   << ")";
-            first = false;
-        }
-    }
-    stream << ")";
-
-    return stream.str();
-}
 
 /// Convert the given normalized_float to a scientific string representation
 template <size_t E, size_t M, typename WordType>

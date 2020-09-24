@@ -9,9 +9,9 @@
 
 namespace aarith {
 
-template <class F> constexpr size_t get_mantissa_width()
+template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
+constexpr size_t get_mantissa_width()
 {
-    static_assert(std::is_floating_point<F>(), "F has to be float or double.");
     if constexpr (sizeof(F) == 4)
     {
         return 23U;
@@ -22,9 +22,9 @@ template <class F> constexpr size_t get_mantissa_width()
     }
 }
 
-template <class F> constexpr size_t get_exponent_width()
+template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
+constexpr size_t get_exponent_width()
 {
-    static_assert(std::is_floating_point<F>(), "F has to be float or double.");
     if constexpr (sizeof(F) == 4)
     {
         return 8U;
@@ -73,7 +73,8 @@ template <class F> constexpr uint8_t extract_sign(F num)
     return static_cast<uint8_t>(sign);
 }
 
-template <class F> inline constexpr auto extract_exponent(F num) -> size_t
+template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
+inline constexpr auto extract_exponent(F num)
 {
     constexpr auto exponent_width = get_exponent_width<F>();
     constexpr auto mantissa_width = get_mantissa_width<F>();

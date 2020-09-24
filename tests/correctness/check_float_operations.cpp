@@ -5,7 +5,7 @@ using namespace aarith;
 
 
 
-TEMPLATE_TEST_CASE_SIG("Arithmetic should match the native data types", "[normalized_float][arithmetic][constexpr]",
+TEMPLATE_TEST_CASE_SIG("Arithmetic should match the native data types", "[normalized_float][arithmetic][constexpr][checking]",
                        ((size_t E, size_t M, typename native), E, M, native), (8,23,float), (11,52, double))
 {
     using F = normalized_float<E,M>;
@@ -31,7 +31,7 @@ TEMPLATE_TEST_CASE_SIG("Arithmetic should match the native data types", "[normal
 
             std::cout << a << " + " << b << " = " << res << "\n";
             std::cout << to_binary(a) << " + " << to_binary(b) << " = " << to_binary(res) << "\n";
-            std::cout << to_compute_string(a) << "\t+\t" << to_compute_string(b) << " = " << to_compute_string(res) << "\n";
+            std::cout << tcs(a) << "\t+\t" << tcs(b) << " = " << tcs(res) << "\n";
 
             std::cout << a_float << " + " << b_float << " = " << res_float << "\n";
             std::cout << to_binary(res) << " vs. " << to_binary(res_float_)  << "\n";
@@ -750,32 +750,3 @@ SCENARIO("IEEE-754 arithmetic conversion: float, double",
     }
 }
 
-//SCENARIO("IEEE-754 arithmetic comparison: float",
-//         "[normalized_float][arithmetic][multiplication][ieee-754]")
-//{
-//
-//    GIVEN("0.5 and 0.25")
-//    {
-//        float half = 0.5;
-//        float quarter = 1.5;
-//        float threequarter = -0.875;
-//        float zero = 0.0;
-//
-//        using afloat = normalized_float<8, 23>;
-//
-//        afloat ahalf{half};
-//        afloat aquarter{quarter};
-//        aquarter.set_exponent(uinteger<8>::zero());
-//        afloat athreequarter{threequarter};
-//        afloat azero{zero};
-//
-//        std::cout << half << " " << ahalf << "\t" << quarter << " " << aquarter << "\n";
-//        std::cout << to_binary(ahalf) << "\t" << to_binary(aquarter) << "\n";
-//        std::cout << to_compute_string(ahalf) << "\t" << to_compute_string(aquarter) << "\n";
-//        std::cout << tcs(ahalf) << "\t" << tcs(aquarter) << "\t" << tcs(athreequarter) << "\t"
-//                  << tcs(azero) << "\n";
-//        //        std::cout << ahalf.get_real_exponent() << "\t" << aquarter.unbiased_exponent() <<
-//        //        "\n"; std::cout << to_binary(ahalf.get_real_exponent()) << "\t" <<
-//        //        to_binary(aquarter.unbiased_exponent()) << "\n";
-//    }
-//}
