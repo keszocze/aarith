@@ -2,7 +2,7 @@
 
 
 
-widths=["8","16","32", "64", "128", "256", "512", "1024"]
+widths=["8","16","32", "64", "128", "256", "512", "1024", "2048", "4096"]
 
 aarith_operations=["Add", "Sub", "NaiveMul", "BoothMul", "Div", "Mod"]
 mpir_operations=["add", "sub", "mul", "div", "mod"]
