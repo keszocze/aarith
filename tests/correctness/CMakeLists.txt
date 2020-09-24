@@ -31,3 +31,7 @@ endif()
 if(MPIR_FOUND)
     add_aarith_test("check-against-mpir" FILES check_against_mpir.cpp INCLUDES ${MPIR_INCLUDE_DIR} LIBS ${MPIR_LIBRARIES})
 endif()
+
+if(MPFR_FOUND)
+    add_aarith_test("check-against-mpfr" FILES check_against_mpfr.cpp INCLUDES ${MPFR_INCLUDE_DIR} LIBS ${MPFR_LIBRARY_RELEASE})
+endif()

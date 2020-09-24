@@ -10,8 +10,8 @@ int main (void)
 
   mpfr_init2 (s, 200);
   mpfr_set_str(s, "1.375", 10, MPFR_RNDD);
-  
-  
+
+
   mpfr_prec_round (s, 2, MPFR_RNDN);
   mpfr_out_str (stdout, 10, 0, s, MPFR_RNDD);
   putchar ('\n');
