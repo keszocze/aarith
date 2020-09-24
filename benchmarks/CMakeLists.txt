@@ -16,7 +16,7 @@ endif()
 
 if (MPFR_FOUND)
     message(STATUS "MPFR found: Building MPFR benchmarks")
-    add_aarith_benchmark(mpfr-comparison FILES mpfr_benchmark.cpp LIBS ${MPFR_LIBRARIES} INCLUDES ${MPFR_INCLUDE_DIR})
+    add_aarith_benchmark(mpfr-comparison FILES mpfr_benchmark.cpp LIBS ${MPFR_LIBRARY_RELEASE} INCLUDES ${MPFR_INCLUDE_DIR})
 endif()
 
 
