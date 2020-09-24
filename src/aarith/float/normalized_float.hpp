@@ -34,7 +34,7 @@ public:
     template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value &&
                                                       get_mantissa_width<F>() <= M &&
                                                       get_exponent_width<F>() <= E>>
-    explicit constexpr normalized_float(F f)
+    explicit  normalized_float(const F f)
     {
 
         exponent = extract_exponent<F, WordType>(f);
