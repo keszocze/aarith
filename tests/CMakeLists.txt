@@ -23,6 +23,7 @@ add_aarith_test(integer-random-generation FILES integer/integer-random-generatio
 add_aarith_test(integer-cast FILES integer/integer-casts.cpp)
 
 add_aarith_test(float-operations FILES float/exact_operations-float-test.cpp)
+add_aarith_test(float-anytime-operations FILES float/anytime_operations-float-test.cpp)
 
 add_aarith_test(fau-adder FILES uint-approx-test.cpp)
 

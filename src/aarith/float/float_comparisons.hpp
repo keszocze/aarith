@@ -44,6 +44,13 @@ auto operator==(const normalized_float<E, M> lhs, const normalized_float<E, M> r
            lhs.get_full_mantissa() == rhs.get_full_mantissa();
 }
 
+
+template <size_t E, size_t M>
+auto operator!=(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
+{
+    return !(lhs == rhs);
+}
+
 template <size_t E, size_t M>
 auto operator>(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
 {

@@ -1,5 +1,10 @@
 #pragma once
 
+
+#define AARITH_FLOAT_TEST_SIGNATURE ((size_t E, size_t M), E, M)
+
+#define AARIHT_FLOAT_TEMPLATE_RANGE (5,2), (6,9), (8,7), (8,23), (11,52), (15,112)
+
 #define AARITH_TEST_SIGNATURE ((size_t W, typename WordType), W, WordType)
 #define AARITH_TEST_TEMPLATE_FULL_PARAM_RANGE                                                      \
     (5, uint8_t), (5, uint16_t), (5, uint32_t), (5, uint64_t), (8, uint8_t), (8, uint16_t),        \
