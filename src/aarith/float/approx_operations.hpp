@@ -106,7 +106,7 @@ template<size_t E, size_t M>
     auto mproduct = approx_expanding_mul_post_masking(lhs.get_full_mantissa(), rhs.get_full_mantissa(), bits);
     //mproduct = mproduct >> (M-1);
     mproduct = mproduct >> (M);
-    auto esum = width_cast<E>(expanding_sub(expanding_add(lhs.get_exponent(), rhs.get_exponent()), lhs.get_bias()));
+    auto esum = width_cast<E>(expanding_sub(expanding_add(lhs.get_exponent(), rhs.get_exponent()), lhs.bias));
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
     normalized_float<E, mproduct.width()-1> product;
@@ -140,7 +140,7 @@ template<size_t E, size_t M>
     
     auto rdmquotient = rshift_and_round(mquotient, 4);
 
-    auto esum = width_cast<E>(expanding_sub(expanding_add(lhs.get_exponent(), lhs.get_bias()), rhs.get_exponent()));
+    auto esum = width_cast<E>(expanding_sub(expanding_add(lhs.get_exponent(), lhs.bias), rhs.get_exponent()));
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
     normalized_float<E, rdmquotient.width()-1> quotient;

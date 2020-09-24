@@ -19,86 +19,48 @@ public:
 
     static constexpr size_t MW = M + 1;
 
+    using IntegerExp = uinteger<E, WordType>;
+    using IntegerMant = uinteger<MW, WordType>;
+
+    static constexpr IntegerExp bias = uinteger<E - 1, WordType>::all_ones();
+
     explicit constexpr normalized_float()
     {
-        exponent = uinteger<E, WordType>(0U);
-        mantissa = uinteger<MW, WordType>(0U);
+        exponent = IntegerExp::zero();
+        mantissa = IntegerMant::zero();
         sign_neg = false;
     }
 
-    template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
+    template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value &&
+                                                      get_mantissa_width<F>() <= M &&
+                                                      get_exponent_width<F>() <= E>>
     explicit constexpr normalized_float(F f)
     {
-        // static_assert(get_mantissa_width<F>() < M, "Mantissa of f does not fit into explicit
-        // mantissa of normalized_float.");
 
-        auto f_exponent = extract_exponent(f);
-        auto f_mantissa = extract_mantissa(f);
-        constexpr auto f_exponent_width = get_exponent_width<F>();
-        constexpr auto f_mantissa_width = get_mantissa_width<F>() + 1;
+        exponent = extract_exponent<F, WordType>(f);
+        mantissa = extract_mantissa<F, WordType>(f);
 
-        sign_neg = extract_sign(f) == 1;
+        sign_neg = (f < 0);
 
-        constexpr auto wider_mantissa = MW >= f_mantissa_width;
-        if constexpr (wider_mantissa)
+        // if the mantissa of the normalized float can store more bits than the
+        // mantissa of the supplied native data type, it has to be shifted by the
+        // difference in widths
+        if constexpr (get_mantissa_width<F>() < M)
         {
-            mantissa = uinteger<MW, WordType>(f_mantissa);
-            constexpr auto mantissa_shift = MW - f_mantissa_width;
-            mantissa = mantissa << mantissa_shift;
+            mantissa <<= (M - get_mantissa_width<F>());
         }
-        else
-        {
-            constexpr auto mantissa_shift = f_mantissa_width - MW;
-            f_mantissa >>= mantissa_shift;
-            mantissa = uinteger<MW, WordType>(f_mantissa);
-        }
-        if (f_exponent > 0)
+        if (!is_special())
         {
             mantissa.set_msb(true);
         }
 
-        if (f_exponent > 0)
+        constexpr size_t exp_width = get_exponent_width<F>();
+        if constexpr (exp_width < M)
         {
-            constexpr auto wider_exponent = E >= f_exponent_width;
-            if (wider_exponent)
-            {
-                exponent = uinteger<E, WordType>(f_exponent);
-                const auto f_bias = width_cast<E>(
-                    normalized_float<f_exponent_width, f_mantissa_width, WordType>::get_bias());
-                const auto exponent_delta = sub(get_bias(), f_bias);
-                exponent = add(exponent, exponent_delta);
-            }
-            else
-            {
-                const auto bias = get_bias();
-                const auto exponent_delta =
-                    normalized_float<f_exponent_width, f_mantissa_width, WordType>::get_bias().word(
-                        0) -
-                    bias.word(0);
-                if (static_cast<decltype(f_exponent)>(exponent_delta) > f_exponent)
-                {
-                    exponent = uinteger<E, WordType>::all_zeroes();
-                    const auto mshift =
-                        static_cast<decltype(f_exponent)>(exponent_delta) - f_exponent;
-                    if (MW < mshift)
-                    {
-                        mantissa = mantissa >> mshift;
-                    }
-                    else
-                    {
-                        mantissa = uinteger<MW, WordType>::all_zeroes();
-                    }
-                }
-                else
-                {
-                    f_exponent -= static_cast<decltype(f_exponent)>(exponent_delta);
-                    exponent = uinteger<E, WordType>(f_exponent);
-                }
-            }
-        }
-        else
-        {
-            mantissa.set_msb(false);
+            constexpr auto smaller_bias = uinteger<exp_width-1, WordType>::all_ones();
+            constexpr IntegerExp diff =
+                sub(bias, IntegerExp{smaller_bias});
+            exponent = add(exponent, diff);
         }
     }
 
@@ -112,13 +74,6 @@ public:
         return M;
     }
 
-    [[nodiscard]] static constexpr auto get_bias() -> uinteger<E, WordType>
-    {
-        const uinteger<E, WordType> one(1U);
-        const uinteger<E, WordType> shifted = one << (E - 1);
-        return sub(shifted, one);
-    }
-
     /**
      * @warn The absolute value of the
      * @return
@@ -126,7 +81,7 @@ public:
     [[nodiscard]] static constexpr integer<E + 1, WordType> denorm_exponent()
     {
 
-        const integer<E + 1, WordType> b{get_bias()};
+        const integer<E + 1, WordType> b{bias};
         const integer<E + 1, WordType> neg_bias = sub(integer<E + 1, WordType>::zero(), b);
 
         return add(neg_bias, integer<E + 1, WordType>::one());
@@ -171,13 +126,13 @@ public:
      */
     [[nodiscard]] constexpr bool is_nan() const
     {
-        return exponent == uinteger<E>::all_ones() && mantissa != uinteger<MW>::zero();
+        return exponent == IntegerExp::all_ones() && width_cast<M>(mantissa) != uinteger<M>::zero();
     }
 
     [[nodiscard]] constexpr auto unbiased_exponent() const -> integer<E + 1, WordType>
     {
-        const integer<E + 1, WordType> signed_bias(get_bias());
-        const integer<E + 1, WordType> signed_exponent(get_exponent());
+        const integer<E + 1, WordType> signed_bias{bias};
+        const integer<E + 1, WordType> signed_exponent{get_exponent()};
 
         const integer<E + 1, WordType> real_exponent = sub(signed_exponent, signed_bias);
         return real_exponent;
@@ -193,11 +148,6 @@ public:
     [[nodiscard]] constexpr bool is_zero() const
     {
         return exponent.is_zero() && mantissa.is_zero();
-    }
-
-    [[nodiscard]] bool constexpr exponent_is_positive() const
-    {
-        return get_exponent() > get_bias();
     }
 
     void set_exponent(const uinteger<E, WordType>& set_to)
@@ -251,7 +201,16 @@ public:
      */
     [[nodiscard]] constexpr bool is_normalized() const
     {
-        return exponent != uinteger<E>::all_zeroes();
+        return exponent != IntegerExp::all_zeroes();
+    }
+
+    /**
+     * @brief Returns if the number is denormalized or NaN/Inf
+     * @return
+     */
+    [[nodiscard]] constexpr bool is_special() const
+    {
+        return exponent == IntegerExp::all_zeroes() || exponent == IntegerExp::all_ones();
     }
 
     /**
@@ -265,8 +224,8 @@ public:
 
         using exp_type = uinteger<ES, WordType>;
 
-        const exp_type in_bias{this->get_bias()};
-        const auto out_bias = normalized_float<ES, M, WordType>::get_bias();
+        const exp_type in_bias{this->bias};
+        const auto out_bias = normalized_float<ES, M, WordType>::bias;
         auto bias_difference = sub(out_bias, in_bias);
 
         exp_type exponent_ = uinteger<ES, WordType>{this->get_exponent()};
@@ -310,6 +269,11 @@ public:
         auto with_sign = concat(word_array<1, WordType>{this->get_sign()}, joined);
 
         return with_sign;
+    }
+
+    static constexpr normalized_float<E, M, WordType> zero()
+    {
+        return normalized_float<E, M, WordType>{};
     }
 
     /**

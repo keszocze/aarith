@@ -12,6 +12,7 @@ function(add_aarith_experiment testname)
             ${ARGN}
     )
 
+
     add_executable(${targetname} ${AARITH_EXP_FILES})
     target_link_libraries(${targetname} PRIVATE aarith::Library ${AARITH_EXP_LIBS})
 
