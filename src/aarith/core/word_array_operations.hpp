@@ -56,7 +56,7 @@ template <typename W>[[nodiscard]] constexpr auto operator~(const W& rhs) -> W
  * @return
  */
 template <size_t Width, typename WordType>
-constexpr auto count_leading_zeroes(const word_array<Width, WordType>& value) -> size_t
+constexpr size_t count_leading_zeroes(const word_array<Width, WordType>& value)
 {
     for (auto i = Width; i > 0; --i)
     {

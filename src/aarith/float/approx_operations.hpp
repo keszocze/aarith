@@ -35,7 +35,7 @@ template<size_t E, size_t M>
 
     const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
     const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
-    const auto mantissa_sum = approx_expanding_add_post_masking(lhs.get_full_mantissa(),  new_mantissa, bits);
+    const auto mantissa_sum = approx_expanding_add_post_masking(lhs.get_full_mantissa(),  new_mantissa, bits+1);
 
     normalized_float<E, mantissa_sum.width()-1> sum;
     sum.set_sign(lhs.get_sign());
