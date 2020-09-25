@@ -18,12 +18,12 @@ namespace aarith {
  *
  */
 template<size_t E, size_t M>
-[[nodiscard]] auto anytime_add(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs, const unsigned int bits = M)
+[[nodiscard]] auto anytime_add(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs, const unsigned int bits = M + 1)
 -> normalized_float<E, M>
 {
     if(abs(lhs) < abs(rhs))
     {
-        return add(rhs, lhs);
+        return anytime_add(rhs, lhs, bits);
     }
 
     if(lhs.get_sign() != rhs.get_sign())
@@ -35,7 +35,7 @@ template<size_t E, size_t M>
 
     const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
     const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
-    const auto mantissa_sum = approx_expanding_add_post_masking(lhs.get_full_mantissa(),  new_mantissa, bits+1);
+    const auto mantissa_sum = approx_expanding_add_post_masking(lhs.get_full_mantissa(),  new_mantissa, bits + 1);
 
     normalized_float<E, mantissa_sum.width()-1> sum;
     sum.set_sign(lhs.get_sign());
@@ -58,14 +58,14 @@ template<size_t E, size_t M>
  *
  */
 template<size_t E, size_t M>
-[[nodiscard]] auto anytime_sub(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs, const unsigned int bits = M)
+[[nodiscard]] auto anytime_sub(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs, const unsigned int bits = M+1)
 -> normalized_float<E, M>
 {
     if(abs(lhs) < abs(rhs))
     {
         auto swap = rhs;
         swap.set_sign(~swap.get_sign());
-        return add(swap, lhs);
+        return anytime_add(swap, lhs, bits);
     }
 
     if(lhs.get_sign() != rhs.get_sign())
@@ -109,12 +109,12 @@ template<size_t E, size_t M>
     auto esum = width_cast<E>(expanding_sub(expanding_add(lhs.get_exponent(), rhs.get_exponent()), lhs.bias));
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
-    normalized_float<E, mproduct.width()-1> product;
+    normalized_float<E, mproduct.width() - 1> product;
     product.set_mantissa(mproduct);
     product.set_exponent(esum);
     product.set_sign(sign);
 
-    return normalize<E, mproduct.width()-1, M>(product);
+    return normalize<E, mproduct.width() - 1, M>(product);
 }
 
 /**

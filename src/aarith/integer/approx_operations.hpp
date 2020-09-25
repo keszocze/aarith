@@ -28,6 +28,11 @@ template <class Integer> auto generate_bitmask(size_t leading_ones) -> Integer
     {
         leading_ones = Integer::width();
     }
+    
+    if (leading_ones == 0)
+    {
+        leading_ones = 1;
+    }
 
     const size_t bits = Integer::width() - leading_ones;
 
