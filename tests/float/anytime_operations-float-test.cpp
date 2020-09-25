@@ -24,7 +24,7 @@ TEMPLATE_TEST_CASE_SIG("Anytime addition", "[normalized_float][arithmetic][const
 
         WHEN("Computing all mantissa bits correctly for the addition")
         {
-            F res = anytime_add(a, b, M + 1);
+            F res = anytime_add(a, b, M +1);
             THEN("The result should match the usual normalized_float result")
             {
                 F res_exact = add(a, b);
@@ -39,7 +39,7 @@ TEMPLATE_TEST_CASE_SIG("Anytime addition", "[normalized_float][arithmetic][const
 
         WHEN("Computing all mantissa bits correctly for the subtraction")
         {
-            F res = anytime_sub(a, b, M + 1);
+            F res = anytime_sub(a, b, M +1);
             THEN("The result should match the usual normalized_float result")
             {
                 F res_exact = sub(a, b);
@@ -54,7 +54,7 @@ TEMPLATE_TEST_CASE_SIG("Anytime addition", "[normalized_float][arithmetic][const
 
         WHEN("Computing all mantissa bits correctly for the multiplication")
         {
-            F res = anytime_mul(a, b, M + 1);
+            F res = anytime_mul(a, b, M +1);
             THEN("The result should match the usual normalized_float result")
             {
                 F res_exact = mul(a, b);
@@ -69,7 +69,7 @@ TEMPLATE_TEST_CASE_SIG("Anytime addition", "[normalized_float][arithmetic][const
 
         WHEN("Computing all mantissa bits correctly for the division")
         {
-            F res = anytime_div(a, b, M + 1);
+            F res = anytime_div(a, b, M +1);
             THEN("The result should match the usual normalized_float result")
             {
                 F res_exact = div(a, b);

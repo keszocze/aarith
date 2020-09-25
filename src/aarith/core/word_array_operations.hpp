@@ -139,6 +139,8 @@ template <typename W> constexpr auto operator<<=(W& lhs, const size_t rhs) -> W
 
     return lhs;
 }
+
+
 /**
  * @brief Left-shift operator
  * @tparam W The word_container type to work on
@@ -156,7 +158,6 @@ template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
     return shifted;
 }
 
-
 /**
  * @brief Logical right-shift assignment
  * @tparam Width The width of the word_array
@@ -164,8 +165,7 @@ template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
  * @param rhs The number of bits to shift
  * @return The shifted word_array
  */
-template <typename W,
-    typename = std::enable_if_t<is_word_array_v<W>>>
+template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
 auto constexpr logical_right_shift(W& lhs, const size_t rhs) -> W
 {
 
@@ -224,7 +224,7 @@ template <typename W,
           typename = std::enable_if_t<is_word_array_v<W> || (is_integral_v<W> && is_unsigned_v<W>)>>
 auto constexpr operator>>=(W& lhs, const size_t rhs) -> W
 {
-        return logical_right_shift(lhs,rhs);
+    return logical_right_shift(lhs, rhs);
 }
 
 /**
@@ -237,13 +237,11 @@ auto constexpr operator>>=(W& lhs, const size_t rhs) -> W
 template <typename W> auto constexpr operator>>(const W& lhs, const size_t rhs) -> W
 {
 
-
     W shifted{lhs};
     shifted >>= rhs;
 
     return shifted;
 }
-
 
 /**
  * @brief Arithmetic right-shift operator
@@ -256,8 +254,7 @@ template <typename W> auto constexpr operator>>(const W& lhs, const size_t rhs) 
  * @return The shifted integer
  */
 template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
-auto constexpr arithmetic_right_shift(W& lhs, const size_t rhs)
--> W
+auto constexpr arithmetic_right_shift(W& lhs, const size_t rhs) -> W
 {
     constexpr size_t Width = W::width();
     using WordType = typename W::word_type;
@@ -288,7 +285,6 @@ auto constexpr arithmetic_right_shift(W& lhs, const size_t rhs)
     const auto skip_words = rhs / lhs.word_width();
     const auto shift_word_right = rhs - skip_words * lhs.word_width();
     const auto shift_word_left = lhs.word_width() - shift_word_right;
-
 
     for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
     {

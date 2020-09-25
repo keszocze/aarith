@@ -3,10 +3,13 @@
 #include <aarith/core.hpp>
 #include <aarith/core/string_utils.hpp>
 
+
 #include "../test-signature-ranges.hpp"
 #include "gen_word_array.hpp"
 
 using namespace aarith;
+
+
 
 SCENARIO("Casting word_containers into different width", "[word_array][casting]")
 {

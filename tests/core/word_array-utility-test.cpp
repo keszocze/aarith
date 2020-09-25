@@ -7,12 +7,6 @@
 
 using namespace aarith;
 
-// TEMPLATE_TEST_CASE_SIG("Invariant: Concatenation is associative", "[word_array][utility]",
-//                       AARITH_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
-//{
-//    GIVEN("Three different words")
-//    {
-//        using I = word_array<W, WordType>;
 
 TEMPLATE_TEST_CASE_SIG("Counting bits in word_array", "[word_array][util]", AARITH_TEST_SIGNATURE,
                        AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
