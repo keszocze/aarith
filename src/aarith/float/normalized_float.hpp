@@ -31,36 +31,59 @@ public:
         sign_neg = false;
     }
 
-    template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value &&
-                                                      get_mantissa_width<F>() <= M &&
-                                                      get_exponent_width<F>() <= E>>
-    explicit  normalized_float(const F f)
+    template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
+    explicit normalized_float(const F f)
     {
 
-        exponent = extract_exponent<F, WordType>(f);
-        mantissa = extract_mantissa<F, WordType>(f);
+        auto extracted_exp = extract_exponent<F, WordType>(f);
+        auto extracted_mantissa = extract_mantissa<F, WordType>(f);
+        constexpr size_t ext_exp_width = get_exponent_width<F>();
+        constexpr size_t ext_mant_width = get_mantissa_width<F>();
 
         sign_neg = (f < 0);
 
-        // if the mantissa of the normalized float can store more bits than the
+        // if the mantissa of the normalized float can store at least as many bit as the
         // mantissa of the supplied native data type, it has to be shifted by the
-        // difference in widths
-        if constexpr (get_mantissa_width<F>() < M)
+        // difference in widths (which may be zero!)
+        if constexpr (ext_mant_width <= M)
         {
-            mantissa <<= (M - get_mantissa_width<F>());
+            // this is basically a width cast of the extracted mantissa to fit into stored one
+            mantissa = extracted_mantissa;
+            mantissa <<= (M - ext_mant_width);
+        }
+        else
+        {
+            // the extracted mantissa does *not* necessarily fit in the stored mantissa. we perform
+            // a width cast that potentially loses quite some precision
+            // we first move the bits to the right in order not to lose them
+            extracted_mantissa >>= (ext_mant_width - M);
+            mantissa = width_cast<M>(extracted_mantissa);
         }
         if (!is_special())
         {
             mantissa.set_msb(true);
         }
 
-        constexpr size_t exp_width = get_exponent_width<F>();
-        if constexpr (exp_width < M)
+        if constexpr (ext_exp_width < E)
         {
-            constexpr auto smaller_bias = uinteger<exp_width-1, WordType>::all_ones();
-            constexpr IntegerExp diff =
-                sub(bias, IntegerExp{smaller_bias});
-            exponent = add(exponent, diff);
+            // a wider exponent means a larger bias, so we have to add the difference between two
+            // biases to the old exponent to get the old value
+            constexpr IntegerExp smaller_bias = uinteger<ext_exp_width - 1, WordType>::all_ones();
+            constexpr IntegerExp diff = sub(bias, smaller_bias);
+            exponent = add(IntegerExp{extracted_exp}, diff);
+
+        }
+        else if (ext_exp_width > E)
+        {
+            // we simply truncate the exponent after shifting to the right, hoping that we do not
+            // loose too much precision (we will....)
+            extracted_exp >>= (ext_exp_width - E);
+            exponent = width_cast<E>(extracted_exp);
+        }
+        else
+        {
+            // assume same size
+            exponent = extracted_exp;
         }
     }
 

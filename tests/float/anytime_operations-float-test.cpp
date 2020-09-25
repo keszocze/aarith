@@ -27,10 +27,13 @@ TEMPLATE_TEST_CASE_SIG("Anytime addition", "[normalized_float][arithmetic][const
 //            std::cout << to_binary(nan_, true) << "\t" << nan_.is_nan() << "\t" << nan_.is_inf() << "\n";
 
 
-//            std::cout << to_binary(normalized_float<8,23>(1.5f),true) << "\t" << to_compute_string(normalized_float<9,23>(1.5f))<< "\n";
-//            std::cout << to_binary(normalized_float<9,23>(1.5f),true) << "\t" << to_compute_string(normalized_float<9,23>(1.5f)) << "\n";
-//            std::cout << to_binary(normalized_float<8,30>(1.5f),true) << "\n";
+            std::cout << to_binary(normalized_float<8,23>(1.5f),false) << "\t" << to_compute_string(normalized_float<8,23>(1.5f))<< "\n";
+            std::cout << to_binary(normalized_float<9,24>(1.5f),false) << "\t" << to_compute_string(normalized_float<9,24>(1.5f)) << "\n";
+            std::cout << to_binary(normalized_float<4,10>(1.5f),false) << "\t" << to_compute_string(normalized_float<4,10>(1.5f)) << "\n";
 
+//            normalized_float<8,23> onehalf(1.5f);
+//            std::cout << to_binary(onehalf,false) << "\t" << to_compute_string(onehalf) << "\n";
+//            std::cout << onehalf.denorm_exponent() << "\t" << onehalf.get_exponent() << "\t" << onehalf.unbiased_exponent() << "\n";
 //            std::cout << to_binary(normalized_float<8,23>(std::numeric_limits<float>::infinity()),true) << "\n";
 //            std::cout << to_binary(normalized_float<8,30>(std::numeric_limits<float>::infinity()),true) << "\n";
 
@@ -43,7 +46,7 @@ TEMPLATE_TEST_CASE_SIG("Anytime addition", "[normalized_float][arithmetic][const
         }
 
         // float case
-        if constexpr (E == 8 && M == 23)
+        if constexpr (E == 8 && M == 1)
         {
             THEN("The computation should match its float counterpart")
             {
@@ -56,7 +59,7 @@ TEMPLATE_TEST_CASE_SIG("Anytime addition", "[normalized_float][arithmetic][const
 
                 F a{a_d};
                 F b{b_d};
-                F res = anytime_add(a, b, 10*M);
+                F res = anytime_add(a, b, M);
 
                 F res_e = a + b;
 

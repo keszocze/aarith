@@ -24,6 +24,7 @@ public:
     {
     }
 
+
     // Constructor for unsigned ints that are *not* the WordType
     template <typename Val, typename = std::enable_if_t<::aarith::is_unsigned_int<Val> &&
                                                         (sizeof(Val) * 8) <= Width>>
