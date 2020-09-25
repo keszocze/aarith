@@ -34,7 +34,7 @@ TEMPLATE_TEST_CASE_SIG("Arithmetic should match the native data types", "[normal
             std::cout << to_compute_string(a) << "\t+\t" << to_compute_string(b) << " = " << to_compute_string(res) << "\n";
 
             std::cout << a_float << " + " << b_float << " = " << res_float << "\n";
-            std::cout << to_binary(res) << " vs. " << to_binary(res_float_)  << "\n";
+            std::cout << to_binary(res) << "\n" << to_binary(res_float_)  << "\n";
         }
 
         CHECK(res_float_ == res);

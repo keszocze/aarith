@@ -59,10 +59,8 @@ public:
             extracted_mantissa >>= (ext_mant_width - M);
             mantissa = width_cast<M>(extracted_mantissa);
         }
-        if (!is_special())
-        {
-            mantissa.set_msb(true);
-        }
+
+
 
         if constexpr (ext_exp_width < E)
         {
@@ -71,7 +69,6 @@ public:
             constexpr IntegerExp smaller_bias = uinteger<ext_exp_width - 1, WordType>::all_ones();
             constexpr IntegerExp diff = sub(bias, smaller_bias);
             exponent = add(IntegerExp{extracted_exp}, diff);
-
         }
         else if (ext_exp_width > E)
         {
@@ -85,6 +82,14 @@ public:
             // assume same size
             exponent = extracted_exp;
         }
+
+
+        if (!is_special())
+        {
+            mantissa.set_msb(true);
+        }
+
+
     }
 
     static constexpr auto exponent_width() -> size_t
@@ -137,7 +142,8 @@ public:
 
     [[nodiscard]] constexpr bool is_inf() const
     {
-        return exponent == uinteger<E>::all_ones() && mantissa == uinteger<MW>::zero();
+        return exponent == uinteger<E>::all_ones() &&
+               width_cast<M>(mantissa) == uinteger<M>::zero();
     }
 
     /**
@@ -233,7 +239,10 @@ public:
      */
     [[nodiscard]] constexpr bool is_special() const
     {
-        return exponent == IntegerExp::all_zeroes() || exponent == IntegerExp::all_ones();
+        const bool denormalized = (exponent == IntegerExp::all_zeroes());
+        const bool exception = (exponent == IntegerExp::all_ones());
+        const bool result = (denormalized || exception);
+        return result;
     }
 
     /**
