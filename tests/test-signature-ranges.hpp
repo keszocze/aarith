@@ -2,8 +2,11 @@
 
 
 #define AARITH_FLOAT_TEST_SIGNATURE ((size_t E, size_t M), E, M)
+#define AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE ((size_t E, size_t M, typename Native), E, M, Native)
 
 #define AARIHT_FLOAT_TEMPLATE_RANGE (5,2), (6,9), (8,7), (8,23), (11,52), (15,112)
+#define AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE (8,23), (11,52)
+#define AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE (8,23, float), (11,52, double)
 
 #define AARITH_TEST_SIGNATURE ((size_t W, typename WordType), W, WordType)
 #define AARITH_TEST_TEMPLATE_FULL_PARAM_RANGE                                                      \

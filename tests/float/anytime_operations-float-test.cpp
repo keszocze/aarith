@@ -5,104 +5,80 @@
 
 using namespace aarith;
 
-
 TEMPLATE_TEST_CASE_SIG("Anytime addition", "[normalized_float][arithmetic][constexpr][checking]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
+                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
     using F = normalized_float<E, M>;
 
-    WHEN("Computing all mantissa bits correctly")
+    GIVEN("Float/Double numbers")
     {
-        THEN("The result should match the usual normalized_float result")
+
+        Native a_ = GENERATE(take(15, random<Native>(std::numeric_limits<Native>::min(),
+                                                     std::numeric_limits<Native>::max())));
+        Native b_ = GENERATE(take(15, random<Native>(std::numeric_limits<Native>::min(),
+                                                     std::numeric_limits<Native>::max())));
+
+        F a{a_};
+        F b{b_};
+
+        WHEN("Computing all mantissa bits correctly for the addition")
         {
-
-//            normalized_float<8,23> inf{std::numeric_limits<float>::infinity()};
-//            normalized_float<8,24> inf_{std::numeric_limits<float>::infinity()};
-//            std::cout << to_binary(inf, true) << "\t" << inf.is_nan() << "\t" << inf.is_inf() << "\n";
-//            std::cout << to_binary(inf_, true) << "\t" << inf_.is_nan() << "\t" << inf_.is_inf() << "\n";
-//
-//            normalized_float<8,23> nan{std::numeric_limits<float>::signaling_NaN()};
-//            normalized_float<8,24> nan_{std::numeric_limits<float>::quiet_NaN()};
-//            std::cout << to_binary(nan, true) << "\t" << nan.is_nan() << "\t" << nan.is_inf() << "\n";
-//            std::cout << to_binary(nan_, true) << "\t" << nan_.is_nan() << "\t" << nan_.is_inf() << "\n";
-
-
-            std::cout << to_binary(normalized_float<8,23>(1.5f),false) << "\t" << to_compute_string(normalized_float<8,23>(1.5f))<< "\n";
-            std::cout << to_binary(normalized_float<9,24>(1.5f),false) << "\t" << to_compute_string(normalized_float<9,24>(1.5f)) << "\n";
-            std::cout << to_binary(normalized_float<4,10>(1.5f),false) << "\t" << to_compute_string(normalized_float<4,10>(1.5f)) << "\n";
-
-//            normalized_float<8,23> onehalf(1.5f);
-//            std::cout << to_binary(onehalf,false) << "\t" << to_compute_string(onehalf) << "\n";
-//            std::cout << onehalf.denorm_exponent() << "\t" << onehalf.get_exponent() << "\t" << onehalf.unbiased_exponent() << "\n";
-//            std::cout << to_binary(normalized_float<8,23>(std::numeric_limits<float>::infinity()),true) << "\n";
-//            std::cout << to_binary(normalized_float<8,30>(std::numeric_limits<float>::infinity()),true) << "\n";
-
-//            const auto onehalf = normalized_float<8,23>(1.5f);
-//            const auto three = onehalf+onehalf;
-//            std::cout << to_binary(onehalf,true) << "\t" << to_compute_string(onehalf) << "\n";
-//            std::cout << to_binary(three,true) << "\t" << to_compute_string(three) << "\n";
-
-            CHECK(true);
-        }
-
-        // float case
-        if constexpr (E == 8 && M == 1)
-        {
-            THEN("The computation should match its float counterpart")
+            F res = anytime_add(a, b, M + 1);
+            THEN("The result should match the usual normalized_float result")
             {
-                float a_d = GENERATE(take(10, random<float>(std::numeric_limits<float>::min(),
-                                                            std::numeric_limits<float>::max())));
-                float b_d = GENERATE(take(10, random<float>(std::numeric_limits<float>::min(),
-                                                            std::numeric_limits<float>::max())));
-                float res_d = a_d + b_d;
-                F res_d_{res_d};
-
-                F a{a_d};
-                F b{b_d};
-                F res = anytime_add(a, b, M);
-
-                F res_e = a + b;
-
-                //                std::cout << a_d << " + " << b_d << "\n";
-
-                if (res != res_d_)
+                F res_exact = add(a, b);
+                if (res != res_exact)
                 {
-                    std::cout << a_d << " + " << b_d << " = " << res_d << "\n";
-                    std::cout << to_binary(res) << "\n"
-                              << to_binary(res_d_) << "\n"
-                              << to_binary(res_e) << "\n";
-                    std::cout << res.is_inf() << " " << res.is_nan() << "\n"
-                              << res_d_.is_inf() << " " << res_d_.is_nan() << "\n"
-                              << res_e.is_inf() << " " << res_e.is_nan() << "\n";
+                    std::cout << to_binary(res) << "\n";
+                    std::cout << to_binary(res_exact) << "\n";
                 }
-                REQUIRE(res == res_d_);
+                REQUIRE(res == res_exact);
             }
         }
 
-        // double case
-        if constexpr (E == 11 && M == 1)
+        WHEN("Computing all mantissa bits correctly for the subtraction")
         {
-            THEN("The computation should match its double counterpart")
+            F res = anytime_sub(a, b, M + 1);
+            THEN("The result should match the usual normalized_float result")
             {
-                double a_d = GENERATE(take(10, random<double>(std::numeric_limits<double>::min(),
-                                                              std::numeric_limits<double>::max())));
-                double b_d = GENERATE(take(10, random<double>(std::numeric_limits<double>::min(),
-                                                              std::numeric_limits<double>::max())));
-                double res_d = a_d + b_d;
-                F res_d_{res_d};
-
-                F a{a_d};
-                F b{b_d};
-                F res = anytime_add(a, b, M);
-
-                //                std::cout << a_d << " + " << b_d << "\n";
-
-                if (res != res_d_)
+                F res_exact = sub(a, b);
+                if (res != res_exact)
                 {
-                    std::cout << a_d << "\t" << b_d << "\n";
-                    std::cout << to_binary(res) << "\n" << to_binary(res_d_) << "\n";
+                    std::cout << to_binary(res) << "\n";
+                    std::cout << to_binary(res_exact) << "\n";
                 }
-                REQUIRE(res == res_d_);
+                REQUIRE(res == res_exact);
+            }
+        }
+
+        WHEN("Computing all mantissa bits correctly for the multiplication")
+        {
+            F res = anytime_mul(a, b, M + 1);
+            THEN("The result should match the usual normalized_float result")
+            {
+                F res_exact = mul(a, b);
+                if (res != res_exact)
+                {
+                    std::cout << to_binary(res) << "\n";
+                    std::cout << to_binary(res_exact) << "\n";
+                }
+                REQUIRE(res == res_exact);
+            }
+        }
+
+        WHEN("Computing all mantissa bits correctly for the division")
+        {
+            F res = anytime_div(a, b, M + 1);
+            THEN("The result should match the usual normalized_float result")
+            {
+                F res_exact = div(a, b);
+                if (res != res_exact)
+                {
+                    std::cout << to_binary(res) << "\n";
+                    std::cout << to_binary(res_exact) << "\n";
+                }
+                REQUIRE(res == res_exact);
             }
         }
     }

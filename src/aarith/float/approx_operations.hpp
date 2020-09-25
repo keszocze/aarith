@@ -77,7 +77,7 @@ template<size_t E, size_t M>
 
     const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
     const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
-    const auto mantissa_sum = approx_expanding_sub_post_masking(lhs.get_full_mantissa(), new_mantissa, bits);
+    const auto mantissa_sum = approx_expanding_sub_post_masking(lhs.get_full_mantissa(), new_mantissa, bits+1);
 
     normalized_float<E, mantissa_sum.width()-1> sum;
     sum.set_sign(lhs.get_sign());
@@ -103,7 +103,7 @@ template<size_t E, size_t M>
 [[nodiscard]] auto anytime_mul(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs, const unsigned int bits = 2*M)
 -> normalized_float<E, M>
 {
-    auto mproduct = approx_expanding_mul_post_masking(lhs.get_full_mantissa(), rhs.get_full_mantissa(), bits);
+    auto mproduct = approx_expanding_mul_post_masking(lhs.get_full_mantissa(), rhs.get_full_mantissa(), bits+1);
     //mproduct = mproduct >> (M-1);
     mproduct = mproduct >> (M);
     auto esum = width_cast<E>(expanding_sub(expanding_add(lhs.get_exponent(), rhs.get_exponent()), lhs.bias));
