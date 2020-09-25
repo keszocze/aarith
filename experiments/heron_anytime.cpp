@@ -32,14 +32,14 @@ template <size_t iterations, size_t C> F heron_anytime(const F& num)
 
     const F one{1.0f};
     const F two{2.0f};
-    F result = anytime_add(num, one, C);
-    result = anytime_div(result, two, C);
+    F result = anytime_add(num, one, C+1);
+    result = anytime_div(result, two, C+1);
 
     for (size_t i = 0; i < iterations; ++i)
     {
-        const F quot = anytime_div(num, result, C);
-        result = anytime_add(result, quot, C);
-        result = anytime_div(result, two, C);
+        const F quot = anytime_div(num, result, C+1);
+        result = anytime_add(result, quot, C+1);
+        result = anytime_div(result, two, C+1);
     }
 
     return result;
