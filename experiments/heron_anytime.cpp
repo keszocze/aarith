@@ -131,5 +131,27 @@ int main(int argc, char** argv)
     compare_heron<starting_value, value_iter, heron_iter, 23>();
     compare_heron<starting_value, value_iter, heron_iter, 24>();
 
+
+    constexpr size_t heron_iter_15 = 15;
+    compare_heron<starting_value, value_iter, heron_iter_15, 6>();
+    compare_heron<starting_value, value_iter, heron_iter_15, 7>();
+    compare_heron<starting_value, value_iter, heron_iter_15, 8>();
+    compare_heron<starting_value, value_iter, heron_iter_15, 9>();
+    compare_heron<starting_value, value_iter, heron_iter_15, 10>();
+    compare_heron<starting_value, value_iter, heron_iter_15, 11>();
+    compare_heron<starting_value, value_iter, heron_iter_15, 12>();
+    compare_heron<starting_value, value_iter, heron_iter_15, 13>();
+    compare_heron<starting_value, value_iter, heron_iter_15, 14>();
+    compare_heron<starting_value, value_iter, heron_iter_15, 15>();
+    compare_heron<starting_value, value_iter, heron_iter_15, 16>();
+    compare_heron<starting_value, value_iter, heron_iter_15, 17>();
+    compare_heron<starting_value, value_iter, heron_iter_15, 18>();
+    compare_heron<starting_value, value_iter, heron_iter_15, 19>();
+    compare_heron<starting_value, value_iter, heron_iter_15, 20>();
+    compare_heron<starting_value, value_iter, heron_iter_15, 21>();
+    compare_heron<starting_value, value_iter, heron_iter_15, 22>();
+    compare_heron<starting_value, value_iter, heron_iter_15, 23>();
+    compare_heron<starting_value, value_iter, heron_iter_15, 24>();
+
     return 0;
 }
