@@ -8,6 +8,11 @@ namespace aarith {
 template <size_t E, size_t M>
 auto operator<(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
 {
+
+    if (lhs.is_nan() || rhs.is_nan()) {
+        return false;
+    }
+
     if (lhs.get_sign() > rhs.get_sign())
     {
         return true;
@@ -40,6 +45,9 @@ auto operator<(const normalized_float<E, M> lhs, const normalized_float<E, M> rh
 template <size_t E, size_t M>
 auto operator==(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
 {
+    if (lhs.is_nan() || rhs.is_nan()) {
+        return false;
+    }
     return lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent() &&
            lhs.get_full_mantissa() == rhs.get_full_mantissa();
 }
