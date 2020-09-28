@@ -17,7 +17,6 @@ SCENARIO("Circular shift")
         using U = uinteger<8>;
 
         const U one=U::one();
-
         const U three{3};
 
 
@@ -67,6 +66,66 @@ SCENARIO("Circular shift")
     }
 }
 
+SCENARIO("Rotate through carry")
+{
+    GIVEN("The examplary number from wikipedia")
+    {
+        // https://en.wikipedia.org/wiki/Bitwise_operation#Bit_shifts
+
+        using W = word_array<8>;
+        const W num{0b00010111};
+
+        using U = uinteger<8>;
+
+        const U one=U::one();
+        const U three{3};
+
+
+        WHEN("Shifting left once")
+        {
+            W a{num};
+
+            rotate_through_carry_left(a, true, one);
+
+            THEN("The result is as expected")
+            {
+                W expected{0b00101111};
+                REQUIRE(a == expected);
+            }
+        }
+        WHEN("Shifting right once")
+        {
+            W a{num};
+            rotate_through_carry_right(a, true, one);
+            {
+                W expected{0b10001011};
+                REQUIRE(a == expected);
+            }
+        }
+
+        AND_WHEN("Shifting left thrice")
+        {
+            W a{num};
+
+            rotate_through_carry_left(a, true, three);
+
+            THEN("The result is as expected")
+            {
+                W expected{0b10111100};
+                REQUIRE(a == expected);
+            }
+        }
+        WHEN("Shifting right thrice")
+        {
+            W a{num};
+            rotate_through_carry_right(a, true, three);
+            {
+                W expected{0b11100010};
+                REQUIRE(a == expected);
+            }
+        }
+    }
+}
 
 TEMPLATE_TEST_CASE_SIG("Shifting by rather large values", "[integer][utility]", ((size_t W), W),
                        5000, 50000, 250000, 1020483)

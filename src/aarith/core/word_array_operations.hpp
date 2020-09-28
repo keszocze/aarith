@@ -321,7 +321,7 @@ auto constexpr operator>>(const W& lhs, const size_t rhs) -> W
  * @return The shifted integer
  */
 template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
-auto constexpr arithmetic_right_shift(W& lhs, const size_t rhs) -> W
+auto constexpr arithmetic_right_shift(W& lhs, const size_t rhs) -> W&
 {
     constexpr size_t Width = W::width();
     using WordType = typename W::word_type;
@@ -459,6 +459,17 @@ constexpr W& rotate_through_carry_left(W& lhs, const bool carry_in, const size_t
 }
 
 /**
+ * @brief Rotates the word_array to the left using a specified carry-in
+ * @tparam W
+ */
+template <typename W, typename U, typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
+constexpr W& rotate_through_carry_left(W& lhs, const bool carry_in, const U& rotate = U::one())
+{
+
+    return rotate_through_carry_left(lhs, carry_in, static_cast<size_t>(rotate));
+}
+
+/**
  * @brief Rotates the word_array to the right using a specified carry-in
  * @tparam W
  */
@@ -473,6 +484,16 @@ constexpr W& rotate_through_carry_right(W& lhs, const bool carry_in, const size_
     lhs |= slice;
 
     return lhs;
+}
+
+/**
+ * @brief Rotates the word_array to the right using a specified carry-in
+ * @tparam W
+ */
+template <typename W, typename U, typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
+constexpr W& rotate_through_carry_right(W& lhs, const bool carry_in, const U& rotate = U::one())
+{
+    return rotate_through_carry_right(lhs, carry_in, static_cast<size_t>(rotate));
 }
 
 /**
