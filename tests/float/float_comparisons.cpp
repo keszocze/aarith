@@ -34,11 +34,7 @@ TEMPLATE_TEST_CASE_SIG("Comparisons should match the native counterparts",
                 bool neq = (a != quite_nan);
                 bool neq_native(a_native != quite_nan_native);
                 CHECK(neq == neq_native);
-                if (neq)
-                {
-                    std::cout << neq << "\t" << neq_native << "\n";
-                }
-                CHECK_FALSE(neq);
+                CHECK(neq); // should actually be true!
 
                 bool leq = (a <= quite_nan);
                 bool leq_native(a_native <= quite_nan_native);
