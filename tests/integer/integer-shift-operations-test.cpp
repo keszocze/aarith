@@ -18,7 +18,7 @@ SCENARIO("Shfiting using unsigned integers", "[foo]") {
 }
 
 TEMPLATE_TEST_CASE_SIG("Left/right shifting signed integers",
-                       "[integer][signed][operation][utility]", AARITH_TEST_SIGNATURE,
+                       "[integer][signed][operation][utility]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = integer<W, WordType>;

@@ -7,7 +7,7 @@ using namespace aarith;
 
 TEMPLATE_TEST_CASE_SIG("Comparisons for certain values should be fixed and constexpr",
                        "[integer][unsigned][utility][comparison][constexpr]",
-                       AARITH_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+                       AARITH_INT_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = uinteger<W, WordType>;
 
@@ -76,7 +76,7 @@ TEMPLATE_TEST_CASE_SIG("Comparisons for certain values should be fixed and const
 }
 
 TEMPLATE_TEST_CASE_SIG("Comparing two unsigned integers of identical bit-width",
-                       "[integer][unsigned][utility][comparison]", AARITH_TEST_SIGNATURE,
+                       "[integer][unsigned][utility][comparison]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
 
@@ -123,7 +123,7 @@ TEMPLATE_TEST_CASE_SIG("Comparing two unsigned integers of identical bit-width",
 }
 
 TEMPLATE_TEST_CASE_SIG("Comparing two unsigned integers with different bit-widths",
-                       "[integer][unsigned][utility][comparison]", AARITH_TEST_SIGNATURE,
+                       "[integer][unsigned][utility][comparison]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
 

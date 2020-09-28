@@ -4,12 +4,12 @@
 
 #include <algorithm>
 #include <array>
+#include <climits>
 #include <cstdint>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
-#include <climits>
 
 namespace aarith {
 
@@ -54,6 +54,7 @@ public:
             set_word(i, other.word(i));
         }
     }
+
     template <size_t V, typename T>
     constexpr word_array<Width, T> operator=(const word_array<V, T>& other)
     {
@@ -83,6 +84,26 @@ public:
         }
 
         return *this;
+    }
+
+    template <size_t V, typename T> void set_bits(const word_array<V, T>& other)
+    {
+
+        static_assert(V <= Width, "Can not create a word_array from larger container");
+
+        for (size_t i = 0U; i < other.word_count(); ++i)
+        {
+            set_word(i, other.word(i));
+        }
+
+        if constexpr (word_array<Width, WordType>::word_count() >
+                      word_array<V, WordType>::word_count())
+        {
+            for (size_t i = other.word_count(); i < this->word_count(); ++i)
+            {
+                set_word(i, 0U);
+            }
+        }
     }
 
     /*

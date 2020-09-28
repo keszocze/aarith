@@ -36,7 +36,7 @@ SCENARIO("Splitting a word_array/extraction from a word_array", "[word_array],[u
 }
 
 TEMPLATE_TEST_CASE_SIG("Invariant: Concatenation is associative", "[word_array][utility]",
-                       AARITH_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
+                       AARITH_INT_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
 {
     GIVEN("Three different words")
     {
@@ -57,7 +57,7 @@ TEMPLATE_TEST_CASE_SIG("Invariant: Concatenation is associative", "[word_array][
 }
 
 TEMPLATE_TEST_CASE_SIG("Concatenating undoes range extraction", "[word_array][utility]",
-                       AARITH_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
+                       AARITH_INT_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
 {
     GIVEN("A word_array")
     {
@@ -91,7 +91,7 @@ TEMPLATE_TEST_CASE_SIG("Concatenating undoes range extraction", "[word_array][ut
 }
 
 TEMPLATE_TEST_CASE_SIG("Concatenating undoes splitting", "[word_array][utility]",
-                       AARITH_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
+                       AARITH_INT_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
 {
     GIVEN("A word_array")
     {

@@ -700,7 +700,7 @@ SCENARIO("Right shift assignment operator works as expected", "[word_array][util
 }
 
 TEMPLATE_TEST_CASE_SIG("Bitwise operations work as expected", "[word_array][bit_logic]",
-                       AARITH_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
+                       AARITH_INT_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
 {
     GIVEN("An word_array a")
     {
@@ -793,7 +793,7 @@ SCENARIO("Bit shifting is possible as constexpr", "[word_array][utility][bit_log
 }
 
 TEMPLATE_TEST_CASE_SIG("Bit operations are performed correctly", "[word_array][bit_logic]",
-                       AARITH_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
+                       AARITH_INT_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
 {
     GIVEN("An word_array<N> w")
     {

@@ -66,7 +66,7 @@ template <size_t BitWidth, typename WordType> void test_uint_add()
 }
 
 TEMPLATE_TEST_CASE_SIG("Large number addition match those of MPIR",
-                       "[integer][unsigned][arithmetic][addition][mpir]", AARITH_TEST_SIGNATURE,
+                       "[integer][unsigned][arithmetic][addition][mpir]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_TEST_TEMPLATE_LARGE_PARAM_RANGE)
 {
     using I = uinteger<W, WordType>;

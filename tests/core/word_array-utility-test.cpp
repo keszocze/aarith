@@ -8,7 +8,8 @@
 using namespace aarith;
 
 
-TEMPLATE_TEST_CASE_SIG("Counting bits in word_array", "[word_array][util]", AARITH_TEST_SIGNATURE,
+TEMPLATE_TEST_CASE_SIG("Counting bits in word_array", "[word_array][util]",
+                       AARITH_INT_TEST_SIGNATURE,
                        AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
 {
     GIVEN("A word container")
@@ -33,7 +34,7 @@ TEMPLATE_TEST_CASE_SIG("Counting bits in word_array", "[word_array][util]", AARI
 }
 
 TEMPLATE_TEST_CASE_SIG("Checking whether an word_array is not equal to zero/false",
-                       "[word_array][utility]", AARITH_TEST_SIGNATURE,
+                       "[word_array][utility]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = word_array<W, WordType>;

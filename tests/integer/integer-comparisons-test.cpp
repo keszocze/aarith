@@ -6,7 +6,7 @@
 using namespace aarith;
 
 TEMPLATE_TEST_CASE_SIG("Comparing two positive signed integers of same bit width",
-                       "[integer][signed][utility][comparison]", AARITH_TEST_SIGNATURE,
+                       "[integer][signed][utility][comparison]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = integer<W, WordType>;
@@ -136,7 +136,7 @@ SCENARIO("Comparing two positive integers with different bit widths",
 
 
 TEMPLATE_TEST_CASE_SIG("Investigating the comparison of max and min values",
-                       "[integer][signed][utility][comparison]", AARITH_TEST_SIGNATURE,
+                       "[integer][signed][utility][comparison]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE) {
     using T = integer<W, WordType>;
     T min = T::min();
