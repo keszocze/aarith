@@ -161,8 +161,6 @@ constexpr W logical_left_shift(W& lhs, const size_t rhs)
     return lhs;
 }
 
-
-
 /**
  * @brief Left-shift assignment operator
  * @tparam W The word_container type to work on
@@ -200,7 +198,8 @@ template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
  * @param rhs The number of bits to shift
  * @return The shifted word_container
  */
-template <typename W, typename U, typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
+template <typename W, typename U,
+          typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
 constexpr W operator<<=(W& lhs, const U& rhs)
 {
     return logical_left_shift(lhs, static_cast<size_t>(rhs));
@@ -213,7 +212,8 @@ constexpr W operator<<=(W& lhs, const U& rhs)
  * @param rhs The number of bits to shift
  * @return The shifted word_container
  */
-template <typename W, typename U, typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
+template <typename W, typename U,
+          typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
 [[nodiscard]] constexpr auto operator<<(const W& lhs, const U& rhs) -> W
 {
 
@@ -222,7 +222,6 @@ template <typename W, typename U, typename = std::enable_if_t<is_word_array_v<W>
 
     return shifted;
 }
-
 
 /**
  * @brief Logical right-shift assignment
@@ -462,7 +461,8 @@ constexpr W& rotate_through_carry_left(W& lhs, const bool carry_in, const size_t
  * @brief Rotates the word_array to the left using a specified carry-in
  * @tparam W
  */
-template <typename W, typename U, typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
+template <typename W, typename U,
+          typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
 constexpr W& rotate_through_carry_left(W& lhs, const bool carry_in, const U& rotate = U::one())
 {
 
@@ -490,7 +490,8 @@ constexpr W& rotate_through_carry_right(W& lhs, const bool carry_in, const size_
  * @brief Rotates the word_array to the right using a specified carry-in
  * @tparam W
  */
-template <typename W, typename U, typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
+template <typename W, typename U,
+          typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
 constexpr W& rotate_through_carry_right(W& lhs, const bool carry_in, const U& rotate = U::one())
 {
     return rotate_through_carry_right(lhs, carry_in, static_cast<size_t>(rotate));
@@ -525,7 +526,6 @@ constexpr W& rotate_left(W& lhs, size_t rotate = 1)
     return lhs;
 }
 
-
 /**
  * @brief Rotates the word_array to the left
  *
@@ -536,10 +536,11 @@ constexpr W& rotate_left(W& lhs, size_t rotate = 1)
  * @param rhs The number of bits to be shifted
  * @return The shifted integer
  */
-template <typename W, typename U, typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
-constexpr W& rotate_left(W& lhs, const U& rotate= U::one())
+template <typename W, typename U,
+          typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
+constexpr W& rotate_left(W& lhs, const U& rotate = U::one())
 {
-   return rotate_left(lhs, static_cast<size_t>(rotate));
+    return rotate_left(lhs, static_cast<size_t>(rotate));
 }
 
 /**
@@ -561,7 +562,6 @@ constexpr W& rotate_right(W& lhs, size_t rotate = 1)
     lhs |= slice;
 
     return lhs;
-
 }
 
 /**
@@ -574,8 +574,9 @@ constexpr W& rotate_right(W& lhs, size_t rotate = 1)
  * @param rhs The number of bits to be shifted
  * @return The shifted integer
  */
-template <typename W, typename U, typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
-constexpr W& rotate_right(W& lhs, const U& rotate= U::one())
+template <typename W, typename U,
+          typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
+constexpr W& rotate_right(W& lhs, const U& rotate = U::one())
 {
     return rotate_right(lhs, static_cast<size_t>(rotate));
 }

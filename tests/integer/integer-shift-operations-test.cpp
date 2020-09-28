@@ -16,9 +16,8 @@ SCENARIO("Circular shift")
 
         using U = uinteger<8>;
 
-        const U one=U::one();
+        const U one = U::one();
         const U three{3};
-
 
         WHEN("Shifting left once")
         {
@@ -77,9 +76,8 @@ SCENARIO("Rotate through carry")
 
         using U = uinteger<8>;
 
-        const U one=U::one();
+        const U one = U::one();
         const U three{3};
-
 
         WHEN("Shifting left once")
         {

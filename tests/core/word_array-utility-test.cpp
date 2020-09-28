@@ -16,8 +16,6 @@ SCENARIO("Circular shift")
         using W = word_array<8>;
         const W num{0b00010111};
 
-
-
         WHEN("Shifting left once")
         {
             W a{num};
