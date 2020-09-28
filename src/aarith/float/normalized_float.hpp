@@ -92,6 +92,33 @@ public:
 
     }
 
+    [[nodiscard]] static constexpr normalized_float zero() {
+        return normalized_float();
+    }
+
+    [[nodiscard]] static constexpr normalized_float pos_infinity() {
+        normalized_float pos_inf{};
+        pos_inf.set_exponent(word_array<E, WordType>::all_ones());
+        return pos_inf;
+    }
+
+    [[nodiscard]] static constexpr normalized_float neg_infinity() {
+        normalized_float neg_inf{};
+        neg_inf.set_exponent(word_array<E, WordType>::all_ones());
+        neg_inf.set_sign(-1);
+        return neg_inf;
+    }
+
+    [[nodiscard]] static constexpr normalized_float NaN() {
+        normalized_float nan{};
+        nan.set_exponent(word_array<E, WordType>::all_ones());
+        auto nan_mantissa = word_array<M, WordType>::all_zeroes();
+        nan_mantissa.set_msb(1);
+
+        nan.set_mantissa(nan_mantissa);
+        return nan;
+    }
+
     static constexpr auto exponent_width() -> size_t
     {
         return E;
@@ -194,7 +221,7 @@ public:
         return width_cast<M>(mantissa);
     }
 
-    void set_mantissa(const uinteger<MW, WordType>& set_to)
+    void set_full_mantissa(const uinteger<MW, WordType>& set_to)
     {
         mantissa = set_to;
     }
@@ -303,10 +330,6 @@ public:
         return with_sign;
     }
 
-    static constexpr normalized_float<E, M, WordType> zero()
-    {
-        return normalized_float<E, M, WordType>{};
-    }
 
     /**
      *
