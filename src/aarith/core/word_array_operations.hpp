@@ -161,6 +161,8 @@ constexpr W logical_left_shift(W& lhs, const size_t rhs)
     return lhs;
 }
 
+
+
 /**
  * @brief Left-shift assignment operator
  * @tparam W The word_container type to work on
@@ -190,6 +192,37 @@ template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
 
     return shifted;
 }
+
+/**
+ * @brief Left-shift assignment operator
+ * @tparam W The word_container type to work on
+ * @param lhs The word_container to be shifted
+ * @param rhs The number of bits to shift
+ * @return The shifted word_container
+ */
+template <typename W, typename U, typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
+constexpr W operator<<=(W& lhs, const U& rhs)
+{
+    return logical_left_shift(lhs, static_cast<size_t>(rhs));
+}
+
+/**
+ * @brief Left-shift operator
+ * @tparam W The word_container type to work on
+ * @param lhs The word_container to be shifted
+ * @param rhs The number of bits to shift
+ * @return The shifted word_container
+ */
+template <typename W, typename U, typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
+[[nodiscard]] constexpr auto operator<<(const W& lhs, const U& rhs) -> W
+{
+
+    W shifted{lhs};
+    shifted <<= static_cast<size_t>(rhs);
+
+    return shifted;
+}
+
 
 /**
  * @brief Logical right-shift assignment
@@ -471,6 +504,23 @@ constexpr W& rotate_left(W& lhs, size_t rotate = 1)
     return lhs;
 }
 
+
+/**
+ * @brief Rotates the word_array to the left
+ *
+ * This shift preserves the signedness of the integer.
+ *
+ * @tparam Width The width of the signed integer
+ * @param lhs The integer to be shifted
+ * @param rhs The number of bits to be shifted
+ * @return The shifted integer
+ */
+template <typename W, typename U, typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
+constexpr W& rotate_left(W& lhs, const U& rotate= U::one())
+{
+   return rotate_left(lhs, static_cast<size_t>(rotate));
+}
+
 /**
  * @brief Rotates the word_array to the right
  *
@@ -491,6 +541,22 @@ constexpr W& rotate_right(W& lhs, size_t rotate = 1)
 
     return lhs;
 
+}
+
+/**
+ * @brief Rotates the word_array to the right
+ *
+ * This shift preserves the signedness of the integer.
+ *
+ * @tparam Width The width of the signed integer
+ * @param lhs The integer to be shifted
+ * @param rhs The number of bits to be shifted
+ * @return The shifted integer
+ */
+template <typename W, typename U, typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
+constexpr W& rotate_right(W& lhs, const U& rotate= U::one())
+{
+    return rotate_right(lhs, static_cast<size_t>(rotate));
 }
 
 /**

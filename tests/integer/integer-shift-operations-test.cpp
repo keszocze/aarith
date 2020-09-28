@@ -5,7 +5,70 @@
 
 using namespace aarith;
 
-TEMPLATE_TEST_CASE_SIG("Shifting by really large values", "[integer][utility]", ((size_t W), W),
+SCENARIO("Circular shift")
+{
+    GIVEN("The examplary number from wikipedia")
+    {
+        // https://en.wikipedia.org/wiki/Bitwise_operation#Bit_shifts
+
+        using W = word_array<8>;
+        const W num{0b00010111};
+
+        using U = uinteger<8>;
+
+        const U one=U::one();
+
+        const U three{3};
+
+
+        WHEN("Shifting left once")
+        {
+            W a{num};
+
+            rotate_left(a, one);
+
+            THEN("The result is as expected")
+            {
+                W expected{0b00101110};
+                REQUIRE(a == expected);
+            }
+        }
+        WHEN("Shifting right once")
+        {
+            W a{num};
+            rotate_right(a, one);
+            {
+                W expected{0b10001011};
+                REQUIRE(a == expected);
+            }
+        }
+
+        WHEN("Shifting left thrice")
+        {
+            W a{num};
+
+            rotate_left(a, three);
+
+            THEN("The result is as expected")
+            {
+                W expected{0b10111000};
+                REQUIRE(a == expected);
+            }
+        }
+        WHEN("Shifting right thrice")
+        {
+            W a{num};
+            rotate_right(a, three);
+            {
+                W expected{0b11100010};
+                REQUIRE(a == expected);
+            }
+        }
+    }
+}
+
+
+TEMPLATE_TEST_CASE_SIG("Shifting by rather large values", "[integer][utility]", ((size_t W), W),
                        5000, 50000, 250000, 1020483)
 {
     GIVEN("The large bit-width number")

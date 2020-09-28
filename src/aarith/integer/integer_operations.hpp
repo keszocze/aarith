@@ -514,6 +514,15 @@ auto constexpr operator>>=(integer<Width, WordType>& lhs, const size_t rhs)
     return lhs;
 }
 
+template <size_t Width, typename WordType, typename U,
+          typename = std::enable_if_t<is_unsigned_v<U>>>
+auto constexpr operator>>=(integer<Width, WordType>& lhs, const U& rhs)
+    -> integer<Width, WordType>&
+{
+    return arithmetic_right_shift(lhs, static_cast<size_t>(rhs));
+
+}
+
 /**
  * @brief Arithmetic right-shift operator
  *
@@ -530,6 +539,16 @@ auto constexpr operator>>(const integer<Width, WordType>& lhs, const size_t rhs)
 {
     integer<Width, WordType> shifted{lhs};
     shifted >>= rhs;
+    return shifted;
+}
+
+template <size_t Width, typename WordType, typename U,
+    typename = std::enable_if_t<is_unsigned_v<U>>>
+auto constexpr operator>>(const integer<Width, WordType>& lhs, const U& rhs)
+-> integer<Width, WordType>
+{
+    integer<Width, WordType> shifted{lhs};
+    shifted >>= static_cast<size_t>(rhs);
     return shifted;
 }
 
