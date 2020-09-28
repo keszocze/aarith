@@ -4,7 +4,7 @@
 using namespace aarith;
 
 TEMPLATE_TEST_CASE_SIG("Comparisons should match the native counterparts",
-                       "[normalized_float][comoparison][utility]",
+                       "[normalized_float][comparison][utility]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, double))
 {
@@ -99,6 +99,39 @@ TEMPLATE_TEST_CASE_SIG("Comparisons should match the native counterparts",
                     CHECK(gt == gt_native);
                 }
             }
+        }
+    }
+}
+
+
+TEMPLATE_TEST_CASE_SIG("Constants should be stored correctly",
+                       "[normalized_float][comparison][utility][foo]",
+                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
+                       (11, 52, double))
+{
+    using F = normalized_float<E, M>;
+
+    GIVEN("The number zero in the native data type and as aarith float")
+    {
+
+        F zero_aarith=F::zero();
+        Native zero_native{0.0f};
+
+        THEN("The numbers should match") {
+            CHECK(zero_aarith == F{zero_native});
+            REQUIRE(static_cast<Native>(zero_aarith) == zero_native);
+        }
+    }
+
+    GIVEN("The number one in the native data type and as aarith float")
+    {
+
+        F one_aarith=F::one();
+        Native one_native{1.0f};
+
+        THEN("The numbers should match") {
+            CHECK(one_aarith == F{one_native});
+            REQUIRE(static_cast<Native>(one_aarith) == one_native);
         }
     }
 }
