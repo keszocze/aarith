@@ -106,6 +106,25 @@ public:
         }
     }
 
+    /**
+     *
+     * @tparam V
+     * @tparam T
+     * @param end
+     * @param other
+     */
+    template <size_t V, typename T> void set_bits(size_t end, const word_array<V, T>& other)
+    {
+
+        static_assert(V <= Width, "Can not create a word_array from larger container");
+
+        for (size_t i = 0; i < other.width(); i++)
+        {
+            const size_t index = i + end;
+            set_bit(index, other.bit(i));
+        }
+    }
+
     /*
      * Getters
      */

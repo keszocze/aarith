@@ -306,7 +306,8 @@ public:
 
     [[nodiscard]] static constexpr integer one()
     {
-        integer one(1);
+        integer one{integer::zero()};
+        one.set_bit(0,true);
         return one;
     }
 

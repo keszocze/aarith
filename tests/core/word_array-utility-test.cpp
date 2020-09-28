@@ -7,8 +7,31 @@
 
 using namespace aarith;
 
+SCENARIO("Manually setting ranges of bits", "[word_array][utility]") {
+    GIVEN ("A word array") {
 
-TEMPLATE_TEST_CASE_SIG("Counting bits in word_array", "[word_array][util]",
+        word_array<32> w;
+
+
+        WHEN("Manually settings bits") {
+            w.set_bits(0,word_array<2>::all_ones());
+            word_array<32> b;
+            b.set_bit(0,true);
+            b.set_bit(1,true);
+            CHECK(w == b);
+
+            w.set_bits(10, word_array<3>::all_ones());
+
+            b.set_bit(10,true);
+            b.set_bit(11,true);
+            b.set_bit(12,true);
+
+            REQUIRE(w == b);
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Counting bits in word_array", "[word_array][utility]",
                        AARITH_INT_TEST_SIGNATURE,
                        AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
 {

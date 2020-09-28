@@ -1,10 +1,38 @@
-#include <aarith/integer_no_operators.hpp>
+#include <aarith/integer.hpp>
 #include <catch.hpp>
 
 #include "../test-signature-ranges.hpp"
 
 using namespace aarith;
 
+
+TEMPLATE_TEST_CASE_SIG("Shifting by really large values", "[integer][utility]", ((size_t W), W),
+                       5000, 50000, 250000, 1020483)
+{
+    GIVEN("The large bit-width number")
+    {
+        //        static constexpr width = std::numeric_limits<size_t>::max();
+
+        using I = integer<W, uint64_t>;
+        using U = uinteger<W, uint64_t>;
+
+        I sone = I::max();
+        U uone = U::max();
+
+        WHEN("Shifting by many bits")
+        {
+            U shift_val{W - 2};
+            THEN("It should be corrected correctly")
+            {
+                I sres = (sone >> shift_val);
+                U rres = (uone >> shift_val);
+
+                CHECK(count_leading_zeroes(sres) == (W - 1));
+                REQUIRE(count_leading_zeroes(rres) == (W - 2));
+            }
+        }
+    }
+}
 
 TEMPLATE_TEST_CASE_SIG("Left/right shifting signed integers",
                        "[integer][signed][operation][utility]", AARITH_INT_TEST_SIGNATURE,
