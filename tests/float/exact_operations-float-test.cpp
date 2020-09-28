@@ -1,14 +1,30 @@
 #include <aarith/float.hpp>
 #include <catch.hpp>
-
+#include <bitset>
 using namespace aarith;
 
+SCENARIO("my addition", "") {
+    float a_{0.5f};
+    float b_{-0.4375f};
+
+    std::cout << std::bitset<32>(bit_cast<uint32_t>(a_)) << "\n";
+
+    using F = normalized_float<8,23>;
+
+    [[maybe_unused]] F a{a_};
+    F b{b_};
+
+    float sum_ = a_ + b_;
+    F sum = my_add(a,b);
+
+    std::cout << to_binary(a,true) << "\t" << to_binary(a.get_mantissa()) << " " << to_binary(a.get_full_mantissa()) << "\t" << to_compute_string(a) << "\n";
+    std::cout << to_binary(b,true) << "\t" << to_binary(b.get_full_mantissa()) << "\t" << to_compute_string(b) << "\n";
+
+    std:: cout << sum_ << "\t" << to_compute_string(sum) << "\t" << to_compute_string(a + b) <<  "\n";
+
+}
 
 
-TEMPLATE_TEST_CASE_SIG("Arithmetic should match the native data types", "[normalized_float][arithmetic][constexpr]",
-                       ((size_t E, size_t M, typename native), E, M, native), (8,23,float), (11,52, double))
-{
-    using F = normalized_float<E,M>;
 
     native a_float{-1337.35f};
     native b_float{420815.0f};

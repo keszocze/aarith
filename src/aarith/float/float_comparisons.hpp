@@ -13,7 +13,11 @@ auto operator<(const normalized_float<E, M> lhs, const normalized_float<E, M> rh
         return false;
     }
 
-    if (lhs.get_sign() > rhs.get_sign())
+    if (lhs.is_zero() && rhs.is_zero()) {
+        return false;
+    }
+
+    if (lhs.is_negative() && rhs.is_positive())
     {
         return true;
     }
@@ -48,6 +52,11 @@ auto operator==(const normalized_float<E, M> lhs, const normalized_float<E, M> r
     if (lhs.is_nan() || rhs.is_nan()) {
         return false;
     }
+
+    if (lhs.is_zero() && rhs.is_zero()) {
+        return true;
+    }
+
     return lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent() &&
            lhs.get_full_mantissa() == rhs.get_full_mantissa();
 }
