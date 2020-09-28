@@ -93,7 +93,20 @@ public:
     }
 
     [[nodiscard]] static constexpr normalized_float zero() {
-        return normalized_float();
+        return normalized_float{};
+    }
+
+    [[nodiscard]] static constexpr normalized_float one() {
+        normalized_float num{};
+        auto exp = word_array<E, WordType>::all_ones();
+        exp.set_msb(false);
+        num.set_exponent(exp);
+
+        auto mant = uinteger<MW, WordType>::all_zeroes();
+        mant.set_msb(true);
+        num.set_full_mantissa(mant);
+
+        return num;
     }
 
     [[nodiscard]] static constexpr normalized_float pos_infinity() {

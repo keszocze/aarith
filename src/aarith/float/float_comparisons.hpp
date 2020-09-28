@@ -60,14 +60,17 @@ auto operator<(const normalized_float<E, M> lhs, const normalized_float<E, M> rh
 template <size_t E, size_t M>
 bool bitwise_equality(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
 {
-    return lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent() &&
-           lhs.get_full_mantissa() == rhs.get_full_mantissa();
+    const bool equal_sign = (lhs.get_sign() == rhs.get_sign());
+    const bool equal_exponent = (lhs.get_exponent() == rhs.get_exponent());
+    const bool equal_mantissa = (lhs.get_full_mantissa() == rhs.get_full_mantissa());
+//    std::cout << equal_sign << "\t" << equal_exponent << "\t" << equal_mantissa << "\n";
+    return equal_sign && equal_exponent && equal_mantissa;
 }
-
 
 template <size_t E, size_t M>
 auto operator==(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
 {
+
     if (lhs.is_nan() || rhs.is_nan())
     {
         return false;
