@@ -3,8 +3,7 @@
 
 using namespace aarith;
 
-SCENARIO("Up-casting to the next larger native integer type",
-         "[integer][unsigned][casting]")
+SCENARIO("Up-casting to the next larger native integer type", "[integer][unsigned][casting]")
 {
     GIVEN("An unsigned integer with 13 bidth")
     {

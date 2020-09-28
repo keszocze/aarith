@@ -109,25 +109,23 @@ TEMPLATE_TEST_CASE_SIG("Concatenating undoes splitting", "[word_array][utility]"
                 }
 
                 {
-                    const auto [left, right] = split<W/2>(w);
+                    const auto [left, right] = split<W / 2>(w);
                     REQUIRE(concat(left, right) == w);
                 }
                 {
-                    const auto [left, right] = split<W/3>(w);
+                    const auto [left, right] = split<W / 3>(w);
                     REQUIRE(concat(left, right) == w);
                 }
 
                 {
-                    const auto [left, right] = split<2*(W/3)>(w);
+                    const auto [left, right] = split<2 * (W / 3)>(w);
                     REQUIRE(concat(left, right) == w);
                 }
-
 
                 {
-                    const auto [left, right] = split<W-2>(w);
+                    const auto [left, right] = split<W - 2>(w);
                     REQUIRE(concat(left, right) == w);
                 }
-
             }
         }
     }

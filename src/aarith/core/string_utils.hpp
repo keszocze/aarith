@@ -94,9 +94,9 @@ auto to_binary(const word_array<Width, WordType>& value) -> std::string
     return result;
 }
 
-template <
-    size_t W, typename WordType, template <size_t, typename> class WA,
-    typename = std::enable_if_t<is_word_array_v<WA<W, WordType>> && !is_integral_v<WA<W, WordType>>>>
+template <size_t W, typename WordType, template <size_t, typename> class WA,
+          typename =
+              std::enable_if_t<is_word_array_v<WA<W, WordType>> && !is_integral_v<WA<W, WordType>>>>
 auto operator<<(std::ostream& out, const WA<W, WordType>& value) -> std::ostream&
 {
     out << group_digits(to_binary(value), WA<W, WordType>::word_width());

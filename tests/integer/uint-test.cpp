@@ -68,7 +68,8 @@ SCENARIO("Casting uintegers into different width", "[integer][unsigned][casting]
     }
 }
 
-SCENARIO("Copy constructor of unsigned integers with various bit widths", "[integer][unsigned][utility]")
+SCENARIO("Copy constructor of unsigned integers with various bit widths",
+         "[integer][unsigned][utility]")
 {
     GIVEN("An uinteger<N> a")
     {
@@ -484,7 +485,8 @@ SCENARIO("Logical NOT works as expected", "[integer][unsigned][bit_logic]")
     }
 }
 
-SCENARIO("Checking whether an unsigned integer is not equal to zero/false", "[integer][unsigned][utility]")
+SCENARIO("Checking whether an unsigned integer is not equal to zero/false",
+         "[integer][unsigned][utility]")
 {
     GIVEN("An uinteger<N>=0=a for various N")
     {

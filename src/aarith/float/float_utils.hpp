@@ -59,8 +59,8 @@ template <> struct bit_cast_to_type_trait<double>
 
 } // namespace float_extraction_helper
 
-
-template <typename F, typename WordType, typename = std::enable_if_t<std::is_floating_point<F>::value>>
+template <typename F, typename WordType,
+          typename = std::enable_if_t<std::is_floating_point<F>::value>>
 inline constexpr auto extract_exponent(F num)
 {
     constexpr auto exponent_width = get_exponent_width<F>();
@@ -76,7 +76,8 @@ inline constexpr auto extract_exponent(F num)
     return uinteger<exponent_width, WordType>{exponent};
 }
 
-template <typename F, typename Wordtype, typename = std::enable_if_t<std::is_floating_point<F>::value>>
+template <typename F, typename Wordtype,
+          typename = std::enable_if_t<std::is_floating_point<F>::value>>
 inline constexpr auto extract_mantissa(F num)
 {
     constexpr auto mantissa_width = get_mantissa_width<F>();
@@ -89,7 +90,7 @@ inline constexpr auto extract_mantissa(F num)
 
     const auto mantissa = (inum & ((one << mantissa_width) - one)) | (one << mantissa_width);
 
-    return uinteger<mantissa_width,Wordtype>{mantissa};
+    return uinteger<mantissa_width, Wordtype>{mantissa};
 }
 
 } // namespace aarith

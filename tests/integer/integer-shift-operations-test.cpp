@@ -5,7 +5,6 @@
 
 using namespace aarith;
 
-
 TEMPLATE_TEST_CASE_SIG("Shifting by really large values", "[integer][utility]", ((size_t W), W),
                        5000, 50000, 250000, 1020483)
 {

@@ -128,14 +128,14 @@ TEMPLATE_TEST_CASE_SIG("Comparing two unsigned integers with different bit-width
 {
 
     using I = uinteger<W, WordType>;
-    using S = uinteger<2*W+1, WordType>;
+    using S = uinteger<2 * W + 1, WordType>;
 
     GIVEN("Two a and b with a < b")
     {
 
         I a = GENERATE(take(10, random_uinteger<W, WordType>(I::zero(), div(I::max(), I{2U}))));
-        S b = GENERATE(
-            take(10, random_uinteger<2*W+1, WordType>(expanding_add(div(I::max(), I{2U}), S::one()), S::max())));
+        S b = GENERATE(take(10, random_uinteger<2 * W + 1, WordType>(
+                                    expanding_add(div(I::max(), I{2U}), S::one()), S::max())));
 
         THEN("operator< returns true")
         {

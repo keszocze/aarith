@@ -6,7 +6,8 @@
 
 using namespace aarith;
 
-SCENARIO("Bit shifting is possible as constexpr for signed integers","[integer][signed][utility][constexpr][bit_logic]")
+SCENARIO("Bit shifting is possible as constexpr for signed integers",
+         "[integer][signed][utility][constexpr][bit_logic]")
 {
     GIVEN("A signed integer of width N")
     {

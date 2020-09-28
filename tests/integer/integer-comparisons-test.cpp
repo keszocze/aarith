@@ -19,7 +19,7 @@ TEMPLATE_TEST_CASE_SIG("Comparing two positive signed integers of same bit width
         THEN("operator< returns true")
         {
             bool comp = a < b;
-            REQUIRE(comp);//
+            REQUIRE(comp); //
         }
         THEN("operator<= returns true")
         {
@@ -134,17 +134,16 @@ SCENARIO("Comparing two positive integers with different bit widths",
     }
 }
 
-
 TEMPLATE_TEST_CASE_SIG("Investigating the comparison of max and min values",
                        "[integer][signed][utility][comparison]", AARITH_INT_TEST_SIGNATURE,
-                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE) {
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
     using T = integer<W, WordType>;
     T min = T::min();
     T max = T::max();
 
     T min_from_limits = std::numeric_limits<T>::min();
     T max_from_limits = std::numeric_limits<T>::max();
-
 
     WHEN("Comparing the integer::max/min and numeric_limits::max/min")
     {
@@ -156,7 +155,8 @@ TEMPLATE_TEST_CASE_SIG("Investigating the comparison of max and min values",
             REQUIRE(!(min != min_from_limits));
             REQUIRE(!(max != max_from_limits));
         }
-        THEN("The minimum should be negative") {
+        THEN("The minimum should be negative")
+        {
             REQUIRE(min.is_negative());
             REQUIRE(min_from_limits.is_negative());
         }
@@ -164,8 +164,8 @@ TEMPLATE_TEST_CASE_SIG("Investigating the comparison of max and min values",
 
     WHEN("Constructing min and max value into a larger integer")
     {
-        integer<W+1, WordType> min_{T::min()};
-        integer<W+1, WordType> max_ = T::max();
+        integer<W + 1, WordType> min_{T::min()};
+        integer<W + 1, WordType> max_ = T::max();
 
         THEN("min should be negative")
         {

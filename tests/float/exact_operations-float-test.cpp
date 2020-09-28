@@ -100,7 +100,7 @@ TEMPLATE_TEST_CASE_SIG("Zero makes the multiplication result zero",
     {
 
         Native a_native = GENERATE(take(15, random<Native>(std::numeric_limits<Native>::min(),
-            std::numeric_limits<Native>::max())));
+                                                           std::numeric_limits<Native>::max())));
         F a{a_native};
         F zero{F::zero()};
 
@@ -109,7 +109,8 @@ TEMPLATE_TEST_CASE_SIG("Zero makes the multiplication result zero",
             F res{a * zero};
             THEN("The result should have left the number untouched")
             {
-                if (res != zero) {
+                if (res != zero)
+                {
                     std::cout << to_binary(a) << "\n";
                     std::cout << to_binary(res) << "\n";
                     std::cout << to_binary(zero) << "\n";
@@ -131,7 +132,7 @@ TEMPLATE_TEST_CASE_SIG("One is the neutral element of the multiplication",
     {
 
         Native a_native = GENERATE(take(15, random<Native>(std::numeric_limits<Native>::min(),
-            std::numeric_limits<Native>::max())));
+                                                           std::numeric_limits<Native>::max())));
         F a{a_native};
         F one{F::one()};
 

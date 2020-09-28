@@ -413,12 +413,12 @@ split(const word_array<W, WordType>& w)
  * @tparam W
  */
 template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
-W constexpr rotate_through_carry_left(W& lhs, const bool carry_in, const size_t rotate = 1)
+constexpr W& rotate_through_carry_left(W& lhs, const bool carry_in, const size_t rotate = 1)
 {
 
-    const size_t right_shift = lhs.width() - (rotate-1);
+    const size_t right_shift = lhs.width() - (rotate - 1);
     auto slice = lhs >> right_shift;
-    slice.set_bit(rotate-1, carry_in);
+    slice.set_bit(rotate - 1, carry_in);
     lhs <<= rotate;
     lhs |= slice;
 
@@ -430,12 +430,12 @@ W constexpr rotate_through_carry_left(W& lhs, const bool carry_in, const size_t 
  * @tparam W
  */
 template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
-W constexpr rotate_through_carry_right(W& lhs, const bool carry_in, const size_t rotate = 1)
+constexpr W& rotate_through_carry_right(W& lhs, const bool carry_in, const size_t rotate = 1)
 {
 
-    const size_t left_shift = lhs.width() - (rotate-1);
+    const size_t left_shift = lhs.width() - (rotate - 1);
     auto slice = lhs << left_shift;
-    slice.set_bit(lhs.width()-rotate, carry_in);
+    slice.set_bit(lhs.width() - rotate, carry_in);
     lhs >>= rotate;
     lhs |= slice;
 
@@ -453,7 +453,7 @@ W constexpr rotate_through_carry_right(W& lhs, const bool carry_in, const size_t
  * @return The shifted integer
  */
 template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
-W constexpr rotate_left(W& lhs, size_t rotate = 1)
+constexpr W& rotate_left(W& lhs, size_t rotate = 1)
 {
 
     // TODO offer this as a compile-time optimized version?
@@ -482,7 +482,7 @@ W constexpr rotate_left(W& lhs, size_t rotate = 1)
  * @return The shifted integer
  */
 template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
-W constexpr rotate_right(W& lhs, size_t rotate = 1)
+constexpr W& rotate_right(W& lhs, size_t rotate = 1)
 {
     const size_t left_shift = lhs.width() - rotate;
     const auto slice = lhs << left_shift;
@@ -490,6 +490,7 @@ W constexpr rotate_right(W& lhs, size_t rotate = 1)
     lhs |= slice;
 
     return lhs;
+
 }
 
 /**

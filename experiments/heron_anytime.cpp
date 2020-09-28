@@ -1,9 +1,9 @@
 #include <aarith/float.hpp>
 #include <aarith/float/approx_operations.hpp>
 #include <chrono>
+#include <cmath>
 #include <iomanip>
 #include <sstream>
-#include <cmath>
 
 using namespace aarith;
 
@@ -32,14 +32,14 @@ template <size_t iterations, size_t C> F heron_anytime(const F& num)
 
     const F one{1.0f};
     const F two{2.0f};
-    F result = anytime_add(num, one, C+1);
-    result = anytime_div(result, two, C+1);
+    F result = anytime_add(num, one, C + 1);
+    result = anytime_div(result, two, C + 1);
 
     for (size_t i = 0; i < iterations; ++i)
     {
-        const F quot = anytime_div(num, result, C+1);
-        result = anytime_add(result, quot, C+1);
-        result = anytime_div(result, two, C+1);
+        const F quot = anytime_div(num, result, C + 1);
+        result = anytime_add(result, quot, C + 1);
+        result = anytime_div(result, two, C + 1);
     }
 
     return result;
@@ -52,7 +52,7 @@ template <int start, size_t iters, size_t heron_iter, size_t C> void compare_her
 
     F a{static_cast<float>(start)};
 
-    const F delta{0.014324f/2.0f};
+    const F delta{0.014324f / 2.0f};
 
     double max_abs_diff{0};
     double max_abs_diff_float{0};
@@ -71,14 +71,16 @@ template <int start, size_t iters, size_t heron_iter, size_t C> void compare_her
 
         max_abs_diff = std::max(max_abs_diff, abs_diff);
         max_abs_diff_float = std::max(max_abs_diff_float, abs_diff_correct);
-//        std::cout << "value iter: " << i << "\n";
-//        std::cout << "sqrt_e(" << static_cast<float>(a) << ") = " << static_cast<float>(res_exact)
-//                  << "\n";
-//        std::cout << "sqrt_a(" << static_cast<float>(a) << ") = " << static_cast<float>(res_anytime)
-//                  << "\n";
-//        std::cout << "sqrt_f(" << a_float << ") = " << res_float << "\n";
-//        std::cout << "diff: " << abs_diff << "\n";
-//        std::cout << "diff_float: " << abs_diff_correct << "\n\n";
+        //        std::cout << "value iter: " << i << "\n";
+        //        std::cout << "sqrt_e(" << static_cast<float>(a) << ") = " <<
+        //        static_cast<float>(res_exact)
+        //                  << "\n";
+        //        std::cout << "sqrt_a(" << static_cast<float>(a) << ") = " <<
+        //        static_cast<float>(res_anytime)
+        //                  << "\n";
+        //        std::cout << "sqrt_f(" << a_float << ") = " << res_float << "\n";
+        //        std::cout << "diff: " << abs_diff << "\n";
+        //        std::cout << "diff_float: " << abs_diff_correct << "\n\n";
 
         a = add(a, delta);
     }
@@ -93,7 +95,7 @@ template <int start, size_t iters, size_t heron_iter, size_t C> void compare_her
 int main(int argc, char** argv)
 {
     using namespace aarith;
-    
+
     constexpr size_t value_iter = 8800;
     constexpr int starting_value = 65;
 
@@ -109,7 +111,6 @@ int main(int argc, char** argv)
     compare_heron<starting_value, value_iter, 1000, 22>();
     compare_heron<starting_value, value_iter, 2000, 22>();
 
-    
     constexpr size_t heron_iter = 5;
     compare_heron<starting_value, value_iter, heron_iter, 6>();
     compare_heron<starting_value, value_iter, heron_iter, 7>();
@@ -130,7 +131,6 @@ int main(int argc, char** argv)
     compare_heron<starting_value, value_iter, heron_iter, 22>();
     compare_heron<starting_value, value_iter, heron_iter, 23>();
     compare_heron<starting_value, value_iter, heron_iter, 24>();
-
 
     constexpr size_t heron_iter_15 = 15;
     compare_heron<starting_value, value_iter, heron_iter_15, 6>();

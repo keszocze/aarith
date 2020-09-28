@@ -1,5 +1,6 @@
 #pragma once
 #include <aarith/core/traits.hpp>
+#include <aarith/integer/integers.hpp>
 #include <type_traits>
 
 namespace aarith {
@@ -1115,13 +1116,12 @@ constexpr auto operator<<=(W& lhs, const I rhs) -> W
  * @return The shifted word_container
  */
 template <typename W, typename I,
-    typename = std::enable_if_t<is_word_array_v<W> && is_integral_v<I> && is_unsigned_v<I>>>
+          typename = std::enable_if_t<is_word_array_v<W> && is_integral_v<I> && is_unsigned_v<I>>>
 constexpr auto operator<<(const W& lhs, const I rhs) -> W
 {
     W cpy{lhs};
     return (cpy <<= rhs);
 }
-
 
 /**
  * @brief Left-shift assignment operator
@@ -1131,7 +1131,7 @@ constexpr auto operator<<(const W& lhs, const I rhs) -> W
  * @return The shifted word_container
  */
 template <typename W, typename I,
-    typename = std::enable_if_t<is_word_array_v<W> && is_integral_v<I> && is_unsigned_v<I>>>
+          typename = std::enable_if_t<is_word_array_v<W> && is_integral_v<I> && is_unsigned_v<I>>>
 constexpr auto operator>>=(W& lhs, const I rhs) -> W
 {
     const size_t shift = static_cast<size_t>(rhs);
@@ -1147,7 +1147,7 @@ constexpr auto operator>>=(W& lhs, const I rhs) -> W
  * @return The shifted word_container
  */
 template <typename W, typename I,
-    typename = std::enable_if_t<is_word_array_v<W> && is_integral_v<I> && is_unsigned_v<I>>>
+          typename = std::enable_if_t<is_word_array_v<W> && is_integral_v<I> && is_unsigned_v<I>>>
 constexpr auto operator>>(const W& lhs, const I rhs) -> W
 {
     W cpy{lhs};

@@ -28,9 +28,8 @@
 #define AARITH_INT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE                                          \
     (8, uint64_t), (16, uint64_t), (32, uint64_t), (64, uint64_t)
 
-
 #define AARITH_INT_EXTENDED_TEST_SIGNATURE                                                         \
-    ((template<size_t, typename> class Type, size_t W, typename WordType), Type, W, WordType)
+    ((template <size_t, typename> class Type, size_t W, typename WordType), Type, W, WordType)
 #define AARITH_INT_EXTENDED_TEST_TEMPLATE_FULL_PARAM_RANGE                                         \
     (integer, 5, uint8_t), (integer, 5, uint16_t), (integer, 5, uint32_t), (integer, 5, uint64_t), \
         (integer, 8, uint8_t), (integer, 8, uint16_t), (integer, 8, uint32_t),                     \
@@ -93,7 +92,8 @@
     AARITH_INT_EXTENDED_TEST_TEMPLATE_FULL_PARAM_RANGE
 #else
 #define AARITH_INT_TEST_TEMPLATE_PARAM_RANGE AARITH_INT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE
-#define AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE AARITH_INT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE
+#define AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE                                                \
+    AARITH_INT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE
 #define AARITH_INT_EXTENDED_TEST_TEMPLATE_PARAM_RANGE                                              \
     AARITH_INT_EXTENDED_TEST_TEMPLATE_FULL_PARAM_RANGE
 #endif

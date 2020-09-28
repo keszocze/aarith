@@ -42,7 +42,7 @@ SCENARIO("Circular shift")
         {
             W a{num};
 
-            rotate_left(a,3);
+            rotate_left(a, 3);
 
             THEN("The result is as expected")
             {
@@ -53,7 +53,7 @@ SCENARIO("Circular shift")
         WHEN("Shifting right thrice")
         {
             W a{num};
-            rotate_right(a,3);
+            rotate_right(a, 3);
             {
                 W expected{0b11100010};
                 REQUIRE(a == expected);
@@ -75,7 +75,7 @@ SCENARIO("Rotate through carry")
         {
             W a{num};
 
-            rotate_through_carry_left(a,true);
+            rotate_through_carry_left(a, true);
 
             THEN("The result is as expected")
             {
@@ -97,7 +97,7 @@ SCENARIO("Rotate through carry")
         {
             W a{num};
 
-            rotate_through_carry_left(a,true,3);
+            rotate_through_carry_left(a, true, 3);
 
             THEN("The result is as expected")
             {
@@ -108,7 +108,7 @@ SCENARIO("Rotate through carry")
         WHEN("Shifting right thrice")
         {
             W a{num};
-            rotate_through_carry_right(a,true,3);
+            rotate_through_carry_right(a, true, 3);
             {
                 W expected{0b11100010};
                 REQUIRE(a == expected);
@@ -116,8 +116,6 @@ SCENARIO("Rotate through carry")
         }
     }
 }
-
-
 
 SCENARIO("Manually setting ranges of bits", "[word_array][utility]")
 {

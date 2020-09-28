@@ -11,7 +11,8 @@ int main()
 
     using I = integer<Width, WordType>;
 
-    check_int_operation<integer, Width, B, true, WordType>("modulo", &::aarith::remainder<I>, native_mod);
+    check_int_operation<integer, Width, B, true, WordType>("modulo", &::aarith::remainder<I>,
+                                                           native_mod);
 
     return 0;
 }

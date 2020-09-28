@@ -165,14 +165,17 @@ template <size_t E, size_t M, typename WordType>
     -> normalized_float<E, M, WordType>
 {
     using F = normalized_float<E, M, WordType>;
-    if (lhs.is_zero() || rhs.is_zero()) {
+    if (lhs.is_zero() || rhs.is_zero())
+    {
         return F::zero();
     }
-    if (lhs == F::one()) {
+    if (lhs == F::one())
+    {
         return rhs;
     }
 
-    if (rhs == F::one()) {
+    if (rhs == F::one())
+    {
         return lhs;
     }
     auto mproduct = schoolbook_expanding_mul(lhs.get_full_mantissa(), rhs.get_full_mantissa());

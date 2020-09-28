@@ -60,8 +60,6 @@ public:
             mantissa = width_cast<M>(extracted_mantissa);
         }
 
-
-
         if constexpr (ext_exp_width < E)
         {
             // a wider exponent means a larger bias, so we have to add the difference between two
@@ -83,20 +81,19 @@ public:
             exponent = extracted_exp;
         }
 
-
         if (!is_special())
         {
             mantissa.set_msb(true);
         }
-
-
     }
 
-    [[nodiscard]] static constexpr normalized_float zero() {
+    [[nodiscard]] static constexpr normalized_float zero()
+    {
         return normalized_float{};
     }
 
-    [[nodiscard]] static constexpr normalized_float one() {
+    [[nodiscard]] static constexpr normalized_float one()
+    {
         normalized_float num{};
         auto exp = word_array<E, WordType>::all_ones();
         exp.set_msb(false);
@@ -109,20 +106,23 @@ public:
         return num;
     }
 
-    [[nodiscard]] static constexpr normalized_float pos_infinity() {
+    [[nodiscard]] static constexpr normalized_float pos_infinity()
+    {
         normalized_float pos_inf{};
         pos_inf.set_exponent(word_array<E, WordType>::all_ones());
         return pos_inf;
     }
 
-    [[nodiscard]] static constexpr normalized_float neg_infinity() {
+    [[nodiscard]] static constexpr normalized_float neg_infinity()
+    {
         normalized_float neg_inf{};
         neg_inf.set_exponent(word_array<E, WordType>::all_ones());
         neg_inf.set_sign(-1);
         return neg_inf;
     }
 
-    [[nodiscard]] static constexpr normalized_float NaN() {
+    [[nodiscard]] static constexpr normalized_float NaN()
+    {
         normalized_float nan{};
         nan.set_exponent(word_array<E, WordType>::all_ones());
         auto nan_mantissa = word_array<M, WordType>::all_zeroes();
@@ -342,7 +342,6 @@ public:
 
         return with_sign;
     }
-
 
     /**
      *

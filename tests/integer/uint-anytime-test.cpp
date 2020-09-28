@@ -6,7 +6,8 @@
 
 using namespace aarith;
 
-SCENARIO("Generate a bitmask for a certain number of bits", "[integer][unsigned][utility][bit_logic]")
+SCENARIO("Generate a bitmask for a certain number of bits",
+         "[integer][unsigned][utility][bit_logic]")
 {
     GIVEN("A unsigned integer and the length of a bitmask")
     {
