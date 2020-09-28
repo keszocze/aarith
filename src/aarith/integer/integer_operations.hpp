@@ -1102,48 +1102,56 @@ template <typename W, typename I,
           typename = std::enable_if_t<is_word_array_v<W> && is_integral_v<I> && is_unsigned_v<I>>>
 constexpr auto operator<<=(W& lhs, const I rhs) -> W
 {
-
-    constexpr size_t width = W::width();
-    using word_type = typename W::word_type;
-    const I w{width};
-
-    if (rhs >= w)
-    {
-        lhs.fill(word_type{0});
-        return lhs;
-    }
-    if (rhs == I::zero())
-    {
-        return lhs;
-    }
-
-    const I lsh_word_width{lhs.word_width()};
-
-    const auto skip_words = div(rhs, I{lhs.word_width()});
-    const auto shift_word_left = sub(rhs, mul(skip_words, lsh_word_width));
-    const auto shift_word_right = sub(lsh_word_width, shift_word_left);
-
-    for (I counter = I{lhs.word_count()}; counter > I::zero(); --counter)
-    {
-        if (counter + skip_words < lhs.word_count())
-        {
-            word_type new_word = lhs.word(counter) << shift_word_left;
-            if (shift_word_right < lhs.word_width())
-            {
-                new_word = new_word | (lhs.word(counter - 1) >> shift_word_right);
-            }
-            lhs.set_word(counter + skip_words, new_word);
-        }
-    }
-    word_type new_word = lhs.word(0) << shift_word_left;
-    lhs.set_word(skip_words, new_word);
-
-    for (size_t i = 0; i < skip_words; ++i)
-    {
-        lhs.set_word(i, word_type{0});
-    }
-
+    const size_t shift = static_cast<size_t>(rhs);
+    lhs <<= shift;
     return lhs;
+}
+
+/**
+ * @brief Left-shift assignment operator
+ * @tparam W The word_container type to work on
+ * @param lhs The word_container to be shifted
+ * @param rhs The number of bits to shift
+ * @return The shifted word_container
+ */
+template <typename W, typename I,
+    typename = std::enable_if_t<is_word_array_v<W> && is_integral_v<I> && is_unsigned_v<I>>>
+constexpr auto operator<<(const W& lhs, const I rhs) -> W
+{
+    W cpy{lhs};
+    return (cpy <<= rhs);
+}
+
+
+/**
+ * @brief Left-shift assignment operator
+ * @tparam W The word_container type to work on
+ * @param lhs The word_container to be shifted
+ * @param rhs The number of bits to shift
+ * @return The shifted word_container
+ */
+template <typename W, typename I,
+    typename = std::enable_if_t<is_word_array_v<W> && is_integral_v<I> && is_unsigned_v<I>>>
+constexpr auto operator>>=(W& lhs, const I rhs) -> W
+{
+    const size_t shift = static_cast<size_t>(rhs);
+    lhs >>= shift;
+    return lhs;
+}
+
+/**
+ * @brief Left-shift assignment operator
+ * @tparam W The word_container type to work on
+ * @param lhs The word_container to be shifted
+ * @param rhs The number of bits to shift
+ * @return The shifted word_container
+ */
+template <typename W, typename I,
+    typename = std::enable_if_t<is_word_array_v<W> && is_integral_v<I> && is_unsigned_v<I>>>
+constexpr auto operator>>(const W& lhs, const I rhs) -> W
+{
+    W cpy{lhs};
+    return (cpy >>= rhs);
 }
 
 /**

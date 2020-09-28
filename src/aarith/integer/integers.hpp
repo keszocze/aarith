@@ -24,7 +24,6 @@ public:
     {
     }
 
-
     // Constructor for unsigned ints that are *not* the WordType
     template <typename Val, typename = std::enable_if_t<::aarith::is_unsigned_int<Val> &&
                                                         (sizeof(Val) * 8) <= Width>>
@@ -274,7 +273,7 @@ public:
     }
 
     template <size_t V>
-     constexpr integer<Width, WordType>(const integer<V, WordType>& other)
+    constexpr integer<Width, WordType>(const integer<V, WordType>& other)
         : word_array<Width, WordType>(width_cast<Width, V, WordType>(other))
     {
     }
@@ -368,7 +367,8 @@ template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
     -> integer<DestinationWidth, WordType>
 {
     word_array<DestinationWidth, WordType> result =
-        width_cast<DestinationWidth, SourceWidth, WordType>(static_cast<word_array<SourceWidth, WordType>>(source));
+        width_cast<DestinationWidth, SourceWidth, WordType>(
+            static_cast<word_array<SourceWidth, WordType>>(source));
     if constexpr (DestinationWidth > SourceWidth)
     {
         const bool is_negative = source.is_negative();
