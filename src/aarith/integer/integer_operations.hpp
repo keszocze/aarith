@@ -495,7 +495,6 @@ template <typename I>
     return width_cast<I::width()>(fun_add_expand(a, b, initial_carry));
 }
 
-
 /**
  * @brief Arithmetic right-shift operator
  *
@@ -513,68 +512,68 @@ auto constexpr operator>>=(integer<Width, WordType>& lhs, const size_t rhs)
     arithmetic_right_shift(lhs, rhs);
     return lhs;
 
-//    const bool lhs_was_negative = lhs.is_negative();
-//
-//    if (rhs >= Width)
-//    {
-//        if (lhs.is_negative())
-//        {
-//            const auto max = std::numeric_limits<WordType>::max();
-//            lhs.fill(max);
-//            return lhs;
-//        }
-//        else
-//        {
-//            lhs.fill(WordType{0});
-//            return lhs;
-//        }
-//    }
-//
-//    if (rhs == 0 || lhs.is_zero())
-//    {
-//        return lhs;
-//    }
-//
-//    const auto skip_words = rhs / lhs.word_width();
-//    const auto shift_word_right = rhs - skip_words * lhs.word_width();
-//    const auto shift_word_left = lhs.word_width() - shift_word_right;
-//
-//    using word_type = typename integer<Width, WordType>::word_type;
-//
-//    for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
-//    {
-//        word_type new_word = lhs.word(counter) >> shift_word_right;
-//        if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
-//        {
-//            new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
-//        }
-//
-//        lhs.set_word(counter - skip_words, new_word);
-//    }
-//
-//    if (skip_words > 0)
-//    {
-//        word_type new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
-//        lhs.set_word(lhs.word_count() - skip_words - 1, new_word);
-//
-//        for (size_t i = lhs.word_count() - skip_words; i < lhs.word_count(); ++i)
-//        {
-//            const auto fill_word =
-//                lhs.is_negative() ? std::numeric_limits<WordType>::max() : WordType{0};
-//            lhs.set_word(i, fill_word);
-//        }
-//    }
-//
-//    if (lhs_was_negative)
-//    {
-//
-//        for (size_t i = (Width - 1); i >= (Width - rhs); --i)
-//        {
-//            lhs.set_bit(i);
-//        }
-//    }
-//
-//    return lhs;
+    //    const bool lhs_was_negative = lhs.is_negative();
+    //
+    //    if (rhs >= Width)
+    //    {
+    //        if (lhs.is_negative())
+    //        {
+    //            const auto max = std::numeric_limits<WordType>::max();
+    //            lhs.fill(max);
+    //            return lhs;
+    //        }
+    //        else
+    //        {
+    //            lhs.fill(WordType{0});
+    //            return lhs;
+    //        }
+    //    }
+    //
+    //    if (rhs == 0 || lhs.is_zero())
+    //    {
+    //        return lhs;
+    //    }
+    //
+    //    const auto skip_words = rhs / lhs.word_width();
+    //    const auto shift_word_right = rhs - skip_words * lhs.word_width();
+    //    const auto shift_word_left = lhs.word_width() - shift_word_right;
+    //
+    //    using word_type = typename integer<Width, WordType>::word_type;
+    //
+    //    for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
+    //    {
+    //        word_type new_word = lhs.word(counter) >> shift_word_right;
+    //        if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
+    //        {
+    //            new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
+    //        }
+    //
+    //        lhs.set_word(counter - skip_words, new_word);
+    //    }
+    //
+    //    if (skip_words > 0)
+    //    {
+    //        word_type new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
+    //        lhs.set_word(lhs.word_count() - skip_words - 1, new_word);
+    //
+    //        for (size_t i = lhs.word_count() - skip_words; i < lhs.word_count(); ++i)
+    //        {
+    //            const auto fill_word =
+    //                lhs.is_negative() ? std::numeric_limits<WordType>::max() : WordType{0};
+    //            lhs.set_word(i, fill_word);
+    //        }
+    //    }
+    //
+    //    if (lhs_was_negative)
+    //    {
+    //
+    //        for (size_t i = (Width - 1); i >= (Width - rhs); --i)
+    //        {
+    //            lhs.set_bit(i);
+    //        }
+    //    }
+    //
+    //    return lhs;
 }
 
 /**
@@ -989,7 +988,8 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
     return std::make_pair(Q_cast, remainder_cast);
 }
 
-template <typename I, typename = std::enable_if_t<is_integral_v<I>>> constexpr I mul(const I& a, const I& b)
+template <typename I, typename = std::enable_if_t<is_integral_v<I>>>
+constexpr I mul(const I& a, const I& b)
 {
     if constexpr (is_unsigned_v<I>)
     {
@@ -1124,6 +1124,61 @@ template <typename Integer>
 [[nodiscard]] constexpr Integer distance(const Integer& a, const Integer& b)
 {
     return (a <= b) ? sub(b, a) : sub(a, b);
+}
+
+/**
+ * @brief Left-shift assignment operator
+ * @tparam W The word_container type to work on
+ * @param lhs The word_container to be shifted
+ * @param rhs The number of bits to shift
+ * @return The shifted word_container
+ */
+template <typename W, typename I,
+          typename = std::enable_if_t<is_word_array_v<W> && is_integral_v<I> && is_unsigned_v<I>>>
+constexpr auto operator<<=(W& lhs, const I rhs) -> W
+{
+
+    constexpr size_t width = W::width();
+    using word_type = typename W::word_type;
+    const I w{width};
+
+    if (rhs >= w)
+    {
+        lhs.fill(word_type{0});
+        return lhs;
+    }
+    if (rhs == I::zero())
+    {
+        return lhs;
+    }
+
+    const I lsh_word_width{lhs.word_width()};
+
+    const auto skip_words = div(rhs, I{lhs.word_width()});
+    const auto shift_word_left = sub(rhs, mul(skip_words,lsh_word_width));
+    const auto shift_word_right = sub(lsh_word_width, shift_word_left);
+
+    for (I counter = I{lhs.word_count()}; counter > I::zero(); --counter)
+    {
+        if (counter + skip_words < lhs.word_count())
+        {
+            word_type new_word = lhs.word(counter) << shift_word_left;
+            if (shift_word_right < lhs.word_width())
+            {
+                new_word = new_word | (lhs.word(counter - 1) >> shift_word_right);
+            }
+            lhs.set_word(counter + skip_words, new_word);
+        }
+    }
+    word_type new_word = lhs.word(0) << shift_word_left;
+    lhs.set_word(skip_words, new_word);
+
+    for (size_t i = 0; i < skip_words; ++i)
+    {
+        lhs.set_word(i, word_type{0});
+    }
+
+    return lhs;
 }
 
 /**

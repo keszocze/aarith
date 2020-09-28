@@ -5,6 +5,18 @@
 
 using namespace aarith;
 
+
+
+SCENARIO("Shfiting using unsigned integers", "[foo]") {
+    word_array<32> a{32};
+    uinteger<32> rhs{4};
+
+    std::cout << to_binary(a) << "\n";
+    a <<= rhs;
+
+    std::cout << to_binary(a) << "\n";
+}
+
 TEMPLATE_TEST_CASE_SIG("Left/right shifting signed integers",
                        "[integer][signed][operation][utility]", AARITH_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
