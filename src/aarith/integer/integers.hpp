@@ -374,7 +374,6 @@ template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
     {
         const bool is_negative = source.is_negative();
 
-        // TODO find a quicker way to correctly expand the width
         if (is_negative)
         {
             for (size_t i = SourceWidth; i < DestinationWidth; ++i)
@@ -388,6 +387,35 @@ template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
     {
         return integer<DestinationWidth, WordType>{result};
     }
+}
+
+template <size_t Left, size_t Right, template <size_t, typename> class W, size_t SourceWidth,
+          typename WordType>
+[[nodiscard]] constexpr auto expand(const W<SourceWidth,WordType>& source)
+{
+
+    using L = W<SourceWidth + Left, WordType>;
+    using R = W<SourceWidth + Left + Right, WordType>;
+    L left_expanded;
+
+    if constexpr (Left > 0)
+    {
+        left_expanded = width_cast<SourceWidth + Left>(source);
+    }
+    else
+    {
+        left_expanded = source;
+    }
+
+    R right_expanded{left_expanded};
+
+    if constexpr (Right > 0) {
+        right_expanded << Right;
+    }
+
+    std::cout << left_expanded;
+    std::cout << right_expanded;
+    return right_expanded;
 }
 
 } // namespace aarith
