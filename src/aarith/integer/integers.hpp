@@ -410,11 +410,9 @@ template <size_t Left, size_t Right, template <size_t, typename> class W, size_t
     R right_expanded{left_expanded};
 
     if constexpr (Right > 0) {
-        right_expanded << Right;
+        right_expanded <<= Right;
     }
 
-    std::cout << left_expanded;
-    std::cout << right_expanded;
     return right_expanded;
 }
 
