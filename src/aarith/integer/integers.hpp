@@ -273,7 +273,7 @@ public:
     }
 
     template <size_t V>
-     constexpr integer<Width, WordType>(const integer<V, WordType>& other)
+    constexpr integer<Width, WordType>(const integer<V, WordType>& other)
         : word_array<Width, WordType>(width_cast<Width, V, WordType>(other))
     {
     }
@@ -306,7 +306,8 @@ public:
 
     [[nodiscard]] static constexpr integer one()
     {
-        integer one(1);
+        integer one{integer::zero()};
+        one.set_bit(0, true);
         return one;
     }
 
@@ -367,12 +368,12 @@ template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
     -> integer<DestinationWidth, WordType>
 {
     word_array<DestinationWidth, WordType> result =
-        width_cast<DestinationWidth, SourceWidth, WordType>(static_cast<word_array<SourceWidth, WordType>>(source));
+        width_cast<DestinationWidth, SourceWidth, WordType>(
+            static_cast<word_array<SourceWidth, WordType>>(source));
     if constexpr (DestinationWidth > SourceWidth)
     {
         const bool is_negative = source.is_negative();
 
-        // TODO find a quicker way to correctly expand the width
         if (is_negative)
         {
             for (size_t i = SourceWidth; i < DestinationWidth; ++i)
@@ -386,6 +387,33 @@ template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
     {
         return integer<DestinationWidth, WordType>{result};
     }
+}
+
+template <size_t Left, size_t Right, template <size_t, typename> class W, size_t SourceWidth,
+          typename WordType>
+[[nodiscard]] constexpr auto expand(const W<SourceWidth,WordType>& source)
+{
+
+    using L = W<SourceWidth + Left, WordType>;
+    using R = W<SourceWidth + Left + Right, WordType>;
+    L left_expanded;
+
+    if constexpr (Left > 0)
+    {
+        left_expanded = width_cast<SourceWidth + Left>(source);
+    }
+    else
+    {
+        left_expanded = source;
+    }
+
+    R right_expanded{left_expanded};
+
+    if constexpr (Right > 0) {
+        right_expanded <<= Right;
+    }
+
+    return right_expanded;
 }
 
 } // namespace aarith

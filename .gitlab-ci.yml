@@ -3,7 +3,7 @@ variables:
     GIT_STRATEGY: recursive
     GIT_SUBMODULE_STRATEGY: recursive
     MPIR_PARAMS: "-DMPIR_INCLUDE_DIR=/opt/software/usr/local/include -DMPIR_LIBRARIES=/opt/software/usr/local/lib/libmpir.a"
-    BUILD_PARAMS: "-DBUILD_BENCHMARKS=ON -DBUILD_EXPERIMENTS=ON -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -DBENCHMARK_ENABLE_TESTING=OFF"
+    BUILD_PARAMS: "-DBUILD_BENCHMARKS=OFF -DBUILD_TESTS=ON -DUSE_FULL_RANGE_IN_TESTS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_EXPERIMENTS=OFF -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -DBENCHMARK_ENABLE_TESTING=OFF"
 
 stages:
     - compile
@@ -14,7 +14,6 @@ stages:
     only:
         variables:
             - $CI_PROJECT_NAMESPACE == "keszocze"
-
 compile_gcc:
     extends: .ciconf
     stage: compile
@@ -27,7 +26,7 @@ compile_gcc:
         - mkdir -p build/gcc/bw_output
         - cd build/gcc
         - CC=gcc-9 CXX=g++-9 cmake ${BUILD_PARAMS} ${MPIR_PARAMS}  ../..
-        - /opt/sonar-build-wrapper/build-wrapper-linux-x86-64 --out-dir bw_output make -j 4 all
+        - /opt/sonar-build-wrapper/build-wrapper-linux-x86-64 --out-dir bw_output make -j $(nproc) all
 
 compile_clang:
     extends: .ciconf
@@ -35,6 +34,7 @@ compile_clang:
     artifacts:
         paths:
             - build/clang
+        expire_in: 30 minutes
     script:
         - mkdir -p build/clang
         - cd build/clang
@@ -44,6 +44,10 @@ compile_clang:
 run_sonarqube:
   extends: .ciconf
   stage: quality
+  dependencies:
+      - test_gcc
+  needs:
+      - test_gcc
   script:
       - echo $CI_COMMIT_REF_NAME
       - chmod +x scripts/mk_sonar_config.sh
@@ -55,24 +59,38 @@ run_sonarqube:
 test_clang:
     extends: .ciconf
     stage: test
+    variables:
+        GIT_STRATEGY: none
+    dependencies:
+        - compile_clang
+    needs:
+        - compile_clang
     script:
         - cd build/clang
-        - make test
+        - rm CMakeCache.txt
+        - make CTEST_OUTPUT_ON_FAILURE=1 test
 
 test_gcc:
     extends: .ciconf
     stage: test
+    variables:
+        GIT_STRATEGY: none
+    dependencies:
+        - compile_gcc
+    needs:
+        - compile_gcc
     artifacts:
         paths:
             - build/tests/coverage
         expire_in: 30 minutes
     script:
         - cd build/gcc
-        - make test
+        - rm CMakeCache.txt
+        - make CTEST_OUTPUT_ON_FAILURE=1 test
         - if !$?; then return 1; fi
         - cd tests
         - export GCOV_PREFIX_STRIP=10
         - rm -rf coverage
         - mkdir -p coverage
-        - /opt/software/usr/local/bin/gcovr --gcov-executable gcov-8 -v --filter '/var/lib/gitlab-runner/builds/.+/0/keszocze/aarith' --object-directory CMakeFiles --sonarqube coverage/coverage.xml 
+        - /opt/software/usr/local/bin/gcovr --gcov-executable gcov-8 -v --filter '/var/lib/gitlab-runner/builds/.+/0/keszocze/aarith' --object-directory CMakeFiles --sonarqube coverage/coverage.xml
         - sed -i -E "s/\/var\/lib\/gitlab-runner\/builds\/[[:alnum:]]+\/[[:digit:]]+\/keszocze\/aarith\///g" coverage/coverage.xml

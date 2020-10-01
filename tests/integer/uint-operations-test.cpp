@@ -1,7 +1,264 @@
+#include "../test-signature-ranges.hpp"
+#include "gen_integer.hpp"
 #include <aarith/integer_no_operators.hpp>
 #include <catch.hpp>
 
 using namespace aarith;
+
+TEMPLATE_TEST_CASE_SIG("Unsigned integer addition is commutative",
+                       "[integer][unsigned][arithmetic][addition]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+    using R = uinteger<2 * W, WordType>;
+
+    I a = GENERATE(take(10, random_uinteger<W, WordType>()));
+    I b = GENERATE(take(10, random_uinteger<W, WordType>()));
+
+    WHEN("Computing with extended bit widths")
+    {
+        R res_a_b{expanding_add(a, b)};
+        R res_b_a{expanding_add(b, a)};
+        THEN("The results should match")
+        {
+            REQUIRE(res_a_b == res_b_a);
+        }
+    }
+    WHEN("Computing with truncation")
+    {
+        I res_a_b{add(a, b)};
+        I res_b_a{add(a, b)};
+        THEN("The results should match")
+        {
+            REQUIRE(res_a_b == res_b_a);
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG(
+    "Unsigned integer addition is commutative for addends with different bit widths",
+    "[integer][unsigned][arithmetic][addition]", AARITH_INT_TEST_SIGNATURE,
+    AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+    using ISmall = uinteger<W - 2, WordType>;
+    using ILarge = uinteger<W + I::word_width() + 3, WordType>;
+
+    I a = GENERATE(take(5, random_uinteger<W, WordType>()));
+    ISmall b = GENERATE(take(5, random_uinteger<W - 2, WordType>()));
+    ILarge c = GENERATE(take(5, random_uinteger<W + I::word_width() + 3, WordType>()));
+
+    WHEN("Using different bit-widths")
+    {
+
+        const auto res_a_b{expanding_add(a, b)};
+        const auto res_b_a{expanding_add(a, b)};
+
+        const auto res_a_c{expanding_add(a, c)};
+        const auto res_c_a{expanding_add(c, a)};
+        THEN("The results should match")
+        {
+            REQUIRE(res_a_b == res_b_a);
+            REQUIRE(res_a_c == res_c_a);
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
+                       "[integer][unsigned][arithmetic][addition]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+    I a = GENERATE(take(100, random_uinteger<W, WordType>()));
+    REQUIRE(add(a, I::zero()) == a);
+    REQUIRE(expanding_add(a, I::zero()) == a);
+}
+
+TEMPLATE_TEST_CASE_SIG("Addition wraps around correctly",
+                       "[integer][unsigned][arithmetic][addition]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+
+    static constexpr I zero = I::zero();
+    static constexpr I one = I::one();
+    static constexpr I max_val = I::max();
+
+    WHEN("Adding one to max")
+    {
+        THEN("The result should be zero")
+        {
+            REQUIRE(add(max_val, one) == zero);
+        }
+    }
+    AND_WHEN("Adding another one")
+    {
+        THEN("The result should be one")
+        {
+            REQUIRE(add(add(max_val, one), one) == one);
+        }
+    }
+    WHEN("Adding max to max")
+    {
+        THEN("The result should be max - 1")
+        {
+            REQUIRE(add(max_val, max_val) == sub(max_val, one));
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the subtraction",
+                       "[integer][unsigned][arithmetic][subtraction]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+    I a = GENERATE(take(100, random_uinteger<W, WordType>()));
+    REQUIRE(sub(a, I::zero()) == a);
+    REQUIRE(expanding_sub(a, I::zero()) == a);
+}
+
+TEMPLATE_TEST_CASE_SIG("Expanding subtraction wraps around correctly for different bit-widths",
+                       "[integer][unsigned][arithmetic][subtraction]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+    using LargeI = uinteger<2 * W + 6, WordType>;
+
+    GIVEN("A n-bit zero and a m-bit (m>n)  max")
+    {
+        static constexpr I zero = I::zero();
+        static constexpr LargeI max_val = LargeI::max();
+        static constexpr LargeI expected = LargeI::one();
+
+        THEN("Subtracting max from zero should give one")
+        {
+            auto constexpr result = expanding_sub(zero, max_val);
+            REQUIRE(result == expected);
+        }
+    }
+
+    GIVEN("A n-bit zero and a m-bit (m<n) max")
+    {
+        static constexpr LargeI zero = LargeI::zero();
+        static constexpr I large = I::max();
+        static constexpr LargeI expected = sub(LargeI::one(), add(LargeI{I::max()}, LargeI::one()));
+
+        THEN("Subtracting max from zero should give 1-(small::max+1)")
+        {
+            auto constexpr result = expanding_sub(zero, large);
+            REQUIRE(result == expected);
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Subtraction wraps around correctly",
+                       "[integer][unsigned][arithmetic][subtraction]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+
+    static constexpr I zero = I::zero();
+    static constexpr I one = I::one();
+    static constexpr I max_val = I::max();
+
+    WHEN("Subtracting max from zero")
+    {
+        THEN("The result should be one")
+        {
+            auto constexpr result = expanding_sub(zero, max_val);
+            REQUIRE(result == one);
+        }
+    }
+
+    WHEN("Subtracting one from zero")
+    {
+        THEN("The result should be max")
+        {
+            auto constexpr result = expanding_sub(zero, one);
+            REQUIRE(result == max_val);
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Unsigned integer multiplication is commutative",
+                       "[integer][unsigned][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+    using R = uinteger<2 * W, WordType>;
+
+    I a = GENERATE(take(10, random_uinteger<W, WordType>()));
+    I b = GENERATE(take(10, random_uinteger<W, WordType>()));
+
+    WHEN("Computing with extended bit widths")
+    {
+        R res_a_b_school{schoolbook_expanding_mul(a, b)};
+        R res_b_a_school{schoolbook_expanding_mul(b, a)};
+        R res_a_b_kara{expanding_karazuba(a, b)};
+        R res_b_a_kara{expanding_karazuba(b, a)};
+        THEN("The the flipped results should match")
+        {
+            REQUIRE(res_a_b_school == res_b_a_school);
+            REQUIRE(res_a_b_kara == res_b_a_kara);
+        }
+        AND_THEN("The results of the different methods should match")
+        {
+            REQUIRE(res_a_b_school == res_a_b_kara);
+        }
+    }
+
+    WHEN("Computing with truncation")
+    {
+        I res_a_b_school{schoolbook_mul(a, b)};
+        I res_b_a_school{schoolbook_mul(b, a)};
+        I res_a_b_kara{karazuba(a, b)};
+        I res_b_a_kara{karazuba(b, a)};
+        THEN("The the flipped results should match")
+        {
+            REQUIRE(res_a_b_school == res_b_a_school);
+            REQUIRE(res_a_b_kara == res_b_a_kara);
+        }
+        AND_THEN("The results of the different methods should match")
+        {
+            REQUIRE(res_a_b_school == res_a_b_kara);
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("One is the neutral element of the multiplication",
+                       "[integer][unsigned][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+    I a = GENERATE(take(50, random_uinteger<W, WordType>()));
+    REQUIRE(schoolbook_mul(a, I::one()) == a);
+    REQUIRE(schoolbook_expanding_mul(a, I::one()) == a);
+    REQUIRE(karazuba(a, I::one()) == a);
+    REQUIRE(expanding_karazuba(a, I::one()) == a);
+}
+
+TEMPLATE_TEST_CASE_SIG("Zero makes the multiplication result zero",
+                       "[integer][unsigned][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+    using R = uinteger<2 * W, WordType>;
+    I a = GENERATE(take(50, random_uinteger<W, WordType>()));
+    REQUIRE(schoolbook_mul(a, I::zero()) == I::zero());
+    REQUIRE(schoolbook_expanding_mul(a, I::zero()) == R::zero());
+    REQUIRE(karazuba(a, I::zero()) == I::zero());
+    REQUIRE(expanding_karazuba(a, I::zero()) == R::zero());
+}
+
+TEMPLATE_TEST_CASE_SIG("Multiplying the max value with itself and truncation yields 1",
+                       "[integer][unsigned][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+    I a{I::max()};
+    REQUIRE(schoolbook_mul(a, a) == I::one());
+    REQUIRE(karazuba(a, a) == I::one());
+}
 
 SCENARIO("Adding two unsigned integers exactly", "[integer][unsigned][arithmetic][addition]")
 {
@@ -117,7 +374,8 @@ SCENARIO("Adding two unsigned integers exactly", "[integer][unsigned][arithmetic
     }
 }
 
-SCENARIO("Bit shifting is possible as constexpr for unsigned integers", "[integer][unsigned][utility][bit_logic][constexpr]")
+SCENARIO("Bit shifting is possible as constexpr for unsigned integers",
+         "[integer][unsigned][utility][bit_logic][constexpr]")
 {
     GIVEN("An unsigned integer of width N")
     {
@@ -158,7 +416,8 @@ SCENARIO("Bit shifting is possible as constexpr for unsigned integers", "[intege
     }
 }
 
-SCENARIO("Adding two unsigned integers of different bit width", "[integer][unsigned][arithmetic][addition]")
+SCENARIO("Adding two unsigned integers of different bit width",
+         "[integer][unsigned][arithmetic][addition]")
 {
     GIVEN("An uinteger of bit width 128")
     {
@@ -190,7 +449,7 @@ SCENARIO("Adding two unsigned integers of different bit width", "[integer][unsig
             REQUIRE(result1 == result2);
         }
     }
-    GIVEN("An uinteger consisting of zeros only")
+    GIVEN("An unsigned integer consisting of zeros only")
     {
         static constexpr uint64_t ones = static_cast<uint64_t>(-1);
         static constexpr uinteger<128> large = uinteger<128>::from_words(ones, ones);
@@ -210,7 +469,8 @@ SCENARIO("Adding two unsigned integers of different bit width", "[integer][unsig
     }
 }
 
-SCENARIO("Subtracting two unsigned integers exactly", "[integer][unsigned][arithmetic][subtraction]")
+SCENARIO("Subtracting two unsigned integers exactly",
+         "[integer][unsigned][arithmetic][subtraction]")
 {
     GIVEN("Two uinteger<N> a and b are subtracted")
     {
@@ -327,45 +587,15 @@ SCENARIO("Subtracting two unsigned integers exactly", "[integer][unsigned][arith
     }
 }
 
-SCENARIO("Expanding subtraction works correctly", "[integer][unsigned][arithmetic][subtraction]")
+TEMPLATE_TEST_CASE_SIG("Investigating max/min values", "[integer][unsigned][operations]",
+                       AARITH_INT_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
-    GIVEN("A n-bit zero and a m-bit (m>n)  max")
-    {
-        static constexpr uinteger<4> zero = uinteger<4>::min();
-        static constexpr uinteger<8> large = uinteger<8>::max();
-        static constexpr uinteger<8> expected = uinteger<8>{1U};
-
-        std::cout << zero << " " << large << " " << expected << std::endl;
-
-        THEN("Subtracting max from zero should give one")
-        {
-            auto constexpr result = expanding_sub(zero, large);
-            REQUIRE(result == expected);
-        }
-    }
-
-    GIVEN("A n-bit zero and a m-bit (m<n) max")
-    {
-        static constexpr uinteger<8> zero = uinteger<8>::min();
-        static constexpr uinteger<4> large = uinteger<4>::max();
-        static constexpr uinteger<8> expected =
-            sub(uinteger<8>{1U}, add(uinteger<8>{uinteger<4>::max()}, uinteger<8>{1U}));
-
-        THEN("Subtracting max from zero should give 1-(small::max+1)")
-        {
-            auto constexpr result = expanding_sub(zero, large);
-            REQUIRE(result == expected);
-        }
-    }
-}
-
-SCENARIO("Investigating max/min values", "[integer][unsigned][operations]")
-{
+    using I = uinteger<W, WordType>;
     GIVEN("The maximal and minimal values of uinteger<V>")
     {
 
-        static constexpr uinteger<89> min = uinteger<89>::min();
-        static constexpr uinteger<89> max = uinteger<89>::max();
+        static constexpr I min = I::min();
+        static constexpr I max = I::max();
 
         THEN("Bit-wise complement should yield the other one")
         {
@@ -375,196 +605,44 @@ SCENARIO("Investigating max/min values", "[integer][unsigned][operations]")
 
         THEN("uinteger::min and uinteger::lowest are the same")
         {
-            REQUIRE(uinteger<89>::min() == std::numeric_limits<uinteger<89>>::lowest());
+            REQUIRE(min == std::numeric_limits<I>::lowest());
         }
 
         WHEN("Adding to max value")
         {
-            const uint64_t a_ = GENERATE(
-                take(100, random(static_cast<uint64_t>(1), std::numeric_limits<uint64_t>::max())));
-            const uinteger<89> a{a_};
-            const uinteger<89> expected_trunc{a_ - 1};
+            const I a = GENERATE(take(10, random_uinteger<W, WordType>(I::one(), I::max())));
+            const I expected_trunc{sub(a, I::one())};
 
             THEN("Truncating addition is overflow modulo 2")
             {
-                uinteger<89> result = add(max, a);
-                const auto result_fun = fun_add(max, a);
-                REQUIRE(result_fun == result);
+                I result = add(max, a);
                 REQUIRE(result == expected_trunc);
             }
 
-            THEN("Expanding addition has the highest bet set and is modulo 2 otherwise")
+            THEN("Expanding addition has the highest bit set and is modulo 2 otherwise")
             {
-                uinteger<90> result = expanding_add(max, a);
-                uinteger<90> result_fun = fun_add_expand(max, a);
-                CHECK(result_fun == result);
-                CHECK(result.bit(89));
-                REQUIRE(width_cast<89>(result) == expected_trunc);
+                uinteger<W + 10, WordType> result = expanding_add(max, a);
+                const auto bit_set = result.bit(W);
+                if (!bit_set)
+                {
+                    std::cout << max << "+" << a << "=" << result << "\n";
+                    std::cout << to_binary(max) << "+" << to_binary(a) << "=" << to_binary(result)
+                              << "\n";
+                }
+                CHECK(result.bit(W));
+                REQUIRE(width_cast<W>(result) == expected_trunc);
             }
         }
 
-        WHEN("Subracting from min value")
+        WHEN("Subtracting from min value")
         {
-            const uint64_t a_ = GENERATE(
-                take(100, random(static_cast<uint64_t>(0), std::numeric_limits<uint64_t>::max())));
-            const uinteger<89> a{a_};
+            const I a = GENERATE(take(10, random_uinteger<W, WordType>()));
 
             THEN("Truncating subtraction is underflow modulo 2")
             {
-                const uinteger<89> expected = sub(uinteger<89>::max(), uinteger<89>{a_ - 1});
-                uinteger<89> result = sub(min, a);
+                const I expected = sub(I::max(), I{sub(a, I::one())});
+                I result = sub(min, a);
                 REQUIRE(result == expected);
-            }
-        }
-
-        THEN("Adding or subtracting min should not change the other value")
-        {
-            static constexpr uinteger<89> n{23543785U}; // randomly chosen
-
-            CHECK(add(max, min) == max);
-            CHECK(fun_add(max, min) == max);
-
-            CHECK(add(n, min) == n);
-            CHECK(fun_add(n, min) == n);
-            CHECK(sub(max, min) == max);
-            REQUIRE(sub(n, min) == n);
-        }
-
-        AND_GIVEN("The uintegers zero and one")
-        {
-
-            static constexpr uinteger<89> zero = uinteger<89>::zero();
-            static constexpr uinteger<89> one = uinteger<89>::one();
-
-            THEN("min and zero should be identical")
-            {
-                REQUIRE(zero == min);
-            }
-
-            THEN("Subtracting one from zero/min yields the maximal value")
-            {
-
-                // completely randomly chosen bit width
-
-                static constexpr uinteger<89> result_zero = sub(zero, one);
-                static constexpr uinteger<89> result_min = sub(min, one);
-                static constexpr uinteger<89> expected = uinteger<89>::max();
-
-                CHECK(result_min == expected);
-                REQUIRE(result_zero == expected);
-            }
-        }
-    }
-}
-
-SCENARIO("Multiplying two unsigned integers exactly", "[integer][unsigned][arithmetic][multiplication]")
-{
-
-    GIVEN("Two uinteger<N> a and b with N <= 32")
-    {
-
-        uint32_t val_a =
-            GENERATE(0, 1, 56567, 23, static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
-        uint32_t val_b = GENERATE(0, 1, 56567, 23, 234, 76856, 2342353456,
-                                  static_cast<uint32_t>(-4366), static_cast<uint32_t>(-1));
-
-        const uinteger<32> a = uinteger<32>::from_words(val_a);
-        const uinteger<32> b = uinteger<32>::from_words(val_b);
-
-        THEN("Multiplication should be commutative")
-        {
-            CHECK(mul(a, b) == mul(b, a));
-        }
-
-        THEN("Multiplication by 1 should not change the other multiplicant")
-        {
-            const uinteger<32> one{1U};
-            CHECK(schoolbook_mul(a, one) == a);
-            CHECK(schoolbook_mul(one, a) == a);
-            CHECK(schoolbook_mul(b, one) == b);
-            CHECK(schoolbook_mul(one, b) == b);
-
-            CHECK(karazuba(a, one) == a);
-            CHECK(karazuba(one, a) == a);
-            CHECK(karazuba(b, one) == b);
-            CHECK(karazuba(one, b) == b);
-        }
-        THEN("Multiplication by 0 should result in 0")
-        {
-            const uinteger<32> zero{0U};
-            CHECK(schoolbook_mul(a, zero) == zero);
-            CHECK(schoolbook_mul(zero, a) == zero);
-            CHECK(schoolbook_mul(b, zero) == zero);
-            CHECK(schoolbook_mul(zero, b) == zero);
-
-            CHECK(karazuba(a, zero) == zero);
-            CHECK(karazuba(zero, a) == zero);
-            CHECK(karazuba(b, zero) == zero);
-            CHECK(karazuba(zero, b) == zero);
-        }
-    }
-
-    GIVEN("Two uinteger<N> a and b to be multiplied")
-    {
-        constexpr uint64_t val = (static_cast<uint64_t>(1) << 35);
-        auto constexpr a = uinteger<128>::from_words(1, val);
-        auto constexpr c = uinteger<128>::from_words(13435, 345897);
-        auto constexpr d =
-            uinteger<128>::from_words(static_cast<typename uinteger<128>::word_type>(-1),
-                                      static_cast<typename uinteger<128>::word_type>(-1));
-        auto constexpr zero = uinteger<128>::from_words(0, 0);
-        auto constexpr one = uinteger<128>::from_words(0, 1);
-
-        const std::vector<uinteger<128>> numbers{a, c, d, one, zero};
-
-        THEN("The operation should be commutative")
-        {
-            for (const uinteger<128>& num_a : numbers)
-            {
-                for (const uinteger<128>& num_b : numbers)
-                {
-                    CHECK(schoolbook_mul(num_a, num_b) == schoolbook_mul(num_b, num_a));
-                    CHECK(karazuba(num_a, num_b) == karazuba(num_b, num_a));
-                }
-            }
-        }
-
-        WHEN("One multiplicant is zero")
-        {
-
-            THEN("The result should be zero")
-            {
-                for (const uinteger<128>& num : numbers)
-                {
-                    CHECK(schoolbook_mul(num, zero) == zero);
-                    CHECK(schoolbook_mul(zero, num) == zero);
-
-                    CHECK(karazuba(num, zero) == zero);
-                    CHECK(karazuba(zero, num) == zero);
-                }
-            }
-        }
-        WHEN("One multiplicant is one")
-        {
-            THEN("Multiplication does not do much")
-            {
-
-                for (const uinteger<128>& num : numbers)
-                {
-                    CHECK(schoolbook_mul(num, one) == num);
-                    CHECK(schoolbook_mul(one, num) == num);
-
-                    CHECK(karazuba(num, one) == num);
-                    CHECK(karazuba(one, num) == num);
-                }
-            }
-        }
-        WHEN("Both multiplicands are maximum")
-        {
-            THEN("The product is 1 for the truncating multiplication")
-            {
-                REQUIRE(schoolbook_mul(d, d) == one);
-                REQUIRE(karazuba(d, d) == one);
             }
         }
     }
@@ -600,7 +678,7 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
     }
 }
 
-SCENARIO("Multiplying two unsigned integers using the karazuba multiplication",
+SCENARIO("Multiplying two unsigned integers using the karatsuba multiplication",
          "[integer][unsigned][arithmetic][multiplication]")
 {
     GIVEN("Two uinteger<N> a and b with N <= 32")
@@ -925,6 +1003,49 @@ SCENARIO("Bit and Word operations work correctly", "[integer][unsigned][utility]
     }
 }
 
+TEMPLATE_TEST_CASE_SIG("Invariants for the unsigned integer division",
+                       "[integer][unsigned][arithmetic][division]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+
+    GIVEN("A non-zero number")
+    {
+
+        const I a = GENERATE(take(10, random_uinteger<W, WordType>(I::one(), I::max())));
+
+        WHEN("Dividing the number by itself")
+        {
+            THEN("The result should be 1")
+            {
+                REQUIRE(div(a, a) == I::one());
+            }
+        }
+        WHEN("Dividing the number by one")
+        {
+            THEN("The result should be the number itself")
+            {
+                REQUIRE(div(a, I::one()) == a);
+            }
+        }
+        WHEN("Dividing the number by a larger number")
+        {
+            THEN("The result should be zero")
+            {
+                // Adding one is safe as I::max() will not be returned by the generator
+                REQUIRE(div(a, add(a, I::one())) == I::zero());
+            }
+        }
+        WHEN("Dividing the number by zero")
+        {
+            THEN("A runtime exception should be thrown")
+            {
+                REQUIRE_THROWS_AS(div(a, I::zero()), std::runtime_error);
+            }
+        }
+    }
+}
+
 SCENARIO("Dividing two unsigned integers exactly", "[integer][unsigned][arithmetic][division]")
 {
     GIVEN("Two uinteger<N> a and b with N <= 32")
@@ -971,36 +1092,64 @@ SCENARIO("Dividing two unsigned integers exactly", "[integer][unsigned][arithmet
     }
 }
 
-SCENARIO("Computing the signum of an unsigned integer", "[integer][unsigned]operation][utility]")
+TEMPLATE_TEST_CASE_SIG("Computing the signum of an unsigned integer",
+                       "[integer][unsigned][operation][utility]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
+    using I = uinteger<W, WordType>;
     GIVEN("The number  zero")
     {
-        THEN("The signum should be zero")
+        WHEN("Determining the signum")
         {
-            REQUIRE(signum(uinteger<8>::zero()) == 0);
-            REQUIRE(signum(uinteger<1>::zero()) == 0);
-            REQUIRE(signum(uinteger<16>::zero()) == 0);
-            REQUIRE(signum(uinteger<32>::zero()) == 0);
-            REQUIRE(signum(uinteger<64>::zero()) == 0);
-            REQUIRE(signum(uinteger<128>::zero()) == 0);
-            REQUIRE(signum(uinteger<300>::zero()) == 0);
-            REQUIRE(signum(uinteger<1313>::zero()) == 0);
+            THEN("The signum should be zero")
+            {
+                REQUIRE(signum(I::zero()) == 0);
+            }
         }
     }
     GIVEN("A non-zero number")
     {
-        THEN("The signum should be one")
+        WHEN("Determining the signum")
         {
-            uint8_t val_a =
-                GENERATE(take(100, random(uint8_t(1), std::numeric_limits<uint8_t>::max())));
+            THEN("The signum should be one")
+            {
+                const I a = GENERATE(take(10, random_uinteger<W, WordType>(I::one(), I::max())));
+                REQUIRE(signum(a) == 1);
+            }
+        }
+    }
+}
 
-            REQUIRE(signum(uinteger<8>{val_a}) == 1);
-            REQUIRE(signum(uinteger<16>{val_a}) == 1);
-            REQUIRE(signum(uinteger<17>{val_a}) == 1);
-            REQUIRE(signum(uinteger<32>{val_a}) == 1);
-            REQUIRE(signum(uinteger<64>{val_a}) == 1);
-            REQUIRE(signum(uinteger<128>{val_a}) == 1);
-            REQUIRE(signum(uinteger<256>{val_a, val_a}) == 1);
+TEMPLATE_TEST_CASE_SIG("Invariants for computing the remainder",
+                       "[integer][unsigned][arithmetic][remainder][division]",
+                       AARITH_INT_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+
+    GIVEN("A non-zero number")
+    {
+
+        const I a = GENERATE(take(10, random_uinteger<W, WordType>(I::one(), I::max())));
+
+        THEN("Computing the remainder of division by zero should throw an exception")
+        {
+
+            CHECK_THROWS_AS(remainder(a, I::zero()), std::runtime_error);
+        }
+
+        THEN("A remainder when dividing by 1 should yield zero")
+        {
+            CHECK(remainder(a, I::one()) == I::zero());
+        }
+        THEN("Computing the remainder with itself should yield zero")
+        {
+
+            CHECK(remainder(a, a) == I::zero());
+        }
+        THEN("Computing the remainder of zero should yield zero")
+        {
+
+            CHECK(remainder(I::zero(), a) == I::zero());
         }
     }
 }
@@ -1024,33 +1173,6 @@ SCENARIO("Computing the remainder of two unsigned integers works as expected",
 
         CHECK(int_div == d.word(0));
         REQUIRE(int_mod == m.word(0));
-    }
-
-    GIVEN("An uinteger<N> a")
-    {
-
-        const size_t width = 150;
-        auto val_a = GENERATE(take(100, random(1U, 10000000U)));
-
-        uinteger<width> a{val_a};
-        const uinteger<width> zero{0U};
-        const uinteger<width> one{1U};
-
-        THEN("Computing the remainder of division by zero should trhow an exception")
-        {
-
-            CHECK_THROWS_AS(remainder(a, zero), std::runtime_error);
-        }
-
-        THEN("A remainder when dividing by 1 should yield zero")
-        {
-            CHECK(remainder(a, one) == zero);
-        }
-        THEN("Computing the remainder of zero should yield 0")
-        {
-
-            CHECK(remainder(zero, a) == zero);
-        }
     }
 
     GIVEN("Two uinteger<N> a and b with N <= 32")

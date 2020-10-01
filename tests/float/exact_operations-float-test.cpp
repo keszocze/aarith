@@ -1,7 +1,196 @@
 #include <aarith/float.hpp>
+#include <bitset>
 #include <catch.hpp>
 
+#include "../test-signature-ranges.hpp"
 using namespace aarith;
+
+TEMPLATE_TEST_CASE_SIG("Addition is commutative",
+                       "[normalized_float][arithmetic][addition][invariant]",
+                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
+                       (11, 52, double))
+{
+    using F = normalized_float<E, M>;
+
+    GIVEN("Tow normalized_floats created from native data types")
+    {
+
+        Native a_native = GENERATE(take(15, random<Native>(std::numeric_limits<Native>::min(),
+                                                           std::numeric_limits<Native>::max())));
+        Native b_native = GENERATE(take(15, random<Native>(std::numeric_limits<Native>::min(),
+                                                           std::numeric_limits<Native>::max())));
+        F a{a_native};
+        F b{b_native};
+
+        WHEN("Adding these numbers")
+        {
+            F res1{a + b};
+            F res2{b + a};
+            THEN("The result should not depend on operand order")
+            {
+                REQUIRE(res1 == res2);
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Multiplication is commutative",
+                       "[normalized_float][arithmetic][multiplication][invariant]",
+                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
+                       (11, 52, double))
+{
+    using F = normalized_float<E, M>;
+
+    GIVEN("Tow normalized_floats created from native data types")
+    {
+
+        Native a_native = GENERATE(take(15, random<Native>(std::numeric_limits<Native>::min(),
+                                                           std::numeric_limits<Native>::max())));
+        Native b_native = GENERATE(take(15, random<Native>(std::numeric_limits<Native>::min(),
+                                                           std::numeric_limits<Native>::max())));
+        F a{a_native};
+        F b{b_native};
+
+        WHEN("Multiplying these numbers")
+        {
+            F res1{a * b};
+            F res2{b * a};
+            THEN("The result should not depend on operand order")
+            {
+                REQUIRE(res1 == res2);
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
+                       "[normalized_float][arithmetic][addition][invariant]",
+                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
+                       (11, 52, double))
+{
+    using F = normalized_float<E, M>;
+
+    GIVEN("A normalized_float  created from native data types and the number zero")
+    {
+
+        Native a_native = GENERATE(take(15, random<Native>(std::numeric_limits<Native>::min(),
+                                                           std::numeric_limits<Native>::max())));
+        F a{a_native};
+        F zero{F::zero()};
+
+        WHEN("Adding these numbers")
+        {
+            F res{a + zero};
+            THEN("The result should have left the number untouched")
+            {
+                REQUIRE(res == a);
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Zero makes the multiplication result zero",
+                       "[normalized_float][arithmetic][multiplication][invariant]",
+                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
+                       (11, 52, double))
+{
+    using F = normalized_float<E, M>;
+
+    GIVEN("A normalized_float  created from native data types and the number zero")
+    {
+
+        Native a_native = GENERATE(take(15, random<Native>(std::numeric_limits<Native>::min(),
+                                                           std::numeric_limits<Native>::max())));
+        F a{a_native};
+        F zero{F::zero()};
+
+        WHEN("Adding these numbers")
+        {
+            F res{a * zero};
+            THEN("The result should have left the number untouched")
+            {
+                if (res != zero)
+                {
+                    std::cout << to_binary(a) << "\n";
+                    std::cout << to_binary(res) << "\n";
+                    std::cout << to_binary(zero) << "\n";
+                }
+                REQUIRE(res == zero);
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("One is the neutral element of the multiplication",
+                       "[normalized_float][arithmetic][multiplication][invariant]",
+                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
+                       (11, 52, double))
+{
+    using F = normalized_float<E, M>;
+
+    GIVEN("A normalized_float created from native data types and the number one")
+    {
+
+        Native a_native = GENERATE(take(15, random<Native>(std::numeric_limits<Native>::min(),
+                                                           std::numeric_limits<Native>::max())));
+        F a{a_native};
+        F one{F::one()};
+
+        WHEN("Adding these numbers")
+        {
+            F res{a * one};
+            THEN("The result should have left the number untouched")
+            {
+                REQUIRE(res == a);
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts",
+                       "[normalized_float][arithmetic][addition][constexpr]",
+                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
+                       (11, 52, double))
+{
+
+    using F = normalized_float<E, M>;
+
+    Native a_float{-1337.35f};
+    Native b_float{420815.0f};
+
+    constexpr Native delta = {0.123f};
+    constexpr Native delta2 = {3.33f};
+
+    for (size_t i = 0; i < std::numeric_limits<size_t>::max() - 1; ++i)
+    {
+        F a{a_float};
+        F b{b_float};
+
+        F res = a + b;
+        Native res_float = a_float + b_float;
+
+        F res_float_{res_float};
+        Native res_ = static_cast<Native>(res);
+
+        if (res_float_ != res)
+        {
+
+            std::cout << a << " + " << b << " = " << res << "\n";
+            std::cout << to_binary(a) << " + " << to_binary(b) << " = " << to_binary(res) << "\n";
+            std::cout << to_compute_string(a) << "\t+\t" << to_compute_string(b) << " = "
+                      << to_compute_string(res) << "\n";
+
+            std::cout << a_float << " + " << b_float << " = " << res_float << "\n";
+            std::cout << to_binary(res) << "\n" << to_binary(res_float_) << "\n";
+        }
+
+        CHECK(res_float_ == res);
+        REQUIRE(res_ == res_float);
+
+        a_float += delta;
+        b_float += delta2;
+    }
+}
 
 SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithmetic][addition]")
 {
@@ -706,75 +895,33 @@ SCENARIO("IEEE-754 arithmetic conversion: float, double",
     }
 }
 
-SCENARIO("IEEE-754 arithmetic comparison: float",
-         "[normalized_float][arithmetic][multiplication][ieee-754]")
-{
-
-    GIVEN("0.5 and 0.25")
-    {
-        float half = 0.5;
-        float quarter = 1.5;
-        float threequarter = -0.875;
-        float zero = 0.0;
-
-        using afloat = normalized_float<8, 23>;
-
-        afloat ahalf{half};
-        afloat aquarter{quarter};
-        aquarter.set_exponent(uinteger<8>::zero());
-        afloat athreequarter{threequarter};
-        afloat azero{zero};
-
-        std::cout << half << " " << ahalf << "\t" << quarter << " " << aquarter << "\n";
-        std::cout << to_binary(ahalf) << "\t" << to_binary(aquarter) << "\n";
-        std::cout << to_compute_string(ahalf) << "\t" << to_compute_string(aquarter) << "\n";
-        std::cout << tcs(ahalf) << "\t" << tcs(aquarter) << "\t" << tcs(athreequarter) << "\t"
-                  << tcs(azero) << "\n";
-        //        std::cout << ahalf.get_real_exponent() << "\t" << aquarter.unbiased_exponent() <<
-        //        "\n"; std::cout << to_binary(ahalf.get_real_exponent()) << "\t" <<
-        //        to_binary(aquarter.unbiased_exponent()) << "\n";
-    }
-    //    GIVEN("Two random floating point values")
-    //    {
-    //        float a = GENERATE(
-    //            take(10, random(float(1.0), std::numeric_limits<float>::max())));
-    //        float b = GENERATE(
-    //            take(10, random(float(1.0), std::numeric_limits<float>::max())));
-    //
-    //        using afloat = normalized_float<8, 23>;
-    //        afloat aa{a};
-    //        afloat ab{b};
-    //
-    //        float f_res_add = a + b;
-    //        float f_res_mul = a * b;
-    //        float f_res_sub = a - b;
-    //        float f_res_div = a / b;
-    //
-    //        afloat a_res_add = add(aa, ab);
-    //        afloat a_res_mul = mul(aa, ab);
-    //        afloat a_res_sub = sub(aa, ab);
-    //        afloat a_res_div = div(aa, ab);
-    //
-    //        CHECK(f_res_add == static_cast<float>(a_res_add));
-    //        CHECK(f_res_sub == static_cast<float>(a_res_sub));
-    //        CHECK(f_res_mul == static_cast<float>(a_res_mul));
-    //        REQUIRE(f_res_div == static_cast<float>(a_res_div));
-    //    }
-}
-//
-// TEMPLATE_TEST_CASE_SIG("IEEE-754 arithmetic comparision: addition",
-//                       "[normalized_float][arithmetic][addition][ieee-754]",
-//                       ((typename F, typename A), F, A),
-//                       (float, normalized_float<8,23>),
-//                       (double, normalized_float<11,52>)
-//                       )
+// SCENARIO("IEEE-754 arithmetic comparison: float",
+//         "[normalized_float][arithmetic][multiplication][ieee-754]")
 //{
-//    std::cout << "works\n";
-////    FloatType a = GENERATE(take(
-////        10, random(std::numeric_limits<FloatType>::min(),
-/// std::numeric_limits<FloatType>::max()))); /    FloatType b = GENERATE(take( /        10,
-/// random(std::numeric_limits<FloatType>::min(), std::numeric_limits<FloatType>::max())));
-////
-////    AarithFloat aa{a};
-////    AarithFloat ab{b};
+//
+//    GIVEN("0.5 and 0.25")
+//    {
+//        float half = 0.5;
+//        float quarter = 1.5;
+//        float threequarter = -0.875;
+//        float zero = 0.0;
+//
+//        using afloat = normalized_float<8, 23>;
+//
+//        afloat ahalf{half};
+//        afloat aquarter{quarter};
+//        aquarter.set_exponent(uinteger<8>::zero());
+//        afloat athreequarter{threequarter};
+//        afloat azero{zero};
+//
+//        std::cout << half << " " << ahalf << "\t" << quarter << " " << aquarter << "\n";
+//        std::cout << to_binary(ahalf) << "\t" << to_binary(aquarter) << "\n";
+//        std::cout << to_compute_string(ahalf) << "\t" << to_compute_string(aquarter) << "\n";
+//        std::cout << tcs(ahalf) << "\t" << tcs(aquarter) << "\t" << tcs(athreequarter) << "\t"
+//                  << tcs(azero) << "\n";
+//        //        std::cout << ahalf.get_real_exponent() << "\t" << aquarter.unbiased_exponent()
+//        <<
+//        //        "\n"; std::cout << to_binary(ahalf.get_real_exponent()) << "\t" <<
+//        //        to_binary(aquarter.unbiased_exponent()) << "\n";
+//    }
 //}

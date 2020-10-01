@@ -1,54 +1,48 @@
-function(add_aarith_test testname)
 
-  SET(targetname "${testname}-test")
-
-
-  set (multiValueArgs FILES)
-  cmake_parse_arguments(
-          AARITH_TEST # prefix
-          "" # no flags
-          "" # no single value options
-          "FILES;LIBS;INCLUDES" # multi value options
-          ${ARGN}
-  )
-
-  add_executable(${targetname} ${AARITH_TEST_FILES})
-  target_link_libraries(${targetname} PRIVATE Catch2::WithMain aarith::Library ${AARITH_TEST_LIBS})
-  add_test(NAME ${targetname} COMMAND ${targetname})
-
-  if (DEFINED AARITH_TEST_INCLUDES)
-    target_include_directories(${targetname} PRIVATE ${AARITH_TEST_INCLUDES})
-  endif()
-
-endfunction(add_aarith_test)
-
-
+add_aarith_test(core-functional-style FILES core/functional-style-test.cpp)
+add_aarith_test(core-number-util FILES core/number_utils-test.cpp)
+add_aarith_test(word_array-random-generation FILES core/word_array-generation-test.cpp)
+add_aarith_test(word_array-bit-operations FILES core/bit_operations-test.cpp)
+add_aarith_test(word_array-extraction FILES core/word_array-extraction-test.cpp)
+add_aarith_test(word_array-utility FILES core/word_array-utility-test.cpp)
 
 
 add_aarith_test(uint-general FILES integer/uint-test.cpp)
+add_aarith_test(uint-random-generation FILES integer/uint-random-generation-test.cpp)
 add_aarith_test(uint-operations FILES integer/uint-operations-test.cpp)
 add_aarith_test(uint-anytime FILES integer/uint-anytime-test.cpp)
 add_aarith_test(uint-comparisons FILES integer/uint-comparisons-test.cpp)
-add_aarith_test(float-operations FILES float/exact_operations-float-test.cpp)
+add_aarith_test(uint-extraction FILES integer/uint-extraction-test.cpp)
+
 add_aarith_test(string_utils FILES integer/string_utils-test.cpp)
-add_aarith_test(util FILES integer/string_utils-test.cpp)
-add_aarith_test(bit-operations FILES core/bit_operations-test.cpp)
-add_aarith_test(integer FILES integer/integer-test.cpp integer/integer-operations-test.cpp integer/integer-comparisons-test.cpp)
+add_aarith_test(integer-general FILES integer/integer-test.cpp)
+add_aarith_test(integer-operations FILES integer/integer-operations-test.cpp)
+add_aarith_test(integer-shift-operations FILES integer/integer-shift-operations-test.cpp)
+add_aarith_test(integer-comparisons FILES integer/integer-comparisons-test.cpp)
 add_aarith_test(integer-ranges FILES integer/ranges_test.cpp)
-add_aarith_test(functional-style FILES core/functional-style-test.cpp)
-add_aarith_test(number-util FILES core/number_utils-test.cpp)
+add_aarith_test(integer-random-generation FILES integer/integer-random-generation-test.cpp)
 add_aarith_test(integer-cast FILES integer/integer-casts.cpp)
 add_aarith_test(fixed-point FILES fixed_point/fixed_point-test.cpp fixed_point/string_utils-test.cpp fixed_point/operations_test.cpp)
 
-add_aarith_test(fau FILES uint-approx-test.cpp)
+add_aarith_test(float-operations FILES float/exact_operations-float-test.cpp)
+add_aarith_test(float-anytime-operations FILES float/anytime_operations-float-test.cpp)
+add_aarith_test(float-casts FILES float/float_casts.cpp)
+add_aarith_test(float-comparison FILES float/float_comparisons.cpp)
+
+add_aarith_test(fau-adder FILES uint-approx-test.cpp)
 
 
 
 if(MPIR_FOUND)
-  add_aarith_test(uint-random FILES integer/uint-random-test.cpp LIBS ${MPIR_LIBRARIES} INCLUDES ${MPIR_INCLUDE_DIR})
+  add_aarith_test(uint-check-against-mpir FILES integer/uint-arithmetic-mpir-test.cpp LIBS ${MPIR_LIBRARIES} INCLUDES ${MPIR_INCLUDE_DIR})
   message(STATUS "MPIR found: Building MPIR tests")
 else()
   message(STATUS "Could not find MPIR: not building MPIR tests")
+endif()
+
+
+if (USE_FULL_RANGE_IN_TESTS)
+  add_compile_definitions(AARITH_USE_FULL_RANGE)
 endif()
 
 

@@ -68,7 +68,8 @@ SCENARIO("Casting uintegers into different width", "[integer][unsigned][casting]
     }
 }
 
-SCENARIO("Copy constructor of unsigned integers with various bit widths", "[integer][unsigned][utility]")
+SCENARIO("Copy constructor of unsigned integers with various bit widths",
+         "[integer][unsigned][utility]")
 {
     GIVEN("An uinteger<N> a")
     {
@@ -126,16 +127,6 @@ SCENARIO("Copy constructor of unsigned integers with various bit widths", "[inte
                     CHECK(a.word(2) == 0U);
                 }
             }
-            //        // does not compile, as expected and intended
-            //        //        WHEN("M > N")
-            //        //        {
-            //        //            const uint64_t val_b = 23;
-            //        //            const uinteger<150> tmp =
-            //        uinteger<150>::from_words(0U,val_b,0U);
-            //        //            std::cout << tmp << "\n";
-            //        //            const uinteger<128> b = tmp;
-            //        //            std::cout << b << "\n";
-            //        //        }
         }
     }
 }
@@ -494,7 +485,8 @@ SCENARIO("Logical NOT works as expected", "[integer][unsigned][bit_logic]")
     }
 }
 
-SCENARIO("Checking whether an unsigned integer is not equal to zero/false", "[integer][unsigned][utility]")
+SCENARIO("Checking whether an unsigned integer is not equal to zero/false",
+         "[integer][unsigned][utility]")
 {
     GIVEN("An uinteger<N>=0=a for various N")
     {

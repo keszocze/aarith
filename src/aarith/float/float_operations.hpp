@@ -164,10 +164,24 @@ template <size_t E, size_t M, typename WordType>
                        const normalized_float<E, M, WordType> rhs)
     -> normalized_float<E, M, WordType>
 {
+    using F = normalized_float<E, M, WordType>;
+    if (lhs.is_zero() || rhs.is_zero())
+    {
+        return F::zero();
+    }
+    if (lhs == F::one())
+    {
+        return rhs;
+    }
+
+    if (rhs == F::one())
+    {
+        return lhs;
+    }
     auto mproduct = schoolbook_expanding_mul(lhs.get_full_mantissa(), rhs.get_full_mantissa());
     mproduct = mproduct >> M;
-    auto esum = width_cast<E>(sub(expanding_add(lhs.get_exponent(), rhs.get_exponent()),
-                                  width_cast<E + 1>(lhs.get_bias())));
+    auto esum = width_cast<E>(
+        sub(expanding_add(lhs.get_exponent(), rhs.get_exponent()), width_cast<E + 1>(lhs.bias)));
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
     normalized_float<E, mproduct.width() - 1> product;
@@ -201,8 +215,8 @@ template <size_t E, size_t M, typename WordType>
     // mquotient >>= 1;
     auto rdmquotient = rshift_and_round(mquotient, 4);
 
-    auto esum = width_cast<E>(sub(expanding_add(lhs.get_exponent(), lhs.get_bias()),
-                                  width_cast<E + 1>(rhs.get_exponent())));
+    auto esum = width_cast<E>(
+        sub(expanding_add(lhs.get_exponent(), lhs.bias), width_cast<E + 1>(rhs.get_exponent())));
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
     normalized_float<E, rdmquotient.width() - 1> quotient;

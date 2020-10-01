@@ -1,95 +1,56 @@
 #include <aarith/integer_no_operators.hpp>
 #include <catch.hpp>
 
+#include "../test-signature-ranges.hpp"
+
 using namespace aarith;
 
-SCENARIO("Comparing two positive sintegers", "[integer][unsigned][utility][comparison]")
+TEMPLATE_TEST_CASE_SIG("Comparing two positive signed integers of same bit width",
+                       "[integer][signed][utility][comparison]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
-    GIVEN("Two integer<N> a and b with a < b")
+    using I = integer<W, WordType>;
+
+    GIVEN("Two a and b with a < b")
     {
-        WHEN("N <= word_width")
-        {
-            constexpr size_t TestWidth = 16;
-            static constexpr uint16_t number_a = 7;
-            static constexpr uint16_t number_b = 23;
-            constexpr integer<TestWidth> a{number_a};
-            constexpr integer<TestWidth> b{number_b};
+        I a{I::zero()};
+        I b{I::max()};
 
-            THEN("operator< returns true")
-            {
-                // enforce constexpr context
-                constexpr bool comp = a < b;
-                REQUIRE(comp);
-            }
-            THEN("operator<= returns true")
-            {
-                constexpr bool comp = a <= b;
-                REQUIRE(comp);
-            }
-            THEN("operator> returns false")
-            {
-                constexpr bool comp = a > b;
-                REQUIRE_FALSE(comp);
-            }
-            THEN("operator>= returns false")
-            {
-                constexpr bool comp = a >= b;
-                REQUIRE_FALSE(comp);
-            }
-            THEN("operator== returns false")
-            {
-                constexpr bool comp = a == b;
-                REQUIRE_FALSE(comp);
-            }
-            THEN("operator!= returns true")
-            {
-                constexpr bool comp = a != b;
-                REQUIRE(comp);
-            }
+        THEN("operator< returns true")
+        {
+            bool comp = a < b;
+            REQUIRE(comp); //
         }
-        WHEN("N > word_width")
+        THEN("operator<= returns true")
         {
-            const size_t TestWidth = 80;
-            integer<TestWidth> constexpr a{7, 0};
-            integer<TestWidth> constexpr b{23, 0};
-
-            integer<TestWidth> constexpr c{7, 0};
-            integer<TestWidth> constexpr d{0, 23};
-
-            THEN("operator< returns true")
-            {
-                REQUIRE(a < b);
-                REQUIRE_FALSE(c < d);
-            }
-            THEN("operator<= returns true")
-            {
-                REQUIRE(a <= b);
-                REQUIRE_FALSE(c <= d);
-            }
-            THEN("operator> returns false")
-            {
-                REQUIRE_FALSE(a > b);
-                REQUIRE(c > d);
-            }
-            THEN("operator>= returns false")
-            {
-                REQUIRE_FALSE(a >= b);
-                REQUIRE(c >= d);
-            }
-            THEN("operator== returns false")
-            {
-                REQUIRE_FALSE(a == b);
-                REQUIRE_FALSE(c == d);
-            }
-            THEN("operator!= returns true")
-            {
-                REQUIRE(a != b);
-                REQUIRE(c != d);
-            }
+            bool comp = a <= b;
+            REQUIRE(comp);
+        }
+        THEN("operator> returns false")
+        {
+            bool comp = a > b;
+            REQUIRE_FALSE(comp);
+        }
+        THEN("operator>= returns false")
+        {
+            bool comp = a >= b;
+            REQUIRE_FALSE(comp);
+        }
+        THEN("operator== returns false")
+        {
+            bool comp = a == b;
+            REQUIRE_FALSE(comp);
+        }
+        THEN("operator!= returns true")
+        {
+            bool comp = a != b;
+            REQUIRE(comp);
         }
     }
 }
-SCENARIO("Comparing two positive integers with different bit widths", "[integer][signed][utility][comparison]")
+
+SCENARIO("Comparing two positive integers with different bit widths",
+         "[integer][signed][utility][comparison]")
 {
     GIVEN("Two integer<N> a and b with a < b with different bit widths")
     {
@@ -173,126 +134,84 @@ SCENARIO("Comparing two positive integers with different bit widths", "[integer]
     }
 }
 
-SCENARIO("Investigating the comparison of max and min values", "[integer][signed][comparison][utility][dinge]")
+TEMPLATE_TEST_CASE_SIG("Investigating the comparison of max and min values",
+                       "[integer][signed][utility][comparison]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
-    GIVEN("integer<8>::max/min")
+    using T = integer<W, WordType>;
+    T min = T::min();
+    T max = T::max();
+
+    T min_from_limits = std::numeric_limits<T>::min();
+    T max_from_limits = std::numeric_limits<T>::max();
+
+    WHEN("Comparing the integer::max/min and numeric_limits::max/min")
     {
-        using T = integer<8>;
-        T min = T::min();
-        T max = T::max();
-
-        T min_from_limits = std::numeric_limits<T>::min();
-        T max_from_limits = std::numeric_limits<T>::max();
-
-        WHEN("Comparing the integer::max/min and numeric_limits::max/min")
+        THEN("The values should be identical")
         {
-            THEN("The values should be identical")
-            {
-                REQUIRE(min == min_from_limits);
-                REQUIRE(max == max_from_limits);
+            REQUIRE(min == min_from_limits);
+            REQUIRE(max == max_from_limits);
 
-                REQUIRE(!(min != min_from_limits));
-                REQUIRE(!(max != max_from_limits));
-            }
+            REQUIRE(!(min != min_from_limits));
+            REQUIRE(!(max != max_from_limits));
         }
-
-        WHEN("Constructing min and max value into a larger integer")
+        THEN("The minimum should be negative")
         {
-            integer<9> min_{T::min()};
-            integer<9> max_ = T::max();
-
-            THEN("min should be negative")
-            {
-                CHECK(min_.is_negative());
-                REQUIRE(min.is_negative());
-            }
-            AND_THEN("the values should match the values from the integers with the smaller width")
-            {
-
-                CHECK(min == min_);
-                CHECK(max == max_);
-
-                CHECK(min_ == T::min());
-                CHECK(max_ == T::max());
-
-                CHECK(min == T::min());
-                REQUIRE(max == T::max());
-            }
-            AND_THEN("min should be smaller than max")
-            {
-                CHECK(min_ < max);
-                REQUIRE(min < max);
-            }
-        }
-
-        WHEN("Comparing these values")
-        {
-            THEN("The result should make sense")
-            {
-                REQUIRE(min < max);
-                REQUIRE(min_from_limits < max_from_limits);
-
-                REQUIRE(min <= max);
-                REQUIRE(min_from_limits <= max_from_limits);
-
-                REQUIRE(!(min > max));
-                REQUIRE(!(min_from_limits > max_from_limits));
-
-                REQUIRE(!(min >= max));
-                REQUIRE(!(min_from_limits >= max_from_limits));
-
-                REQUIRE(min != max);
-                REQUIRE(min_from_limits != max_from_limits);
-
-                REQUIRE(!(min == max));
-                REQUIRE(!(min_from_limits == max_from_limits));
-            }
+            REQUIRE(min.is_negative());
+            REQUIRE(min_from_limits.is_negative());
         }
     }
 
-    GIVEN("integer<16>::max/min")
+    WHEN("Constructing min and max value into a larger integer")
     {
-        using T = integer<16>;
-        T min = T::min();
-        T max = T::max();
+        integer<W + 1, WordType> min_{T::min()};
+        integer<W + 1, WordType> max_ = T::max();
 
-        T min_from_limits = std::numeric_limits<T>::min();
-        T max_from_limits = std::numeric_limits<T>::max();
-
-        WHEN("Comparing the integer::max/min and numeric_limits::max/min")
+        THEN("min should be negative")
         {
-            THEN("The values should be identical")
-            {
-                REQUIRE(min == min_from_limits);
-                REQUIRE(max == max_from_limits);
-
-                REQUIRE(!(min != min_from_limits));
-                REQUIRE(!(max != max_from_limits));
-            }
+            CHECK(min_.is_negative());
+            REQUIRE(min.is_negative());
         }
-
-        WHEN("Comparing these values")
+        AND_THEN("the values should match the values from the integers with the smaller width")
         {
-            THEN("The result should make sense")
-            {
-                REQUIRE(min < max);
-                REQUIRE(min_from_limits < max_from_limits);
 
-                REQUIRE(min <= max);
-                REQUIRE(min_from_limits <= max_from_limits);
+            CHECK(min == min_);
+            CHECK(max == max_);
 
-                REQUIRE(!(min > max));
-                REQUIRE(!(min_from_limits > max_from_limits));
+            CHECK(min_ == T::min());
+            CHECK(max_ == T::max());
 
-                REQUIRE(!(min >= max));
-                REQUIRE(!(min_from_limits >= max_from_limits));
+            CHECK(min == T::min());
+            REQUIRE(max == T::max());
+        }
+        AND_THEN("min should be smaller than max")
+        {
+            CHECK(min_ < max);
+            REQUIRE(min < max);
+        }
+    }
 
-                REQUIRE(min != max);
-                REQUIRE(min_from_limits != max_from_limits);
+    WHEN("Comparing these values")
+    {
+        THEN("The result should make sense")
+        {
+            REQUIRE(min < max);
+            REQUIRE(min_from_limits < max_from_limits);
 
-                REQUIRE(!(min == max));
-                REQUIRE(!(min_from_limits == max_from_limits));
-            }
+            REQUIRE(min <= max);
+            REQUIRE(min_from_limits <= max_from_limits);
+
+            REQUIRE_FALSE(min > max);
+            REQUIRE_FALSE(min_from_limits > max_from_limits);
+
+            REQUIRE_FALSE(min >= max);
+            REQUIRE_FALSE(min_from_limits >= max_from_limits);
+
+            REQUIRE(min != max);
+            REQUIRE(min_from_limits != max_from_limits);
+
+            REQUIRE_FALSE(min == max);
+            REQUIRE_FALSE(min_from_limits == max_from_limits);
         }
     }
 }

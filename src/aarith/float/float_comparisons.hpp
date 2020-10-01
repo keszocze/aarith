@@ -8,7 +8,19 @@ namespace aarith {
 template <size_t E, size_t M>
 auto operator<(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
 {
-    if (lhs.get_sign() > rhs.get_sign())
+
+    if (lhs.is_nan() || rhs.is_nan())
+    {
+        return false;
+    }
+
+    // positive and negative zero are to be treated equally
+    if (lhs.is_zero() && rhs.is_zero())
+    {
+        return false;
+    }
+
+    if (lhs.is_negative() && rhs.is_positive())
     {
         return true;
     }
@@ -37,11 +49,46 @@ auto operator<(const normalized_float<E, M> lhs, const normalized_float<E, M> rh
     }
 }
 
+/**
+ * @brief Compares to floating point numbers bit by bit
+ * @tparam E Exponent width
+ * @tparam M Mantissa width
+ * @param lhs
+ * @param rhs
+ * @return True iff the floats match in every single bit
+ */
+template <size_t E, size_t M>
+bool bitwise_equality(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
+{
+    const bool equal_sign = (lhs.get_sign() == rhs.get_sign());
+    const bool equal_exponent = (lhs.get_exponent() == rhs.get_exponent());
+    const bool equal_mantissa = (lhs.get_full_mantissa() == rhs.get_full_mantissa());
+    //    std::cout << equal_sign << "\t" << equal_exponent << "\t" << equal_mantissa << "\n";
+    return equal_sign && equal_exponent && equal_mantissa;
+}
+
 template <size_t E, size_t M>
 auto operator==(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
 {
-    return lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent() &&
-           lhs.get_full_mantissa() == rhs.get_full_mantissa();
+
+    if (lhs.is_nan() || rhs.is_nan())
+    {
+        return false;
+    }
+
+    // positive and negative zero should be treated equal
+    if (lhs.is_zero() && rhs.is_zero())
+    {
+        return true;
+    }
+
+    return bitwise_equality(lhs, rhs);
+}
+
+template <size_t E, size_t M>
+auto operator!=(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
+{
+    return !(lhs == rhs);
 }
 
 template <size_t E, size_t M>

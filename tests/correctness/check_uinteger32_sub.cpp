@@ -7,12 +7,11 @@ int main()
 
     constexpr size_t Width = 32;
     using UB = uint32_t;
-    using B = int32_t;
     using WordType = uint64_t;
-    using UI = uinteger<Width, uint64_t>;
-    using I = integer<Width, uint64_t>;
+    using UI = uinteger<Width, WordType>;
 
-    check_int_operation<integer, Width, B, true, WordType>("division", &::aarith::div<I>, native_div);
+    check_int_operation<uinteger, Width, UB, false, WordType>("subtraction", &::aarith::sub<UI>,
+                                                              native_sub);
 
     return 0;
 }
