@@ -58,7 +58,7 @@ constexpr fixed<I, F, B, WordType> operator<<(const fixed<I, F, B, WordType>& lh
  * In general, there are no guarantees on the value the number stores after a  reduction of any
  * of the widths.
  *
- * If the width of integer part is extended, the sign and the number (of the integer aprt) is
+ * If the width of integer part is extended, the sign and the number (of the integer part) is
  * preserved. That means that if both widths are increased (or at least not decreased), the number
  * stored in the fixed point number remains the same and simply uses more bits.
  *

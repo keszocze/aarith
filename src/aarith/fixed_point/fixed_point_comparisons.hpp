@@ -2,56 +2,76 @@
 
 namespace aarith {
 
-template <typename FixedA, typename FixedB>
+template <typename FixedA, typename FixedB,
+          typename = std::enable_if_t<is_fixed_point_v<FixedA> && is_fixed_point_v<FixedB>>>
 constexpr bool operator==(const FixedA& a, const FixedB& b)
 {
-    static_assert(::aarith::is_fixed_point_v<FixedA>,
-                  "First parameter must be an aarith fixed point number");
-    static_assert(::aarith::is_fixed_point_v<FixedB>,
-                  "Second parameter must be an aarith fixed point number");
-    return (a.bits() == b.bits());
-}
-
-template <typename FixedA, typename FixedB>
-constexpr bool operator<(const FixedA& a, const FixedB& b)
-{
-    static_assert(::aarith::is_fixed_point_v<FixedA>,
-                  "First parameter must be an aarith fixed point number");
-    static_assert(::aarith::is_fixed_point_v<FixedB>,
-                  "Second parameter must be an aarith fixed point number");
-    static_assert(::aarith::same_signedness<FixedA, FixedB>,
-                  "The fixed point numbers need to have the same signedness");
-
-    return (a.bits() < b.bits());
+    constexpr size_t fracA = a.frac_width();
+    constexpr size_t fracB = b.frac_width();
+    if constexpr (fracA == fracB)
+    {
+        return (a.bits() == b.bits());
+    }
+    else {
+        if constexpr (fracA > fracB) {
+            return a.bits() == width_cast<b.int_width(), fracA>(b).bits();
+        }
+        else {
+            return width_cast<a.int_width(), fracB>(a).bits() == b.bits();
+        }
+    }
 }
 
 template <typename FixedA, typename FixedB,
-          typename = std::enable_if_t<
-              ::aarith::is_fixed_point_v<FixedA>&& ::aarith::is_fixed_point_v<FixedB>>>
+          typename = std::enable_if_t<is_fixed_point_v<FixedA> && is_fixed_point_v<FixedB>>>
+constexpr bool operator!=(const FixedA& a, const FixedB& b)
+{
+    return !(a == b);
+}
+
+template <typename FixedA, typename FixedB,
+          typename = std::enable_if_t<is_fixed_point_v<FixedA> && is_fixed_point_v<FixedB> &&
+                                      same_signedness<FixedA, FixedB>>>
+constexpr bool operator<(const FixedA& a, const FixedB& b)
+{
+    constexpr size_t fracA = a.frac_width();
+    constexpr size_t fracB = b.frac_width();
+    if constexpr (fracA == fracB)
+    {
+        return (a.bits() < b.bits());
+    }
+    else {
+        if constexpr (fracA > fracB) {
+            return a.bits() < width_cast<b.int_width(), fracA>(b).bits();
+        }
+        else {
+            return width_cast<a.int_width(), fracB>(a).bits() == b.bits();
+        }
+    }
+}
+
+template <typename FixedA, typename FixedB,
+          typename = std::enable_if_t<is_fixed_point_v<FixedA> && is_fixed_point_v<FixedB> &&
+                                      same_signedness<FixedA, FixedB>>>
 constexpr bool operator<=(const FixedA& a, const FixedB& b)
 {
     return (a < b) || (a == b);
 }
 
 template <typename FixedA, typename FixedB,
-          typename = std::enable_if_t<
-              ::aarith::is_fixed_point_v<FixedA>&& ::aarith::is_fixed_point_v<FixedB>>>
+          typename = std::enable_if_t<is_fixed_point_v<FixedA> && is_fixed_point_v<FixedB> &&
+                                      same_signedness<FixedA, FixedB>>>
 constexpr bool operator>=(const FixedA& a, const FixedB& b)
 {
     return b <= a;
 }
 
 template <typename FixedA, typename FixedB,
-          typename = std::enable_if_t<
-              ::aarith::is_fixed_point_v<FixedA>&& ::aarith::is_fixed_point_v<FixedB>>>
+          typename = std::enable_if_t<is_fixed_point_v<FixedA> && is_fixed_point_v<FixedB> &&
+                                      same_signedness<FixedA, FixedB>>>
 constexpr bool operator>(const FixedA& a, const FixedB& b)
 {
     return (b < a);
 }
-
-//template <typename FixedA, typename FixedB> constexpr auto min(const FixedA& a, const FixedB& b)
-//{
-//    return a;
-//}
 
 } // namespace aarith

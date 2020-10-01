@@ -113,7 +113,7 @@ public:
      * @param w The word array containing the raw data
      * @return A fixed point number constructed from the word array
      */
-    template <size_t W>[[nodiscard]] static constexpr fixed from_bitstring(const word_array<W>& w)
+    template <size_t W>[[nodiscard]] static constexpr fixed from_bitstring(const word_array<W, WordType>& w)
     {
         static_assert(width() >= W);
         fixed result;
@@ -121,7 +121,7 @@ public:
         return result;
     }
 
-    // Example: ufixed<5,3>(7) = ufixed<5,3>(00...00111) = 0011100 = 00111.00 = 7.0
+    // Example: ufixed<5,2>(7) = ufixed<5,2>(00...00111) = 0011100 = 00111.00 = 7.0
     template <typename Int> [[nodiscard]] static constexpr fixed from_integral(const Int& n)
     {
         static_assert(std::is_integral_v<Int>);

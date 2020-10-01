@@ -22,7 +22,11 @@ add_aarith_test(integer-comparisons FILES integer/integer-comparisons-test.cpp)
 add_aarith_test(integer-ranges FILES integer/ranges_test.cpp)
 add_aarith_test(integer-random-generation FILES integer/integer-random-generation-test.cpp)
 add_aarith_test(integer-cast FILES integer/integer-casts.cpp)
-add_aarith_test(fixed-point FILES fixed_point/fixed_point-test.cpp fixed_point/string_utils-test.cpp fixed_point/operations_test.cpp)
+
+
+add_aarith_test(fixed-point FILES fixed_point/fixed_point-test.cpp fixed_point/string_utils-test.cpp)
+add_aarith_test(fixed-point-operation FILES fixed_point/operations_test.cpp)
+add_aarith_test(fixed-point-comparison FILES fixed_point/fixed_point-comparison-test.cpp)
 
 add_aarith_test(float-operations FILES float/exact_operations-float-test.cpp)
 add_aarith_test(float-anytime-operations FILES float/anytime_operations-float-test.cpp)

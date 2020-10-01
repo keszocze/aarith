@@ -2,29 +2,31 @@
 
 namespace aarith {
 
-template <size_t I, size_t F, template <size_t, class> typename B, typename WordType>
-auto operator<<(std::ostream& out, const fixed<I, F, B, WordType>& value) -> std::ostream&
-{
-    if (out.flags() & std::ios::hex)
-    {
-        out << to_hex(value.integer_part());
-        out << ".";
-        out << to_hex(value.fractional_part());
-    }
-    else if (out.flags() & std::ios::oct)
-    {
-        out << to_octal(value.integer_part());
-        out << ".";
-        out << to_octal(value.fractional_part());
-    }
-    else
-    {
-        out << to_decimal(value.integer_part());
-        out << ".";
-        out << to_decimal(value.fractional_part());
-    }
-    return out;
-}
+
+// TODO implement something reasonable here!
+//template <size_t I, size_t F, template <size_t, class> typename B, typename WordType>
+//auto operator<<(std::ostream& out, const fixed<I, F, B, WordType>& value) -> std::ostream&
+//{
+//    if (out.flags() & std::ios::hex)
+//    {
+//        out << to_hex(value.integer_part());
+//        out << ".";
+//        out << to_hex(value.fractional_part());
+//    }
+//    else if (out.flags() & std::ios::oct)
+//    {
+//        out << to_octal(value.integer_part());
+//        out << ".";
+//        out << to_octal(value.fractional_part());
+//    }
+//    else
+//    {
+//        out << to_decimal(value.integer_part());
+//        out << ".";
+//        out << to_decimal(value.fractional_part());
+//    }
+//    return out;
+//}
 
 /**
  * @brief Creates a string of bits representing the fixed point number using a '.' to indicate the
@@ -41,6 +43,12 @@ template <typename Fixed, typename = std::enable_if_t<::aarith::is_fixed_point_v
     result += ".";
     result += to_binary(value.fractional_part());
     return result;
+}
+
+template <size_t I, size_t F, template <size_t, size_t, typename> typename Type, typename WordType = uint64_t>
+std::ostream& operator<<(std::ostream& out, const Type<I,F,WordType>& value) {
+    out << to_binary(value);
+    return out;
 }
 
 } // namespace aarith
