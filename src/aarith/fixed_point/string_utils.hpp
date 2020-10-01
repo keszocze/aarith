@@ -45,8 +45,8 @@ template <typename Fixed, typename = std::enable_if_t<::aarith::is_fixed_point_v
     return result;
 }
 
-template <size_t I, size_t F, template <size_t, size_t, typename> typename Type, typename WordType = uint64_t>
-std::ostream& operator<<(std::ostream& out, const Type<I,F,WordType>& value) {
+template <size_t I, size_t F, template <size_t, typename> typename BaseInt, typename WordType = uint64_t>
+std::ostream& operator<<(std::ostream& out, const fixed<I,F,BaseInt, WordType>& value) {
     out << to_binary(value);
     return out;
 }
