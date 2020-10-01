@@ -8,6 +8,7 @@ class fixed
 
 public:
     using int_type = B<I + F, WordType>;
+    using fixed_type = fixed<I,F,B, WordType>;
 
     static_assert(::aarith::is_integral_v<int_type>);
     static_assert(I + F > 0, "At least one bit is needed to construct a fixed point number");
@@ -164,6 +165,52 @@ public:
     [[nodiscard]] constexpr uinteger<F, WordType> fractional_part() const
     {
         return bit_range<F - 1, 0>(data);
+    }
+
+    /*
+     *
+     * Constants
+     *
+     */
+
+    /**
+     * @brief Maximal value that can be stored.
+     *
+     * @return Max value
+     */
+    [[nodiscard]] static constexpr fixed_type max() {
+        fixed_type max;
+        max.data = int_type::max();
+        return max;
+    }
+
+    /**
+     * @brief Minimal value that can be stored.
+     * @return Min value
+     */
+    [[nodiscard]] static constexpr fixed_type min() {
+        fixed_type min;
+        min.data = int_type::min();
+        return min;
+    }
+
+    /**
+     * @brief The number zero.
+     * @return Zero
+     */
+    [[nodiscard]] static constexpr fixed_type zero() {
+        fixed_type zero;
+        return zero;
+    }
+
+    /**
+     * @brief The number one.
+     * @return One
+     */
+    [[nodiscard]] static constexpr fixed_type one() {
+        fixed_type one;
+        one.data.set_bit(F,true);
+        return one;
     }
 };
 
