@@ -117,7 +117,7 @@ template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(cons
  * @param b Second summand
  * @return Sum of a and b
  */
-template <typename I>[[nodiscard]] I constexpr add(const I& a, const I& b)
+template <typename I, typename = std::enable_if_t<is_integral_v<I>>>[[nodiscard]] I constexpr add(const I& a, const I& b)
 {
     constexpr size_t W = I::width();
 

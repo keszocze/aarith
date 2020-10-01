@@ -90,14 +90,24 @@ constexpr auto width_cast(const fixed<I, F, B, WordType>& a) -> fixed<TargetI, T
     }
 }
 
+/**
+ * @brief Adds two fixed point numbers expanding the size to store the result.
+ *
+ * @tparam I1 Integer part width of the first number
+ * @tparam F1 Fraction part width of the first number
+ * @tparam I2 Integer part width of the second number
+ * @tparam F2 Fraction part width of the second number
+ * @tparam B The integer type used to store the number (signed or unsigned)
+ * @tparam WordType The word type used to actually store the data
+ * @param a First addend
+ * @param b Second addend
+ * @return The sum of both numbers using enough bits to correctly store the data
+ */
 template <size_t I1, size_t F1, size_t I2, size_t F2, template <size_t, typename> typename B,
           typename WordType = uint64_t>
 auto expanding_add(const fixed<I1, F1, B, WordType>& a, const fixed<I2, F2, B, WordType>& b)
     -> fixed<std::max(I1, I2) + 1, std::max(F1, F2), B, WordType>
 {
-
-
-
     constexpr size_t I_expanded = std::max(I1, I2) + 1;
     constexpr size_t F_expanded = std::max(F1, F2);
 
@@ -109,5 +119,25 @@ auto expanding_add(const fixed<I1, F1, B, WordType>& a, const fixed<I2, F2, B, W
 
     return result;
 }
+
+/**
+ * @brief Adds two fixed point numbers with over/underflow semantics and truncation on the right
+ * @tparam I Integer part width
+ * @tparam F Fractionpart width
+ * @tparam B The integer type used to store the number (signed or unsigned)
+ * @tparam WordType The word type used to actually store the data
+ * @param a The first addend
+ * @param b The second addend
+ * @return The (truncated) sum of both numbers
+ */
+template <size_t I, size_t F, template <size_t, typename> typename B,
+    typename WordType = uint64_t>
+auto add(const fixed<I, F, B, WordType>& a, const fixed<I, F, B, WordType>& b)
+-> fixed<I, F, B, WordType>
+{
+    const auto result = expanding_add(a,b);
+    return width_cast<I,F>(result);
+}
+
 
 } // namespace aarith
