@@ -118,10 +118,10 @@ SCENARIO("Width casting fixed point numbers")
 
             THEN("The result should be a correctly expanded fixed point number")
             {
-                REQUIRE(s_cast.int_width() == 40);
-                REQUIRE(u_cast.int_width() == 33);
-                REQUIRE(s.frac_width() == s_cast.frac_width());
-                REQUIRE(u.frac_width() == u_cast.frac_width());
+                REQUIRE(s_cast.int_width == 40);
+                REQUIRE(u_cast.int_width == 33);
+                REQUIRE(s.frac_width == s_cast.frac_width);
+                REQUIRE(u.frac_width == u_cast.frac_width);
             }
         }
 
@@ -132,10 +132,10 @@ SCENARIO("Width casting fixed point numbers")
 
             THEN("The result should be a correctly expanded fixed point number")
             {
-                REQUIRE(s.int_width() == s_cast.int_width());
-                REQUIRE(u.int_width() == u_cast.int_width());
-                REQUIRE(s_cast.frac_width() == 8);
-                REQUIRE(u_cast.frac_width() == 8);
+                REQUIRE(s.int_width == s_cast.int_width);
+                REQUIRE(u.int_width == u_cast.int_width);
+                REQUIRE(s_cast.frac_width == 8);
+                REQUIRE(u_cast.frac_width == 8);
             }
         }
 
@@ -146,10 +146,10 @@ SCENARIO("Width casting fixed point numbers")
 
             THEN("The result should be a correctly shrunk fixed point number")
             {
-                REQUIRE(s_cast.int_width() == 10);
-                REQUIRE(u_cast.int_width() == 10);
-                REQUIRE(s.frac_width() == s_cast.frac_width());
-                REQUIRE(u.frac_width() == u_cast.frac_width());
+                REQUIRE(s_cast.int_width == 10);
+                REQUIRE(u_cast.int_width == 10);
+                REQUIRE(s.frac_width == s_cast.frac_width);
+                REQUIRE(u.frac_width == u_cast.frac_width);
             }
         }
 
@@ -160,10 +160,10 @@ SCENARIO("Width casting fixed point numbers")
 
             THEN("The result should be a correctly shrunk fixed point number")
             {
-                REQUIRE(s.int_width() == s_cast.int_width());
-                REQUIRE(u.int_width() == u_cast.int_width());
-                REQUIRE(s_cast.frac_width() == 2);
-                REQUIRE(u_cast.frac_width() == 2);
+                REQUIRE(s.int_width == s_cast.int_width);
+                REQUIRE(u.int_width == u_cast.int_width);
+                REQUIRE(s_cast.frac_width == 2);
+                REQUIRE(u_cast.frac_width == 2);
             }
         }
 
@@ -174,10 +174,10 @@ SCENARIO("Width casting fixed point numbers")
 
             THEN("The result should be a correctly shrunk fixed point number")
             {
-                REQUIRE(s_cast.int_width() == 10);
-                REQUIRE(u_cast.int_width() == 10);
-                REQUIRE(s_cast.frac_width() == 2);
-                REQUIRE(u_cast.frac_width() == 2);
+                REQUIRE(s_cast.int_width == 10);
+                REQUIRE(u_cast.int_width == 10);
+                REQUIRE(s_cast.frac_width == 2);
+                REQUIRE(u_cast.frac_width == 2);
             }
         }
 
@@ -188,10 +188,10 @@ SCENARIO("Width casting fixed point numbers")
 
             THEN("The result should be a correctly expanded fixed point number")
             {
-                REQUIRE(s_cast.int_width() == 35);
-                REQUIRE(u_cast.int_width() == 35);
-                REQUIRE(s_cast.frac_width() == 5);
-                REQUIRE(u_cast.frac_width() == 5);
+                REQUIRE(s_cast.int_width == 35);
+                REQUIRE(u_cast.int_width == 35);
+                REQUIRE(s_cast.frac_width == 5);
+                REQUIRE(u_cast.frac_width == 5);
             }
         }
     }

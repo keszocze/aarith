@@ -195,7 +195,8 @@ public:
      */
     [[nodiscard]] constexpr bool is_nan() const
     {
-        return exponent == IntegerExp::all_ones() && width_cast<M>(mantissa) != uinteger<M>::zero();
+        const auto mantissa_{width_cast<M>(mantissa)};
+        return exponent == IntegerExp::all_ones() && mantissa_ != uinteger<M>::zero();
     }
 
     [[nodiscard]] constexpr auto unbiased_exponent() const -> integer<E + 1, WordType>
@@ -270,7 +271,7 @@ public:
      */
     [[nodiscard]] constexpr bool is_normalized() const
     {
-        return exponent != IntegerExp::all_zeroes();
+        return exponent != IntegerExp::zero();
     }
 
     /**

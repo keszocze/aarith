@@ -81,7 +81,7 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
 
     normalized_float<E, mantissa_sum.width() - 1> sum;
     sum.set_sign(lhs.get_sign());
-    if (mantissa_sum != uinteger<mantissa_sum.width()>::all_zeroes())
+    if (mantissa_sum != uinteger<mantissa_sum.width()>::zero())
     {
         sum.set_exponent(lhs.get_exponent());
     }

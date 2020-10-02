@@ -67,8 +67,9 @@ bool bitwise_equality(const normalized_float<E, M> lhs, const normalized_float<E
     return equal_sign && equal_exponent && equal_mantissa;
 }
 
-template <size_t E, size_t M>
-auto operator==(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
+template <size_t E, size_t M, typename WordType>
+auto operator==(const normalized_float<E, M, WordType> lhs,
+                const normalized_float<E, M, WordType> rhs) -> bool
 {
 
     if (lhs.is_nan() || rhs.is_nan())
@@ -85,8 +86,9 @@ auto operator==(const normalized_float<E, M> lhs, const normalized_float<E, M> r
     return bitwise_equality(lhs, rhs);
 }
 
-template <size_t E, size_t M>
-auto operator!=(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
+template <size_t E, size_t M, typename WordType>
+auto operator!=(const normalized_float<E, M, WordType> lhs,
+                const normalized_float<E, M, WordType> rhs) -> bool
 {
     return !(lhs == rhs);
 }

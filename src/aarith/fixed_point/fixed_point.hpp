@@ -7,7 +7,10 @@ class fixed
 {
 
 public:
-    using int_type = B<I + F, WordType>;
+    static constexpr size_t width = I + F;
+    static constexpr size_t int_width = I;
+    static constexpr size_t frac_width = F;
+    using int_type = B<width, WordType>;
     using fixed_type = fixed<I,F,B, WordType>;
 
     static_assert(::aarith::is_integral_v<int_type>);
@@ -69,39 +72,13 @@ public:
         }
         else if constexpr (::aarith::is_integral_v<Integer>)
         {
-            static_assert(I >= i.width());
-            static_assert(width() >= i.width());
+            static_assert(I >= i.width);
+            static_assert(width>= i.width);
             data = i;
             data = data << F;
         }
     }
 
-    /**
-     *
-     * @return The width of the fixed point number
-     */
-    [[nodiscard]] static constexpr size_t width()
-    {
-        return I + F;
-    }
-
-    /**
-     *
-     * @return The width of the integral part of the fixed point number
-     */
-    [[nodiscard]] static constexpr size_t int_width()
-    {
-        return I;
-    }
-
-    /**
-     *
-     * @return The width of the fractional part of the fixed point number
-     */
-    [[nodiscard]] static constexpr size_t frac_width()
-    {
-        return F;
-    }
 
     /**
      * @brief Constructs a fixed point number from a given "raw" string of bits.
@@ -116,7 +93,7 @@ public:
      */
     template <size_t W>[[nodiscard]] static constexpr fixed from_bitstring(const word_array<W, WordType>& w)
     {
-        static_assert(width() >= W);
+        static_assert(width >= W);
         fixed result;
         result.data = w;
         return result;
@@ -210,6 +187,16 @@ public:
     [[nodiscard]] static constexpr fixed_type one() {
         fixed_type one;
         one.data.set_bit(F,true);
+        return one;
+    }
+
+    /**
+     * @brief The unit in the last place.
+     * @return ULP
+     */
+    [[nodiscard]] static constexpr fixed_type ulp() {
+        fixed_type one;
+        one.data.set_bit(0,true);
         return one;
     }
 };
