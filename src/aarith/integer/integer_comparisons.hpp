@@ -28,6 +28,17 @@ constexpr bool operator==(const Int<W, T>& a, const Int<V, T>& b)
     return true;
 }
 
+
+/**
+ *
+ * @note Two numbers can be equal even though they have different bit widths!
+ */
+template <size_t W, size_t V, typename T, template <size_t, typename> typename Int>
+constexpr bool operator!=(const Int<W, T>& a, const Int<V, T>& b)
+{
+    return !(a == b);
+}
+
 template <size_t W, size_t V, typename WordType>
 constexpr bool operator<(const uinteger<W, WordType>& a, const uinteger<V, WordType>& b)
 {
