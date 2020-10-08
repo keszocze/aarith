@@ -2,6 +2,7 @@
 
 #include <aarith/core/traits.hpp>
 #include <aarith/float/float_utils.hpp>
+#include <aarith/float/float_comparisons.hpp>
 #include <aarith/integer_no_operators.hpp>
 #include <cstdint>
 #include <iostream>
@@ -196,7 +197,8 @@ public:
     [[nodiscard]] constexpr bool is_nan() const
     {
         const auto mantissa_{width_cast<M>(mantissa)};
-        return exponent == IntegerExp::all_ones() && mantissa_ != uinteger<M>::zero();
+        const auto zero = uinteger<M>::zero();
+        return exponent == IntegerExp::all_ones() && mantissa_ != zero;
     }
 
     [[nodiscard]] constexpr auto unbiased_exponent() const -> integer<E + 1, WordType>
@@ -382,8 +384,8 @@ private:
     }
 
     bool sign_neg;
-    uinteger<E, WordType> exponent;
-    uinteger<MW, WordType> mantissa;
+    IntegerExp exponent;
+    IntegerMant mantissa;
 };
 
 template <size_t E, size_t M, typename WordType> class is_integral<normalized_float<E, M, WordType>>

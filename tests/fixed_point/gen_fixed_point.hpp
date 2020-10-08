@@ -5,7 +5,7 @@
 
 namespace aarith {
 
-template <size_t I, size_t F, template <size_t, typename> typename BaseInt,
+template <size_t I, size_t F, template <size_t, typename> class BaseInt,
           typename WordType = uint64_t>
 class FixedPointGenerator : public Catch::Generators::IGenerator<fixed<I, F, BaseInt, WordType>>
 {
@@ -36,7 +36,7 @@ private:
     Fixed current_number;
 };
 
-template <size_t I, size_t F, template <size_t, typename> typename BaseInt,
+template <size_t I, size_t F, template <size_t, typename> class BaseInt,
           typename WordType = uint64_t>
 auto random_fixed_point() -> Catch::Generators::GeneratorWrapper<fixed<I, F, BaseInt, WordType>>
 {

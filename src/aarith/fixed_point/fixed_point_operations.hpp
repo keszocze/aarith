@@ -134,12 +134,13 @@ auto constexpr expanding_add(const fixed<I1, F1, B, WordType>& a, const fixed<I2
     -> fixed<std::max(I1, I2) + 1, std::max(F1, F2), B, WordType>
 {
     constexpr size_t I_expanded = std::max(I1, I2) + 1;
+    constexpr size_t F_expanded = std::max(F1, F2);
 
     const auto [expanded_a, expanded_b] = equalize_fraction_width(a, b);
 
     const auto tmp_result = expanding_add(expanded_a.bits(), expanded_b.bits());
     const auto result =
-        fixed<I_expanded, expanded_a.frac_width, B, WordType>::from_bitstring(tmp_result);
+        fixed<I_expanded, F_expanded, B, WordType>::from_bitstring(tmp_result);
 
     return result;
 }
