@@ -47,8 +47,6 @@ SCENARIO("Splitting a word_array/extraction from a word_array", "[word_array][ut
                 CHECK(r2 == word_array<5>{5});
                 CHECK(r3 == word_array<5>{10});
 
-
-
                 const auto s1 = bit_range<6, 1>(a);
                 const auto s2 = bit_range<6, 2>(a);
                 const auto s3 = bit_range<5, 1>(a);

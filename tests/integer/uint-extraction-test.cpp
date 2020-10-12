@@ -48,8 +48,6 @@ SCENARIO("Splitting an integer/extraction from an integer", "[integer][unsigned]
                 CHECK(r2 == uinteger<5>{5});
                 CHECK(r3 == uinteger<5>{10});
 
-
-
                 const auto s1 = bit_range<6, 1>(a);
                 const auto s2 = bit_range<6, 2>(a);
                 const auto s3 = bit_range<5, 1>(a);

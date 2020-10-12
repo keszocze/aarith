@@ -391,7 +391,7 @@ template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
 
 template <size_t Left, size_t Right, template <size_t, typename> class W, size_t SourceWidth,
           typename WordType>
-[[nodiscard]] constexpr auto expand(const W<SourceWidth,WordType>& source)
+[[nodiscard]] constexpr auto expand(const W<SourceWidth, WordType>& source)
 {
 
     using L = W<SourceWidth + Left, WordType>;
@@ -409,7 +409,8 @@ template <size_t Left, size_t Right, template <size_t, typename> class W, size_t
 
     R right_expanded{left_expanded};
 
-    if constexpr (Right > 0) {
+    if constexpr (Right > 0)
+    {
         right_expanded <<= Right;
     }
 

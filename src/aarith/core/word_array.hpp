@@ -252,7 +252,8 @@ public:
         //            std::string msg = gen_oob_msg(index, false);
         //            throw std::out_of_range(msg);
         //        }
-        words[index] = value & word_mask(index);
+        const auto mask = word_mask(index);
+        words[index] = value & mask;
     }
 
     /**
@@ -489,6 +490,7 @@ template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
     {
 
         word_array<DestinationWidth, WordType> word_container;
+
         if constexpr (DestinationWidth >= SourceWidth)
         {
             for (auto i = 0U; i < source.word_count(); ++i)

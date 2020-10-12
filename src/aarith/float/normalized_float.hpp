@@ -24,7 +24,7 @@ template <size_t MS, size_t E, size_t M, typename WordType>
 {
     static_assert(MS >= M, "Expanded mantissa must not be shorter than the original mantissa");
     uinteger<MS, WordType> mantissa_{f.get_mantissa()};
-    mantissa_ = mantissa_ << (size_t{MS} - size_t{M});
+    mantissa_ <<= (size_t{MS} - size_t{M});
     return mantissa_;
 }
 
@@ -111,9 +111,11 @@ public:
         static_assert(E_ <= E, "Exponent too long");
         static_assert(M_ <= M, "Mantissa too long");
 
-        sign_neg = f.msb();
+        sign_neg = f.is_negative();
         exponent = expand_exponent<E>(f);
         mantissa = expand_mantissa<M>(f);
+        mantissa.set_msb(
+            f.get_full_mantissa().msb()); // manually copy the stupid unhidden hidden bit
     }
 
     template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
@@ -280,7 +282,10 @@ public:
      */
     [[nodiscard]] constexpr bool is_nan() const
     {
-        return exponent == IntegerExp::all_ones() && width_cast<M>(mantissa) != uinteger<M>::zero();
+        const bool exp_ones = exponent == IntegerExp ::all_ones();
+        constexpr auto zero = uinteger<M>::zero();
+        const bool mant_zero = get_mantissa() != zero;
+        return exp_ones && mant_zero;
     }
 
     [[nodiscard]] constexpr auto unbiased_exponent() const -> integer<E + 1, WordType>
@@ -398,7 +403,7 @@ public:
     [[nodiscard]] explicit constexpr operator normalized_float<ETarget, MTarget, WordType>() const
     {
 
-        const auto tmp{as_word_array<ETarget, MTarget>()};
+        const auto tmp{as_word_array<ETarget, MTarget>(*this)};
         return normalized_float<ETarget, MTarget, WordType>{tmp};
     }
 

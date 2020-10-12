@@ -3,14 +3,14 @@
 #include <catch.hpp>
 using namespace aarith;
 
-TEMPLATE_TEST_CASE_SIG("Casting to and from the native data types should be lossless",
+TEMPLATE_TEST_CASE_SIG("Casting from and to the native data types should be lossless",
                        "[normalized_float][casting][utility]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, double))
 {
     using F = normalized_float<E, M>;
 
-    Native native = GENERATE(take(15, random<Native>(std::numeric_limits<Native>::min(),
+    Native native = GENERATE(take(30, random<Native>(std::numeric_limits<Native>::min(),
                                                      std::numeric_limits<Native>::max())));
 
     F from_native{native};
@@ -18,6 +18,71 @@ TEMPLATE_TEST_CASE_SIG("Casting to and from the native data types should be loss
     Native casted_back = static_cast<Native>(from_native);
 
     REQUIRE(casted_back == native);
+}
+
+SCENARIO("Casting to a larger native data type does not change the value",
+         "[normalized_float][casting][utility]")
+{
+    using F = normalized_float<8, 23>;
+    GIVEN("A random floating point value")
+    {
+
+        float f = GENERATE(take(50, random<float>(std::numeric_limits<float>::min(),
+                                                  std::numeric_limits<float>::max())));
+
+        WHEN("Casting it to a normalized_float<8,23>")
+        {
+            F f_cast{f};
+
+            AND_THEN("Casting it to a double")
+            {
+                double d = static_cast<double>(f_cast);
+
+                THEN("The value should not have changed")
+                {
+                    REQUIRE(f == d);
+                }
+            }
+        }
+    }
+}
+
+SCENARIO("Casting to a larger data type does not change the value",
+         "[normalized_float][casting][utility]")
+{
+    using F = normalized_float<8, 23>;
+    using G = normalized_float<80, 23>;
+    using H = normalized_float<8, 80>;
+    using J = normalized_float<80, 80>;
+
+    GIVEN("A random floating point value")
+    {
+        float f_ = GENERATE(take(50, random<float>(std::numeric_limits<float>::min(),
+                                                  std::numeric_limits<float>::max())));
+
+        WHEN("Casting it to a normalized_float<8,23>")
+        {
+            F f{f_};
+
+            AND_THEN("Casting it to a larger normalized float")
+            {
+
+                [[maybe_unused]] G g = static_cast<G>(f);
+                [[maybe_unused]] H h = static_cast<H>(f);
+                J j = static_cast<J>(f);
+
+                THEN("The value should not have changed")
+                {
+                    CHECK(f == g);
+                    CHECK(f == h);
+                    CHECK(g == f);
+                    CHECK(h == f);
+                    CHECK(j == f);
+                    REQUIRE(f == j);
+                }
+            }
+        }
+    }
 }
 
 TEMPLATE_TEST_CASE_SIG("Infinity and NaNs are created correctly",
@@ -34,8 +99,6 @@ TEMPLATE_TEST_CASE_SIG("Infinity and NaNs are created correctly",
     F pos_inf{F::pos_infinity()};
 
     Native pos_inf_casted = static_cast<Native>(pos_inf);
-
-    CHECK(nan_from_native == nan);
 
     REQUIRE(pos_inf_casted == pos_inf_native);
 }

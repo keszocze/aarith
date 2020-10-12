@@ -85,8 +85,55 @@ auto operator==(const normalized_float<E, M> lhs, const normalized_float<E, M> r
     return bitwise_equality(lhs, rhs);
 }
 
-template <size_t E, size_t M>
-auto operator!=(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
+template <size_t E, size_t M, size_t E_, size_t M_,
+          typename = std::enable_if_t<(E != E_) || (M != M_)>>
+bool logical_equality(const normalized_float<E, M> lhs, const normalized_float<E_, M_> rhs)
+{
+
+    bool equal_mantissa = false;
+
+    if constexpr (M > M_)
+    {
+        return logical_equality(rhs, lhs);
+    }
+    else if constexpr (M == M_) {
+        equal_mantissa = lhs.get_full_mantissa() == rhs.get_full_mantissa();
+    }
+    else
+    {
+        const auto val = bit_range<M_, M_ - M>(rhs.get_full_mantissa());
+        const auto zero = bit_range<(M_ - M) - 1, 0>(rhs.get_full_mantissa());
+        equal_mantissa = (zero == zero.all_zeroes()) && (val == lhs.get_full_mantissa());
+    }
+
+    const bool equal_sign = (lhs.get_sign() == rhs.get_sign());
+
+    const bool equal_exponent = (lhs.unbiased_exponent() == rhs.unbiased_exponent());
+    return equal_sign && equal_exponent && equal_mantissa;
+}
+
+template <size_t E, size_t M, size_t E_, size_t M_,
+          typename = std::enable_if_t<(E != E_) || (M != M_)>>
+auto operator==(const normalized_float<E, M> lhs, const normalized_float<E_, M_> rhs) -> bool
+{
+
+    if (lhs.is_nan() || rhs.is_nan())
+    {
+        return false;
+    }
+
+    // positive and negative zero should be treated equal
+    if (lhs.is_zero() && rhs.is_zero())
+    {
+        return true;
+    }
+
+    const bool logic_eq = logical_equality(lhs, rhs);
+    return logic_eq;
+}
+
+template <size_t E, size_t M, size_t E_, size_t M_>
+auto operator!=(const normalized_float<E, M> lhs, const normalized_float<E_, M_> rhs) -> bool
 {
     return !(lhs == rhs);
 }
