@@ -11,7 +11,73 @@
 
 namespace aarith {
 
-template <size_t E, size_t M, typename WordType = uint64_t> class normalized_float
+template <size_t E, size_t M, typename WordType = uint64_t> class normalized_float;
+
+/**
+ * @brief Expands the mantissa by correctly shifting the bits in the larger uinteger
+ * @tparam MS The target width of the mantissa
+ * @return The mantissa expended to a width of MS
+ */
+template <size_t MS, size_t E, size_t M, typename WordType>
+[[nodiscard]] uinteger<MS, WordType> constexpr expand_mantissa(
+    const normalized_float<E, M, WordType>& f)
+{
+    static_assert(MS >= M, "Expanded mantissa must not be shorter than the original mantissa");
+    uinteger<MS, WordType> mantissa_{f.get_mantissa()};
+    mantissa_ = mantissa_ << (size_t{MS} - size_t{M});
+    return mantissa_;
+}
+
+/**
+ * @brief Expands the exponent respecting the bias of the target width
+ * @tparam ES The target width of the exponent
+ * @return The exponent expanded to a width of ES
+ */
+template <size_t ES, size_t E, size_t M, typename WordType>
+[[nodiscard]] uinteger<ES, WordType> constexpr expand_exponent(
+    const normalized_float<E, M, WordType>& f)
+{
+    static_assert(ES >= E, "Expanded exponent must not be shorter than the original exponent");
+
+    using exp_type = uinteger<ES, WordType>;
+
+    const exp_type in_bias{f.bias};
+    const auto out_bias = normalized_float<ES, M, WordType>::bias;
+    auto bias_difference = sub(out_bias, in_bias);
+
+    exp_type exponent_ = uinteger<ES, WordType>{f.get_exponent()};
+    exponent_ = add(exponent_, bias_difference);
+
+    return exponent_;
+}
+
+/**
+ * @brief Creates a bitstring representation of the floating point number.
+ *
+ * The bitstring returned may use more bits for the exponent/mantissa than the floating point
+ * number it was created from. You can use this method to create valid IEEE 754 bitstrings.
+ *
+ * @tparam ES The number of bits to use for the exponent
+ * @tparam MS The number of bits to use for the mantissa
+ * @return IEEE-754 bitstring representation of the floating point number
+ */
+template <size_t ES, size_t MS, size_t E, size_t M, typename WordType>
+[[nodiscard]] word_array<1 + ES + MS, WordType> constexpr as_word_array(
+    const normalized_float<E, M, WordType>& f)
+{
+    using namespace aarith;
+
+    static_assert(ES >= E);
+    static_assert(MS >= M);
+
+    auto mantissa_ = expand_mantissa<MS, E, M, WordType>(f);
+    auto joined = concat(expand_exponent<ES>(f), mantissa_);
+    auto with_sign = concat(word_array<1, WordType>{f.get_sign()}, joined);
+
+    return with_sign;
+}
+
+template <size_t E, size_t M, typename WordType> class normalized_float
 {
 public:
     static_assert(M > 0, "Mantissa width has to be greater zero.");
@@ -39,16 +105,15 @@ public:
     }
 
     template <size_t E_, size_t M_>
-    explicit normalized_float(const normalized_float<E_, M_, WordType>& f)
+    explicit normalized_float(const normalized_float<E_, M_, WordType> f)
     {
+
         static_assert(E_ <= E, "Exponent too long");
         static_assert(M_ <= M, "Mantissa too long");
 
-        auto tmp{as_word_array<E, M>()};
-
-        sign_neg = tmp.msb();
-        exponent = bit_range<(E + M) - 1, M>(tmp);
-        mantissa = bit_range<M - 1, 0>(tmp);
+        sign_neg = f.msb();
+        exponent = expand_exponent<E>(f);
+        mantissa = expand_mantissa<M>(f);
     }
 
     template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
@@ -306,79 +371,46 @@ public:
     }
 
     /**
-     * @brief Expands the exponent respecting the bias of the target width
-     * @tparam ES The target width of the exponent
-     * @return The exponent expanded to a width of ES
-     */
-    template <size_t ES>[[nodiscard]] uinteger<ES, WordType> constexpr expand_exponent() const
-    {
-        static_assert(ES >= E, "Expanded exponent must not be shorter than the original exponent");
-
-        using exp_type = uinteger<ES, WordType>;
-
-        const exp_type in_bias{this->bias};
-        const auto out_bias = normalized_float<ES, M, WordType>::bias;
-        auto bias_difference = sub(out_bias, in_bias);
-
-        exp_type exponent_ = uinteger<ES, WordType>{this->get_exponent()};
-        exponent_ = add(exponent_, bias_difference);
-
-        return exponent_;
-    }
-
-    /**
-     * @brief Expands the mantissa by correctly shifting the bits in the larger uinteger
-     * @tparam MS The target width of the mantissa
-     * @return The mantissa expended to a width of MS
-     */
-    template <size_t MS>[[nodiscard]] uinteger<MS, WordType> constexpr expand_mantissa() const
-    {
-        static_assert(MS >= M, "Expanded mantissa must not be shorter than the original mantissa");
-        uinteger<MS, WordType> mantissa_{get_mantissa()};
-        mantissa_ = mantissa_ << (size_t{MS} - size_t{M});
-        return mantissa_;
-    }
-
-    /**
-     * @brief Creates a bitstring representation of the floating point number.
+     * @brief Casts the normalized float to the native float type.
      *
-     * The bitstring returned may use more bits for the exponent/mantissa than the floating point
-     * number it was created from. You can use this method to create valid IEEE 754 bitstrings.
+     * @note The cast is only possible when there will be no loss of precision
      *
-     * @tparam ES The number of bits to use for the exponent
-     * @tparam MS The number of bits to use for the mantissa
-     * @return IEEE-754 bitstring representation of the floating point number
-     */
-    template <size_t ES = E, size_t MS = M>
-    [[nodiscard]] word_array<1 + ES + MS, WordType> constexpr as_word_array() const
-    {
-        using namespace aarith;
-
-        static_assert(ES >= E);
-        static_assert(MS >= M);
-
-        auto mantissa_ = expand_mantissa<MS>();
-        auto joined = concat(expand_exponent<ES>(), mantissa_);
-        auto with_sign = concat(word_array<1, WordType>{this->get_sign()}, joined);
-
-        return with_sign;
-    }
-
-    /**
-     *
-     * @return
+     * @return The value converted to float format
      */
     [[nodiscard]] explicit constexpr operator float() const
     {
         return generic_cast<float>();
     }
 
+    /**
+     * @brief Casts the normalized float to the native double type.
+     *
+     * @note The cast is only possible when there will be no loss of precision
+     *
+     * @return The value converted to double format
+     */
     [[nodiscard]] explicit constexpr operator double() const
     {
         return generic_cast<double>();
     }
 
+    template <size_t ETarget, size_t MTarget>
+    [[nodiscard]] explicit constexpr operator normalized_float<ETarget, MTarget, WordType>() const
+    {
+
+        const auto tmp{as_word_array<ETarget, MTarget>()};
+        return normalized_float<ETarget, MTarget, WordType>{tmp};
+    }
+
 private:
+    /**
+     * @brief Casts the number to float or double.
+     *
+     * @note The cast is only possible when there will be no loss of precision.
+     *
+     * @tparam To Either float or double
+     * @return Float/Double representation of the number
+     */
     template <typename To>[[nodiscard]] constexpr To generic_cast() const
     {
 
@@ -394,7 +426,7 @@ private:
         static_assert(M <= mant_width, "Mantissa width too large");
 
         uinteger<1 + exp_width + mant_width, WordType> array{
-            as_word_array<exp_width, mant_width>()};
+            as_word_array<exp_width, mant_width>(*this)};
 
         uint_storage bitstring = static_cast<uint_storage>(array);
         To result = bit_cast<To>(bitstring);
