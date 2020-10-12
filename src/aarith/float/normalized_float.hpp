@@ -41,14 +41,24 @@ template <size_t ES, size_t E, size_t M, typename WordType>
 
     using exp_type = uinteger<ES, WordType>;
 
-    const exp_type in_bias{f.bias};
-    const auto out_bias = normalized_float<ES, M, WordType>::bias;
-    auto bias_difference = sub(out_bias, in_bias);
 
-    exp_type exponent_ = uinteger<ES, WordType>{f.get_exponent()};
-    exponent_ = add(exponent_, bias_difference);
 
-    return exponent_;
+    uinteger<E, WordType> exp_f = f.get_exponent();
+
+    if (exp_f == uinteger<E, WordType>::all_ones())
+    {
+        return exp_type::all_ones();
+    }
+    else
+    {
+        const exp_type in_bias{f.bias};
+        const auto out_bias = normalized_float<ES, M, WordType>::bias;
+        auto bias_difference = sub(out_bias, in_bias);
+
+        exp_type exponent_ = exp_type{exp_f};
+        exponent_ = add(exponent_, bias_difference);
+        return exponent_;
+    }
 }
 
 /**
@@ -102,6 +112,11 @@ public:
         sign_neg = w.msb();
         exponent = bit_range<(E + M) - 1, M>(w);
         mantissa = bit_range<M - 1, 0>(w);
+
+        //manually set the hidden bit
+        if (exponent != uinteger<E>::all_zeroes()) {
+            mantissa.set_msb(true);
+        }
     }
 
     template <size_t E_, size_t M_>
@@ -151,9 +166,20 @@ public:
         {
             // a wider exponent means a larger bias, so we have to add the difference between two
             // biases to the old exponent to get the old value
-            constexpr IntegerExp smaller_bias = uinteger<ext_exp_width - 1, WordType>::all_ones();
-            constexpr IntegerExp diff = sub(bias, smaller_bias);
-            exponent = add(IntegerExp{extracted_exp}, diff);
+
+            // we need to make sure that inf/NaN remains the same
+            if (extracted_exp == decltype(extracted_exp)::all_ones())
+            {
+                exponent = uinteger<E>::all_ones();
+            }
+            else
+            {
+
+                constexpr IntegerExp smaller_bias =
+                    uinteger<ext_exp_width - 1, WordType>::all_ones();
+                constexpr IntegerExp diff = sub(bias, smaller_bias);
+                exponent = add(IntegerExp{extracted_exp}, diff);
+            }
         }
         else if (ext_exp_width > E)
         {

@@ -47,18 +47,20 @@ SCENARIO("Casting to a larger native data type does not change the value",
     }
 }
 
-SCENARIO("Casting to a larger data type does not change the value",
-         "[normalized_float][casting][utility]")
+TEMPLATE_TEST_CASE_SIG("Casting to a larger data type does not change the value",
+         "[normalized_float][casting][utility]",
+                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
+                       (11, 52, float), (11, 52, double))
 {
-    using F = normalized_float<8, 23>;
-    using G = normalized_float<80, 23>;
-    using H = normalized_float<8, 80>;
-    using J = normalized_float<80, 80>;
+    using F = normalized_float<E, M>;
+    using G = normalized_float<E+80, M>;
+    using H = normalized_float<M, M+80>;
+    using J = normalized_float<E+80, M+80>;
 
     GIVEN("A random floating point value")
     {
-        float f_ = GENERATE(take(50, random<float>(std::numeric_limits<float>::min(),
-                                                  std::numeric_limits<float>::max())));
+        Native f_ = GENERATE(take(50, random<float>(std::numeric_limits<Native>::min(),
+            std::numeric_limits<Native>::max())));
 
         WHEN("Casting it to a normalized_float<8,23>")
         {
@@ -67,8 +69,8 @@ SCENARIO("Casting to a larger data type does not change the value",
             AND_THEN("Casting it to a larger normalized float")
             {
 
-                [[maybe_unused]] G g = static_cast<G>(f);
-                [[maybe_unused]] H h = static_cast<H>(f);
+                G g = static_cast<G>(f);
+                H h = static_cast<H>(f);
                 J j = static_cast<J>(f);
 
                 THEN("The value should not have changed")

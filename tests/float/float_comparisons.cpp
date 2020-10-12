@@ -133,3 +133,80 @@ TEMPLATE_TEST_CASE_SIG("Constants should be stored correctly",
         }
     }
 }
+
+TEMPLATE_TEST_CASE_SIG("Comparing differently sized floating points works as expected",
+                       "[normalized_float][casting][constructor][bar]",
+                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
+                       (11, 52, float), (11, 52, double))
+{
+    using F = normalized_float<E, M>;
+    using G = normalized_float<E + 80, M>;
+    using H = normalized_float<M, M + 80>;
+    using J = normalized_float<E + 80, M + 80>;
+
+    GIVEN("A random floating point value")
+    {
+        Native f_native = GENERATE(take(1, random<Native>(std::numeric_limits<Native>::min()/4,
+                                                          std::numeric_limits<Native>::max()/4)));
+
+        F f{f_native};
+
+        G g{f};
+        H h{f};
+        J j{f};
+
+        THEN("The value should not have changed")
+        {
+            CHECK(f == g);
+            CHECK(f == h);
+            CHECK(g == f);
+            CHECK(h == f);
+            CHECK(j == f);
+            REQUIRE(f == j);
+        }
+        AND_THEN("Inequality should not be true")
+        {
+            CHECK_FALSE(f != g);
+            CHECK_FALSE(f != h);
+            CHECK_FALSE(g != f);
+            CHECK_FALSE(h != f);
+            CHECK_FALSE(j != f);
+            REQUIRE_FALSE(f != j);
+        }
+        AND_GIVEN("A larger floating point value")
+        {
+            Native val = f_native + Native(30);
+            std::cout << f_native << "\t" << val << "\n";
+            F f_{val};
+            G g_{f_};
+            H h_{f_};
+            J j_{f_};
+
+            THEN("The value should have changed")
+            {
+                if (f == f_) {
+                    std::cout << f.is_nan() << "\t" << f.is_inf() << "\n";
+                    std::cout << to_binary(f) << "(" << f << ")\n";
+                    std::cout << to_binary(f_) << "(" << f_ << ")\n";
+                    std::cout << to_binary(g_) << "(" << g_ << ")\n";
+                }
+                REQUIRE(f != f_);
+                REQUIRE(f != g_);
+                CHECK(f != h_);
+                CHECK(g_ != f);
+                CHECK(h_ != f);
+                CHECK(j_ != f);
+                REQUIRE(f != j_);
+            }
+            AND_THEN("Inequality should be true")
+            {
+                REQUIRE(f != g_);
+                CHECK(f != h_);
+                CHECK(g_ != f);
+                CHECK(h_ != f);
+                CHECK(j_ != f);
+                REQUIRE(f != j_);
+            }
+        }
+    }
+}
