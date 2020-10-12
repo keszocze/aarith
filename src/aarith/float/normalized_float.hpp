@@ -31,6 +31,26 @@ public:
         sign_neg = false;
     }
 
+    explicit normalized_float(const word_array<1 + E + M>& w)
+    {
+        sign_neg = w.msb();
+        exponent = bit_range<(E + M) - 1, M>(w);
+        mantissa = bit_range<M - 1, 0>(w);
+    }
+
+    template <size_t E_, size_t M_>
+    explicit normalized_float(const normalized_float<E_, M_, WordType>& f)
+    {
+        static_assert(E_ <= E, "Exponent too long");
+        static_assert(M_ <= M, "Mantissa too long");
+
+        auto tmp{as_word_array<E, M>()};
+
+        sign_neg = tmp.msb();
+        exponent = bit_range<(E + M) - 1, M>(tmp);
+        mantissa = bit_range<M - 1, 0>(tmp);
+    }
+
     template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
     explicit normalized_float(const F f)
     {
@@ -324,12 +344,13 @@ public:
      *
      * The bitstring returned may use more bits for the exponent/mantissa than the floating point
      * number it was created from. You can use this method to create valid IEEE 754 bitstrings.
+     *
      * @tparam ES The number of bits to use for the exponent
      * @tparam MS The number of bits to use for the mantissa
      * @return IEEE-754 bitstring representation of the floating point number
      */
     template <size_t ES = E, size_t MS = M>
-    word_array<1 + ES + MS, WordType> constexpr as_word_array() const
+    [[nodiscard]] word_array<1 + ES + MS, WordType> constexpr as_word_array() const
     {
         using namespace aarith;
 
