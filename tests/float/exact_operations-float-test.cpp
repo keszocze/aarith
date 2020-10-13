@@ -147,6 +147,26 @@ TEMPLATE_TEST_CASE_SIG("One is the neutral element of the multiplication",
     }
 }
 
+SCENARIO("Multiplication should work correctly","[normalized_float][arithmetic][multiplication][bar]") {
+    GIVEN("Two numbers in in <8,23> format") {
+        using nf_t = normalized_float<8, 23>;
+
+        nf_t nf_a(0.0117647f);
+        nf_t nf_b(0.385671f);
+
+        WHEN("Multiplying them") {
+            nf_t nf_res = nf_a * nf_b;
+            THEN("The result should be correct") {
+                word_array<32> wrong_(0b01000111000000000000000000000001);
+                nf_t nf_wrong(wrong_);
+
+                // hand picked counterexample
+                REQUIRE(nf_res != nf_wrong);
+            }
+        }
+    }
+}
+
 TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts",
                        "[normalized_float][arithmetic][addition][constexpr]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
