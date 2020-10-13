@@ -347,6 +347,10 @@ public:
      * Constants
      */
 
+    /**
+     * @brief Creates a word array consisting of ones only
+     * @return <111.....11>
+     */
     [[nodiscard]] static constexpr word_array<Width, WordType> all_ones()
     {
         word_array<Width, WordType> n;
@@ -358,6 +362,21 @@ public:
         return n;
     }
 
+    /**
+     * @brief Creates a word array with only the most significant bit being one
+     * @return <10000....00>
+     */
+    [[nodiscard]] static constexpr word_array<Width, WordType> msb_one()
+    {
+        word_array<Width, WordType> n;
+        n.set_msb(true);
+        return n;
+    }
+
+    /**
+     * @brief Creates a word array consisting of zeroes only
+     * @return <000...00>
+     */
     [[nodiscard]] static constexpr word_array<Width, WordType> all_zeroes()
     {
         return word_array{0U};
@@ -367,6 +386,10 @@ public:
      * Utility stuff
      */
 
+    /**
+     * @brief Tests if all bits are zero
+     * @return True iff all bits are zero
+     */
     [[nodiscard]] bool constexpr is_zero() const noexcept
     {
 

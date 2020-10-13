@@ -17,8 +17,10 @@ TEMPLATE_TEST_CASE_SIG("Comparisons should match the native counterparts",
                                                            std::numeric_limits<Native>::max())));
         F a{a_native};
 
-        AND_GIVEN("Positive/negative infinity") {
-            THEN("Comparison with inf should be possible and correct") {
+        AND_GIVEN("Positive/negative infinity")
+        {
+            THEN("Comparison with inf should be possible and correct")
+            {
                 F pos{F::pos_infinity()};
                 F neg{F::neg_infinity()};
                 CHECK(pos > a);
@@ -157,9 +159,8 @@ TEMPLATE_TEST_CASE_SIG("Comparing differently sized floating points works as exp
 
     GIVEN("A random floating point value")
     {
-        Native f_native = GENERATE(take(30, random<Native>(std::numeric_limits<Native>::min()/4,
-                                                          0.0f)));
-
+        Native f_native =
+            GENERATE(take(30, random<Native>(std::numeric_limits<Native>::min() / 4, 0.0f)));
 
         F f{f_native};
 
@@ -189,8 +190,9 @@ TEMPLATE_TEST_CASE_SIG("Comparing differently sized floating points works as exp
         {
             // the ranges are chosen in such a way that,  hopefully, adding the second number
             // actually changes the value
-            Native fs_native = GENERATE(take(10, random<Native>(std::numeric_limits<Native>::max()/20,
-                std::numeric_limits<Native>::max()/4)));
+            Native fs_native =
+                GENERATE(take(10, random<Native>(std::numeric_limits<Native>::max() / 20,
+                                                 std::numeric_limits<Native>::max() / 4)));
 
             F f_{fs_native + f_native};
             G g_{f_};
@@ -199,7 +201,8 @@ TEMPLATE_TEST_CASE_SIG("Comparing differently sized floating points works as exp
 
             THEN("The value should have changed")
             {
-                if (f == f_) {
+                if (f == f_)
+                {
                     std::cout << f.is_nan() << "\t" << f.is_inf() << "\n";
                     std::cout << to_binary(f) << "(" << f << ")\n";
                     std::cout << to_binary(f_) << "(" << f_ << ")\n";

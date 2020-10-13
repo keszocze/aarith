@@ -1,6 +1,6 @@
 #pragma once
 
-#include <aarith/core/traits.hpp>
+#include <aarith/core.hpp>
 #include <aarith/float/float_utils.hpp>
 #include <aarith/integer_no_operators.hpp>
 #include <cstdint>
@@ -25,6 +25,23 @@ template <size_t MS, size_t E, size_t M, typename WordType>
     static_assert(MS >= M, "Expanded mantissa must not be shorter than the original mantissa");
     uinteger<MS, WordType> mantissa_{f.get_mantissa()};
     mantissa_ <<= (size_t{MS} - size_t{M});
+    return mantissa_;
+}
+
+/**
+ * @brief Expands the full mantissa (i.e. the significand) by correctly shifting the bits in the
+ * larger uinteger.
+ *
+ * @tparam MS The target width of the mantissa
+ * @return The mantissa expended to a width of MS
+ */
+template <size_t MS, size_t E, size_t M, typename WordType>
+[[nodiscard]] uinteger<MS, WordType> constexpr expand_full_mantissa(
+    const normalized_float<E, M, WordType>& f)
+{
+    static_assert(MS >= M + 1, "Expanded mantissa must not be shorter than the original mantissa");
+    uinteger<MS, WordType> mantissa_{f.get_full_mantissa()};
+    mantissa_ <<= (size_t{MS} - size_t{M + 1});
     return mantissa_;
 }
 
@@ -95,47 +112,57 @@ public:
 
     using IntegerExp = uinteger<E, WordType>;
     using IntegerMant = uinteger<MW, WordType>;
+    using IntegerFrac = uinteger<M, WordType>;
 
     static constexpr IntegerExp bias = uinteger<E - 1, WordType>::all_ones();
 
     explicit constexpr normalized_float()
+        : sign_neg(false)
+        , exponent(IntegerExp::zero())
+        , mantissa(IntegerMant::zero())
     {
-        exponent = IntegerExp::zero();
-        mantissa = IntegerMant::zero();
-        sign_neg = false;
     }
 
-    explicit normalized_float(const word_array<1 + E + M>& w)
+    explicit constexpr normalized_float(const word_array<1 + E + M>& w)
+        : sign_neg(w.msb())
+        , exponent(bit_range<(E + M) - 1, M>(w))
+        , mantissa(exponent == IntegerExp::all_zeroes()
+                       ? IntegerMant{bit_range<M - 1, 0>(w)}
+                       : msb_one(IntegerMant{bit_range<M - 1, 0>(w)}))
     {
-        sign_neg = w.msb();
-        exponent = bit_range<(E + M) - 1, M>(w);
-        mantissa = bit_range<M - 1, 0>(w);
+    }
 
-        // manually set the hidden bit
-        if (exponent != uinteger<E>::all_zeroes())
-        {
-            mantissa.set_msb(true);
-        }
+    explicit constexpr normalized_float(const bool is_neg, IntegerExp exp,
+                                        word_array<M, WordType> frac)
+        : sign_neg(is_neg)
+        , exponent(exp)
+        , mantissa((exponent == IntegerExp::zero()) ? IntegerMant{frac}
+                                                    : msb_one(IntegerMant{frac}))
+    {
+    }
+
+    explicit constexpr normalized_float(const bool is_neg, IntegerExp exp,
+                                        word_array<MW, WordType> mant)
+        : sign_neg(is_neg)
+        , exponent(exp)
+        , mantissa(mant)
+    {
     }
 
     template <size_t E_, size_t M_>
     explicit normalized_float(const normalized_float<E_, M_, WordType> f)
-    {
+        : sign_neg(f.is_negative())
+        , exponent(expand_exponent<E>(f))
+        , mantissa(expand_full_mantissa<MW>(f))
 
+    {
         static_assert(E_ <= E, "Exponent too long");
         static_assert(M_ <= M, "Mantissa too long");
-
-        sign_neg = f.is_negative();
-        exponent = expand_exponent<E>(f);
-        mantissa = expand_mantissa<M>(f);
-        mantissa.set_msb(
-            f.get_full_mantissa().msb()); // manually copy the stupid unhidden hidden bit
     }
 
     template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
     explicit normalized_float(const F f)
     {
-
         auto extracted_exp = extract_exponent<F, WordType>(f);
         auto extracted_mantissa = extract_mantissa<F, WordType>(f);
         constexpr size_t ext_exp_width = get_exponent_width<F>();
@@ -199,54 +226,53 @@ public:
         }
     }
 
+    /**
+     *
+     * @return The value zero
+     */
     [[nodiscard]] static constexpr normalized_float zero()
     {
         return normalized_float{};
     }
 
+    /**
+     *
+     * @return The value one
+     */
     [[nodiscard]] static constexpr normalized_float one()
     {
-        normalized_float num{};
-        auto exp = word_array<E, WordType>::all_ones();
-        exp.set_msb(false);
-        num.set_exponent(exp);
-
-        auto mant = uinteger<MW, WordType>::all_zeroes();
-        mant.set_msb(true);
-        num.set_full_mantissa(mant);
-
-        return num;
-    }
-
-    [[nodiscard]] static constexpr normalized_float pos_infinity()
-    {
-        normalized_float pos_inf{};
-        pos_inf.set_exponent(word_array<E, WordType>::all_ones());
-        return pos_inf;
-    }
-
-    [[nodiscard]] static constexpr normalized_float neg_infinity()
-    {
-        normalized_float neg_inf{};
-        neg_inf.set_exponent(word_array<E, WordType>::all_ones());
-        neg_inf.set_sign(-1);
-        return neg_inf;
+        constexpr word_array<E, WordType> exp{word_array<E-1, WordType>::all_ones()};
+        return normalized_float(false,exp, IntegerMant::msb_one());
     }
 
     /**
      *
-     * @return
+     * @return positive infinity
+     */
+    [[nodiscard]] static constexpr normalized_float pos_infinity()
+    {
+        constexpr normalized_float pos_inf(false, IntegerExp::all_ones(),
+                                           IntegerMant::all_zeroes());
+        return pos_inf;
+    }
+
+    /**
+     *
+     * @return negative infinity
+     */
+    [[nodiscard]] static constexpr normalized_float neg_infinity()
+    {
+        constexpr normalized_float neg_inf(true, IntegerExp::all_ones(), IntegerMant::all_zeroes());
+        return neg_inf;
+    }
+
+    /**
+     * @brief Returns a floating point number indicating not a number.
+     * @return A non-signalling not a number value
      */
     [[nodiscard]] static constexpr normalized_float NaN()
     {
-        // TODO why isn't this constexpr?
-        normalized_float nan{};
-        nan.set_exponent(word_array<E, WordType>::all_ones());
-        auto nan_mantissa = word_array<M, WordType>::all_zeroes();
-        nan_mantissa.set_msb(1);
-
-        nan.set_mantissa(nan_mantissa);
-        return nan;
+        return normalized_float(false, IntegerExp::all_ones(), IntegerMant{IntegerFrac::msb_one()});
     }
 
     static constexpr auto exponent_width() -> size_t
@@ -265,7 +291,6 @@ public:
      */
     [[nodiscard]] static constexpr integer<E + 1, WordType> denorm_exponent()
     {
-
         const integer<E + 1, WordType> b{bias};
         const integer<E + 1, WordType> neg_bias = sub(integer<E + 1, WordType>::zero(), b);
 
@@ -435,7 +460,6 @@ public:
     template <size_t ETarget, size_t MTarget>
     [[nodiscard]] explicit constexpr operator normalized_float<ETarget, MTarget, WordType>() const
     {
-
         const auto tmp{as_word_array<ETarget, MTarget>(*this)};
         return normalized_float<ETarget, MTarget, WordType>{tmp};
     }
@@ -451,7 +475,6 @@ private:
      */
     template <typename To>[[nodiscard]] constexpr To generic_cast() const
     {
-
         static_assert(std::is_floating_point<To>(), "Can only convert to float or double.");
 
         using namespace aarith;

@@ -48,19 +48,19 @@ SCENARIO("Casting to a larger native data type does not change the value",
 }
 
 TEMPLATE_TEST_CASE_SIG("Casting to a larger data type does not change the value",
-         "[normalized_float][casting][utility]",
+                       "[normalized_float][casting][utility]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, float), (11, 52, double))
 {
     using F = normalized_float<E, M>;
-    using G = normalized_float<E+80, M>;
-    using H = normalized_float<M, M+80>;
-    using J = normalized_float<E+80, M+80>;
+    using G = normalized_float<E + 80, M>;
+    using H = normalized_float<M, M + 80>;
+    using J = normalized_float<E + 80, M + 80>;
 
     GIVEN("A random floating point value")
     {
         Native f_ = GENERATE(take(50, random<float>(std::numeric_limits<Native>::min(),
-            std::numeric_limits<Native>::max())));
+                                                    std::numeric_limits<Native>::max())));
 
         WHEN("Casting it to a normalized_float<8,23>")
         {

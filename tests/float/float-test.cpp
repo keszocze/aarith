@@ -44,6 +44,33 @@ TEMPLATE_TEST_CASE_SIG("Constructing larger normalized floats from smaller ones"
     }
 }
 
+TEMPLATE_TEST_CASE_SIG("Creating constant values is a constexpr",
+                       "[normalized_float][constant][constexpr]", ((size_t E, size_t M), E, M),
+                       (8, 23), (11, 52), (3, 3), (80, 80))
+{
+    using F = normalized_float<E, M>;
+    using W = word_array<1 + E + M>;
+
+    WHEN("Creating some constant values")
+    {
+        THEN("This should be possible as constexpr")
+        {
+
+            constexpr F zero{F::zero()};
+            constexpr F pos_inf{F::pos_infinity()};
+            constexpr F neg_inf{F::neg_infinity()};
+            constexpr F nan{F::NaN()};
+            constexpr F one{F::one()};
+
+            CHECK(zero != pos_inf);
+            CHECK(zero != neg_inf);
+            CHECK(zero != nan);
+            CHECK(zero < one);
+            REQUIRE(nan.is_nan());
+        }
+    }
+}
+
 TEMPLATE_TEST_CASE_SIG("Width-casting special values into larger normalized floats",
                        "[normalized_float][casting][constructor]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),

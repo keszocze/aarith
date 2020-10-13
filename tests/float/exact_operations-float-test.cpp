@@ -226,19 +226,17 @@ TEMPLATE_TEST_CASE_SIG("Adding special numbers", "[normalized_float][arithmetic]
 {
 }
 
-TEMPLATE_TEST_CASE_SIG("Generating NaN as a result",
-                       "[normalized_float][arithmetic][addition]",
+TEMPLATE_TEST_CASE_SIG("Generating NaN as a result", "[normalized_float][arithmetic][addition]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, double))
 {
 
     using F = normalized_float<E, M>;
 
-
     Native inf = std::numeric_limits<Native>::infinity();
     Native ninf = -inf;
 
-    std::cout << (inf * 0) << "\t" << (inf * 4.0f) << "\t" << (inf*ninf) << "\n";
+    std::cout << (inf * 0) << "\t" << (inf * 4.0f) << "\t" << (inf * ninf) << "\n";
 
     GIVEN("NaN and +/- infinity")
     {
@@ -262,7 +260,8 @@ TEMPLATE_TEST_CASE_SIG("Generating NaN as a result",
             std::cout << to_binary(res_mul) << "\n";
             REQUIRE(res_mul.is_nan());
         }
-        WHEN("Dividing/computing modulus") {
+        WHEN("Dividing/computing modulus")
+        {
             F res_div_zero = F::zero() / F::zero();
             F res_div_inf = pos_inf / pos_inf;
             CHECK(res_div_zero.is_nan());
