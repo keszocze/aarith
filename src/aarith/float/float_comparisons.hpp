@@ -24,6 +24,10 @@ auto operator<(const normalized_float<E, M> lhs, const normalized_float<E, M> rh
     {
         return true;
     }
+    else if (lhs.is_positive() && rhs.is_negative()) {
+        return false;
+    }
+    // now the sign is equal
     else if (lhs.get_exponent() == rhs.get_exponent())
     {
         if (lhs.get_full_mantissa() == rhs.get_full_mantissa())
@@ -159,6 +163,10 @@ bool operator<(const normalized_float<E, M> lhs, const normalized_float<E_, M_> 
     {
         return true;
     }
+    else if (lhs.is_positive() && rhs.is_negative()) {
+        return false;
+    }
+    // now the sign is equal
     else if (lhs.unbiased_exponent() == rhs.unbiased_exponent())
     {
         if (lhs.get_full_mantissa() == rhs.get_full_mantissa())

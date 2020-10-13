@@ -21,7 +21,7 @@ TEMPLATE_TEST_CASE_SIG("Comparisons should match the native counterparts",
     GIVEN("A normalized_float created from native data types")
     {
 
-        Native a_native = GENERATE(take(15, full_native_range<Native>()));
+        Native a_native = GENERATE(take(10, full_native_range<Native>()));
         F a{a_native};
 
         AND_GIVEN("Positive/negative infinity")
@@ -80,7 +80,7 @@ TEMPLATE_TEST_CASE_SIG("Comparisons should match the native counterparts",
 
         AND_GIVEN("Another normalized float generated from native data types")
         {
-            Native b_native = GENERATE(take(15, full_native_range<Native>()));
+            Native b_native = GENERATE(take(10, full_native_range<Native>()));
             F b{b_native};
 
             WHEN("Comparing these numbers")
@@ -99,6 +99,12 @@ TEMPLATE_TEST_CASE_SIG("Comparisons should match the native counterparts",
 
                     bool leq = (a <= b);
                     bool leq_native(a_native <= b_native);
+                    if (leq != leq_native)
+                    {
+                        std::cout << a_native << "\t" << b_native << "\n";
+                        std::cout << a << "\t" << b << "\n";
+                        std::cout << leq << "\t" << leq_native << "\n";
+                    }
                     CHECK(leq == leq_native);
 
                     bool lt = (a < b);

@@ -21,5 +21,13 @@ int main()
     std::cout << to_binary(result) << "\n";
 
 
+    nf_t lhs{5.0f};
+    nf_t rhs{-2.0f};
+
+
+    std::cout << lhs << "\t" << rhs << "\n";
+    std::cout << (lhs < rhs) << "\n";
+
+
     return 0;
 }
