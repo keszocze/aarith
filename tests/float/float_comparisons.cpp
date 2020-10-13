@@ -17,6 +17,17 @@ TEMPLATE_TEST_CASE_SIG("Comparisons should match the native counterparts",
                                                            std::numeric_limits<Native>::max())));
         F a{a_native};
 
+        AND_GIVEN("Positive/negative infinity") {
+            THEN("Comparison with inf should be possible and correct") {
+                F pos{F::pos_infinity()};
+                F neg{F::neg_infinity()};
+                CHECK(pos > a);
+                CHECK(pos != a);
+                CHECK(neg < a);
+                REQUIRE(neg != a);
+            }
+        }
+
         AND_GIVEN("The NaN value")
         {
             Native quite_nan_native = std::numeric_limits<Native>::quiet_NaN();
