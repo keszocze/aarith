@@ -208,23 +208,23 @@ template <size_t E, size_t M, typename WordType>
                        const normalized_float<E, M, WordType> rhs)
     -> normalized_float<E, M, WordType>
 {
-    auto dividend = width_cast<2 * (M + 1) + 3>(lhs.get_full_mantissa());
-    auto divisor = width_cast<2 * (M + 1) + 3>(rhs.get_full_mantissa());
-    dividend = (dividend << M + 4);
+    auto dividend = width_cast<2 * M + 1>(lhs.get_full_mantissa());
+    auto divisor = width_cast<2 * M + 1>(rhs.get_full_mantissa());
+    dividend = dividend << M;
     auto mquotient = div(dividend, divisor);
     // mquotient >>= 1;
-    auto rdmquotient = rshift_and_round(mquotient, 4);
+    // auto rdmquotient = rshift_and_round(mquotient, 1);
 
     auto esum = width_cast<E>(
         sub(expanding_add(lhs.get_exponent(), lhs.bias), width_cast<E + 1>(rhs.get_exponent())));
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
-    normalized_float<E, rdmquotient.width() - 1> quotient;
-    quotient.set_mantissa(rdmquotient);
+    normalized_float<E, mquotient.width() - 1> quotient;
+    quotient.set_full_mantissa(mquotient);
     quotient.set_exponent(esum);
     quotient.set_sign(sign);
 
-    return normalize<E, rdmquotient.width() - 1, M>(quotient);
+    return normalize<E, mquotient.width() - 1, M>(quotient);
 }
 
 /**

@@ -64,16 +64,38 @@ public:
         {
             // a wider exponent means a larger bias, so we have to add the difference between two
             // biases to the old exponent to get the old value
+            // TODO handle denormalized numbers?
             constexpr IntegerExp smaller_bias = uinteger<ext_exp_width - 1, WordType>::all_ones();
             constexpr IntegerExp diff = sub(bias, smaller_bias);
             exponent = add(IntegerExp{extracted_exp}, diff);
         }
         else if (ext_exp_width > E)
         {
-            // we simply truncate the exponent after shifting to the right, hoping that we do not
-            // loose too much precision (we will....)
-            extracted_exp >>= (ext_exp_width - E);
-            exponent = width_cast<E>(extracted_exp);
+            // a smaller exponent means a lower bias, so we subtract the difference between the two
+            // biases from the original bias
+            // in case of over- or underflow we set the value to infinity or 0
+            // TODO handle denormalized numbers?
+            using OExp = uinteger<ext_exp_width + 1, WordType>;
+            constexpr OExp bigger_bias = uinteger<ext_exp_width - 1, WordType>::all_ones();
+            constexpr OExp smaller_bias = bias;
+            constexpr OExp diff = sub(bigger_bias, smaller_bias);
+            const auto exp = sub(OExp(extracted_exp), diff);
+            const bool overflow = exp >= OExp(IntegerExp::all_ones()) && exp.bit(ext_exp_width) == 0;
+            const bool underflow = exp.bit(ext_exp_width) == 1;
+            if (underflow)
+            {
+                mantissa = mantissa.all_zeroes();
+                exponent = exponent.all_zeroes();
+            }
+            else if (overflow)
+            {
+                mantissa = mantissa.all_zeroes();
+                exponent = exponent.all_ones();
+            }
+            else
+            {
+                exponent = width_cast<E>(exp);
+            }
         }
         else
         {
