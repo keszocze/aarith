@@ -40,7 +40,7 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
     normalized_float<E, mantissa_sum.width() - 1> sum;
     sum.set_sign(lhs.get_sign());
     sum.set_exponent(lhs.get_exponent());
-    sum.set_mantissa(mantissa_sum);
+    sum.set_full_mantissa(mantissa_sum);
 
     return normalize<E, mantissa_sum.width() - 1, M>(sum);
 }
@@ -85,7 +85,7 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
     {
         sum.set_exponent(lhs.get_exponent());
     }
-    sum.set_mantissa(mantissa_sum);
+    sum.set_full_mantissa(mantissa_sum);
 
     return normalize<E, mantissa_sum.width() - 1, M>(sum);
 }
@@ -185,7 +185,7 @@ template <size_t E, size_t M, typename WordType>
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
     normalized_float<E, mproduct.width() - 1> product;
-    product.set_mantissa(mproduct);
+    product.set_full_mantissa(mproduct);
     product.set_exponent(esum);
     product.set_sign(sign);
 
