@@ -236,6 +236,15 @@ public:
     }
 
     /**
+ *
+ * @return The value negative zero
+ */
+    [[nodiscard]] static constexpr normalized_float neg_zero()
+    {
+        return normalized_float(true, IntegerExp::all_zeroes(), IntegerMant::all_zeroes());
+    }
+
+    /**
      *
      * @return The value one
      */
@@ -325,6 +334,18 @@ public:
     [[nodiscard]] constexpr bool is_inf() const
     {
         return exponent == uinteger<E>::all_ones() &&
+               width_cast<M>(mantissa) == uinteger<M>::zero();
+    }
+
+    [[nodiscard]] constexpr bool is_pos_inf() const
+    {
+        return !sign_neg && exponent == uinteger<E>::all_ones() &&
+               width_cast<M>(mantissa) == uinteger<M>::zero();
+    }
+
+    [[nodiscard]] constexpr bool is_neg_inf() const
+    {
+        return sign_neg && exponent == uinteger<E>::all_ones() &&
                width_cast<M>(mantissa) == uinteger<M>::zero();
     }
 

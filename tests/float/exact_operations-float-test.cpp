@@ -147,8 +147,7 @@ TEMPLATE_TEST_CASE_SIG("One is the neutral element of the multiplication",
     }
 }
 
-SCENARIO("Multiplication should work correctly",
-         "[normalized_float][arithmetic][multiplication][bar]")
+SCENARIO("Multiplication should work correctly", "[normalized_float][arithmetic][multiplication]")
 {
     GIVEN("Two numbers in in <8,23> format")
     {
@@ -220,23 +219,204 @@ TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts"
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("Adding special numbers", "[normalized_float][arithmetic][addition]",
+TEMPLATE_TEST_CASE_SIG("Adding to infinity", "[normalized_float][arithmetic][addition][bar]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, double))
 {
+    using F = normalized_float<E, M>;
+    constexpr F neg_inf{F::neg_infinity()};
+    constexpr F pos_inf{F::pos_infinity()};
+
+    std::cout << (-std::numeric_limits<float>::infinity() + 234.0f) << "\n";
+
+    GIVEN("Infinity")
+    {
+        WHEN("Adding infinity to infinity")
+        {
+            F res = pos_inf + pos_inf;
+            THEN("The result should still be infinity")
+            {
+                CHECK(res == pos_inf);
+                CHECK(res.is_pos_inf());
+                REQUIRE(res.is_inf());
+            }
+        }
+    }
+    AND_GIVEN("A random floating point number")
+    {
+
+        Native f_ = GENERATE(take(50, random<float>(std::numeric_limits<Native>::min(),
+                                                    std::numeric_limits<Native>::max())));
+
+        F f{f_};
+        WHEN("Adding that number to infinity")
+        {
+            F res = pos_inf + f;
+            F res_neg = neg_inf + f;
+            THEN("The value should still be infinity")
+            {
+                CHECK(res_neg == neg_inf);
+                CHECK(res_neg.is_inf());
+                CHECK(res_neg.is_neg_inf());
+                CHECK(res == pos_inf);
+                CHECK(res.is_pos_inf());
+                REQUIRE(res.is_inf());
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Dividing by infinity", "[normalized_float][arithmetic][division]",
+                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
+                       (11, 52, double))
+{
+    // I haven't found easily readable official documents that motivate these test cases. They are
+    // based on the following web sites:
+    // https://wiki.analytica.com/index.php/INF,_Nan,_Zero_and_IEEE/SANE_arithmetic
+    // https://stackoverflow.com/questions/42926763/the-behaviour-of-floating-point-division-by-zero
+    //      and the reference to Annex F
+
+    GIVEN("A random floating point number")
+    {
+
+        using F = normalized_float<E, M>;
+
+        Native f_ = GENERATE(take(50, random<float>(std::numeric_limits<Native>::min(),
+                                                    std::numeric_limits<Native>::max())));
+        F f{f_};
+
+        constexpr F neg_inf{F::neg_infinity()};
+        constexpr F pos_inf{F::pos_infinity()};
+        constexpr F pos_zero{F::zero()};
+        constexpr F neg_zero{F::neg_zero()};
+        WHEN("Dividing by infinity")
+        {
+            THEN("The sign of the resulting zero should be correct")
+            {
+                F res = f / neg_inf;
+                F res_ = f / pos_inf;
+
+                if (f.is_negative())
+                {
+                    CHECK(res == pos_zero);
+                    REQUIRE(res_ == neg_zero);
+                }
+                else
+                {
+                    CHECK(res == neg_zero);
+                    REQUIRE(res_ == pos_zero);
+                }
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Dividing by zero", "[normalized_float][arithmetic][division]",
+                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
+                       (11, 52, double))
+{
+    // I haven't found easily readable official documents that motivate these test cases. They are
+    // based on the following web sites:
+    // https://wiki.analytica.com/index.php/INF,_Nan,_Zero_and_IEEE/SANE_arithmetic
+    // https://stackoverflow.com/questions/42926763/the-behaviour-of-floating-point-division-by-zero
+    //      and the reference to Annex F
+
+    GIVEN("A random floating point number")
+    {
+
+        using F = normalized_float<E, M>;
+
+        Native f_ = GENERATE(take(50, random<float>(std::numeric_limits<Native>::min(),
+                                                    std::numeric_limits<Native>::max())));
+        F f{f_};
+
+        constexpr F neg_inf{F::neg_infinity()};
+        constexpr F pos_inf{F::pos_infinity()};
+        constexpr F pos_zero{F::zero()};
+        constexpr F neg_zero{F::neg_zero()};
+        WHEN("Dividing by infinity")
+        {
+            THEN("The sign of the resulting zero should be correct")
+            {
+
+                if (!f.is_zero())
+                {
+
+                    F res = f / neg_zero;
+                    F res_ = f / pos_zero;
+
+                    if (f.is_negative())
+                    {
+                        CHECK(res == pos_inf);
+                        REQUIRE(res_ == neg_inf);
+                    }
+                    else
+                    {
+                        CHECK(res == neg_inf);
+                        REQUIRE(res_ == pos_inf);
+                    }
+                }
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Multiplying with infinity",
+                       "[normalized_float][arithmetic][multiplication]",
+                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
+                       (11, 52, double))
+{
+    // I haven't found easily readable official documents that motivate these test cases. They are
+    // based on the following web sites:
+    // https://wiki.analytica.com/index.php/INF,_Nan,_Zero_and_IEEE/SANE_arithmetic
+    // https://stackoverflow.com/questions/42926763/the-behaviour-of-floating-point-division-by-zero
+    //      and the reference to Annex F
+    GIVEN("A random floating point number")
+    {
+
+        using F = normalized_float<E, M>;
+
+        Native f_ = GENERATE(take(50, random<float>(std::numeric_limits<Native>::min(),
+                                                    std::numeric_limits<Native>::max())));
+        F f{f_};
+
+        constexpr F neg_inf{F::neg_infinity()};
+        constexpr F pos_inf{F::pos_infinity()};
+
+        WHEN("Multiplying with infinity")
+        {
+            THEN("The sign of the resulting infinity should be correct")
+            {
+                F res = f * neg_inf;
+                F res_ = f * pos_inf;
+
+                if (f.is_negative())
+                {
+                    CHECK(res == pos_inf);
+                    REQUIRE(res_ == neg_inf);
+                }
+                else
+                {
+                    CHECK(res == neg_inf);
+                    REQUIRE(res_ == pos_inf);
+                }
+            }
+        }
+    }
 }
 
 TEMPLATE_TEST_CASE_SIG("Generating NaN as a result", "[normalized_float][arithmetic][addition]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, double))
 {
-
+    // these tests are modeled after the information
     using F = normalized_float<E, M>;
 
     Native inf = std::numeric_limits<Native>::infinity();
     Native ninf = -inf;
 
     std::cout << (inf * 0) << "\t" << (inf * 4.0f) << "\t" << (inf * ninf) << "\n";
+    std::cout << (-0.0f / inf) << "\t" << (-5.0f / ninf) << "\t" << (inf / inf) << "\n";
 
     GIVEN("NaN and +/- infinity")
     {

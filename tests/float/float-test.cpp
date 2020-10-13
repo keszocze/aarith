@@ -49,7 +49,7 @@ TEMPLATE_TEST_CASE_SIG("Creating constant values is a constexpr",
                        (8, 23), (11, 52), (3, 3), (80, 80))
 {
     using F = normalized_float<E, M>;
-    using W = word_array<1 + E + M>;
+
 
     WHEN("Creating some constant values")
     {
@@ -62,6 +62,8 @@ TEMPLATE_TEST_CASE_SIG("Creating constant values is a constexpr",
             constexpr F nan{F::NaN()};
             constexpr F one{F::one()};
 
+            // the tests are only there to ensure that the compiler does not complain about
+            // unused variables
             CHECK(zero != pos_inf);
             CHECK(zero != neg_inf);
             CHECK(zero != nan);
