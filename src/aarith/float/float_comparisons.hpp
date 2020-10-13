@@ -110,7 +110,7 @@ bool logical_equality(const normalized_float<E, M> lhs, const normalized_float<E
     const bool equal_sign = (lhs.get_sign() == rhs.get_sign());
 
     const bool equal_exponent = (lhs.unbiased_exponent() == rhs.unbiased_exponent());
-    std::cout << equal_sign << "\t" << equal_exponent << "\t" << equal_mantissa << "\n";
+//    std::cout << equal_sign << "\t" << equal_exponent << "\t" << equal_mantissa << "\n";
     return equal_sign && equal_exponent && equal_mantissa;
 }
 

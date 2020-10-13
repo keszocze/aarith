@@ -135,7 +135,7 @@ TEMPLATE_TEST_CASE_SIG("Constants should be stored correctly",
 }
 
 TEMPLATE_TEST_CASE_SIG("Comparing differently sized floating points works as expected",
-                       "[normalized_float][casting][constructor][bar]",
+                       "[normalized_float][casting][constructor]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, float), (11, 52, double))
 {
@@ -146,8 +146,9 @@ TEMPLATE_TEST_CASE_SIG("Comparing differently sized floating points works as exp
 
     GIVEN("A random floating point value")
     {
-        Native f_native = GENERATE(take(1, random<Native>(std::numeric_limits<Native>::min()/4,
-                                                          std::numeric_limits<Native>::max()/4)));
+        Native f_native = GENERATE(take(30, random<Native>(std::numeric_limits<Native>::min()/4,
+                                                          0.0f)));
+
 
         F f{f_native};
 
@@ -175,9 +176,12 @@ TEMPLATE_TEST_CASE_SIG("Comparing differently sized floating points works as exp
         }
         AND_GIVEN("A larger floating point value")
         {
-            Native val = f_native + Native(30);
-            std::cout << f_native << "\t" << val << "\n";
-            F f_{val};
+            // the ranges are chosen in such a way that,  hopefully, adding the second number
+            // actually changes the value
+            Native fs_native = GENERATE(take(10, random<Native>(std::numeric_limits<Native>::max()/20,
+                std::numeric_limits<Native>::max()/4)));
+
+            F f_{fs_native + f_native};
             G g_{f_};
             H h_{f_};
             J j_{f_};
