@@ -4,6 +4,14 @@
 #include <cmath>
 using namespace aarith;
 
+template <typename N>
+// it is not really "full range" but at least it works
+auto full_native_range()
+{
+    return Catch::Generators::random<N>(std::numeric_limits<N>::lowest() / 100.0f,
+                                        std::numeric_limits<N>::max() / 100.0f);
+}
+
 TEMPLATE_TEST_CASE_SIG("Constructing larger normalized floats from smaller ones",
                        "[normalized_float][casting][constructor]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
@@ -16,8 +24,7 @@ TEMPLATE_TEST_CASE_SIG("Constructing larger normalized floats from smaller ones"
 
     GIVEN("A random floating point value")
     {
-        Native f_ = GENERATE(take(50, random<float>(std::numeric_limits<Native>::min(),
-                                                    std::numeric_limits<Native>::max())));
+        Native f_ = GENERATE(take(50, full_native_range<Native>()));
 
         WHEN("Casting it to a normalized_float<8,23>")
         {
@@ -49,7 +56,6 @@ TEMPLATE_TEST_CASE_SIG("Creating constant values is a constexpr",
                        (8, 23), (11, 52), (3, 3), (80, 80))
 {
     using F = normalized_float<E, M>;
-
 
     WHEN("Creating some constant values")
     {

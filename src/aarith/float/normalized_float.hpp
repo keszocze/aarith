@@ -236,9 +236,9 @@ public:
     }
 
     /**
- *
- * @return The value negative zero
- */
+     *
+     * @return The value negative zero
+     */
     [[nodiscard]] static constexpr normalized_float neg_zero()
     {
         return normalized_float(true, IntegerExp::all_zeroes(), IntegerMant::all_zeroes());
@@ -250,8 +250,8 @@ public:
      */
     [[nodiscard]] static constexpr normalized_float one()
     {
-        constexpr word_array<E, WordType> exp{word_array<E-1, WordType>::all_ones()};
-        return normalized_float(false,exp, IntegerMant::msb_one());
+        constexpr word_array<E, WordType> exp{word_array<E - 1, WordType>::all_ones()};
+        return normalized_float(false, exp, IntegerMant::msb_one());
     }
 
     /**

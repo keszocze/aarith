@@ -3,6 +3,14 @@
 #include <catch.hpp>
 using namespace aarith;
 
+template <typename N>
+// it is not really "full range" but at least it works
+auto full_native_range()
+{
+    return Catch::Generators::random<N>(std::numeric_limits<N>::lowest() / 100.0f,
+                                        std::numeric_limits<N>::max() / 100.0f);
+}
+
 TEMPLATE_TEST_CASE_SIG("Comparisons should match the native counterparts",
                        "[normalized_float][comparison][utility]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
@@ -13,8 +21,7 @@ TEMPLATE_TEST_CASE_SIG("Comparisons should match the native counterparts",
     GIVEN("A normalized_float created from native data types")
     {
 
-        Native a_native = GENERATE(take(15, random<Native>(std::numeric_limits<Native>::min(),
-                                                           std::numeric_limits<Native>::max())));
+        Native a_native = GENERATE(take(15, full_native_range<Native>()));
         F a{a_native};
 
         AND_GIVEN("Positive/negative infinity")
@@ -73,9 +80,7 @@ TEMPLATE_TEST_CASE_SIG("Comparisons should match the native counterparts",
 
         AND_GIVEN("Another normalized float generated from native data types")
         {
-            Native b_native =
-                GENERATE(take(15, random<Native>(std::numeric_limits<Native>::min(),
-                                                 std::numeric_limits<Native>::max())));
+            Native b_native = GENERATE(take(15, full_native_range<Native>()));
             F b{b_native};
 
             WHEN("Comparing these numbers")
@@ -160,7 +165,7 @@ TEMPLATE_TEST_CASE_SIG("Comparing differently sized floating points works as exp
     GIVEN("A random floating point value")
     {
         Native f_native =
-            GENERATE(take(30, random<Native>(std::numeric_limits<Native>::min() / 4, 0.0f)));
+            GENERATE(take(30, random<Native>(std::numeric_limits<Native>::lowest() / 4, 0.0f)));
 
         F f{f_native};
 

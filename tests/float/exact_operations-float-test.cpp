@@ -5,6 +5,14 @@
 #include "../test-signature-ranges.hpp"
 using namespace aarith;
 
+template <typename N>
+// it is not really "full range" but at least it works
+auto full_native_range()
+{
+    return Catch::Generators::random<N>(std::numeric_limits<N>::lowest() / 100.0f,
+                                        std::numeric_limits<N>::max() / 100.0f);
+}
+
 TEMPLATE_TEST_CASE_SIG("Addition is commutative",
                        "[normalized_float][arithmetic][addition][invariant]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
@@ -15,10 +23,9 @@ TEMPLATE_TEST_CASE_SIG("Addition is commutative",
     GIVEN("Tow normalized_floats created from native data types")
     {
 
-        Native a_native = GENERATE(take(15, random<Native>(std::numeric_limits<Native>::min(),
-                                                           std::numeric_limits<Native>::max())));
-        Native b_native = GENERATE(take(15, random<Native>(std::numeric_limits<Native>::min(),
-                                                           std::numeric_limits<Native>::max())));
+        Native a_native = GENERATE(take(15, full_native_range<Native>()));
+        Native b_native = GENERATE(take(15, full_native_range<Native>()));
+
         F a{a_native};
         F b{b_native};
 
@@ -44,10 +51,9 @@ TEMPLATE_TEST_CASE_SIG("Multiplication is commutative",
     GIVEN("Tow normalized_floats created from native data types")
     {
 
-        Native a_native = GENERATE(take(15, random<Native>(std::numeric_limits<Native>::min(),
-                                                           std::numeric_limits<Native>::max())));
-        Native b_native = GENERATE(take(15, random<Native>(std::numeric_limits<Native>::min(),
-                                                           std::numeric_limits<Native>::max())));
+        Native a_native = GENERATE(take(15, full_native_range<Native>()));
+        Native b_native = GENERATE(take(15, full_native_range<Native>()));
+
         F a{a_native};
         F b{b_native};
 
@@ -73,8 +79,8 @@ TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
     GIVEN("A normalized_float  created from native data types and the number zero")
     {
 
-        Native a_native = GENERATE(take(15, random<Native>(std::numeric_limits<Native>::min(),
-                                                           std::numeric_limits<Native>::max())));
+        Native a_native = GENERATE(take(15, full_native_range<Native>()));
+
         F a{a_native};
         F zero{F::zero()};
 
@@ -99,8 +105,7 @@ TEMPLATE_TEST_CASE_SIG("Zero makes the multiplication result zero",
     GIVEN("A normalized_float  created from native data types and the number zero")
     {
 
-        Native a_native = GENERATE(take(15, random<Native>(std::numeric_limits<Native>::min(),
-                                                           std::numeric_limits<Native>::max())));
+        Native a_native = GENERATE(take(15, full_native_range<Native>()));
         F a{a_native};
         F zero{F::zero()};
 
@@ -131,8 +136,7 @@ TEMPLATE_TEST_CASE_SIG("One is the neutral element of the multiplication",
     GIVEN("A normalized_float created from native data types and the number one")
     {
 
-        Native a_native = GENERATE(take(15, random<Native>(std::numeric_limits<Native>::min(),
-                                                           std::numeric_limits<Native>::max())));
+        Native a_native = GENERATE(take(15, full_native_range<Native>()));
         F a{a_native};
         F one{F::one()};
 
@@ -219,7 +223,7 @@ TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts"
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("Adding to infinity", "[normalized_float][arithmetic][addition][bar]",
+TEMPLATE_TEST_CASE_SIG("Adding to infinity", "[normalized_float][arithmetic][addition]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, double))
 {
@@ -245,8 +249,7 @@ TEMPLATE_TEST_CASE_SIG("Adding to infinity", "[normalized_float][arithmetic][add
     AND_GIVEN("A random floating point number")
     {
 
-        Native f_ = GENERATE(take(50, random<float>(std::numeric_limits<Native>::min(),
-                                                    std::numeric_limits<Native>::max())));
+        Native f_ = GENERATE(take(50, full_native_range<Native>()));
 
         F f{f_};
         WHEN("Adding that number to infinity")
@@ -281,8 +284,7 @@ TEMPLATE_TEST_CASE_SIG("Dividing by infinity", "[normalized_float][arithmetic][d
 
         using F = normalized_float<E, M>;
 
-        Native f_ = GENERATE(take(50, random<float>(std::numeric_limits<Native>::min(),
-                                                    std::numeric_limits<Native>::max())));
+        Native f_ = GENERATE(take(15, full_native_range<Native>()));
         F f{f_};
 
         constexpr F neg_inf{F::neg_infinity()};
@@ -326,8 +328,7 @@ TEMPLATE_TEST_CASE_SIG("Dividing by zero", "[normalized_float][arithmetic][divis
 
         using F = normalized_float<E, M>;
 
-        Native f_ = GENERATE(take(50, random<float>(std::numeric_limits<Native>::min(),
-                                                    std::numeric_limits<Native>::max())));
+        Native f_ = GENERATE(take(15, full_native_range<Native>()));
         F f{f_};
 
         constexpr F neg_inf{F::neg_infinity()};
@@ -376,8 +377,7 @@ TEMPLATE_TEST_CASE_SIG("Multiplying with infinity",
 
         using F = normalized_float<E, M>;
 
-        Native f_ = GENERATE(take(50, random<float>(std::numeric_limits<Native>::min(),
-                                                    std::numeric_limits<Native>::max())));
+        Native f_ = GENERATE(take(15, full_native_range<Native>()));
         F f{f_};
 
         constexpr F neg_inf{F::neg_infinity()};
