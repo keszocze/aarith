@@ -21,13 +21,13 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
 [[nodiscard]] auto add_(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs,
                         Function_add fun_add, Function_sub fun_sub) -> normalized_float<E, M>
 {
-    //order operands
+    // order operands
     if (abs(lhs) < abs(rhs))
     {
         return add_(rhs, lhs, fun_add, fun_sub);
     }
 
-    //sub if 2nd operand is negative
+    // sub if 2nd operand is negative
     if (lhs.get_sign() != rhs.get_sign())
     {
         auto swap_sign = rhs;
@@ -35,13 +35,15 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
         return sub_(lhs, swap_sign, fun_add, fun_sub);
     }
 
-    const auto exponent_delta = sub(width_cast<E+1>(lhs.get_exponent()), width_cast<E+1>(rhs.get_exponent()));
-        
+    const auto exponent_delta =
+        sub(width_cast<E + 1>(lhs.get_exponent()), width_cast<E + 1>(rhs.get_exponent()));
+
     const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
     const auto mantissa_sum = fun_add(lhs.get_full_mantissa(), new_mantissa);
 
-    normalized_float<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(), mantissa_sum);
-    
+    normalized_float<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(),
+                                                      mantissa_sum);
+
     return normalize<E, mantissa_sum.width() - 1, M>(sum);
 }
 
@@ -105,6 +107,13 @@ template <size_t E, size_t M>
 [[nodiscard]] auto add(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
     -> normalized_float<E, M>
 {
+
+    if ((lhs.is_nan() || rhs.is_nan()) || (lhs.is_neg_inf() && rhs.is_pos_inf()) ||
+        (lhs.is_pos_inf() && rhs.is_neg_inf()))
+    {
+        return normalized_float<E, M>::NaN();
+    }
+
     // return add_<E, M, class aarith::uinteger<M+1, long unsigned int> (*)(const class
     // aarith::uinteger<M+1>&, const class aarith::uinteger<M+1>&, const bool)>(lhs, rhs,
     // expanding_add<M+1, M+1>, expanding_sub<M+1, M+1>);
@@ -138,6 +147,13 @@ template <size_t E, size_t M>
 {
     // return sub_<E, M>(lhs, rhs, expanding_add<uinteger<M+1>, uinteger<M+1>>,
     // expanding_sub<uinteger<M+1>, uinteger<M+1>>);
+
+    if ((lhs.is_nan() || rhs.is_nan()) || (lhs.is_pos_inf() && rhs.is_pos_inf()) ||
+        (lhs.is_neg_inf() && rhs.is_neg_inf()))
+    {
+        return normalized_float<E, M>::NaN();
+    }
+
     return sub_<
         E, M,
         class aarith::uinteger<M + 2, uint64_t> (*)(const aarith::uinteger<M + 1, uint64_t>&,
@@ -164,26 +180,32 @@ template <size_t E, size_t M, typename WordType>
                        const normalized_float<E, M, WordType> rhs)
     -> normalized_float<E, M, WordType>
 {
-    //compute sign
+    if ((lhs.is_nan() || rhs.is_nan()) || (lhs.is_zero() && rhs.is_inf()) ||
+        (lhs.is_inf() && rhs.is_zero()))
+    {
+        return normalized_float<E, M>::NaN();
+    }
+
+    // compute sign
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
-    //compute exponent
+    // compute exponent
     auto ext_esum = expanding_add(lhs.get_exponent(), rhs.get_exponent());
     bool overflow = ext_esum.bit(E) == 1;
     ext_esum = sub(ext_esum, width_cast<E + 1>(lhs.bias));
     bool underflow = (not overflow) and ext_esum.bit(E) == 1;
     overflow = overflow and ext_esum.bit(E) == 1;
 
-    //compute mantissa
+    // compute mantissa
     auto mproduct = schoolbook_expanding_mul(lhs.get_full_mantissa(), rhs.get_full_mantissa());
     mproduct = mproduct >> M;
 
-    //check for over or underflow and break
-    if(underflow || overflow)
+    // check for over or underflow and break
+    if (underflow || overflow)
     {
         normalized_float<E, M> product;
         product.set_sign(sign);
-        if(overflow)
+        if (overflow)
         {
             product.set_exponent(uinteger<E>::all_ones());
         }
@@ -191,12 +213,11 @@ template <size_t E, size_t M, typename WordType>
         {
             ext_esum = ~ext_esum;
             ext_esum = add(ext_esum, uinteger<ext_esum.width()>(2));
-            if(ext_esum < uinteger<64>(M+1))
+            if (ext_esum < uinteger<64>(M + 1))
             {
                 mproduct = mproduct >> ext_esum.word(0);
-                product.set_full_mantissa(width_cast<M+1>(mproduct));
+                product.set_full_mantissa(width_cast<M + 1>(mproduct));
             }
-
         }
         return normalize<E, M, M>(product);
     }
@@ -227,12 +248,19 @@ template <size_t E, size_t M, typename WordType>
                        const normalized_float<E, M, WordType> rhs)
     -> normalized_float<E, M, WordType>
 {
-    if(lhs.is_inf())
+
+    if ((lhs.is_nan() || rhs.is_nan()) || (lhs.is_zero() && rhs.is_zero()) ||
+        (lhs.is_inf() && rhs.is_inf()))
+    {
+        return normalized_float<E, M>::NaN();
+    }
+
+    if (lhs.is_inf())
     {
         return lhs;
     }
 
-    if(rhs.is_inf())
+    if (rhs.is_inf())
     {
         return rhs;
     }
@@ -243,7 +271,7 @@ template <size_t E, size_t M, typename WordType>
     auto mquotient = div(dividend, divisor);
 
     auto esum = expanding_add(lhs.get_exponent(), lhs.bias);
-    if (esum <= rhs.get_exponent()) 
+    if (esum <= rhs.get_exponent())
     {
         esum = esum.zero();
     }

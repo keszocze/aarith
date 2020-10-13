@@ -219,7 +219,8 @@ public:
             constexpr OExp smaller_bias = bias;
             constexpr OExp diff = sub(bigger_bias, smaller_bias);
             const auto exp = sub(OExp(extracted_exp), diff);
-            const bool overflow = exp >= OExp(IntegerExp::all_ones()) && exp.bit(ext_exp_width) == 0;
+            const bool overflow =
+                exp >= OExp(IntegerExp::all_ones()) && exp.bit(ext_exp_width) == 0;
             const bool underflow = exp.bit(ext_exp_width) == 1;
             if (underflow)
             {
@@ -710,8 +711,8 @@ auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<
         {
             if (exponent <= uinteger<E>(shift_by))
             {
-                //shift_by -= 1;
-                mantissa = (mantissa << (exponent.word(0)-1));
+                // shift_by -= 1;
+                mantissa = (mantissa << (exponent.word(0) - 1));
                 exponent = exponent.all_zeroes();
             }
             else
@@ -722,7 +723,8 @@ auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<
         }
     }
 
-    normalized_float<E, M2, WordType> normalized_float(denormalized.get_sign(), exponent, width_cast<M2 + 1>(mantissa));
+    normalized_float<E, M2, WordType> normalized_float(denormalized.get_sign(), exponent,
+                                                       width_cast<M2 + 1>(mantissa));
 
     /*
     normalized_float.set_sign(denormalized.get_sign());
