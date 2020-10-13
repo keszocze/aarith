@@ -103,4 +103,7 @@ TEMPLATE_TEST_CASE_SIG("Infinity and NaNs are created correctly",
     Native pos_inf_casted = static_cast<Native>(pos_inf);
 
     REQUIRE(pos_inf_casted == pos_inf_native);
+
+    REQUIRE(nan.is_nan());
+    REQUIRE(nan_from_native.is_nan());
 }
