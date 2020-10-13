@@ -273,7 +273,6 @@ TEMPLATE_TEST_CASE_SIG("Dividing by infinity", "[normalized_float][arithmetic][d
     GIVEN("A random floating point number")
     {
 
-
         using F = normalized_float<E, M>;
 
         Native f_ = GENERATE(take(15, full_native_range<Native>()));
@@ -398,8 +397,7 @@ TEMPLATE_TEST_CASE_SIG("Multiplying with infinity",
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("Generating NaN as a result",
-                       "[normalized_float][arithmetic][addition]",
+TEMPLATE_TEST_CASE_SIG("Generating NaN as a result", "[normalized_float][arithmetic][addition]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, double))
 {
@@ -456,6 +454,76 @@ TEMPLATE_TEST_CASE_SIG("Generating NaN as a result",
             REQUIRE(res_div_inf4.is_nan());
         }
     }
+}
+
+TEMPLATE_TEST_CASE_SIG("Floating point subtraction matches its native counterparts",
+                       "[normalized_float][arithmetic][subtraction]",
+                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
+                       (11, 52, double))
+{
+
+    using F = normalized_float<E, M>;
+
+    Native a_native = GENERATE(take(15, full_native_range<Native>()));
+    Native b_native = GENERATE(take(15, full_native_range<Native>()));
+    F a{a_native};
+    F b{b_native};
+
+    F res = a - b;
+    Native res_native = a_native - a_native;
+
+    F res_native_{res_native};
+    Native res_ = static_cast<Native>(res);
+
+    CHECK(equal_except_rounding(res_native_, res));
+    REQUIRE(equal_except_rounding(F{res_}, F{res_native}));
+}
+
+TEMPLATE_TEST_CASE_SIG("Floating point multiplication matches its native counterparts",
+                       "[normalized_float][arithmetic][multiplication]",
+                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
+                       (11, 52, double))
+{
+
+    using F = normalized_float<E, M>;
+
+    Native a_native = GENERATE(take(15, full_native_range<Native>()));
+    Native b_native = GENERATE(take(15, full_native_range<Native>()));
+    F a{a_native};
+    F b{b_native};
+
+    F res = a * b;
+    Native res_native = a_native * a_native;
+
+    F res_native_{res_native};
+    Native res_ = static_cast<Native>(res);
+
+    CHECK(equal_except_rounding(res_native_, res));
+    REQUIRE(equal_except_rounding(F{res_}, F{res_native}));
+}
+
+TEMPLATE_TEST_CASE_SIG("Floating point division matches its native counterparts",
+                       "[normalized_float][arithmetic][division]",
+                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
+                       (11, 52, double))
+{
+
+
+    using F = normalized_float<E, M>;
+
+    Native a_native = GENERATE(take(15, full_native_range<Native>()));
+    Native b_native = GENERATE(take(15, full_native_range<Native>()));
+    F a{a_native};
+    F b{b_native};
+
+    F res = a / b;
+    Native res_native = a_native / a_native;
+
+    F res_native_{res_native};
+    Native res_ = static_cast<Native>(res);
+
+    CHECK(equal_except_rounding(res_native_, res));
+    REQUIRE(equal_except_rounding(F{res_}, F{res_native}));
 }
 
 SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithmetic][addition]")

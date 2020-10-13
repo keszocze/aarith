@@ -657,7 +657,7 @@ auto equal_except_rounding(const normalized_float<E, M1, WordType> lhs,
 }
 
 template <size_t E, size_t M, typename WordType = uint64_t>
-auto abs(const normalized_float<E, M, WordType> nf) -> normalized_float<E, M, WordType>
+auto constexpr abs(const normalized_float<E, M, WordType> nf) -> normalized_float<E, M, WordType>
 {
     auto absolute = nf;
     absolute.set_sign(0U);
