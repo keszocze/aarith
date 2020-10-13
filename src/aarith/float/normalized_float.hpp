@@ -163,6 +163,7 @@ public:
     template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
     explicit normalized_float(const F f)
     {
+
         auto extracted_exp = extract_exponent<F, WordType>(f);
         auto extracted_mantissa = extract_mantissa<F, WordType>(f);
         constexpr size_t ext_exp_width = get_exponent_width<F>();
@@ -209,10 +210,31 @@ public:
         }
         else if (ext_exp_width > E)
         {
-            // we simply truncate the exponent after shifting to the right, hoping that we do not
-            // loose too much precision (we will....)
-            extracted_exp >>= (ext_exp_width - E);
-            exponent = width_cast<E>(extracted_exp);
+            // a smaller exponent means a lower bias, so we subtract the difference between the two
+            // biases from the original bias
+            // in case of over- or underflow we set the value to infinity or 0
+            // TODO handle denormalized numbers?
+            using OExp = uinteger<ext_exp_width + 1, WordType>;
+            constexpr OExp bigger_bias = uinteger<ext_exp_width - 1, WordType>::all_ones();
+            constexpr OExp smaller_bias = bias;
+            constexpr OExp diff = sub(bigger_bias, smaller_bias);
+            const auto exp = sub(OExp(extracted_exp), diff);
+            const bool overflow = exp >= OExp(IntegerExp::all_ones()) && exp.bit(ext_exp_width) == 0;
+            const bool underflow = exp.bit(ext_exp_width) == 1;
+            if (underflow)
+            {
+                mantissa = mantissa.all_zeroes();
+                exponent = exponent.all_zeroes();
+            }
+            else if (overflow)
+            {
+                mantissa = mantissa.all_zeroes();
+                exponent = exponent.all_ones();
+            }
+            else
+            {
+                exponent = width_cast<E>(exp);
+            }
         }
         else
         {
@@ -300,6 +322,7 @@ public:
      */
     [[nodiscard]] static constexpr integer<E + 1, WordType> denorm_exponent()
     {
+
         const integer<E + 1, WordType> b{bias};
         const integer<E + 1, WordType> neg_bias = sub(integer<E + 1, WordType>::zero(), b);
 
@@ -496,6 +519,7 @@ private:
      */
     template <typename To>[[nodiscard]] constexpr To generic_cast() const
     {
+
         static_assert(std::is_floating_point<To>(), "Can only convert to float or double.");
 
         using namespace aarith;
@@ -664,27 +688,47 @@ auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<
 
     if (one_at > M1)
     {
-        exponent = uinteger<E, WordType>(0U);
-        // denormalized.set_sign(0);
+        exponent = exponent.all_zeroes();
     }
     else if (one_at >= M2)
     {
         auto shift_by = one_at - M2;
         mantissa = rshift_and_round(mantissa, shift_by);
-        exponent = add(exponent, uinteger<E, WordType>(shift_by));
+        if (exponent == exponent.all_zeroes())
+        {
+            exponent = add(exponent, uinteger<E, WordType>(shift_by + 1));
+        }
+        else
+        {
+            exponent = add(exponent, uinteger<E, WordType>(shift_by));
+        }
     }
     else
     {
         auto shift_by = M2 - one_at;
-        mantissa = (mantissa << shift_by);
-        exponent = sub(exponent, uinteger<E, WordType>(shift_by));
+        if (exponent != exponent.all_zeroes())
+        {
+            if (exponent <= uinteger<E>(shift_by))
+            {
+                //shift_by -= 1;
+                mantissa = (mantissa << (exponent.word(0)-1));
+                exponent = exponent.all_zeroes();
+            }
+            else
+            {
+                mantissa = (mantissa << shift_by);
+                exponent = sub(exponent, uinteger<E, WordType>(shift_by));
+            }
+        }
     }
 
-    normalized_float<E, M2, WordType> normalized_float;
+    normalized_float<E, M2, WordType> normalized_float(denormalized.get_sign(), exponent, width_cast<M2 + 1>(mantissa));
 
+    /*
     normalized_float.set_sign(denormalized.get_sign());
     normalized_float.set_exponent(exponent);
-    normalized_float.set_mantissa(width_cast<M2 + 1>(mantissa));
+    normalized_float.set_full_mantissa(width_cast<M2 + 1>(mantissa));
+    */
 
     return normalized_float;
 }

@@ -1153,6 +1153,180 @@ SCENARIO("IEEE-754 arithmetic conversion: float, double",
     }
 }
 
+SCENARIO("IEEE-754 denormalized number computations: float, double",
+         "[normalized_float][denormalized][ieee-754][computation]")
+{
+    GIVEN("Two denormalized float numbers")
+    {
+        using nfloat = normalized_float<8, 23>;
+        WHEN("The result of the addition is still denormalized > 0")
+        {
+            unsigned int a_i = 0b00000000000000000000000000000010;
+            unsigned int b_i = 0b00000000000000000000000000000001;
+            float *a_if = reinterpret_cast<float *>(&a_i);
+            float *b_if = reinterpret_cast<float *>(&b_i);
+            float a = *a_if;
+            float b = *b_if;
+
+            float res_f = a + b;
+            const auto nfa = nfloat(a);
+            const auto nfb = nfloat(b);
+            auto res = nfa + nfb;
+
+            if(static_cast<float>(res) != res_f)
+            {
+                std::cout << "denorm test 0\n"
+                    << to_binary(nfloat(a)) << " + " << to_binary(nfloat(b)) << "\n"
+                    << "float res != normalized_float res: \n" << to_binary(nfloat(res_f)) << "\n" << to_binary(res) << "\n\n";
+            }
+
+            THEN("The results should be the same as the float computation.")
+            {
+                REQUIRE(static_cast<float>(res) == res_f);
+            }
+        }
+        WHEN("The result of the addition is normalized")
+        {
+            unsigned int a_i = 0b00000000011111111111111111111111;
+            unsigned int b_i = 0b00000000011111111111111111111111;
+            float *a_if = reinterpret_cast<float *>(&a_i);
+            float *b_if = reinterpret_cast<float *>(&b_i);
+            float a = *a_if;
+            float b = *b_if;
+            auto const a_nf = nfloat(a);
+            auto const b_nf = nfloat(b);
+
+            float res_f = a + b;
+            auto res = a_nf + b_nf;
+
+            if(static_cast<float>(res) != res_f)
+            {
+                std::cout << "denorm test 1\n"
+                    << to_binary(nfloat(a)) << " + " << to_binary(nfloat(b)) << "\n"
+                    << "float res != normalized_float res: \n" << to_binary(nfloat(res_f)) << "\n" << to_binary(res) << "\n\n";
+            }
+
+            THEN("The results should be the same as the float computation.")
+            {
+                REQUIRE(static_cast<float>(res) == res_f);
+            }
+        }
+        WHEN("The result of the multiplcation is still denormalized > 0")
+        {
+            unsigned int a_i = 0b00000000000000000000000000000010;
+            unsigned int b_i = 0b00000000000000000000000000000001;
+            float *a_if = reinterpret_cast<float *>(&a_i);
+            float *b_if = reinterpret_cast<float *>(&b_i);
+            float a = *a_if;
+            float b = *b_if;
+
+            float res_f = a * b;
+            const auto nfa = nfloat(a);
+            const auto nfb = nfloat(b);
+            auto res = nfa * nfb;
+
+            if(static_cast<float>(res) != res_f)
+            {
+                std::cout << "denorm mul test 0\n"
+                    << to_binary(nfloat(a)) << " * " << to_binary(nfloat(b)) << "\n"
+                    << "float res != normalized_float res: \n" << to_binary(nfloat(res_f)) << "\n" << to_binary(res) << "\n\n";
+            }
+
+            THEN("The results should be the same as the float computation.")
+            {
+                REQUIRE(static_cast<float>(res) == res_f);
+            }
+        }
+        WHEN("The result of the multiplication is normalized")
+        {
+            unsigned int a_i = 0b00000000011111111111111111111111;
+            unsigned int b_i = 0b00000000011111111111111111111111;
+            float *a_if = reinterpret_cast<float *>(&a_i);
+            float *b_if = reinterpret_cast<float *>(&b_i);
+            float a = *a_if;
+            float b = *b_if;
+
+            float res_f = a * b;
+            const auto nfa = nfloat(a);
+            const auto nfb = nfloat(b);
+            auto res = nfa * nfb;
+
+            if(static_cast<float>(res) != res_f)
+            {
+                std::cout << "denorm mul test 1\n"
+                    << to_binary(nfloat(a)) << " * " << to_binary(nfloat(b)) << "\n"
+                    << "float res != normalized_float res: \n" << to_binary(nfloat(res_f)) << "\n" << to_binary(res) << "\n\n";
+            }
+
+            THEN("The results should be the same as the float computation.")
+            {
+                REQUIRE(static_cast<float>(res) == res_f);
+            }
+        }
+    }
+    GIVEN("Two normalized float numbers")
+    {
+        using nfloat = normalized_float<8, 23>;
+        WHEN("The result of the multiplication should be denormalized > 0")
+        {
+            unsigned int a_i = 0b00011111111111111111111111111111;
+            unsigned int b_i = 0b00011111111111111111111111111111;
+            float *a_if = reinterpret_cast<float *>(&a_i);
+            float *b_if = reinterpret_cast<float *>(&b_i);
+            float a = *a_if;
+            float b = *b_if;
+
+            float res_f = a * b;
+            const auto nfa = nfloat(a);
+            const auto nfb = nfloat(b);
+            auto res = nfa * nfb;
+
+            if(static_cast<float>(res) != res_f)
+            {
+                std::cout << "norm to denorm mul test 0\n"
+                    << to_binary(nfloat(a)) << " * " << to_binary(nfloat(b)) << "\n"
+                    << "float res != normalized_float res: \n" << to_binary(nfloat(res_f)) << "\n" << to_binary(res) << "\n\n";
+            }
+
+            THEN("The results should be the same as the float computation.")
+            {
+                REQUIRE(equal_except_rounding(res, nfloat(res_f)));
+                //REQUIRE(static_cast<float>(res) == res_f);
+            }
+            
+        }
+        
+        WHEN("The result of the multiplication should be denormalized > 0")
+        {
+            unsigned int a_i = 0b00011010111111111111111111111111;
+            unsigned int b_i = 0b00011010111111111111111111111111;
+            float *a_if = reinterpret_cast<float *>(&a_i);
+            float *b_if = reinterpret_cast<float *>(&b_i);
+            float a = *a_if;
+            float b = *b_if;
+
+            float res_f = a * b;
+            const auto nfa = nfloat(a);
+            const auto nfb = nfloat(b);
+            auto res = nfa * nfb;
+
+            if(static_cast<float>(res) != res_f)
+            {
+                std::cout << "norm to denorm mul test 0\n"
+                    << to_binary(nfloat(a)) << " * " << to_binary(nfloat(b)) << "\n"
+                    << "float res != normalized_float res: \n" << to_binary(nfloat(res_f)) << "\n" << to_binary(res) << "\n\n";
+            }
+
+            THEN("The results should be the same as the float computation.")
+            {
+                REQUIRE(equal_except_rounding(res, nfloat(res_f)));
+                //REQUIRE(static_cast<float>(res) == res_f);
+            }
+            
+        }
+    }
+}
+
 // SCENARIO("IEEE-754 arithmetic comparison: float",
 //         "[normalized_float][arithmetic][multiplication][ieee-754]")
 //{
