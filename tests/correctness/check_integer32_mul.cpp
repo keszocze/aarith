@@ -9,9 +9,12 @@ int main()
     using B = int32_t;
     using WordType = uint64_t;
 
-    check_int_operation<integer, Width, B, false, WordType>("mul_booth", &::aarith::naive_mul<Width, WordType>, native_mul);
-    check_int_operation<integer, Width, B, false, WordType>("mul_booth", &::aarith::booth_mul<Width, WordType>, native_mul);
-    check_int_operation<integer, Width, B, false, WordType>("mul_booth", &::aarith::booth_inplace_mul<Width, WordType>, native_mul);
+    check_int_operation<integer, Width, B, false, WordType>(
+        "mul_booth", &::aarith::naive_mul<Width, WordType>, native_mul);
+    check_int_operation<integer, Width, B, false, WordType>(
+        "mul_booth", &::aarith::booth_mul<Width, WordType>, native_mul);
+    check_int_operation<integer, Width, B, false, WordType>(
+        "mul_booth", &::aarith::booth_inplace_mul<Width, WordType>, native_mul);
 
     return 0;
 }

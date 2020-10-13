@@ -12,6 +12,7 @@ add_aarith_test(uint-random-generation FILES integer/uint-random-generation-test
 add_aarith_test(uint-operations FILES integer/uint-operations-test.cpp)
 add_aarith_test(uint-anytime FILES integer/uint-anytime-test.cpp)
 add_aarith_test(uint-comparisons FILES integer/uint-comparisons-test.cpp)
+add_aarith_test(uint-extraction FILES integer/uint-extraction-test.cpp)
 
 add_aarith_test(string_utils FILES integer/string_utils-test.cpp)
 add_aarith_test(integer-general FILES integer/integer-test.cpp)

@@ -6,7 +6,7 @@
 using namespace aarith;
 
 TEMPLATE_TEST_CASE_SIG("Unsigned integer addition is commutative",
-                       "[integer][unsigned][arithmetic][addition]", AARITH_TEST_SIGNATURE,
+                       "[integer][unsigned][arithmetic][addition]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = uinteger<W, WordType>;
@@ -37,7 +37,7 @@ TEMPLATE_TEST_CASE_SIG("Unsigned integer addition is commutative",
 
 TEMPLATE_TEST_CASE_SIG(
     "Unsigned integer addition is commutative for addends with different bit widths",
-    "[integer][unsigned][arithmetic][addition]", AARITH_TEST_SIGNATURE,
+    "[integer][unsigned][arithmetic][addition]", AARITH_INT_TEST_SIGNATURE,
     AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = uinteger<W, WordType>;
@@ -65,7 +65,7 @@ TEMPLATE_TEST_CASE_SIG(
 }
 
 TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
-                       "[integer][unsigned][arithmetic][addition]", AARITH_TEST_SIGNATURE,
+                       "[integer][unsigned][arithmetic][addition]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = uinteger<W, WordType>;
@@ -74,10 +74,8 @@ TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
     REQUIRE(expanding_add(a, I::zero()) == a);
 }
 
-
-
 TEMPLATE_TEST_CASE_SIG("Addition wraps around correctly",
-                       "[integer][unsigned][arithmetic][addition]", AARITH_TEST_SIGNATURE,
+                       "[integer][unsigned][arithmetic][addition]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = uinteger<W, WordType>;
@@ -93,20 +91,24 @@ TEMPLATE_TEST_CASE_SIG("Addition wraps around correctly",
             REQUIRE(add(max_val, one) == zero);
         }
     }
-    AND_WHEN("Adding another one") {
-        THEN("The result should be one") {
+    AND_WHEN("Adding another one")
+    {
+        THEN("The result should be one")
+        {
             REQUIRE(add(add(max_val, one), one) == one);
         }
     }
-    WHEN("Adding max to max") {
-        THEN("The result should be max - 1") {
+    WHEN("Adding max to max")
+    {
+        THEN("The result should be max - 1")
+        {
             REQUIRE(add(max_val, max_val) == sub(max_val, one));
         }
     }
 }
 
 TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the subtraction",
-                       "[integer][unsigned][arithmetic][subtraction]", AARITH_TEST_SIGNATURE,
+                       "[integer][unsigned][arithmetic][subtraction]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = uinteger<W, WordType>;
@@ -116,7 +118,7 @@ TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the subtraction",
 }
 
 TEMPLATE_TEST_CASE_SIG("Expanding subtraction wraps around correctly for different bit-widths",
-                       "[integer][unsigned][arithmetic][subtraction]", AARITH_TEST_SIGNATURE,
+                       "[integer][unsigned][arithmetic][subtraction]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = uinteger<W, WordType>;
@@ -150,7 +152,7 @@ TEMPLATE_TEST_CASE_SIG("Expanding subtraction wraps around correctly for differe
 }
 
 TEMPLATE_TEST_CASE_SIG("Subtraction wraps around correctly",
-                       "[integer][unsigned][arithmetic][subtraction]", AARITH_TEST_SIGNATURE,
+                       "[integer][unsigned][arithmetic][subtraction]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = uinteger<W, WordType>;
@@ -179,7 +181,7 @@ TEMPLATE_TEST_CASE_SIG("Subtraction wraps around correctly",
 }
 
 TEMPLATE_TEST_CASE_SIG("Unsigned integer multiplication is commutative",
-                       "[integer][unsigned][arithmetic][multiplication]", AARITH_TEST_SIGNATURE,
+                       "[integer][unsigned][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = uinteger<W, WordType>;
@@ -224,7 +226,7 @@ TEMPLATE_TEST_CASE_SIG("Unsigned integer multiplication is commutative",
 }
 
 TEMPLATE_TEST_CASE_SIG("One is the neutral element of the multiplication",
-                       "[integer][unsigned][arithmetic][multiplication]", AARITH_TEST_SIGNATURE,
+                       "[integer][unsigned][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = uinteger<W, WordType>;
@@ -236,7 +238,7 @@ TEMPLATE_TEST_CASE_SIG("One is the neutral element of the multiplication",
 }
 
 TEMPLATE_TEST_CASE_SIG("Zero makes the multiplication result zero",
-                       "[integer][unsigned][arithmetic][multiplication]", AARITH_TEST_SIGNATURE,
+                       "[integer][unsigned][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = uinteger<W, WordType>;
@@ -249,7 +251,7 @@ TEMPLATE_TEST_CASE_SIG("Zero makes the multiplication result zero",
 }
 
 TEMPLATE_TEST_CASE_SIG("Multiplying the max value with itself and truncation yields 1",
-                       "[integer][unsigned][arithmetic][multiplication]", AARITH_TEST_SIGNATURE,
+                       "[integer][unsigned][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = uinteger<W, WordType>;
@@ -586,7 +588,7 @@ SCENARIO("Subtracting two unsigned integers exactly",
 }
 
 TEMPLATE_TEST_CASE_SIG("Investigating max/min values", "[integer][unsigned][operations]",
-                       AARITH_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+                       AARITH_INT_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = uinteger<W, WordType>;
     GIVEN("The maximal and minimal values of uinteger<V>")
@@ -1002,7 +1004,7 @@ SCENARIO("Bit and Word operations work correctly", "[integer][unsigned][utility]
 }
 
 TEMPLATE_TEST_CASE_SIG("Invariants for the unsigned integer division",
-                       "[integer][unsigned][arithmetic][division]", AARITH_TEST_SIGNATURE,
+                       "[integer][unsigned][arithmetic][division]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = uinteger<W, WordType>;
@@ -1016,14 +1018,14 @@ TEMPLATE_TEST_CASE_SIG("Invariants for the unsigned integer division",
         {
             THEN("The result should be 1")
             {
-                REQUIRE(div(a,a) == I::one());
+                REQUIRE(div(a, a) == I::one());
             }
         }
         WHEN("Dividing the number by one")
         {
             THEN("The result should be the number itself")
             {
-                REQUIRE(div(a,I::one()) == a);
+                REQUIRE(div(a, I::one()) == a);
             }
         }
         WHEN("Dividing the number by a larger number")
@@ -1031,14 +1033,14 @@ TEMPLATE_TEST_CASE_SIG("Invariants for the unsigned integer division",
             THEN("The result should be zero")
             {
                 // Adding one is safe as I::max() will not be returned by the generator
-                REQUIRE(div(a,add(a, I::one())) == I::zero());
+                REQUIRE(div(a, add(a, I::one())) == I::zero());
             }
         }
         WHEN("Dividing the number by zero")
         {
             THEN("A runtime exception should be thrown")
             {
-                REQUIRE_THROWS_AS(div(a,I::zero()), std::runtime_error);
+                REQUIRE_THROWS_AS(div(a, I::zero()), std::runtime_error);
             }
         }
     }
@@ -1091,7 +1093,7 @@ SCENARIO("Dividing two unsigned integers exactly", "[integer][unsigned][arithmet
 }
 
 TEMPLATE_TEST_CASE_SIG("Computing the signum of an unsigned integer",
-                       "[integer][unsigned][operation][utility]", AARITH_TEST_SIGNATURE,
+                       "[integer][unsigned][operation][utility]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = uinteger<W, WordType>;
@@ -1119,8 +1121,9 @@ TEMPLATE_TEST_CASE_SIG("Computing the signum of an unsigned integer",
 }
 
 TEMPLATE_TEST_CASE_SIG("Invariants for computing the remainder",
-         "[integer][unsigned][arithmetic][remainder][division]", AARITH_TEST_SIGNATURE,
-         AARITH_INT_TEST_TEMPLATE_PARAM_RANGE) {
+                       "[integer][unsigned][arithmetic][remainder][division]",
+                       AARITH_INT_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
     using I = uinteger<W, WordType>;
 
     GIVEN("A non-zero number")
@@ -1149,7 +1152,6 @@ TEMPLATE_TEST_CASE_SIG("Invariants for computing the remainder",
             CHECK(remainder(I::zero(), a) == I::zero());
         }
     }
-
 }
 
 SCENARIO("Computing the remainder of two unsigned integers works as expected",

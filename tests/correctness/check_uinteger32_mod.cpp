@@ -10,7 +10,8 @@ int main()
     using WordType = uint64_t;
     using UI = uinteger<Width, WordType>;
 
-    check_int_operation<uinteger, Width, UB, true, WordType>("modulo", &::aarith::remainder<UI>, native_mod);
+    check_int_operation<uinteger, Width, UB, true, WordType>("modulo", &::aarith::remainder<UI>,
+                                                             native_mod);
 
     return 0;
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include <aarith/core/traits.hpp>
+#include <aarith/integer/integers.hpp>
 #include <type_traits>
 
 namespace aarith {
@@ -495,7 +496,6 @@ template <typename I>
     return width_cast<I::width()>(fun_add_expand(a, b, initial_carry));
 }
 
-
 /**
  * @brief Arithmetic right-shift operator
  *
@@ -512,69 +512,13 @@ auto constexpr operator>>=(integer<Width, WordType>& lhs, const size_t rhs)
 {
     arithmetic_right_shift(lhs, rhs);
     return lhs;
+}
 
-//    const bool lhs_was_negative = lhs.is_negative();
-//
-//    if (rhs >= Width)
-//    {
-//        if (lhs.is_negative())
-//        {
-//            const auto max = std::numeric_limits<WordType>::max();
-//            lhs.fill(max);
-//            return lhs;
-//        }
-//        else
-//        {
-//            lhs.fill(WordType{0});
-//            return lhs;
-//        }
-//    }
-//
-//    if (rhs == 0 || lhs.is_zero())
-//    {
-//        return lhs;
-//    }
-//
-//    const auto skip_words = rhs / lhs.word_width();
-//    const auto shift_word_right = rhs - skip_words * lhs.word_width();
-//    const auto shift_word_left = lhs.word_width() - shift_word_right;
-//
-//    using word_type = typename integer<Width, WordType>::word_type;
-//
-//    for (auto counter = skip_words; counter < lhs.word_count(); ++counter)
-//    {
-//        word_type new_word = lhs.word(counter) >> shift_word_right;
-//        if (shift_word_left < lhs.word_width() && counter + 1 < lhs.word_count())
-//        {
-//            new_word = new_word | (lhs.word(counter + 1) << shift_word_left);
-//        }
-//
-//        lhs.set_word(counter - skip_words, new_word);
-//    }
-//
-//    if (skip_words > 0)
-//    {
-//        word_type new_word = lhs.word(lhs.word_count() - 1) >> shift_word_right;
-//        lhs.set_word(lhs.word_count() - skip_words - 1, new_word);
-//
-//        for (size_t i = lhs.word_count() - skip_words; i < lhs.word_count(); ++i)
-//        {
-//            const auto fill_word =
-//                lhs.is_negative() ? std::numeric_limits<WordType>::max() : WordType{0};
-//            lhs.set_word(i, fill_word);
-//        }
-//    }
-//
-//    if (lhs_was_negative)
-//    {
-//
-//        for (size_t i = (Width - 1); i >= (Width - rhs); --i)
-//        {
-//            lhs.set_bit(i);
-//        }
-//    }
-//
-//    return lhs;
+template <size_t Width, typename WordType, typename U,
+          typename = std::enable_if_t<is_unsigned_v<U>>>
+auto constexpr operator>>=(integer<Width, WordType>& lhs, const U& rhs) -> integer<Width, WordType>&
+{
+    return arithmetic_right_shift(lhs, static_cast<size_t>(rhs));
 }
 
 /**
@@ -594,6 +538,44 @@ auto constexpr operator>>(const integer<Width, WordType>& lhs, const size_t rhs)
     integer<Width, WordType> shifted{lhs};
     shifted >>= rhs;
     return shifted;
+}
+
+template <size_t Width, typename WordType, typename U,
+          typename = std::enable_if_t<is_unsigned_v<U>>>
+auto constexpr operator>>(const integer<Width, WordType>& lhs, const U& rhs)
+    -> integer<Width, WordType>
+{
+    integer<Width, WordType> shifted{lhs};
+    shifted >>= static_cast<size_t>(rhs);
+    return shifted;
+}
+
+template <typename I, typename = std::enable_if_t<is_integral_v<I>>> I& operator--(I& a)
+{
+    I val = sub(a, I::one());
+    a.set_bits(val);
+    return a;
+}
+
+template <typename I, typename = std::enable_if_t<is_integral_v<I>>> I operator--(I& a, int)
+{
+    I cpy{a};
+    --a;
+    return cpy;
+}
+
+template <typename I, typename = std::enable_if_t<is_integral_v<I>>> I& operator++(I& a)
+{
+    I val = add(a, I::one());
+    a.set_bits(val);
+    return a;
+}
+
+template <typename I, typename = std::enable_if_t<is_integral_v<I>>> I operator++(I& a, int)
+{
+    I cpy{a};
+    ++a;
+    return cpy;
 }
 
 /**
@@ -989,7 +971,8 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
     return std::make_pair(Q_cast, remainder_cast);
 }
 
-template <typename I, typename = std::enable_if_t<is_integral_v<I>>> constexpr I mul(const I& a, const I& b)
+template <typename I, typename = std::enable_if_t<is_integral_v<I>>>
+constexpr I mul(const I& a, const I& b)
 {
     if constexpr (is_unsigned_v<I>)
     {
@@ -1124,6 +1107,68 @@ template <typename Integer>
 [[nodiscard]] constexpr Integer distance(const Integer& a, const Integer& b)
 {
     return (a <= b) ? sub(b, a) : sub(a, b);
+}
+
+/**
+ * @brief Left-shift assignment operator
+ * @tparam W The word_container type to work on
+ * @param lhs The word_container to be shifted
+ * @param rhs The number of bits to shift
+ * @return The shifted word_container
+ */
+template <typename W, typename I,
+          typename = std::enable_if_t<is_word_array_v<W> && is_integral_v<I> && is_unsigned_v<I>>>
+constexpr auto operator<<=(W& lhs, const I rhs) -> W
+{
+    const size_t shift = static_cast<size_t>(rhs);
+    lhs <<= shift;
+    return lhs;
+}
+
+/**
+ * @brief Left-shift assignment operator
+ * @tparam W The word_container type to work on
+ * @param lhs The word_container to be shifted
+ * @param rhs The number of bits to shift
+ * @return The shifted word_container
+ */
+template <typename W, typename I,
+          typename = std::enable_if_t<is_word_array_v<W> && is_integral_v<I> && is_unsigned_v<I>>>
+constexpr auto operator<<(const W& lhs, const I rhs) -> W
+{
+    W cpy{lhs};
+    return (cpy <<= rhs);
+}
+
+/**
+ * @brief Left-shift assignment operator
+ * @tparam W The word_container type to work on
+ * @param lhs The word_container to be shifted
+ * @param rhs The number of bits to shift
+ * @return The shifted word_container
+ */
+template <typename W, typename I,
+          typename = std::enable_if_t<is_word_array_v<W> && is_integral_v<I> && is_unsigned_v<I>>>
+constexpr auto operator>>=(W& lhs, const I rhs) -> W
+{
+    const size_t shift = static_cast<size_t>(rhs);
+    lhs >>= shift;
+    return lhs;
+}
+
+/**
+ * @brief Left-shift assignment operator
+ * @tparam W The word_container type to work on
+ * @param lhs The word_container to be shifted
+ * @param rhs The number of bits to shift
+ * @return The shifted word_container
+ */
+template <typename W, typename I,
+          typename = std::enable_if_t<is_word_array_v<W> && is_integral_v<I> && is_unsigned_v<I>>>
+constexpr auto operator>>(const W& lhs, const I rhs) -> W
+{
+    W cpy{lhs};
+    return (cpy >>= rhs);
 }
 
 /**

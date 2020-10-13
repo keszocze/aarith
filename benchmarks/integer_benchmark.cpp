@@ -205,7 +205,7 @@ int main(int argc, char** argv)
 {
 
     using namespace aarith::helpers;
-    
+
     constexpr size_t reps = 5;
     // the code below has been generated using a ruby script...
 

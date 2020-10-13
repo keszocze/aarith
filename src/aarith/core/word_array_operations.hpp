@@ -5,36 +5,57 @@
 
 namespace aarith {
 
-template <typename W>[[nodiscard]] constexpr auto operator&(const W& lhs, const W& rhs) -> W
+template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
+constexpr W& operator&=(W& a, const W& b)
 {
-    static_assert(::aarith::is_word_array_v<W>);
-    W bitwise_and;
-    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
+    for (auto counter = 0U; counter < a.word_count(); ++counter)
     {
-        bitwise_and.set_word(counter, lhs.word(counter) & rhs.word(counter));
+        a.set_word(counter, a.word(counter) & b.word(counter));
     }
+    return a;
+}
+
+template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
+[[nodiscard]] constexpr auto operator&(const W& lhs, const W& rhs) -> W
+{
+    W bitwise_and{lhs};
+    bitwise_and &= rhs;
     return bitwise_and;
 }
 
-template <typename W> auto constexpr operator|(const W& lhs, const W& rhs) -> W
+template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
+constexpr W& operator|=(W& a, const W& b)
 {
-    static_assert(::aarith::is_word_array_v<W>);
-    W bitwise_or;
-    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
+    for (auto counter = 0U; counter < a.word_count(); ++counter)
     {
-        bitwise_or.set_word(counter, lhs.word(counter) | rhs.word(counter));
+        a.set_word(counter, a.word(counter) | b.word(counter));
     }
+    return a;
+}
+
+template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
+auto constexpr operator|(const W& lhs, const W& rhs) -> W
+{
+    W bitwise_or{lhs};
+    bitwise_or |= rhs;
     return bitwise_or;
 }
 
-template <typename W> constexpr auto operator^(const W& lhs, const W& rhs) -> W
+template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
+constexpr W& operator^=(W& a, const W& b)
 {
-    static_assert(::aarith::is_word_array_v<W>);
-    W bitwise_xor;
-    for (auto counter = 0U; counter < lhs.word_count(); ++counter)
+    for (auto counter = 0U; counter < a.word_count(); ++counter)
     {
-        bitwise_xor.set_word(counter, lhs.word(counter) ^ rhs.word(counter));
+        a.set_word(counter, a.word(counter) ^ b.word(counter));
     }
+    return a;
+}
+
+template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
+constexpr auto operator^(const W& lhs, const W& rhs) -> W
+{
+    W bitwise_xor{lhs};
+    bitwise_xor ^= rhs;
     return bitwise_xor;
 }
 
@@ -90,15 +111,15 @@ size_t first_set_bit(const word_array<Width, WordType>& value)
 }
 
 /**
- * @brief Left-shift assignment operator
+ * @brief Logical Left-shift assignment operator
  * @tparam W The word_container type to work on
  * @param lhs The word_container to be shifted
  * @param rhs The number of bits to shift
  * @return The shifted word_container
  */
-template <typename W> constexpr auto operator<<=(W& lhs, const size_t rhs) -> W
+template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
+constexpr W logical_left_shift(W& lhs, const size_t rhs)
 {
-
     static_assert(::aarith::is_word_array_v<W>);
 
     constexpr size_t width = W::width();
@@ -140,6 +161,18 @@ template <typename W> constexpr auto operator<<=(W& lhs, const size_t rhs) -> W
     return lhs;
 }
 
+/**
+ * @brief Left-shift assignment operator
+ * @tparam W The word_container type to work on
+ * @param lhs The word_container to be shifted
+ * @param rhs The number of bits to shift
+ * @return The shifted word_container
+ */
+template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
+constexpr W operator<<=(W& lhs, const size_t rhs)
+{
+    return logical_left_shift(lhs, rhs);
+}
 
 /**
  * @brief Left-shift operator
@@ -159,7 +192,40 @@ template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
 }
 
 /**
+ * @brief Left-shift assignment operator
+ * @tparam W The word_container type to work on
+ * @param lhs The word_container to be shifted
+ * @param rhs The number of bits to shift
+ * @return The shifted word_container
+ */
+template <typename W, typename U,
+          typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
+constexpr W operator<<=(W& lhs, const U& rhs)
+{
+    return logical_left_shift(lhs, static_cast<size_t>(rhs));
+}
+
+/**
+ * @brief Left-shift operator
+ * @tparam W The word_container type to work on
+ * @param lhs The word_container to be shifted
+ * @param rhs The number of bits to shift
+ * @return The shifted word_container
+ */
+template <typename W, typename U,
+          typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
+[[nodiscard]] constexpr auto operator<<(const W& lhs, const U& rhs) -> W
+{
+
+    W shifted{lhs};
+    shifted <<= static_cast<size_t>(rhs);
+
+    return shifted;
+}
+
+/**
  * @brief Logical right-shift assignment
+ *
  * @tparam Width The width of the word_array
  * @param lhs The word_array that is to be shifted
  * @param rhs The number of bits to shift
@@ -220,8 +286,7 @@ auto constexpr logical_right_shift(W& lhs, const size_t rhs) -> W
  * @param rhs The number of bits to shift
  * @return The shifted word_array
  */
-template <typename W,
-          typename = std::enable_if_t<is_word_array_v<W> || (is_integral_v<W> && is_unsigned_v<W>)>>
+template <typename W, typename = std::enable_if_t<is_word_array_v<W> || is_unsigned_v<W>>>
 auto constexpr operator>>=(W& lhs, const size_t rhs) -> W
 {
     return logical_right_shift(lhs, rhs);
@@ -234,7 +299,8 @@ auto constexpr operator>>=(W& lhs, const size_t rhs) -> W
  * @param rhs The number of bits to shift
  * @return The shifted word_array
  */
-template <typename W> auto constexpr operator>>(const W& lhs, const size_t rhs) -> W
+template <typename W, typename = std::enable_if_t<is_word_array_v<W> || is_unsigned_v<W>>>
+auto constexpr operator>>(const W& lhs, const size_t rhs) -> W
 {
 
     W shifted{lhs};
@@ -254,7 +320,7 @@ template <typename W> auto constexpr operator>>(const W& lhs, const size_t rhs) 
  * @return The shifted integer
  */
 template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
-auto constexpr arithmetic_right_shift(W& lhs, const size_t rhs) -> W
+auto constexpr arithmetic_right_shift(W& lhs, const size_t rhs) -> W&
 {
     constexpr size_t Width = W::width();
     using WordType = typename W::word_type;
@@ -312,7 +378,6 @@ auto constexpr arithmetic_right_shift(W& lhs, const size_t rhs) -> W
 
     if (lhs_was_negative)
     {
-
         for (size_t i = (Width - 1); i >= (Width - rhs); --i)
         {
             lhs.set_bit(i);
@@ -373,6 +438,147 @@ split(const word_array<W, WordType>& w)
     const word_array<S + 1, WordType> rhs = width_cast<S + 1>(w);
 
     return std::make_pair(lhs, rhs);
+}
+
+/**
+ * @brief Rotates the word_array to the left using a specified carry-in
+ * @tparam W
+ */
+template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
+constexpr W& rotate_through_carry_left(W& lhs, const bool carry_in, const size_t rotate = 1)
+{
+
+    const size_t right_shift = lhs.width() - (rotate - 1);
+    auto slice = lhs >> right_shift;
+    slice.set_bit(rotate - 1, carry_in);
+    lhs <<= rotate;
+    lhs |= slice;
+
+    return lhs;
+}
+
+/**
+ * @brief Rotates the word_array to the left using a specified carry-in
+ * @tparam W
+ */
+template <typename W, typename U,
+          typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
+constexpr W& rotate_through_carry_left(W& lhs, const bool carry_in, const U& rotate = U::one())
+{
+
+    return rotate_through_carry_left(lhs, carry_in, static_cast<size_t>(rotate));
+}
+
+/**
+ * @brief Rotates the word_array to the right using a specified carry-in
+ * @tparam W
+ */
+template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
+constexpr W& rotate_through_carry_right(W& lhs, const bool carry_in, const size_t rotate = 1)
+{
+
+    const size_t left_shift = lhs.width() - (rotate - 1);
+    auto slice = lhs << left_shift;
+    slice.set_bit(lhs.width() - rotate, carry_in);
+    lhs >>= rotate;
+    lhs |= slice;
+
+    return lhs;
+}
+
+/**
+ * @brief Rotates the word_array to the right using a specified carry-in
+ * @tparam W
+ */
+template <typename W, typename U,
+          typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
+constexpr W& rotate_through_carry_right(W& lhs, const bool carry_in, const U& rotate = U::one())
+{
+    return rotate_through_carry_right(lhs, carry_in, static_cast<size_t>(rotate));
+}
+
+/**
+ * @brief Rotates the word_array to the left
+ *
+ * This shift preserves the signedness of the integer.
+ *
+ * @tparam Width The width of the signed integer
+ * @param lhs The integer to be shifted
+ * @param rhs The number of bits to be shifted
+ * @return The shifted integer
+ */
+template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
+constexpr W& rotate_left(W& lhs, size_t rotate = 1)
+{
+
+    // TODO offer this as a compile-time optimized version?
+    //    constexpr size_t width = W::width();
+    //    const auto slice = bit_range<width-1, width-R>(lhs);
+    //
+    //    lhs <<= R;
+    //    lhs.set_bits(0, slice);
+
+    const size_t right_shift = lhs.width() - rotate;
+    const auto slice = lhs >> right_shift;
+    lhs <<= rotate;
+    lhs |= slice;
+
+    return lhs;
+}
+
+/**
+ * @brief Rotates the word_array to the left
+ *
+ * This shift preserves the signedness of the integer.
+ *
+ * @tparam Width The width of the signed integer
+ * @param lhs The integer to be shifted
+ * @param rhs The number of bits to be shifted
+ * @return The shifted integer
+ */
+template <typename W, typename U,
+          typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
+constexpr W& rotate_left(W& lhs, const U& rotate = U::one())
+{
+    return rotate_left(lhs, static_cast<size_t>(rotate));
+}
+
+/**
+ * @brief Rotates the word_array to the right
+ *
+ * This shift preserves the signedness of the integer.
+ *
+ * @tparam Width The width of the signed integer
+ * @param lhs The integer to be shifted
+ * @param rhs The number of bits to be shifted
+ * @return The shifted integer
+ */
+template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
+constexpr W& rotate_right(W& lhs, size_t rotate = 1)
+{
+    const size_t left_shift = lhs.width() - rotate;
+    const auto slice = lhs << left_shift;
+    lhs >>= rotate;
+    lhs |= slice;
+
+    return lhs;
+}
+
+/**
+ * @brief Rotates the word_array to the right
+ *
+ * This shift preserves the signedness of the integer.
+ *
+ * @tparam Width The width of the signed integer
+ * @param lhs The integer to be shifted
+ * @param rhs The number of bits to be shifted
+ * @return The shifted integer
+ */
+template <typename W, typename U,
+          typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
+constexpr W& rotate_right(W& lhs, const U& rotate = U::one())
+{
+    return rotate_right(lhs, static_cast<size_t>(rotate));
 }
 
 /**

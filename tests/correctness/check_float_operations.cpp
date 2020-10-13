@@ -3,12 +3,12 @@
 
 using namespace aarith;
 
-
-
-TEMPLATE_TEST_CASE_SIG("Arithmetic should match the native data types", "[normalized_float][arithmetic][constexpr][checking]",
-                       ((size_t E, size_t M, typename native), E, M, native), (8,23,float), (11,52, double))
+TEMPLATE_TEST_CASE_SIG("Arithmetic should match the native data types",
+                       "[normalized_float][arithmetic][constexpr][checking]",
+                       ((size_t E, size_t M, typename native), E, M, native), (8, 23, float),
+                       (11, 52, double))
 {
-    using F = normalized_float<E,M>;
+    using F = normalized_float<E, M>;
 
     native a_float{-1337.35f};
     native b_float{420815.0f};
@@ -16,36 +16,35 @@ TEMPLATE_TEST_CASE_SIG("Arithmetic should match the native data types", "[normal
     constexpr native delta = {0.123f};
     constexpr native delta2 = {3.33f};
 
-    for (size_t i = 0; i < std::numeric_limits<size_t>::max()-1; ++i) {
+    for (size_t i = 0; i < std::numeric_limits<size_t>::max() - 1; ++i)
+    {
         F a{a_float};
         F b{b_float};
 
-        F res = a+b;
+        F res = a + b;
         native res_float = a_float + b_float;
 
         F res_float_{res_float};
         native res_ = static_cast<native>(res);
 
-
-        if (res_float_ != res) {
+        if (res_float_ != res)
+        {
 
             std::cout << a << " + " << b << " = " << res << "\n";
             std::cout << to_binary(a) << " + " << to_binary(b) << " = " << to_binary(res) << "\n";
             std::cout << tcs(a) << "\t+\t" << tcs(b) << " = " << tcs(res) << "\n";
 
             std::cout << a_float << " + " << b_float << " = " << res_float << "\n";
-            std::cout << to_binary(res) << " vs. " << to_binary(res_float_)  << "\n";
+            std::cout << to_binary(res) << " vs. " << to_binary(res_float_) << "\n";
         }
 
         CHECK(res_float_ == res);
         REQUIRE(res_ == res_float);
 
-
-        a_float+=delta;
-        b_float+=delta2;
+        a_float += delta;
+        b_float += delta2;
     }
 }
-
 
 SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithmetic][addition]")
 {
@@ -749,4 +748,3 @@ SCENARIO("IEEE-754 arithmetic conversion: float, double",
         }
     }
 }
-

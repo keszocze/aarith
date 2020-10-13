@@ -1,10 +1,104 @@
-#include <aarith/integer_no_operators.hpp>
+#include "gen_integer.hpp"
+#include <aarith/integer.hpp>
+#include <aarith/integer/integer_random_generation.hpp>
 #include <catch.hpp>
+
+#include "../test-signature-ranges.hpp"
 
 using namespace aarith;
 
-SCENARIO("Up-casting to the next larger native integer type",
-         "[integer][unsigned][casting]")
+TEMPLATE_TEST_CASE_SIG("Expanding integers", "[integer][signed][unsigned][casting][foo]",
+                       AARITH_INT_TEST_SIGNATURE,
+                       //                       (8, uint64_t)
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+
+    using I = integer<W, WordType>;
+    using U = uinteger<W, WordType>;
+
+    constexpr size_t extL = 3;
+    constexpr size_t extR = 5;
+
+    GIVEN("A random integer")
+    {
+        I a = GENERATE(take(10, random_integer<W, WordType>()));
+
+        WHEN("Extending to the left only")
+        {
+            auto extended_left{expand<extL, 0>(a)};
+            THEN("The value should not have changed")
+            {
+                REQUIRE(extended_left == a);
+            }
+            AND_THEN("The width should match the desired width")
+            {
+                REQUIRE(extended_left.width() == (W + extL));
+            }
+        }
+        WHEN("Extending to the right only")
+        {
+            auto extended_right{expand<0, extR>(a)};
+            THEN("The width should match the desired with")
+            {
+                REQUIRE(extended_right.width() == (W + extR));
+            }
+            THEN("The first bits should be unchanged")
+            {
+                constexpr size_t S = W + extR - 1;
+                constexpr size_t E = extR;
+                auto slice = bit_range<S, E>(extended_right);
+                //                std::cout << to_binary(extended_right) << "\n" << to_binary(slice)
+                //                << "\n" << to_binary(a) << "\n\n";
+                REQUIRE(slice == a);
+            }
+        }
+
+        WHEN("Extending in both directions at once")
+        {
+            auto extended{expand<extL, extR>(a)};
+            THEN("The width should match the desired with")
+            {
+                REQUIRE(extended.width() == (W + extL + extR));
+            }
+        }
+    }
+
+    GIVEN("A random unsigned integer")
+    {
+        U a = GENERATE(take(10, random_uinteger<W, WordType>()));
+
+        WHEN("Extending to the left only")
+        {
+            auto extended_left{expand<extL, 0>(a)};
+
+            THEN("The value should not have changed")
+            {
+                REQUIRE(extended_left == a);
+            }
+            AND_THEN("The width should match the desired width")
+            {
+                REQUIRE(extended_left.width() == (W + extL));
+            }
+        }
+        WHEN("Extending to the right only")
+        {
+            auto extended_right{expand<0, extR>(a)};
+            THEN("The width should match the desired with")
+            {
+                REQUIRE(extended_right.width() == (W + extR));
+            }
+            THEN("The first bits should be unchanged")
+            {
+                constexpr size_t S = W + extR - 1;
+                constexpr size_t E = extR;
+                auto slice = bit_range<S, E>(extended_right);
+                REQUIRE(slice == a);
+            }
+        }
+    }
+}
+
+SCENARIO("Up-casting to the next larger native integer type", "[integer][unsigned][casting]")
 {
     GIVEN("An unsigned integer with 13 bidth")
     {

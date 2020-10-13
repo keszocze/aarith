@@ -10,7 +10,8 @@ int main()
     using WordType = uint64_t;
     using I = integer<Width, WordType>;
 
-    check_int_operation<integer, Width, B, false, WordType>("subtraction", &::aarith::sub<I>, native_sub);
+    check_int_operation<integer, Width, B, false, WordType>("subtraction", &::aarith::sub<I>,
+                                                            native_sub);
 
     return 0;
 }

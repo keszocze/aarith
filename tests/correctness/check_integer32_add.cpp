@@ -11,7 +11,8 @@ int main()
     using WordType = uint64_t;
     using I = integer<Width, WordType>;
 
-    check_int_operation<integer, Width, B, false, WordType>("addition", &::aarith::add<I>, native_add);
+    check_int_operation<integer, Width, B, false, WordType>("addition", &::aarith::add<I>,
+                                                            native_add);
 
     return 0;
 }

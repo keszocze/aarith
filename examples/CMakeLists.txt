@@ -7,3 +7,5 @@ target_link_libraries(sqrt_example aarith::Library)
 add_executable(fau_adder_evaluation fau_adder.cpp)
 target_link_libraries(fau_adder_evaluation aarith::Library)
 
+add_executable(invert_gti invert.cpp)
+target_link_libraries(invert_gti aarith::Library)

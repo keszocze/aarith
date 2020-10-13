@@ -34,10 +34,7 @@ TEMPLATE_TEST_CASE_SIG("Comparisons should match the native counterparts",
                 bool neq = (a != quite_nan);
                 bool neq_native(a_native != quite_nan_native);
                 CHECK(neq == neq_native);
-                if (neq) {
-                    std::cout << neq << "\t" << neq_native << "\n";
-                }
-                CHECK_FALSE(neq);
+                CHECK(neq); // should actually be true!
 
                 bool leq = (a <= quite_nan);
                 bool leq_native(a_native <= quite_nan_native);
@@ -103,7 +100,6 @@ TEMPLATE_TEST_CASE_SIG("Comparisons should match the native counterparts",
     }
 }
 
-
 TEMPLATE_TEST_CASE_SIG("Constants should be stored correctly",
                        "[normalized_float][comparison][utility][foo]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
@@ -114,10 +110,11 @@ TEMPLATE_TEST_CASE_SIG("Constants should be stored correctly",
     GIVEN("The number zero in the native data type and as aarith float")
     {
 
-        F zero_aarith=F::zero();
+        F zero_aarith = F::zero();
         Native zero_native{0.0f};
 
-        THEN("The numbers should match") {
+        THEN("The numbers should match")
+        {
             CHECK(zero_aarith == F{zero_native});
             REQUIRE(static_cast<Native>(zero_aarith) == zero_native);
         }
@@ -126,10 +123,11 @@ TEMPLATE_TEST_CASE_SIG("Constants should be stored correctly",
     GIVEN("The number one in the native data type and as aarith float")
     {
 
-        F one_aarith=F::one();
+        F one_aarith = F::one();
         Native one_native{1.0f};
 
-        THEN("The numbers should match") {
+        THEN("The numbers should match")
+        {
             CHECK(one_aarith == F{one_native});
             REQUIRE(static_cast<Native>(one_aarith) == one_native);
         }

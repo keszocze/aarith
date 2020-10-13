@@ -10,7 +10,8 @@ int main()
     using WordType = uint64_t;
     using I = integer<Width, uint64_t>;
 
-    check_int_operation<integer, Width, B, true, WordType>("division", &::aarith::div<I>, native_div);
+    check_int_operation<integer, Width, B, true, WordType>("division", &::aarith::div<I>,
+                                                           native_div);
 
     return 0;
 }

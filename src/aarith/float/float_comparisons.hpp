@@ -63,7 +63,7 @@ bool bitwise_equality(const normalized_float<E, M> lhs, const normalized_float<E
     const bool equal_sign = (lhs.get_sign() == rhs.get_sign());
     const bool equal_exponent = (lhs.get_exponent() == rhs.get_exponent());
     const bool equal_mantissa = (lhs.get_full_mantissa() == rhs.get_full_mantissa());
-//    std::cout << equal_sign << "\t" << equal_exponent << "\t" << equal_mantissa << "\n";
+    //    std::cout << equal_sign << "\t" << equal_exponent << "\t" << equal_mantissa << "\n";
     return equal_sign && equal_exponent && equal_mantissa;
 }
 

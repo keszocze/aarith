@@ -2,8 +2,8 @@
 
 #include <aarith/core/word_array.hpp>
 #include <aarith/core/word_array_operations.hpp>
-#include <aarith/integer/integers.hpp>
 #include <aarith/integer/integer_operations.hpp>
+#include <aarith/integer/integers.hpp>
 #include <cstdint>
 #include <iostream>
 
@@ -28,7 +28,7 @@ template <class Integer> auto generate_bitmask(size_t leading_ones) -> Integer
     {
         leading_ones = Integer::width();
     }
-    
+
     if (leading_ones == 0)
     {
         leading_ones = 1;
@@ -87,10 +87,9 @@ template <class Integer>
 
 template <size_t W>
 [[nodiscard]] auto approx_expanding_add_post_masking(const uinteger<W> a, const uinteger<W> b,
-                                                     const size_t bits = W)
--> uinteger<W+1>
+                                                     const size_t bits = W) -> uinteger<W + 1>
 {
-    const auto result = expanding_add(a,b);
+    const auto result = expanding_add(a, b);
     const auto mask = generate_bitmask<uinteger<result.width()>>(bits);
 
     return result & mask;
@@ -106,10 +105,9 @@ template <class Integer>
 
 template <size_t W>
 [[nodiscard]] auto approx_expanding_sub_post_masking(const uinteger<W> a, const uinteger<W> b,
-                                                     const size_t bits = W)
--> uinteger<W+1>
+                                                     const size_t bits = W) -> uinteger<W + 1>
 {
-    const auto result = expanding_sub(a,b);
+    const auto result = expanding_sub(a, b);
     const auto mask = generate_bitmask<uinteger<result.width()>>(bits);
 
     return result & mask;
@@ -125,8 +123,7 @@ template <class Integer>
 
 template <size_t W>
 [[nodiscard]] auto approx_expanding_mul_post_masking(const uinteger<W>& a, const uinteger<W> b,
-                                                     const size_t bits = 2*W)
--> uinteger<2*W>
+                                                     const size_t bits = 2 * W) -> uinteger<2 * W>
 {
     const auto result = schoolbook_expanding_mul(a, b);
     const auto mask = generate_bitmask<uinteger<result.width()>>(bits);
@@ -227,7 +224,7 @@ template <class Integer>
 template <size_t Width, typename WordType>
 auto approx_uint_bitmasking_mul(const uinteger<Width, WordType>& opd1,
                                 const uinteger<Width, WordType>& opd2, const size_t bits)
--> uinteger<2 * Width, WordType>
+    -> uinteger<2 * Width, WordType>
 {
     constexpr auto product_width = 2 * Width;
 
@@ -247,7 +244,7 @@ auto approx_uint_bitmasking_mul(const uinteger<Width, WordType>& opd1,
 }
 
 template <size_t width, size_t lsp_width, size_t shared_bits = 0>
-uinteger<width+1> FAUadder(const uinteger<width>& a, const uinteger<width>& b)
+uinteger<width + 1> FAUadder(const uinteger<width>& a, const uinteger<width>& b)
 {
 
     static_assert(shared_bits <= lsp_width);
@@ -261,7 +258,6 @@ uinteger<width+1> FAUadder(const uinteger<width>& a, const uinteger<width>& b)
 
     constexpr size_t msp_width = width - lsp_width;
 
-
     const uinteger<lsp_width> a_lsp = a_split.second;
     const uinteger<lsp_width> b_lsp = b_split.second;
 
@@ -271,7 +267,6 @@ uinteger<width+1> FAUadder(const uinteger<width>& a, const uinteger<width>& b)
     uinteger<lsp_width + 1> lsp_sum = expanding_add(a_lsp, b_lsp);
 
     uinteger<lsp_width> lsp = width_cast<lsp_width>(lsp_sum);
-
 
     // conditionally perform carry prediction
     bool predicted_carry = false;
@@ -291,9 +286,9 @@ uinteger<width+1> FAUadder(const uinteger<width>& a, const uinteger<width>& b)
         lsp = lsp.all_ones();
     }
 
-    const uinteger<msp_width + 1> msp = expanding_add(a_msp,b_msp,predicted_carry);
+    const uinteger<msp_width + 1> msp = expanding_add(a_msp, b_msp, predicted_carry);
 
-    uinteger<width+1> result{lsp};
+    uinteger<width + 1> result{lsp};
 
     const auto extended_msp = width_cast<width + 1>(msp);
     result = add(result, extended_msp << lsp_width);
@@ -324,19 +319,18 @@ template <size_t W, size_t V, typename WordType>
     const uinteger<std::max(W, V), WordType> result =
         zip_with_expand<decltype(word_adder), W, V, WordType>(a, b, word_adder);
 
-
     return result;
 }
 
 template <size_t width, size_t lsp_width, size_t shared_bits = 0>
-uinteger<width+1> FAU_sub(const uinteger<width>& a, [[maybe_unused]] const uinteger<width>& b)
+uinteger<width + 1> FAU_sub(const uinteger<width>& a, [[maybe_unused]] const uinteger<width>& b)
 {
-    auto b_inv = ~width_cast<width+1>(b);
-    const auto one = uinteger<width+1>(1U);
+    auto b_inv = ~width_cast<width + 1>(b);
+    const auto one = uinteger<width + 1>(1U);
     b_inv = add(b_inv, one);
 
-    const auto a_ext = width_cast<width+1>(a);
-    return width_cast<width+1>(FAUadder<width+1, lsp_width, shared_bits>(a_ext, b_inv));
+    const auto a_ext = width_cast<width + 1>(a);
+    return width_cast<width + 1>(FAUadder<width + 1, lsp_width, shared_bits>(a_ext, b_inv));
 }
 
 } // namespace aarith

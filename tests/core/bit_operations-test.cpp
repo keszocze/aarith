@@ -3,13 +3,10 @@
 #include <aarith/core.hpp>
 #include <aarith/core/string_utils.hpp>
 
-
 #include "../test-signature-ranges.hpp"
 #include "gen_word_array.hpp"
 
 using namespace aarith;
-
-
 
 SCENARIO("Casting word_containers into different width", "[word_array][casting]")
 {
@@ -700,7 +697,7 @@ SCENARIO("Right shift assignment operator works as expected", "[word_array][util
 }
 
 TEMPLATE_TEST_CASE_SIG("Bitwise operations work as expected", "[word_array][bit_logic]",
-                       AARITH_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
+                       AARITH_INT_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
 {
     GIVEN("An word_array a")
     {
@@ -714,7 +711,8 @@ TEMPLATE_TEST_CASE_SIG("Bitwise operations work as expected", "[word_array][bit_
             THEN("The result should match the NOT of the underlying WordType")
             {
                 const auto result = ~a;
-                for (size_t i=0; i < a.word_count(); ++i) {
+                for (size_t i = 0; i < a.word_count(); ++i)
+                {
                     REQUIRE(result.word(i) == (~a.word(i) & a.word_mask(i)));
                 }
             }
@@ -727,7 +725,8 @@ TEMPLATE_TEST_CASE_SIG("Bitwise operations work as expected", "[word_array][bit_
             THEN("Bitwise AND should work as expected")
             {
                 const auto result = a & b;
-                for (size_t i=0; i < a.word_count(); ++i) {
+                for (size_t i = 0; i < a.word_count(); ++i)
+                {
                     REQUIRE(result.word(i) == ((a.word(i) & b.word(i)) & a.word_mask(i)));
                 }
             }
@@ -735,19 +734,20 @@ TEMPLATE_TEST_CASE_SIG("Bitwise operations work as expected", "[word_array][bit_
             AND_THEN("Bitwise OR should work as expected")
             {
                 const auto result = a | b;
-                for (size_t i=0; i < a.word_count(); ++i) {
+                for (size_t i = 0; i < a.word_count(); ++i)
+                {
                     REQUIRE(result.word(i) == ((a.word(i) | b.word(i)) & a.word_mask(i)));
                 }
             }
             AND_THEN("Bitwise XOR should work as expected")
             {
                 const auto result = a ^ b;
-                for (size_t i=0; i < a.word_count(); ++i) {
+                for (size_t i = 0; i < a.word_count(); ++i)
+                {
                     REQUIRE(result.word(i) == ((a.word(i) ^ b.word(i)) & a.word_mask(i)));
                 }
             }
         }
-
     }
 }
 
@@ -793,7 +793,7 @@ SCENARIO("Bit shifting is possible as constexpr", "[word_array][utility][bit_log
 }
 
 TEMPLATE_TEST_CASE_SIG("Bit operations are performed correctly", "[word_array][bit_logic]",
-                       AARITH_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
+                       AARITH_INT_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
 {
     GIVEN("An word_array<N> w")
     {

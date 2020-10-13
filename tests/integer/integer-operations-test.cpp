@@ -8,8 +8,62 @@
 
 using namespace aarith;
 
+TEMPLATE_TEST_CASE_SIG("Pre/postfix operator++", "[integer][arithmetic][foo]",
+                       AARITH_INT_EXTENDED_TEST_SIGNATURE,
+                       AARITH_INT_EXTENDED_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE)
+{
+    using I = Type<W, WordType>;
+    GIVEN("A random integer and a random uint8_t")
+    {
+        I a = GENERATE(take(10, random_integer<W, WordType>()));
+        I b{a};
+
+        uint8_t iters = GENERATE(take(10, random<uint8_t>(std::numeric_limits<uint8_t>::min(),
+                                                          std::numeric_limits<uint8_t>::max())));
+
+        WHEN("Calling the prefix/postfix -- operator multiple times")
+        {
+            THEN("It should match the subtraction operation")
+            {
+                I a_sub{sub(a, I{iters})};
+                for (size_t i = 0; i < iters; ++i)
+                {
+                    CHECK(--a == sub(b--, I::one()));
+                    CHECK(a == b);
+                }
+                CHECK(a == a_sub);
+                REQUIRE(b == a_sub);
+            }
+        }
+    }
+
+    GIVEN("A random integer and a random uint8_t")
+    {
+        I a = GENERATE(take(10, random_integer<W, WordType>()));
+        I b{a};
+
+        uint8_t iters = GENERATE(take(10, random<uint8_t>(std::numeric_limits<uint8_t>::min(),
+                                                          std::numeric_limits<uint8_t>::max())));
+
+        WHEN("Calling the prefix/postfix ++ operator multiple times")
+        {
+            THEN("It should match the addition operation")
+            {
+                I a_add{add(a, I{iters})};
+                for (size_t i = 0; i < iters; ++i)
+                {
+                    CHECK(++a == add(b++, I::one()));
+                    CHECK(a == b);
+                }
+                CHECK(a == a_add);
+                REQUIRE(b == a_add);
+            }
+        }
+    }
+}
+
 TEMPLATE_TEST_CASE_SIG("Arithmetic should be constexpr", "[integer][signed][arithmetic][constexpr]",
-                       AARITH_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+                       AARITH_INT_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = integer<W, WordType>;
     GIVEN("Two integers")
@@ -252,7 +306,7 @@ SCENARIO("Adding two positive integers", "[integer][signed][arithmetic][addition
 }
 
 TEMPLATE_TEST_CASE_SIG("Signed integer addition is commutative",
-                       "[integer][signed][arithmetic][addition]", AARITH_TEST_SIGNATURE,
+                       "[integer][signed][arithmetic][addition]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = integer<W, WordType>;
@@ -283,7 +337,7 @@ TEMPLATE_TEST_CASE_SIG("Signed integer addition is commutative",
 
 TEMPLATE_TEST_CASE_SIG(
     "Signed integer addition is commutative for addends with different bit widths",
-    "[integer][signed][arithmetic][addition]", AARITH_TEST_SIGNATURE,
+    "[integer][signed][arithmetic][addition]", AARITH_INT_TEST_SIGNATURE,
     AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = integer<W, WordType>;
@@ -311,7 +365,7 @@ TEMPLATE_TEST_CASE_SIG(
 }
 
 TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
-                       "[integer][signed][arithmetic][addition]", AARITH_TEST_SIGNATURE,
+                       "[integer][signed][arithmetic][addition]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = integer<W, WordType>;
@@ -321,7 +375,7 @@ TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
 }
 
 TEMPLATE_TEST_CASE_SIG("Addition wraps around correctly", "[integer][signed][arithmetic][addition]",
-                       AARITH_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+                       AARITH_INT_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = integer<W, WordType>;
 
@@ -354,7 +408,7 @@ TEMPLATE_TEST_CASE_SIG("Addition wraps around correctly", "[integer][signed][ari
 }
 
 TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the subtraction",
-                       "[integer][unsigned][arithmetic][subtraction]", AARITH_TEST_SIGNATURE,
+                       "[integer][unsigned][arithmetic][subtraction]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = integer<W, WordType>;
@@ -364,7 +418,7 @@ TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the subtraction",
 }
 
 TEMPLATE_TEST_CASE_SIG("Expanding subtraction wraps around correctly for different bit-widths",
-                       "[integer][signed][arithmetic][subtraction]", AARITH_TEST_SIGNATURE,
+                       "[integer][signed][arithmetic][subtraction]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = integer<W, WordType>;
@@ -398,7 +452,7 @@ TEMPLATE_TEST_CASE_SIG("Expanding subtraction wraps around correctly for differe
 }
 
 TEMPLATE_TEST_CASE_SIG("Subtraction wraps around correctly",
-                       "[integer][signed][arithmetic][subtraction]", AARITH_TEST_SIGNATURE,
+                       "[integer][signed][arithmetic][subtraction]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = integer<W, WordType>;
@@ -428,7 +482,7 @@ TEMPLATE_TEST_CASE_SIG("Subtraction wraps around correctly",
 }
 
 TEMPLATE_TEST_CASE_SIG("Unsigned integer multiplication is commutative",
-                       "[integer][signed][arithmetic][multiplication]", AARITH_TEST_SIGNATURE,
+                       "[integer][signed][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = integer<W, WordType>;
@@ -478,7 +532,7 @@ TEMPLATE_TEST_CASE_SIG("Unsigned integer multiplication is commutative",
 }
 
 TEMPLATE_TEST_CASE_SIG("One is the neutral element of the multiplication",
-                       "[integer][signed][arithmetic][multiplication]", AARITH_TEST_SIGNATURE,
+                       "[integer][signed][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = integer<W, WordType>;
@@ -490,7 +544,7 @@ TEMPLATE_TEST_CASE_SIG("One is the neutral element of the multiplication",
 }
 
 TEMPLATE_TEST_CASE_SIG("Multiplying with minus one only changes the sign ",
-                       "[integer][signed][arithmetic][multiplication]", AARITH_TEST_SIGNATURE,
+                       "[integer][signed][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     GIVEN("No the most negative number")
@@ -508,7 +562,7 @@ TEMPLATE_TEST_CASE_SIG("Multiplying with minus one only changes the sign ",
 }
 
 TEMPLATE_TEST_CASE_SIG("Zero makes the multiplication result zero",
-                       "[integer][signed][arithmetic][multiplication]", AARITH_TEST_SIGNATURE,
+                       "[integer][signed][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = integer<W, WordType>;
@@ -521,7 +575,7 @@ TEMPLATE_TEST_CASE_SIG("Zero makes the multiplication result zero",
 }
 
 TEMPLATE_TEST_CASE_SIG("Multiplying the max value with itself and truncation yields 1",
-                       "[integer][signed][arithmetic][multiplication]", AARITH_TEST_SIGNATURE,
+                       "[integer][signed][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = integer<W, WordType>;
@@ -531,7 +585,7 @@ TEMPLATE_TEST_CASE_SIG("Multiplying the max value with itself and truncation yie
 }
 
 TEMPLATE_TEST_CASE_SIG("Testing the most negative number", "[integer][signed][arithmetic]",
-                       AARITH_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+                       AARITH_INT_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = integer<W, WordType>;
     GIVEN("The most negative number")
@@ -767,7 +821,7 @@ SCENARIO("Division of signed integers", "[integer][signed][arithmetic][division]
 }
 
 TEMPLATE_TEST_CASE_SIG("Invariants for the signed integer division",
-                       "[integer][signed][arithmetic][division]", AARITH_TEST_SIGNATURE,
+                       "[integer][signed][arithmetic][division]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = integer<W, WordType>;
@@ -1220,7 +1274,7 @@ SCENARIO("Expanding subtraction works correctly", "[integer][signed][arithmetic]
 }
 
 TEMPLATE_TEST_CASE_SIG("Unary minus operation", "[integer][signed][arithmetic][utility]",
-                       AARITH_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+                       AARITH_INT_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = integer<W, WordType>;
     GIVEN("An integer")
@@ -1244,7 +1298,7 @@ TEMPLATE_TEST_CASE_SIG("Unary minus operation", "[integer][signed][arithmetic][u
 }
 
 TEMPLATE_TEST_CASE_SIG("MIN/MAX Values behave as expected", "[integer][signed][operation][utility]",
-                       AARITH_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+                       AARITH_INT_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = integer<W, WordType>;
     GIVEN("The min and max value")
@@ -1271,7 +1325,7 @@ TEMPLATE_TEST_CASE_SIG("MIN/MAX Values behave as expected", "[integer][signed][o
 }
 
 TEMPLATE_TEST_CASE_SIG("Computing the signum of an non-zero integer",
-                       "[integer][signed][operation][utility]", AARITH_TEST_SIGNATURE,
+                       "[integer][signed][operation][utility]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using I = integer<W, WordType>;

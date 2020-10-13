@@ -33,7 +33,6 @@ TEMPLATE_TEST_CASE_SIG("Infinity and NaNs are created correctly",
     F nan_from_native{nan_native};
     F pos_inf{F::pos_infinity()};
 
-
     Native pos_inf_casted = static_cast<Native>(pos_inf);
 
     CHECK(nan_from_native == nan);

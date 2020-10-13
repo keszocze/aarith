@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <aarith/core/traits.hpp>
 #include <aarith/core/word_array.hpp>
 #include <cstdint>

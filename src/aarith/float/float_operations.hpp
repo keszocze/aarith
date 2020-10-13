@@ -36,20 +36,12 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
     }
 
     const auto exponent_delta = sub(width_cast<E+1>(lhs.get_exponent()), width_cast<E+1>(rhs.get_exponent()));
-    //check for underflow
-    if(exponent_delta.bit(E) == 1)
-    {
         
-    }
     const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
     const auto mantissa_sum = fun_add(lhs.get_full_mantissa(), new_mantissa);
 
     normalized_float<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(), mantissa_sum);
-    /*
-    sum.set_sign(lhs.get_sign());
-    sum.set_exponent(lhs.get_exponent());
-    sum.set_full_mantissa(mantissa_sum);
-    */
+    
     return normalize<E, mantissa_sum.width() - 1, M>(sum);
 }
 
@@ -245,15 +237,11 @@ template <size_t E, size_t M, typename WordType>
         return rhs;
     }
 
-    auto dividend = width_cast<2 * (M + 1) + 3>(lhs.get_full_mantissa());
-    auto divisor = width_cast<2 * (M + 1) + 3>(rhs.get_full_mantissa());
-    dividend = (dividend << M + 4);
+    auto dividend = width_cast<2 * M + 1>(lhs.get_full_mantissa());
+    auto divisor = width_cast<2 * M + 1>(rhs.get_full_mantissa());
+    dividend = dividend << M;
     auto mquotient = div(dividend, divisor);
-    // mquotient >>= 1;
-    auto rdmquotient = rshift_and_round(mquotient, 4);
 
-    //auto esum = width_cast<E>(
-    //    sub(expanding_add(lhs.get_exponent(), lhs.bias), width_cast<E + 1>(rhs.get_exponent())));
     auto esum = expanding_add(lhs.get_exponent(), lhs.bias);
     if (esum <= rhs.get_exponent()) 
     {
@@ -263,14 +251,11 @@ template <size_t E, size_t M, typename WordType>
     {
         esum = width_cast<E>(sub(esum, width_cast<E + 1>(rhs.get_exponent())));
     }
+
     auto sign = lhs.get_sign() ^ rhs.get_sign();
+    normalized_float<E, mquotient.width() - 1> quotient(sign, esum, mquotient);
 
-    normalized_float<E, rdmquotient.width() - 1> quotient;
-    quotient.set_full_mantissa(rdmquotient);
-    quotient.set_exponent(esum);
-    quotient.set_sign(sign);
-
-    return normalize<E, rdmquotient.width() - 1, M>(quotient);
+    return normalize<E, mquotient.width() - 1, M>(quotient);
 }
 
 /**

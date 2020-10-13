@@ -1,19 +1,20 @@
 #include <catch.hpp>
 
 #include "../test-signature-ranges.hpp"
-#include "gen_word_array.hpp"
-#include <aarith/core.hpp>
-#include <aarith/core/string_utils.hpp>
+#include "gen_integer.hpp"
+#include <aarith/integer.hpp>
+
+#include <catch.hpp>
 
 using namespace aarith;
 
-SCENARIO("Splitting a word_array/extraction from a word_array", "[word_array][utility]")
+SCENARIO("Splitting an integer/extraction from an integer", "[integer][unsigned][utility]")
 {
-    GIVEN("A word_array w")
+    GIVEN("A uinteger w")
     {
 
-        const word_array<7> w3{21};
-        word_array<8> a{0b00111001};
+        constexpr uinteger<7> w3{21};
+        constexpr uinteger<8> a{0b00111001};
 
         WHEN("The container is split")
         {
@@ -22,14 +23,14 @@ SCENARIO("Splitting a word_array/extraction from a word_array", "[word_array][ut
                 const auto [w3_left, w3_right] = split<2>(w3);
                 CHECK(w3_left.width() == 4);
                 CHECK(w3_right.width() == 3);
-                CHECK(w3_left == word_array<4>{2});
-                CHECK(w3_right == word_array<3>{5});
+                CHECK(w3_left == uinteger<4>{2});
+                CHECK(w3_right == uinteger<3>{5});
 
                 const auto [a_left, a_right] = split<2>(a);
                 CHECK(a_left.width() == 5);
                 CHECK(a_right.width() == 3);
-                CHECK(a_left == word_array<5>{0b00111});
-                REQUIRE(a_right == word_array<3>{0b001});
+                CHECK(a_left == uinteger<5>{0b00111});
+                REQUIRE(a_right == uinteger<3>{0b001});
             }
         }
         WHEN("Ranges are extracted correctly")
@@ -43,9 +44,9 @@ SCENARIO("Splitting a word_array/extraction from a word_array", "[word_array][ut
                 CHECK(r1.width() == 6);
                 CHECK(r2.width() == 5);
                 CHECK(r3.width() == 5);
-                CHECK(r1 == word_array<6>{10});
-                CHECK(r2 == word_array<5>{5});
-                CHECK(r3 == word_array<5>{10});
+                CHECK(r1 == uinteger<6>{10});
+                CHECK(r2 == uinteger<5>{5});
+                CHECK(r3 == uinteger<5>{10});
 
 
 
@@ -56,24 +57,24 @@ SCENARIO("Splitting a word_array/extraction from a word_array", "[word_array][ut
                 CHECK(s1.width() == 6);
                 CHECK(s2.width() == 5);
                 CHECK(s3.width() == 5);
-                CHECK(s1 == word_array<6>{0b11100});
-                CHECK(s2 == word_array<5>{0b01110});
-                REQUIRE(s3 == word_array<5>{0b11100});
+                CHECK(s1 == uinteger<6>{0b11100});
+                CHECK(s2 == uinteger<5>{0b01110});
+                REQUIRE(s3 == uinteger<5>{0b11100});
             }
         }
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("Invariant: Concatenation is associative", "[word_array][utility]",
+TEMPLATE_TEST_CASE_SIG("Invariant: Concatenation is associative", "[uinteger][utility]",
                        AARITH_INT_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
 {
     GIVEN("Three different words")
     {
-        using I = word_array<W, WordType>;
+        using I = uinteger<W, WordType>;
 
-        const I w1 = GENERATE(take(5, random_word_array<W, WordType>()));
-        const I w2 = GENERATE(take(5, random_word_array<W, WordType>()));
-        const I w3 = GENERATE(take(5, random_word_array<W, WordType>()));
+        const I w1 = GENERATE(take(5, random_uinteger<W, WordType>()));
+        const I w2 = GENERATE(take(5, random_uinteger<W, WordType>()));
+        const I w3 = GENERATE(take(5, random_uinteger<W, WordType>()));
 
         WHEN("Concatenating the words")
         {
@@ -85,14 +86,14 @@ TEMPLATE_TEST_CASE_SIG("Invariant: Concatenation is associative", "[word_array][
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("Concatenating undoes range extraction", "[word_array][utility]",
+TEMPLATE_TEST_CASE_SIG("Concatenating undoes range extraction", "[uinteger][utility]",
                        AARITH_INT_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
 {
-    GIVEN("A word_array")
+    GIVEN("A uinteger")
     {
-        using I = word_array<W, WordType>;
+        using I = uinteger<W, WordType>;
 
-        const I w = GENERATE(take(20, random_word_array<W, WordType>()));
+        const I w = GENERATE(take(20, random_uinteger<W, WordType>()));
 
         WHEN("Extracting a range from including one end (i.e. basically splitting the word array)")
         {
@@ -119,14 +120,14 @@ TEMPLATE_TEST_CASE_SIG("Concatenating undoes range extraction", "[word_array][ut
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("Concatenating undoes splitting", "[word_array][utility]",
+TEMPLATE_TEST_CASE_SIG("Concatenating undoes splitting", "[uinteger][utility]",
                        AARITH_INT_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
 {
-    GIVEN("A word_array")
+    GIVEN("A uinteger")
     {
-        using I = word_array<W, WordType>;
+        using I = uinteger<W, WordType>;
 
-        const I w = GENERATE(take(20, random_word_array<W, WordType>()));
+        const I w = GENERATE(take(20, random_uinteger<W, WordType>()));
 
         WHEN("Splitting the word at some position")
         {
