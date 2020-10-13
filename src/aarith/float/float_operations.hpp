@@ -114,6 +114,15 @@ template <size_t E, size_t M>
         return normalized_float<E, M>::NaN();
     }
 
+    if (lhs.is_inf())
+    {
+        return lhs;
+    }
+    if (rhs.is_inf())
+    {
+        return rhs;
+    }
+
     // return add_<E, M, class aarith::uinteger<M+1, long unsigned int> (*)(const class
     // aarith::uinteger<M+1>&, const class aarith::uinteger<M+1>&, const bool)>(lhs, rhs,
     // expanding_add<M+1, M+1>, expanding_sub<M+1, M+1>);
@@ -189,6 +198,10 @@ template <size_t E, size_t M, typename WordType>
     // compute sign
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
+    if (lhs.is_inf() || rhs.is_inf()) {
+        return sign ? normalized_float<E,M>::neg_infinity() : normalized_float<E,M>::pos_infinity();
+    }
+
     // compute exponent
     auto ext_esum = expanding_add(lhs.get_exponent(), rhs.get_exponent());
     bool overflow = ext_esum.bit(E) == 1;
@@ -260,9 +273,16 @@ template <size_t E, size_t M, typename WordType>
         return lhs;
     }
 
+    const bool neg_result = lhs.is_negative() ^ rhs.is_negative();
+
     if (rhs.is_inf())
     {
-        return rhs;
+        return neg_result ? normalized_float<E, M>::neg_zero() : normalized_float<E, M>::zero();
+    }
+    if (rhs.is_zero())
+    {
+        return neg_result ? normalized_float<E, M>::neg_infinity()
+                          : normalized_float<E, M>::pos_infinity();
     }
 
     auto dividend = width_cast<2 * M + 1>(lhs.get_full_mantissa());

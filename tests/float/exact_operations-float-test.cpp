@@ -269,6 +269,7 @@ TEMPLATE_TEST_CASE_SIG("Dividing by infinity", "[normalized_float][arithmetic][d
     GIVEN("A random floating point number")
     {
 
+
         using F = normalized_float<E, M>;
 
         Native f_ = GENERATE(take(15, full_native_range<Native>()));
@@ -278,6 +279,7 @@ TEMPLATE_TEST_CASE_SIG("Dividing by infinity", "[normalized_float][arithmetic][d
         constexpr F pos_inf{F::pos_infinity()};
         constexpr F pos_zero{F::zero()};
         constexpr F neg_zero{F::neg_zero()};
+
         WHEN("Dividing by infinity")
         {
             THEN("The sign of the resulting zero should be correct")
@@ -393,7 +395,7 @@ TEMPLATE_TEST_CASE_SIG("Multiplying with infinity",
 }
 
 TEMPLATE_TEST_CASE_SIG("Generating NaN as a result",
-                       "[normalized_float][arithmetic][addition][bar]",
+                       "[normalized_float][arithmetic][addition]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, double))
 {
