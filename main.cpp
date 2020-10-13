@@ -3,28 +3,31 @@
 #include <numeric>
 #include <vector>
 
-//namespace aarith {
-//template <size_t E, size_t M, typename WordType>
-//auto operator+(const normalized_float<E, M, WordType>& lhs,
-//               const normalized_float<E, M, WordType>& rhs) -> normalized_float<E, M, WordType>
-//{
-//    return add(lhs, rhs);
-//}
-//} // namespace aarith
 
 int main()
 {
     using namespace aarith;
 
     using nf_t = normalized_float<8, 23>;
-
+    float a = 0.0117647f;
+    float b = 0.385671f;
     nf_t nf_a(0.0117647f);
     nf_t nf_b(0.385671f);
 
-    nf_t nf_res = nf_a * nf_b;
+    auto result_f = a * b;
+    auto result = mul(nf_a, nf_b);
+    std::cout << result << "\n";
+    std::cout << to_binary(nf_t(result_f)) << "\n";
+    std::cout << to_binary(result) << "\n";
 
-    std::cout << nf_a << " * " << nf_b << " = " << nf_res << "\n";
-    std::cout << to_binary(nf_a) << " * " << to_binary(nf_b) << " = " << to_binary(nf_res) << "\n";
+
+    nf_t lhs{5.0f};
+    nf_t rhs{-2.0f};
+
+
+    std::cout << lhs << "\t" << rhs << "\n";
+    std::cout << (lhs < rhs) << "\n";
+
 
     return 0;
 }

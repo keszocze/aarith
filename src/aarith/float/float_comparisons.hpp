@@ -15,16 +15,19 @@ auto operator<(const normalized_float<E, M> lhs, const normalized_float<E, M> rh
     }
 
     // positive and negative zero are to be treated equally
+
     if (lhs.is_zero() && rhs.is_zero())
     {
         return false;
     }
 
-    if (lhs.is_negative() && rhs.is_positive())
+    if (lhs.is_negative() != rhs.is_negative())
     {
-        return true;
+        return lhs.is_negative() && rhs.is_positive();
     }
-    else if (lhs.get_exponent() == rhs.get_exponent())
+    // now the sign is equal
+
+    if (lhs.get_exponent() == rhs.get_exponent())
     {
         if (lhs.get_full_mantissa() == rhs.get_full_mantissa())
         {
@@ -155,11 +158,13 @@ bool operator<(const normalized_float<E, M> lhs, const normalized_float<E_, M_> 
         return false;
     }
 
-    if (lhs.is_negative() && rhs.is_positive())
+    if (lhs.is_negative() != rhs.is_negative())
     {
-        return true;
+        return lhs.is_negative() && rhs.is_positive();
     }
-    else if (lhs.unbiased_exponent() == rhs.unbiased_exponent())
+    // now the sign is equal
+
+    if (lhs.unbiased_exponent() == rhs.unbiased_exponent())
     {
         if (lhs.get_full_mantissa() == rhs.get_full_mantissa())
         {
