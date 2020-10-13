@@ -493,6 +493,7 @@ TEMPLATE_TEST_CASE_SIG("Floating point division matches its native counterparts"
                        (11, 52, double))
 {
 
+
     using F = normalized_float<E, M>;
 
     Native a_native = GENERATE(take(15, full_native_range<Native>()));
