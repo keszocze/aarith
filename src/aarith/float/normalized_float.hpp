@@ -41,8 +41,6 @@ template <size_t ES, size_t E, size_t M, typename WordType>
 
     using exp_type = uinteger<ES, WordType>;
 
-
-
     uinteger<E, WordType> exp_f = f.get_exponent();
 
     if (exp_f == uinteger<E, WordType>::all_ones())
@@ -113,8 +111,9 @@ public:
         exponent = bit_range<(E + M) - 1, M>(w);
         mantissa = bit_range<M - 1, 0>(w);
 
-        //manually set the hidden bit
-        if (exponent != uinteger<E>::all_zeroes()) {
+        // manually set the hidden bit
+        if (exponent != uinteger<E>::all_zeroes())
+        {
             mantissa.set_msb(true);
         }
     }
@@ -234,8 +233,13 @@ public:
         return neg_inf;
     }
 
+    /**
+     *
+     * @return
+     */
     [[nodiscard]] static constexpr normalized_float NaN()
     {
+        // TODO why isn't this constexpr?
         normalized_float nan{};
         nan.set_exponent(word_array<E, WordType>::all_ones());
         auto nan_mantissa = word_array<M, WordType>::all_zeroes();
@@ -358,7 +362,10 @@ public:
     void set_mantissa(const uinteger<M, WordType>& set_to)
     {
         mantissa = set_to;
-        mantissa.set_msb(true);
+        if (exponent != IntegerExp::all_zeroes())
+        {
+            mantissa.set_msb(true);
+        }
     }
 
     auto bit(size_t index) const -> typename uinteger<M, WordType>::bit_type

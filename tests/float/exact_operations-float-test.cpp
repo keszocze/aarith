@@ -147,18 +147,26 @@ TEMPLATE_TEST_CASE_SIG("One is the neutral element of the multiplication",
     }
 }
 
-SCENARIO("Multiplication should work correctly","[normalized_float][arithmetic][multiplication][bar]") {
-    GIVEN("Two numbers in in <8,23> format") {
+SCENARIO("Multiplication should work correctly",
+         "[normalized_float][arithmetic][multiplication][bar]")
+{
+    GIVEN("Two numbers in in <8,23> format")
+    {
         using nf_t = normalized_float<8, 23>;
 
         nf_t nf_a(0.0117647f);
         nf_t nf_b(0.385671f);
 
-        WHEN("Multiplying them") {
+        WHEN("Multiplying them")
+        {
             nf_t nf_res = nf_a * nf_b;
-            THEN("The result should be correct") {
+            THEN("The result should be correct")
+            {
                 word_array<32> wrong_(0b01000111000000000000000000000001);
                 nf_t nf_wrong(wrong_);
+
+                //                std::cout << to_binary(nf_res, true) << "\n";
+                //                std::cout << to_binary(nf_wrong, true) << "\n";
 
                 // hand picked counterexample
                 REQUIRE(nf_res != nf_wrong);
@@ -168,7 +176,7 @@ SCENARIO("Multiplication should work correctly","[normalized_float][arithmetic][
 }
 
 TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts",
-                       "[normalized_float][arithmetic][addition][constexpr]",
+                       "[normalized_float][arithmetic][addition]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, double))
 {
@@ -209,6 +217,57 @@ TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts"
 
         a_float += delta;
         b_float += delta2;
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Adding special numbers", "[normalized_float][arithmetic][addition]",
+                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
+                       (11, 52, double))
+{
+}
+
+TEMPLATE_TEST_CASE_SIG("Generating NaN as a result",
+                       "[normalized_float][arithmetic][addition]",
+                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
+                       (11, 52, double))
+{
+
+    using F = normalized_float<E, M>;
+
+
+    Native inf = std::numeric_limits<Native>::infinity();
+    Native ninf = -inf;
+
+    std::cout << (inf * 0) << "\t" << (inf * 4.0f) << "\t" << (inf*ninf) << "\n";
+
+    GIVEN("NaN and +/- infinity")
+    {
+        const F nan{F::NaN()};
+        const F neg_inf{F::neg_infinity()};
+        const F pos_inf{F::pos_infinity()};
+        WHEN("Adding/subtracting")
+        {
+            F res_add = neg_inf + pos_inf;
+            F res_sub = pos_inf - neg_inf;
+            //            std::cout << to_binary(neg_inf) << "\n";
+            //            std::cout << to_binary(pos_inf) << "\n";
+            //            std::cout << to_binary(res_add) << "\n";
+
+            CHECK(res_add.is_nan());
+            REQUIRE(res_sub.is_nan());
+        }
+        WHEN("Multiplying")
+        {
+            F res_mul = F::zero() * pos_inf;
+            std::cout << to_binary(res_mul) << "\n";
+            REQUIRE(res_mul.is_nan());
+        }
+        WHEN("Dividing/computing modulus") {
+            F res_div_zero = F::zero() / F::zero();
+            F res_div_inf = pos_inf / pos_inf;
+            CHECK(res_div_zero.is_nan());
+            REQUIRE(res_div_inf.is_nan());
+        }
     }
 }
 
