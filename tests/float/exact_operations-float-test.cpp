@@ -192,21 +192,25 @@ TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts"
     F b{b_native};
 
     F res = a + b;
-    Native res_native = a_native + a_native;
+    Native res_native = a_native + b_native;
 
     F res_native_{res_native};
     Native res_ = static_cast<Native>(res);
 
-    //    if (!equal_except_rounding(res_native_, res))
-    //    {
-    //        std::cout << a << " + " << b << " = " << res << "\n";
-    //        std::cout << to_binary(a) << " + " << to_binary(b) << " = " << to_binary(res) << "\n";
-    //        std::cout << to_compute_string(a) << "\t+\t" << to_compute_string(b) << " = "
-    //                  << to_compute_string(res) << "\n";
-    //
-    //        std::cout << a_native << " + " << b_native << " = " << res_native << "\n";
-    //        std::cout << to_binary(res) << "\n" << to_binary(res_native_) << "\n";
-    //    }
+    if (!equal_except_rounding(res_native_, res))
+    {
+        F res_ = a + b;
+        if (!equal_except_rounding(res_native_, res_))
+        {
+        }
+        std::cout << a << " + " << b << " = " << res_ << "\n";
+        std::cout << to_binary(a) << " + \n" << to_binary(b) << " = \n" << to_binary(res) << "\n";
+        //std::cout << to_compute_string(a) << "\t+\t" << to_compute_string(b) << " = "
+        //          << to_compute_string(res) << "\n";
+    
+        std::cout << a_native << " + " << b_native << " = " << res_native << "\n";
+        std::cout << to_binary(res) << "\n" << to_binary(res_native_) << "\n";
+    }
 
     CHECK(equal_except_rounding(res_native_, res));
     REQUIRE(equal_except_rounding(F{res_}, F{res_native}));
