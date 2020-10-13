@@ -938,9 +938,11 @@ SCENARIO("IEEE-754 denormalized number computations: float, double",
             float *b_if = reinterpret_cast<float *>(&b_i);
             float a = *a_if;
             float b = *b_if;
+            auto const a_nf = nfloat(a);
+            auto const b_nf = nfloat(b);
 
             float res_f = a + b;
-            auto res = nfloat(a) + nfloat(b);
+            auto res = a_nf + b_nf;
 
             if(static_cast<float>(res) != res_f)
             {
@@ -1033,7 +1035,8 @@ SCENARIO("IEEE-754 denormalized number computations: float, double",
 
             THEN("The results should be the same as the float computation.")
             {
-                REQUIRE(static_cast<float>(res) == res_f);
+                REQUIRE(equal_except_rounding(res, nfloat(res_f)));
+                //REQUIRE(static_cast<float>(res) == res_f);
             }
             
         }
@@ -1061,7 +1064,8 @@ SCENARIO("IEEE-754 denormalized number computations: float, double",
 
             THEN("The results should be the same as the float computation.")
             {
-                REQUIRE(static_cast<float>(res) == res_f);
+                REQUIRE(equal_except_rounding(res, nfloat(res_f)));
+                //REQUIRE(static_cast<float>(res) == res_f);
             }
             
         }
