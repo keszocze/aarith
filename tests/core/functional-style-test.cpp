@@ -108,7 +108,8 @@ SCENARIO("Performing common functional operations", "[word_array][functional][ut
                         uint64_t new_carry = (partial_sum < ain || partial_sum < bin) ? 1U : 0U;
 
                         partial_sum = partial_sum + cin;
-                        new_carry = new_carry | ((partial_sum < ain || partial_sum < bin) ? 1U : 0U);
+                        new_carry =
+                            new_carry | ((partial_sum < ain || partial_sum < bin) ? 1U : 0U);
 
                         return std::make_pair(partial_sum, new_carry);
                     };

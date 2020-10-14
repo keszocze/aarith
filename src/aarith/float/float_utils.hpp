@@ -3,36 +3,44 @@
 #include <aarith/core/bit_cast.hpp>
 #include <aarith/core/traits.hpp>
 
+#include <aarith/integer/integers.hpp>
+
 #include <cstdint>
 #include <cstring>
 #include <type_traits>
 
 namespace aarith {
 
-template <class F> constexpr size_t get_mantissa_width()
+template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
+constexpr size_t get_mantissa_width()
 {
-    static_assert(std::is_floating_point<F>(), "F has to be float or double.");
-    if constexpr (sizeof(F) == 4)
-    {
-        return 23U;
-    }
-    else
-    {
-        return 52U;
-    }
+    return 0U;
 }
 
-template <class F> constexpr size_t get_exponent_width()
+template <> constexpr size_t get_mantissa_width<float>()
 {
-    static_assert(std::is_floating_point<F>(), "F has to be float or double.");
-    if constexpr (sizeof(F) == 4)
-    {
-        return 8U;
-    }
-    else
-    {
-        return 11U;
-    }
+    return 23U;
+}
+
+template <> constexpr size_t get_mantissa_width<double>()
+{
+    return 52U;
+}
+
+template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
+constexpr size_t get_exponent_width()
+{
+    return 0;
+}
+
+template <> constexpr size_t get_exponent_width<float>()
+{
+    return 8U;
+}
+
+template <> constexpr size_t get_exponent_width<double>()
+{
+    return 11U;
 }
 
 /**
@@ -51,29 +59,9 @@ template <> struct bit_cast_to_type_trait<double>
 
 } // namespace float_extraction_helper
 
-/**
- * @brief Extracts the sign of a float or double
- * @tparam F The type working on (float or double)
- * @param num The number whose sign is extracted
- * @return The sign of the provided number
- */
-template <class F> constexpr uint8_t extract_sign(F num)
-{
-
-    static_assert(std::is_same_v<F, float> || std::is_same_v<F, double>);
-
-    constexpr auto exponent_width = get_exponent_width<F>();
-    constexpr auto mantissa_width = get_mantissa_width<F>();
-
-    using int_type = typename float_extraction_helper::bit_cast_to_type_trait<F>::type;
-
-    const int_type inum = bit_cast<int_type, F>(num);
-
-    auto sign = inum >> (exponent_width + mantissa_width);
-    return static_cast<uint8_t>(sign);
-}
-
-template <class F> inline constexpr auto extract_exponent(F num) -> size_t
+template <typename F, typename WordType,
+          typename = std::enable_if_t<std::is_floating_point<F>::value>>
+inline constexpr auto extract_exponent(F num)
 {
     constexpr auto exponent_width = get_exponent_width<F>();
     constexpr auto mantissa_width = get_mantissa_width<F>();
@@ -85,12 +73,12 @@ template <class F> inline constexpr auto extract_exponent(F num) -> size_t
 
     const auto exponent = (inum >> mantissa_width) & ((one << exponent_width) - one);
 
-    return static_cast<unsigned int>(exponent);
+    return uinteger<exponent_width, WordType>{exponent};
 }
 
-template <class F>
-inline constexpr auto extract_mantissa(F num) ->
-    typename float_extraction_helper::bit_cast_to_type_trait<F>::type
+template <typename F, typename Wordtype,
+          typename = std::enable_if_t<std::is_floating_point<F>::value>>
+inline constexpr auto extract_mantissa(F num)
 {
     constexpr auto mantissa_width = get_mantissa_width<F>();
 
@@ -102,7 +90,7 @@ inline constexpr auto extract_mantissa(F num) ->
 
     const auto mantissa = (inum & ((one << mantissa_width) - one)) | (one << mantissa_width);
 
-    return static_cast<int_type>(mantissa);
+    return uinteger<mantissa_width, Wordtype>{mantissa};
 }
 
 } // namespace aarith

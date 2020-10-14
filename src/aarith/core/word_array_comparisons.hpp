@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <aarith/core/traits.hpp>
 #include <aarith/core/word_array.hpp>
 #include <cstdint>
@@ -18,7 +17,6 @@ namespace aarith {
 template <size_t W, size_t V, typename WordType>
 constexpr bool operator==(const word_array<W, WordType>& a, const word_array<V, WordType>& b)
 {
-
     if constexpr (W != V)
     {
         return false;

@@ -1,24 +1,85 @@
+#include "gen_integer.hpp"
 #include <aarith/integer.hpp>
+#include <aarith/integer/integer_random_generation.hpp>
 #include <catch.hpp>
+#include <limits>
+
+#include "../test-signature-ranges.hpp"
 
 using namespace aarith;
 
-SCENARIO("Arithmetic should be constexpr", "[integer][signed][arithmetic][constexpr]")
+TEMPLATE_TEST_CASE_SIG("Pre/postfix operator++", "[integer][arithmetic][foo]",
+                       AARITH_INT_EXTENDED_TEST_SIGNATURE,
+                       AARITH_INT_EXTENDED_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE)
 {
+    using I = Type<W, WordType>;
+    GIVEN("A random integer and a random uint8_t")
+    {
+        I a = GENERATE(take(10, random_integer<W, WordType>()));
+        I b{a};
+
+        uint8_t iters = GENERATE(take(10, random<uint8_t>(std::numeric_limits<uint8_t>::min(),
+                                                          std::numeric_limits<uint8_t>::max())));
+
+        WHEN("Calling the prefix/postfix -- operator multiple times")
+        {
+            THEN("It should match the subtraction operation")
+            {
+                I a_sub{sub(a, I{iters})};
+                for (size_t i = 0; i < iters; ++i)
+                {
+                    CHECK(--a == sub(b--, I::one()));
+                    CHECK(a == b);
+                }
+                CHECK(a == a_sub);
+                REQUIRE(b == a_sub);
+            }
+        }
+    }
+
+    GIVEN("A random integer and a random uint8_t")
+    {
+        I a = GENERATE(take(10, random_integer<W, WordType>()));
+        I b{a};
+
+        uint8_t iters = GENERATE(take(10, random<uint8_t>(std::numeric_limits<uint8_t>::min(),
+                                                          std::numeric_limits<uint8_t>::max())));
+
+        WHEN("Calling the prefix/postfix ++ operator multiple times")
+        {
+            THEN("It should match the addition operation")
+            {
+                I a_add{add(a, I{iters})};
+                for (size_t i = 0; i < iters; ++i)
+                {
+                    CHECK(++a == add(b++, I::one()));
+                    CHECK(a == b);
+                }
+                CHECK(a == a_add);
+                REQUIRE(b == a_add);
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Arithmetic should be constexpr", "[integer][signed][arithmetic][constexpr]",
+                       AARITH_INT_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = integer<W, WordType>;
     GIVEN("Two integers")
     {
-        constexpr integer<32> a{4};
-        constexpr integer<32> b{8};
+        constexpr I a{4};
+        constexpr I b{8};
 
         WHEN("Performing addition")
         {
 
             THEN("The operation is constexpr")
             {
-                constexpr integer<32> expected{12};
+                constexpr I expected{12};
 
-                const integer<33> result_expanded = expanding_add(a, b);
-                const integer<32> result = add(a, b);
+                constexpr auto result_expanded = expanding_add(a, b);
+                constexpr I result = add(a, b);
 
                 REQUIRE(result_expanded == expected);
                 REQUIRE(result == expected);
@@ -28,9 +89,32 @@ SCENARIO("Arithmetic should be constexpr", "[integer][signed][arithmetic][conste
         {
             THEN("The operation is constexpr")
             {
-                constexpr integer<32> expected{4};
+                constexpr I expected{4};
 
-                const integer<32> result = sub(b, a);
+                constexpr I result = sub(b, a);
+                //                constexpr integer<32> result = expanding_sub(b, a);
+
+                REQUIRE(result == expected);
+            }
+        }
+        WHEN("Performing multiplication")
+        {
+            THEN("The operation is constexpr")
+            {
+                constexpr I expected{32};
+
+                constexpr I result = mul(b, a);
+
+                REQUIRE(result == expected);
+            }
+        }
+        WHEN("Performing Division/Modulo")
+        {
+            THEN("The operation is constexpr")
+            {
+                constexpr I expected{2};
+
+                constexpr I result = div(b, a);
 
                 REQUIRE(result == expected);
             }
@@ -43,7 +127,7 @@ SCENARIO("Adding two positive integers", "[integer][signed][arithmetic][addition
     GIVEN("Two positive integer<N> a and b with N <= word_width")
     {
         static constexpr size_t TestWidth = 16;
-        static_assert(integer<TestWidth>::word_count() == 1);
+        static_assert(1 == integer<TestWidth>::word_count());
 
         WHEN("The result a+b still fits into N bits")
         {
@@ -219,22 +303,317 @@ SCENARIO("Adding two positive integers", "[integer][signed][arithmetic][addition
             REQUIRE(sum150.is_negative());
         }
     }
-    //    GIVEN("A positive integer and a negative integer with smaller absolute value")
-    //    {
-    //        const integer<192> a = integer<192>::from_words(1U, 0U, 0U);
-    //
-    //        const integer<64> b{-1};
-    //
-    //        WHEN("Adding both numbers")
-    //        {
-    //            const auto result = expanding_add(a, b);
-    //
-    //            std::cout << group_digits(to_binary(a), 64) << "\n";
-    //            std::cout << group_digits(to_binary(b), 64) << "\n";
-    //            std::cout << group_digits(to_binary(width_cast<192>(b)), 64) << "\n";
-    //            std::cout << group_digits(to_binary(result), 64) << "\n";
-    //        }
-    //    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Signed integer addition is commutative",
+                       "[integer][signed][arithmetic][addition]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = integer<W, WordType>;
+    using R = integer<2 * W, WordType>;
+
+    I a = GENERATE(take(10, random_integer<W, WordType>()));
+    I b = GENERATE(take(10, random_integer<W, WordType>()));
+
+    WHEN("Computing with extended bit widths")
+    {
+        R res_a_b{expanding_add(a, b)};
+        R res_b_a{expanding_add(b, a)};
+        THEN("The results should match")
+        {
+            REQUIRE(res_a_b == res_b_a);
+        }
+    }
+    WHEN("Computing with truncation")
+    {
+        I res_a_b{add(a, b)};
+        I res_b_a{add(a, b)};
+        THEN("The results should match")
+        {
+            REQUIRE(res_a_b == res_b_a);
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG(
+    "Signed integer addition is commutative for addends with different bit widths",
+    "[integer][signed][arithmetic][addition]", AARITH_INT_TEST_SIGNATURE,
+    AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = integer<W, WordType>;
+    using ISmall = integer<W - 2, WordType>;
+    using ILarge = integer<W + I::word_width() + 3, WordType>;
+
+    I a = GENERATE(take(5, random_integer<W, WordType>()));
+    ISmall b = GENERATE(take(5, random_integer<W - 2, WordType>()));
+    ILarge c = GENERATE(take(5, random_integer<W + I::word_width() + 3, WordType>()));
+
+    WHEN("Using different bit-widths")
+    {
+
+        const auto res_a_b{expanding_add(a, b)};
+        const auto res_b_a{expanding_add(a, b)};
+
+        const auto res_a_c{expanding_add(a, c)};
+        const auto res_c_a{expanding_add(c, a)};
+        THEN("The results should match")
+        {
+            REQUIRE(res_a_b == res_b_a);
+            REQUIRE(res_a_c == res_c_a);
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
+                       "[integer][signed][arithmetic][addition]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = integer<W, WordType>;
+    I a = GENERATE(take(100, random_integer<W, WordType>()));
+    REQUIRE(add(a, I::zero()) == a);
+    REQUIRE(expanding_add(a, I::zero()) == a);
+}
+
+TEMPLATE_TEST_CASE_SIG("Addition wraps around correctly", "[integer][signed][arithmetic][addition]",
+                       AARITH_INT_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = integer<W, WordType>;
+
+    static constexpr I one = I::one();
+    static constexpr I max_val = I::max();
+    static constexpr I min_val = I::min();
+
+    WHEN("Adding one to max")
+    {
+        THEN("The result should be min")
+        {
+            REQUIRE(add(max_val, one) == min_val);
+        }
+    }
+    WHEN("Adding max to max")
+    {
+        THEN("The result should be minus two")
+        {
+            const I minus_two = sub(I::minus_one(), I::one());
+            REQUIRE(add(max_val, max_val) == minus_two);
+        }
+    }
+    WHEN("Adding min to max")
+    {
+        THEN("The result should be minus one")
+        {
+            REQUIRE(add(max_val, min_val) == I::minus_one());
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the subtraction",
+                       "[integer][unsigned][arithmetic][subtraction]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = integer<W, WordType>;
+    I a = GENERATE(take(100, random_integer<W, WordType>()));
+    REQUIRE(sub(a, I::zero()) == a);
+    REQUIRE(expanding_sub(a, I::zero()) == a);
+}
+
+TEMPLATE_TEST_CASE_SIG("Expanding subtraction wraps around correctly for different bit-widths",
+                       "[integer][signed][arithmetic][subtraction]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = integer<W, WordType>;
+    using LargeI = integer<2 * W + 6, WordType>;
+
+    GIVEN("A n-bit zero and a m-bit (m>n)  max")
+    {
+        static constexpr LargeI max_val = LargeI::max();
+        static constexpr LargeI min_val = LargeI::min();
+        static constexpr LargeI expected = LargeI::one();
+
+        THEN("Subtracting max from min should give one")
+        {
+            auto constexpr result = expanding_sub(min_val, max_val);
+            REQUIRE(result == expected);
+        }
+    }
+
+    GIVEN("A n-bit zero and a m-bit (m<n) max")
+    {
+        static constexpr LargeI zero = LargeI::zero();
+        static constexpr I large = I::max();
+        static constexpr LargeI expected = sub(LargeI::one(), add(LargeI{I::max()}, LargeI::one()));
+
+        THEN("Subtracting max from zero should give 1-(small::max+1)")
+        {
+            auto constexpr result = expanding_sub(zero, large);
+            REQUIRE(result == expected);
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Subtraction wraps around correctly",
+                       "[integer][signed][arithmetic][subtraction]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = integer<W, WordType>;
+
+    static constexpr I one = I::one();
+    static constexpr I minus_one = I::minus_one();
+    static constexpr I max_val = I::max();
+    static constexpr I min_val = I::min();
+
+    WHEN("Subtracting one from min")
+    {
+        THEN("The result should be max")
+        {
+            auto constexpr result = expanding_sub(min_val, one);
+            REQUIRE(result == max_val);
+        }
+    }
+
+    WHEN("Subtracting minus one from max")
+    {
+        THEN("The result should be min")
+        {
+            auto constexpr result = expanding_sub(max_val, minus_one);
+            REQUIRE(result == min_val);
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Unsigned integer multiplication is commutative",
+                       "[integer][signed][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = integer<W, WordType>;
+    using R = integer<2 * W, WordType>;
+
+    I a = GENERATE(take(10, random_integer<W, WordType>()));
+    I b = GENERATE(take(10, random_integer<W, WordType>()));
+
+    // the most negtive number behaves strangely
+    if (a != I::min() && b != I::min())
+    {
+
+        WHEN("Computing with extended bit widths")
+        {
+            R res_a_b_naive{naive_expanding_mul(a, b)};
+            R res_b_a_naive{naive_expanding_mul(b, a)};
+            R res_a_b_booth{booth_expanding_mul(a, b)};
+            R res_b_a_booth{booth_expanding_mul(b, a)};
+            THEN("The the flipped results should match")
+            {
+                REQUIRE(res_a_b_naive == res_b_a_naive);
+                REQUIRE(res_a_b_booth == res_b_a_booth);
+            }
+            AND_THEN("The results of the different methods should match")
+            {
+                REQUIRE(res_a_b_naive == res_a_b_booth);
+            }
+        }
+
+        WHEN("Computing with truncation")
+        {
+            I res_a_b_naive{naive_mul(a, b)};
+            I res_b_a_naive{naive_mul(b, a)};
+            I res_a_b_booth{booth_mul(a, b)};
+            I res_b_a_booth{booth_mul(b, a)};
+            THEN("The the flipped results should match")
+            {
+                REQUIRE(res_a_b_naive == res_b_a_naive);
+                REQUIRE(res_a_b_booth == res_b_a_booth);
+            }
+            AND_THEN("The results of the different methods should match")
+            {
+                REQUIRE(res_a_b_naive == res_a_b_booth);
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("One is the neutral element of the multiplication",
+                       "[integer][signed][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = integer<W, WordType>;
+    I a = GENERATE(take(50, random_integer<W, WordType>()));
+    REQUIRE(naive_mul(a, I::one()) == a);
+    REQUIRE(naive_expanding_mul(a, I::one()) == a);
+    REQUIRE(booth_mul(a, I::one()) == a);
+    REQUIRE(booth_expanding_mul(a, I::one()) == a);
+}
+
+TEMPLATE_TEST_CASE_SIG("Multiplying with minus one only changes the sign ",
+                       "[integer][signed][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    GIVEN("No the most negative number")
+    {
+        using I = integer<W, WordType>;
+        I a = GENERATE(take(50, random_integer<W, WordType>()));
+        if (a != I::min())
+        {
+            REQUIRE(naive_mul(a, I::minus_one()) == -a);
+            REQUIRE(naive_expanding_mul(a, I::minus_one()) == -a);
+            REQUIRE(booth_mul(a, I::minus_one()) == -a);
+            REQUIRE(booth_expanding_mul(a, I::minus_one()) == -a);
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Zero makes the multiplication result zero",
+                       "[integer][signed][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = integer<W, WordType>;
+    using R = integer<2 * W, WordType>;
+    I a = GENERATE(take(50, random_integer<W, WordType>()));
+    REQUIRE(naive_mul(a, I::zero()) == I::zero());
+    REQUIRE(naive_expanding_mul(a, I::zero()) == R::zero());
+    REQUIRE(booth_mul(a, I::zero()) == I::zero());
+    REQUIRE(booth_expanding_mul(a, I::zero()) == R::zero());
+}
+
+TEMPLATE_TEST_CASE_SIG("Multiplying the max value with itself and truncation yields 1",
+                       "[integer][signed][arithmetic][multiplication]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = integer<W, WordType>;
+    I a{I::max()};
+    REQUIRE(naive_mul(a, a) == I::one());
+    REQUIRE(booth_mul(a, a) == I::one());
+}
+
+TEMPLATE_TEST_CASE_SIG("Testing the most negative number", "[integer][signed][arithmetic]",
+                       AARITH_INT_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = integer<W, WordType>;
+    GIVEN("The most negative number")
+    {
+        constexpr I mnn = I::min();
+        WHEN("Multyplying with -1")
+        {
+            THEN("The value should not change")
+            {
+                CHECK(naive_mul(mnn, I::minus_one()) == mnn);
+                REQUIRE(booth_mul(mnn, I::minus_one()) == mnn);
+            }
+        }
+        WHEN("Performing unary negation")
+        {
+            THEN("The value should not change")
+            {
+                REQUIRE(-mnn == mnn);
+            }
+        }
+        WHEN("Computing the absolute value")
+        {
+            THEN("The value should not change")
+            {
+                REQUIRE(abs(mnn) == mnn);
+            }
+        }
+    }
 }
 
 SCENARIO("Multiplying larger integers using the various implementations works",
@@ -272,7 +651,7 @@ SCENARIO("Multiplying larger integers using the various implementations works",
                 for (const auto& num : numbers)
                 {
                     REQUIRE(naive_mul(num, one) == num);
-                    REQUIRE(booth_mul(num,one) == num);
+                    REQUIRE(booth_mul(num, one) == num);
                     REQUIRE(booth_inplace_mul(num, one) == num);
                 }
             }
@@ -441,58 +820,63 @@ SCENARIO("Division of signed integers", "[integer][signed][arithmetic][division]
     }
 }
 
-SCENARIO("Multiplying unsigned integers", "[integer][signed][arithmetic][multiplication]")
+TEMPLATE_TEST_CASE_SIG("Invariants for the signed integer division",
+                       "[integer][signed][arithmetic][division]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
-    GIVEN("The largest integer value")
+    using I = integer<W, WordType>;
+
+    GIVEN("A non-zero number")
     {
-        const uinteger<64> a64{std::numeric_limits<uint64_t>::max()};
-        const uinteger<32> a32{std::numeric_limits<uint32_t>::max()};
 
-        const uint64_t result32_uint64 =
-            static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) *
-            static_cast<uint64_t>(std::numeric_limits<uint32_t>::max());
+        const I a = GENERATE(take(10, random_integer<W, WordType>()));
 
-        const uinteger<8> a8{std::numeric_limits<uint8_t>::max()};
-        const uinteger<5> a5{31U};
-
-        WHEN("Mutliplying this value with itself")
+        WHEN("Dividing the number by itself")
         {
-            THEN("The expanding_mul should not truncate the result")
+            THEN("The result should be 1")
             {
-                const auto result64 = expanding_mul(a64, a64);
-                const auto result32 = expanding_mul(a32, a32);
-                const auto result8 = expanding_mul(a8, a8);
-                const auto result5 = expanding_mul(a5, a5);
-
-
-                const auto result64k = expanding_karazuba(a64, a64);
-                const auto result32k = expanding_karazuba(a32, a32);
-                const auto result8k = expanding_karazuba(a8, a8);
-                const auto result5k = expanding_karazuba(a5, a5);
-
-                CHECK(result64 == result64k);
-                CHECK(result32 == result32k);
-                CHECK(result8 == result8k);
-                CHECK(result5 == result5k);
-
-                CHECK(result64.width() == 128);
-                CHECK(result64 > a64);
-
-                CHECK(result32.width() == 64);
-                CHECK(result32.word(0) == result32_uint64);
-                CHECK(result32 > a32);
-
-                CHECK(result8.width() == 16);
-                CHECK(result8.word(0) == 65025U);
-                CHECK(result8 > a8);
-
-                CHECK(result5.width() == 10);
-                CHECK(result5.word(0) == 961U);
-                CHECK(result5 > a5);
+                if (a != I::zero())
+                {
+                    REQUIRE(div(a, a) == I::one());
+                }
+            }
+        }
+        WHEN("Dividing the number by one")
+        {
+            THEN("The result should be the number itself")
+            {
+                REQUIRE(div(a, I::one()) == a);
+            }
+        }
+        WHEN("Dividing the number by a larger number")
+        {
+            THEN("The result should be zero")
+            {
+                // Adding one is safe as I::max() will not be returned by the generator
+                const I c = add(a, I::one());
+                if (c != I::zero() && c != I::one())
+                {
+                    if (c.is_negative())
+                    {
+                        REQUIRE(div(a, c) == I::one());
+                    }
+                    else
+                    {
+                        REQUIRE(div(a, c) == I::zero());
+                    }
+                }
+            }
+        }
+        WHEN("Dividing the number by zero")
+        {
+            THEN("A runtime exception should be thrown")
+            {
+                REQUIRE_THROWS_AS(div(a, I::zero()), std::runtime_error);
             }
         }
     }
 }
+
 SCENARIO("Multiplying signed integers using Booth's algorithm",
          "[integer][signed][arithmetic][multiplication]")
 {
@@ -694,7 +1078,7 @@ SCENARIO("Multiplying two integers exactly", "[integer][signed][arithmetic][mult
                 }
             }
         }
-        WHEN("One multiplicant is one")
+        WHEN("One multiplicand is one")
         {
             THEN("Multiplication does not do much")
             {
@@ -772,19 +1156,18 @@ SCENARIO("Multiplication of larger numbers", "[integer][signed][arithmetic][mult
         using I = integer<128>;
         using IR = integer<256>;
 
-
         I a_ = I::one();
         I b_ = I::one();
 
         a_ = a_ << 126;
         b_ = b_ << 63;
-        static constexpr IR expected128{IR::one() << (126+63)};
+        static constexpr IR expected128{IR::one() << (126 + 63)};
 
         aint a = aint::one();
         aint b = aint::one();
         a = a << 1022;
         b = b << 511;
-        static constexpr aintR expected1024{aintR::one() << (1022+511)};
+        static constexpr aintR expected1024{aintR::one() << (1022 + 511)};
 
         THEN("The product should be correct")
         {
@@ -805,7 +1188,7 @@ SCENARIO("Multiplication of larger numbers", "[integer][signed][arithmetic][mult
             CHECK(result_booth_ == result_inplace_);
             CHECK(result_booth_ == expected128);
 
-            REQUIRE(result_booth_ != I::zero()); // test case coming from a found bug
+            REQUIRE(result_booth_ != I::zero());   // test case coming from a found bug
             REQUIRE(result_booth != aint::zero()); // test case coming from a found bug
         }
     }
@@ -890,123 +1273,40 @@ SCENARIO("Expanding subtraction works correctly", "[integer][signed][arithmetic]
     }
 }
 
-SCENARIO("Width casting of signed integers", "[integer][signed][utility][casting]")
+TEMPLATE_TEST_CASE_SIG("Unary minus operation", "[integer][signed][arithmetic][utility]",
+                       AARITH_INT_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
-    GIVEN("A positive integer")
+    using I = integer<W, WordType>;
+    GIVEN("An integer")
     {
-        constexpr integer<16> i16{400};
-        constexpr integer<32> i32{400};
-        constexpr integer<150> i150{354346546};
-
-        WHEN("Expanding the width")
-        {
-
-            const integer<24> i16e = width_cast<24>(i16);
-            const integer<50> i32e = width_cast<50>(i32);
-            const integer<200> i150e = width_cast<200>(i150);
-
-            THEN("The numerical value should not have changed")
-            {
-                CHECK(i16 == i16e);
-                CHECK(i32 == i32e);
-                REQUIRE(i150 == i150e);
-            }
-        }
-        WHEN("Reducing the width")
-        {
-            THEN("The first bits are simply dropped")
-            {
-                const integer<8> i16r = width_cast<8>(i16);
-                const integer<20> i32r = width_cast<20>(i32);
-                const integer<2> i150r = width_cast<2>(i150);
-                CHECK(i16r == integer<8>{400 - 256});
-                CHECK(i32r == i32);
-                CHECK(i150r == integer<2>{2});
-                //                std::cout << group_digits(to_binary(i150),8) << "\n";
-                //                std::cout << group_digits(to_binary(i150r),8) << "\n";
-            }
-        }
-    }
-    GIVEN("A negative integer")
-    {
-        constexpr integer<16> i16{-400};
-        constexpr integer<32> i32{-400};
-        constexpr integer<150> i150{-354346546};
-
-        WHEN("Expanding the width")
-        {
-
-            const integer<24> i16e = width_cast<24>(i16);
-            const integer<50> i32e = width_cast<50>(i32);
-            const integer<200> i150e = width_cast<200>(i150);
-
-            THEN("The numerical value should not have changed")
-            {
-                CHECK(i16 == i16e);
-                CHECK(i32 == i32e);
-                REQUIRE(i150 == i150e);
-            }
-        }
-        WHEN("Reducing the width")
-        {
-            THEN("The first bits are simply dropped")
-            {
-                const integer<8> i16r = width_cast<8>(i16);
-                const integer<20> i32r = width_cast<20>(i32);
-                const integer<2> i150r = width_cast<2>(i150);
-
-                CHECK(i16r == integer<8>{112});
-                CHECK(i32r == i32);
-                CHECK(i150r == integer<2>{2});
-            }
-        }
-    }
-}
-
-SCENARIO("Unary minus operation", "[integer][signed][arithmetic][utility]")
-{
-    GIVEN("The smallest possible value")
-    {
-        constexpr integer<150> min = std::numeric_limits<integer<150>>::min();
-        THEN("The unary minus value of that value is the value again")
-        {
-            const integer<150> minus_min = -min;
-            REQUIRE(minus_min == min);
-        }
-    }
-
-    GIVEN("Any non-smallest value")
-    {
-        using sint = integer<64>;
-        const int32_t val_32 =
-            GENERATE(take(50, random(std::numeric_limits<int32_t>::min() + 1, -1)));
-        const int64_t val_64 = GENERATE(
-            take(50, random(std::numeric_limits<int64_t>::min() + 1, static_cast<int64_t>(-1))));
-        const sint a{val_32};
-        const sint b{val_64};
-
+        const I a = GENERATE(take(20, random_integer<W, WordType>()));
         THEN("Unary minus is self-inverse")
         {
-            REQUIRE(-(-a) == a);
-            REQUIRE(-(-b) == b);
+            if (a != I::min())
+            {
+                REQUIRE(-(-a) == a);
+            }
         }
-
-        // does not work for int64 as, for some reason, there is no matching abs function for that
-        THEN("Computing abs should match its int32 type counterpart")
+        THEN("Unary minus changes the sign")
         {
-            REQUIRE((-a).word(0) == -val_32);
+            if (a != I::zero() && a != I::min())
+            {
+                REQUIRE(signum(-a) == -signum(a));
+            }
         }
     }
 }
 
-SCENARIO("MIN/MAX Values behave as expected", "[integer][signed][operation][utility]")
+TEMPLATE_TEST_CASE_SIG("MIN/MAX Values behave as expected", "[integer][signed][operation][utility]",
+                       AARITH_INT_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
+    using I = integer<W, WordType>;
     GIVEN("The min and max value")
     {
-        constexpr size_t w = 50;
-        constexpr integer<w> min = integer<w>::min();
-        const integer<w> max = integer<w>::max();
-        constexpr integer<w> one(1U);
+        constexpr I min = I::min();
+        constexpr I max = I::max();
+        constexpr I one{I::one()};
+
         THEN("Adding/subtracting one should wrap around")
         {
             const auto sum = add(max, one);
@@ -1024,183 +1324,23 @@ SCENARIO("MIN/MAX Values behave as expected", "[integer][signed][operation][util
     }
 }
 
-SCENARIO("Left/right shifting signed integers", "[integer][signed][operation][utility]")
+TEMPLATE_TEST_CASE_SIG("Computing the signum of an non-zero integer",
+                       "[integer][signed][operation][utility]", AARITH_INT_TEST_SIGNATURE,
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
-    GIVEN("A positive integer")
-    {
-        constexpr integer<150> a{0U, 1U, 0U};
-        constexpr integer<150> b{8, 8, 8};
-        constexpr integer<150> b_{4, 4, 4};
-        constexpr integer<150> b__{2, 2, 2};
-        constexpr integer<150> b___{1, 1, 1};
-        WHEN("Right Shfiting")
-        {
-            THEN("It should behave like division by a power of two")
-            {
-                //                std::cout << group_digits(to_binary(a),64) << "\n";
-                //                std::cout << group_digits(to_binary(b), 64) << "\n";
-                //                std::cout << group_digits(to_binary(b >> 1), 64) << "\n";
-                //                std::cout << group_digits(to_binary(b >> 2), 64) << "\n";
-                //                std::cout << group_digits(to_binary(b >> 4), 64) << "\n";
-
-                REQUIRE((b >> 1) == b_);
-                REQUIRE((b >> 2) == b__);
-                REQUIRE((b_ >> 1) == b__);
-                REQUIRE((b >> 3) == b___);
-                REQUIRE((b__ >> 1) == b___);
-            }
-            THEN("It should move correctly over word boundaries")
-            {
-                constexpr auto k = (a >> 1);
-                constexpr auto b____ = integer<150>(0U, 0U, (uint64_t(1) << 63U));
-                //                std::cout << group_digits(to_binary(k), 64) << "\n";
-                //                std::cout << group_digits(to_binary(b), 64) << "\n";
-                REQUIRE(k == b____);
-            }
-
-            THEN("The it should also work when moving farther than the word width")
-            {
-                constexpr integer<150> c{12U, 0U, 0U};
-                constexpr integer c_shifted = c >> 68;
-                constexpr auto b____ = integer<150>(0U, 0U, (uint64_t(11) << 62U));
-                REQUIRE(c_shifted == b____);
-                //                std::cout << group_digits(to_binary(c), 64) << "\n";
-                //                std::cout << group_digits(to_binary(c_shifted), 64) << "\n";
-            }
-        }
-        WHEN("Left Shifting")
-        {
-            THEN("It should behave like multiplication by a power of two")
-            {
-
-                constexpr integer<150> _b___ = b___ << 1;
-                constexpr integer<150> __b___ = b___ << 2;
-                constexpr integer<150> ___b___ = b___ << 3;
-                REQUIRE(_b___ == b__);
-                REQUIRE(__b___ == b_);
-                REQUIRE(___b___ == b);
-                //                        REQUIRE((b___<<2) == b_);
-                //                        REQUIRE((b___<<3) == b);
-            }
-        }
-    }
-
-    GIVEN("The integer -1")
-    {
-        WHEN("Right shifting")
-        {
-            THEN("-1 should not be affected")
-            {
-                constexpr integer<150> minus_one(-1);
-                constexpr integer<150> shifted1 = minus_one >> 1;
-                constexpr integer<150> shifted2 = minus_one >> 22;
-                constexpr integer<150> shifted3 = minus_one >> 23;
-                constexpr integer<150> shifted4 = minus_one >> 149;
-
-                // TODO why the hell is the constexpr above working and now below?
-                const integer<150> shifted5 = minus_one >> 150;
-                const integer<150> shifted6 = minus_one >> 1151;
-
-                CHECK(shifted1 == minus_one);
-                CHECK(shifted2 == minus_one);
-                REQUIRE(shifted3 == minus_one);
-                REQUIRE(shifted4 == minus_one);
-                REQUIRE(shifted5 == minus_one);
-                REQUIRE(shifted6 == minus_one);
-            }
-        }
-    }
-}
-
-SCENARIO("Right-shift asigning signed integers", "[integer][signed][operation][utility]")
-{
-    GIVEN("A positive integer")
-    {
-
-        constexpr integer<150> b_{4, 4, 4};
-        constexpr integer<150> b__{2, 2, 2};
-        constexpr integer<150> b___{1, 1, 1};
-        WHEN("Right Shfiting")
-        {
-            THEN("It should behave like division by a power of two")
-            {
-                //                std::cout << group_digits(to_binary(a),64) << "\n";
-                //                std::cout << group_digits(to_binary(b), 64) << "\n";
-                //                std::cout << group_digits(to_binary(b >> 1), 64) << "\n";
-                //                std::cout << group_digits(to_binary(b >> 2), 64) << "\n";
-                //                std::cout << group_digits(to_binary(b >> 4), 64) << "\n";
-
-                integer<150> b{8, 8, 8};
-                b >>= 1;
-                REQUIRE(b == b_);
-                b >>= 1;
-                REQUIRE(b == b__);
-                b >>= 1;
-                REQUIRE(b == b___);
-            }
-            THEN("It should move correctly over word boundaries")
-            {
-                integer<150> a{0U, 1U, 0U};
-                a >>= 1;
-                constexpr auto b____ = integer<150>(0U, 0U, (uint64_t(1) << 63U));
-                //                std::cout << group_digits(to_binary(k), 64) << "\n";
-                //                std::cout << group_digits(to_binary(b), 64) << "\n";
-                REQUIRE(a == b____);
-            }
-
-            THEN("The it should also work when moving farther than the word width")
-            {
-                integer<150> c{12U, 0U, 0U};
-                constexpr auto b____ = integer<150>(0U, 0U, (uint64_t(11) << 62U));
-                c >>= 68;
-                REQUIRE(c == b____);
-            }
-        }
-    }
-
-    GIVEN("The integer -1")
-    {
-        WHEN("Right shifting")
-        {
-            THEN("-1 should not be affected")
-            {
-                constexpr integer<150> minus_one(-1);
-                constexpr integer<150> shifted1 = minus_one >> 1;
-                constexpr integer<150> shifted2 = minus_one >> 22;
-                constexpr integer<150> shifted3 = minus_one >> 23;
-                constexpr integer<150> shifted4 = minus_one >> 149;
-
-                // TODO why the hell is the constexpr above working and now below?
-                const integer<150> shifted5 = minus_one >> 150;
-                const integer<150> shifted6 = minus_one >> 1151;
-
-                CHECK(shifted1 == minus_one);
-                CHECK(shifted2 == minus_one);
-                REQUIRE(shifted3 == minus_one);
-                REQUIRE(shifted4 == minus_one);
-                REQUIRE(shifted5 == minus_one);
-                REQUIRE(shifted6 == minus_one);
-            }
-        }
-    }
-}
-
-SCENARIO("Computing the signum of an integer", "[integer][signed][operation][utility]")
-{
+    using I = integer<W, WordType>;
     GIVEN("The number  zero")
     {
         THEN("The signum should be zero")
         {
-            REQUIRE(signum(integer<8>::zero()) == 0);
-            REQUIRE(signum(integer<1>::zero()) == 0);
-            REQUIRE(signum(integer<16>::zero()) == 0);
-            REQUIRE(signum(integer<32>::zero()) == 0);
-            REQUIRE(signum(integer<64>::zero()) == 0);
-            REQUIRE(signum(integer<128>::zero()) == 0);
-            REQUIRE(signum(integer<300>::zero()) == 0);
-            REQUIRE(signum(integer<1313>::zero()) == 0);
+            REQUIRE(signum(I::zero()) == 0);
         }
     }
+}
+
+SCENARIO("Computing the signum of an non-zero integer", "[integer][signed][operation][utility]")
+{
+
     GIVEN("A non-negative number")
     {
         THEN("The signum should be one")

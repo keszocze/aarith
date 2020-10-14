@@ -10,4 +10,4 @@
 
 #include <aarith/integer/string_utils.hpp>
 
-#include <aarith/integer/random.hpp>
+#include <aarith/integer/integer_random_generation.hpp>

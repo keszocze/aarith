@@ -1,14 +1,108 @@
-#include <aarith/integer_no_operators.hpp>
+#include "gen_integer.hpp"
+#include <aarith/integer.hpp>
+#include <aarith/integer/integer_random_generation.hpp>
 #include <catch.hpp>
+
+#include "../test-signature-ranges.hpp"
 
 using namespace aarith;
 
-SCENARIO("Up-casting to the next larger native integer type",
-         "[integer][unsigned][casting]")
+TEMPLATE_TEST_CASE_SIG("Expanding integers", "[integer][signed][unsigned][casting][foo]",
+                       AARITH_INT_TEST_SIGNATURE,
+                       //                       (8, uint64_t)
+                       AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+
+    using I = integer<W, WordType>;
+    using U = uinteger<W, WordType>;
+
+    constexpr size_t extL = 3;
+    constexpr size_t extR = 5;
+
+    GIVEN("A random integer")
+    {
+        I a = GENERATE(take(10, random_integer<W, WordType>()));
+
+        WHEN("Extending to the left only")
+        {
+            auto extended_left{expand<extL, 0>(a)};
+            THEN("The value should not have changed")
+            {
+                REQUIRE(extended_left == a);
+            }
+            AND_THEN("The width should match the desired width")
+            {
+                REQUIRE(extended_left.width() == (W + extL));
+            }
+        }
+        WHEN("Extending to the right only")
+        {
+            auto extended_right{expand<0, extR>(a)};
+            THEN("The width should match the desired with")
+            {
+                REQUIRE(extended_right.width() == (W + extR));
+            }
+            THEN("The first bits should be unchanged")
+            {
+                constexpr size_t S = W + extR - 1;
+                constexpr size_t E = extR;
+                auto slice = bit_range<S, E>(extended_right);
+                //                std::cout << to_binary(extended_right) << "\n" << to_binary(slice)
+                //                << "\n" << to_binary(a) << "\n\n";
+                REQUIRE(slice == a);
+            }
+        }
+
+        WHEN("Extending in both directions at once")
+        {
+            auto extended{expand<extL, extR>(a)};
+            THEN("The width should match the desired with")
+            {
+                REQUIRE(extended.width() == (W + extL + extR));
+            }
+        }
+    }
+
+    GIVEN("A random unsigned integer")
+    {
+        U a = GENERATE(take(10, random_uinteger<W, WordType>()));
+
+        WHEN("Extending to the left only")
+        {
+            auto extended_left{expand<extL, 0>(a)};
+
+            THEN("The value should not have changed")
+            {
+                REQUIRE(extended_left == a);
+            }
+            AND_THEN("The width should match the desired width")
+            {
+                REQUIRE(extended_left.width() == (W + extL));
+            }
+        }
+        WHEN("Extending to the right only")
+        {
+            auto extended_right{expand<0, extR>(a)};
+            THEN("The width should match the desired with")
+            {
+                REQUIRE(extended_right.width() == (W + extR));
+            }
+            THEN("The first bits should be unchanged")
+            {
+                constexpr size_t S = W + extR - 1;
+                constexpr size_t E = extR;
+                auto slice = bit_range<S, E>(extended_right);
+                REQUIRE(slice == a);
+            }
+        }
+    }
+}
+
+SCENARIO("Up-casting to the next larger native integer type", "[integer][unsigned][casting]")
 {
     GIVEN("An unsigned integer with 13 bidth")
     {
-        WHEN("Castingto an uint16_t")
+        WHEN("Casting to an uint16_t")
         {
             THEN("The value should be correct")
             {
@@ -434,6 +528,79 @@ SCENARIO("Casting unsigned integers with various WordTypes to uint16_t",
                 CHECK_THROWS_AS(narrow_cast<uint8_t>(d), std::domain_error);
                 CHECK_THROWS_AS(narrow_cast<uint8_t>(e), std::domain_error);
                 CHECK_THROWS_AS(narrow_cast<uint8_t>(f), std::domain_error);
+            }
+        }
+    }
+}
+
+SCENARIO("Width casting of signed integers", "[integer][signed][utility][casting]")
+{
+    GIVEN("A positive integer")
+    {
+        constexpr integer<16> i16{400};
+        constexpr integer<32> i32{400};
+        constexpr integer<150> i150{354346546};
+
+        WHEN("Expanding the width")
+        {
+
+            const integer<24> i16e = width_cast<24>(i16);
+            const integer<50> i32e = width_cast<50>(i32);
+            const integer<200> i150e = width_cast<200>(i150);
+
+            THEN("The numerical value should not have changed")
+            {
+                CHECK(i16 == i16e);
+                CHECK(i32 == i32e);
+                REQUIRE(i150 == i150e);
+            }
+        }
+        WHEN("Reducing the width")
+        {
+            THEN("The first bits are simply dropped")
+            {
+                const integer<8> i16r = width_cast<8>(i16);
+                const integer<20> i32r = width_cast<20>(i32);
+                const integer<2> i150r = width_cast<2>(i150);
+                CHECK(i16r == integer<8>{400 - 256});
+                CHECK(i32r == i32);
+                CHECK(i150r == integer<2>{2});
+                //                std::cout << group_digits(to_binary(i150),8) << "\n";
+                //                std::cout << group_digits(to_binary(i150r),8) << "\n";
+            }
+        }
+    }
+    GIVEN("A negative integer")
+    {
+        constexpr integer<16> i16{-400};
+        constexpr integer<32> i32{-400};
+        constexpr integer<150> i150{-354346546};
+
+        WHEN("Expanding the width")
+        {
+
+            const integer<24> i16e = width_cast<24>(i16);
+            const integer<50> i32e = width_cast<50>(i32);
+            const integer<200> i150e = width_cast<200>(i150);
+
+            THEN("The numerical value should not have changed")
+            {
+                CHECK(i16 == i16e);
+                CHECK(i32 == i32e);
+                REQUIRE(i150 == i150e);
+            }
+        }
+        WHEN("Reducing the width")
+        {
+            THEN("The first bits are simply dropped")
+            {
+                const integer<8> i16r = width_cast<8>(i16);
+                const integer<20> i32r = width_cast<20>(i32);
+                const integer<2> i150r = width_cast<2>(i150);
+
+                CHECK(i16r == integer<8>{112});
+                CHECK(i32r == i32);
+                CHECK(i150r == integer<2>{2});
             }
         }
     }
