@@ -7,14 +7,16 @@ namespace aarith {
 
 /**
  * Implements random number generation interface similar to std::uniform_int_distribution.
+ * @note The interval returned is [min,max[
  */
 template <size_t BitWidth, typename WordType = uint64_t> class uniform_uinteger_distribution
 {
 public:
-    using result_type = uinteger<BitWidth, WordType>;
+    using input_type = uinteger<BitWidth, WordType>;
+    using internal_type = uinteger<BitWidth+1, WordType>;
 
-    explicit uniform_uinteger_distribution(const result_type& min = result_type::min(),
-                                           const result_type& max = result_type::max())
+    explicit uniform_uinteger_distribution(const input_type& min = input_type::min(),
+                                           const input_type& max = input_type::max())
         : min(min)
         , max(max)
         , length(sub(max, min))
@@ -25,9 +27,9 @@ public:
         }
     }
 
-    template <class Generator> auto operator()(Generator& g) -> result_type
+    template <class Generator> auto operator()(Generator& g) -> internal_type
     {
-        result_type uint;
+        internal_type uint;
         for (auto i = 0U; i < uint.word_count(); ++i)
         {
             uint.set_word(i, random_word(g));
@@ -44,9 +46,9 @@ public:
     }
 
 private:
-    result_type min;
-    result_type max;
-    result_type length;
+    internal_type min;
+    internal_type max;
+    internal_type length;
     std::uniform_int_distribution<WordType> random_word{std::numeric_limits<WordType>::min(),
                                                         std::numeric_limits<WordType>::max()};
 };
