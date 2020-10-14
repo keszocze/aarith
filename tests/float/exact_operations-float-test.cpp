@@ -41,7 +41,6 @@ TEMPLATE_TEST_CASE_SIG("Addition is commutative",
     }
 }
 
-/*
 TEMPLATE_TEST_CASE_SIG("Multiplication is commutative",
                        "[normalized_float][arithmetic][multiplication][invariant]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
@@ -69,7 +68,7 @@ TEMPLATE_TEST_CASE_SIG("Multiplication is commutative",
         }
     }
 }
-*/
+
 TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
                        "[normalized_float][arithmetic][addition][invariant]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
@@ -151,7 +150,7 @@ TEMPLATE_TEST_CASE_SIG("One is the neutral element of the multiplication",
         }
     }
 }
-/*
+
 SCENARIO("Multiplication should work correctly", "[normalized_float][arithmetic][multiplication]")
 {
     GIVEN("Two numbers in in <8,23> format")
@@ -178,7 +177,7 @@ SCENARIO("Multiplication should work correctly", "[normalized_float][arithmetic]
         }
     }
 }
-*/
+
 TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts",
                        "[normalized_float][arithmetic][addition]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
@@ -260,7 +259,7 @@ TEMPLATE_TEST_CASE_SIG("Adding to infinity", "[normalized_float][arithmetic][add
         }
     }
 }
-/*
+
 TEMPLATE_TEST_CASE_SIG("Dividing by infinity", "[normalized_float][arithmetic][division]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, double))
@@ -456,7 +455,7 @@ TEMPLATE_TEST_CASE_SIG("Generating NaN as a result", "[normalized_float][arithme
         }
     }
 }
-*/
+
 TEMPLATE_TEST_CASE_SIG("Floating point subtraction matches its native counterparts",
                        "[normalized_float][arithmetic][subtraction]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
@@ -490,7 +489,7 @@ TEMPLATE_TEST_CASE_SIG("Floating point subtraction matches its native counterpar
     CHECK(equal_except_rounding(res_native_, res));
     REQUIRE(equal_except_rounding(F{res_}, F{res_native}));
 }
-/*
+
 TEMPLATE_TEST_CASE_SIG("Floating point multiplication matches its native counterparts",
                        "[normalized_float][arithmetic][multiplication]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
@@ -505,10 +504,21 @@ TEMPLATE_TEST_CASE_SIG("Floating point multiplication matches its native counter
     F b{b_native};
 
     F res = a * b;
-    Native res_native = a_native * a_native;
+    Native res_native = a_native * b_native;
 
     F res_native_{res_native};
     Native res_ = static_cast<Native>(res);
+
+    if (!equal_except_rounding(res_native_, res))
+    {
+        F res_dbg = a * b;
+        if (equal_except_rounding(res_native_, res_dbg)){}
+
+        std::cout << "a * b\n"
+                  << to_binary(a) << " * \n" << to_binary(b) << "\n"
+                  << to_binary(res) << "(normalized_float) !=\n"
+                  << to_binary(res_native_) << "(float)\n\n";
+    }
 
     CHECK(equal_except_rounding(res_native_, res));
     REQUIRE(equal_except_rounding(F{res_}, F{res_native}));
@@ -529,7 +539,7 @@ TEMPLATE_TEST_CASE_SIG("Floating point division matches its native counterparts"
     F b{b_native};
 
     F res = a / b;
-    Native res_native = a_native / a_native;
+    Native res_native = a_native / b_native;
 
     F res_native_{res_native};
     Native res_ = static_cast<Native>(res);
@@ -537,7 +547,7 @@ TEMPLATE_TEST_CASE_SIG("Floating point division matches its native counterparts"
     CHECK(equal_except_rounding(res_native_, res));
     REQUIRE(equal_except_rounding(F{res_}, F{res_native}));
 }
-*/
+
 SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithmetic][addition]")
 {
     GIVEN("Single precision floats (E = 8, M = 23)")
@@ -930,7 +940,7 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         }
     }
 }
-/*
+
 SCENARIO("Exact multiplication of two floating-point numbers",
          "[normalized_float][arithmetic][multiplication]")
 {
@@ -1193,7 +1203,6 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
         }
     }
 }
-*/
 
 SCENARIO("IEEE-754 arithmetic conversion: float, double",
          "[normalized_float][conversion][ieee-754][casting]")
