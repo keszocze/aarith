@@ -829,7 +829,7 @@ TEMPLATE_TEST_CASE_SIG("Invariants for the signed integer division",
     GIVEN("A non-zero number")
     {
 
-        const I a = GENERATE(take(10, random_integer<W, WordType>()));
+        const I a = GENERATE(take(100, random_integer<W, WordType>()));
 
         WHEN("Dividing the number by itself")
         {
@@ -858,6 +858,12 @@ TEMPLATE_TEST_CASE_SIG("Invariants for the signed integer division",
                 {
                     if (c.is_negative())
                     {
+                        // flaky test, I need to find out, why this fails from time to time
+                        if (div(a, c) != I::one())
+                        {
+                            std::cout << a << " / " << c << " = " << div(a, c) << " != " << I::one()
+                                      << "\n";
+                        }
                         REQUIRE(div(a, c) == I::one());
                     }
                     else
