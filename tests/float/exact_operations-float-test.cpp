@@ -563,8 +563,6 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = add(a, b);
 
-            std::cout << "result: " << to_binary(result) << std::endl;
-            std::cout << "zero: " << to_binary(normalized_float<E, M>(0.f)) << std::endl;
             THEN("The result should be 0")
             {
                 REQUIRE(result == normalized_float<E, M>(0.f));
@@ -580,7 +578,6 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
 
             THEN("The result should be a")
             {
-                std::cout << to_binary(result) << " vs. " << to_binary(a) << "\n";
                 REQUIRE(result == a);
             }
         }
@@ -961,10 +958,6 @@ SCENARIO("Exact multiplication of two floating-point numbers",
 
             THEN("It should be the correct product.")
             {
-                std::cout << number_a << "\t" << number_b << "\n";
-                std::cout << (number_a * number_b) << "\n";
-                std::cout << result_float << "\n";
-                std::cout << result << "\n";
                 REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
             }
         }
@@ -1271,15 +1264,6 @@ SCENARIO("IEEE-754 denormalized number computations: float, double",
             const auto nfb = nfloat(b);
             auto res = nfa + nfb;
 
-            if (static_cast<float>(res) != res_f)
-            {
-                std::cout << "denorm test 0\n"
-                          << to_binary(nfloat(a)) << " + " << to_binary(nfloat(b)) << "\n"
-                          << "float res != normalized_float res: \n"
-                          << to_binary(nfloat(res_f)) << "\n"
-                          << to_binary(res) << "\n\n";
-            }
-
             THEN("The results should be the same as the float computation.")
             {
                 REQUIRE(static_cast<float>(res) == res_f);
@@ -1298,15 +1282,6 @@ SCENARIO("IEEE-754 denormalized number computations: float, double",
 
             float res_f = a + b;
             auto res = a_nf + b_nf;
-
-            if (static_cast<float>(res) != res_f)
-            {
-                std::cout << "denorm test 1\n"
-                          << to_binary(nfloat(a)) << " + " << to_binary(nfloat(b)) << "\n"
-                          << "float res != normalized_float res: \n"
-                          << to_binary(nfloat(res_f)) << "\n"
-                          << to_binary(res) << "\n\n";
-            }
 
             THEN("The results should be the same as the float computation.")
             {
@@ -1327,15 +1302,6 @@ SCENARIO("IEEE-754 denormalized number computations: float, double",
             const auto nfb = nfloat(b);
             auto res = nfa * nfb;
 
-            if (static_cast<float>(res) != res_f)
-            {
-                std::cout << "denorm mul test 0\n"
-                          << to_binary(nfloat(a)) << " * " << to_binary(nfloat(b)) << "\n"
-                          << "float res != normalized_float res: \n"
-                          << to_binary(nfloat(res_f)) << "\n"
-                          << to_binary(res) << "\n\n";
-            }
-
             THEN("The results should be the same as the float computation.")
             {
                 REQUIRE(static_cast<float>(res) == res_f);
@@ -1354,15 +1320,6 @@ SCENARIO("IEEE-754 denormalized number computations: float, double",
             const auto nfa = nfloat(a);
             const auto nfb = nfloat(b);
             auto res = nfa * nfb;
-
-            if (static_cast<float>(res) != res_f)
-            {
-                std::cout << "denorm mul test 1\n"
-                          << to_binary(nfloat(a)) << " * " << to_binary(nfloat(b)) << "\n"
-                          << "float res != normalized_float res: \n"
-                          << to_binary(nfloat(res_f)) << "\n"
-                          << to_binary(res) << "\n\n";
-            }
 
             THEN("The results should be the same as the float computation.")
             {
@@ -1387,15 +1344,6 @@ SCENARIO("IEEE-754 denormalized number computations: float, double",
             const auto nfb = nfloat(b);
             auto res = nfa * nfb;
 
-            if (static_cast<float>(res) != res_f)
-            {
-                std::cout << "norm to denorm mul test 0\n"
-                          << to_binary(nfloat(a)) << " * " << to_binary(nfloat(b)) << "\n"
-                          << "float res != normalized_float res: \n"
-                          << to_binary(nfloat(res_f)) << "\n"
-                          << to_binary(res) << "\n\n";
-            }
-
             THEN("The results should be the same as the float computation.")
             {
                 REQUIRE(equal_except_rounding(res, nfloat(res_f)));
@@ -1417,15 +1365,6 @@ SCENARIO("IEEE-754 denormalized number computations: float, double",
             const auto nfb = nfloat(b);
             auto res = nfa * nfb;
 
-            if (static_cast<float>(res) != res_f)
-            {
-                std::cout << "norm to denorm mul test 0\n"
-                          << to_binary(nfloat(a)) << " * " << to_binary(nfloat(b)) << "\n"
-                          << "float res != normalized_float res: \n"
-                          << to_binary(nfloat(res_f)) << "\n"
-                          << to_binary(res) << "\n\n";
-            }
-
             THEN("The results should be the same as the float computation.")
             {
                 REQUIRE(equal_except_rounding(res, nfloat(res_f)));
@@ -1434,34 +1373,3 @@ SCENARIO("IEEE-754 denormalized number computations: float, double",
         }
     }
 }
-
-// SCENARIO("IEEE-754 arithmetic comparison: float",
-//         "[normalized_float][arithmetic][multiplication][ieee-754]")
-//{
-//
-//    GIVEN("0.5 and 0.25")
-//    {
-//        float half = 0.5;
-//        float quarter = 1.5;
-//        float threequarter = -0.875;
-//        float zero = 0.0;
-//
-//        using afloat = normalized_float<8, 23>;
-//
-//        afloat ahalf{half};
-//        afloat aquarter{quarter};
-//        aquarter.set_exponent(uinteger<8>::zero());
-//        afloat athreequarter{threequarter};
-//        afloat azero{zero};
-//
-//        std::cout << half << " " << ahalf << "\t" << quarter << " " << aquarter << "\n";
-//        std::cout << to_binary(ahalf) << "\t" << to_binary(aquarter) << "\n";
-//        std::cout << to_compute_string(ahalf) << "\t" << to_compute_string(aquarter) << "\n";
-//        std::cout << tcs(ahalf) << "\t" << tcs(aquarter) << "\t" << tcs(athreequarter) << "\t"
-//                  << tcs(azero) << "\n";
-//        //        std::cout << ahalf.get_real_exponent() << "\t" << aquarter.unbiased_exponent()
-//        <<
-//        //        "\n"; std::cout << to_binary(ahalf.get_real_exponent()) << "\t" <<
-//        //        to_binary(aquarter.unbiased_exponent()) << "\n";
-//    }
-//}
