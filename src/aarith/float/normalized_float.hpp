@@ -296,6 +296,16 @@ public:
 
     /**
      *
+     * @return The value one
+     */
+    [[nodiscard]] static constexpr normalized_float neg_one()
+    {
+        constexpr word_array<E, WordType> exp{word_array<E - 1, WordType>::all_ones()};
+        return normalized_float(true, exp, IntegerMant::msb_one());
+    }
+
+    /**
+     *
      * @return positive infinity
      */
     [[nodiscard]] static constexpr normalized_float pos_infinity()
@@ -313,6 +323,27 @@ public:
     {
         constexpr normalized_float neg_inf(true, IntegerExp::all_ones(), IntegerMant::all_zeroes());
         return neg_inf;
+    }
+
+    /**
+     *
+     * @return Smallest positive normalized value
+     */
+    [[nodiscard]] static constexpr normalized_float smallest_normalized()
+    {
+        constexpr normalized_float small_normalized(false, IntegerExp::one(),
+                                                    IntegerMant::all_zeroes());
+        return small_normalized;
+    }
+
+    /**
+     *
+     * @return Smallest positive normalized value
+     */
+    [[nodiscard]] static constexpr normalized_float smallest_denormalized()
+    {
+        constexpr normalized_float small_denorm(false, IntegerExp::all_zeroes(), IntegerMant::one());
+        return small_denorm;
     }
 
     /**
@@ -603,7 +634,7 @@ auto equal_except_rounding(const normalized_float<E, M1, WordType> lhs,
             auto bit2 = m2.bit(offset_M2);
 
             bool rounding_error = true;
-            bool has_to_be_equal = false; //bit1 == bit2;
+            bool has_to_be_equal = false; // bit1 == bit2;
             bool initial_zeroes = true;
             for (auto i = 0U; i < Min; ++i)
             {
@@ -617,16 +648,16 @@ auto equal_except_rounding(const normalized_float<E, M1, WordType> lhs,
                 }
                 else
                 {
-                    if (initial_zeroes && m1.bit(i + offset_M1) == 0 && m2.bit(i + offset_M2) == 0 )
+                    if (initial_zeroes && m1.bit(i + offset_M1) == 0 && m2.bit(i + offset_M2) == 0)
                     {
                         continue;
                     }
                     else if (m1.bit(i + offset_M1) != m2.bit(i + offset_M2))
                     {
-                        if(initial_zeroes)
+                        if (initial_zeroes)
                         {
-                            bit1 = m1.bit(i+offset_M1);
-                            bit2 = m2.bit(i+offset_M2);
+                            bit1 = m1.bit(i + offset_M1);
+                            bit2 = m2.bit(i + offset_M2);
                             initial_zeroes = false;
                         }
                         if (m1.bit(i + offset_M1) == bit1 && m2.bit(i + offset_M2) == bit2)
