@@ -557,7 +557,7 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
 
         WHEN("The second operand is -a.")
         {
-            static constexpr float number_a = 93.211546f;
+            static constexpr float number_a = 93.211546F;
             static constexpr float number_b = -number_a;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
@@ -570,7 +570,7 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         }
         WHEN("The second operand is 0.")
         {
-            static constexpr float number_a = 93.211546f;
+            static constexpr float number_a = 93.211546F;
             static constexpr float number_b = 0;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
@@ -583,7 +583,7 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         }
         WHEN("The first operand is negative, and the second operand is 0.")
         {
-            static constexpr float number_a = -93.211546f;
+            static constexpr float number_a = -93.211546F;
             static constexpr float number_b = 0;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
@@ -597,7 +597,7 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         WHEN("The first operand is 0.")
         {
             static constexpr float number_a = 0;
-            static constexpr float number_b = 93.211546f;
+            static constexpr float number_b = 93.211546F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = add(a, b);
@@ -610,7 +610,7 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         WHEN("The first operand is 0, and the second operand is negative.")
         {
             static constexpr float number_a = 0;
-            static constexpr float number_b = -93.211546f;
+            static constexpr float number_b = -93.211546F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = add(a, b);
@@ -623,8 +623,8 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")
         {
-            static constexpr float number_a = 213.22154f;
-            static constexpr float number_b = 93.211546f;
+            static constexpr float number_a = 213.22154F;
+            static constexpr float number_b = 93.211546F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = add(a, b);
@@ -637,8 +637,8 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "operand 1 is negative, and the result is not infinity.")
         {
-            static constexpr float number_a = -213.22154f;
-            static constexpr float number_b = 93.211546f;
+            static constexpr float number_a = -213.22154F;
+            static constexpr float number_b = 93.211546F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = add(a, b);
@@ -651,8 +651,8 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "operand 2 is negative, and the result is not infinity.")
         {
-            static constexpr float number_a = 213.22154f;
-            static constexpr float number_b = -93.211546f;
+            static constexpr float number_a = 213.22154F;
+            static constexpr float number_b = -93.211546F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = add(a, b);
@@ -665,8 +665,8 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are negative, and the result is not infinity.")
         {
-            static constexpr float number_a = -213.22154f;
-            static constexpr float number_b = -93.211546f;
+            static constexpr float number_a = -213.22154F;
+            static constexpr float number_b = -93.211546F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = add(a, b);
@@ -679,8 +679,8 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")
         {
-            static constexpr float number_a = 93.211546f;
-            static constexpr float number_b = 213.22154f;
+            static constexpr float number_a = 93.211546F;
+            static constexpr float number_b = 213.22154F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = add(a, b);
@@ -693,8 +693,8 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "operand 1 is negative, and the result is not infinity.")
         {
-            static constexpr float number_a = -93.211546f;
-            static constexpr float number_b = 213.22154f;
+            static constexpr float number_a = -93.211546F;
+            static constexpr float number_b = 213.22154F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = add(a, b);
@@ -707,8 +707,8 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "operand 2 is negative, and the result is not infinity.")
         {
-            static constexpr float number_a = 93.211546f;
-            static constexpr float number_b = -213.22154f;
+            static constexpr float number_a = 93.211546F;
+            static constexpr float number_b = -213.22154F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = add(a, b);
@@ -721,8 +721,8 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "both operands are negative, and the result is not infinity.")
         {
-            static constexpr float number_a = -93.211546f;
-            static constexpr float number_b = -213.22154f;
+            static constexpr float number_a = -93.211546F;
+            static constexpr float number_b = -213.22154F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = add(a, b);
@@ -734,8 +734,8 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         }
         WHEN("When one operand is a > 1 and the other is 0 < b < 1.")
         {
-            static constexpr float number_a = 2.75f;
-            static constexpr float number_b = 0.5f;
+            static constexpr float number_a = 2.75F;
+            static constexpr float number_b = 0.5F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = add(a, b);
@@ -758,7 +758,7 @@ SCENARIO("Subtracting two floating-point numbers exactly",
 
         WHEN("Both operands are the same.")
         {
-            static constexpr float number_a = 93.211546f;
+            static constexpr float number_a = 93.211546F;
             static constexpr float number_b = number_a;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
@@ -771,7 +771,7 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         }
         WHEN("The second operand is 0.")
         {
-            static constexpr float number_a = 93.211546f;
+            static constexpr float number_a = 93.211546F;
             static constexpr float number_b = 0;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
@@ -784,7 +784,7 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         }
         WHEN("The first operand is negative, and the second operand is 0.")
         {
-            static constexpr float number_a = -93.211546f;
+            static constexpr float number_a = -93.211546F;
             static constexpr float number_b = 0;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
@@ -798,7 +798,7 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         WHEN("The first operand is 0.")
         {
             static constexpr float number_a = 0;
-            static constexpr float number_b = 93.211546f;
+            static constexpr float number_b = 93.211546F;
             static constexpr float res = -number_b;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
@@ -812,7 +812,7 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         WHEN("The first operand is 0, and the second operand is negative.")
         {
             static constexpr float number_a = 0;
-            static constexpr float number_b = -93.211546f;
+            static constexpr float number_b = -93.211546F;
             static constexpr float res = -number_b;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
@@ -826,8 +826,8 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")
         {
-            static constexpr float number_a = 213.22154f;
-            static constexpr float number_b = 93.211546f;
+            static constexpr float number_a = 213.22154F;
+            static constexpr float number_b = 93.211546F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = sub(a, b);
@@ -840,8 +840,8 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "operand 1 is negative, and the result is not infinity.")
         {
-            static constexpr float number_a = -213.22154f;
-            static constexpr float number_b = 93.211546f;
+            static constexpr float number_a = -213.22154F;
+            static constexpr float number_b = 93.211546F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = sub(a, b);
@@ -854,8 +854,8 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "operand 2 is negative, and the result is not infinity.")
         {
-            static constexpr float number_a = 213.22154f;
-            static constexpr float number_b = -93.211546f;
+            static constexpr float number_a = 213.22154F;
+            static constexpr float number_b = -93.211546F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = sub(a, b);
@@ -868,8 +868,8 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are negative, and the result is not infinity.")
         {
-            static constexpr float number_a = -213.22154f;
-            static constexpr float number_b = -93.211546f;
+            static constexpr float number_a = -213.22154F;
+            static constexpr float number_b = -93.211546F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = sub(a, b);
@@ -882,8 +882,8 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")
         {
-            static constexpr float number_a = 93.211546f;
-            static constexpr float number_b = 213.22154f;
+            static constexpr float number_a = 93.211546F;
+            static constexpr float number_b = 213.22154F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = sub(a, b);
@@ -896,8 +896,8 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "operand 1 is negative, and the result is not infinity.")
         {
-            static constexpr float number_a = -93.211546f;
-            static constexpr float number_b = 213.22154f;
+            static constexpr float number_a = -93.211546F;
+            static constexpr float number_b = 213.22154F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = sub(a, b);
@@ -910,8 +910,8 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "operand 2 is negative, and the result is not infinity.")
         {
-            static constexpr float number_a = 93.211546f;
-            static constexpr float number_b = -213.22154f;
+            static constexpr float number_a = 93.211546F;
+            static constexpr float number_b = -213.22154F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = sub(a, b);
@@ -924,8 +924,8 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "both operands are negative, and the result is not infinity.")
         {
-            static constexpr float number_a = -93.211546f;
-            static constexpr float number_b = -213.22154f;
+            static constexpr float number_a = -93.211546F;
+            static constexpr float number_b = -213.22154F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = sub(a, b);
@@ -949,8 +949,8 @@ SCENARIO("Exact multiplication of two floating-point numbers",
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")
         {
-            static constexpr float number_a = 213.22154f;
-            static constexpr float number_b = 93.211546f;
+            static constexpr float number_a = 213.22154F;
+            static constexpr float number_b = 93.211546F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result_float{number_a * number_b};
@@ -964,8 +964,8 @@ SCENARIO("Exact multiplication of two floating-point numbers",
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "operand 1 is negative, and the result is not infinity.")
         {
-            static constexpr float number_a = -213.22154f;
-            static constexpr float number_b = 93.211546f;
+            static constexpr float number_a = -213.22154F;
+            static constexpr float number_b = 93.211546F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = mul(a, b);
@@ -978,8 +978,8 @@ SCENARIO("Exact multiplication of two floating-point numbers",
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "operand 2 is negative, and the result is not infinity.")
         {
-            static constexpr float number_a = 213.22154f;
-            static constexpr float number_b = -93.211546f;
+            static constexpr float number_a = 213.22154F;
+            static constexpr float number_b = -93.211546F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = mul(a, b);
@@ -992,8 +992,8 @@ SCENARIO("Exact multiplication of two floating-point numbers",
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are negative, and the result is not infinity.")
         {
-            static constexpr float number_a = -213.22154f;
-            static constexpr float number_b = -93.211546f;
+            static constexpr float number_a = -213.22154F;
+            static constexpr float number_b = -93.211546F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = mul(a, b);
@@ -1006,8 +1006,8 @@ SCENARIO("Exact multiplication of two floating-point numbers",
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")
         {
-            static constexpr float number_a = 93.211546f;
-            static constexpr float number_b = 213.22154f;
+            static constexpr float number_a = 93.211546F;
+            static constexpr float number_b = 213.22154F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = mul(a, b);
@@ -1020,8 +1020,8 @@ SCENARIO("Exact multiplication of two floating-point numbers",
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "operand 1 is negative, and the result is not infinity.")
         {
-            static constexpr float number_a = -93.211546f;
-            static constexpr float number_b = 213.22154f;
+            static constexpr float number_a = -93.211546F;
+            static constexpr float number_b = 213.22154F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = mul(a, b);
@@ -1034,8 +1034,8 @@ SCENARIO("Exact multiplication of two floating-point numbers",
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "operand 2 is negative, and the result is not infinity.")
         {
-            static constexpr float number_a = 93.211546f;
-            static constexpr float number_b = -213.22154f;
+            static constexpr float number_a = 93.211546F;
+            static constexpr float number_b = -213.22154F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = mul(a, b);
@@ -1048,8 +1048,8 @@ SCENARIO("Exact multiplication of two floating-point numbers",
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "both operands are negative, and the result is not infinity.")
         {
-            static constexpr float number_a = -93.211546f;
-            static constexpr float number_b = -213.22154f;
+            static constexpr float number_a = -93.211546F;
+            static constexpr float number_b = -213.22154F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = mul(a, b);
@@ -1061,8 +1061,8 @@ SCENARIO("Exact multiplication of two floating-point numbers",
         }
         WHEN("When one operand is a > 1 and the other is 0 < b < 1.")
         {
-            static constexpr float number_a = 2.75f;
-            static constexpr float number_b = 0.5f;
+            static constexpr float number_a = 2.75F;
+            static constexpr float number_b = 0.5F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = mul(a, b);
@@ -1085,8 +1085,8 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")
         {
-            static constexpr float number_a = 213.22154f;
-            static constexpr float number_b = 93.211546f;
+            static constexpr float number_a = 213.22154F;
+            static constexpr float number_b = 93.211546F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = div(a, b);
@@ -1099,8 +1099,8 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "operand 1 is negative, and the result is not infinity.")
         {
-            static constexpr float number_a = -213.22154f;
-            static constexpr float number_b = 93.211546f;
+            static constexpr float number_a = -213.22154F;
+            static constexpr float number_b = 93.211546F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = div(a, b);
@@ -1113,8 +1113,8 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "operand 2 is negative, and the result is not infinity.")
         {
-            static constexpr float number_a = 213.22154f;
-            static constexpr float number_b = -93.211546f;
+            static constexpr float number_a = 213.22154F;
+            static constexpr float number_b = -93.211546F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = div(a, b);
@@ -1127,8 +1127,8 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are negative, and the result is not infinity.")
         {
-            static constexpr float number_a = -213.22154f;
-            static constexpr float number_b = -93.211546f;
+            static constexpr float number_a = -213.22154F;
+            static constexpr float number_b = -93.211546F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = div(a, b);
@@ -1141,8 +1141,8 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")
         {
-            static constexpr float number_a = 93.211546f;
-            static constexpr float number_b = 213.22154f;
+            static constexpr float number_a = 93.211546F;
+            static constexpr float number_b = 213.22154F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = div(a, b);
@@ -1155,8 +1155,8 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "operand 1 is negative, and the result is not infinity.")
         {
-            static constexpr float number_a = -93.211546f;
-            static constexpr float number_b = 213.22154f;
+            static constexpr float number_a = -93.211546F;
+            static constexpr float number_b = 213.22154F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = div(a, b);
@@ -1169,8 +1169,8 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "operand 2 is negative, and the result is not infinity.")
         {
-            static constexpr float number_a = 93.211546f;
-            static constexpr float number_b = -213.22154f;
+            static constexpr float number_a = 93.211546F;
+            static constexpr float number_b = -213.22154F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = div(a, b);
@@ -1183,8 +1183,8 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
              "both operands are negative, and the result is not infinity.")
         {
-            static constexpr float number_a = -93.211546f;
-            static constexpr float number_b = -213.22154f;
+            static constexpr float number_a = -93.211546F;
+            static constexpr float number_b = -213.22154F;
             const normalized_float<E, M> a{number_a};
             const normalized_float<E, M> b{number_b};
             const normalized_float<E, M> result = div(a, b);
@@ -1204,7 +1204,7 @@ SCENARIO("IEEE-754 arithmetic conversion: float, double",
     {
         WHEN("The number is 0.")
         {
-            float a = 0.f;
+            float a = 0.F;
 
             THEN("The normalized_float should convert back to the original number.")
             {
