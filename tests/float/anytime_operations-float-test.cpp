@@ -28,12 +28,15 @@ TEMPLATE_TEST_CASE_SIG("Anytime addition", "[normalized_float][arithmetic][const
             THEN("The result should match the usual normalized_float result")
             {
                 F res_exact = add(a, b);
-                if (res != res_exact)
+                if (!equal_except_rounding(res, res_exact))
                 {
-                    std::cout << to_binary(res) << "\n";
-                    std::cout << to_binary(res_exact) << "\n";
+                    F res_dbg = anytime_add(a, b, M + 1);
+                    if (equal_except_rounding(res_dbg, res_exact)){}
+                    std::cout << to_binary(a) << " +\n" << to_binary(b) << "\n";
+                    std::cout << to_binary(res) << " (anytime)\n";
+                    std::cout << to_binary(res_exact) << " (exact)\n";
                 }
-                REQUIRE(res == res_exact);
+                REQUIRE(equal_except_rounding(res, res_exact));
             }
         }
 
@@ -43,12 +46,15 @@ TEMPLATE_TEST_CASE_SIG("Anytime addition", "[normalized_float][arithmetic][const
             THEN("The result should match the usual normalized_float result")
             {
                 F res_exact = sub(a, b);
-                if (res != res_exact)
+                if (!equal_except_rounding(res, res_exact))
                 {
-                    std::cout << to_binary(res) << "\n";
-                    std::cout << to_binary(res_exact) << "\n";
+                    F res_dbg = anytime_sub(a, b, M + 1);
+                    if (equal_except_rounding(res_dbg, res_exact)){}
+                    std::cout << to_binary(a) << " -\n" << to_binary(b) << "\n";
+                    std::cout << to_binary(res) << " (anytime)\n";
+                    std::cout << to_binary(res_exact) << " (exact)\n";
                 }
-                REQUIRE(res == res_exact);
+                REQUIRE(equal_except_rounding(res, res_exact));
             }
         }
 
@@ -58,12 +64,15 @@ TEMPLATE_TEST_CASE_SIG("Anytime addition", "[normalized_float][arithmetic][const
             THEN("The result should match the usual normalized_float result")
             {
                 F res_exact = mul(a, b);
-                if (res != res_exact)
+                if (!equal_except_rounding(res, res_exact))
                 {
-                    std::cout << to_binary(res) << "\n";
-                    std::cout << to_binary(res_exact) << "\n";
+                    F res_dbg = anytime_mul(a, b, M + 1);
+                    if (equal_except_rounding(res_dbg, res_exact)){}
+                    std::cout << to_binary(a) << " *\n" << to_binary(b) << "\n";
+                    std::cout << to_binary(res) << " (anytime)\n";
+                    std::cout << to_binary(res_exact) << " (exact)\n";
                 }
-                REQUIRE(res == res_exact);
+                REQUIRE(equal_except_rounding(res, res_exact));
             }
         }
 
@@ -73,12 +82,15 @@ TEMPLATE_TEST_CASE_SIG("Anytime addition", "[normalized_float][arithmetic][const
             THEN("The result should match the usual normalized_float result")
             {
                 F res_exact = div(a, b);
-                if (res != res_exact)
+                if (!equal_except_rounding(res, res_exact))
                 {
-                    std::cout << to_binary(res) << "\n";
-                    std::cout << to_binary(res_exact) << "\n";
+                    F res_dbg = anytime_div(a, b, M + 1);
+                    if (equal_except_rounding(res_dbg, res_exact)){}
+                    std::cout << to_binary(a) << " /\n" << to_binary(b) << "\n";
+                    std::cout << to_binary(res) << " (anytime)\n";
+                    std::cout << to_binary(res_exact) << " (exact)\n";
                 }
-                REQUIRE(res == res_exact);
+                REQUIRE(equal_except_rounding(res, res_exact));
             }
         }
     }

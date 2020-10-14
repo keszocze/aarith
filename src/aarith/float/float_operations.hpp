@@ -231,10 +231,7 @@ template <size_t E, size_t M, typename WordType>
 
     auto esum = width_cast<E>(ext_esum);
 
-    normalized_float<E, mproduct.width() - 1> product;
-    product.set_full_mantissa(mproduct);
-    product.set_exponent(esum);
-    product.set_sign(sign);
+    normalized_float<E, mproduct.width() - 1> product(sign, esum, mproduct);
 
     return normalize<E, mproduct.width() - 1, M>(product);
 }

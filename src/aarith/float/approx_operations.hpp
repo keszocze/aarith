@@ -33,15 +33,15 @@ template <size_t E, size_t M>
         return anytime_sub(lhs, swap_sign, bits);
     }
 
-    const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
+    const auto exponent_delta =
+        sub(width_cast<E + 1>(lhs.get_exponent()), width_cast<E + 1>(rhs.get_exponent()));
+
     const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
     const auto mantissa_sum =
-        approx_expanding_add_post_masking(lhs.get_full_mantissa(), new_mantissa, bits + 1);
+        approx_expanding_add_post_masking(lhs.get_full_mantissa(), new_mantissa, bits);
 
-    normalized_float<E, mantissa_sum.width() - 1> sum;
-    sum.set_sign(lhs.get_sign());
-    sum.set_exponent(lhs.get_exponent());
-    sum.set_mantissa(mantissa_sum);
+    normalized_float<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(),
+                                                      mantissa_sum);
 
     return normalize<E, mantissa_sum.width() - 1, M>(sum);
 }
@@ -81,10 +81,7 @@ template <size_t E, size_t M>
     const auto mantissa_sum =
         approx_expanding_sub_post_masking(lhs.get_full_mantissa(), new_mantissa, bits + 1);
 
-    normalized_float<E, mantissa_sum.width() - 1> sum;
-    sum.set_sign(lhs.get_sign());
-    sum.set_exponent(lhs.get_exponent());
-    sum.set_mantissa(mantissa_sum);
+    normalized_float<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(), mantissa_sum);
 
     return normalize<E, mantissa_sum.width() - 1, M>(sum);
 }
@@ -106,18 +103,55 @@ template <size_t E, size_t M>
 [[nodiscard]] auto anytime_mul(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs,
                                const unsigned int bits = 2 * M) -> normalized_float<E, M>
 {
-    auto mproduct = approx_expanding_mul_post_masking(lhs.get_full_mantissa(),
-                                                      rhs.get_full_mantissa(), bits + 1);
-    // mproduct = mproduct >> (M-1);
-    mproduct = mproduct >> (M);
-    auto esum = width_cast<E>(
-        expanding_sub(expanding_add(lhs.get_exponent(), rhs.get_exponent()), lhs.bias));
+    if ((lhs.is_nan() || rhs.is_nan()) || (lhs.is_zero() && rhs.is_inf()) ||
+        (lhs.is_inf() && rhs.is_zero()))
+    {
+        return normalized_float<E, M>::NaN();
+    }
+
+    // compute sign
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
-    normalized_float<E, mproduct.width() - 1> product;
-    product.set_mantissa(mproduct);
-    product.set_exponent(esum);
-    product.set_sign(sign);
+    if (lhs.is_inf() || rhs.is_inf()) {
+        return sign ? normalized_float<E,M>::neg_infinity() : normalized_float<E,M>::pos_infinity();
+    }
+
+    // compute exponent
+    auto ext_esum = expanding_add(lhs.get_exponent(), rhs.get_exponent());
+    bool overflow = ext_esum.bit(E) == 1;
+    ext_esum = sub(ext_esum, width_cast<E + 1>(lhs.bias));
+    bool underflow = (not overflow) and ext_esum.bit(E) == 1;
+    overflow = overflow and ext_esum.bit(E) == 1;
+
+    auto mproduct = approx_expanding_mul_post_masking(lhs.get_full_mantissa(),
+                                                      rhs.get_full_mantissa(), bits + 1);
+    mproduct = mproduct >> (M);
+
+    // check for over or underflow and break
+    if (underflow || overflow)
+    {
+        normalized_float<E, M> product;
+        product.set_sign(sign);
+        if (overflow)
+        {
+            product.set_exponent(uinteger<E>::all_ones());
+        }
+        else
+        {
+            ext_esum = ~ext_esum;
+            ext_esum = add(ext_esum, uinteger<ext_esum.width()>(2));
+            if (ext_esum < uinteger<64>(M + 1))
+            {
+                mproduct = mproduct >> ext_esum.word(0);
+                product.set_full_mantissa(width_cast<M + 1>(mproduct));
+            }
+        }
+        return normalize<E, M, M>(product);
+    }
+
+    auto esum = width_cast<E>(ext_esum);
+
+    normalized_float<E, mproduct.width() - 1> product(sign, esum, mproduct);
 
     return normalize<E, mproduct.width() - 1, M>(product);
 }
