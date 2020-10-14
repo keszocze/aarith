@@ -1,4 +1,5 @@
 #include <aarith/float.hpp>
+#include <aarith/integer.hpp>
 #include <bitset>
 #include <catch.hpp>
 using namespace aarith;
