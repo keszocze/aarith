@@ -81,13 +81,7 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
     const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
     const auto mantissa_sum = fun_sub(lhs.get_full_mantissa(), new_mantissa);
 
-    normalized_float<E, mantissa_sum.width() - 1> sum;
-    sum.set_sign(lhs.get_sign());
-    if (mantissa_sum != uinteger<mantissa_sum.width()>::all_zeroes())
-    {
-        sum.set_exponent(lhs.get_exponent());
-    }
-    sum.set_full_mantissa(mantissa_sum);
+    normalized_float<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(), mantissa_sum);
 
     return normalize<E, mantissa_sum.width() - 1, M>(sum);
 }
@@ -237,10 +231,7 @@ template <size_t E, size_t M, typename WordType>
 
     auto esum = width_cast<E>(ext_esum);
 
-    normalized_float<E, mproduct.width() - 1> product;
-    product.set_full_mantissa(mproduct);
-    product.set_exponent(esum);
-    product.set_sign(sign);
+    normalized_float<E, mproduct.width() - 1> product(sign, esum, mproduct);
 
     return normalize<E, mproduct.width() - 1, M>(product);
 }
@@ -355,13 +346,6 @@ auto operator/(const normalized_float<E, M, WordType>& lhs,
                const normalized_float<E, M, WordType>& rhs) -> normalized_float<E, M, WordType>
 {
     return div(lhs, rhs);
-}
-
-template <size_t E, size_t M, typename WordType>
-auto operator%(const normalized_float<E, M, WordType>& lhs,
-               const normalized_float<E, M, WordType>& rhs) -> normalized_float<E, M, WordType>
-{
-    return remainder(lhs, rhs);
 }
 
 } // namespace float_operators

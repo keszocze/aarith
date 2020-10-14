@@ -149,6 +149,23 @@ public:
     {
     }
 
+    explicit constexpr normalized_float(const unsigned int is_neg, IntegerExp exp,
+                                        word_array<M, WordType> frac)
+        : sign_neg(is_neg)
+        , exponent(exp)
+        , mantissa((exponent == IntegerExp::zero()) ? IntegerMant{frac}
+                                                    : msb_one(IntegerMant{frac}))
+    {
+    }
+
+    explicit constexpr normalized_float(const unsigned int is_neg, IntegerExp exp,
+                                        word_array<MW, WordType> mant)
+        : sign_neg(is_neg)
+        , exponent(exp)
+        , mantissa(mant)
+    {
+    }
+
     template <size_t E_, size_t M_>
     explicit normalized_float(const normalized_float<E_, M_, WordType> f)
         : sign_neg(f.is_negative())
@@ -582,11 +599,12 @@ auto equal_except_rounding(const normalized_float<E, M1, WordType> lhs,
             const auto m1 = lhs.get_full_mantissa();
             const auto m2 = rhs.get_full_mantissa();
 
-            const auto bit1 = m1.bit(offset_M1);
-            const auto bit2 = m2.bit(offset_M2);
+            auto bit1 = m1.bit(offset_M1);
+            auto bit2 = m2.bit(offset_M2);
 
             bool rounding_error = true;
-            bool has_to_be_equal = bit1 == bit2;
+            bool has_to_be_equal = false; //bit1 == bit2;
+            bool initial_zeroes = true;
             for (auto i = 0U; i < Min; ++i)
             {
                 if (has_to_be_equal)
@@ -599,8 +617,18 @@ auto equal_except_rounding(const normalized_float<E, M1, WordType> lhs,
                 }
                 else
                 {
-                    if (m1.bit(i + offset_M1) != m2.bit(i + offset_M2))
+                    if (initial_zeroes && m1.bit(i + offset_M1) == 0 && m2.bit(i + offset_M2) == 0 )
                     {
+                        continue;
+                    }
+                    else if (m1.bit(i + offset_M1) != m2.bit(i + offset_M2))
+                    {
+                        if(initial_zeroes)
+                        {
+                            bit1 = m1.bit(i+offset_M1);
+                            bit2 = m2.bit(i+offset_M2);
+                            initial_zeroes = false;
+                        }
                         if (m1.bit(i + offset_M1) == bit1 && m2.bit(i + offset_M2) == bit2)
                         {
                             continue;
@@ -610,7 +638,7 @@ auto equal_except_rounding(const normalized_float<E, M1, WordType> lhs,
                             has_to_be_equal = true;
                         }
                     }
-                    else if (i == 1)
+                    else if (i > 0)
                     {
                         has_to_be_equal = true;
                     }
@@ -629,7 +657,7 @@ auto equal_except_rounding(const normalized_float<E, M1, WordType> lhs,
 }
 
 template <size_t E, size_t M, typename WordType = uint64_t>
-auto abs(const normalized_float<E, M, WordType> nf) -> normalized_float<E, M, WordType>
+auto constexpr abs(const normalized_float<E, M, WordType> nf) -> normalized_float<E, M, WordType>
 {
     auto absolute = nf;
     absolute.set_sign(0U);
@@ -680,6 +708,13 @@ auto rshift_and_round(const uinteger<M, WordType>& m, const size_t shift_by)
 template <size_t E, size_t M1, size_t M2 = M1, typename WordType = uint64_t>
 auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<E, M2, WordType>
 {
+    if (nf.is_inf() || nf.is_nan())
+    {
+        auto inf = normalized_float<E, M2, WordType>::pos_infinity();
+        inf.set_sign(nf.get_sign());
+        return inf;
+    }
+
     auto denormalized = nf;
 
     auto exponent = denormalized.get_exponent();
