@@ -7,18 +7,18 @@ namespace aarith {
 
 /**
  * Implements random number generation interface similar to std::uniform_int_distribution.
- * @note The interval returned is [min,max[
+ * @note The interval returned is [min,max]
  */
 template <size_t BitWidth, typename WordType = uint64_t> class uniform_uinteger_distribution
 {
 public:
     using input_type = uinteger<BitWidth, WordType>;
-    using internal_type = uinteger<BitWidth+1, WordType>;
+    using internal_type = uinteger<BitWidth + 1, WordType>;
 
-    explicit uniform_uinteger_distribution(const input_type& min = input_type::min(),
-                                           const input_type& max = input_type::max())
-        : min(min)
-        , max(max)
+    explicit uniform_uinteger_distribution(const input_type& min_ = input_type::min(),
+                                           const input_type& max_ = input_type::max())
+        : min(min_)
+        , max(add(internal_type{max_}, internal_type::one()))
         , length(sub(max, min))
     {
         if (!(min <= max))
@@ -37,6 +37,8 @@ public:
         // Modulo is slightly biased towards smaller numbers. Possible fix: e.g. use "Java's
         // algorithm.
         using namespace aarith::integer_operators;
+//        std::cout << min << " + (" << uint << " % " << length << ") = " << min << " + "
+//                  << (uint % length) << "\n";
         return width_cast<BitWidth>(min + (uint % length));
     }
 
@@ -55,6 +57,7 @@ private:
 
 /**
  * Implements random number generation interface similar to std::uniform_int_distribution.
+ * @note the interval returned is
  */
 template <size_t BitWidth, typename WordType = uint64_t> class uniform_integer_distribution
 {
