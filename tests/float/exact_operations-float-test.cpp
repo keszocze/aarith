@@ -2,6 +2,8 @@
 #include <bitset>
 #include <catch.hpp>
 
+
+
 #include "../test-signature-ranges.hpp"
 using namespace aarith;
 
@@ -552,6 +554,21 @@ TEMPLATE_TEST_CASE_SIG("Floating point division matches its native counterparts"
     CHECK(equal_except_rounding(res_native_, res));
     REQUIRE(equal_except_rounding(F{res_}, F{res_native}));
 }
+
+
+
+// TODO create this test case the moment the random float branch is merged into development
+//TEMPLATE_TEST_CASE_SIG("Dividing by denormalised numbers returns a larger number",
+//                       "[normalized_float][arithmetic][division]", ((size_t E, size_t M), E, M),
+//                       (8, 23), (11, 52), (15, 15), (3, 2))
+//{
+//
+//    using F = normalized_float<E,M>;
+//
+//    GIVEN("A random normalized floating point number") {
+//        F = GENERATE(take(15, full_native_range<Native>()));
+//    }
+//}
 
 SCENARIO("Manual test case for  floating point division",
          "[normalized_float][arithmetic][division][bar]")

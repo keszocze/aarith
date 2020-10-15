@@ -332,7 +332,7 @@ public:
     [[nodiscard]] static constexpr normalized_float smallest_normalized()
     {
         constexpr normalized_float small_normalized(false, IntegerExp::one(),
-                                                    IntegerMant::all_zeroes());
+                                                    IntegerFrac::all_zeroes());
         return small_normalized;
     }
 
