@@ -27,7 +27,7 @@ public:
         }
     }
 
-    template <class Generator> auto operator()(Generator& g) -> internal_type
+    template <class Generator> auto operator()(Generator& g) -> input_type
     {
         internal_type uint;
         for (auto i = 0U; i < uint.word_count(); ++i)
@@ -37,7 +37,7 @@ public:
         // Modulo is slightly biased towards smaller numbers. Possible fix: e.g. use "Java's
         // algorithm.
         using namespace aarith::integer_operators;
-        return min + (uint % length);
+        return width_cast<BitWidth>(min + (uint % length));
     }
 
     void reset()
