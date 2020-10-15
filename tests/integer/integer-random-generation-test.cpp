@@ -8,7 +8,7 @@ using namespace aarith;
 
 // This test basically checks that the thing compiles...
 TEMPLATE_TEST_CASE_SIG("Generating ten integers yields ten different results",
-                       "[word_array][utility][random]",
+                       "[integer][utility][random]",
                        ((size_t W, typename WordType), W, WordType), (16, uint8_t))
 {
     using I = integer<W, WordType>;
