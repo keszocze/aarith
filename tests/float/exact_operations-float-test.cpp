@@ -557,16 +557,43 @@ SCENARIO("Manual test case for  floating point division",
          "[normalized_float][arithmetic][division][bar]")
 {
     using F = normalized_float<8, 23>;
-    GIVEN("The number one and the smalles noramlized number")
+    GIVEN("The number one and the smallest normalised number")
     {
         F one{F::one()};
-        F smallest{F::smallest_normalized()};
-        WHEN("Dividing one")
+        AND_GIVEN("The smallest normalised number sn")
         {
-            THEN("It should not throw an exception")
+            F smallest{F::smallest_normalized()};
+
+            WHEN("Dividing one by sn")
             {
-                //                REQUIRE_NOTHROW(div(one, smallest));
-                std::cout << div(one, smallest) << "\n";
+                THEN("It should not throw an exception")
+                {
+                    REQUIRE_NOTHROW(div(one, smallest));
+                }
+                THEN("The resulting number should be larger than one")
+                {
+                    REQUIRE(F::one() < div(one, smallest));
+                }
+            }
+        }
+        AND_GIVEN("The smallest denormalised number sd")
+        {
+            F smallest{F::smallest_denormalized()};
+            F res = div(F::one(), smallest);
+            std::cout << to_binary(smallest) << "\t" << to_binary(smallest, true) << "\t"
+                      << smallest << "\n";
+            std::cout << to_binary(res) << "\t" << to_binary(res, true) << "\t" << res << "\n";
+
+            WHEN("Dividing one by sn")
+            {
+                THEN("It should not throw an exception")
+                {
+                    REQUIRE_NOTHROW(div(one, smallest));
+                }
+                THEN("The resulting number should be larger than one")
+                {
+                    REQUIRE(F::one() < div(one, smallest));
+                }
             }
         }
     }
