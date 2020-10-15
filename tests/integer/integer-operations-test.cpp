@@ -855,19 +855,26 @@ TEMPLATE_TEST_CASE_SIG("Invariants for the signed integer division",
 
                 if (a.is_negative())
                 {
-                    const I c = sub(a, I::one());
-                    if (div(a,c) != I::zero()) {
-                    std::cout << a << "/" << c << " == " << div(a, c)  << " should be 1" << "\n";
-
+                    if (a != I::min())
+                    {
+                        const I c = sub(a, I::one());
+                        if (div(a, c) != I::zero())
+                        {
+                            std::cout << a << "/" << c << " == " << div(a, c) << " should be 1"
+                                      << "\n";
+                        }
+                        REQUIRE(div(a, c) == I::zero());
                     }
-                    REQUIRE(div(a,c) == I::zero());
                 }
                 else
                 {
-                    const I c = add(a, I::one());
-                    if (c != I::one())
+                    if (a != I::max())
                     {
+                        const I c = add(a, I::one());
+                        if (c != I::one())
+                        {
                             REQUIRE(div(a, c) == I::zero());
+                        }
                     }
                 }
             }
