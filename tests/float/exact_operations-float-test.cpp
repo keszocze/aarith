@@ -596,10 +596,10 @@ SCENARIO("Manual test case for  floating point division",
         AND_GIVEN("The smallest denormalised number sd")
         {
             F smallest{F::smallest_denormalized()};
-            F res = div(F::one(), smallest);
-            std::cout << to_binary(smallest) << "\t" << to_binary(smallest, true) << "\t"
-                      << smallest << "\n";
-            std::cout << to_binary(res) << "\t" << to_binary(res, true) << "\t" << res << "\n";
+//            F res = div(F::one(), smallest);
+//            std::cout << to_binary(smallest) << "\t" << to_binary(smallest, true) << "\t"
+//                      << smallest << "\n";
+//            std::cout << to_binary(res) << "\t" << to_binary(res, true) << "\t" << res << "\n";
 
             WHEN("Dividing one by sn")
             {

@@ -848,27 +848,26 @@ TEMPLATE_TEST_CASE_SIG("Invariants for the signed integer division",
                 REQUIRE(div(a, I::one()) == a);
             }
         }
-        WHEN("Dividing the number by a larger number")
+        WHEN("Dividing the number by a larger number (in absolute terms)")
         {
             THEN("The result should be zero")
             {
-                // Adding one is safe as I::max() will not be returned by the generator
-                const I c = add(a, I::one());
-                if (c != I::zero() && c != I::one())
+
+                if (a.is_negative())
                 {
-                    if (c.is_negative())
-                    {
-                        // flaky test, I need to find out, why this fails from time to time
-                        if (div(a, c) != I::one())
-                        {
-                            std::cout << a << " / " << c << " = " << div(a, c) << " != " << I::one()
-                                      << "\n";
-                        }
-                        REQUIRE(div(a, c) == I::one());
+                    const I c = sub(a, I::one());
+                    if (div(a,c) != I::zero()) {
+                    std::cout << a << "/" << c << " == " << div(a, c)  << " should be 1" << "\n";
+
                     }
-                    else
+                    REQUIRE(div(a,c) == I::zero());
+                }
+                else
+                {
+                    const I c = add(a, I::one());
+                    if (c != I::one())
                     {
-                        REQUIRE(div(a, c) == I::zero());
+                            REQUIRE(div(a, c) == I::zero());
                     }
                 }
             }
