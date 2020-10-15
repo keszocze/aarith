@@ -47,6 +47,8 @@ compile_clang:
 run_sonarqube:
   extends: .ciconf
   stage: quality
+  variables:
+    GIT_STRATEGY: none
   dependencies:
       - test_gcc
   needs:
