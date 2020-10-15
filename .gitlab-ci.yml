@@ -1,6 +1,5 @@
 variables:
     GIT_DEPTH: 0
-    GIT_STRATEGY: recursive
     GIT_SUBMODULE_STRATEGY: recursive
     MPIR_PARAMS: "-DMPIR_INCLUDE_DIR=/opt/software/usr/local/include -DMPIR_LIBRARIES=/opt/software/usr/local/lib/libmpir.a"
     BUILD_PARAMS: "-DBUILD_BENCHMARKS=OFF -DBUILD_TESTS=ON -DUSE_FULL_RANGE_IN_TESTS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_EXPERIMENTS=OFF -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -DBENCHMARK_ENABLE_TESTING=OFF"
@@ -53,6 +52,8 @@ run_sonarqube:
       - chmod +x scripts/mk_sonar_config.sh
       - scripts/mk_sonar_config.sh $CI_COMMIT_REF_NAME > sonar-project.properties
       - scripts/mk_sonar_config.sh $CI_COMMIT_REF_NAME
+      - ls .
+      - ls build
       - /opt/sonar-scanner/bin/sonar-scanner
 
 
