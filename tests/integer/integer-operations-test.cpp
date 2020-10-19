@@ -911,6 +911,7 @@ SCENARIO("Multiplying signed integers using Booth's algorithm",
                     static constexpr auto res_inplace = booth_inplace_expanding_mul(m, r);
 
                     static constexpr R expected{-12};
+
                     CHECK(res == expected);
                     CHECK(res == res_inplace);
                     REQUIRE(res == res_naive);
