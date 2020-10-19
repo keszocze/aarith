@@ -1,0 +1,6 @@
+---
+Checks: '*,-fuchsia-trailing-return,-fuchsia-default-arguments,-hicpp-use-auto,-modernize-use-auto,-fuchsia-overloaded-operator,-fuchsia-default-arguments-calls'
+WarningsAsErrors: ''
+HeaderFilterRegex: ''
+...
+
