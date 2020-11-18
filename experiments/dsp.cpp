@@ -26,7 +26,7 @@ using auint4 = uinteger<4>;
     return prod;
 }
 
-[[nodiscard]] std::array<aint8, 4> pack_dsp(const aint4& w1, const aint4& w2, const auint4& a1,
+[[nodiscard]] std::array<aint8, 4> pack_dsp_xilinx(const aint4& w1, const aint4& w2, const auint4& a1,
                                             const auint4& a2)
 {
 
@@ -49,7 +49,7 @@ using auint4 = uinteger<4>;
     return {a2w2, a1w2, a2w1, a1w1};
 }
 
-bool test_single_packing(const aint4& w1, const aint4& w2, const auint4& a1, const auint4& a2)
+int test_single_packing(const aint4& w1, const aint4& w2, const auint4& a1, const auint4& a2)
 {
 
     aint8 w1_{w1};
@@ -60,15 +60,15 @@ bool test_single_packing(const aint4& w1, const aint4& w2, const auint4& a1, con
 
     const std::array<aint8, 4> res_correct = {a2_ * w2_, a1_ * w2_, a2_ * w1_, a1_ * w1_};
 
-    const std::array<aint8, 4> res_dsp = pack_dsp(w1, w2, a1, a2);
+    const std::array<aint8, 4> res_dsp = pack_dsp_xilinx(w1, w2, a1, a2);
 
     bool error = false;
 
     for (size_t i = 0; i < 4; ++i)
     {
         error |= res_correct[i] != res_dsp[i];
-        std::cout << res_correct[i] << ";" << res_dsp[i] << ";" << (res_correct[i] - res_dsp[i]) << ";";
-
+        std::cout << res_correct[i] << ";" << res_dsp[i] << ";" << (res_correct[i] - res_dsp[i])
+                  << ";";
     }
 
     std::cout << "\n";
@@ -76,10 +76,25 @@ bool test_single_packing(const aint4& w1, const aint4& w2, const auint4& a1, con
     return error;
 }
 
-void test_packing() {
-    for (aint4 w1: integer_range<aint4>(aint4::min(),6)) {
-        std::cout << w1 << "\n";
+void test_packing()
+{
+    size_t n_errors = 0;
+    size_t n_tests=0;
+    for (aint4 w1 : integer_range<aint4>())
+    {
+        for (aint4 w2 : integer_range<aint4>())
+        {
+            for (auint4 a1 : integer_range<auint4>())
+            {
+                for (auint4 a2 : integer_range<auint4>())
+                {
+                    n_errors+=test_single_packing(w1,w2,a1,a2);
+                    ++n_tests;
+                }
+            }
+        }
     }
+    std::cout << n_errors << ";" << n_tests << "\n";
 }
 
 int main()
@@ -91,7 +106,7 @@ int main()
     const auint4 a1 = auint4::one();
     const auint4 a2 = auint4::one();
 
-    test_single_packing(w1,w2,a1,a2);
+    test_single_packing(w1, w2, a1, a2);
     test_packing();
     return 0;
 }
