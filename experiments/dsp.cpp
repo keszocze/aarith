@@ -1,5 +1,8 @@
 #include <aarith/integer.hpp>
 
+// TODO allow for wider activation values
+
+
 using namespace aarith;
 
 static constexpr size_t DSPResWidth = 48;
@@ -20,7 +23,7 @@ struct DSPIn
 {
     DSPAddIn A;                //! First of the summands
     DSPAddIn D;                //! Second of the summands
-    DSPProdIn B;               //!
+    DSPProdIn B;               //! The other half of the multiplication
     DSPRes C = DSPRes::zero(); //! The optional carry
 };
 
@@ -128,6 +131,20 @@ DSPIn pack_akif(const aint4& w1, const aint4& w2, const auint4& a1, const auint4
     return {a2w2, a1w2, a2w1, a1w1};
 }
 
+/**
+ * @brief Generic function for DSP packing for the use of multiple multiplications in a single DSP.
+ *
+ * The function packs the weights and activation variables using the provided packing function.
+ * Afterwards, the data is fed to the DSP. The result is then extracted and returned.
+ *
+ * @tparam Packing Function template parameter for the packing to use
+ * @param w1 Weight 1
+ * @param w2 Weight 2
+ * @param a1 Activation value 1
+ * @param a2 Activation value 2
+ * @param packing The concrete packing that is used to feed the DSP
+ * @return Individual results
+ */
 template <typename Packing>
 [[nodiscard]] std::array<aint8, 4> generic_approach(const aint4& w1, const aint4& w2,
                                                     const auint4& a1, const auint4& a2,
@@ -140,6 +157,17 @@ template <typename Packing>
     return extract_results(dsp_res);
 }
 
+/**
+ * @brief Evaluates a single packed input
+ * @tparam Packing
+ * @param w1 Weight 1
+ * @param w2 Weight 2
+ * @param a1 Activation value 1
+ * @param a2 Activation value 2
+ * @param packing The concrete packing that is used to feed the DSP
+ * @param show_intermediate_results If true, all computations are printed to standard out
+ * @return 1 if an error occurred during the computation
+ */
 template <typename Packing>
 int test_single_packing(const aint4& w1, const aint4& w2, const auint4& a1, const auint4& a2,
                         Packing packing, const bool show_intermediate_results = false)
@@ -176,6 +204,12 @@ int test_single_packing(const aint4& w1, const aint4& w2, const auint4& a1, cons
     return error;
 }
 
+/**
+ * @brief Fully evaluates a packing for the given bit-widths.
+ * @tparam Packing
+ * @param packing The concrete packing that is used to feed the DSP
+ * @param show_intermediate_results
+ */
 template <typename Packing>
 void test_packing(Packing packing, const bool show_intermediate_results = false)
 {
