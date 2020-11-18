@@ -215,3 +215,20 @@ TEMPLATE_TEST_CASE_SIG("Investigating the comparison of max and min values",
         }
     }
 }
+
+SCENARIO("Handpicked test cases", "[integer][signed][utility][comparison")
+{
+    GIVEN("Two negative numbers a,b with a < b")
+    {
+        static constexpr integer<4> a{-8};
+        static constexpr integer<4> b{-7};
+
+        WHEN("Computing b > a")
+        {
+            constexpr bool res = (b > a);
+            THEN("The result should be true") {
+                REQUIRE(res);
+            }
+        }
+    }
+}
