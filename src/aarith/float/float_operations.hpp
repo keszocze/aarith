@@ -266,7 +266,7 @@ template <size_t E, size_t M, typename WordType>
 
     const bool neg_result = lhs.is_negative() ^ rhs.is_negative();
 
-    if (rhs.is_inf())
+    if (rhs.is_inf() || lhs.is_zero())
     {
         return neg_result ? normalized_float<E, M>::neg_zero() : normalized_float<E, M>::zero();
     }
