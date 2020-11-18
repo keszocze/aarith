@@ -13,7 +13,8 @@ using aint8 = integer<8>;
 using aint4 = integer<4>;
 using auint4 = uinteger<4>;
 
-[[nodiscard]] constexpr DSPRes dsp(const DSPAddIn& A, const DSPAddIn& D, const DSPProdIn& B)
+[[nodiscard]] constexpr DSPRes dsp(const DSPAddIn& A, const DSPAddIn& D, const DSPProdIn& B,
+                                   const DSPRes C = DSPRes::zero())
 {
 
     const DSPAddIn sum = A + D;
@@ -23,11 +24,13 @@ using auint4 = uinteger<4>;
     // TODO ask Akif about preferred automatic width extension
     const DSPRes prod = sum * B_;
 
-    return prod;
+    const DSPRes result = prod + C;
+
+    return result;
 }
 
-[[nodiscard]] std::array<aint8, 4> pack_dsp_xilinx(const aint4& w1, const aint4& w2, const auint4& a1,
-                                            const auint4& a2)
+[[nodiscard]] std::array<aint8, 4> pack_dsp_xilinx(const aint4& w1, const aint4& w2,
+                                                   const auint4& a1, const auint4& a2)
 {
 
     const DSPAddIn A{w1};
@@ -79,7 +82,7 @@ int test_single_packing(const aint4& w1, const aint4& w2, const auint4& a1, cons
 void test_packing()
 {
     size_t n_errors = 0;
-    size_t n_tests=0;
+    size_t n_tests = 0;
     for (aint4 w1 : integer_range<aint4>())
     {
         for (aint4 w2 : integer_range<aint4>())
@@ -88,7 +91,7 @@ void test_packing()
             {
                 for (auint4 a2 : integer_range<auint4>())
                 {
-                    n_errors+=test_single_packing(w1,w2,a1,a2);
+                    n_errors += test_single_packing(w1, w2, a1, a2);
                     ++n_tests;
                 }
             }
