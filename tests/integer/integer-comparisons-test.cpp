@@ -3,7 +3,7 @@
 
 #include "../test-signature-ranges.hpp"
 
-using namespace aarith;
+using namespace aarith; // NOLINT
 
 TEMPLATE_TEST_CASE_SIG("Comparing two positive signed integers of same bit width",
                        "[integer][signed][utility][comparison]", AARITH_INT_TEST_SIGNATURE,
