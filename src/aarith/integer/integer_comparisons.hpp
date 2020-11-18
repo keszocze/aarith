@@ -32,8 +32,6 @@ template <size_t W, size_t V, typename WordType>
 constexpr bool operator<(const uinteger<W, WordType>& a, const uinteger<V, WordType>& b)
 {
 
-    using word_type = typename integer<W, WordType>::word_type;
-
     constexpr size_t words_W = integer<W, WordType>::word_count();
     constexpr size_t words_V = integer<V, WordType>::word_count();
 
@@ -41,8 +39,8 @@ constexpr bool operator<(const uinteger<W, WordType>& a, const uinteger<V, WordT
     {
         for (auto i = words_W; i > 0; --i)
         {
-            word_type const word_a = a.word(i - 1);
-            word_type const word_b = b.word(i - 1);
+            WordType const word_a = a.word(i - 1);
+            WordType const word_b = b.word(i - 1);
 
             if (word_a < word_b)
             {
@@ -68,8 +66,7 @@ constexpr bool operator<(const uinteger<W, WordType>& a, const uinteger<V, WordT
 
         for (auto i = integer<max_width, WordType>::word_count(); i > 0; --i)
         {
-            word_type const word_a = a_.word(i - 1);
-            word_type const word_b = b_.word(i - 1);
+            WordType const word_a = a_.word(i - 1);
 
             if (word_a < word_b)
             {
