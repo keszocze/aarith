@@ -67,6 +67,7 @@ constexpr bool operator<(const uinteger<W, WordType>& a, const uinteger<V, WordT
         for (auto i = integer<max_width, WordType>::word_count(); i > 0; --i)
         {
             WordType const word_a = a_.word(i - 1);
+            WordType const word_b = b_.word(i - 1);
 
             if (word_a < word_b)
             {
@@ -103,10 +104,6 @@ template <typename W, typename V> constexpr bool operator>(const W& a, const V& 
 template <size_t W, size_t V, typename WordType>
 constexpr bool operator<(const integer<W, WordType>& a, const integer<V, WordType>& b)
 {
-
-    const auto min_count = std::min(a.word_count(), b.word_count());
-    const auto max_count = std::max(a.word_count(), b.word_count());
-
     if (a.is_negative() && !b.is_negative())
     {
         return true;
@@ -117,47 +114,18 @@ constexpr bool operator<(const integer<W, WordType>& a, const integer<V, WordTyp
     }
 
     // from here on, the signs of the numbers are identical
-    const bool both_positive = !a.is_negative();
-
-    if constexpr (W > V)
+    if (a.is_negative())
     {
-        for (size_t i = max_count - 1; i >= min_count; --i)
-        {
-            auto const word_a = static_cast<WordType>(a.word(i));
-            if (word_a > 0U)
-            {
-                return !both_positive;
-            }
-        }
+        // both numbers are negative -> need to switch the order of the operands and take the
+        // absolute value before calling the unsigned integer version of the comparator
+        return (expanding_abs(b) < expanding_abs(a));
     }
     else
     {
-        for (size_t i = max_count - 1; i >= min_count; --i)
-        {
-            auto const word_b = static_cast<WordType>(b.word(i));
-            if (word_b > 0U)
-            {
-                return both_positive;
-            }
-        }
+        // both numbers are positive -> we can directly call the unsigned integer version of
+        // comparator
+        return (uinteger<W, WordType>(a) < uinteger<V, WordType>(b));
     }
-
-    for (auto i = min_count - 1; i >= 0; --i)
-    {
-        auto const word_a = static_cast<WordType>(a.word(i));
-        auto const word_b = static_cast<WordType>(b.word(i));
-
-        if (word_a > word_b)
-        {
-            return !both_positive;
-        }
-        else if (word_a < word_b)
-        {
-            return both_positive;
-        }
-    }
-
-    return false;
 }
 
 template <typename Integer> const Integer& min(const Integer& a, const Integer& b)
