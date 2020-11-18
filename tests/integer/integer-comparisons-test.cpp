@@ -260,20 +260,21 @@ TEMPLATE_TEST_CASE_SIG("Investigating the comparison of max and min values",
     }
 }
 
-SCENARIO("Handpicked test cases", "[integer][signed][utility][comparison")
+SCENARIO("Handpicked test cases", "[integer][signed][utility][comparison]")
 {
     GIVEN("Two negative numbers a,b with a < b")
     {
-
-        constexpr size_t width=32;
+        constexpr size_t width=4;
         static constexpr integer<width> a{-8};
         static constexpr integer<width> b{-7};
 
         WHEN("Computing b > a")
         {
-            constexpr bool res = (b > a);
+            constexpr bool res1 = (a < b);
+            constexpr bool res2 = (b>a);
             THEN("The result should be true") {
-                REQUIRE(res);
+                REQUIRE(res1);
+                REQUIRE(res2);
             }
         }
     }
