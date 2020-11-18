@@ -44,10 +44,10 @@ using auint4 = uinteger<4>;
 
     const DSPRes dsp_res = dsp(A,D,B);
 
-    const aint8 a1w1 =  aint8(bit_range<7,0>(dsp_res));
-    const aint8 a2w1 =  aint8(bit_range<17,11>(dsp_res));
-    const aint8 a1w2 =  aint8(bit_range<29,22>(dsp_res));
-    const aint8 a2w2 =  aint8(bit_range<40,33>(dsp_res));
+    const aint8 a1w1{bit_range<7,0>(dsp_res)};
+    const aint8 a2w1{bit_range<18,11>(dsp_res)};
+    const aint8 a1w2{bit_range<29,22>(dsp_res)};
+    const aint8 a2w2{bit_range<40,33>(dsp_res)};
 
     std::cout << dsp_res << " " << to_binary(dsp_res) << "\n";
 
