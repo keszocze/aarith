@@ -191,6 +191,50 @@ TEMPLATE_TEST_CASE_SIG("Investigating the comparison of max and min values",
         }
     }
 
+    WHEN("Comparing min to itself") {
+        THEN("The result should make sense") {
+            REQUIRE_FALSE(min < min);
+            REQUIRE_FALSE(min_from_limits < min_from_limits);
+
+            REQUIRE(min <= min);
+            REQUIRE(min_from_limits <= min_from_limits);
+
+            REQUIRE_FALSE(min > min);
+            REQUIRE_FALSE(min_from_limits > min_from_limits);
+
+            REQUIRE(min >= min);
+            REQUIRE(min_from_limits >= min_from_limits);
+
+            REQUIRE_FALSE(min != min);
+            REQUIRE_FALSE(min_from_limits != min_from_limits);
+
+            REQUIRE(min == min);
+            REQUIRE(min_from_limits == min_from_limits);
+        }
+    }
+
+    WHEN("Comparing max to itself") {
+        THEN("The result should make sense") {
+            REQUIRE_FALSE(max < max);
+            REQUIRE_FALSE(max_from_limits < max_from_limits);
+
+            REQUIRE(max <= max);
+            REQUIRE(max_from_limits <= max_from_limits);
+
+            REQUIRE_FALSE(max > max);
+            REQUIRE_FALSE(max_from_limits > max_from_limits);
+
+            REQUIRE(max >= max);
+            REQUIRE(max_from_limits >= max_from_limits);
+
+            REQUIRE_FALSE(max != max);
+            REQUIRE_FALSE(max_from_limits != max_from_limits);
+
+            REQUIRE(max == max);
+            REQUIRE(max_from_limits == max_from_limits);
+        }
+    }
+
     WHEN("Comparing these values")
     {
         THEN("The result should make sense")
@@ -220,8 +264,10 @@ SCENARIO("Handpicked test cases", "[integer][signed][utility][comparison")
 {
     GIVEN("Two negative numbers a,b with a < b")
     {
-        static constexpr integer<4> a{-8};
-        static constexpr integer<4> b{-7};
+
+        constexpr size_t width=32;
+        static constexpr integer<width> a{-8};
+        static constexpr integer<width> b{-7};
 
         WHEN("Computing b > a")
         {
