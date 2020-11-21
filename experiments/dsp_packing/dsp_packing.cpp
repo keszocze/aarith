@@ -2,7 +2,7 @@
 
 // TODO allow for wider activation values
 
-#include "DSP.hpp"
+#include "DUT.hpp"
 
 namespace dsp_packing {
 
@@ -62,46 +62,7 @@ DSPInput pack_akif(const aint4& w1, const aint4& w2, const auint4& a1, const aui
     return params;
 }
 
-/**
- * @brief Helper function the extracts the individual results from the DSP's output bitstring
- * @param result The result computed by the DSP
- * @return The individual extracted results
- */
-[[nodiscard]] std::array<aint8, 4> extract_results(const PPort result)
-{
-    const aint8 a1w1{bit_range<7, 0>(result)};
-    const aint8 a2w1{bit_range<18, 11>(result)};
-    const aint8 a1w2{bit_range<29, 22>(result)};
-    const aint8 a2w2{bit_range<40, 33>(result)};
 
-    return {a2w2, a1w2, a2w1, a1w1};
-}
-
-/**
- * @brief Generic function for DSP packing for the use of multiple multiplications in a single DSP.
- *
- * The function packs the weights and activation variables using the provided packing function.
- * Afterwards, the data is fed to the DSP. The result is then extracted and returned.
- *
- * @tparam Packing Function template parameter for the packing to use
- * @param w1 Weight 1
- * @param w2 Weight 2
- * @param a1 Activation value 1
- * @param a2 Activation value 2
- * @param packing The concrete packing that is used to feed the DSP
- * @return Individual results
- */
-template <typename Packing>
-[[nodiscard]] std::array<aint8, 4> generic_approach(const aint4& w1, const aint4& w2,
-                                                    const auint4& a1, const auint4& a2,
-                                                    Packing packing)
-{
-    const DSPInput params = packing(w1, w2, a1, a2);
-
-    const PPort dsp_res = dsp(params);
-
-    return extract_results(dsp_res);
-}
 
 /**
  * @brief Helper function for debugging.
@@ -181,7 +142,7 @@ test_single_packing(const aint4& w1, const aint4& w2, const auint4& a1, const au
 
     const std::array<aint8, 4> res_correct = {a2_ * w2_, a1_ * w2_, a2_ * w1_, a1_ * w1_};
 
-    const std::array<aint8, 4> res_dsp = generic_approach(w1, w2, a1, a2, packing);
+    const std::array<aint8, 4> res_dsp = call_dut(w1, w2, a1, a2, packing);
 
     bool error = false;
     int num_error = 0;
@@ -207,99 +168,18 @@ test_single_packing(const aint4& w1, const aint4& w2, const auint4& a1, const au
     return {error, num_error, max_error};
 }
 
-/**
- * @brief Function to iterate over all inputs for the DSP calling a provided functor on each vector
- *
- * Each generated input vector is forwarded to the provided functor realizing the desired
- * functionality such as, for example, feeding the vector to the DSP to actually compute the
- * multiple multiplications.
- *
- * @tparam T
- * @param functor The functionality that is called on each input vector.
- */
-template <typename T> void iterate_inputs(T& functor)
-{
-    for (aint4 w1 : integer_range<auint4>())
-    {
-        for (aint4 w2 : integer_range<auint4>())
-        {
-            for (auint4 a1 : integer_range<auint4>())
-            {
-                for (auint4 a2 : integer_range<auint4>())
-                {
-                    functor(w1, w2, a1, a2);
-                }
-            }
-        }
-    }
-}
 
-/**
- * @brief Prints all inputs in the correct order as used in the experiment.
- *
- * @param print_header If true, print column header
- */
-void print_inputs(const bool print_header = false)
-{
-    auto output = [](auto a1, auto a2, auto w1, auto w2) {
-        std::cout << to_binary(a1) << " " << to_binary(a2) << " " << to_binary(w1) << " "
-                  << to_binary(w2) << "\n";
-    };
 
-    if (print_header)
-    {
-        std::cout << "a1   a2   w1   w2\n";
-    }
+//template <typename Packing>
+//void test_packing(Packing packing, const bool print_individual_results = false)
+//{
+//    D t{packing, print_individual_results};
+//    t.setup();
+//    iterate_inputs(t);
+//    t.teardown();
+//}
 
-    iterate_inputs(output);
-}
-
-template <typename Packing> class D
-{
-    size_t n_errors = 0;
-    size_t n_individual_errors = 0;
-    size_t n_tests = 0;
-    aint8 max_error{0};
-    Packing packing;
-    bool print_individual_result = false;
-
-public:
-    void setup()
-    {
-        // does nothing right now but we might come up with something interesting
-    }
-    void teardown()
-    {
-        std::cout << n_errors << ";" << n_tests << ";" << ((float)n_errors / (float)n_tests) << ";"
-                  << n_individual_errors << ";" << max_error << "\n";
-    }
-
-    D(Packing packing, const bool print_individual_results = false)
-        : packing(packing)
-        , print_individual_result(print_individual_results)
-    {
-    }
-
-    void operator()(const aint4& w1, const aint4& w2, const auint4 a1, const auint4 a2)
-    {
-        const auto res = test_single_packing(w1, w2, a1, a2, packing, print_individual_result);
-        n_errors += std::get<0>(res);
-        n_individual_errors += std::get<1>(res);
-        max_error = max(max_error, std::get<2>(res));
-        ++n_tests;
-    }
-};
-
-template <typename Packing>
-void test_packing(Packing packing, const bool print_individual_results = false)
-{
-    D t{packing, print_individual_results};
-    t.setup();
-    iterate_inputs(t);
-    t.teardown();
-}
-
-}
+} // namespace dsp_packing
 
 int main()
 {
@@ -312,8 +192,10 @@ int main()
     //    auint4 a2{8};
     //        generic_investigate(w1, w2, a1, a2, pack_xilinx);
 
-    test_packing(pack_xilinx, false);
-    test_packing(pack_akif, true);
+//    test_packing(pack_xilinx, false);
+//    test_packing(pack_akif, true);
+
+    print_inputs();
 
     return 0;
 }
