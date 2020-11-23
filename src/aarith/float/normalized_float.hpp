@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 #include <time.h>
+#include <assert.h>
 #include <type_traits>
 
 namespace aarith {
@@ -342,18 +343,37 @@ public:
      */
     [[nodiscard]] static constexpr normalized_float smallest_denormalized()
     {
-        constexpr normalized_float small_denorm(false, IntegerExp::all_zeroes(), IntegerMant::one());
+        constexpr normalized_float small_denorm(false, IntegerExp::all_zeroes(),
+                                                IntegerMant::one());
         return small_denorm;
     }
 
+    [[nodiscard]] static constexpr normalized_float qNaN(const IntegerFrac& payload = IntegerFrac::msb_one())
+    {
+        IntegerFrac payload_{payload};
+        payload_.set_msb(true);
+        return normalized_float(false, IntegerExp::all_ones(), IntegerMant{payload_});
+    }
+
+    [[nodiscard]] static constexpr normalized_float sNaN(const IntegerFrac& payload = IntegerFrac::msb_one())
+    {
+
+        IntegerFrac payload_{payload};
+        payload_.set_msb(false);
+        assert(!payload_.is_zero() && "NaN must have a payload");
+        return normalized_float(false, IntegerExp::all_ones(), payload_);
+    }
+
     /**
-     * @brief Returns a floating point number indicating not a number.
+     * @brief Returns a floating point number indicating not a number (NaN).
      * @return A non-signalling not a number value
      */
     [[nodiscard]] static constexpr normalized_float NaN()
     {
-        return normalized_float(false, IntegerExp::all_ones(), IntegerMant{IntegerFrac::msb_one()});
+        return qNaN();
     }
+
+
 
     static constexpr auto exponent_width() -> size_t
     {
@@ -371,7 +391,6 @@ public:
      */
     [[nodiscard]] static constexpr integer<E + 1, WordType> denorm_exponent()
     {
-
         const integer<E + 1, WordType> b{bias};
         const integer<E + 1, WordType> neg_bias = sub(integer<E + 1, WordType>::zero(), b);
 
@@ -566,9 +585,8 @@ private:
      * @tparam To Either float or double
      * @return Float/Double representation of the number
      */
-    template <typename To>[[nodiscard]] constexpr To generic_cast() const
+    template <typename To> [[nodiscard]] constexpr To generic_cast() const
     {
-
         static_assert(std::is_floating_point<To>(), "Can only convert to float or double.");
 
         using namespace aarith;
