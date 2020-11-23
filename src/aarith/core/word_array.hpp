@@ -252,7 +252,8 @@ public:
         //            std::string msg = gen_oob_msg(index, false);
         //            throw std::out_of_range(msg);
         //        }
-        words[index] = value & word_mask(index);
+        const auto mask = word_mask(index);
+        words[index] = value & mask;
     }
 
     /**
@@ -346,6 +347,10 @@ public:
      * Constants
      */
 
+    /**
+     * @brief Creates a word array consisting of ones only
+     * @return <111.....11>
+     */
     [[nodiscard]] static constexpr word_array<Width, WordType> all_ones()
     {
         word_array<Width, WordType> n;
@@ -357,6 +362,21 @@ public:
         return n;
     }
 
+    /**
+     * @brief Creates a word array with only the most significant bit being one
+     * @return <10000....00>
+     */
+    [[nodiscard]] static constexpr word_array<Width, WordType> msb_one()
+    {
+        word_array<Width, WordType> n;
+        n.set_msb(true);
+        return n;
+    }
+
+    /**
+     * @brief Creates a word array consisting of zeroes only
+     * @return <000...00>
+     */
     [[nodiscard]] static constexpr word_array<Width, WordType> all_zeroes()
     {
         return word_array{0U};
@@ -366,6 +386,10 @@ public:
      * Utility stuff
      */
 
+    /**
+     * @brief Tests if all bits are zero
+     * @return True iff all bits are zero
+     */
     [[nodiscard]] bool constexpr is_zero() const noexcept
     {
 
@@ -489,6 +513,7 @@ template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
     {
 
         word_array<DestinationWidth, WordType> word_container;
+
         if constexpr (DestinationWidth >= SourceWidth)
         {
             for (auto i = 0U; i < source.word_count(); ++i)

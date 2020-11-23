@@ -30,8 +30,10 @@ add_aarith_test(fixed-point-comparison FILES fixed_point/fixed_point-comparison-
 
 add_aarith_test(float-operations FILES float/exact_operations-float-test.cpp)
 add_aarith_test(float-anytime-operations FILES float/anytime_operations-float-test.cpp)
+add_aarith_test(float FILES float/float-test.cpp)
 add_aarith_test(float-casts FILES float/float_casts.cpp)
 add_aarith_test(float-comparison FILES float/float_comparisons.cpp)
+add_aarith_test(float-random-generation FILES float/float-random-generation-test.cpp)
 
 add_aarith_test(fau-adder FILES uint-approx-test.cpp)
 

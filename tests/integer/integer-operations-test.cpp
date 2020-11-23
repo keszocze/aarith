@@ -829,7 +829,7 @@ TEMPLATE_TEST_CASE_SIG("Invariants for the signed integer division",
     GIVEN("A non-zero number")
     {
 
-        const I a = GENERATE(take(10, random_integer<W, WordType>()));
+        const I a = GENERATE(take(100, random_integer<W, WordType>()));
 
         WHEN("Dividing the number by itself")
         {
@@ -852,17 +852,26 @@ TEMPLATE_TEST_CASE_SIG("Invariants for the signed integer division",
         {
             THEN("The result should be zero")
             {
-                // Adding one is safe as I::max() will not be returned by the generator
-                const I c = add(a, I::one());
-                if (c != I::zero() && c != I::one())
+                if (a != I::max())
                 {
-                    if (c.is_negative())
+                    const I c = add(a, I::one());
+                    if (c != I::zero() && c != I::one())
                     {
-                        REQUIRE(div(a, c) == I::one());
-                    }
-                    else
-                    {
-                        REQUIRE(div(a, c) == I::zero());
+                        if (c.is_negative())
+                        {
+                            // flaky test, I need to find out, why this fails from time to time
+                            // it *should* have been the missing test for max() above
+                            if (div(a, c) != I::one())
+                            {
+                                std::cout << a << " / " << c << " = " << div(a, c)
+                                          << " != " << I::one() << "\n";
+                            }
+                            REQUIRE(div(a, c) == I::one());
+                        }
+                        else
+                        {
+                            REQUIRE(div(a, c) == I::zero());
+                        }
                     }
                 }
             }

@@ -1,8 +1,7 @@
 #pragma once
 
-#include <aarith/core/traits.hpp>
+#include <aarith/core.hpp>
 #include <aarith/float/float_utils.hpp>
-#include <aarith/float/float_comparisons.hpp>
 #include <aarith/integer_no_operators.hpp>
 #include <cstdint>
 #include <iostream>
@@ -12,7 +11,98 @@
 
 namespace aarith {
 
-template <size_t E, size_t M, typename WordType = uint64_t> class normalized_float
+template <size_t E, size_t M, typename WordType = uint64_t> class normalized_float;
+
+/**
+ * @brief Expands the mantissa by correctly shifting the bits in the larger uinteger
+ * @tparam MS The target width of the mantissa
+ * @return The mantissa expended to a width of MS
+ */
+template <size_t MS, size_t E, size_t M, typename WordType>
+[[nodiscard]] uinteger<MS, WordType> constexpr expand_mantissa(
+    const normalized_float<E, M, WordType>& f)
+{
+    static_assert(MS >= M, "Expanded mantissa must not be shorter than the original mantissa");
+    uinteger<MS, WordType> mantissa_{f.get_mantissa()};
+    mantissa_ <<= (size_t{MS} - size_t{M});
+    return mantissa_;
+}
+
+/**
+ * @brief Expands the full mantissa (i.e. the significand) by correctly shifting the bits in the
+ * larger uinteger.
+ *
+ * @tparam MS The target width of the mantissa
+ * @return The mantissa expended to a width of MS
+ */
+template <size_t MS, size_t E, size_t M, typename WordType>
+[[nodiscard]] uinteger<MS, WordType> constexpr expand_full_mantissa(
+    const normalized_float<E, M, WordType>& f)
+{
+    static_assert(MS >= M + 1, "Expanded mantissa must not be shorter than the original mantissa");
+    uinteger<MS, WordType> mantissa_{f.get_full_mantissa()};
+    mantissa_ <<= (size_t{MS} - size_t{M + 1});
+    return mantissa_;
+}
+
+/**
+ * @brief Expands the exponent respecting the bias of the target width
+ * @tparam ES The target width of the exponent
+ * @return The exponent expanded to a width of ES
+ */
+template <size_t ES, size_t E, size_t M, typename WordType>
+[[nodiscard]] uinteger<ES, WordType> constexpr expand_exponent(
+    const normalized_float<E, M, WordType>& f)
+{
+    static_assert(ES >= E, "Expanded exponent must not be shorter than the original exponent");
+
+    using exp_type = uinteger<ES, WordType>;
+
+    uinteger<E, WordType> exp_f = f.get_exponent();
+
+    if (exp_f == uinteger<E, WordType>::all_ones())
+    {
+        return exp_type::all_ones();
+    }
+    else
+    {
+        const exp_type in_bias{f.bias};
+        const auto out_bias = normalized_float<ES, M, WordType>::bias;
+        auto bias_difference = sub(out_bias, in_bias);
+
+        exp_type exponent_ = exp_type{exp_f};
+        exponent_ = add(exponent_, bias_difference);
+        return exponent_;
+    }
+}
+
+/**
+ * @brief Creates a bitstring representation of the floating point number.
+ *
+ * The bitstring returned may use more bits for the exponent/mantissa than the floating point
+ * number it was created from. You can use this method to create valid IEEE 754 bitstrings.
+ *
+ * @tparam ES The number of bits to use for the exponent
+ * @tparam MS The number of bits to use for the mantissa
+ * @return IEEE-754 bitstring representation of the floating point number
+ */
+template <size_t ES, size_t MS, size_t E, size_t M, typename WordType>
+[[nodiscard]] word_array<1 + ES + MS, WordType> constexpr as_word_array(
+    const normalized_float<E, M, WordType>& f)
+{
+    using namespace aarith;
+
+    static_assert(ES >= E);
+    static_assert(MS >= M);
+
+    auto mantissa_ = expand_mantissa<MS, E, M, WordType>(f);
+    auto joined = concat(expand_exponent<ES>(f), mantissa_);
+    auto with_sign = concat(word_array<1, WordType>{f.get_sign()}, joined);
+
+    return with_sign;
+}
+
+template <size_t E, size_t M, typename WordType> class normalized_float
 {
 public:
     static_assert(M > 0, "Mantissa width has to be greater zero.");
@@ -22,14 +112,69 @@ public:
 
     using IntegerExp = uinteger<E, WordType>;
     using IntegerMant = uinteger<MW, WordType>;
+    using IntegerFrac = uinteger<M, WordType>;
 
     static constexpr IntegerExp bias = uinteger<E - 1, WordType>::all_ones();
 
     explicit constexpr normalized_float()
+        : sign_neg(false)
+        , exponent(IntegerExp::zero())
+        , mantissa(IntegerMant::zero())
     {
-        exponent = IntegerExp::zero();
-        mantissa = IntegerMant::zero();
-        sign_neg = false;
+    }
+
+    explicit constexpr normalized_float(const word_array<1 + E + M>& w)
+        : sign_neg(w.msb())
+        , exponent(bit_range<(E + M) - 1, M>(w))
+        , mantissa(exponent == IntegerExp::all_zeroes()
+                       ? IntegerMant{bit_range<M - 1, 0>(w)}
+                       : msb_one(IntegerMant{bit_range<M - 1, 0>(w)}))
+    {
+    }
+
+    explicit constexpr normalized_float(const bool is_neg, IntegerExp exp,
+                                        word_array<M, WordType> frac)
+        : sign_neg(is_neg)
+        , exponent(exp)
+        , mantissa((exponent == IntegerExp::zero()) ? IntegerMant{frac}
+                                                    : msb_one(IntegerMant{frac}))
+    {
+    }
+
+    explicit constexpr normalized_float(const bool is_neg, IntegerExp exp,
+                                        word_array<MW, WordType> mant)
+        : sign_neg(is_neg)
+        , exponent(exp)
+        , mantissa(mant)
+    {
+    }
+
+    explicit constexpr normalized_float(const unsigned int is_neg, IntegerExp exp,
+                                        word_array<M, WordType> frac)
+        : sign_neg(is_neg)
+        , exponent(exp)
+        , mantissa((exponent == IntegerExp::zero()) ? IntegerMant{frac}
+                                                    : msb_one(IntegerMant{frac}))
+    {
+    }
+
+    explicit constexpr normalized_float(const unsigned int is_neg, IntegerExp exp,
+                                        word_array<MW, WordType> mant)
+        : sign_neg(is_neg)
+        , exponent(exp)
+        , mantissa(mant)
+    {
+    }
+
+    template <size_t E_, size_t M_>
+    explicit normalized_float(const normalized_float<E_, M_, WordType> f)
+        : sign_neg(f.is_negative())
+        , exponent(expand_exponent<E>(f))
+        , mantissa(expand_full_mantissa<MW>(f))
+
+    {
+        static_assert(E_ <= E, "Exponent too long");
+        static_assert(M_ <= M, "Mantissa too long");
     }
 
     template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
@@ -65,16 +210,49 @@ public:
         {
             // a wider exponent means a larger bias, so we have to add the difference between two
             // biases to the old exponent to get the old value
-            constexpr IntegerExp smaller_bias = uinteger<ext_exp_width - 1, WordType>::all_ones();
-            constexpr IntegerExp diff = sub(bias, smaller_bias);
-            exponent = add(IntegerExp{extracted_exp}, diff);
+
+            // we need to make sure that inf/NaN remains the same
+            if (extracted_exp == decltype(extracted_exp)::all_ones())
+            {
+                exponent = uinteger<E>::all_ones();
+            }
+            else
+            {
+
+                constexpr IntegerExp smaller_bias =
+                    uinteger<ext_exp_width - 1, WordType>::all_ones();
+                constexpr IntegerExp diff = sub(bias, smaller_bias);
+                exponent = add(IntegerExp{extracted_exp}, diff);
+            }
         }
         else if (ext_exp_width > E)
         {
-            // we simply truncate the exponent after shifting to the right, hoping that we do not
-            // loose too much precision (we will....)
-            extracted_exp >>= (ext_exp_width - E);
-            exponent = width_cast<E>(extracted_exp);
+            // a smaller exponent means a lower bias, so we subtract the difference between the two
+            // biases from the original bias
+            // in case of over- or underflow we set the value to infinity or 0
+            // TODO handle denormalized numbers?
+            using OExp = uinteger<ext_exp_width + 1, WordType>;
+            constexpr OExp bigger_bias = uinteger<ext_exp_width - 1, WordType>::all_ones();
+            constexpr OExp smaller_bias = bias;
+            constexpr OExp diff = sub(bigger_bias, smaller_bias);
+            const auto exp = sub(OExp(extracted_exp), diff);
+            const bool overflow =
+                exp >= OExp(IntegerExp::all_ones()) && exp.bit(ext_exp_width) == 0;
+            const bool underflow = exp.bit(ext_exp_width) == 1;
+            if (underflow)
+            {
+                mantissa = mantissa.all_zeroes();
+                exponent = exponent.all_zeroes();
+            }
+            else if (overflow)
+            {
+                mantissa = mantissa.all_zeroes();
+                exponent = exponent.all_ones();
+            }
+            else
+            {
+                exponent = width_cast<E>(exp);
+            }
         }
         else
         {
@@ -88,49 +266,94 @@ public:
         }
     }
 
+    /**
+     *
+     * @return The value zero
+     */
     [[nodiscard]] static constexpr normalized_float zero()
     {
         return normalized_float{};
     }
 
-    [[nodiscard]] static constexpr normalized_float one()
+    /**
+     *
+     * @return The value negative zero
+     */
+    [[nodiscard]] static constexpr normalized_float neg_zero()
     {
-        normalized_float num{};
-        auto exp = word_array<E, WordType>::all_ones();
-        exp.set_msb(false);
-        num.set_exponent(exp);
-
-        auto mant = uinteger<MW, WordType>::all_zeroes();
-        mant.set_msb(true);
-        num.set_full_mantissa(mant);
-
-        return num;
+        return normalized_float(true, IntegerExp::all_zeroes(), IntegerMant::all_zeroes());
     }
 
+    /**
+     *
+     * @return The value one
+     */
+    [[nodiscard]] static constexpr normalized_float one()
+    {
+        constexpr word_array<E, WordType> exp{word_array<E - 1, WordType>::all_ones()};
+        return normalized_float(false, exp, IntegerMant::msb_one());
+    }
+
+    /**
+     *
+     * @return The value one
+     */
+    [[nodiscard]] static constexpr normalized_float neg_one()
+    {
+        constexpr word_array<E, WordType> exp{word_array<E - 1, WordType>::all_ones()};
+        return normalized_float(true, exp, IntegerMant::msb_one());
+    }
+
+    /**
+     *
+     * @return positive infinity
+     */
     [[nodiscard]] static constexpr normalized_float pos_infinity()
     {
-        normalized_float pos_inf{};
-        pos_inf.set_exponent(word_array<E, WordType>::all_ones());
+        constexpr normalized_float pos_inf(false, IntegerExp::all_ones(),
+                                           IntegerMant::all_zeroes());
         return pos_inf;
     }
 
+    /**
+     *
+     * @return negative infinity
+     */
     [[nodiscard]] static constexpr normalized_float neg_infinity()
     {
-        normalized_float neg_inf{};
-        neg_inf.set_exponent(word_array<E, WordType>::all_ones());
-        neg_inf.set_sign(-1);
+        constexpr normalized_float neg_inf(true, IntegerExp::all_ones(), IntegerMant::all_zeroes());
         return neg_inf;
     }
 
+    /**
+     *
+     * @return Smallest positive normalized value
+     */
+    [[nodiscard]] static constexpr normalized_float smallest_normalized()
+    {
+        constexpr normalized_float small_normalized(false, IntegerExp::one(),
+                                                    IntegerMant::all_zeroes());
+        return small_normalized;
+    }
+
+    /**
+     *
+     * @return Smallest positive normalized value
+     */
+    [[nodiscard]] static constexpr normalized_float smallest_denormalized()
+    {
+        constexpr normalized_float small_denorm(false, IntegerExp::all_zeroes(),
+                                                IntegerMant::one());
+        return small_denorm;
+    }
+
+    /**
+     * @brief Returns a floating point number indicating not a number.
+     * @return A non-signalling not a number value
+     */
     [[nodiscard]] static constexpr normalized_float NaN()
     {
-        normalized_float nan{};
-        nan.set_exponent(word_array<E, WordType>::all_ones());
-        auto nan_mantissa = word_array<M, WordType>::all_zeroes();
-        nan_mantissa.set_msb(1);
-
-        nan.set_mantissa(nan_mantissa);
-        return nan;
+        return normalized_float(false, IntegerExp::all_ones(), IntegerMant{IntegerFrac::msb_one()});
     }
 
     static constexpr auto exponent_width() -> size_t
@@ -187,6 +410,18 @@ public:
                width_cast<M>(mantissa) == uinteger<M>::zero();
     }
 
+    [[nodiscard]] constexpr bool is_pos_inf() const
+    {
+        return !sign_neg && exponent == uinteger<E>::all_ones() &&
+               width_cast<M>(mantissa) == uinteger<M>::zero();
+    }
+
+    [[nodiscard]] constexpr bool is_neg_inf() const
+    {
+        return sign_neg && exponent == uinteger<E>::all_ones() &&
+               width_cast<M>(mantissa) == uinteger<M>::zero();
+    }
+
     /**
      * @brief Checks whether the floating point number is not a number
      *
@@ -196,9 +431,10 @@ public:
      */
     [[nodiscard]] constexpr bool is_nan() const
     {
-        const auto mantissa_{width_cast<M>(mantissa)};
-        const auto zero = uinteger<M>::zero();
-        return exponent == IntegerExp::all_ones() && mantissa_ != zero;
+        const bool exp_ones = exponent == IntegerExp ::all_ones();
+        constexpr auto zero = uinteger<M>::zero();
+        const bool mant_zero = get_mantissa() != zero;
+        return exp_ones && mant_zero;
     }
 
     [[nodiscard]] constexpr auto unbiased_exponent() const -> integer<E + 1, WordType>
@@ -245,7 +481,10 @@ public:
     void set_mantissa(const uinteger<M, WordType>& set_to)
     {
         mantissa = set_to;
-        mantissa.set_msb(true);
+        if (exponent != IntegerExp::zero())
+        {
+            mantissa.set_msb(true);
+        }
     }
 
     auto bit(size_t index) const -> typename uinteger<M, WordType>::bit_type
@@ -273,7 +512,7 @@ public:
      */
     [[nodiscard]] constexpr bool is_normalized() const
     {
-        return exponent != IntegerExp::zero();
+        return exponent != IntegerExp::all_zeroes();
     }
 
     /**
@@ -289,79 +528,46 @@ public:
     }
 
     /**
-     * @brief Expands the exponent respecting the bias of the target width
-     * @tparam ES The target width of the exponent
-     * @return The exponent expanded to a width of ES
-     */
-    template <size_t ES>[[nodiscard]] uinteger<ES, WordType> constexpr expand_exponent() const
-    {
-        static_assert(ES >= E, "Expanded exponent must not be shorter than the original exponent");
-
-        using exp_type = uinteger<ES, WordType>;
-
-        const exp_type in_bias{this->bias};
-        const auto out_bias = normalized_float<ES, M, WordType>::bias;
-        auto bias_difference = sub(out_bias, in_bias);
-
-        exp_type exponent_ = uinteger<ES, WordType>{this->get_exponent()};
-        exponent_ = add(exponent_, bias_difference);
-
-        return exponent_;
-    }
-
-    /**
-     * @brief Expands the mantissa by correctly shifting the bits in the larger uinteger
-     * @tparam MS The target width of the mantissa
-     * @return The mantissa expended to a width of MS
-     */
-    template <size_t MS>[[nodiscard]] uinteger<MS, WordType> constexpr expand_mantissa() const
-    {
-        static_assert(MS >= M, "Expanded mantissa must not be shorter than the original mantissa");
-        uinteger<MS, WordType> mantissa_{get_mantissa()};
-        mantissa_ = mantissa_ << (size_t{MS} - size_t{M});
-        return mantissa_;
-    }
-
-    /**
-     * @brief Creates a bitstring representation of the floating point number.
+     * @brief Casts the normalized float to the native float type.
      *
-     * The bitstring returned may use more bits for the exponent/mantissa than the floating point
-     * number it was created from. You can use this method to create valid IEEE 754 bitstrings.
-     * @tparam ES The number of bits to use for the exponent
-     * @tparam MS The number of bits to use for the mantissa
-     * @return IEEE-754 bitstring representation of the floating point number
-     */
-    template <size_t ES = E, size_t MS = M>
-    word_array<1 + ES + MS, WordType> constexpr as_word_array() const
-    {
-        using namespace aarith;
-
-        static_assert(ES >= E);
-        static_assert(MS >= M);
-
-        auto mantissa_ = expand_mantissa<MS>();
-        auto joined = concat(expand_exponent<ES>(), mantissa_);
-        auto with_sign = concat(word_array<1, WordType>{this->get_sign()}, joined);
-
-        return with_sign;
-    }
-
-    /**
+     * @note The cast is only possible when there will be no loss of precision
      *
-     * @return
+     * @return The value converted to float format
      */
     [[nodiscard]] explicit constexpr operator float() const
     {
         return generic_cast<float>();
     }
 
+    /**
+     * @brief Casts the normalized float to the native double type.
+     *
+     * @note The cast is only possible when there will be no loss of precision
+     *
+     * @return The value converted to double format
+     */
     [[nodiscard]] explicit constexpr operator double() const
     {
         return generic_cast<double>();
     }
 
+    template <size_t ETarget, size_t MTarget>
+    [[nodiscard]] explicit constexpr operator normalized_float<ETarget, MTarget, WordType>() const
+    {
+        const auto tmp{as_word_array<ETarget, MTarget>(*this)};
+        return normalized_float<ETarget, MTarget, WordType>{tmp};
+    }
+
 private:
-    template <typename To>[[nodiscard]] constexpr To generic_cast() const
+    /**
+     * @brief Casts the number to float or double.
+     *
+     * @note The cast is only possible when there will be no loss of precision.
+     *
+     * @tparam To Either float or double
+     * @return Float/Double representation of the number
+     */
+    template <typename To> [[nodiscard]] constexpr To generic_cast() const
     {
 
         static_assert(std::is_floating_point<To>(), "Can only convert to float or double.");
@@ -376,7 +582,7 @@ private:
         static_assert(M <= mant_width, "Mantissa width too large");
 
         uinteger<1 + exp_width + mant_width, WordType> array{
-            as_word_array<exp_width, mant_width>()};
+            as_word_array<exp_width, mant_width>(*this)};
 
         uint_storage bitstring = static_cast<uint_storage>(array);
         To result = bit_cast<To>(bitstring);
@@ -384,8 +590,8 @@ private:
     }
 
     bool sign_neg;
-    IntegerExp exponent;
-    IntegerMant mantissa;
+    uinteger<E, WordType> exponent;
+    uinteger<MW, WordType> mantissa;
 };
 
 template <size_t E, size_t M, typename WordType> class is_integral<normalized_float<E, M, WordType>>
@@ -425,11 +631,12 @@ auto equal_except_rounding(const normalized_float<E, M1, WordType> lhs,
             const auto m1 = lhs.get_full_mantissa();
             const auto m2 = rhs.get_full_mantissa();
 
-            const auto bit1 = m1.bit(offset_M1);
-            const auto bit2 = m2.bit(offset_M2);
+            auto bit1 = m1.bit(offset_M1);
+            auto bit2 = m2.bit(offset_M2);
 
             bool rounding_error = true;
-            bool has_to_be_equal = bit1 == bit2;
+            bool has_to_be_equal = false; // bit1 == bit2;
+            bool initial_zeroes = true;
             for (auto i = 0U; i < Min; ++i)
             {
                 if (has_to_be_equal)
@@ -442,8 +649,18 @@ auto equal_except_rounding(const normalized_float<E, M1, WordType> lhs,
                 }
                 else
                 {
-                    if (m1.bit(i + offset_M1) != m2.bit(i + offset_M2))
+                    if (initial_zeroes && m1.bit(i + offset_M1) == 0 && m2.bit(i + offset_M2) == 0)
                     {
+                        continue;
+                    }
+                    else if (m1.bit(i + offset_M1) != m2.bit(i + offset_M2))
+                    {
+                        if (initial_zeroes)
+                        {
+                            bit1 = m1.bit(i + offset_M1);
+                            bit2 = m2.bit(i + offset_M2);
+                            initial_zeroes = false;
+                        }
                         if (m1.bit(i + offset_M1) == bit1 && m2.bit(i + offset_M2) == bit2)
                         {
                             continue;
@@ -453,7 +670,7 @@ auto equal_except_rounding(const normalized_float<E, M1, WordType> lhs,
                             has_to_be_equal = true;
                         }
                     }
-                    else if (i == 1)
+                    else if (i > 0)
                     {
                         has_to_be_equal = true;
                     }
@@ -472,7 +689,7 @@ auto equal_except_rounding(const normalized_float<E, M1, WordType> lhs,
 }
 
 template <size_t E, size_t M, typename WordType = uint64_t>
-auto abs(const normalized_float<E, M, WordType> nf) -> normalized_float<E, M, WordType>
+auto constexpr abs(const normalized_float<E, M, WordType> nf) -> normalized_float<E, M, WordType>
 {
     auto absolute = nf;
     absolute.set_sign(0U);
@@ -523,6 +740,13 @@ auto rshift_and_round(const uinteger<M, WordType>& m, const size_t shift_by)
 template <size_t E, size_t M1, size_t M2 = M1, typename WordType = uint64_t>
 auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<E, M2, WordType>
 {
+    if (nf.is_inf() || nf.is_nan())
+    {
+        auto inf = normalized_float<E, M2, WordType>::pos_infinity();
+        inf.set_sign(nf.get_sign());
+        return inf;
+    }
+
     auto denormalized = nf;
 
     auto exponent = denormalized.get_exponent();
@@ -532,27 +756,48 @@ auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<
 
     if (one_at > M1)
     {
-        exponent = uinteger<E, WordType>(0U);
-        // denormalized.set_sign(0);
+        exponent = exponent.all_zeroes();
     }
     else if (one_at >= M2)
     {
         auto shift_by = one_at - M2;
         mantissa = rshift_and_round(mantissa, shift_by);
-        exponent = add(exponent, uinteger<E, WordType>(shift_by));
+        if (exponent == exponent.all_zeroes())
+        {
+            exponent = add(exponent, uinteger<E, WordType>(shift_by + 1));
+        }
+        else
+        {
+            exponent = add(exponent, uinteger<E, WordType>(shift_by));
+        }
     }
     else
     {
         auto shift_by = M2 - one_at;
-        mantissa = (mantissa << shift_by);
-        exponent = sub(exponent, uinteger<E, WordType>(shift_by));
+        if (exponent != exponent.zero())
+        {
+            if (exponent <= uinteger<E>(shift_by))
+            {
+                // shift_by -= 1;
+                mantissa = (mantissa << (exponent.word(0) - 1));
+                exponent = exponent.all_zeroes();
+            }
+            else
+            {
+                mantissa = (mantissa << shift_by);
+                exponent = sub(exponent, uinteger<E, WordType>(shift_by));
+            }
+        }
     }
 
-    normalized_float<E, M2, WordType> normalized_float;
+    normalized_float<E, M2, WordType> normalized_float(denormalized.get_sign(), exponent,
+                                                       width_cast<M2 + 1>(mantissa));
 
+    /*
     normalized_float.set_sign(denormalized.get_sign());
     normalized_float.set_exponent(exponent);
-    normalized_float.set_mantissa(width_cast<M2 + 1>(mantissa));
+    normalized_float.set_full_mantissa(width_cast<M2 + 1>(mantissa));
+    */
 
     return normalized_float;
 }

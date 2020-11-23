@@ -388,6 +388,21 @@ auto constexpr arithmetic_right_shift(W& lhs, const size_t rhs) -> W&
 }
 
 /**
+ * @brief Sets the most significant bit to one
+ * @tparam W Type that behaves like a word array (can, e.g., also be an uinteger)
+ * @tparam V The bit width of the type W
+ * @tparam WordType The word type the data is stored in
+ * @param w The word array like parameter
+ * @return w with the most significant bit set to one
+ */
+template <template <size_t, typename> class W, size_t V, typename WordType = uint64_t>
+[[nodiscard]] constexpr W<V, WordType> msb_one(const W<V, WordType>& w)
+{
+    constexpr W<V, WordType> msbone{word_array<V, WordType>::msb_one()};
+    return (w | msbone);
+}
+
+/**
  * @brief Extracts a range from the word array
  *
  * Note that the indexing is done
