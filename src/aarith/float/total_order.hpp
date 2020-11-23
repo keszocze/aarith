@@ -5,6 +5,18 @@
 
 namespace aarith {
 
+/**
+ * @brief Checks for total ordering x < y of two floating-point numbers.
+ *
+ * These numbers *may* be NaNs or infinities.
+ *
+ * @tparam E Exponent width
+ * @tparam M Mantissa width
+ * @tparam WordType The data type the underlying data is stored in
+ * @param x The first/lhs floating-point number
+ * @param y The scond/rhs floating-point number
+ * @return true iff x < y
+ */
 template <size_t E, size_t M, typename WordType>
 bool totalOrder(const normalized_float<E, M, WordType>& x,
                 const normalized_float<E, M, WordType>& y)
@@ -108,6 +120,8 @@ bool totalOrder(const normalized_float<E, M, WordType>& x,
         return false;
     }
 
+    // This *should* be unreachable code as all cases as shown in the stanard document have been
+    // taken care of. Returning false seems to be a reasonable thing to do.
     return false;
 }
 } // namespace aarith
