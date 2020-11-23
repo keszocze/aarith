@@ -301,7 +301,7 @@ template <size_t E, size_t M, typename WordType>
 }
 
 /**
- * @brief Computes the negative value of the floating point number
+ * @brief Computes the negative value of the floating-point number
  *
  * Quoting the standard: "copies a floating-point operand x to a destination in the same format,
  * reversing the sign bit. negate(x) is not the same as subtraction(0, x)"
@@ -323,6 +323,32 @@ negate(const normalized_float<E, M, WordType>& x)
     negated.set_sign(!x.get_sign());
 
     return negated;
+}
+
+/**
+ * @brief Copiest he floating-point number
+ *
+ * Quoting the standard: "copies a floating-point operand x to a destination in the same format,
+ * with no change to the sign bit."
+ *
+ * @note This method ignores NaN values in the sense that they are also copied not signalling any
+ * error.
+ *
+ * @note This is a rather useless method that only exists to be more compliant with the IEEE 754
+ * (2019) standard.
+ *
+ * @tparam E Width of exponent
+ * @tparam M Width of mantissa
+ * @tparam WordType The word type used to internally store the data
+ * @return The copied value
+ */
+template <size_t E, size_t M, typename WordType = uint64_t>
+[[nodiscard]] constexpr normalized_float<E, M, WordType>
+copy(const normalized_float<E, M, WordType>& x)
+{
+    normalized_float<E, M, WordType> copied{x};
+
+    return copied;
 }
 
 /**

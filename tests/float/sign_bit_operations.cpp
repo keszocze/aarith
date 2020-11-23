@@ -14,7 +14,7 @@ auto full_native_range()
                                         std::numeric_limits<N>::max() / 100.0f);
 }
 
-TEMPLATE_TEST_CASE_SIG("Addition is commutative",
+TEMPLATE_TEST_CASE_SIG("Negation works as intended",
                        "[normalized_float][negate][sig_bit_operation][invariant]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, double))
@@ -24,7 +24,7 @@ TEMPLATE_TEST_CASE_SIG("Addition is commutative",
     GIVEN("A random floating-point number")
     {
 
-        F a = GENERATE(take(15, random_float<E, M>()));
+        F a = GENERATE(take(15, random_float<E, M, FloatGenerationModes::FullyRandom>()));
 
         WHEN("Negating the number")
         {
@@ -34,9 +34,30 @@ TEMPLATE_TEST_CASE_SIG("Addition is commutative",
                 REQUIRE(negate(b) == a);
                 REQUIRE(negate(a) == b);
             }
+        }
+    }
+}
 
-            THEN("The negation should match the unary minus operator") {
-                REQUIRE(b == -a);
+
+TEMPLATE_TEST_CASE_SIG("Copying a floating-point number works",
+                       "[normalized_float][copy][sig_bit_operation][invariant]",
+                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
+                       (11, 52, double))
+{
+    using F = normalized_float<E, M>;
+
+    GIVEN("A random floating-point number")
+    {
+
+        F a = GENERATE(take(15, random_float<E, M, FloatGenerationModes::FullyRandom>()));
+
+        WHEN("Copying the number")
+        {
+            F b = copy(a);
+
+            THEN("The result compares equal") {
+                // we need to use this equality as NaNs do not compare equal otherwise
+                REQUIRE(bitwise_equality(a,b));
             }
         }
     }
