@@ -326,7 +326,7 @@ negate(const normalized_float<E, M, WordType>& x)
 }
 
 /**
- * @brief Copiest he floating-point number
+ * @brief Copies the floating-point number
  *
  * Quoting the standard: "copies a floating-point operand x to a destination in the same format,
  * with no change to the sign bit."
@@ -347,6 +347,31 @@ template <size_t E, size_t M, typename WordType = uint64_t>
 copy(const normalized_float<E, M, WordType>& x)
 {
     normalized_float<E, M, WordType> copied{x};
+
+    return copied;
+}
+
+/**
+ * @brief Copies a floating-point number using the sign of another number
+ *
+ * Quoting the standard: "copies a floating-point operand x to a destination in the same format as
+ * x, but with the sign bit of y."
+ *
+ * @note This method ignores NaN values in the sense that they are also copied not signalling any
+ * error.
+ *
+ * @tparam E Width of exponent
+ * @tparam M Width of mantissa
+ * @tparam WordType The word type used to internally store the data
+ * @return The copied value
+ */
+template <size_t E, size_t M, typename WordType = uint64_t>
+[[nodiscard]] constexpr normalized_float<E, M, WordType>
+copySign(const normalized_float<E, M, WordType>& x, const normalized_float<E, M, WordType>& y)
+{
+    normalized_float<E, M, WordType> copied{x};
+
+    copied.set_sign(y.get_sign());
 
     return copied;
 }
