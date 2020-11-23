@@ -509,6 +509,28 @@ public:
         return exponent.is_zero() && mantissa.is_zero();
     }
 
+    /**
+     * @brief Checks whether the floating point number is positive zero
+     *
+     *
+     * @return True iff the floating point is positive zero
+     */
+    [[nodiscard]] constexpr bool is_pos_zero() const
+    {
+        return !sign_neg && exponent.is_zero() && mantissa.is_zero();
+    }
+
+    /**
+     * @brief Checks whether the floating point number is negative zero
+     *
+     *
+     * @return True iff the floating point is negative zero
+     */
+    [[nodiscard]] constexpr bool is_neg_zero() const
+    {
+        return sign_neg && exponent.is_zero() && mantissa.is_zero();
+    }
+
     void set_exponent(const uinteger<E, WordType>& set_to)
     {
         exponent = set_to;
