@@ -348,6 +348,11 @@ public:
         return small_denorm;
     }
 
+    /**
+     * @brief Creates a quiet NaN value
+     * @param payload The payload to store in the NaN
+     * @return The bit representation of the quiet NaN containing the payload
+     */
     [[nodiscard]] static constexpr normalized_float qNaN(const IntegerFrac& payload = IntegerFrac::msb_one())
     {
         IntegerFrac payload_{payload};
@@ -355,7 +360,12 @@ public:
         return normalized_float(false, IntegerExp::all_ones(), IntegerMant{payload_});
     }
 
-    [[nodiscard]] static constexpr normalized_float sNaN(const IntegerFrac& payload = IntegerFrac::msb_one())
+    /**
+     * @brief Creates a signalling NaN value
+     * @param payload The payload to store in the NaN (must not be zero)
+     * @return The bit representation of the signalling NaN containing the payload
+     */
+    [[nodiscard]] static constexpr normalized_float sNaN(const IntegerFrac& payload = IntegerFrac::one())
     {
 
         IntegerFrac payload_{payload};
@@ -441,7 +451,7 @@ public:
     }
 
     /**
-     * @brief Checks whether the floating point number is not a number
+     * @brief Checks whether the floating point number is NaN (not a number)
      *
      * @note There is no distinction between signalling and non-signalling NaN
      *
@@ -450,9 +460,31 @@ public:
     [[nodiscard]] constexpr bool is_nan() const
     {
         const bool exp_ones = exponent == IntegerExp ::all_ones();
-        constexpr auto zero = uinteger<M>::zero();
-        const bool mant_zero = get_mantissa() != zero;
-        return exp_ones && mant_zero;
+        const bool mant_zero = get_mantissa() == uinteger<M>::zero();
+        return exp_ones && !mant_zero;
+    }
+
+
+    /**
+     * @brief Checks if the number is a quiet NaN
+     * @return True iff the number is a quiet NaN
+     */
+    constexpr bool is_qNaN() const {
+        const bool exp_all_ones = exponent == IntegerExp ::all_ones();
+        const bool first_bit_set = width_cast<M>(mantissa).msb();
+        return exp_all_ones && first_bit_set;
+    }
+
+    /**
+ * @brief Checks if the number is a signalling NaN
+ * @return True iff the number is a signalling NaN
+ */
+    constexpr bool is_sNaN() const {
+        const bool exp_all_ones = exponent == IntegerExp ::all_ones();
+        const auto fraction = width_cast<M>(mantissa);
+        const bool first_bit_unset = !fraction.msb();
+        const bool not_zero = fraction != IntegerFrac::zero();
+        return exp_all_ones && first_bit_unset && not_zero;
     }
 
     [[nodiscard]] constexpr auto unbiased_exponent() const -> integer<E + 1, WordType>
