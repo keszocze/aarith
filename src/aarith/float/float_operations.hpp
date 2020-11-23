@@ -12,7 +12,7 @@ namespace aarith {
  * @param rhs The second number that is to be summed up
  * @param bits The number of most-significant bits that are calculated of the mantissa addition
  * @tparam E Width of exponent
- * @tparam M Width of mantissa including the leading 1
+ * @tparam M Width of mantissa
  *
  * @return The sum
  *
@@ -81,7 +81,8 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
     const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
     const auto mantissa_sum = fun_sub(lhs.get_full_mantissa(), new_mantissa);
 
-    normalized_float<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(), mantissa_sum);
+    normalized_float<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(),
+                                                      mantissa_sum);
 
     return normalize<E, mantissa_sum.width() - 1, M>(sum);
 }
@@ -192,8 +193,10 @@ template <size_t E, size_t M, typename WordType>
     // compute sign
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
-    if (lhs.is_inf() || rhs.is_inf()) {
-        return sign ? normalized_float<E,M>::neg_infinity() : normalized_float<E,M>::pos_infinity();
+    if (lhs.is_inf() || rhs.is_inf())
+    {
+        return sign ? normalized_float<E, M>::neg_infinity()
+                    : normalized_float<E, M>::pos_infinity();
     }
 
     // compute exponent
@@ -243,7 +246,7 @@ template <size_t E, size_t M, typename WordType>
  * @param rhs The divisor
  * @tparam E Width of exponent
  * @tparam M Width of mantissa including the leading 1
- *
+ * @tparam WordType The word type used to internally store the data
  * @return The quotient lhs/rhs
  *
  */
@@ -295,6 +298,31 @@ template <size_t E, size_t M, typename WordType>
     normalized_float<E, mquotient.width() - 1> quotient(sign, esum, mquotient);
 
     return normalize<E, mquotient.width() - 1, M>(quotient);
+}
+
+/**
+ * @brief Computes the negative value of the floating point number
+ *
+ * Quoting the standard: "copies a floating-point operand x to a destination in the same format,
+ * reversing the sign bit. negate(x) is not the same as subtraction(0, x)"
+ *
+ * @note This method ignores NaN values in the sense that they are also copied and the sign bit
+ * flipped.
+ *
+ * @tparam E Width of exponent
+ * @tparam M Width of mantissa
+ * @tparam WordType The word type used to internally store the data
+ * @return The negated value of the provided number
+ */
+template <size_t E, size_t M, typename WordType = uint64_t>
+[[nodiscard]] constexpr normalized_float<E, M, WordType>
+negate(const normalized_float<E, M, WordType>& x)
+{
+    normalized_float<E, M, WordType> negated{x};
+
+    negated.set_sign(!x.get_sign());
+
+    return negated;
 }
 
 /**
