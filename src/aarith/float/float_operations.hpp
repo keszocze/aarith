@@ -81,7 +81,8 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
     const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
     const auto mantissa_sum = fun_sub(lhs.get_full_mantissa(), new_mantissa);
 
-    normalized_float<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(), mantissa_sum);
+    normalized_float<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(),
+                                                      mantissa_sum);
 
     return normalize<E, mantissa_sum.width() - 1, M>(sum);
 }
@@ -192,8 +193,10 @@ template <size_t E, size_t M, typename WordType>
     // compute sign
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
-    if (lhs.is_inf() || rhs.is_inf()) {
-        return sign ? normalized_float<E,M>::neg_infinity() : normalized_float<E,M>::pos_infinity();
+    if (lhs.is_inf() || rhs.is_inf())
+    {
+        return sign ? normalized_float<E, M>::neg_infinity()
+                    : normalized_float<E, M>::pos_infinity();
     }
 
     // compute exponent

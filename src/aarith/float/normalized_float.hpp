@@ -3,11 +3,11 @@
 #include <aarith/core.hpp>
 #include <aarith/float/float_utils.hpp>
 #include <aarith/integer_no_operators.hpp>
+#include <assert.h>
 #include <cstdint>
 #include <iostream>
 #include <string>
 #include <time.h>
-#include <assert.h>
 #include <type_traits>
 
 namespace aarith {
@@ -353,7 +353,8 @@ public:
      * @param payload The payload to store in the NaN
      * @return The bit representation of the quiet NaN containing the payload
      */
-    [[nodiscard]] static constexpr normalized_float qNaN(const IntegerFrac& payload = IntegerFrac::msb_one())
+    [[nodiscard]] static constexpr normalized_float
+    qNaN(const IntegerFrac& payload = IntegerFrac::msb_one())
     {
         IntegerFrac payload_{payload};
         payload_.set_msb(true);
@@ -365,7 +366,8 @@ public:
      * @param payload The payload to store in the NaN (must not be zero)
      * @return The bit representation of the signalling NaN containing the payload
      */
-    [[nodiscard]] static constexpr normalized_float sNaN(const IntegerFrac& payload = IntegerFrac::one())
+    [[nodiscard]] static constexpr normalized_float
+    sNaN(const IntegerFrac& payload = IntegerFrac::one())
     {
 
         IntegerFrac payload_{payload};
@@ -382,8 +384,6 @@ public:
     {
         return qNaN();
     }
-
-
 
     static constexpr auto exponent_width() -> size_t
     {
@@ -464,22 +464,23 @@ public:
         return exp_ones && !mant_zero;
     }
 
-
     /**
      * @brief Checks if the number is a quiet NaN
      * @return True iff the number is a quiet NaN
      */
-    constexpr bool is_qNaN() const {
+    constexpr bool is_qNaN() const
+    {
         const bool exp_all_ones = exponent == IntegerExp ::all_ones();
         const bool first_bit_set = width_cast<M>(mantissa).msb();
         return exp_all_ones && first_bit_set;
     }
 
     /**
- * @brief Checks if the number is a signalling NaN
- * @return True iff the number is a signalling NaN
- */
-    constexpr bool is_sNaN() const {
+     * @brief Checks if the number is a signalling NaN
+     * @return True iff the number is a signalling NaN
+     */
+    constexpr bool is_sNaN() const
+    {
         const bool exp_all_ones = exponent == IntegerExp ::all_ones();
         const auto fraction = width_cast<M>(mantissa);
         const bool first_bit_unset = !fraction.msb();

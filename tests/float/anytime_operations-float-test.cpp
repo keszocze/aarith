@@ -31,7 +31,9 @@ TEMPLATE_TEST_CASE_SIG("Anytime addition", "[normalized_float][arithmetic][const
                 if (!equal_except_rounding(res, res_exact))
                 {
                     F res_dbg = anytime_add(a, b, M + 1);
-                    if (equal_except_rounding(res_dbg, res_exact)){}
+                    if (equal_except_rounding(res_dbg, res_exact))
+                    {
+                    }
                     std::cout << to_binary(a) << " +\n" << to_binary(b) << "\n";
                     std::cout << to_binary(res) << " (anytime)\n";
                     std::cout << to_binary(res_exact) << " (exact)\n";
@@ -49,7 +51,9 @@ TEMPLATE_TEST_CASE_SIG("Anytime addition", "[normalized_float][arithmetic][const
                 if (!equal_except_rounding(res, res_exact))
                 {
                     F res_dbg = anytime_sub(a, b, M + 1);
-                    if (equal_except_rounding(res_dbg, res_exact)){}
+                    if (equal_except_rounding(res_dbg, res_exact))
+                    {
+                    }
                     std::cout << to_binary(a) << " -\n" << to_binary(b) << "\n";
                     std::cout << to_binary(res) << " (anytime)\n";
                     std::cout << to_binary(res_exact) << " (exact)\n";
@@ -67,7 +71,9 @@ TEMPLATE_TEST_CASE_SIG("Anytime addition", "[normalized_float][arithmetic][const
                 if (!equal_except_rounding(res, res_exact))
                 {
                     F res_dbg = anytime_mul(a, b, M + 1);
-                    if (equal_except_rounding(res_dbg, res_exact)){}
+                    if (equal_except_rounding(res_dbg, res_exact))
+                    {
+                    }
                     std::cout << to_binary(a) << " *\n" << to_binary(b) << "\n";
                     std::cout << to_binary(res) << " (anytime)\n";
                     std::cout << to_binary(res_exact) << " (exact)\n";
@@ -85,7 +91,9 @@ TEMPLATE_TEST_CASE_SIG("Anytime addition", "[normalized_float][arithmetic][const
                 if (!equal_except_rounding(res, res_exact))
                 {
                     F res_dbg = anytime_div(a, b, M + 1);
-                    if (equal_except_rounding(res_dbg, res_exact)){}
+                    if (equal_except_rounding(res_dbg, res_exact))
+                    {
+                    }
                     std::cout << to_binary(a) << " /\n" << to_binary(b) << "\n";
                     std::cout << to_binary(res) << " (anytime)\n";
                     std::cout << to_binary(res_exact) << " (exact)\n";
