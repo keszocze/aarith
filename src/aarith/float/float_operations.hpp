@@ -376,5 +376,11 @@ auto operator/(const normalized_float<E, M, WordType>& lhs,
     return div(lhs, rhs);
 }
 
+template <size_t E, size_t M, typename WordType>
+auto operator-(const normalized_float<E, M, WordType>& x) -> normalized_float<E, M, WordType>
+{
+    return negate(x);
+}
+
 } // namespace float_operators
 } // namespace aarith
