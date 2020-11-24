@@ -27,6 +27,7 @@ add_aarith_test(float-operations FILES float/exact_operations-float-test.cpp)
 add_aarith_test(float-anytime-operations FILES float/anytime_operations-float-test.cpp)
 add_aarith_test(float FILES float/float-test.cpp)
 add_aarith_test(float-casts FILES float/float_casts.cpp)
+add_aarith_test(float-string_utils FILES float/string_utils.cpp)
 add_aarith_test(float-comparison FILES float/float_comparisons.cpp)
 add_aarith_test(float-random-generation FILES float/float-random-generation-test.cpp)
 
