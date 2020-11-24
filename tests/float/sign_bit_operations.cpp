@@ -24,7 +24,7 @@ TEMPLATE_TEST_CASE_SIG("Negation works as intended",
     GIVEN("A random floating-point number")
     {
 
-        F a = GENERATE(take(15, random_float<E, M, FloatGenerationModes::FullyRandom>()));
+        F a = GENERATE(take(100, random_float<E, M, FloatGenerationModes::FullyRandom>()));
 
         WHEN("Negating the number")
         {
@@ -49,7 +49,7 @@ TEMPLATE_TEST_CASE_SIG("Copying a floating-point number works",
     GIVEN("A random floating-point number")
     {
 
-        F a = GENERATE(take(15, random_float<E, M, FloatGenerationModes::FullyRandom>()));
+        F a = GENERATE(take(100, random_float<E, M, FloatGenerationModes::FullyRandom>()));
 
         WHEN("Copying the number")
         {
@@ -73,8 +73,8 @@ TEMPLATE_TEST_CASE_SIG("Copying a floating-point number with the sign of another
     GIVEN("A random floating-point number")
     {
 
-        F a = GENERATE(take(15, random_float<E, M, FloatGenerationModes::FullyRandom>()));
-        F b = GENERATE(take(15, random_float<E, M, FloatGenerationModes::FullyRandom>()));
+        F a = GENERATE(take(100, random_float<E, M, FloatGenerationModes::FullyRandom>()));
+        F b = GENERATE(take(100, random_float<E, M, FloatGenerationModes::FullyRandom>()));
 
         WHEN("Copying the number with the sign of another number")
         {
@@ -83,7 +83,10 @@ TEMPLATE_TEST_CASE_SIG("Copying a floating-point number with the sign of another
             THEN("The result compares equal")
             {
                 REQUIRE(c.get_sign() == b.get_sign());
-                REQUIRE(abs(c) == abs(a));
+                if(!a.is_nan())
+                {
+                    REQUIRE(abs(c) == abs(a));
+                }
             }
         }
     }
