@@ -57,6 +57,9 @@ bool totalOrder(const normalized_float<E, M, WordType>& x,
         {
             return true;
         }
+        if (x.is_positive() && y.is_negative()) {
+            return false;
+        }
 
         // ii) signaling orders below quiet for +NaN, reverse for −NaN
         if (x.is_positive() && y.is_positive())
@@ -117,7 +120,7 @@ bool totalOrder(const normalized_float<E, M, WordType>& x,
         // ii) otherwise,
         // totalOrder(x, y) is true if and only if the exponent of x ≤ the exponent of y.
 
-        return false;
+        return true;
     }
 
     // This *should* be unreachable code as all cases as shown in the stanard document have been

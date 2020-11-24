@@ -19,7 +19,7 @@ TEMPLATE_TEST_CASE_SIG("Total ordering +/- zero",
         constexpr F neg_zero{F::neg_zero()};
 
         THEN("The cordering behaves as defined in the standard") {
-            constexpr bool v = totalOrder(neg_zero,pos_zero);
+            const bool v = totalOrder(neg_zero,pos_zero);
             REQUIRE(v);
         }
     }
@@ -40,9 +40,6 @@ TEMPLATE_TEST_CASE_SIG("Total ordering with itself",
             WHEN("ordering the number with itself") {
                 THEN("The result should be true") {
                     const bool b = totalOrder(x,x);
-                    if (!b) {
-                        std::cout << x << "\t" << to_binary(x) << "\n";
-                    }
                     REQUIRE(totalOrder(x,x));
                 }
             }
