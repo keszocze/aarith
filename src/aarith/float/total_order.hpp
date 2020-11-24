@@ -123,7 +123,7 @@ bool constexpr totalOrder(const normalized_float<E, M, WordType>& x,
         return true;
     }
 
-    // This *should* be unreachable code as all cases as shown in the stanard document have been
+    // This *should* be unreachable code as all cases as shown in the standard document have been
     // taken care of. Returning false seems to be a reasonable thing to do.
     return false;
 }
