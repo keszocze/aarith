@@ -58,11 +58,13 @@ template <typename Integer> class integer_range
                 {
                     const I curr = *current;
                     const I stride = range.stride_;
-                    const I dist = sub(range.end_, curr);
+                    const I new_val = add(curr, stride);
 
-                    if (dist >= stride)
+                    const bool no_overflow = new_val > curr;
+                    const bool far_enough_away = new_val <= range.end_;
+                    if (no_overflow && far_enough_away)
                     {
-                        current = add(curr, stride);
+                        current = new_val;
                     }
                     else
                     {
@@ -80,11 +82,13 @@ template <typename Integer> class integer_range
                 {
                     const I curr = *current;
                     const I stride = range.stride_;
-                    const I dist = sub(curr, range.start_);
+                    const I new_val = sub(curr, stride);
 
-                    if (dist >= stride)
+                    const bool no_underflow = new_val < curr;
+                    const bool far_enough_away = new_val >= range.start_;
+                    if (no_underflow && far_enough_away)
                     {
-                        current = sub(curr, stride);
+                        current = new_val;
                     }
                     else
                     {
@@ -109,7 +113,7 @@ template <typename Integer> class integer_range
     };
 
 public:
-    integer_range(const Integer start, const Integer end, const Integer stride = Integer::one())
+    integer_range(const Integer start=Integer::min(), const Integer end=Integer::max(), const Integer stride = Integer::one())
         : start_(start)
         , end_(end)
         , stride_(stride)

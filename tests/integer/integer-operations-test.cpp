@@ -855,7 +855,7 @@ TEMPLATE_TEST_CASE_SIG("Invariants for the signed integer division",
                 if (a != I::max())
                 {
                     const I c = add(a, I::one());
-                    if (c != I::zero() && c != I::one())
+                    if (c != I::zero() && c != I::one() && c != -I::one())
                     {
                         if (c.is_negative())
                         {
