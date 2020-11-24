@@ -532,12 +532,12 @@ public:
         exponent = set_to;
     }
 
-    auto get_full_mantissa() const -> uinteger<MW, WordType>
+    auto constexpr get_full_mantissa() const -> uinteger<MW, WordType>
     {
         return mantissa;
     }
 
-    auto get_mantissa() const -> uinteger<M, WordType>
+    auto constexpr get_mantissa() const -> uinteger<M, WordType>
     {
         return width_cast<M>(mantissa);
     }

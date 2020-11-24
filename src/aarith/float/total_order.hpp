@@ -18,7 +18,7 @@ namespace aarith {
  * @return true iff x < y
  */
 template <size_t E, size_t M, typename WordType>
-bool totalOrder(const normalized_float<E, M, WordType>& x,
+bool constexpr totalOrder(const normalized_float<E, M, WordType>& x,
                 const normalized_float<E, M, WordType>& y)
 {
 
