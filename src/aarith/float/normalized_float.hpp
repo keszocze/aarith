@@ -929,4 +929,36 @@ template <class uint> auto find_leading_one(const uint mantissa) -> typename uin
     return one_at;
 }
 
+// ironically, defining the functions below makes the implementation conform more to the standard
+
+/**
+ * @brief Indicates whether this floating-point implementation conforms to the IEEE 754 (1985)
+ * standard
+ * @return false
+ */
+constexpr bool is754version1985()
+{
+    return false;
+}
+
+/**
+ * @brief Indicates whether this floating-point implementation conforms to the IEEE 754 (2008)
+ * standard
+ * @return false
+ */
+constexpr bool is754version2008()
+{
+    return false;
+}
+
+/**
+ * @brief Indicates whether this floating-point implementation conforms to the IEEE 754 (2019)
+ * standard
+ * @return false
+ */
+constexpr bool is754version2019()
+{
+    return false;
+}
+
 } // namespace aarith
