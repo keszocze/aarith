@@ -41,7 +41,7 @@ compile_clang:
         - CC=clang-9 CXX=clang++-9 cmake ${BUILD_PARAMS} ${MPIR_PARAMS} ../..
         - make -j $(nproc)
 
-run_sonarqube:
+.run_sonarqube:
   extends: .ciconf
   stage: quality
   dependencies:

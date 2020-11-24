@@ -126,15 +126,12 @@ auto to_sci_string(const normalized_float<E, M, WordType> nf) -> std::string
     uint32_t ui_mantissa = (static_cast<uint32_t>(flc_mantissa.word(0)) & 0x7fffff) | 0x3f800000;
     float* mantissa = reinterpret_cast<float*>(&ui_mantissa);
 
-    auto const exponent = sub(nf.get_exponent(), nf.bias);
-
-    const integer<E, WordType> s_exponent(exponent);
-    auto const s_abs_exponent = abs(s_exponent);
-    const uinteger<E, WordType> abs_exponent(s_abs_exponent);
+    const integer<E + 1, WordType> exp{nf.get_exponent()};
+    const integer<E + 1, WordType> bias{nf.bias};
+    const integer<E + 1, WordType> unbiased_exponent = sub(exp, bias);
 
     std::stringstream str;
-    str << ((nf.get_sign() == 1) ? "-" : "") << *mantissa << "E"
-        << (exponent.bit(E - 1) == 1 ? "-" : "") << to_decimal(abs_exponent);
+    str << ((nf.get_sign() == 1) ? "-" : "") << *mantissa << "E" << unbiased_exponent;
 
     return str.str();
 }
