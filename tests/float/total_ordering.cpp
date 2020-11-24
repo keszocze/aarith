@@ -1,34 +1,31 @@
+#include "../test-signature-ranges.hpp"
 #include "gen_float.hpp"
 #include <aarith/float.hpp>
 #include <bitset>
 #include <catch.hpp>
 using namespace aarith;
 
-
-
-TEMPLATE_TEST_CASE_SIG("Total ordering +/- zero",
-                       "[normalized_float][comparison][utility]",
-                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
-                       (11, 52, double))
+TEMPLATE_TEST_CASE_SIG("Total ordering +/- zero", "[normalized_float][comparison][utility]",
+                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
 {
     using F = normalized_float<E, M>;
 
-    GIVEN("+/- zero") {
+    GIVEN("+/- zero")
+    {
 
         constexpr F pos_zero{F::zero()};
         constexpr F neg_zero{F::neg_zero()};
 
-        THEN("The cordering behaves as defined in the standard") {
-            constexpr bool v = totalOrder(neg_zero,pos_zero);
+        THEN("The cordering behaves as defined in the standard")
+        {
+            constexpr bool v = totalOrder(neg_zero, pos_zero);
             REQUIRE(v);
         }
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("Total ordering with itself",
-                       "[normalized_float][comparison][utility]",
-                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
-                       (11, 52, double))
+TEMPLATE_TEST_CASE_SIG("Total ordering with itself", "[normalized_float][comparison][utility]",
+                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
 {
     using F = normalized_float<E, M>;
 
@@ -36,10 +33,13 @@ TEMPLATE_TEST_CASE_SIG("Total ordering with itself",
     {
         F x = GENERATE(take(100, random_float<E, M, FloatGenerationModes::FullyRandom>()));
 
-        if (!x.is_nan()) {
-            WHEN("ordering the number with itself") {
-                THEN("The result should be true") {
-                    const bool b = totalOrder(x,x);
+        if (!x.is_nan())
+        {
+            WHEN("ordering the number with itself")
+            {
+                THEN("The result should be true")
+                {
+                    const bool b = totalOrder(x, x);
                     REQUIRE(b);
                 }
             }
@@ -48,9 +48,8 @@ TEMPLATE_TEST_CASE_SIG("Total ordering with itself",
 }
 
 TEMPLATE_TEST_CASE_SIG("Total ordering with a single NaN value",
-                       "[normalized_float][comparison][utility]",
-                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
-                       (11, 52, double))
+                       "[normalized_float][comparison][utility]", AARITH_FLOAT_TEST_SIGNATURE,
+                       AARIHT_FLOAT_TEMPLATE_RANGE)
 {
     using F = normalized_float<E, M>;
     constexpr F pqNaN = F::qNaN();
@@ -138,9 +137,8 @@ TEMPLATE_TEST_CASE_SIG("Total ordering with a single NaN value",
 }
 
 TEMPLATE_TEST_CASE_SIG("Total ordering with a two NaN values",
-                       "[normalized_float][comparison][utility]",
-                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
-                       (11, 52, double))
+                       "[normalized_float][comparison][utility]", AARITH_FLOAT_TEST_SIGNATURE,
+                       AARIHT_FLOAT_TEMPLATE_RANGE)
 {
     using F = normalized_float<E, M>;
     constexpr F pqNaN = F::qNaN();
