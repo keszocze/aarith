@@ -395,10 +395,6 @@ public:
         return M;
     }
 
-    /**
-     * @warn The absolute value of the
-     * @return
-     */
     [[nodiscard]] static constexpr integer<E + 1, WordType> denorm_exponent()
     {
         const integer<E + 1, WordType> b{bias};
@@ -760,6 +756,20 @@ auto equal_except_rounding(const normalized_float<E, M1, WordType> lhs,
     return false;
 }
 
+/**
+ * @brief Computes the asbolute value of the floating point number
+ *
+ * Quoting the standard: "copies a floating-point operand x to a destination in the same format,
+ * setting the sign bit to 0 (positive)"
+ *
+ * @note This method ignores NaN values in the sense that they are also copied and the sign bit set
+ * to zero.
+ *
+ * @tparam E Width of exponent
+ * @tparam M Width of mantissa
+ * @tparam WordType The word type used to internally store the data
+ * @return The absolute value of the provided number
+ */
 template <size_t E, size_t M, typename WordType = uint64_t>
 auto constexpr abs(const normalized_float<E, M, WordType> nf) -> normalized_float<E, M, WordType>
 {

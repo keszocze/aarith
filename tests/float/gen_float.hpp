@@ -1,6 +1,6 @@
 #pragma once
 
-#include <aarith/integer.hpp>
+#include <aarith/float.hpp>
 #include <catch.hpp>
 
 namespace aarith {
@@ -36,9 +36,9 @@ private:
     F current_number;
 };
 
-template <size_t E, size_t M, FloatGenerationModes Mode = FloatGenerationModes::DenormalizedOnly,
+template <size_t E, size_t M, FloatGenerationModes Mode = FloatGenerationModes::NonSpecial,
           typename WordType = uint64_t>
-auto random_integer() -> Catch::Generators::GeneratorWrapper<normalized_float<E, M, WordType>>
+auto random_float() -> Catch::Generators::GeneratorWrapper<normalized_float<E, M, WordType>>
 {
     return Catch::Generators::GeneratorWrapper<normalized_float<E, M, WordType>>(
         std::unique_ptr<Catch::Generators::IGenerator<normalized_float<E, M, WordType>>>(
