@@ -59,6 +59,35 @@ template <> struct bit_cast_to_type_trait<double>
 
 } // namespace float_extraction_helper
 
+struct float_disassembly
+{
+    uint64_t exponent;
+    uint64_t mantissa;
+    bool is_neg;
+};
+
+template <typename F,
+          typename = std::enable_if_t<std::is_floating_point<F>::value>>
+inline auto disassemble_float(F num)
+-> float_disassembly
+{
+    constexpr auto exponent_width = get_exponent_width<F>();
+    constexpr auto mantissa_width = get_mantissa_width<F>();
+
+    using int_type = typename float_extraction_helper::bit_cast_to_type_trait<F>::type;
+
+    const int_type inum = bit_cast<int_type, F>(num);
+    constexpr int_type one(1U);
+
+    const auto exponent = (inum >> mantissa_width) & ((one << exponent_width) - one);
+    const auto mantissa = (inum & ((one << mantissa_width) - one)) | (one << mantissa_width);
+    const auto sign = (inum >> (mantissa_width + exponent_width));
+    
+    const struct float_disassembly fd {exponent, mantissa, sign > 0};
+
+    return fd;
+}
+
 template <typename F, typename WordType,
           typename = std::enable_if_t<std::is_floating_point<F>::value>>
 inline constexpr auto extract_exponent(F num)
