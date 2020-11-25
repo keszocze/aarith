@@ -170,17 +170,19 @@ auto to_sci_string(const normalized_float<E, M, WordType> nf) -> std::string
         return str.str();
     }
 
-    // now that the NaNs are gone, the minus can safely be added
-    // TODO Marcel please check this.
+    if (nf.is_negative())
+    {
+        str << "-";
+    }
 
     if (nf.is_zero())
     {
-        str << ((nf.is_negative()) ? "-" : "") << "0";
+        str << "0";
         return str.str();
     }
     if (nf.is_inf())
     {
-        str << ((nf.is_negative()) ? "-" : "") << "inf";
+        str << "inf";
         return str.str();
     }
 
@@ -226,7 +228,7 @@ auto to_sci_string(const normalized_float<E, M, WordType> nf) -> std::string
             conv.dec_exponent -= 1;
         }
     }
-    str << ((nf.get_sign() == 1) ? "-" : "") << *mantissa;
+    str << *mantissa;
     if (conv.dec_exponent != 0)
     {
         str << "e" << (conv.neg_exponent ? "-" : "+") << conv.dec_exponent;
