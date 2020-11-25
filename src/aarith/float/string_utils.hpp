@@ -137,7 +137,7 @@ auto compute_nearest_exponent10(const normalized_float<E, M, WordType>& nf)
         is_neg = true;
     }
 
-    auto constexpr convert_2exp = log10(2.);
+    auto const convert_2exp = log10(2.);
     auto decimal_exponent = static_cast<double>(exponent);
     decimal_exponent *= convert_2exp;
 
