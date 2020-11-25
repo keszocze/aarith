@@ -171,7 +171,7 @@ auto to_sci_string(const normalized_float<E, M, WordType> nf) -> std::string
     }
     if(nf.is_inf())
     {
-        str << ((nf.is_negative()) ? "-" : "") << "INF";
+        str << ((nf.is_negative()) ? "-" : "") << "inf";
         return str.str();
     }
     if(nf.is_nan())
@@ -195,6 +195,7 @@ auto to_sci_string(const normalized_float<E, M, WordType> nf) -> std::string
         flc_mantissa = (flc_mantissa << shift_mantissa);
     }
     //construct a float with the given mantissa and an exponent of 0
+    //to leech on float's inherent decimal output
     uint32_t ui_mantissa = (static_cast<uint32_t>(flc_mantissa.word(0)) & 0x7fffff) | 0x3f800000;
     float* mantissa = reinterpret_cast<float*>(&ui_mantissa);
     auto conv = compute_nearest_exponent10(nf);
@@ -202,7 +203,6 @@ auto to_sci_string(const normalized_float<E, M, WordType> nf) -> std::string
 
     const integer<E + 1, WordType> exp{nf.get_exponent()};
     const integer<E + 1, WordType> bias{nf.bias};
-    //const integer<E + 1, WordType> unbiased_exponent = sub(exp, bias);
 
     if(conv.not_supported)
     {
@@ -210,10 +210,22 @@ auto to_sci_string(const normalized_float<E, M, WordType> nf) -> std::string
         return str.str();
     }
 
+    if(*mantissa <= 1.f && conv.dec_exponent != 0)
+    {
+        *mantissa *= 10.f;
+        if(conv.neg_exponent)
+        {
+            conv.dec_exponent += 1;
+        }
+        else
+        {
+            conv.dec_exponent -= 1;
+        }
+    }
     str << ((nf.get_sign() == 1) ? "-" : "") << *mantissa;
     if (conv.dec_exponent != 0)
     {
-        str << "E" << (conv.neg_exponent?"-":"") << conv.dec_exponent;
+        str << "e" << (conv.neg_exponent?"-":"+") << conv.dec_exponent;
     }
 
     return str.str();
