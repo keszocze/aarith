@@ -111,10 +111,19 @@ public:
     static constexpr size_t MW = M + 1;
 
     using IntegerExp = uinteger<E, WordType>;
+    using IntegerUnbiasedExp = integer<E + 1, WordType>;
     using IntegerMant = uinteger<MW, WordType>;
     using IntegerFrac = uinteger<M, WordType>;
 
     static constexpr IntegerExp bias = uinteger<E - 1, WordType>::all_ones();
+    static constexpr IntegerUnbiasedExp max_exp = uinteger<E - 1, WordType>::all_ones();
+    static constexpr IntegerUnbiasedExp min_exp = []() {
+        const IntegerExp bias_ = uinteger<E - 1, WordType>::all_ones();
+        IntegerUnbiasedExp min_exp_{bias_};
+        IntegerUnbiasedExp one = IntegerUnbiasedExp::one();
+        min_exp_ = negate(sub(min_exp_, one));
+        return min_exp_;
+    }();
 
     explicit constexpr normalized_float()
         : sign_neg(false)
@@ -435,10 +444,14 @@ public:
 
     [[nodiscard]] constexpr auto unbiased_exponent() const -> integer<E + 1, WordType>
     {
-        const integer<E + 1, WordType> signed_bias{bias};
-        const integer<E + 1, WordType> signed_exponent{get_exponent()};
+        if (!this->is_normalized()) {
+            return min_exp;
+        }
 
-        const integer<E + 1, WordType> real_exponent = sub(signed_exponent, signed_bias);
+        const IntegerUnbiasedExp signed_bias{bias};
+        const IntegerUnbiasedExp signed_exponent{get_exponent()};
+
+        const IntegerUnbiasedExp real_exponent = sub(signed_exponent, signed_bias);
         return real_exponent;
     }
 
