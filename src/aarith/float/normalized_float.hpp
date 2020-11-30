@@ -342,7 +342,8 @@ public:
      */
     [[nodiscard]] static constexpr normalized_float smallest_denormalized()
     {
-        constexpr normalized_float small_denorm(false, IntegerExp::all_zeroes(), IntegerMant::one());
+        constexpr normalized_float small_denorm(false, IntegerExp::all_zeroes(),
+                                                IntegerMant::one());
         return small_denorm;
     }
 
@@ -365,10 +366,6 @@ public:
         return M;
     }
 
-    /**
-     * @warn The absolute value of the
-     * @return
-     */
     [[nodiscard]] static constexpr integer<E + 1, WordType> denorm_exponent()
     {
 
@@ -566,7 +563,7 @@ private:
      * @tparam To Either float or double
      * @return Float/Double representation of the number
      */
-    template <typename To>[[nodiscard]] constexpr To generic_cast() const
+    template <typename To> [[nodiscard]] constexpr To generic_cast() const
     {
 
         static_assert(std::is_floating_point<To>(), "Can only convert to float or double.");
@@ -687,6 +684,20 @@ auto equal_except_rounding(const normalized_float<E, M1, WordType> lhs,
     return false;
 }
 
+/**
+ * @brief Computes the asbolute value of the floating point number
+ *
+ * Quoting the standard: "copies a floating-point operand x to a destination in the same format,
+ * setting the sign bit to 0 (positive)"
+ *
+ * @note This method ignores NaN values in the sense that they are also copied and the sign bit set
+ * to zero.
+ *
+ * @tparam E Width of exponent
+ * @tparam M Width of mantissa
+ * @tparam WordType The word type used to internally store the data
+ * @return The absolute value of the provided number
+ */
 template <size_t E, size_t M, typename WordType = uint64_t>
 auto constexpr abs(const normalized_float<E, M, WordType> nf) -> normalized_float<E, M, WordType>
 {

@@ -28,6 +28,8 @@ add_aarith_test(float-anytime-operations FILES float/anytime_operations-float-te
 add_aarith_test(float FILES float/float-test.cpp)
 add_aarith_test(float-casts FILES float/float_casts.cpp)
 add_aarith_test(float-comparison FILES float/float_comparisons.cpp)
+add_aarith_test(float-sign_bit_operations FILES float/sign_bit_operations.cpp)
+add_aarith_test(float-random-generation FILES float/float-random-generation-test.cpp)
 
 add_aarith_test(fau-adder FILES uint-approx-test.cpp)
 

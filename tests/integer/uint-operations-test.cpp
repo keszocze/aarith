@@ -1032,8 +1032,10 @@ TEMPLATE_TEST_CASE_SIG("Invariants for the unsigned integer division",
         {
             THEN("The result should be zero")
             {
-                // Adding one is safe as I::max() will not be returned by the generator
-                REQUIRE(div(a, add(a, I::one())) == I::zero());
+                if (a != I::max())
+                {
+                    REQUIRE(div(a, add(a, I::one())) == I::zero());
+                }
             }
         }
         WHEN("Dividing the number by zero")
