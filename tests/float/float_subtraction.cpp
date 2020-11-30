@@ -1,36 +1,25 @@
 #include <aarith/float.hpp>
 
-#include "gen_float.hpp"
 #include "../test-signature-ranges.hpp"
+#include "gen_float.hpp"
+#include <aarith/core/bit_cast.hpp>
 
 #include <bitset>
 #include <catch.hpp>
 
-
 using namespace aarith;
-
-template <typename N>
-// it is not really "full range" but at least it works
-auto full_native_range()
-{
-    return Catch::Generators::random<N>(std::numeric_limits<N>::lowest() / 100.0f,
-                                        std::numeric_limits<N>::max() / 100.0f);
-}
-
-
 
 TEMPLATE_TEST_CASE_SIG("Floating point subtraction matches its native counterparts",
                        "[normalized_float][arithmetic][subtraction]",
-                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
-                       (11, 52, double))
+                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float))
 {
 
     using F = normalized_float<E, M>;
 
-    Native a_native = GENERATE(take(15, full_native_range<Native>()));
-    Native b_native = GENERATE(take(15, full_native_range<Native>()));
-    F a{a_native};
-    F b{b_native};
+    F a = GENERATE(take(100, random_float<E, M, FloatGenerationModes::NonSpecial>()));
+    F b = GENERATE(take(100, random_float<E, M, FloatGenerationModes::NonSpecial>()));
+    Native a_native = static_cast<Native>(a);
+    Native b_native = static_cast<Native>(b);
 
     F res = a - b;
     Native res_native = a_native - b_native;
@@ -41,16 +30,24 @@ TEMPLATE_TEST_CASE_SIG("Floating point subtraction matches its native counterpar
     if (!equal_except_rounding(res_native_, res))
     {
         std::cout << "a - b\n"
-                  << to_binary(F(a)) << " - \n"
-                  << to_binary(F(b)) << "\n"
+                  << to_binary(a) << " - \n"
+                  << to_binary(b) << "\n"
                   << to_binary(res) << "(normalized_float) !=\n"
-                  << to_binary(F(res_native_)) << "(float)\n\n";
+                  << to_binary(res_native_) << "(native)\n\n";
+
+        std::cout << a << " - " << b << " = " << res << "\n";
+        std::cout << a_native << " - " << b_native << " = " << res_native << "\n";
+        std::cout << to_binary(F{a_native}) << " - " << to_binary(F{b_native}) << "\n";
+        std::cout << to_binary(a) << " - " << to_binary(b) << "\n";
+
+        std::bitset<32> bs_a = bit_cast<uint32_t>(a_native);
+        std::bitset<32> bs_b = bit_cast<uint32_t>(b_native);
+        std::cout << bs_a << " - " << bs_b << "\n";
     }
 
     CHECK(equal_except_rounding(res_native_, res));
     REQUIRE(equal_except_rounding(F{res_}, F{res_native}));
 }
-
 
 SCENARIO("Subtracting two floating-point numbers (hand picked examples)",
          "[normalized_float][arithmetic][subtraction]")
