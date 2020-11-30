@@ -1,16 +1,73 @@
 #include <aarith/float.hpp>
 #include <aarith/integer.hpp>
+
+#include "../test-signature-ranges.hpp"
+#include "gen_float.hpp"
+
 #include <bitset>
 #include <catch.hpp>
 using namespace aarith;
-
-
-
 
 // TODO (keszocze) make it generic
 SCENARIO("IEEE-754 arithmetic conversion: float, double",
          "[normalized_float][conversion][ieee-754][casting]")
 {
+
+    using F = normalized_float<8, 23>;
+
+    GIVEN("A random number in the native format")
+    {
+        float a = GENERATE(
+            take(50, random(std::numeric_limits<float>::min(), std::numeric_limits<float>::max())));
+
+        WHEN("Creating an aarith floating-point from that number")
+        {
+
+            const F a_cast{a};
+
+            AND_WHEN("Converting back to the native data format")
+            {
+
+                const float a_cast_back = static_cast<float>(a_cast);
+
+                THEN("The number should not have changed")
+                {
+                    REQUIRE(a == a_cast_back);
+                }
+            }
+        }
+    }
+
+    GIVEN("A random number in the aarith format")
+    {
+        F b = GENERATE(take(50, random_float<8, 23, FloatGenerationModes::NonSpecial>()));
+
+        std::cout << to_binary(b, true) << "\n";
+
+        WHEN("Casting the value to the native format")
+        {
+            const float b_cast = static_cast<float>(b);
+
+            AND_WHEN("Calling the aarith floating-point constructor with the cast value")
+            {
+                const F b_cast_back{b_cast};
+                THEN("The number should not have changed")
+                {
+                    if (b != b_cast_back)
+                    {
+                        std::cout << "considered unequal: "
+                                  << "\n";
+                        std::cout << to_binary(b, true) << "\n"
+                                  << to_binary(b_cast_back, true) << "\n";
+                        std::cout << b << "\n" << b_cast_back << "\n";
+                        exit(0);
+                    }
+                    REQUIRE(b == b_cast_back);
+                }
+            }
+        }
+    }
+
     GIVEN("A float number")
     {
         WHEN("The number is 0.")
@@ -54,7 +111,6 @@ SCENARIO("IEEE-754 arithmetic conversion: float, double",
         }
     }
 }
-
 
 TEMPLATE_TEST_CASE_SIG("Casting from and to the native data types should be lossless",
                        "[normalized_float][casting][utility]",
