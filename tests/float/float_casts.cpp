@@ -4,6 +4,58 @@
 #include <catch.hpp>
 using namespace aarith;
 
+
+
+
+// TODO (keszocze) make it generic
+SCENARIO("IEEE-754 arithmetic conversion: float, double",
+         "[normalized_float][conversion][ieee-754][casting]")
+{
+    GIVEN("A float number")
+    {
+        WHEN("The number is 0.")
+        {
+            float a = 0.F;
+
+            THEN("The normalized_float should convert back to the original number.")
+            {
+                REQUIRE(static_cast<float>(normalized_float<8, 23>(a)) == a);
+            }
+        }
+    }
+    GIVEN("A double number")
+    {
+        WHEN("The number is 0.")
+        {
+            double a = 0.;
+
+            THEN("The normalized_float should convert back to the original number.")
+            {
+                REQUIRE(static_cast<double>(normalized_float<11, 52>(a)) == a);
+            }
+        }
+    }
+    GIVEN("A random float number")
+    {
+        float a = GENERATE(take(10, random(float(1.0), std::numeric_limits<float>::max())));
+
+        THEN("The normalized_float should convert back to the original number.")
+        {
+            REQUIRE(static_cast<float>(normalized_float<8, 23>(a)) == a);
+        }
+    }
+    GIVEN("A random double number")
+    {
+        double a = GENERATE(take(10, random(double(1.0), std::numeric_limits<double>::max())));
+
+        THEN("The normalized_float should convert back to the original number.")
+        {
+            REQUIRE(static_cast<double>(normalized_float<11, 52>(a)) == a);
+        }
+    }
+}
+
+
 TEMPLATE_TEST_CASE_SIG("Casting from and to the native data types should be lossless",
                        "[normalized_float][casting][utility]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
