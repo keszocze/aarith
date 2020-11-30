@@ -18,8 +18,8 @@ TEMPLATE_TEST_CASE_SIG("IEEE-754 arithmetic conversion: float, double",
 
     GIVEN("A random number in the native format")
     {
-        Native a = GENERATE(
-            take(50, random(std::numeric_limits<Native>::min(), std::numeric_limits<Native>::max())));
+        Native a = GENERATE(take(
+            50, random(std::numeric_limits<Native>::min(), std::numeric_limits<Native>::max())));
 
         WHEN("Creating an aarith floating-point from that number")
         {
@@ -61,8 +61,8 @@ TEMPLATE_TEST_CASE_SIG("IEEE-754 arithmetic conversion: float, double",
 
 TEMPLATE_TEST_CASE_SIG("Casting from and to the native data types should be lossless",
                        "[normalized_float][casting][utility]",
-                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
-                       (11, 52, double))
+                       AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
+                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
     using F = normalized_float<E, M>;
 
@@ -105,8 +105,8 @@ SCENARIO("Casting to a larger native data type does not change the value",
 
 TEMPLATE_TEST_CASE_SIG("Casting to a larger data type does not change the value",
                        "[normalized_float][casting][utility]",
-                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
-                       (11, 52, float), (11, 52, double))
+                       AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
+                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
     using F = normalized_float<E, M>;
     using G = normalized_float<E + 80, M>;
@@ -145,8 +145,8 @@ TEMPLATE_TEST_CASE_SIG("Casting to a larger data type does not change the value"
 
 TEMPLATE_TEST_CASE_SIG("Infinity and NaNs are created correctly",
                        "[normalized_float][casting][utility]",
-                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
-                       (11, 52, double))
+                       AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
+                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
     using F = normalized_float<E, M>;
 
