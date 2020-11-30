@@ -1,3 +1,5 @@
+set(CMAKE_CXX_CLANG_TIDY "")
+
 
 add_aarith_test(core-functional-style FILES core/functional-style-test.cpp)
 add_aarith_test(core-number-util FILES core/number_utils-test.cpp)
