@@ -6,13 +6,6 @@
 
 using namespace aarith;
 
-template <typename N>
-// it is not really "full range" but at least it works
-auto full_native_range()
-{
-    return Catch::Generators::random<N>(std::numeric_limits<N>::lowest() / 100.0f,
-                                        std::numeric_limits<N>::max() / 100.0f);
-}
 
 TEMPLATE_TEST_CASE_SIG("Negation works as intended",
                        "[normalized_float][negate][sig_bit_operation][invariant]",
