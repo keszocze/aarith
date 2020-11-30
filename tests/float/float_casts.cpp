@@ -8,17 +8,18 @@
 #include <catch.hpp>
 using namespace aarith;
 
-// TODO (keszocze) make it generic
-SCENARIO("IEEE-754 arithmetic conversion: float, double",
-         "[normalized_float][conversion][ieee-754][casting]")
+TEMPLATE_TEST_CASE_SIG("IEEE-754 arithmetic conversion: float, double",
+                       "[normalized_float][conversion][ieee-754][casting]",
+                       AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
+                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
-    using F = normalized_float<8, 23>;
+    using F = normalized_float<E, M>;
 
     GIVEN("A random number in the native format")
     {
-        float a = GENERATE(
-            take(50, random(std::numeric_limits<float>::min(), std::numeric_limits<float>::max())));
+        Native a = GENERATE(
+            take(50, random(std::numeric_limits<Native>::min(), std::numeric_limits<Native>::max())));
 
         WHEN("Creating an aarith floating-point from that number")
         {
@@ -28,7 +29,7 @@ SCENARIO("IEEE-754 arithmetic conversion: float, double",
             AND_WHEN("Converting back to the native data format")
             {
 
-                const float a_cast_back = static_cast<float>(a_cast);
+                const Native a_cast_back = static_cast<Native>(a_cast);
 
                 THEN("The number should not have changed")
                 {
@@ -40,74 +41,20 @@ SCENARIO("IEEE-754 arithmetic conversion: float, double",
 
     GIVEN("A random number in the aarith format")
     {
-        F b = GENERATE(take(50, random_float<8, 23, FloatGenerationModes::NonSpecial>()));
-
-        std::cout << to_binary(b, true) << "\n";
+        F b = GENERATE(take(50, random_float<E, M, FloatGenerationModes::NonSpecial>()));
 
         WHEN("Casting the value to the native format")
         {
-            const float b_cast = static_cast<float>(b);
+            const Native b_cast = static_cast<Native>(b);
 
             AND_WHEN("Calling the aarith floating-point constructor with the cast value")
             {
                 const F b_cast_back{b_cast};
                 THEN("The number should not have changed")
                 {
-                    if (b != b_cast_back)
-                    {
-                        std::cout << "considered unequal: "
-                                  << "\n";
-                        std::cout << to_binary(b, true) << "\n"
-                                  << to_binary(b_cast_back, true) << "\n";
-                        std::cout << b << "\n" << b_cast_back << "\n";
-                        exit(0);
-                    }
                     REQUIRE(b == b_cast_back);
                 }
             }
-        }
-    }
-
-    GIVEN("A float number")
-    {
-        WHEN("The number is 0.")
-        {
-            float a = 0.F;
-
-            THEN("The normalized_float should convert back to the original number.")
-            {
-                REQUIRE(static_cast<float>(normalized_float<8, 23>(a)) == a);
-            }
-        }
-    }
-    GIVEN("A double number")
-    {
-        WHEN("The number is 0.")
-        {
-            double a = 0.;
-
-            THEN("The normalized_float should convert back to the original number.")
-            {
-                REQUIRE(static_cast<double>(normalized_float<11, 52>(a)) == a);
-            }
-        }
-    }
-    GIVEN("A random float number")
-    {
-        float a = GENERATE(take(10, random(float(1.0), std::numeric_limits<float>::max())));
-
-        THEN("The normalized_float should convert back to the original number.")
-        {
-            REQUIRE(static_cast<float>(normalized_float<8, 23>(a)) == a);
-        }
-    }
-    GIVEN("A random double number")
-    {
-        double a = GENERATE(take(10, random(double(1.0), std::numeric_limits<double>::max())));
-
-        THEN("The normalized_float should convert back to the original number.")
-        {
-            REQUIRE(static_cast<double>(normalized_float<11, 52>(a)) == a);
         }
     }
 }
