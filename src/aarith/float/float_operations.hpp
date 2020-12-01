@@ -279,22 +279,47 @@ template <size_t E, size_t M, typename WordType>
                           : normalized_float<E, M>::pos_infinity();
     }
 
+    auto sign = lhs.get_sign() ^ rhs.get_sign();
     auto dividend = width_cast<2 * M + 1>(lhs.get_full_mantissa());
     auto divisor = width_cast<2 * M + 1>(rhs.get_full_mantissa());
     dividend = dividend << M;
     auto mquotient = div(dividend, divisor);
 
-    auto esum = expanding_add(lhs.get_exponent(), lhs.bias);
-    if (esum <= rhs.get_exponent())
+    bool overflow = false;
+    bool underflow = false;
+    auto exponent_tmp = expanding_add(lhs.get_exponent(), lhs.bias);
+    overflow = exponent_tmp.bit(E) == 1;
+    exponent_tmp = sub(exponent_tmp, width_cast<E + 1>(rhs.get_exponent()));
+    auto esum = width_cast<E>(exponent_tmp);
+    overflow &= exponent_tmp.bit(E) == 1;
+    underflow = !overflow && exponent_tmp.bit(E) == 1;
+    
+    // check for over or underflow and break
+    if (underflow || overflow)
     {
-        esum = esum.zero();
-    }
-    else
-    {
-        esum = width_cast<E>(sub(esum, width_cast<E + 1>(rhs.get_exponent())));
+        normalized_float<E, M> quotient;
+        //apparently float div does not produce -0
+        //quotient.set_sign(sign);
+        if (overflow)
+        {
+            quotient.set_exponent(uinteger<E>::all_ones());
+            quotient.set_sign(sign);
+        }
+        else
+        {
+            //shift mantissa of denormal number 
+            exponent_tmp = ~exponent_tmp;
+            exponent_tmp = add(exponent_tmp, uinteger<exponent_tmp.width()>(2));
+            if (exponent_tmp < uinteger<64>(M + 1))
+            {
+                mquotient = mquotient >> exponent_tmp.word(0);
+                quotient.set_full_mantissa(width_cast<M + 1>(mquotient));
+                quotient.set_sign(sign);
+            }
+        }
+        return normalize<E, M, M>(quotient);
     }
 
-    auto sign = lhs.get_sign() ^ rhs.get_sign();
     normalized_float<E, mquotient.width() - 1> quotient(sign, esum, mquotient);
 
     return normalize<E, mquotient.width() - 1, M>(quotient);
