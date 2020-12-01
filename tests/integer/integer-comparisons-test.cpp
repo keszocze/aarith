@@ -64,11 +64,11 @@ TEMPLATE_TEST_CASE_SIG("Comparing two signed integers of different bit width",
 
     GIVEN("a and b with a < b")
     {
-        I a = GENERATE(take(30, random_integer<W, WordType>()));
+        I a = GENERATE(take(300, random_integer<W, WordType>()));
 
         V b{a};
 
-        b = add(a, I::one());
+        b = add(b, V::one());
 
         THEN("operator< returns true")
         {
@@ -83,6 +83,11 @@ TEMPLATE_TEST_CASE_SIG("Comparing two signed integers of different bit width",
         THEN("operator> returns false")
         {
             bool comp = a > b;
+            if (comp) {
+                std::cout << "a > b failed for\n";
+                std::cout << "a: " << a << "\t" << to_binary(a) << "\n";
+                std::cout << "b: " << b << "\t" << to_binary(b) << "\n";
+            }
             REQUIRE_FALSE(comp);
         }
         THEN("operator>= returns false")

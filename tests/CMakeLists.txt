@@ -25,15 +25,16 @@ add_aarith_test(integer-ranges FILES integer/ranges_test.cpp)
 add_aarith_test(integer-random-generation FILES integer/integer-random-generation-test.cpp)
 add_aarith_test(integer-cast FILES integer/integer-casts.cpp)
 
-add_aarith_test(float-operations FILES float/exact_operations-float-test.cpp)
 add_aarith_test(float-anytime-operations FILES float/anytime_operations-float-test.cpp)
-add_aarith_test(float FILES float/float-test.cpp)
+add_aarith_test(float FILES float/float-test.cpp  float/float_general_operations.cpp)
 add_aarith_test(float-casts FILES float/float_casts.cpp)
 add_aarith_test(float-comparison FILES float/float_comparisons.cpp)
 add_aarith_test(float-sign_bit_operations FILES float/sign_bit_operations.cpp)
 add_aarith_test(float-random-generation FILES float/float-random-generation-test.cpp)
 add_aarith_test(float-division FILES float/float_division.cpp)
 add_aarith_test(float-multiplication FILES float/float_mul.cpp)
+add_aarith_test(float-addition FILES float/float_addition.cpp)
+add_aarith_test(float-subtraction FILES float/float_subtraction.cpp)
 
 add_aarith_test(fau-adder FILES uint-approx-test.cpp)
 

@@ -63,7 +63,7 @@ class normalized_float_distribution
 public:
     using F = normalized_float<E, M, WordType>;
     using IntExp = typename F::IntegerExp;
-    using IntMant = typename F::IntegerMant;
+    using IntFrac = typename F::IntegerFrac;
 
     explicit normalized_float_distribution()
     {
@@ -96,7 +96,7 @@ public:
             // nothing needs to be done here as e already is zero
         }
 
-        IntMant m = random_mant(g);
+        IntFrac m = random_mant(g);
         bool sign = random_sign(g);
 
         return F{sign, e, m};

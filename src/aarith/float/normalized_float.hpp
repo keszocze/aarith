@@ -500,20 +500,52 @@ public:
     }
 
     /**
-     * @brief Checks whether the number is normalized
+     * @brief Returns whether the number is normalized
      *
-     * @note The NaNs are also considered normalized!
+     * @note Normalized numbers do *not* include: NaN, +/- inf and, surprisingly, zero.
      *
      * @return True iff the number is normalized
      */
     [[nodiscard]] constexpr bool is_normalized() const
     {
-        return exponent != IntegerExp::all_zeroes();
+        const bool denormalized = (exponent == IntegerExp::all_zeroes());
+        const bool exception = (exponent == IntegerExp::all_ones());
+        const bool result = !denormalized && !exception;
+        return result;
     }
 
     /**
-     * @brief Returns if the number is denormalized or NaN/Inf
-     * @return
+     * @brief Returns whether the number is denormalized
+     *
+     * @note Denormalized numbers do *not* include: NaN, +/- inf and, surprisingly, zero.
+     *
+     * @return True iff the number is denormalized
+     */
+    [[nodiscard]] constexpr bool is_denormalized() const
+    {
+        const bool denormalized = (exponent == IntegerExp::all_zeroes());
+        const bool exception = (exponent == IntegerExp::all_ones());
+        const bool result = denormalized && !exception;
+        return result;
+    }
+
+    /**
+     * @brief Returns whether the number is subnormal
+     *
+     * @note This method is an alias for {@see is_denormalized}
+     *
+     * @note Denormalized numbers do *not* include: NaN, +/- inf and, surprisingly, zero.
+     *
+     * @return True iff the number is subnormal
+     */
+    [[nodiscard]] constexpr bool is_subnormal() const
+    {
+        return is_denormalized();
+    }
+
+    /**
+     * @brief Returns whether the number is denormalized or NaN/Inf
+     * @return True iff the number is denornmalized, infinite or a NaN
      */
     [[nodiscard]] constexpr bool is_special() const
     {
