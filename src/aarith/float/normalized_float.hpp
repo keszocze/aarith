@@ -400,6 +400,17 @@ public:
         return sign_neg;
     }
 
+    /**
+     * @brief Returns whether the number is finity
+     *
+     * @note NaNs are *not* considered finite
+     *
+     * @return True iff the number is finite
+     */
+    [[nodiscard]] constexpr bool is_finite() const {
+        return (exponent != uinteger<E>::all_ones())
+    }
+
     [[nodiscard]] constexpr bool is_inf() const
     {
         return exponent == uinteger<E>::all_ones() &&
