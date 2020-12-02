@@ -121,7 +121,7 @@ TEMPLATE_TEST_CASE_SIG("Floating point division matches its native counterparts"
     F res_native_{res_native};
     Native res_ = static_cast<Native>(res);
 
-    if (!equal_except_rounding(res_native_, res))
+    if (!res.is_nan() && !equal_except_rounding(res_native_, res))
     {
         std::cout
             << "a (aarith): " << to_binary(a) << "\n"
@@ -146,8 +146,16 @@ TEMPLATE_TEST_CASE_SIG("Floating point division matches its native counterparts"
             << "res (native): " << to_binary(F(res_native2)) << "\n";
     }
 
-    CHECK(equal_except_rounding(res_native_, res));
-    REQUIRE(equal_except_rounding(F{res_}, F{res_native}));
+    const auto res__ = F{res_};
+    if(!res.is_nan() && !res__.is_nan())
+    {
+        CHECK(equal_except_rounding(res_native_, res));
+        REQUIRE(equal_except_rounding(res__, F{res_native}));
+    }
+    else
+    {
+       REQUIRE(equal(res_native_, res));
+    }
 }
 
 SCENARIO("Manual test case for  floating point division",

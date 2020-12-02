@@ -650,6 +650,15 @@ public:
 };
 
 template <size_t E, size_t M1, size_t M2, typename WordType = uint64_t>
+auto equal(const normalized_float<E, M1, WordType> lhs,
+          const normalized_float<E, M2, WordType> rhs) -> bool
+{
+    return lhs.get_sign() == rhs.get_sign() &&
+           lhs.get_exponent() == rhs.get_exponent() &&
+           lhs.get_mantissa() == rhs.get_mantissa();
+}
+
+template <size_t E, size_t M1, size_t M2, typename WordType = uint64_t>
 auto equal_except_rounding(const normalized_float<E, M1, WordType> lhs,
                            const normalized_float<E, M2, WordType> rhs) -> bool
 {
