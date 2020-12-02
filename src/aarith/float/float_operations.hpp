@@ -278,34 +278,35 @@ template <size_t E, size_t M, typename WordType>
     }
     //==========================================
 
-    const auto sign = lhs.get_sign() ^ rhs.get_sign();
+    const auto result_is_negative = lhs.get_sign() ^ rhs.get_sign();
 
     if (rhs.is_zero())
     {
-        return sign ? normalized_float<E, M>::neg_infinity()
+        return result_is_negative ? normalized_float<E, M>::neg_infinity()
                     : normalized_float<E, M>::pos_infinity();
     }
 
     if (lhs.is_inf())
     {
         // due to the checks above, we already know that rhs is finite
-        return sign ? normalized_float<E, M>::neg_zero() : normalized_float<E, M>::zero();
+        return result_is_negative ? normalized_float<E, M>::neg_zero() : normalized_float<E, M>::zero();
     }
 
     if (rhs.is_inf() || lhs.is_zero())
     {
-        return sign ? normalized_float<E, M>::neg_zero() : normalized_float<E, M>::zero();
+        return result_is_negative ? normalized_float<E, M>::neg_zero() : normalized_float<E, M>::zero();
     }
 
     auto dividend = width_cast<2 * M + 1>(lhs.get_full_mantissa());
     auto divisor = width_cast<2 * M + 1>(rhs.get_full_mantissa());
-    dividend = dividend << M;
+    dividend = dividend << M; // warum shifted er diesen Wert?
     auto mquotient = div(dividend, divisor);
 
-    bool overflow = false;
-    bool underflow = false;
     auto exponent_tmp = expanding_add(lhs.get_exponent(), lhs.bias);
-    overflow = exponent_tmp.bit(E) == 1;
+
+    bool overflow = exponent_tmp.bit(E) == 1;
+
+
     exponent_tmp = sub(exponent_tmp, width_cast<E + 1>(rhs.get_exponent()));
     uinteger<E + 1> denorm_exponent_correction{1U};
 
@@ -320,29 +321,31 @@ template <size_t E, size_t M, typename WordType>
 
     auto esum = width_cast<E>(exponent_tmp);
     overflow &= exponent_tmp.bit(E) == 1;
-    underflow = !overflow && exponent_tmp.bit(E) == 1;
+    const bool underflow = !overflow && exponent_tmp.bit(E) == 1;
 
     // check for over or underflow and break
     if (underflow || overflow)
     {
+        std::cout << "(underflow / overflow)  ---  (" << underflow << " / " << overflow << ")\n";
         normalized_float<E, M> quotient;
+        quotient.set_sign(result_is_negative);
         // apparently float div does not produce -0
         // quotient.set_sign(sign);
         if (overflow)
         {
             quotient.set_exponent(uinteger<E>::all_ones());
-            quotient.set_sign(sign);
+
         }
         else
         {
-            // shift mantissa of denormal number
+            // TODO (brand) Wieso wird hier nicht direkt Null zurückgegeben?
+            // shift mantissa of subnormal number
             exponent_tmp = ~exponent_tmp;
             exponent_tmp = add(exponent_tmp, uinteger<exponent_tmp.width()>(2));
-            if (exponent_tmp < uinteger<64>(M + 1))
+            if (exponent_tmp < uinteger<64>(M + 1)) // TODO (brand) Why this hard-wired 64?
             {
                 mquotient = rshift_and_round(mquotient, exponent_tmp.word(0));
                 quotient.set_full_mantissa(width_cast<M + 1>(mquotient));
-                quotient.set_sign(sign);
             }
             /*
             else if(exponent_tmp.word(0) == (M+1))
@@ -356,12 +359,12 @@ template <size_t E, size_t M, typename WordType>
     }
     else if (esum == uinteger<esum.width()>::zero())
     {
-        normalized_float<E, M> quotient{sign, esum,
+        normalized_float<E, M> quotient{result_is_negative, esum,
                                         width_cast<M + 1>(rshift_and_round(mquotient, 1))};
         return quotient;
     }
 
-    normalized_float<E, mquotient.width() - 1> quotient(sign, esum, mquotient);
+    normalized_float<E, mquotient.width() - 1> quotient(result_is_negative, esum, mquotient);
 
     return normalize<E, mquotient.width() - 1, M>(quotient);
 }
