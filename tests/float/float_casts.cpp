@@ -59,6 +59,79 @@ TEMPLATE_TEST_CASE_SIG("IEEE-754 arithmetic conversion: float, double",
     }
 }
 
+SCENARIO("Creating aarith floats from native negative zeros")
+{
+    using Single = normalized_float<8, 23>;
+    using Double = normalized_float<11, 52>;
+    using Large = normalized_float<20, 70>;
+    using Small = normalized_float<3, 10>;
+
+    GIVEN("Negative zero in IEEE 754 single precision")
+    {
+        constexpr float fnegzero = -0.0F;
+
+        WHEN("Creating aarith foating-point numbers with enough bits from the zero")
+        {
+            const Single snegzero(fnegzero);
+            const Double dnegzero(fnegzero);
+            const Large lnegzero(fnegzero);
+            THEN("The result should be negative zero")
+            {
+                REQUIRE(snegzero.is_negative());
+                REQUIRE(snegzero.is_zero());
+
+                REQUIRE(dnegzero.is_negative());
+                REQUIRE(dnegzero.is_zero());
+
+                REQUIRE(lnegzero.is_negative());
+                REQUIRE(lnegzero.is_zero());
+            }
+        }
+        WHEN("Creating aarith foating-point numbers with enough bits from the zero")
+        {
+            THEN("The result should still be zero")
+            {
+                const Small smallnegzero(fnegzero);
+
+                REQUIRE(smallnegzero.is_negative());
+                REQUIRE(smallnegzero.is_zero());
+            }
+        }
+    }
+    GIVEN("Negative zero in IEEE 754 double precision")
+    {
+        constexpr double dnegzero = -0.0;
+        WHEN("Creating aarith foating-point numbers with enough bits from the zero")
+        {
+            const Double negzero(dnegzero);
+            const Large lnegzero(dnegzero);
+
+            THEN("The result should be negative zero")
+            {
+                REQUIRE(negzero.is_negative());
+                REQUIRE(negzero.is_zero());
+
+                REQUIRE(lnegzero.is_negative());
+                REQUIRE(lnegzero.is_zero());
+            }
+        }
+        WHEN("Creating aarith foating-point numbers with enough bits from the zero")
+        {
+            THEN("The result should still be zero")
+            {
+                const Small smallnegzero(dnegzero);
+                const Single snegzero(dnegzero);
+
+                REQUIRE(smallnegzero.is_negative());
+                REQUIRE(smallnegzero.is_zero());
+
+                REQUIRE(snegzero.is_negative());
+                REQUIRE(snegzero.is_zero());
+            }
+        }
+    }
+}
+
 TEMPLATE_TEST_CASE_SIG("Casting from and to the native data types should be lossless",
                        "[normalized_float][casting][utility]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
