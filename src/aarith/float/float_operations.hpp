@@ -273,24 +273,22 @@ template <size_t E, size_t M, typename WordType>
         return normalized_float<E, M>::NaN();
     }
 
+    const auto sign = lhs.get_sign() ^ rhs.get_sign();
     if (lhs.is_inf())
     {
-        return lhs;
+        return sign ? normalized_float<E, M>::neg_zero() : normalized_float<E, M>::zero();
     }
-
-    const bool neg_result = lhs.is_negative() ^ rhs.is_negative();
 
     if (rhs.is_inf() || lhs.is_zero())
     {
-        return neg_result ? normalized_float<E, M>::neg_zero() : normalized_float<E, M>::zero();
+        return sign ? normalized_float<E, M>::neg_zero() : normalized_float<E, M>::zero();
     }
     if (rhs.is_zero())
     {
-        return neg_result ? normalized_float<E, M>::neg_infinity()
+        return sign ? normalized_float<E, M>::neg_infinity()
                           : normalized_float<E, M>::pos_infinity();
     }
 
-    auto sign = lhs.get_sign() ^ rhs.get_sign();
     auto dividend = width_cast<2 * M + 1>(lhs.get_full_mantissa());
     auto divisor = width_cast<2 * M + 1>(rhs.get_full_mantissa());
     dividend = dividend << M;
@@ -333,26 +331,23 @@ template <size_t E, size_t M, typename WordType>
             exponent_tmp = add(exponent_tmp, uinteger<exponent_tmp.width()>(2));
             if (exponent_tmp < uinteger<64>(M + 1))
             {
-                mquotient = mquotient >> exponent_tmp.word(0);
+                mquotient = rshift_and_round(mquotient, exponent_tmp.word(0));
                 quotient.set_full_mantissa(width_cast<M + 1>(mquotient));
                 quotient.set_sign(sign);
             }
+            /*
+            else if(exponent_tmp.word(0) == (M+1))
+            {
+                quotient.set_full_mantissa(uinteger<M+1>(1U));
+                quotient.set_sign(sign);
+            }
+            */
         }
         return quotient;
     }
     else if (esum == uinteger<esum.width()>::zero())
     {
         normalized_float<E, M> quotient{sign, esum, width_cast<M+1>(rshift_and_round(mquotient, 1))};
-        return quotient;
-    }
-
-    //complience with IEEE implementation
-    if (esum == uinteger<esum.width()>(1U))
-    {
-        esum = esum.zero();
-        //I don't get why we don't have to shift, when reducing
-        //mquotient = rshift_and_round(mquotient, 1);
-        normalized_float<E, M> quotient(sign, esum, width_cast<M+1>(mquotient));
         return quotient;
     }
 

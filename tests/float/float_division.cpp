@@ -35,18 +35,37 @@ TEMPLATE_TEST_CASE_SIG("Dividing by infinity", "[normalized_float][arithmetic][d
         {
             THEN("The sign of the resulting zero should be correct")
             {
-                F res = f / neg_inf;
-                F res_ = f / pos_inf;
+                if(!f.is_zero() && !f.is_nan())
+                {
+                    F res = f / neg_inf;
+                    F res_ = f / pos_inf;
 
-                if (f.is_negative())
-                {
-                    CHECK(res == pos_zero);
-                    REQUIRE(res_ == neg_zero);
-                }
-                else
-                {
-                    CHECK(res == neg_zero);
-                    REQUIRE(res_ == pos_zero);
+                    if (f.is_negative())
+                    {
+                        if (res != pos_zero || res_!= neg_zero)
+                        {
+                            std::cout
+                                << "f:    " << to_binary(f) << "\n"
+                                << "res:  " << to_binary(res) << "\n"
+                                << "res_: " << to_binary(F(res_)) << "\n";
+                        }
+
+                        CHECK(res == pos_zero);
+                        REQUIRE(res_ == neg_zero);
+                    }
+                    else
+                    {
+                        if (res != neg_zero || res_!= pos_zero)
+                        {
+                            std::cout
+                                << "f:    " << to_binary(f) << "\n"
+                                << "res:  " << to_binary(res) << "\n"
+                                << "res_: " << to_binary(F(res_)) << "\n";
+                        }
+
+                        CHECK(res == neg_zero);
+                        REQUIRE(res_ == pos_zero);
+                    }
                 }
             }
         }
@@ -79,7 +98,7 @@ TEMPLATE_TEST_CASE_SIG("Dividing by zero", "[normalized_float][arithmetic][divis
             THEN("The sign of the resulting zero should be correct")
             {
 
-                if (!f.is_zero())
+                if (!f.is_zero() && !f.is_nan())
                 {
 
                     F res = f / neg_zero;
@@ -87,11 +106,27 @@ TEMPLATE_TEST_CASE_SIG("Dividing by zero", "[normalized_float][arithmetic][divis
 
                     if (f.is_negative())
                     {
+                        if (res != pos_inf || res_!= neg_inf)
+                        {
+                            std::cout
+                                << "f:    " << to_binary(f) << "\n"
+                                << "res:  " << to_binary(res) << "\n"
+                                << "res_: " << to_binary(F(res_)) << "\n";
+                        }
+
                         CHECK(res == pos_inf);
                         REQUIRE(res_ == neg_inf);
                     }
                     else
                     {
+                        if (res != neg_inf || res_!= pos_inf)
+                        {
+                            std::cout
+                                << "f:    " << to_binary(f) << "\n"
+                                << "res:  " << to_binary(res) << "\n"
+                                << "res_: " << to_binary(F(res_)) << "\n";
+                        }
+
                         CHECK(res == neg_inf);
                         REQUIRE(res_ == pos_inf);
                     }
@@ -121,7 +156,7 @@ TEMPLATE_TEST_CASE_SIG("Floating point division matches its native counterparts"
     F res_native_{res_native};
     Native res_ = static_cast<Native>(res);
 
-    if (!res.is_nan() && !equal_except_rounding(res_native_, res))
+    if (!equal_except_rounding(res_native_, res) && !equal(res_native_, res))
     {
         std::cout
             << "a (aarith): " << to_binary(a) << "\n"
@@ -129,13 +164,14 @@ TEMPLATE_TEST_CASE_SIG("Floating point division matches its native counterparts"
             << "b (aarith): " << to_binary(b) << "\n"
             << "b (native): " << to_binary(F(b)) << "\n"
             << "res (aarith): " << to_binary(res) << "\n"
-            << "res (native): " << to_binary(F(res_native)) << "\n";
+            << "res (native): " << to_binary(F(res_native)) << "\n"
+            << "res (cast):   " << to_binary(F(res_)) << "\n";
             
         F res2 = a / b;
         Native res_native2 = a_native / b_native;
 
         F res_native2_ {res_native2};
-        //Native res2_ = static_cast<Native>(res2);
+        Native res2_ = static_cast<Native>(res2);
 
         std::cout
             << "a (aarith): " << to_binary(a) << "\n"
@@ -143,18 +179,18 @@ TEMPLATE_TEST_CASE_SIG("Floating point division matches its native counterparts"
             << "b (aarith): " << to_binary(b) << "\n"
             << "b (native): " << to_binary(F(b)) << "\n"
             << "res (aarith): " << to_binary(res2) << "\n"
-            << "res (native): " << to_binary(F(res_native2)) << "\n";
+            << "res (native): " << to_binary(F(res_native2)) << "\n"
+            << "res (cast):   " << to_binary(F(res2_)) << "\n";
     }
 
-    const auto res__ = F{res_};
-    if(!res.is_nan() && !res__.is_nan())
+    if(a.is_nan() || b.is_nan())
     {
-        CHECK(equal_except_rounding(res_native_, res));
-        REQUIRE(equal_except_rounding(res__, F{res_native}));
+       REQUIRE(equal(res_native_, res));
     }
     else
     {
-       REQUIRE(equal(res_native_, res));
+        CHECK(equal_except_rounding(res_native_, res));
+        REQUIRE(equal_except_rounding(F{res_}, F{res_native}));
     }
 }
 
