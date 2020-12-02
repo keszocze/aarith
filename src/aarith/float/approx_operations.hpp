@@ -103,19 +103,31 @@ template <size_t E, size_t M>
 [[nodiscard]] auto anytime_mul(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs,
                                const unsigned int bits = 2 * M) -> normalized_float<E, M>
 {
+    if (lhs.is_nan())
+    {
+        return lhs.make_quiet_nan();
+    }
+ 
+    if (rhs.is_nan())
+    {
+        return rhs.make_quiet_nan();
+    }
+ 
     if ((lhs.is_nan() || rhs.is_nan()) || (lhs.is_zero() && rhs.is_inf()) ||
         (lhs.is_inf() && rhs.is_zero()))
     {
         return normalized_float<E, M>::NaN();
     }
-
+ 
     // compute sign
     auto sign = lhs.get_sign() ^ rhs.get_sign();
-
-    if (lhs.is_inf() || rhs.is_inf()) {
-        return sign ? normalized_float<E,M>::neg_infinity() : normalized_float<E,M>::pos_infinity();
+ 
+    if (lhs.is_inf() || rhs.is_inf())
+    {
+        return sign ? normalized_float<E, M>::neg_infinity()
+                    : normalized_float<E, M>::pos_infinity();
     }
-
+ 
     // compute exponent
     auto ext_esum = expanding_add(lhs.get_exponent(), rhs.get_exponent());
     bool overflow = ext_esum.bit(E) == 1;
@@ -146,7 +158,7 @@ template <size_t E, size_t M>
                 product.set_full_mantissa(width_cast<M + 1>(mproduct));
             }
         }
-        return normalize<E, M, M>(product);
+        return product;
     }
 
     auto esum = width_cast<E>(ext_esum);
