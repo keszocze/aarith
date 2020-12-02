@@ -623,7 +623,7 @@ public:
         auto nan_mantissa = mantissa;
         nan_mantissa.set_bit(M - 1, static_cast<WordType>(1U));
         const auto nan_exponent = uinteger<E>::all_ones();
-        normalized_float<E, M> nan{false, nan_exponent, nan_mantissa};
+        normalized_float<E, M> nan{sign_neg, nan_exponent, nan_mantissa};
         return nan;
     }
 

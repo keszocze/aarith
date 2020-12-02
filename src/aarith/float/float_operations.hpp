@@ -326,7 +326,7 @@ template <size_t E, size_t M, typename WordType>
     // check for over or underflow and break
     if (underflow || overflow)
     {
-        std::cout << "(underflow / overflow)  ---  (" << underflow << " / " << overflow << ")\n";
+        //std::cout << "(underflow / overflow)  ---  (" << underflow << " / " << overflow << ")\n";
         normalized_float<E, M> quotient;
         quotient.set_sign(result_is_negative);
         // apparently float div does not produce -0
@@ -334,7 +334,6 @@ template <size_t E, size_t M, typename WordType>
         if (overflow)
         {
             quotient.set_exponent(uinteger<E>::all_ones());
-
         }
         else
         {
@@ -342,7 +341,7 @@ template <size_t E, size_t M, typename WordType>
             // shift mantissa of subnormal number
             exponent_tmp = ~exponent_tmp;
             exponent_tmp = add(exponent_tmp, uinteger<exponent_tmp.width()>(2));
-            if (exponent_tmp < uinteger<64>(M + 1)) // TODO (brand) Why this hard-wired 64?
+            if (exponent_tmp < uinteger<sizeof(M)*8>(M + 1))
             {
                 mquotient = rshift_and_round(mquotient, exponent_tmp.word(0));
                 quotient.set_full_mantissa(width_cast<M + 1>(mquotient));
