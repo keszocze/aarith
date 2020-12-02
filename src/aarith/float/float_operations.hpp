@@ -38,7 +38,13 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
     const auto exponent_delta =
         sub(width_cast<E + 1>(lhs.get_exponent()), width_cast<E + 1>(rhs.get_exponent()));
 
-    const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
+    auto extra_shift = 0U;
+    if(lhs.is_normalized() && !rhs.is_normalized())
+    {
+        extra_shift = 1;
+    }
+
+    const auto new_mantissa = rhs.get_full_mantissa() >> (exponent_delta.word(0) - extra_shift);
     const auto mantissa_sum = fun_add(lhs.get_full_mantissa(), new_mantissa);
 
     normalized_float<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(),
@@ -78,7 +84,13 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
     }
 
     const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
-    const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
+    auto extra_shift = 0U;
+    if(lhs.is_normalized() && !rhs.is_normalized())
+    {
+        extra_shift = 1;
+    }
+
+    const auto new_mantissa = rhs.get_full_mantissa() >> (exponent_delta.word(0) - extra_shift);
     const auto mantissa_sum = fun_sub(lhs.get_full_mantissa(), new_mantissa);
 
     normalized_float<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(),
@@ -102,6 +114,16 @@ template <size_t E, size_t M>
 [[nodiscard]] auto add(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
     -> normalized_float<E, M>
 {
+    if (lhs.is_nan())
+    {
+        return lhs.make_quiet_nan();
+    }
+
+    if (rhs.is_nan())
+    {
+        return rhs.make_quiet_nan();
+    }
+
 
     if ((lhs.is_nan() || rhs.is_nan()) || (lhs.is_neg_inf() && rhs.is_pos_inf()) ||
         (lhs.is_pos_inf() && rhs.is_neg_inf()))
@@ -152,6 +174,16 @@ template <size_t E, size_t M>
     // return sub_<E, M>(lhs, rhs, expanding_add<uinteger<M+1>, uinteger<M+1>>,
     // expanding_sub<uinteger<M+1>, uinteger<M+1>>);
 
+    if (lhs.is_nan())
+    {
+        return lhs.make_quiet_nan();
+    }
+
+    if (rhs.is_nan())
+    {
+        return rhs.make_quiet_nan();
+    }
+
     if ((lhs.is_nan() || rhs.is_nan()) || (lhs.is_pos_inf() && rhs.is_pos_inf()) ||
         (lhs.is_neg_inf() && rhs.is_neg_inf()))
     {
@@ -184,6 +216,16 @@ template <size_t E, size_t M, typename WordType>
                        const normalized_float<E, M, WordType> rhs)
     -> normalized_float<E, M, WordType>
 {
+    if (lhs.is_nan())
+    {
+        return lhs.make_quiet_nan();
+    }
+
+    if (rhs.is_nan())
+    {
+        return rhs.make_quiet_nan();
+    }
+
     if ((lhs.is_nan() || rhs.is_nan()) || (lhs.is_zero() && rhs.is_inf()) ||
         (lhs.is_inf() && rhs.is_zero()))
     {

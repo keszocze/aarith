@@ -19,8 +19,8 @@ TEMPLATE_TEST_CASE_SIG("Addition is commutative",
     GIVEN("Tow normalized_floats created from native data types")
     {
 
-        F a = GENERATE(take(15, random_float<E, M, FloatGenerationModes::FullyRandom>()));
-        F b = GENERATE(take(15, random_float<E, M, FloatGenerationModes::FullyRandom>()));
+        F a = GENERATE(take(50, random_float<E, M, FloatGenerationModes::FullyRandom>()));
+        F b = GENERATE(take(50, random_float<E, M, FloatGenerationModes::FullyRandom>()));
 
 
         WHEN("Adding these numbers")
@@ -29,7 +29,25 @@ TEMPLATE_TEST_CASE_SIG("Addition is commutative",
             F res2{b + a};
             THEN("The result should not depend on operand order")
             {
-                REQUIRE(res1 == res2);
+                if(!a.is_nan() && !b.is_nan())
+                {
+                    const bool pass_test = res1 == res2 || (res1.is_inf() && res2.is_inf()) || bit_equal(res1, res2);
+                    if(!pass_test)
+                    {
+                        std::cout 
+                            << to_binary(a) << " + \n" 
+                            << to_binary(b) << " = \n" 
+                            << "res1: " << to_binary(res1) << "\n" 
+                            << "res2: " << to_binary(res2) << "\n";
+                        auto dbg1 = a + b;
+                        auto dbg2 = b + a;
+                        std::cout 
+                            << "dbg1: " << to_binary(dbg1) << "\n"
+                            << "dbg2: " << to_binary(dbg2) << "\n";
+                        
+                    }
+                    REQUIRE(pass_test);
+                }
             }
         }
     }
@@ -53,7 +71,16 @@ TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
             F res{a + F::zero()};
             THEN("The result should have left the number untouched")
             {
-                REQUIRE(res == a);
+                if(!a.is_nan())
+                {
+                    if(res != a)
+                    {
+                        std::cout
+                            << "a:   " << to_binary(a) << "\n"
+                            << "res: " << to_binary(res) << "\n";
+                    }
+                    REQUIRE(res == a);
+                }
             }
         }
     }
@@ -81,20 +108,35 @@ TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts"
     F res_native_{res_native};
     Native res_ = static_cast<Native>(res);
 
-    if (!equal_except_rounding(res_native_, res))
+    if(a.is_nan() || b.is_nan())
     {
-        F res__ = a + b;
-        std::cout << a << " + " << b << " = " << res__ << "\n";
-        std::cout << to_binary(a) << " + \n" << to_binary(b) << " = \n" << to_binary(res) << "\n";
-        // std::cout << to_compute_string(a) << "\t+\t" << to_compute_string(b) << " = "
-        //          << to_compute_string(res) << "\n";
-
-        std::cout << a_native << " + " << b_native << " = " << res_native << "\n";
-        std::cout << to_binary(res) << "\n" << to_binary(res_native_) << "\n";
+        REQUIRE(bit_equal(F{res_}, F{res_native}));
     }
+    else
+    {
+        if (!equal_except_rounding(res_native_, res))
+        {
+            //F res__ = a + b;
+            //std::cout << a << " + " << b << " = " << res__ << "\n";
+            std::cout 
+                << to_binary(a) << " + \n" 
+                << to_binary(b) << " = \n" 
+                << to_binary(res) << "\n";
+            // std::cout << to_compute_string(a) << "\t+\t" << to_compute_string(b) << " = "
+            //          << to_compute_string(res) << "\n";
 
-    CHECK(equal_except_rounding(res_native_, res));
-    REQUIRE(equal_except_rounding(F{res_}, F{res_native}));
+            //std::cout << a_native << " + " << b_native << " = " << res_native << "\n";
+            std::cout 
+                << "res:        " << to_binary(res) << "\n" 
+                << "res_native: " << to_binary(res_native_) << "\n";
+            auto dbg = a+b;
+            std::cout 
+                << "dbg: " << to_binary(dbg) << "\n";
+        }
+
+        CHECK(equal_except_rounding(res_native_, res));
+        REQUIRE(equal_except_rounding(F{res_}, F{res_native}));
+    }
 }
 
 
