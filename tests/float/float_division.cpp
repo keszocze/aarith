@@ -135,6 +135,95 @@ TEMPLATE_TEST_CASE_SIG("Dividing by zero", "[normalized_float][arithmetic][divis
     }
 }
 
+SCENARIO("Hand-picked division examples", "[normalized_float][arithmetic][division][current]")
+{
+
+    GIVEN("Two fixed single-precision floating-point numbers a and b")
+    {
+
+        static constexpr size_t E_ = 8;
+        static constexpr size_t M_ = 23;
+        using F = normalized_float<E_, M_>;
+        using E = uinteger<E_>;
+        using M = uinteger<M_>;
+
+        constexpr F a{false, E{0b00101101}, M{0b11000010001001010011000}};
+        constexpr F b{true, E{0b11000011}, M{0b10011001000111101011101}};
+
+        const float a_float = static_cast<float>(a);
+        const float b_float = static_cast<float>(b);
+
+        WHEN("Computing a/b")
+        {
+            const F result_aarith = a / b;
+
+            const float result_float = a_float / b_float;
+            THEN("The result should match the native data type's result")
+            {
+                const bool eql = equal_except_rounding(result_aarith, F{result_float});
+
+                if (!eql)
+                {
+                    std::cout << "a (aarith): " << to_binary(a) << "\n"
+                              << "a (native): " << to_binary(F(a_float)) << "\n"
+                              << "b (aarith): " << to_binary(b) << "\n"
+                              << "b (native): " << to_binary(F(b_float)) << "\n"
+                              << "res (aarith): " << to_binary(result_aarith) << "\n"
+                              << "res (native): " << to_binary(F(result_float)) << "\n";
+                }
+
+                REQUIRE(eql);
+            }
+        }
+    }
+    GIVEN("Two fixed single-precision floating-point numbers a and b")
+    {
+
+        static constexpr size_t E_ = 11;
+        static constexpr size_t M_ = 52;
+        using F = normalized_float<E_, M_>;
+        using E = uinteger<E_>;
+        using M = uinteger<M_>;
+
+        constexpr F a{false, E{0b00101011111},
+                      M{0b0100010100101001010001101111000011011110111100011111}};
+        constexpr F b{true, E{0b11010011100},
+                      M{0b0001001011101011000101111101101001100001011100101110}};
+
+        const double a_float = static_cast<double>(a);
+        const double b_float = static_cast<double>(b);
+
+        std::bitset<64> bs_a = bit_cast<uint64_t>(a_float);
+        std::bitset<64> bs_b = bit_cast<uint64_t>(b_float);
+
+        WHEN("Computing a/b")
+        {
+            const F result_aarith = a / b;
+            const double result_float = a_float / b_float;
+
+            std::bitset<64> bs_res = bit_cast<uint64_t>(result_float);
+            THEN("The result should match the native data type's result")
+            {
+                const bool eql = equal_except_rounding(result_aarith, F{result_float});
+
+                if (!eql)
+                {
+                    std::cout << "a (aarith): " << to_binary(a) << "\n"
+                              << "a (native): " << bs_a << "\n"
+                              << "b (aarith): " << to_binary(b) << "\n"
+                              << "b (native): " << bs_b << "\n"
+                              << "res (aarith): " << to_binary(result_aarith) << "\n"
+                              << "res (native): " << to_binary(F{result_float}) << "\n"
+                              << "res (bs): " << bs_res << "\n"
+                              << (a_float / b_float) << "\n";
+                }
+
+                REQUIRE(eql);
+            }
+        }
+    }
+}
+
 TEMPLATE_TEST_CASE_SIG("Floating point division matches its native counterparts",
                        "[normalized_float][arithmetic][division]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
