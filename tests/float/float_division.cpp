@@ -1,14 +1,12 @@
 #include <aarith/float.hpp>
 
-#include "gen_float.hpp"
 #include "../test-signature-ranges.hpp"
+#include "gen_float.hpp"
 
 #include <bitset>
 #include <catch.hpp>
 
-
 using namespace aarith;
-
 
 TEMPLATE_TEST_CASE_SIG("Dividing by infinity", "[normalized_float][arithmetic][division]",
                        AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
@@ -35,19 +33,19 @@ TEMPLATE_TEST_CASE_SIG("Dividing by infinity", "[normalized_float][arithmetic][d
         {
             THEN("The sign of the resulting zero should be correct")
             {
-                if(!f.is_zero() && !f.is_nan())
+                if (!f.is_zero() && !f.is_nan() && !f.is_inf())
                 {
                     F res = f / neg_inf;
                     F res_ = f / pos_inf;
 
                     if (f.is_negative())
                     {
-                        if (res != pos_zero || res_!= neg_zero)
+                        if (res != pos_zero || res_ != neg_zero)
                         {
-                            std::cout
-                                << "f:    " << to_binary(f) << "\n"
-                                << "res:  " << to_binary(res) << "\n"
-                                << "res_: " << to_binary(F(res_)) << "\n";
+                            std::cout << "f:    " << to_binary(f) << "(" << f.is_inf() << ")"
+                                      << "\n"
+                                      << "res:  " << to_binary(res) << "\n"
+                                      << "res_: " << to_binary(F(res_)) << "\n";
                         }
 
                         CHECK(res == pos_zero);
@@ -55,12 +53,12 @@ TEMPLATE_TEST_CASE_SIG("Dividing by infinity", "[normalized_float][arithmetic][d
                     }
                     else
                     {
-                        if (res != neg_zero || res_!= pos_zero)
+                        if (res != neg_zero || res_ != pos_zero)
                         {
-                            std::cout
-                                << "f:    " << to_binary(f) << "\n"
-                                << "res:  " << to_binary(res) << "\n"
-                                << "res_: " << to_binary(F(res_)) << "\n";
+                            std::cout << "f:    " << to_binary(f) << "(" << f.is_inf() << ")"
+                                      << "\n"
+                                      << "res:  " << to_binary(res) << "\n"
+                                      << "res_: " << to_binary(F(res_)) << "\n";
                         }
 
                         CHECK(res == neg_zero);
@@ -71,7 +69,6 @@ TEMPLATE_TEST_CASE_SIG("Dividing by infinity", "[normalized_float][arithmetic][d
         }
     }
 }
-
 
 TEMPLATE_TEST_CASE_SIG("Dividing by zero", "[normalized_float][arithmetic][division]",
                        AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
@@ -106,12 +103,14 @@ TEMPLATE_TEST_CASE_SIG("Dividing by zero", "[normalized_float][arithmetic][divis
 
                     if (f.is_negative())
                     {
-                        if (res != pos_inf || res_!= neg_inf)
+                        if (res != pos_inf || res_ != neg_inf)
                         {
-                            std::cout
-                                << "f:    " << to_binary(f) << "\n"
-                                << "res:  " << to_binary(res) << "\n"
-                                << "res_: " << to_binary(F(res_)) << "\n";
+                            std::cout << "f:    " << to_binary(f) << "(" << f.is_inf() << ")"
+                                      << "\n"
+                                      << "res:  " << to_binary(res) << "\n"
+                                      << "res_: " << to_binary(F(res_)) << "\n"
+                                      << "pos_inf: " << to_binary(pos_inf) << "\n"
+                                      << "neg_inf: " << to_binary(neg_inf) << "\n";
                         }
 
                         CHECK(res == pos_inf);
@@ -119,12 +118,12 @@ TEMPLATE_TEST_CASE_SIG("Dividing by zero", "[normalized_float][arithmetic][divis
                     }
                     else
                     {
-                        if (res != neg_inf || res_!= pos_inf)
+                        if (res != neg_inf || res_ != pos_inf)
                         {
-                            std::cout
-                                << "f:    " << to_binary(f) << "\n"
-                                << "res:  " << to_binary(res) << "\n"
-                                << "res_: " << to_binary(F(res_)) << "\n";
+                            std::cout << "f:    " << to_binary(f) << "(" << f.is_inf() << ")"
+                                      << "\n"
+                                      << "res:  " << to_binary(res) << "\n"
+                                      << "res_: " << to_binary(F(res_)) << "\n";
                         }
 
                         CHECK(res == neg_inf);
@@ -138,14 +137,14 @@ TEMPLATE_TEST_CASE_SIG("Dividing by zero", "[normalized_float][arithmetic][divis
 
 TEMPLATE_TEST_CASE_SIG("Floating point division matches its native counterparts",
                        "[normalized_float][arithmetic][division]",
-                       AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE, AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+                       AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
+                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
     using F = normalized_float<E, M>;
 
     F a = GENERATE(take(100, random_float<E, M, FloatGenerationModes::FullyRandom>()));
     F b = GENERATE(take(100, random_float<E, M, FloatGenerationModes::FullyRandom>()));
-
 
     Native a_native = static_cast<Native>(a);
     Native b_native = static_cast<Native>(b);
@@ -158,34 +157,32 @@ TEMPLATE_TEST_CASE_SIG("Floating point division matches its native counterparts"
 
     if (!equal_except_rounding(res_native_, res) && !equal(res_native_, res))
     {
-        std::cout
-            << "a (aarith): " << to_binary(a) << "\n"
-            << "a (native): " << to_binary(F(a)) << "\n"
-            << "b (aarith): " << to_binary(b) << "\n"
-            << "b (native): " << to_binary(F(b)) << "\n"
-            << "res (aarith): " << to_binary(res) << "\n"
-            << "res (native): " << to_binary(F(res_native)) << "\n"
-            << "res (cast):   " << to_binary(F(res_)) << "\n";
-            
+        std::cout << "a (aarith): " << to_binary(a) << "\n"
+                  << "a (native): " << to_binary(F(a)) << "\n"
+                  << "b (aarith): " << to_binary(b) << "\n"
+                  << "b (native): " << to_binary(F(b)) << "\n"
+                  << "res (aarith): " << to_binary(res) << "\n"
+                  << "res (native): " << to_binary(F(res_native)) << "\n"
+                  << "res (cast):   " << to_binary(F(res_)) << "\n";
+
         F res2 = a / b;
         Native res_native2 = a_native / b_native;
 
-        F res_native2_ {res_native2};
+        F res_native2_{res_native2};
         Native res2_ = static_cast<Native>(res2);
 
-        std::cout
-            << "a (aarith): " << to_binary(a) << "\n"
-            << "a (native): " << to_binary(F(a)) << "\n"
-            << "b (aarith): " << to_binary(b) << "\n"
-            << "b (native): " << to_binary(F(b)) << "\n"
-            << "res (aarith): " << to_binary(res2) << "\n"
-            << "res (native): " << to_binary(F(res_native2)) << "\n"
-            << "res (cast):   " << to_binary(F(res2_)) << "\n";
+        std::cout << "a (aarith): " << to_binary(a) << "\n"
+                  << "a (native): " << to_binary(F(a)) << "\n"
+                  << "b (aarith): " << to_binary(b) << "\n"
+                  << "b (native): " << to_binary(F(b)) << "\n"
+                  << "res (aarith): " << to_binary(res2) << "\n"
+                  << "res (native): " << to_binary(F(res_native2)) << "\n"
+                  << "res (cast):   " << to_binary(F(res2_)) << "\n";
     }
 
-    if(a.is_nan() || b.is_nan())
+    if (a.is_nan() || b.is_nan())
     {
-       REQUIRE(equal(res_native_, res));
+        REQUIRE(equal(res_native_, res));
     }
     else
     {
@@ -220,10 +217,12 @@ SCENARIO("Manual test case for  floating point division",
         AND_GIVEN("The smallest denormalized number")
         {
             F smallest{F::smallest_denormalized()};
-//            F res = div(F::one(), smallest);
-//            std::cout << to_binary(smallest) << "\t" << to_binary(smallest, true) << "\t"
-//                      << smallest << "\n";
-//            std::cout << to_binary(res) << "\t" << to_binary(res, true) << "\t" << res << "\n";
+            //            F res = div(F::one(), smallest);
+            //            std::cout << to_binary(smallest) << "\t" << to_binary(smallest, true) <<
+            //            "\t"
+            //                      << smallest << "\n";
+            //            std::cout << to_binary(res) << "\t" << to_binary(res, true) << "\t" << res
+            //            << "\n";
 
             WHEN("Dividing one by the smallest denormalized number")
             {
@@ -241,8 +240,8 @@ SCENARIO("Manual test case for  floating point division",
     }
 }
 
-
-SCENARIO("Division of two floating-point numbers (hand picked examples)", "[normalized_float][arithmetic][division]")
+SCENARIO("Division of two floating-point numbers (hand picked examples)",
+         "[normalized_float][arithmetic][division]")
 {
     GIVEN("Single precision floats (E = 8, M = 23)")
     {

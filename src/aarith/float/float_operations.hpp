@@ -257,6 +257,11 @@ template <size_t E, size_t M, typename WordType>
     -> normalized_float<E, M, WordType>
 {
 
+
+    /*=================================
+     * 7.2. Invalid Operation
+     */
+    // TODO (keszocze) make this calls use the corresponding 754 std function once the branch is merged
     if (lhs.is_nan())
     {
         return lhs.make_quiet_nan();
@@ -272,8 +277,18 @@ template <size_t E, size_t M, typename WordType>
     {
         return normalized_float<E, M>::NaN();
     }
+    //==========================================
+
 
     const auto sign = lhs.get_sign() ^ rhs.get_sign();
+
+
+    if (rhs.is_zero())
+    {
+        return sign ? normalized_float<E, M>::neg_infinity()
+                    : normalized_float<E, M>::pos_infinity();
+    }
+
     if (lhs.is_inf())
     {
         return sign ? normalized_float<E, M>::neg_zero() : normalized_float<E, M>::zero();
@@ -283,11 +298,11 @@ template <size_t E, size_t M, typename WordType>
     {
         return sign ? normalized_float<E, M>::neg_zero() : normalized_float<E, M>::zero();
     }
-    if (rhs.is_zero())
-    {
-        return sign ? normalized_float<E, M>::neg_infinity()
-                          : normalized_float<E, M>::pos_infinity();
-    }
+
+
+
+
+
 
     auto dividend = width_cast<2 * M + 1>(lhs.get_full_mantissa());
     auto divisor = width_cast<2 * M + 1>(rhs.get_full_mantissa());
@@ -300,6 +315,7 @@ template <size_t E, size_t M, typename WordType>
     overflow = exponent_tmp.bit(E) == 1;
     exponent_tmp = sub(exponent_tmp, width_cast<E + 1>(rhs.get_exponent()));
     uinteger<E+1> denorm_exponent_correction {1U};
+
     if(!lhs.is_normalized())
     {
         exponent_tmp = add(exponent_tmp, denorm_exponent_correction);
