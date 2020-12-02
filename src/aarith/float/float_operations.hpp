@@ -256,7 +256,17 @@ template <size_t E, size_t M, typename WordType>
     -> normalized_float<E, M, WordType>
 {
 
-    if ((lhs.is_nan() || rhs.is_nan()) || (lhs.is_zero() && rhs.is_zero()) ||
+    if (lhs.is_nan())
+    {
+        return lhs.make_quiet_nan();
+    }
+
+    if (rhs.is_nan())
+    {
+        return rhs.make_quiet_nan();
+    }
+
+    if ((lhs.is_zero() && rhs.is_zero()) ||
         (lhs.is_inf() && rhs.is_inf()))
     {
         return normalized_float<E, M>::NaN();
@@ -290,6 +300,16 @@ template <size_t E, size_t M, typename WordType>
     auto exponent_tmp = expanding_add(lhs.get_exponent(), lhs.bias);
     overflow = exponent_tmp.bit(E) == 1;
     exponent_tmp = sub(exponent_tmp, width_cast<E + 1>(rhs.get_exponent()));
+    uinteger<E+1> denorm_exponent_correction {1U};
+    if(!lhs.is_normalized())
+    {
+        exponent_tmp = add(exponent_tmp, denorm_exponent_correction);
+    }
+    if(!rhs.is_normalized())
+    {
+        exponent_tmp = sub(exponent_tmp, denorm_exponent_correction);
+    }
+
     auto esum = width_cast<E>(exponent_tmp);
     overflow &= exponent_tmp.bit(E) == 1;
     underflow = !overflow && exponent_tmp.bit(E) == 1;
@@ -318,6 +338,14 @@ template <size_t E, size_t M, typename WordType>
             }
         }
         return normalize<E, M, M>(quotient);
+    }
+
+    if (esum == uinteger<esum.width()>(1U))
+    {
+        esum = esum.zero();
+        mquotient = rshift_and_round(mquotient, M+1);
+        normalized_float<E, M> quotient(sign, esum, width_cast<M+1>(mquotient));
+        return quotient;
     }
 
     normalized_float<E, mquotient.width() - 1> quotient(sign, esum, mquotient);
