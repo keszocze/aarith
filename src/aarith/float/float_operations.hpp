@@ -229,7 +229,8 @@ template <size_t E, size_t M, typename WordType>
                 product.set_full_mantissa(width_cast<M + 1>(mproduct));
             }
         }
-        return normalize<E, M, M>(product);
+        //return normalize<E, M, M>(product);
+        return product;
     }
 
     auto esum = width_cast<E>(ext_esum);
@@ -337,13 +338,20 @@ template <size_t E, size_t M, typename WordType>
                 quotient.set_sign(sign);
             }
         }
-        return normalize<E, M, M>(quotient);
+        return quotient;
+    }
+    else if (esum == uinteger<esum.width()>::zero())
+    {
+        normalized_float<E, M> quotient{sign, esum, width_cast<M+1>(rshift_and_round(mquotient, 1))};
+        return quotient;
     }
 
+    //complience with IEEE implementation
     if (esum == uinteger<esum.width()>(1U))
     {
         esum = esum.zero();
-        mquotient = rshift_and_round(mquotient, M+1);
+        //I don't get why we don't have to shift, when reducing
+        //mquotient = rshift_and_round(mquotient, 1);
         normalized_float<E, M> quotient(sign, esum, width_cast<M+1>(mquotient));
         return quotient;
     }

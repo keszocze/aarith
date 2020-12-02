@@ -123,6 +123,14 @@ TEMPLATE_TEST_CASE_SIG("Floating point division matches its native counterparts"
 
     if (!equal_except_rounding(res_native_, res))
     {
+        std::cout
+            << "a (aarith): " << to_binary(a) << "\n"
+            << "a (native): " << to_binary(F(a)) << "\n"
+            << "b (aarith): " << to_binary(b) << "\n"
+            << "b (native): " << to_binary(F(b)) << "\n"
+            << "res (aarith): " << to_binary(res) << "\n"
+            << "res (native): " << to_binary(F(res_native)) << "\n";
+            
         F res2 = a / b;
         Native res_native2 = a_native / b_native;
 
@@ -136,7 +144,6 @@ TEMPLATE_TEST_CASE_SIG("Floating point division matches its native counterparts"
             << "b (native): " << to_binary(F(b)) << "\n"
             << "res (aarith): " << to_binary(res2) << "\n"
             << "res (native): " << to_binary(F(res_native2)) << "\n";
-            
     }
 
     CHECK(equal_except_rounding(res_native_, res));
