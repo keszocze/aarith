@@ -59,6 +59,140 @@ TEMPLATE_TEST_CASE_SIG("IEEE-754 arithmetic conversion: float, double",
     }
 }
 
+
+SCENARIO("Creating aarith floats from native +/- infinity")
+{
+    using Single = normalized_float<8, 23>;
+    using Double = normalized_float<11, 52>;
+    using Large = normalized_float<20, 70>;
+    using Small = normalized_float<3, 10>;
+
+    GIVEN("The infinities in IEEE 754 single precision")
+    {
+        constexpr float native_pos_inf = std::numeric_limits<float>::infinity();
+        constexpr float native_neg_inf = -std::numeric_limits<float>::infinity();
+
+        WHEN("Creating aarith foating-point numbers with enough bits from the infinities")
+        {
+            const Single sposinf(native_pos_inf);
+            const Double dposinf(native_pos_inf);
+            const Large lposinf(native_pos_inf);
+
+            const Single sneginf(native_neg_inf);
+            const Double dneginf(native_neg_inf);
+            const Large lneginf(native_neg_inf);
+
+            THEN("The result should be the correct infinity")
+            {
+                REQUIRE(sposinf.is_positive());
+                REQUIRE(sposinf.is_pos_inf());
+                REQUIRE(sposinf.is_inf());
+
+                REQUIRE(sneginf.is_negative());
+                REQUIRE(sneginf.is_neg_inf());
+                REQUIRE(sneginf.is_inf());
+
+                REQUIRE(dposinf.is_positive());
+                REQUIRE(dposinf.is_pos_inf());
+                REQUIRE(dposinf.is_inf());
+
+                REQUIRE(dneginf.is_negative());
+                REQUIRE(dneginf.is_neg_inf());
+                REQUIRE(dneginf.is_inf());
+
+                REQUIRE(lposinf.is_positive());
+                REQUIRE(lposinf.is_pos_inf());
+                REQUIRE(lposinf.is_inf());
+
+                REQUIRE(lneginf.is_negative());
+                REQUIRE(lneginf.is_neg_inf());
+                REQUIRE(lneginf.is_inf());
+
+
+            }
+        }
+        WHEN("Creating aarith foating-point numbers with enough bits from the infinities")
+        {
+            THEN("The result should still be the correct infinity")
+            {
+                const Small smallposinf(native_pos_inf);
+                const Small smallneginf(native_neg_inf);
+
+                REQUIRE(smallposinf.is_positive());
+                REQUIRE(smallposinf.is_pos_inf());
+                REQUIRE(smallposinf.is_inf());
+
+                REQUIRE(smallneginf.is_negative());
+                REQUIRE(smallneginf.is_neg_inf());
+                REQUIRE(smallneginf.is_inf());
+            }
+        }
+    }
+    GIVEN("The inifities in IEEE 754 double precision")
+    {
+        constexpr double native_pos_inf = std::numeric_limits<double>::infinity();
+        constexpr double native_neg_inf = -std::numeric_limits<double>::infinity();
+
+        WHEN("Creating aarith foating-point numbers with enough bits from the zero")
+        {
+
+            const Double dposinf(native_pos_inf);
+            const Large lposinf(native_pos_inf);
+
+
+            const Double dneginf(native_neg_inf);
+            const Large lneginf(native_neg_inf);
+
+            THEN("The result should be the correct infinity")
+            {
+                REQUIRE(dposinf.is_positive());
+                REQUIRE(dposinf.is_pos_inf());
+                REQUIRE(dposinf.is_inf());
+
+                REQUIRE(dneginf.is_negative());
+                REQUIRE(dneginf.is_neg_inf());
+                REQUIRE(dneginf.is_inf());
+
+                REQUIRE(lposinf.is_positive());
+                REQUIRE(lposinf.is_pos_inf());
+                REQUIRE(lposinf.is_inf());
+
+                REQUIRE(lneginf.is_negative());
+                REQUIRE(lneginf.is_neg_inf());
+                REQUIRE(lneginf.is_inf());
+            }
+        }
+        WHEN("Creating aarith foating-point numbers with enough bits from the zero")
+        {
+            THEN("The result should still be zero")
+            {
+                const Small smallposinf(native_pos_inf);
+                const Single sposinf(native_pos_inf);
+
+
+                const Small smallneginf(native_neg_inf);
+                const Single sneginf(native_neg_inf);
+
+                REQUIRE(smallposinf.is_positive());
+                REQUIRE(smallposinf.is_pos_inf());
+                REQUIRE(smallposinf.is_inf());
+
+                REQUIRE(smallneginf.is_negative());
+                REQUIRE(smallneginf.is_neg_inf());
+                REQUIRE(smallneginf.is_inf());
+
+                REQUIRE(sposinf.is_positive());
+                REQUIRE(sposinf.is_pos_inf());
+                REQUIRE(sposinf.is_inf());
+
+                REQUIRE(sneginf.is_negative());
+                REQUIRE(sneginf.is_neg_inf());
+                REQUIRE(sneginf.is_inf());
+            }
+        }
+    }
+}
+
 SCENARIO("Creating aarith floats from native negative zeros")
 {
     using Single = normalized_float<8, 23>;
