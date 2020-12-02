@@ -237,28 +237,41 @@ public:
             // a smaller exponent means a lower bias, so we subtract the difference between the two
             // biases from the original bias
             // in case of over- or underflow we set the value to infinity or 0
-            // TODO handle denormalized numbers?
-            using OExp = uinteger<ext_exp_width + 1, WordType>;
-            constexpr OExp bigger_bias = uinteger<ext_exp_width - 1, WordType>::all_ones();
-            constexpr OExp smaller_bias = bias;
-            constexpr OExp diff = sub(bigger_bias, smaller_bias);
-            const auto exp = sub(OExp(extracted_exp), diff);
-            const bool overflow =
-                exp >= OExp(IntegerExp::all_ones()) && exp.bit(ext_exp_width) == 0;
-            const bool underflow = exp.bit(ext_exp_width) == 1;
-            if (underflow)
+
+
+            // we need to make sure that inf/NaN remains the same
+            if (extracted_exp == E_::all_ones())
             {
-                mantissa = mantissa.all_zeroes();
-                exponent = exponent.all_zeroes();
+                exponent = uinteger<E>::all_ones();
             }
-            else if (overflow)
-            {
-                mantissa = mantissa.all_zeroes();
-                exponent = exponent.all_ones();
+                // the other special case is for zero and denormalized numbers: the exponent has to
+                // remain zeroes only as well
+            else if (extracted_exp == E_::all_zeroes()) {
+                exponent = uinteger<E>::all_zeroes();
             }
-            else
-            {
-                exponent = width_cast<E>(exp);
+            else {
+                using OExp = uinteger<ext_exp_width + 1, WordType>;
+                constexpr OExp bigger_bias = uinteger<ext_exp_width - 1, WordType>::all_ones();
+                constexpr OExp smaller_bias = bias;
+                constexpr OExp diff = sub(bigger_bias, smaller_bias);
+                const auto exp = sub(OExp(extracted_exp), diff);
+                const bool overflow =
+                    exp >= OExp(IntegerExp::all_ones()) && exp.bit(ext_exp_width) == 0;
+                const bool underflow = exp.bit(ext_exp_width) == 1;
+                if (underflow)
+                {
+                    mantissa = mantissa.all_zeroes();
+                    exponent = exponent.all_zeroes();
+                }
+                else if (overflow)
+                {
+                    mantissa = mantissa.all_zeroes();
+                    exponent = exponent.all_ones();
+                }
+                else
+                {
+                    exponent = width_cast<E>(exp);
+                }
             }
         }
         else
