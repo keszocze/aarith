@@ -229,7 +229,7 @@ template <size_t E, size_t M, typename WordType>
                 product.set_full_mantissa(width_cast<M + 1>(mproduct));
             }
         }
-        //return normalize<E, M, M>(product);
+        // return normalize<E, M, M>(product);
         return product;
     }
 
@@ -257,11 +257,11 @@ template <size_t E, size_t M, typename WordType>
     -> normalized_float<E, M, WordType>
 {
 
-
     /*=================================
      * 7.2. Invalid Operation
      */
-    // TODO (keszocze) make this calls use the corresponding 754 std function once the branch is merged
+    // TODO (keszocze) make this calls use the corresponding 754 std function once the branch is
+    // merged
     if (lhs.is_nan())
     {
         return lhs.make_quiet_nan();
@@ -272,16 +272,13 @@ template <size_t E, size_t M, typename WordType>
         return rhs.make_quiet_nan();
     }
 
-    if ((lhs.is_zero() && rhs.is_zero()) ||
-        (lhs.is_inf() && rhs.is_inf()))
+    if ((lhs.is_zero() && rhs.is_zero()) || (lhs.is_inf() && rhs.is_inf()))
     {
         return normalized_float<E, M>::NaN();
     }
     //==========================================
 
-
     const auto sign = lhs.get_sign() ^ rhs.get_sign();
-
 
     if (rhs.is_zero())
     {
@@ -291,6 +288,7 @@ template <size_t E, size_t M, typename WordType>
 
     if (lhs.is_inf())
     {
+        // due to the checks above, we already know that rhs is finite
         return sign ? normalized_float<E, M>::neg_zero() : normalized_float<E, M>::zero();
     }
 
@@ -298,11 +296,6 @@ template <size_t E, size_t M, typename WordType>
     {
         return sign ? normalized_float<E, M>::neg_zero() : normalized_float<E, M>::zero();
     }
-
-
-
-
-
 
     auto dividend = width_cast<2 * M + 1>(lhs.get_full_mantissa());
     auto divisor = width_cast<2 * M + 1>(rhs.get_full_mantissa());
@@ -314,13 +307,13 @@ template <size_t E, size_t M, typename WordType>
     auto exponent_tmp = expanding_add(lhs.get_exponent(), lhs.bias);
     overflow = exponent_tmp.bit(E) == 1;
     exponent_tmp = sub(exponent_tmp, width_cast<E + 1>(rhs.get_exponent()));
-    uinteger<E+1> denorm_exponent_correction {1U};
+    uinteger<E + 1> denorm_exponent_correction{1U};
 
-    if(!lhs.is_normalized())
+    if (!lhs.is_normalized())
     {
         exponent_tmp = add(exponent_tmp, denorm_exponent_correction);
     }
-    if(!rhs.is_normalized())
+    if (!rhs.is_normalized())
     {
         exponent_tmp = sub(exponent_tmp, denorm_exponent_correction);
     }
@@ -328,13 +321,13 @@ template <size_t E, size_t M, typename WordType>
     auto esum = width_cast<E>(exponent_tmp);
     overflow &= exponent_tmp.bit(E) == 1;
     underflow = !overflow && exponent_tmp.bit(E) == 1;
-    
+
     // check for over or underflow and break
     if (underflow || overflow)
     {
         normalized_float<E, M> quotient;
-        //apparently float div does not produce -0
-        //quotient.set_sign(sign);
+        // apparently float div does not produce -0
+        // quotient.set_sign(sign);
         if (overflow)
         {
             quotient.set_exponent(uinteger<E>::all_ones());
@@ -342,7 +335,7 @@ template <size_t E, size_t M, typename WordType>
         }
         else
         {
-            //shift mantissa of denormal number 
+            // shift mantissa of denormal number
             exponent_tmp = ~exponent_tmp;
             exponent_tmp = add(exponent_tmp, uinteger<exponent_tmp.width()>(2));
             if (exponent_tmp < uinteger<64>(M + 1))
@@ -363,7 +356,8 @@ template <size_t E, size_t M, typename WordType>
     }
     else if (esum == uinteger<esum.width()>::zero())
     {
-        normalized_float<E, M> quotient{sign, esum, width_cast<M+1>(rshift_and_round(mquotient, 1))};
+        normalized_float<E, M> quotient{sign, esum,
+                                        width_cast<M + 1>(rshift_and_round(mquotient, 1))};
         return quotient;
     }
 
