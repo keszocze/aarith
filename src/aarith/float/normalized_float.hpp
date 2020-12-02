@@ -186,9 +186,11 @@ public:
         constexpr size_t ext_exp_width = get_exponent_width<F>();
         constexpr size_t ext_mant_width = get_mantissa_width<F>();
 
-        sign_neg = (f < 0);
+        using E_ = decltype(extracted_exp);
 
-        // if the mantissa of the normalized float can store at least as many bit as the
+        sign_neg = std::signbit(f);
+
+        // if the mantissa of the float can store at least as many bit as the
         // mantissa of the supplied native data type, it has to be shifted by the
         // difference in widths (which may be zero!)
         if constexpr (ext_mant_width <= M)
@@ -212,13 +214,18 @@ public:
             // biases to the old exponent to get the old value
 
             // we need to make sure that inf/NaN remains the same
-            if (extracted_exp == decltype(extracted_exp)::all_ones())
+            if (extracted_exp == E_::all_ones())
             {
                 exponent = uinteger<E>::all_ones();
             }
+            // the other special case is for zero and denormalized numbers: the exponent has to
+            // remain zeroes only as well
+            else if (extracted_exp == E_::all_zeroes()) {
+                exponent = uinteger<E>::all_zeroes();
+            }
             else
             {
-
+                // no special case left -> we can adjust the exponent
                 constexpr IntegerExp smaller_bias =
                     uinteger<ext_exp_width - 1, WordType>::all_ones();
                 constexpr IntegerExp diff = sub(bias, smaller_bias);
@@ -401,14 +408,15 @@ public:
     }
 
     /**
-     * @brief Returns whether the number is finity
+     * @brief Returns whether the number is finite
      *
      * @note NaNs are *not* considered finite
      *
      * @return True iff the number is finite
      */
-    [[nodiscard]] constexpr bool is_finite() const {
-        return (exponent != uinteger<E>::all_ones())
+    [[nodiscard]] constexpr bool is_finite() const
+    {
+        return (exponent != uinteger<E>::all_ones());
     }
 
     [[nodiscard]] constexpr bool is_inf() const
@@ -600,9 +608,9 @@ public:
     [[nodiscard]] normalized_float<E, M> make_quiet_nan() const
     {
         auto nan_mantissa = mantissa;
-        nan_mantissa.set_bit(M-1, static_cast<WordType>(1U));
+        nan_mantissa.set_bit(M - 1, static_cast<WordType>(1U));
         const auto nan_exponent = uinteger<E>::all_ones();
-        normalized_float<E, M> nan {false, nan_exponent, nan_mantissa};
+        normalized_float<E, M> nan{false, nan_exponent, nan_mantissa};
         return nan;
     }
 
@@ -661,11 +669,10 @@ public:
 };
 
 template <size_t E, size_t M1, size_t M2, typename WordType = uint64_t>
-auto equal(const normalized_float<E, M1, WordType> lhs,
-          const normalized_float<E, M2, WordType> rhs) -> bool
+auto equal(const normalized_float<E, M1, WordType> lhs, const normalized_float<E, M2, WordType> rhs)
+    -> bool
 {
-    return lhs.get_sign() == rhs.get_sign() &&
-           lhs.get_exponent() == rhs.get_exponent() &&
+    return lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent() &&
            lhs.get_mantissa() == rhs.get_mantissa();
 }
 
@@ -813,14 +820,14 @@ auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<
 {
     auto denormalized = nf;
 
-    auto exponent = width_cast<E+1>(denormalized.get_exponent());
+    auto exponent = width_cast<E + 1>(denormalized.get_exponent());
     auto mantissa = denormalized.get_full_mantissa();
 
     auto one_at = find_leading_one(mantissa);
 
     if (one_at > M1)
     {
-        //if mantissa is zero
+        // if mantissa is zero
         exponent = exponent.all_zeroes();
     }
     else if (one_at >= M2)
@@ -829,11 +836,11 @@ auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<
         mantissa = rshift_and_round(mantissa, shift_by);
         if (exponent == exponent.all_zeroes())
         {
-            exponent = add(exponent, uinteger<E+1, WordType>(shift_by + 1));
+            exponent = add(exponent, uinteger<E + 1, WordType>(shift_by + 1));
         }
         else
         {
-            exponent = add(exponent, uinteger<E+1, WordType>(shift_by));
+            exponent = add(exponent, uinteger<E + 1, WordType>(shift_by));
         }
     }
     else
@@ -841,7 +848,7 @@ auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<
         auto shift_by = M2 - one_at;
         if (exponent != exponent.all_zeroes())
         {
-            if (exponent <= uinteger<E+1>(shift_by))
+            if (exponent <= uinteger<E + 1>(shift_by))
             {
                 // shift_by -= 1;
                 mantissa = (mantissa << (exponent.word(0) - 1));
@@ -850,13 +857,13 @@ auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<
             else
             {
                 mantissa = (mantissa << shift_by);
-                exponent = sub(exponent, uinteger<E+1, WordType>(shift_by));
+                exponent = sub(exponent, uinteger<E + 1, WordType>(shift_by));
             }
         }
     }
 
     normalized_float<E, M2, WordType> normalized(denormalized.get_sign(), width_cast<E>(exponent),
-                                                       width_cast<M2 + 1>(mantissa));
+                                                 width_cast<M2 + 1>(mantissa));
 
     if (normalized.is_nan() || exponent.bit(E) == 1)
     {
