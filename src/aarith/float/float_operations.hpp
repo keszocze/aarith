@@ -297,23 +297,31 @@ template <size_t E, size_t M, typename WordType>
         return result_is_negative ? normalized_float<E, M>::neg_zero() : normalized_float<E, M>::zero();
     }
 
+    auto denorm_exponent_lhs = 0U;
+    const bool lhs_is_denormal = !lhs.is_normalized();
+    if (lhs_is_denormal)
+    {
+        //more precision of the computation with denormal numbers
+        denorm_exponent_lhs = M - find_leading_one(lhs.get_full_mantissa());
+    }
     auto dividend = width_cast<2 * M + 1>(lhs.get_full_mantissa());
     auto divisor = width_cast<2 * M + 1>(rhs.get_full_mantissa());
-    dividend = dividend << M; // warum shifted er diesen Wert?
+    // shift to use integer division for producing 1,M
+    dividend = dividend << M + denorm_exponent_lhs;
     auto mquotient = div(dividend, divisor);
 
     auto exponent_tmp = expanding_add(lhs.get_exponent(), lhs.bias);
+    if(lhs_is_denormal)
+    {
+        denorm_exponent_lhs -= 1U;
+        exponent_tmp = sub(exponent_tmp, uinteger<E+1>(denorm_exponent_lhs));
+    }
 
     bool overflow = exponent_tmp.bit(E) == 1;
 
 
     exponent_tmp = sub(exponent_tmp, width_cast<E + 1>(rhs.get_exponent()));
     uinteger<E + 1> denorm_exponent_correction{1U};
-
-    if (!lhs.is_normalized())
-    {
-        exponent_tmp = add(exponent_tmp, denorm_exponent_correction);
-    }
     if (!rhs.is_normalized())
     {
         exponent_tmp = sub(exponent_tmp, denorm_exponent_correction);
@@ -326,19 +334,17 @@ template <size_t E, size_t M, typename WordType>
     // check for over or underflow and break
     if (underflow || overflow)
     {
-        //std::cout << "(underflow / overflow)  ---  (" << underflow << " / " << overflow << ")\n";
         normalized_float<E, M> quotient;
         quotient.set_sign(result_is_negative);
         // apparently float div does not produce -0
-        // quotient.set_sign(sign);
         if (overflow)
         {
             quotient.set_exponent(uinteger<E>::all_ones());
         }
         else
         {
-            // TODO (brand) Wieso wird hier nicht direkt Null zurückgegeben?
             // shift mantissa of subnormal number
+            // in case some part of the mantissa can be expressed as subnormal number
             exponent_tmp = ~exponent_tmp;
             exponent_tmp = add(exponent_tmp, uinteger<exponent_tmp.width()>(2));
             if (exponent_tmp < uinteger<sizeof(M)*8>(M + 1))
@@ -346,13 +352,6 @@ template <size_t E, size_t M, typename WordType>
                 mquotient = rshift_and_round(mquotient, exponent_tmp.word(0));
                 quotient.set_full_mantissa(width_cast<M + 1>(mquotient));
             }
-            /*
-            else if(exponent_tmp.word(0) == (M+1))
-            {
-                quotient.set_full_mantissa(uinteger<M+1>(1U));
-                quotient.set_sign(sign);
-            }
-            */
         }
         return quotient;
     }
