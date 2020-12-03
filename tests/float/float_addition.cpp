@@ -17,8 +17,8 @@ TEMPLATE_TEST_CASE_SIG("Addition is commutative",
     GIVEN("Two random floating-point numbers")
     {
 
-        F a = GENERATE(take(100, random_float<E, M, FloatGenerationModes::FullyRandom>()));
-        F b = GENERATE(take(100, random_float<E, M, FloatGenerationModes::FullyRandom>()));
+        F a = GENERATE(take(80, random_float<E, M, FloatGenerationModes::FullyRandom>()));
+        F b = GENERATE(take(80, random_float<E, M, FloatGenerationModes::FullyRandom>()));
 
         WHEN("Adding these numbers")
         {
@@ -33,7 +33,7 @@ TEMPLATE_TEST_CASE_SIG("Addition is commutative",
                     // Adding infinities of different sign is another special case
                     if (a.is_inf() && b.is_inf() && (a.is_negative() != b.is_negative()))
                     {
-                        CHECK(bit_equal(res1,res2));
+                        CHECK(bit_equal(res1, res2));
                         CHECK(res1.is_nan());
                         REQUIRE(res2.is_nan());
                     }
@@ -90,6 +90,39 @@ TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
                     }
                     REQUIRE(res == a);
                 }
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG(
+    "Floating point addition matches its native counterparts (special values only)",
+    "[normalized_float][arithmetic][addition]", AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
+    AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+{
+
+    using F = normalized_float<E, M>;
+
+    GIVEN("Random NaN and infinity values")
+    {
+
+        F a = GENERATE(take(30, random_float<E, M, FloatGenerationModes::Special>()));
+        F b = GENERATE(take(30, random_float<E, M, FloatGenerationModes::Special>()));
+
+        Native a_native = static_cast<Native>(a);
+        Native b_native = static_cast<Native>(b);
+
+        WHEN("Adding them")
+        {
+
+            F res = a + b;
+            Native res_native = a_native + b_native;
+
+            F res_native_{res_native};
+//            Native res_ = static_cast<Native>(res);
+            
+            THEN("The result should match the native result bit by bit") {
+                REQUIRE(bit_equal(res, res_native_));
             }
         }
     }
