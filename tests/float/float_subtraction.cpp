@@ -11,7 +11,8 @@ using namespace aarith;
 
 TEMPLATE_TEST_CASE_SIG("Floating point subtraction matches its native counterparts",
                        "[normalized_float][arithmetic][subtraction]",
-                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float))
+                       AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
+                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
     using F = normalized_float<E, M>;
@@ -27,32 +28,72 @@ TEMPLATE_TEST_CASE_SIG("Floating point subtraction matches its native counterpar
     F res_native_{res_native};
     Native res_ = static_cast<Native>(res);
 
-    if (!equal_except_rounding(res_native_, res))
-    {
-        std::cout << "a - b\n"
-                  << to_binary(a) << " - \n"
-                  << to_binary(b) << "\n"
-                  << to_binary(res) << "(normalized_float) !=\n"
-                  << to_binary(res_native_) << "(native)\n\n";
-
-        std::cout << a << " - " << b << " = " << res << "\n";
-        std::cout << a_native << " - " << b_native << " = " << res_native << "\n";
-        std::cout << to_binary(F{a_native},true) << " - " << to_binary(F{b_native},true) << "\n";
-        std::cout << to_binary(a,true) << " - " << to_binary(b,true) << "\n";
-
-        std::bitset<32> bs_a = bit_cast<uint32_t>(a_native);
-        std::bitset<32> bs_b = bit_cast<uint32_t>(b_native);
-        std::cout << bs_a << " - " << bs_b << "\n";
-
-        std::cout << "\n";
-        std::bitset<32> bs_res_native = bit_cast<uint32_t>(res_native);
-        std::bitset<32> bs_res = bit_cast<uint32_t>(res_);
-        std::cout << bs_res_native << " != \n" << bs_res << "\n";
-        exit(0);
-    }
+//    if (!equal_except_rounding(res_native_, res))
+//    {
+//        std::cout << "a - b\n"
+//                  << to_binary(a) << " - \n"
+//                  << to_binary(b) << "\n"
+//                  << to_binary(res) << "(normalized_float) !=\n"
+//                  << to_binary(res_native_) << "(native)\n\n";
+//
+//        std::cout << a << " - " << b << " = " << res << "\n";
+//        std::cout << a_native << " - " << b_native << " = " << res_native << "\n";
+//        std::cout << to_binary(F{a_native}, true) << " - " << to_binary(F{b_native}, true) << "\n";
+//        std::cout << to_binary(a, true) << " - " << to_binary(b, true) << "\n";
+//
+//        std::bitset<32> bs_a = bit_cast<uint32_t>(a_native);
+//        std::bitset<32> bs_b = bit_cast<uint32_t>(b_native);
+//        std::cout << bs_a << " - " << bs_b << "\n";
+//
+//        std::cout << "\n";
+//        std::bitset<32> bs_res_native = bit_cast<uint32_t>(res_native);
+//        std::bitset<32> bs_res = bit_cast<uint32_t>(res_);
+//        std::cout << bs_res_native << " != \n" << bs_res << "\n";
+//        exit(0);
+//    }
 
     CHECK(equal_except_rounding(res_native_, res));
     REQUIRE(equal_except_rounding(F{res_}, F{res_native}));
+}
+
+TEMPLATE_TEST_CASE_SIG("Floating point subtraction involving zero",
+                       "[normalized_float][arithmetic][subtraction]",
+                       AARITH_FLOAT_TEST_SIGNATURE,
+                       AARIHT_FLOAT_TEMPLATE_RANGE)
+{
+
+    using F = normalized_float<E, M>;
+
+    constexpr F zero = F::zero();
+    constexpr F neg_zero = F::neg_zero();
+
+    GIVEN("A random floating-point number")
+    {
+        F a = GENERATE(take(100, random_float<E, M, FloatGenerationModes::NonSpecial>()));
+
+        WHEN("Subtracting zero")
+        {
+            const F res_p = a - zero;
+            const F res_n = a - neg_zero;
+
+            THEN("The result is unchanged")
+            {
+                CHECK(res_p == a);
+                CHECK(res_n == a);
+                REQUIRE(res_p == res_n);
+            }
+        }
+
+        WHEN("Subtracting from zero")
+        {
+            const F res1 = zero - a;
+            const F res2 = neg_zero - a;
+
+            CHECK(res1 == -a);
+            CHECK(res2 == -a);
+            REQUIRE(res1 == res2);
+        }
+    }
 }
 
 TEMPLATE_TEST_CASE_SIG(
@@ -79,9 +120,10 @@ TEMPLATE_TEST_CASE_SIG(
             Native res_native = a_native - b_native;
 
             F res_native_{res_native};
-//            Native res_ = static_cast<Native>(res);
+            //            Native res_ = static_cast<Native>(res);
 
-            THEN("The result should match the native result bit by bit") {
+            THEN("The result should match the native result bit by bit")
+            {
                 REQUIRE(bit_equal(res, res_native_));
             }
         }
