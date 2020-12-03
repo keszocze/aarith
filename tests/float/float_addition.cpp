@@ -1,14 +1,12 @@
 #include <aarith/float.hpp>
 
-#include "gen_float.hpp"
 #include "../test-signature-ranges.hpp"
+#include "gen_float.hpp"
 
 #include <bitset>
 #include <catch.hpp>
 
-
 using namespace aarith;
-
 
 TEMPLATE_TEST_CASE_SIG("Addition is commutative",
                        "[normalized_float][arithmetic][addition][invariant]",
@@ -22,29 +20,26 @@ TEMPLATE_TEST_CASE_SIG("Addition is commutative",
         F a = GENERATE(take(50, random_float<E, M, FloatGenerationModes::FullyRandom>()));
         F b = GENERATE(take(50, random_float<E, M, FloatGenerationModes::FullyRandom>()));
 
-
         WHEN("Adding these numbers")
         {
             F res1{a + b};
             F res2{b + a};
             THEN("The result should not depend on operand order")
             {
-                if(!a.is_nan() && !b.is_nan())
+                if (!a.is_nan() && !b.is_nan())
                 {
-                    const bool pass_test = res1 == res2 || (res1.is_inf() && res2.is_inf()) || bit_equal(res1, res2);
-                    if(!pass_test)
+                    const bool pass_test =
+                        res1 == res2 || (res1.is_inf() && res2.is_inf()) || bit_equal(res1, res2);
+                    if (!pass_test)
                     {
-                        std::cout 
-                            << to_binary(a) << " + \n" 
-                            << to_binary(b) << " = \n" 
-                            << "res1: " << to_binary(res1) << "\n" 
-                            << "res2: " << to_binary(res2) << "\n";
+                        std::cout << to_binary(a) << " + \n"
+                                  << to_binary(b) << " = \n"
+                                  << "res1: " << to_binary(res1) << "\n"
+                                  << "res2: " << to_binary(res2) << "\n";
                         auto dbg1 = a + b;
                         auto dbg2 = b + a;
-                        std::cout 
-                            << "dbg1: " << to_binary(dbg1) << "\n"
-                            << "dbg2: " << to_binary(dbg2) << "\n";
-                        
+                        std::cout << "dbg1: " << to_binary(dbg1) << "\n"
+                                  << "dbg2: " << to_binary(dbg2) << "\n";
                     }
                     REQUIRE(pass_test);
                 }
@@ -52,8 +47,6 @@ TEMPLATE_TEST_CASE_SIG("Addition is commutative",
         }
     }
 }
-
-
 
 TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
                        "[normalized_float][arithmetic][addition][invariant]",
@@ -71,13 +64,12 @@ TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
             F res{a + F::zero()};
             THEN("The result should have left the number untouched")
             {
-                if(!a.is_nan())
+                if (!a.is_nan())
                 {
-                    if(res != a)
+                    if (res != a)
                     {
-                        std::cout
-                            << "a:   " << to_binary(a) << "\n"
-                            << "res: " << to_binary(res) << "\n";
+                        std::cout << "a:   " << to_binary(a) << "\n"
+                                  << "res: " << to_binary(res) << "\n";
                     }
                     REQUIRE(res == a);
                 }
@@ -86,12 +78,10 @@ TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
     }
 }
 
-
-
-
 TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts",
                        "[normalized_float][arithmetic][addition]",
-                       AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE, AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+                       AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
+                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
     using F = normalized_float<E, M>;
@@ -108,7 +98,7 @@ TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts"
     F res_native_{res_native};
     Native res_ = static_cast<Native>(res);
 
-    if(a.is_nan() || b.is_nan())
+    if (a.is_nan() || b.is_nan())
     {
         REQUIRE(bit_equal(F{res_}, F{res_native}));
     }
@@ -116,29 +106,25 @@ TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts"
     {
         if (!equal_except_rounding(res_native_, res))
         {
-            //F res__ = a + b;
-            //std::cout << a << " + " << b << " = " << res__ << "\n";
-            std::cout 
-                << to_binary(a) << " + \n" 
-                << to_binary(b) << " = \n" 
-                << to_binary(res) << "\n";
+            // F res__ = a + b;
+            // std::cout << a << " + " << b << " = " << res__ << "\n";
+            std::cout << to_binary(a) << " + \n"
+                      << to_binary(b) << " = \n"
+                      << to_binary(res) << "\n";
             // std::cout << to_compute_string(a) << "\t+\t" << to_compute_string(b) << " = "
             //          << to_compute_string(res) << "\n";
 
-            //std::cout << a_native << " + " << b_native << " = " << res_native << "\n";
-            std::cout 
-                << "res:        " << to_binary(res) << "\n" 
-                << "res_native: " << to_binary(res_native_) << "\n";
-            auto dbg = a+b;
-            std::cout 
-                << "dbg: " << to_binary(dbg) << "\n";
+            // std::cout << a_native << " + " << b_native << " = " << res_native << "\n";
+            std::cout << "res:        " << to_binary(res) << "\n"
+                      << "res_native: " << to_binary(res_native_) << "\n";
+            auto dbg = a + b;
+            std::cout << "dbg: " << to_binary(dbg) << "\n";
         }
 
         CHECK(equal_except_rounding(res_native_, res));
         REQUIRE(equal_except_rounding(F{res_}, F{res_native}));
     }
 }
-
 
 TEMPLATE_TEST_CASE_SIG("Adding to infinity", "[normalized_float][arithmetic][addition]",
                        AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
@@ -147,7 +133,7 @@ TEMPLATE_TEST_CASE_SIG("Adding to infinity", "[normalized_float][arithmetic][add
     constexpr F neg_inf{F::neg_infinity()};
     constexpr F pos_inf{F::pos_infinity()};
 
-    GIVEN("Infinity")
+    GIVEN("Positive infinity")
     {
         WHEN("Adding infinity to infinity")
         {
@@ -160,9 +146,35 @@ TEMPLATE_TEST_CASE_SIG("Adding to infinity", "[normalized_float][arithmetic][add
             }
         }
     }
+    GIVEN("Negative infinitiy")
+    {
+        WHEN("Adding negative infinity")
+        {
+            F res = neg_inf + neg_inf;
+            THEN("The result should still be negative infinity")
+            {
+                CHECK(res == neg_inf);
+                CHECK(res.is_neg_inf());
+                REQUIRE(res.is_inf());
+            }
+        }
+    }
+    GIVEN("Both infinities")
+    {
+        WHEN("Adding them")
+        {
+            F res1 = pos_inf + neg_inf;
+            F res2 = neg_inf + pos_inf;
+
+            THEN("The result should be NaN")
+            {
+                CHECK(res1.is_nan());
+                REQUIRE(res2.is_nan());
+            }
+        }
+    }
     AND_GIVEN("A random floating point number")
     {
-
         F f = GENERATE(take(100, random_float<E, M, FloatGenerationModes::NonSpecial>()));
 
         WHEN("Adding that number to infinity")
@@ -181,7 +193,6 @@ TEMPLATE_TEST_CASE_SIG("Adding to infinity", "[normalized_float][arithmetic][add
         }
     }
 }
-
 
 SCENARIO("Adding two floating-point numbers", "[normalized_float][arithmetic][addition]")
 {
@@ -382,7 +393,6 @@ SCENARIO("Adding two floating-point numbers", "[normalized_float][arithmetic][ad
         }
     }
 }
-
 
 SCENARIO("IEEE-754 denormalized number computations: float, double",
          "[normalized_float][denormalized][ieee-754][computation]")
