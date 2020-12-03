@@ -14,11 +14,11 @@ TEMPLATE_TEST_CASE_SIG("Addition is commutative",
 {
     using F = normalized_float<E, M>;
 
-    GIVEN("Tow normalized_floats created from native data types")
+    GIVEN("Two random floating-point numbers")
     {
 
-        F a = GENERATE(take(50, random_float<E, M, FloatGenerationModes::FullyRandom>()));
-        F b = GENERATE(take(50, random_float<E, M, FloatGenerationModes::FullyRandom>()));
+        F a = GENERATE(take(100, random_float<E, M, FloatGenerationModes::FullyRandom>()));
+        F b = GENERATE(take(100, random_float<E, M, FloatGenerationModes::FullyRandom>()));
 
         WHEN("Adding these numbers")
         {
@@ -26,22 +26,39 @@ TEMPLATE_TEST_CASE_SIG("Addition is commutative",
             F res2{b + a};
             THEN("The result should not depend on operand order")
             {
+                // NaNs should simply propagate (see below)
                 if (!a.is_nan() && !b.is_nan())
                 {
-                    const bool pass_test =
-                        res1 == res2 || (res1.is_inf() && res2.is_inf()) || bit_equal(res1, res2);
-                    if (!pass_test)
+
+                    // Adding infinities of different sign is another special case
+                    if (a.is_inf() && b.is_inf() && (a.is_negative() != b.is_negative()))
                     {
-                        std::cout << to_binary(a) << " + \n"
-                                  << to_binary(b) << " = \n"
-                                  << "res1: " << to_binary(res1) << "\n"
-                                  << "res2: " << to_binary(res2) << "\n";
-                        auto dbg1 = a + b;
-                        auto dbg2 = b + a;
-                        std::cout << "dbg1: " << to_binary(dbg1) << "\n"
-                                  << "dbg2: " << to_binary(dbg2) << "\n";
+                        CHECK(bit_equal(res1,res2));
+                        CHECK(res1.is_nan());
+                        REQUIRE(res2.is_nan());
                     }
-                    REQUIRE(pass_test);
+                    else
+                    {
+                        const bool pass_test = res1 == res2 || (res1.is_inf() && res2.is_inf()) ||
+                                               bit_equal(res1, res2);
+                        if (!pass_test)
+                        {
+                            std::cout << to_binary(a) << " + \n"
+                                      << to_binary(b) << " = \n"
+                                      << "res1: " << to_binary(res1) << "\n"
+                                      << "res2: " << to_binary(res2) << "\n";
+                            auto dbg1 = a + b;
+                            auto dbg2 = b + a;
+                            std::cout << "dbg1: " << to_binary(dbg1) << "\n"
+                                      << "dbg2: " << to_binary(dbg2) << "\n";
+                        }
+                        REQUIRE(pass_test);
+                    }
+                }
+                else
+                {
+                    CHECK(res1.is_nan());
+                    REQUIRE(res2.is_nan());
                 }
             }
         }
@@ -86,8 +103,8 @@ TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts"
 
     using F = normalized_float<E, M>;
 
-    F a = GENERATE(take(15, random_float<E, M, FloatGenerationModes::FullyRandom>()));
-    F b = GENERATE(take(15, random_float<E, M, FloatGenerationModes::FullyRandom>()));
+    F a = GENERATE(take(150, random_float<E, M, FloatGenerationModes::FullyRandom>()));
+    F b = GENERATE(take(150, random_float<E, M, FloatGenerationModes::FullyRandom>()));
 
     Native a_native = static_cast<Native>(a);
     Native b_native = static_cast<Native>(b);
@@ -146,7 +163,7 @@ TEMPLATE_TEST_CASE_SIG("Adding to infinity", "[normalized_float][arithmetic][add
             }
         }
     }
-    GIVEN("Negative infinitiy")
+    GIVEN("Negative infinity")
     {
         WHEN("Adding negative infinity")
         {
