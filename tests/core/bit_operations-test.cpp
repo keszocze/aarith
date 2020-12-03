@@ -792,6 +792,88 @@ SCENARIO("Bit shifting is possible as constexpr", "[word_array][utility][bit_log
     }
 }
 
+TEMPLATE_TEST_CASE_SIG("Counting leading ones/zeroes", "[word_array][utility][bit_logic]",
+                       AARITH_INT_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using A = word_array<W, WordType>;
+
+    GIVEN("<0...0> of length W")
+    {
+
+        constexpr A zeroes = A::all_zeroes();
+
+        WHEN("Counting the leading zeroes")
+        {
+            THEN("The result should be W")
+            {
+                REQUIRE(count_leading_zeroes(zeroes) == W);
+            }
+        }
+        WHEN("Counting the leading ones")
+        {
+            THEN("The result should be 0")
+            {
+                REQUIRE(count_leading_ones(zeroes) == 0);
+            }
+        }
+    }
+
+    GIVEN("<1...1> of length W")
+    {
+
+        constexpr A ones = A::all_ones();
+
+        WHEN("Counting the leading zeroes")
+        {
+            THEN("The result should be 0")
+            {
+                REQUIRE(count_leading_zeroes(ones) == 0);
+            }
+        }
+        WHEN("Counting the leading ones")
+        {
+            THEN("The result should be W")
+            {
+                REQUIRE(count_leading_ones(ones) == W);
+            }
+        }
+    }
+
+    GIVEN("<00..010...0> of length W with the one at position k")
+    {
+        A a = A::all_zeroes();
+
+        size_t k = GENERATE(take(50, random<size_t>(0U, W - 1)));
+        a.set_bit(k, true);
+
+        WHEN("Counting the leading zeroes")
+        {
+            const size_t count = count_leading_zeroes(a);
+            THEN("The result should be W - (k + 1)")
+            {
+                const size_t expected = W - (k + 1);
+                REQUIRE(count == expected);
+            }
+        }
+        WHEN("Counting the leading ones")
+        {
+            const size_t count = count_leading_ones(a);
+            THEN("The result should be 0 (except for k = W-1)")
+            {
+
+                if (k == W - 1)
+                {
+                    REQUIRE(count == 1);
+                }
+                else
+                {
+                    REQUIRE(count == 0);
+                }
+            }
+        }
+    }
+}
+
 TEMPLATE_TEST_CASE_SIG("Bit operations are performed correctly", "[word_array][bit_logic]",
                        AARITH_INT_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
 {
@@ -815,7 +897,7 @@ TEMPLATE_TEST_CASE_SIG("Bit operations are performed correctly", "[word_array][b
                 {
                     CHECK(prepended_w.word(i) == w.word(i));
                 }
-                if constexpr(prepended_w.word_count() > w.word_count())
+                if constexpr (prepended_w.word_count() > w.word_count())
                 {
                     CHECK(prepended_w.word(w.word_count()) == static_cast<WordType>(0U));
                 }
@@ -823,7 +905,7 @@ TEMPLATE_TEST_CASE_SIG("Bit operations are performed correctly", "[word_array][b
         }
         WHEN("The size is doubled")
         {
-            //const auto doubled = width_cast<2 * W>(w);
+            // const auto doubled = width_cast<2 * W>(w);
             auto doubled = width_cast<2 * W>(w);
             THEN("The result should have twice the bits of the original word_array")
             {
@@ -843,7 +925,7 @@ TEMPLATE_TEST_CASE_SIG("Bit operations are performed correctly", "[word_array][b
                 {
                     CHECK(doubled.word(i) == w.word(i));
                 }
-                if constexpr(doubled.word_count() > w.word_count())
+                if constexpr (doubled.word_count() > w.word_count())
                 {
                     CHECK(doubled.word(w.word_count()) == static_cast<WordType>(0U));
                 }

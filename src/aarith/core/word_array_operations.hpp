@@ -90,6 +90,25 @@ constexpr size_t count_leading_zeroes(const word_array<Width, WordType>& value)
 }
 
 /**
+ * @brief  Counts the number of bits set to one before the first zero appears (from MSB to LSB)
+ * @tparam Width Width of the word_array
+ * @param value The word to count the leading ones in
+ * @return
+ */
+template <size_t Width, typename WordType>
+constexpr size_t count_leading_ones(const word_array<Width, WordType>& value)
+{
+    for (auto i = Width; i > 0; --i)
+    {
+        if (!value.bit(i - 1))
+        {
+            return (Width - i);
+        }
+    }
+    return Width;
+}
+
+/**
  * @brief Computes the position of the first set bit (i.e. a bit set to one) in the word_array from
  * MSB to LSB
  *
@@ -523,15 +542,16 @@ constexpr W& rotate_through_carry_right(W& lhs, const bool carry_in, const U& ro
  * @return The shifted integer
  */
 template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
-constexpr W& rotate_left(W& lhs, size_t rotate = 1)
+constexpr W& rotate_left(W& lhs, const size_t rotate = 1)
 {
 
-    // TODO offer this as a compile-time optimized version?
+    // TODO (keszocze) offer this as a compile-time optimized version?
     //    constexpr size_t width = W::width();
     //    const auto slice = bit_range<width-1, width-R>(lhs);
     //
     //    lhs <<= R;
     //    lhs.set_bits(0, slice);
+
 
     const size_t right_shift = lhs.width() - rotate;
     const auto slice = lhs >> right_shift;
@@ -543,8 +563,6 @@ constexpr W& rotate_left(W& lhs, size_t rotate = 1)
 
 /**
  * @brief Rotates the word_array to the left
- *
- * This shift preserves the signedness of the integer.
  *
  * @tparam Width The width of the signed integer
  * @param lhs The integer to be shifted
@@ -561,15 +579,13 @@ constexpr W& rotate_left(W& lhs, const U& rotate = U::one())
 /**
  * @brief Rotates the word_array to the right
  *
- * This shift preserves the signedness of the integer.
- *
  * @tparam Width The width of the signed integer
  * @param lhs The integer to be shifted
  * @param rhs The number of bits to be shifted
  * @return The shifted integer
  */
 template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
-constexpr W& rotate_right(W& lhs, size_t rotate = 1)
+constexpr W& rotate_right(W& lhs, const size_t rotate = 1)
 {
     const size_t left_shift = lhs.width() - rotate;
     const auto slice = lhs << left_shift;
@@ -777,6 +793,8 @@ zip_with_state_expand(const word_array<W, WordType>& w, const word_array<V, Word
         return zip_with_state(w_, v_, f, initial_state);
     }
 }
+
+
 
 /**
  *
