@@ -16,7 +16,6 @@ auto full_native_range()
                                         std::numeric_limits<N>::max() / 100.0f);
 }
 
-
 TEMPLATE_TEST_CASE_SIG("One is the neutral element of the multiplication",
                        "[normalized_float][arithmetic][multiplication][invariant]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
@@ -35,10 +34,11 @@ TEMPLATE_TEST_CASE_SIG("One is the neutral element of the multiplication",
             F res{a * one};
             THEN("The result should have left the number untouched")
             {
-                const bool eq_round = equal_except_rounding(res,a);
-                const bool eq= res == a;
+                const bool eq_round = equal_except_rounding(res, a);
+                const bool eq = res == a;
 
-                if (!eq_round || !eq) {
+                if (!eq_round || !eq)
+                {
                     std::cout << to_binary(a) << "\n" << to_binary(one) << "\n";
                     std::cout << to_binary(res) << "\n";
                 }
@@ -60,8 +60,8 @@ TEMPLATE_TEST_CASE_SIG("Multiplication is commutative",
     GIVEN("Tow normalized_floats created from native data types")
     {
 
-        F a = GENERATE(take(10, random_float<E, M, FloatGenerationModes::FullyRandom>()));
-        F b = GENERATE(take(10, random_float<E, M, FloatGenerationModes::FullyRandom>()));
+        F a = GENERATE(take(30, random_float<E, M, FloatGenerationModes::FullyRandom>()));
+        F b = GENERATE(take(30, random_float<E, M, FloatGenerationModes::FullyRandom>()));
 
         WHEN("Multiplying these numbers")
         {
@@ -69,7 +69,7 @@ TEMPLATE_TEST_CASE_SIG("Multiplication is commutative",
             F res2{b * a};
             THEN("The result should not depend on operand order")
             {
-                REQUIRE(equal_except_rounding(res1,res2));
+                REQUIRE(equal_except_rounding(res1, res2));
             }
         }
     }
@@ -85,7 +85,7 @@ TEMPLATE_TEST_CASE_SIG("Zero makes the multiplication result zero",
     GIVEN("A normalized floating-point number")
     {
 
-        F a = GENERATE(take(50, random_float<E, M, FloatGenerationModes::NormalizedOnly>()));
+        F a = GENERATE(take(100, random_float<E, M, FloatGenerationModes::NormalizedOnly>()));
         F zero{F::zero()};
 
         WHEN("Multiplying with zero")
@@ -105,20 +105,29 @@ TEMPLATE_TEST_CASE_SIG("Multiplying with infinity",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
                        AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
-    // I haven't found easily readable official documents that motivate these test cases. They are
-    // based on the following web sites:
-    // https://wiki.analytica.com/index.php/INF,_Nan,_Zero_and_IEEE/SANE_arithmetic
-    // https://stackoverflow.com/questions/42926763/the-behaviour-of-floating-point-division-by-zero
-    //      and the reference to Annex F
+    using F = normalized_float<E, M>;
+    constexpr F neg_inf{F::neg_infinity()};
+    constexpr F pos_inf{F::pos_infinity()};
+
+    GIVEN("A NaN floating-point")
+    {
+        F nan = F::NaN();
+        WHEN("Multiplying with infinity")
+        {
+            F res = nan * pos_inf;
+            F res_ = nan * neg_inf;
+
+            CHECK(res.is_nan());
+            REQUIRE(res_.is_nan());
+        }
+    }
+
     GIVEN("A random floating point number")
     {
 
-        using F = normalized_float<E, M>;
-
-        F f = GENERATE(take(15, random_float<E, M, FloatGenerationModes::FullyRandom>()));
-
-        constexpr F neg_inf{F::neg_infinity()};
-        constexpr F pos_inf{F::pos_infinity()};
+        // we allow to generate NaNs here as they have different payloads than the single NaN
+        // generated from the F::NaN() method. This broadens the range of inputs we test.
+        F f = GENERATE(take(100, random_float<E, M, FloatGenerationModes::FullyRandom>()));
 
         WHEN("Multiplying with infinity")
         {
@@ -127,15 +136,47 @@ TEMPLATE_TEST_CASE_SIG("Multiplying with infinity",
                 F res = f * neg_inf;
                 F res_ = f * pos_inf;
 
-                if (f.is_negative())
+                if (f.is_nan())
                 {
-                    CHECK(res == pos_inf);
-                    REQUIRE(res_ == neg_inf);
+                    REQUIRE(res.is_nan());
+                    REQUIRE(res_.is_nan());
                 }
                 else
                 {
-                    CHECK(res == neg_inf);
-                    REQUIRE(res_ == pos_inf);
+                    if (f.is_negative())
+                    {
+                        if (res != pos_inf)
+                        {
+                            std::cout << to_binary(f, true) << " * pos_inf"
+                                      << " = " << to_binary(res, true) << "\n";
+                        }
+
+                        if (res_ != neg_inf)
+                        {
+                            std::cout << to_binary(f, true) << " * neg_inf"
+                                      << " = " << to_binary(res_, true) << "\n";
+                        }
+                        CHECK(res == pos_inf);
+                        REQUIRE(res_ == neg_inf);
+                    }
+                    else
+                    {
+
+                        if (res != neg_inf)
+                        {
+                            std::cout << to_binary(f, true) << " * pos_inf"
+                                      << " = " << to_binary(res, true) << "\n";
+                        }
+
+                        if (res_ != pos_inf)
+                        {
+                            std::cout << to_binary(f, true) << " * neg_inf"
+                                      << " = " << to_binary(res_, true) << "\n";
+                        }
+
+                        CHECK(res == neg_inf);
+                        REQUIRE(res_ == pos_inf);
+                    }
                 }
             }
         }
@@ -178,8 +219,8 @@ TEMPLATE_TEST_CASE_SIG("Floating point multiplication matches its native counter
 
     using F = normalized_float<E, M>;
 
-    Native a_native = GENERATE(take(15, full_native_range<Native>()));
-    Native b_native = GENERATE(take(15, full_native_range<Native>()));
+    Native a_native = GENERATE(take(30, full_native_range<Native>()));
+    Native b_native = GENERATE(take(30, full_native_range<Native>()));
     F a{a_native};
     F b{b_native};
 
