@@ -49,7 +49,12 @@ enum class FloatGenerationModes
      *  - Not a number
      *  - +/- infinity
      */
-    FullyRandom
+    FullyRandom,
+
+    /**
+     * @brief Generates +/- inf and NaNs only
+     */
+    Special
 };
 
 /**
@@ -89,6 +94,10 @@ public:
         else if constexpr (Mode == FloatGenerationModes::NormalizedAndSpecial)
         {
             e = random_norm_exp(g);
+        }
+        else if constexpr (Mode == FloatGenerationModes::Special)
+        {
+            e = IntExp::all_ones();
         }
         else
         {
