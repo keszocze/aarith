@@ -39,7 +39,7 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
         sub(width_cast<E + 1>(lhs.get_exponent()), width_cast<E + 1>(rhs.get_exponent()));
 
     auto extra_shift = 0U;
-    if(lhs.is_normalized() && !rhs.is_normalized())
+    if (lhs.is_normalized() && !rhs.is_normalized())
     {
         extra_shift = 1;
     }
@@ -85,7 +85,7 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
 
     const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
     auto extra_shift = 0U;
-    if(lhs.is_normalized() && !rhs.is_normalized())
+    if (lhs.is_normalized() && !rhs.is_normalized())
     {
         extra_shift = 1;
     }
@@ -123,7 +123,6 @@ template <size_t E, size_t M>
     {
         return rhs.make_quiet_nan();
     }
-
 
     if ((lhs.is_nan() || rhs.is_nan()) || (lhs.is_neg_inf() && rhs.is_pos_inf()) ||
         (lhs.is_pos_inf() && rhs.is_neg_inf()))
@@ -325,26 +324,40 @@ template <size_t E, size_t M, typename WordType>
     if (rhs.is_zero())
     {
         return result_is_negative ? normalized_float<E, M>::neg_infinity()
-                    : normalized_float<E, M>::pos_infinity();
+                                  : normalized_float<E, M>::pos_infinity();
     }
 
     if (lhs.is_inf())
     {
         // due to the checks above, we already know that rhs is finite
-        return result_is_negative ? normalized_float<E, M>::neg_zero() : normalized_float<E, M>::zero();
+        return result_is_negative ? normalized_float<E, M>::neg_zero()
+                                  : normalized_float<E, M>::zero();
     }
 
     if (rhs.is_inf() || lhs.is_zero())
     {
-        return result_is_negative ? normalized_float<E, M>::neg_zero() : normalized_float<E, M>::zero();
+        return result_is_negative ? normalized_float<E, M>::neg_zero()
+                                  : normalized_float<E, M>::zero();
     }
 
-    auto denorm_exponent_lhs = 0U;
+    size_t denorm_exponent_lhs = 0;
     const bool lhs_is_denormal = !lhs.is_normalized();
     if (lhs_is_denormal)
     {
-        //more precision of the computation with denormal numbers
-        denorm_exponent_lhs = M - find_leading_one(lhs.get_full_mantissa());
+        // more precision of the computation with denormal numbers
+        //        denorm_exponent_lhs = M - find_leading_one(lhs.get_full_mantissa());
+
+        denorm_exponent_lhs = [&lhs]() {
+            const std::optional<size_t> one_at = first_set_bit(lhs.get_full_mantissa());
+            if (one_at)
+            {
+                return size_t(M - (*one_at));
+            }
+            else
+            {
+                return size_t(0);
+            }
+        }();
     }
     auto dividend = width_cast<2 * M + 1>(lhs.get_full_mantissa());
     auto divisor = width_cast<2 * M + 1>(rhs.get_full_mantissa());
@@ -353,14 +366,13 @@ template <size_t E, size_t M, typename WordType>
     auto mquotient = div(dividend, divisor);
 
     auto exponent_tmp = expanding_add(lhs.get_exponent(), lhs.bias);
-    if(lhs_is_denormal)
+    if (lhs_is_denormal)
     {
         denorm_exponent_lhs -= 1U;
-        exponent_tmp = sub(exponent_tmp, uinteger<E+1>(denorm_exponent_lhs));
+        exponent_tmp = sub(exponent_tmp, uinteger<E + 1>(denorm_exponent_lhs));
     }
 
     bool overflow = exponent_tmp.bit(E) == 1;
-
 
     exponent_tmp = sub(exponent_tmp, width_cast<E + 1>(rhs.get_exponent()));
     uinteger<E + 1> denorm_exponent_correction{1U};
@@ -389,7 +401,7 @@ template <size_t E, size_t M, typename WordType>
             // in case some part of the mantissa can be expressed as subnormal number
             exponent_tmp = ~exponent_tmp;
             exponent_tmp = add(exponent_tmp, uinteger<exponent_tmp.width()>(2));
-            if (exponent_tmp < uinteger<sizeof(M)*8>(M + 1))
+            if (exponent_tmp < uinteger<sizeof(M) * 8>(M + 1))
             {
                 mquotient = rshift_and_round(mquotient, exponent_tmp.word(0));
                 quotient.set_full_mantissa(width_cast<M + 1>(mquotient));

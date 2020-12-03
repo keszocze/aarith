@@ -836,16 +836,17 @@ auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<
     auto exponent = width_cast<E + 1>(denormalized.get_exponent());
     auto mantissa = denormalized.get_full_mantissa();
 
-    auto one_at = find_leading_one(mantissa);
+    const auto one_at = first_set_bit(mantissa);
 
-    if (one_at > M1)
+    // i.e. there was no one in the mantissa at all
+    if (!one_at)
     {
         // if mantissa is zero
         exponent = exponent.all_zeroes();
     }
-    else if (one_at >= M2)
+    else if (*one_at >= M2)
     {
-        auto shift_by = one_at - M2;
+        auto shift_by = *one_at - M2;
         mantissa = rshift_and_round(mantissa, shift_by);
         if (exponent == exponent.all_zeroes())
         {
@@ -858,7 +859,7 @@ auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<
     }
     else
     {
-        auto shift_by = M2 - one_at;
+        auto shift_by = M2 - *one_at;
         if (exponent != exponent.all_zeroes())
         {
             if (exponent <= uinteger<E + 1>(shift_by))
@@ -886,51 +887,6 @@ auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<
     }
 
     return normalized;
-}
-
-template <class uint> auto find_leading_one(const uint mantissa) -> typename uint::word_type
-{
-    static_assert(::aarith::is_integral_v<uint>);
-    static_assert(::aarith::is_unsigned_v<uint>);
-
-    const auto width = uint::width();
-    auto one_at = width;
-
-    for (auto i = uint::word_count(); i > 0; --i)
-    {
-        if (mantissa.word(i - 1) == 0)
-        {
-            if (i == uint::word_count())
-            {
-                auto const modulo = width % (sizeof(typename uint::word_type) * 8);
-                one_at -= modulo == 0 ? sizeof(typename uint::word_type) * 8 : modulo;
-            }
-            else
-            {
-                one_at -= sizeof(typename uint::word_type) * 8;
-            }
-        }
-        else
-        {
-            break;
-        }
-    }
-
-    while (one_at > 0)
-    {
-        --one_at;
-        if (mantissa.bit(one_at) == 1)
-        {
-            break;
-        }
-    }
-
-    if (one_at == 0 && mantissa.bit(0) == 0)
-    {
-        one_at = width;
-    }
-
-    return one_at;
 }
 
 } // namespace aarith
