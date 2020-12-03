@@ -120,7 +120,7 @@ TEMPLATE_TEST_CASE_SIG(
 
             F res_native_{res_native};
 //            Native res_ = static_cast<Native>(res);
-            
+
             THEN("The result should match the native result bit by bit") {
                 REQUIRE(bit_equal(res, res_native_));
             }
