@@ -85,7 +85,7 @@ TEMPLATE_TEST_CASE_SIG("Zero makes the multiplication result zero",
     GIVEN("A normalized floating-point number")
     {
 
-        F a = GENERATE(take(100, random_float<E, M, FloatGenerationModes::NormalizedOnly>()));
+        F a = GENERATE(take(100, random_float<E, M, FloatGenerationModes::NonSpecial>()));
         F zero{F::zero()};
 
         WHEN("Multiplying with zero")
