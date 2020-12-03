@@ -1,16 +1,15 @@
 #include <aarith/float.hpp>
+
 #include <iostream>
-#include <numeric>
-#include <vector>
-#include <math.h>
+#include <cmath>
 
 using namespace aarith;
 
-using nf_t = normalized_float<8, 23>;
-using nf_db = normalized_float<11, 52>;
-using nf_s = normalized_float<4, 3>;
+using nf_t = normalized_float<8, 23>; // NOLINT
+using nf_db = normalized_float<11, 52>; // NOLINT
+using nf_s = normalized_float<4, 3>; // NOLINT
 
-void show_float(float& a, nf_t& nf_a)
+void show_float(const float& a, const nf_t& nf_a)
 {
     std::cout 
         << "float: "
@@ -21,7 +20,7 @@ void show_float(float& a, nf_t& nf_a)
 
 }
 
-void show_float(double& a, nf_db& nf_a)
+void show_float(const double& a, const nf_db& nf_a)
 {
     std::cout 
         << "double: "
@@ -32,7 +31,7 @@ void show_float(double& a, nf_db& nf_a)
 
 }
 
-void show_float(float& a, nf_s& nf_a)
+void show_float(const float& a, const nf_s& nf_a)
 {
     std::cout 
         << "float: "
@@ -46,19 +45,19 @@ void show_float(float& a, nf_s& nf_a)
 int main()
 {
 
-    double two{2.};
-    double test{8.};
+    const double two{2.};
+    const double test{8.};
     auto conversion = log10(two);
 
     std::cout << "conversion: " << conversion << "\n"
               << "test 2^8 = 10^" << test*conversion << "\n\n";
 
-    float a = 0.f;
-    float b = 0.5f;
-    float c = 1.25;
-    float d = 0.385671f;
-    float e = 0.0117647f;
-    float f = 10.f;
+    const float a = 0.F;
+    const float b = 0.5F;
+    const float c = 1.25F;
+    const float d = 0.385671F;
+    const float e = 0.0117647F;
+    const float f = 10.F;
     nf_t nf_a(a);
     nf_t nf_b(b);
     nf_t nf_c(c);
@@ -93,12 +92,12 @@ int main()
     show_float(nf, nf_nf);
 
 
-    double adb = 0.;
-    double bdb = 0.5;
-    double cdb = 1.25;
-    double ddb = 0.385671;
-    double edb = 0.0117647;
-    double fdb = 10.;
+    const double adb = 0.;
+    const double bdb = 0.5;
+    const double cdb = 1.25;
+    const double ddb = 0.385671;
+    const double edb = 0.0117647;
+    const double fdb = 10.;
     nf_db nfdb_a(adb);
     nf_db nfdb_b(bdb);
     nf_db nfdb_c(cdb);
