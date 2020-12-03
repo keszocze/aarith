@@ -8,6 +8,69 @@
 
 using namespace aarith;
 
+TEMPLATE_TEST_CASE_SIG(
+    "Floating point division matches its native counterparts (special values only)",
+    "[normalized_float][arithmetic][division]", AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
+    AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+{
+
+    using F = normalized_float<E, M>;
+
+    GIVEN("Random NaN and infinity values")
+    {
+
+        F a = GENERATE(take(30, random_float<E, M, FloatGenerationModes::Special>()));
+        F b = GENERATE(take(30, random_float<E, M, FloatGenerationModes::Special>()));
+
+        Native a_native = static_cast<Native>(a);
+        Native b_native = static_cast<Native>(b);
+
+        WHEN("Adding them")
+        {
+
+            F res = a / b;
+            Native res_native = a_native / b_native;
+
+            F res_native_{res_native};
+            //            Native res_ = static_cast<Native>(res);
+
+            THEN("The result should match the native result bit by bit")
+            {
+                REQUIRE(bit_equal(res, res_native_));
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Dividing by one", "[normalized_float][arithmetic][division]",
+                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+{
+    GIVEN("A random floating point number")
+    {
+
+        using F = normalized_float<E, M>;
+
+        F f = GENERATE(take(100, random_float<E, M, FloatGenerationModes::NonSpecial>()));
+
+        WHEN("Dividing the number by 1") {
+            const F res = f / F::one();
+
+
+            THEN("The result should be unchanged") {
+                REQUIRE(res == f);
+            }
+        }
+
+        WHEN("Dividing the number by -1") {
+            const F res = f / F::neg_one();
+
+            THEN("The number should have switched its sign") {
+                REQUIRE(res == -f);
+            }
+        }
+    }
+}
+
 TEMPLATE_TEST_CASE_SIG("Dividing by infinity", "[normalized_float][arithmetic][division]",
                        AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
 {
@@ -92,7 +155,7 @@ TEMPLATE_TEST_CASE_SIG("Dividing by zero", "[normalized_float][arithmetic][divis
         constexpr F neg_zero{F::neg_zero()};
         WHEN("Dividing by infinity")
         {
-            THEN("The sign of the resulting zero should be correct")
+            THEN("The sign of the resulting infinity should be correct")
             {
 
                 if (!f.is_zero() && !f.is_nan())
@@ -280,7 +343,7 @@ TEMPLATE_TEST_CASE_SIG("Floating point division matches its native counterparts"
     }
 }
 
-SCENARIO("Manual test case for  floating point division",
+SCENARIO("Manual test case for floating point division",
          "[normalized_float][arithmetic][division][bar]")
 {
     using F = normalized_float<8, 23>;
@@ -321,7 +384,6 @@ SCENARIO("Manual test case for  floating point division",
                 }
                 THEN("The resulting number should be larger than one")
                 {
-                    // TODO turn this test back on
                     REQUIRE(F::one() < div(one, smallest));
                 }
             }
