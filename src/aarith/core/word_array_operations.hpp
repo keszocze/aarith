@@ -111,6 +111,30 @@ size_t first_set_bit(const word_array<Width, WordType>& value)
 }
 
 /**
+ * @brief Return a mask that has the n least significant bits set to one
+ * and all other bits set to zero.
+ *
+ * If n is greater than Width, this function returns a word array with
+ * all Width-many bits set to one.
+ *
+ * @tparam Width Width of the returned word_array
+ * @param n The number of ones in the returned array
+ * @return The mask with n-many bits set to one.
+ */
+template <size_t Width, typename WordType>
+[[nodiscard]] constexpr word_array<Width, WordType> get_low_mask(size_t n)
+{
+    word_array<Width, WordType> w(0);
+
+    for (size_t idx = 0; idx < n && idx < Width; ++idx)
+    {
+        w.set_bit(idx, true);
+    }
+
+    return w;
+}
+
+/**
  * @brief Logical Left-shift assignment operator
  * @tparam W The word_container type to work on
  * @param lhs The word_container to be shifted

@@ -5,7 +5,7 @@ add_aarith_test(word_array-random-generation FILES core/word_array-generation-te
 add_aarith_test(word_array-bit-operations FILES core/bit_operations-test.cpp)
 add_aarith_test(word_array-extraction FILES core/word_array-extraction-test.cpp)
 add_aarith_test(word_array-utility FILES core/word_array-utility-test.cpp)
-
+add_aarith_test(word_array-bitops FILES core/word_array-bitops-test.cpp)
 
 add_aarith_test(uint-general FILES integer/uint-test.cpp)
 add_aarith_test(uint-random-generation FILES integer/uint-random-generation-test.cpp)
