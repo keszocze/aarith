@@ -2,4 +2,5 @@
 
 #include <aarith/core.hpp>
 
-#include <aarith/posit/posits.hpp>
+#include <aarith/posit/posit.hpp>
+#include <aarith/posit/posit_operations.hpp>
