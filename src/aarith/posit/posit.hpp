@@ -15,8 +15,7 @@ namespace aarith {
  * @tparam ExponentSize The maximum width in bits of the exponent for
  * a given Posit.
  */
-template <size_t NBits, size_t ExponentSize, class WordType = uint64_t>
-class posit
+template <size_t NBits, size_t ExponentSize, class WordType = uint64_t> class posit
 {
 public:
     using storage_type = uinteger<NBits, WordType>;
@@ -28,27 +27,32 @@ public:
     /**
      * Construct this posit initalized to zero.
      */
-    constexpr posit() : bits(0)
+    constexpr posit()
+        : bits(0)
     {
         assert_template_parameters();
     }
 
-    constexpr posit(const posit &other) : bits(other.bits)
+    constexpr posit(const posit& other)
+        : bits(other.bits)
     {
     }
 
-    constexpr posit(const posit &&other) : bits(other.bits)
+    constexpr posit(const posit&& other)
+        : bits(other.bits)
     {
     }
 
-    constexpr posit operator=(const posit &other)
+    constexpr posit& operator=(const posit& other)
     {
-        return posit(other.bits);
+        bits = other.bits;
+        return *this;
     }
 
-    constexpr posit operator=(const posit &&other)
+    constexpr posit& operator=(const posit&& other)
     {
-        return posit(other.bits);
+        bits = other.bits;
+        return *this;
     }
 
     /**
@@ -56,7 +60,8 @@ public:
      *
      * @param n Bits used to initalize the underlying type.
      */
-    constexpr explicit posit(WordType n) : bits(n)
+    constexpr explicit posit(WordType n)
+        : bits(n)
     {
     }
 
