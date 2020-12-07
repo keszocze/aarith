@@ -12,18 +12,19 @@
 
 namespace aarith {
 
+/**
+ * @param n The integer to compute the twos complement of.
+ * @return The twos complement of n.
+ */
 template <size_t N, class WT = uint64_t>
 [[nodiscard]] constexpr uinteger<N, WT> twos_complement(const uinteger<N, WT>& n)
 {
     return (~n) + n.one();
 }
 
-template <size_t N, size_t ES, size_t Start, size_t End, size_t E, size_t M, typename WT>
-[[nodiscard]] constexpr word_array<(Start - End) + 1, WT> bit_range(const posit<N, ES, WT>& p)
-{
-    return bit_range<Start, End>(p.as_word_array());
-}
-
+/**
+ * @return The number of regime bits in the given posit.
+ */
 template <size_t N, size_t ES, class WT = uint64_t>
 [[nodiscard]] constexpr size_t get_num_regime_bits(const posit<N, ES, WT>& p)
 {
@@ -61,15 +62,18 @@ template <size_t N, size_t ES, class WT = uint64_t>
     return nregime;
 }
 
+/**
+ * @return The number of exponent bits in the given posit.
+ */
 template <size_t N, size_t ES, class WT = uint64_t>
 [[nodiscard]] constexpr size_t get_num_exponent_bits(const posit<N, ES, WT>& p)
 {
     const size_t nregime = get_num_regime_bits(p);
 
     // We have zero exponent bits if (1) the posit consists of just regime
-    // bits (nregime == N), if (2) the posit consits of just regime and sign
-    // bits (nregime == N - 1) or if (3) the posit consits of sign bit, regime
-    // bits and a single seperation bit (nregime == N - 2).
+    // bits (nregime == N), if (2) the posit consists of just regime and sign
+    // bits (nregime == N - 1) or if (3) the posit consists of sign bit, regime
+    // bits and a single separation bit (nregime == N - 2).
 
     if (nregime >= N - 2)
     {
@@ -79,19 +83,22 @@ template <size_t N, size_t ES, class WT = uint64_t>
     // Otherwise the number of exponent bit is determined by the number of
     // remaining usable bits and the exponent size as defined by template
     // parameter ES. The remaining bits are N minus the bits for regime,
-    // minus one bit for sign and minus one bit for seperation bit.
+    // minus one bit for sign and minus one bit for separation bit.
 
     const size_t nremaining = N - nregime - 2;
     return std::min(nremaining, ES);
 }
 
+/**
+ * @return The number of fraction bits in the given posit.
+ */
 template <size_t N, size_t ES, class WT = uint64_t>
 [[nodiscard]] constexpr size_t get_num_fraction_bits(const posit<N, ES, WT>& p)
 {
     const size_t nregime = get_num_regime_bits(p);
 
     // Just like when calculating the number of exponent bits, we have to
-    // check if sign + regime + seperation bit take up the whole posit.
+    // check if sign + regime + separation bit take up the whole posit.
     // In that case, we have zero fraction bits.
 
     if (nregime >= N - 2)
@@ -99,7 +106,7 @@ template <size_t N, size_t ES, class WT = uint64_t>
         return 0;
     }
 
-    // We do have some bits left aside from sign + regime and seperation bit.
+    // We do have some bits left aside from sign + regime and separation bit.
 
     const size_t nsign = 1;
     const size_t nseperator = 1;
@@ -110,6 +117,9 @@ template <size_t N, size_t ES, class WT = uint64_t>
     return N - nused;
 }
 
+/**
+ * @return The regime value of the given posit.
+ */
 template <size_t N, size_t ES, class WT = uint64_t>
 [[nodiscard]] constexpr integer<N, WT> get_regime_value(const posit<N, ES, WT>& p)
 {
@@ -130,6 +140,9 @@ template <size_t N, size_t ES, class WT = uint64_t>
     }
 }
 
+/**
+ * @return The exponent value of the given posit.
+ */
 template <size_t N, size_t ES, class WT = uint64_t>
 [[nodiscard]] constexpr uinteger<N, WT> get_exponent_value(const posit<N, ES, WT>& p)
 {
@@ -147,6 +160,12 @@ template <size_t N, size_t ES, class WT = uint64_t>
     return (bits >> nfrac) & mask;
 }
 
+/**
+ * Return the fraction of the given posit. The fraction is the fractional part
+ * of the posit interpreted as an unsigned integer.
+ *
+ * @return The fraction of the given posit.
+ */
 template <size_t N, size_t ES, class WT = uint64_t>
 [[nodiscard]] constexpr uinteger<N, WT> get_fraction_value(const posit<N, ES, WT>& p)
 {

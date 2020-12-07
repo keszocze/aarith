@@ -33,34 +33,54 @@ public:
         static_assert_template_parameters();
     }
 
+    /**
+     * Construct this posit to be a clone of other.
+     *
+     * @param other The posit to clone.
+     */
     constexpr posit(const posit& other)
         : bits(other.bits)
     {
         static_assert_template_parameters();
     }
 
+    /**
+     * Construct this posit to be a clone of other.
+     *
+     * @param other The posit to clone.
+     */
     constexpr posit(const posit&& other)
-        : bits(other.bits)
+        : bits(std::move(other.bits))
     {
         static_assert_template_parameters();
     }
 
+    /**
+     * Assign this posit to hold the value of other.
+     *
+     * @param The value to change to.
+     */
     constexpr posit& operator=(const posit& other)
     {
         bits = other.bits;
         return *this;
     }
 
+    /**
+     * Assign this posit to hold the value of other.
+     *
+     * @param The value to change to.
+     */
     constexpr posit& operator=(const posit&& other)
     {
-        bits = other.bits;
+        bits = std::move(other.bits);
         return *this;
     }
 
     /**
      * Construct this posit with given bits.
      *
-     * @param n Bits used to initalize the underlying type.
+     * @param n Bits used to initialize the underlying type.
      */
     constexpr explicit posit(WordType n)
         : bits(n)
@@ -71,11 +91,23 @@ public:
     // Comparison Operators
     //
 
+    /**
+     * Compare this and other for equality.
+     *
+     * @return true if this and other represent the same value. Otherwise
+     * returns true.
+     */
     constexpr bool operator==(const posit& other) const
     {
         return bits == other.bits;
     }
 
+    /**
+     * Compare this and other for inequality.
+     *
+     * @return true if this and other represent different values. Otherwise
+     * returns false.
+     */
     constexpr bool operator!=(const posit& other) const
     {
         return !(*this == other);
@@ -85,9 +117,15 @@ public:
     // Constants
     //
 
+    /**
+     * Return the minimum value of this posit type. The minimum is the
+     * negative posit that has the greatest magnitude.
+     *
+     * @return The smallest representable posit that represents a real number.
+     */
     [[nodiscard]] static constexpr posit min()
     {
-        // the minum value is represented by 10..01
+        // the min value is represented by 10..01
 
         posit p;
 
@@ -97,6 +135,11 @@ public:
         return p;
     }
 
+    /**
+     * Return the smallest representable positive value that is not zero.
+     *
+     * @return Smallest positive non-zero posit that represents a real number.
+     */
     [[nodiscard]] static constexpr posit minpos()
     {
         // minpos is presented by 0..01
@@ -108,6 +151,12 @@ public:
         return p;
     }
 
+    /**
+     * Return the maximum value of this posit type. The maximum is the
+     * positive posit that has the greatest magnitude.
+     *
+     * @return The biggest representable posit that represents a real number.
+     */
     [[nodiscard]] static constexpr posit max()
     {
         // the maximum value is represented by 01..1
@@ -120,6 +169,9 @@ public:
         return p;
     }
 
+    /**
+     * @return Representation of the real number zero.
+     */
     [[nodiscard]] static constexpr posit zero()
     {
         // zero is represented by all bits set to zero
@@ -127,6 +179,9 @@ public:
         return posit();
     }
 
+    /**
+     * @return Representation of the real number one.
+     */
     [[nodiscard]] static constexpr posit one()
     {
         // one is represented by 010...0
@@ -138,6 +193,9 @@ public:
         return p;
     }
 
+    /**
+     * @return Representation of complex infinity.
+     */
     [[nodiscard]] static constexpr posit complex_infinity()
     {
         // complex infinity is sign bit set to one and all
@@ -173,16 +231,29 @@ public:
     // Getters
     //
 
+    /**
+     * @return Whether this posit represents a negative real number.
+     */
     [[nodiscard]] constexpr bool is_negative() const
     {
+        if (*this == complex_infinity()) {
+            return false;
+        }
+
         return get_sign_bit() == 1;
     }
 
+    /**
+     * @return The sign bit. The returned integer is either set to 0 or 1.
+     */
     [[nodiscard]] constexpr storage_type get_sign_bit() const
     {
         return storage_type(bits.msb());
     }
 
+    /**
+     * @return The underlying storage.
+     */
     [[nodiscard]] constexpr storage_type get_bits() const
     {
         return bits;
@@ -191,6 +262,13 @@ public:
 private:
     storage_type bits;
 
+    /**
+     * Statically assert that the created instance of a given posit
+     * conforms to the requirements for legal posits.
+     *
+     * We call this method in the constructor so it is guaranteed
+     * to get generated on template instantiation.
+     */
     constexpr void static_assert_template_parameters() const
     {
         static_assert(NBits >= 2, "number of bits needs to be at least 2");
