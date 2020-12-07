@@ -16,7 +16,7 @@ namespace aarith {
  * @param n The integer to compute the twos complement of.
  * @return The twos complement of n.
  */
-template <size_t N, class WT = uint64_t>
+template <size_t N, class WT>
 [[nodiscard]] constexpr uinteger<N, WT> twos_complement(const uinteger<N, WT>& n)
 {
     return (~n) + n.one();
@@ -25,7 +25,7 @@ template <size_t N, class WT = uint64_t>
 /**
  * @return The number of regime bits in the given posit.
  */
-template <size_t N, size_t ES, class WT = uint64_t>
+template <size_t N, size_t ES, class WT>
 [[nodiscard]] constexpr size_t get_num_regime_bits(const posit<N, ES, WT>& p)
 {
     // special case
@@ -37,7 +37,7 @@ template <size_t N, size_t ES, class WT = uint64_t>
 
     // regular cases
 
-    size_t nregime;
+    size_t nregime = 0;
 
     auto bits = p.get_bits();
 
@@ -45,7 +45,7 @@ template <size_t N, size_t ES, class WT = uint64_t>
 
     if (bits.msb())
     {
-        bits = twos_complement(bits);
+        bits = twos_complement<N, WT>(bits);
     }
 
     // now count leading digits; regime is always >= 1
@@ -65,10 +65,10 @@ template <size_t N, size_t ES, class WT = uint64_t>
 /**
  * @return The number of exponent bits in the given posit.
  */
-template <size_t N, size_t ES, class WT = uint64_t>
+template <size_t N, size_t ES, class WT>
 [[nodiscard]] constexpr size_t get_num_exponent_bits(const posit<N, ES, WT>& p)
 {
-    const size_t nregime = get_num_regime_bits(p);
+    const size_t nregime = get_num_regime_bits<N, ES, WT>(p);
 
     // We have zero exponent bits if (1) the posit consists of just regime
     // bits (nregime == N), if (2) the posit consists of just regime and sign
@@ -92,10 +92,10 @@ template <size_t N, size_t ES, class WT = uint64_t>
 /**
  * @return The number of fraction bits in the given posit.
  */
-template <size_t N, size_t ES, class WT = uint64_t>
+template <size_t N, size_t ES, class WT>
 [[nodiscard]] constexpr size_t get_num_fraction_bits(const posit<N, ES, WT>& p)
 {
-    const size_t nregime = get_num_regime_bits(p);
+    const size_t nregime = get_num_regime_bits<N, ES, WT>(p);
 
     // Just like when calculating the number of exponent bits, we have to
     // check if sign + regime + separation bit take up the whole posit.
@@ -110,7 +110,7 @@ template <size_t N, size_t ES, class WT = uint64_t>
 
     const size_t nsign = 1;
     const size_t nseperator = 1;
-    const size_t nexp = get_num_exponent_bits(p);
+    const size_t nexp = get_num_exponent_bits<N, ES, WT>(p);
 
     const size_t nused = nsign + nregime + nseperator + nexp;
 
@@ -120,7 +120,7 @@ template <size_t N, size_t ES, class WT = uint64_t>
 /**
  * @return The regime value of the given posit.
  */
-template <size_t N, size_t ES, class WT = uint64_t>
+template <size_t N, size_t ES, class WT>
 [[nodiscard]] constexpr integer<N, WT> get_regime_value(const posit<N, ES, WT>& p)
 {
     // Getting the regime value means counting the number of bits in the
@@ -128,7 +128,7 @@ template <size_t N, size_t ES, class WT = uint64_t>
     // less than the number of bits in the run, since we need to be able to
     // represent a value of zero" (Posit Arithmetic, Gustafson, October 2017).
 
-    const ssize_t nregime = get_num_regime_bits(p);
+    const ssize_t nregime = get_num_regime_bits<N, ES, WT>(p);
 
     if (p.get_sign_bit())
     {
@@ -143,17 +143,17 @@ template <size_t N, size_t ES, class WT = uint64_t>
 /**
  * @return The exponent value of the given posit.
  */
-template <size_t N, size_t ES, class WT = uint64_t>
+template <size_t N, size_t ES, class WT>
 [[nodiscard]] constexpr uinteger<N, WT> get_exponent_value(const posit<N, ES, WT>& p)
 {
-    const size_t nexp = get_num_exponent_bits(p);
-    const size_t nfrac = get_num_fraction_bits(p);
+    const size_t nexp = get_num_exponent_bits<N, ES, WT>(p);
+    const size_t nfrac = get_num_fraction_bits<N, ES, WT>(p);
 
     auto bits = p.get_bits();
 
     if (bits.msb())
     {
-        bits = twos_complement(bits);
+        bits = twos_complement<N, WT>(bits);
     }
 
     const auto mask = uinteger<N, WT>(get_low_mask<N, WT>(nexp));
@@ -166,16 +166,16 @@ template <size_t N, size_t ES, class WT = uint64_t>
  *
  * @return The fraction of the given posit.
  */
-template <size_t N, size_t ES, class WT = uint64_t>
+template <size_t N, size_t ES, class WT>
 [[nodiscard]] constexpr uinteger<N, WT> get_fraction_value(const posit<N, ES, WT>& p)
 {
-    const size_t nfrac = get_num_fraction_bits(p);
+    const size_t nfrac = get_num_fraction_bits<N, ES, WT>(p);
 
     auto bits = p.get_bits();
 
     if (bits.msb())
     {
-        bits = twos_complement(bits);
+        bits = twos_complement<N, WT>(bits);
     }
 
     const auto mask = uinteger<N, WT>(get_low_mask<N, WT>(nfrac));

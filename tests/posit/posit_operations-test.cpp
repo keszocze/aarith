@@ -107,7 +107,7 @@ SCENARIO("Extract the regime bits")
 
 static void require_exponent(const P8& p, size_t expected_nexp, uint16_t expected_exponent_value)
 {
-    const size_t nexp = get_num_exponent_bits(p);
+    const size_t nexp = get_num_exponent_bits<NBits, ExponentSize, WordType>(p);
     REQUIRE(nexp == expected_nexp);
 
     const auto exp_value = get_exponent_value(p);
