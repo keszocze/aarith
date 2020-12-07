@@ -66,6 +66,20 @@ public:
     }
 
     //
+    // Comparison Operators
+    //
+
+    constexpr bool operator==(const posit &other) const
+    {
+        return bits == other.bits;
+    }
+
+    constexpr bool operator!=(const posit &other) const
+    {
+        return !(*this == other);
+    }
+
+    //
     // Constants
     //
 
