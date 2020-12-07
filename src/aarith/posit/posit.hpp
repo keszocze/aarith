@@ -30,17 +30,19 @@ public:
     constexpr posit()
         : bits(0)
     {
-        assert_template_parameters();
+        static_assert_template_parameters();
     }
 
     constexpr posit(const posit& other)
         : bits(other.bits)
     {
+        static_assert_template_parameters();
     }
 
     constexpr posit(const posit&& other)
         : bits(other.bits)
     {
+        static_assert_template_parameters();
     }
 
     constexpr posit& operator=(const posit& other)
@@ -85,22 +87,55 @@ public:
 
     [[nodiscard]] static constexpr posit min()
     {
-        // TODO
+        // the minum value is represented by 10..01
+
+        posit p;
+
+        p.bits.set_bit(NBits - 1, true);
+        p.bits.set_bit(0, true);
+
+        return p;
+    }
+
+    [[nodiscard]] static constexpr posit minpos()
+    {
+        // minpos is presented by 0..01
+
+        posit p;
+
+        p.bits.set_bit(0, true);
+
+        return p;
     }
 
     [[nodiscard]] static constexpr posit max()
     {
-        // TODO
+        // the maximum value is represented by 01..1
+
+        posit p;
+
+        p.bits = p.bits.all_ones();
+        p.bits.set_bit(NBits - 1, false);
+
+        return p;
     }
 
     [[nodiscard]] static constexpr posit zero()
     {
-        // TODO
+        // zero is represented by all bits set to zero
+
+        return posit();
     }
 
     [[nodiscard]] static constexpr posit one()
     {
-        // TODO
+        // one is represented by 010...0
+
+        posit p;
+
+        p.bits.set_bit(NBits - 2, true);
+
+        return p;
     }
 
     [[nodiscard]] static constexpr posit complex_infinity()
@@ -156,7 +191,7 @@ public:
 private:
     storage_type bits;
 
-    constexpr void assert_template_parameters() const
+    constexpr void static_assert_template_parameters() const
     {
         static_assert(NBits >= 2, "number of bits needs to be at least 2");
     }
