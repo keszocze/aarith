@@ -2,6 +2,7 @@
 
 #include <aarith/integer.hpp>
 #include <aarith/posit.hpp>
+#include <algorithm>
 #include <cassert>
 #include <cstdint>
 #include <cstdlib>
@@ -12,18 +13,9 @@
 namespace aarith {
 
 template <size_t N, class WT = uint64_t>
-[[nodiscard]] constexpr uinteger<N, WT> get_twos_complement_if_msb_is_set(const uinteger<N, WT>& n)
+[[nodiscard]] constexpr uinteger<N, WT> twos_complement(const uinteger<N, WT>& n)
 {
-    if (n.msb() == 0)
-    {
-        // sign bit is not set; return as-is
-        return n;
-    }
-    else
-    {
-        // sign bit *is* set; return twos complement
-        return (~n) + uinteger<N, WT>(1);
-    }
+    return (~n) + n.one();
 }
 
 template <size_t N, size_t ES, size_t Start, size_t End, size_t E, size_t M, typename WT>
@@ -52,7 +44,7 @@ template <size_t N, size_t ES, class WT = uint64_t>
 
     if (bits.msb())
     {
-        bits = (~bits) + bits.one();
+        bits = twos_complement(bits);
     }
 
     // now count leading digits; regime is always >= 1
@@ -72,13 +64,49 @@ template <size_t N, size_t ES, class WT = uint64_t>
 template <size_t N, size_t ES, class WT = uint64_t>
 [[nodiscard]] constexpr size_t get_num_exponent_bits(const posit<N, ES, WT>& p)
 {
-    throw std::logic_error("not implemented");
+    const size_t nregime = get_num_regime_bits(p);
+
+    // We have zero exponent bits if (1) the posit consists of just regime
+    // bits (nregime == N), if (2) the posit consits of just regime and sign
+    // bits (nregime == N - 1) or if (3) the posit consits of sign bit, regime
+    // bits and a single seperation bit (nregime == N - 2).
+
+    if (nregime >= N - 2)
+    {
+        return 0;
+    }
+
+    // Otherwise the number of exponent bit is determined by the number of
+    // remaining usable bits and the exponent size as defined by template
+    // parameter ES. The remaining bits are N minus the bits for regime,
+    // minus one bit for sign and minus one bit for seperation bit.
+
+    const size_t nremaining = N - nregime - 2;
+    return std::min(nremaining, ES);
 }
 
 template <size_t N, size_t ES, class WT = uint64_t>
 [[nodiscard]] constexpr size_t get_num_fraction_bits(const posit<N, ES, WT>& p)
 {
-    throw std::logic_error("not implemented");
+    const size_t nregime = get_num_regime_bits(p);
+
+    // Just like when calculating the number of exponent bits, we have to
+    // check if sign + regime + seperation bit take up the whole posit.
+    // In that case, we have zero fraction bits.
+
+    if (nregime >= N - 2)
+    {
+        return 0;
+    }
+
+    // We do have some bits left aside from sign + regime and seperation bit.
+
+    const size_t nsign = 1;
+    const size_t nseperator = 1;
+    const size_t nexp = get_num_exponent_bits(p);
+
+    const size_t nused = nsign + nregime + nseperator + nexp;
+    return N - nused;
 }
 
 template <size_t N, size_t ES, class WT = uint64_t>
@@ -99,6 +127,24 @@ template <size_t N, size_t ES, class WT = uint64_t>
     {
         return integer<N, WT>((-1) * nregime);
     }
+}
+
+template <size_t N, size_t ES, class WT = uint64_t>
+[[nodiscard]] constexpr uinteger<N, WT> get_exponent_value(const posit<N, ES, WT>& p)
+{
+    const size_t nexp = get_num_exponent_bits(p);
+    const size_t nfrac = get_num_fraction_bits(p);
+
+    auto bits = p.get_bits();
+
+    if (bits.msb())
+    {
+        bits = twos_complement(bits);
+    }
+
+    const auto mask = uinteger<N, WT>(get_low_mask<N, WT>(nexp));
+
+    return (bits >> nfrac) & mask;
 }
 
 } // namespace aarith
