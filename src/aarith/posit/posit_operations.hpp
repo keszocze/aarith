@@ -106,6 +106,7 @@ template <size_t N, size_t ES, class WT = uint64_t>
     const size_t nexp = get_num_exponent_bits(p);
 
     const size_t nused = nsign + nregime + nseperator + nexp;
+
     return N - nused;
 }
 
@@ -143,8 +144,23 @@ template <size_t N, size_t ES, class WT = uint64_t>
     }
 
     const auto mask = uinteger<N, WT>(get_low_mask<N, WT>(nexp));
-
     return (bits >> nfrac) & mask;
+}
+
+template <size_t N, size_t ES, class WT = uint64_t>
+[[nodiscard]] constexpr uinteger<N, WT> get_fraction_value(const posit<N, ES, WT>& p)
+{
+    const size_t nfrac = get_num_fraction_bits(p);
+
+    auto bits = p.get_bits();
+
+    if (bits.msb())
+    {
+        bits = twos_complement(bits);
+    }
+
+    const auto mask = uinteger<N, WT>(get_low_mask<N, WT>(nfrac));
+    return bits & mask;
 }
 
 } // namespace aarith
