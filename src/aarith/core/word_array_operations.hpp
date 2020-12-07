@@ -71,22 +71,59 @@ template <typename W>[[nodiscard]] constexpr auto operator~(const W& rhs) -> W
 }
 
 /**
- * @brief  Counts the number of bits set to zero before the first one appears (from MSB to LSB)
+ * @brief Counts the number of bits set to zero before the first one appears
+ * (from MSB to LSB).
+ *
+ * Optional parameter offset makes it possible to skip the first offset-many
+ * MSB. For example, calling count_leading_zeroes(0b100111, offset=1) would
+ * return 2 as the first one is skipped.
+ *
  * @tparam Width Width of the word_array
  * @param value The word to count the leading zeroes in
- * @return
+ * @param offset The number of MSB to skip before conuting.
+ * @return The number of zeroes
  */
 template <size_t Width, typename WordType>
-constexpr size_t count_leading_zeroes(const word_array<Width, WordType>& value)
+constexpr size_t count_leading_zeroes(const word_array<Width, WordType>& value, size_t offset=0)
 {
-    for (auto i = Width; i > 0; --i)
+    // if offset is chosen too big, skip all bits, counting none
+
+    if (offset >= Width) {
+        return 0;
+    }
+
+    // if offset is set to a reasonable value, count bit by bit
+
+    const size_t start = Width - offset;
+
+    for (auto i = start; i > 0; --i)
     {
         if (value.bit(i - 1))
         {
-            return (Width - i);
+            return (Width - i - offset);
         }
     }
-    return Width;
+
+    return Width - offset;
+}
+
+/**
+ * @brief Counts the number of bits set to ones before the first zero appears
+ * (from MSB to LSB).
+ *
+ * Optional parameter offset makes it possible to skip the first offset-many
+ * MSB. For example, calling count_leading_ones(0b011000, offset=1) would
+ * return 2 as the first zero is skipped.
+ *
+ * @tparam Width Width of the word_array
+ * @param value The word to count the leading ones in
+ * @param offset The number of MSB to skip before conuting.
+ * @return The number of ones
+ */
+template <size_t Width, typename WordType>
+constexpr size_t count_leading_ones(const word_array<Width, WordType>& value, size_t offset=0)
+{
+    return count_leading_zeroes(~value, offset);
 }
 
 /**
