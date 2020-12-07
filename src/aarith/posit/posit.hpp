@@ -91,7 +91,13 @@ public:
 
     [[nodiscard]] static constexpr posit complex_infinity()
     {
-        // TODO
+        // complex infinity is sign bit set to one and all
+        // other bits set to zero
+
+        posit p;
+        p.bits.set_bit(NBits - 1, true);
+
+        return p;
     }
 
     //
