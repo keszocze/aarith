@@ -182,4 +182,53 @@ template <size_t N, size_t ES, class WT>
     return bits & mask;
 }
 
+template <size_t N, class WT> [[nodiscard]] constexpr double to_double(const uinteger<N, WT>& n)
+{
+    const uint64_t n64 = narrow_cast<uint64_t>(n);
+    return static_cast<double>(n64);
+}
+
+template <size_t N, class WT> [[nodiscard]] constexpr double to_double(const integer<N, WT>& n)
+{
+    const int64_t i64 = narrow_cast<int64_t>(n);
+    return static_cast<double>(i64);
+}
+
+/**
+ * Evaluate the given posit to compute the represented real value.  Uses
+ * double precision IEEE floats for computation.
+ *
+ * The special value posit::complex_infinity gets translated to NaN
+ * by this function.
+ *
+ * @ The real value of p, represented as a double precision float.
+ */
+template <size_t N, size_t ES, class WT>
+[[nodiscard]] constexpr double to_double(const posit<N, ES, WT>& p)
+{
+    // [Posit Arithmetic, Gustafson, October 2017, p. 13]
+
+    if (p == p.zero())
+    {
+        return 0.0;
+    }
+
+    if (p == p.complex_infinity())
+    {
+        return NAN;
+    }
+
+    const double sign = p.is_negative() ? -1.0 : 1.0;
+    const double useed = std::pow(2.0, std::pow(2.0, static_cast<double>(ES)));
+    const double k = to_double(get_regime_value(p));
+    const uint64_t e = to_double(get_exponent_value(p));
+
+    const double fval = to_double(get_fraction_value(p));
+    const double nfrac = static_cast<double>(get_num_fraction_bits(p));
+    // const double fdiv = fval / nfrac;
+    const double f = (fval == 0.0) ? (1.0) : (1 + fval * std::pow(2, (-1.0) * nfrac));
+
+    return sign * std::pow(useed, k) * std::pow(2, e) * f;
+}
+
 } // namespace aarith

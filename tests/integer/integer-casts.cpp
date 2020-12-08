@@ -605,3 +605,37 @@ SCENARIO("Width casting of signed integers", "[integer][signed][utility][casting
         }
     }
 }
+
+SCENARIO("Casting signed integers to uint8_t", "[integer][unsigned][casting]")
+{
+    GIVEN("All of the 16 bit signed integers")
+    {
+        using I16 = integer<16>;
+
+        constexpr int32_t min16 = std::numeric_limits<int16_t>::min();
+        constexpr int32_t max16 = std::numeric_limits<int16_t>::max();
+
+        constexpr int32_t min8 = std::numeric_limits<int8_t>::min();
+        constexpr int32_t max8 = std::numeric_limits<int8_t>::max();
+
+        THEN("Only casts with enough space should succeed")
+        {
+            for (int32_t i = min16; i <= max16; ++i)
+            {
+                const int16_t actual = static_cast<int16_t>(i);
+                const I16 i16(actual);
+
+                if (actual >= min8 && actual <= max8)
+                {
+                    // "actual" fits into 8 bits
+                    REQUIRE(narrow_cast<int8_t>(i16) == actual);
+                }
+                else
+                {
+                    // "actual" does not fit into 8 bits
+                    REQUIRE_THROWS_AS(narrow_cast<int8_t>(i16), std::domain_error);
+                }
+            }
+        }
+    }
+}
