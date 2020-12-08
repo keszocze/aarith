@@ -4,6 +4,7 @@
 #include <aarith/posit.hpp>
 #include <algorithm>
 #include <cassert>
+#include <cctype>
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
@@ -13,6 +14,22 @@
 #include <iostream>
 
 namespace aarith {
+
+namespace internal {
+
+template <size_t N, class WT> [[nodiscard]] constexpr double to_double(const uinteger<N, WT>& n)
+{
+    const uint64_t n64 = narrow_cast<uint64_t>(n);
+    return static_cast<double>(n64);
+}
+
+template <size_t N, class WT> [[nodiscard]] constexpr double to_double(const integer<N, WT>& n)
+{
+    const int64_t i64 = narrow_cast<int64_t>(n);
+    return static_cast<double>(i64);
+}
+
+} // namespace internal
 
 /**
  * @param n The integer to compute the twos complement of.
@@ -140,7 +157,7 @@ template <size_t N, size_t ES, class WT>
 
     if (R0 == 0)
     {
-        return - integer<N, WT>(nregime);
+        return -integer<N, WT>(nregime);
     }
     else
     {
@@ -191,23 +208,6 @@ template <size_t N, size_t ES, class WT>
     return bits & mask;
 }
 
-namespace internal
-{
-
-template <size_t N, class WT> [[nodiscard]] constexpr double to_double(const uinteger<N, WT>& n)
-{
-    const uint64_t n64 = narrow_cast<uint64_t>(n);
-    return static_cast<double>(n64);
-}
-
-template <size_t N, class WT> [[nodiscard]] constexpr double to_double(const integer<N, WT>& n)
-{
-    const int64_t i64 = narrow_cast<int64_t>(n);
-    return static_cast<double>(i64);
-}
-
-} // namespace internal
-
 /**
  * Evaluate the given posit to compute the represented real value.  Uses
  * double precision IEEE floats for computation.
@@ -217,8 +217,7 @@ template <size_t N, class WT> [[nodiscard]] constexpr double to_double(const int
  *
  * @ The real value of p, represented as a double precision float.
  */
-template <size_t N, size_t ES, class WT>
-constexpr double to_double(const posit<N, ES, WT>& p)
+template <size_t N, size_t ES, class WT> constexpr double to_double(const posit<N, ES, WT>& p)
 {
     // [Posit Arithmetic, Gustafson, October 2017, p. 13]
 
@@ -241,7 +240,7 @@ constexpr double to_double(const posit<N, ES, WT>& p)
     const double nfrac = static_cast<double>(get_num_fraction_bits(p));
     const double f = (fval == 0.0) ? (1.0) : (1 + fval * std::pow(2, (-1.0) * nfrac));
 
-    const double res =  sign * std::pow(useed, k) * std::pow(2, e) * f;
+    const double res = sign * std::pow(useed, k) * std::pow(2, e) * f;
     return res;
 }
 
