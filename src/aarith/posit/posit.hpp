@@ -212,18 +212,32 @@ public:
     //
 
     /**
-     * Return the number of possible bit patterns this type can
-     * take.
+     * @brief Return the npat for this type as defined in unum literature.
+     *
+     * @return The number of possible bit patterns this type can take.
      */
-    [[nodiscard]] static constexpr size_t npat()
+    [[nodiscard]] static constexpr uinteger<NBits + 1, WordType> npat()
     {
-        // TODO
-        return 0;
+        // to support arbitrary template parameters, we need to be able to
+        // return arbitrary large sizes; so instead of size_t we use uinteger
+        // as a return type here
+
+        using SizeType = uinteger<NBits + 1, WordType>;
+        const SizeType one = SizeType::one();
+
+        return one << NBits;
     }
 
+    /**
+     * @brief Return the useed for this type as used in offical unum
+     * literature.
+     *
+     * @ The useed value, which is 2 to the power of 2 to the power of the
+     * exponent size.
+     */
     [[nodiscard]] static constexpr size_t useed()
     {
-        // TODO
+        throw std::logic_error("not implemented");
         return 0;
     }
 
@@ -240,7 +254,7 @@ public:
             return false;
         }
 
-        return get_sign_bit() == 1;
+        return get_sign_bit() == storage_type(1);
     }
 
     /**

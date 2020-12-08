@@ -4,8 +4,10 @@
 #include <aarith/posit.hpp>
 #include <algorithm>
 #include <cassert>
+#include <cmath>
 #include <cstdint>
 #include <cstdlib>
+#include <cstring>
 #include <stdexcept>
 
 #include <iostream>
@@ -128,15 +130,22 @@ template <size_t N, size_t ES, class WT>
     // less than the number of bits in the run, since we need to be able to
     // represent a value of zero" (Posit Arithmetic, Gustafson, October 2017).
 
+    // Also refer to Posit Standard Documentation, Release 4.9-draft, November
+    // 10, 2020, page 7.
+
     const ssize_t nregime = get_num_regime_bits<N, ES, WT>(p);
 
-    if (p.get_sign_bit())
+    auto bits = p.get_bits();
+    const auto R0 = bits.bit(N - 1);
+
+    if (R0 == 0)
     {
-        return integer<N, WT>(nregime - 1);
+        return - integer<N, WT>(nregime);
     }
     else
     {
-        return integer<N, WT>((-1) * nregime);
+        // R0 == 1
+        return integer<N, WT>(nregime) - integer<N, WT>::one();
     }
 }
 
@@ -182,6 +191,9 @@ template <size_t N, size_t ES, class WT>
     return bits & mask;
 }
 
+namespace internal
+{
+
 template <size_t N, class WT> [[nodiscard]] constexpr double to_double(const uinteger<N, WT>& n)
 {
     const uint64_t n64 = narrow_cast<uint64_t>(n);
@@ -194,6 +206,8 @@ template <size_t N, class WT> [[nodiscard]] constexpr double to_double(const int
     return static_cast<double>(i64);
 }
 
+} // namespace internal
+
 /**
  * Evaluate the given posit to compute the represented real value.  Uses
  * double precision IEEE floats for computation.
@@ -204,7 +218,7 @@ template <size_t N, class WT> [[nodiscard]] constexpr double to_double(const int
  * @ The real value of p, represented as a double precision float.
  */
 template <size_t N, size_t ES, class WT>
-[[nodiscard]] constexpr double to_double(const posit<N, ES, WT>& p)
+constexpr double to_double(const posit<N, ES, WT>& p)
 {
     // [Posit Arithmetic, Gustafson, October 2017, p. 13]
 
@@ -220,15 +234,15 @@ template <size_t N, size_t ES, class WT>
 
     const double sign = p.is_negative() ? -1.0 : 1.0;
     const double useed = std::pow(2.0, std::pow(2.0, static_cast<double>(ES)));
-    const double k = to_double(get_regime_value(p));
-    const uint64_t e = to_double(get_exponent_value(p));
+    const double k = internal::to_double(get_regime_value(p));
+    const double e = internal::to_double(get_exponent_value(p));
 
-    const double fval = to_double(get_fraction_value(p));
+    const double fval = internal::to_double(get_fraction_value(p));
     const double nfrac = static_cast<double>(get_num_fraction_bits(p));
-    // const double fdiv = fval / nfrac;
     const double f = (fval == 0.0) ? (1.0) : (1 + fval * std::pow(2, (-1.0) * nfrac));
 
-    return sign * std::pow(useed, k) * std::pow(2, e) * f;
+    const double res =  sign * std::pow(useed, k) * std::pow(2, e) * f;
+    return res;
 }
 
 } // namespace aarith

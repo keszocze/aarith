@@ -36,6 +36,9 @@ SCENARIO("Posit Constants")
 
             const P8 cinf = P8::complex_infinity();
             CHECK(to_binary(cinf) == "100000");
+
+            const auto npat = P8::npat();
+            CHECK(to_binary(npat) == "1000000");
         }
     }
 }
