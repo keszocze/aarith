@@ -5,16 +5,16 @@
 #include <aarith/posit.hpp>
 #include <iostream>
 
-using namespace aarith;
-
-constexpr size_t NBits = 6;
-constexpr size_t ExponentSize = 2;
-using WordType = uint16_t;
-
-using P8 = aarith::posit<NBits, ExponentSize, WordType>;
-
 SCENARIO("Posit Constants")
 {
+    using namespace aarith;
+
+    constexpr size_t NBits = 6;
+    constexpr size_t ExponentSize = 2;
+    using WordType = uint16_t;
+
+    using P8 = aarith::posit<NBits, ExponentSize, WordType>;
+
     GIVEN("Some posit values provided by the posit class")
     {
         THEN("Assert that they return the expected")
