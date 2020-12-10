@@ -42,3 +42,115 @@ SCENARIO("Posit Constants")
         }
     }
 }
+
+template <size_t N, size_t ES, class WT>
+static void require_cmp(const aarith::posit<N, ES, WT>& x, const aarith::posit<N, ES, WT>& y)
+{
+    const double xdouble = aarith::to_double(x);
+    const double ydouble = aarith::to_double(y);
+
+    if (xdouble > ydouble)
+    {
+        REQUIRE(x > y);
+    }
+
+    if (xdouble >= ydouble)
+    {
+        REQUIRE(x >= y);
+    }
+
+    if (xdouble < ydouble)
+    {
+        REQUIRE(x < y);
+    }
+
+    if (xdouble <= ydouble)
+    {
+        REQUIRE(x <= y);
+    }
+
+    if (xdouble == ydouble)
+    {
+        REQUIRE(x == y);
+    }
+}
+
+SCENARIO("Check comparison comparisons")
+{
+    // we have no trouble representing all values of a <8,2> posit with double
+    // precision floats; so we just use the double conversion functions and
+    // compare the returned double as a reference
+
+    GIVEN("All (x, y) tuples with x, y in posit<8, 0>")
+    {
+        THEN("Assert that a given posit compares like the closest double")
+        {
+            using namespace aarith;
+
+            using P8 = aarith::posit<8, 0>;
+
+            for (uint16_t i = 0; i <= 0xffU; ++i)
+            {
+                const uint8_t iactual = i;
+                const P8 iposit(iactual);
+
+                for (uint16_t j = 0; j < 0xffU; ++j)
+                {
+                    const uint8_t jactual = j;
+                    const P8 jposit(jactual);
+
+                    require_cmp(iposit, jposit);
+                }
+            }
+        }
+    }
+
+    GIVEN("All (x, y) tuples with x, y in posit<8, 1>")
+    {
+        THEN("Assert that a given posit compares like the closest double")
+        {
+            using namespace aarith;
+
+            using P8 = aarith::posit<8, 1>;
+
+            for (uint16_t i = 0; i <= 0xffU; ++i)
+            {
+                const uint8_t iactual = i;
+                const P8 iposit(iactual);
+
+                for (uint16_t j = 0; j < 0xffU; ++j)
+                {
+                    const uint8_t jactual = j;
+                    const P8 jposit(jactual);
+
+                    require_cmp(iposit, jposit);
+                }
+            }
+        }
+    }
+
+    GIVEN("All (x, y) tuples with x, y in posit<8, 2>")
+    {
+        THEN("Assert that a given posit compares like the closest double")
+        {
+
+            using namespace aarith;
+
+            using P8 = aarith::posit<8, 2>;
+
+            for (uint16_t i = 0; i < 0xffU; ++i)
+            {
+                const uint8_t iactual = i;
+                const P8 iposit(iactual);
+
+                for (uint16_t j = 0; j <= 0xffU; ++j)
+                {
+                    const uint8_t jactual = j;
+                    const P8 jposit(jactual);
+
+                    require_cmp(iposit, jposit);
+                }
+            }
+        }
+    }
+}

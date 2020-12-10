@@ -2,6 +2,7 @@
 
 #include <aarith/core/word_array.hpp>
 #include <aarith/integer.hpp>
+#include <cassert>
 #include <cstdint>
 #include <cstdlib>
 
@@ -92,7 +93,7 @@ public:
     //
 
     /**
-     * Compare this and other for equality.
+     * @brief Compare this and other for equality.
      *
      * @return true if this and other represent the same value. Otherwise
      * returns true.
@@ -103,7 +104,7 @@ public:
     }
 
     /**
-     * Compare this and other for inequality.
+     * @brief Compare this and other for inequality.
      *
      * @return true if this and other represent different values. Otherwise
      * returns false.
@@ -111,6 +112,79 @@ public:
     constexpr bool operator!=(const posit& other) const
     {
         return !(*this == other);
+    }
+
+    /**
+     * @brief Return whether this is less than other.
+     *
+     * If this or other represent complex infinity, this method returns false.
+     */
+    constexpr bool operator<(const posit& other) const
+    {
+        // special case complex infinity
+
+        const auto inf = complex_infinity();
+
+        if (*this == inf || other == inf)
+        {
+            return false;
+        }
+
+        // regular cases
+
+        auto mybits = get_bits();
+        auto otherbits = other.get_bits();
+
+        if (mybits.msb() && otherbits.msb())
+        {
+            mybits = twos_complement(mybits);
+            otherbits = twos_complement(otherbits);
+
+            return mybits > otherbits;
+        }
+        else if ((!mybits.msb()) && (!otherbits.msb()))
+        {
+            return mybits < otherbits;
+        }
+        else if (mybits.msb() && (!otherbits.msb()))
+        {
+            return true;
+        }
+        else
+        {
+            assert((!mybits.msb()) && otherbits.msb());
+            return false;
+        }
+    }
+
+    /**
+     * @brief Return whether this is less than or equal to other.
+     *
+     * If this or other represent complex infinity, this method returns false.
+     */
+    constexpr bool operator<=(const posit& other) const
+    {
+        return (*this < other) || (*this == other);
+    }
+
+    /**
+     * @brief Return whether this is greater than other.
+     *
+     * If this or other represent complex infinity, this method returns false.
+     */
+    constexpr bool operator>(const posit& other) const
+    {
+        return other < *this;
+    }
+
+    /**
+     * @brief Return whether this is greater than or equal to other.
+     *
+     * If this or other represent complex infinity, this method returns false.
+     */
+    constexpr bool operator>=(const posit& other) const
+    {
+        return (*this > other) || (*this == other);
     }
 
     //
@@ -229,7 +303,7 @@ public:
     }
 
     /**
-     * @brief Return the useed for this type as used in offical unum
+     * @brief Return the useed for this type as used in official unum
      * literature.
      *
      * @ The useed value, which is 2 to the power of 2 to the power of the
@@ -250,7 +324,8 @@ public:
      */
     [[nodiscard]] constexpr bool is_negative() const
     {
-        if (*this == complex_infinity()) {
+        if (*this == complex_infinity())
+        {
             return false;
         }
 
