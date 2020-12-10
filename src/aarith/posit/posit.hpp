@@ -160,11 +160,13 @@ public:
     /**
      * @brief Return whether this is less than or equal to other.
      *
-     * If this or other represent complex infinity, this method returns false.
+     * If either this or other represent complex infinity, this method returns
+     * false. If both this and other represent complex infinity, this method
+     * returns true.
      */
     constexpr bool operator<=(const posit& other) const
     {
-        return (*this < other) || (*this == other);
+        return (*this == other) || (*this < other);
     }
 
     /**
@@ -180,11 +182,13 @@ public:
     /**
      * @brief Return whether this is greater than or equal to other.
      *
-     * If this or other represent complex infinity, this method returns false.
+     * If either this or other represent complex infinity, this method returns
+     * false. If both this and other represent complex infinity, this method
+     * returns true.
      */
     constexpr bool operator>=(const posit& other) const
     {
-        return (*this > other) || (*this == other);
+        return (*this == other) || (*this > other);
     }
 
     //
