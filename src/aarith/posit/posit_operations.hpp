@@ -32,16 +32,6 @@ template <size_t N, class WT> [[nodiscard]] constexpr double to_double(const int
 } // namespace internal
 
 /**
- * @param n The integer to compute the twos complement of.
- * @return The twos complement of n.
- */
-template <size_t N, class WT>
-[[nodiscard]] constexpr uinteger<N, WT> twos_complement(const uinteger<N, WT>& n)
-{
-    return (~n) + n.one();
-}
-
-/**
  * @return The number of regime bits in the given posit.
  */
 template <size_t N, size_t ES, class WT>
@@ -211,7 +201,7 @@ template <size_t N, size_t ES, class WT>
 
     if (bits.msb())
     {
-        bits = twos_complement<N, WT>(bits);
+        bits = twos_complement(bits);
     }
 
     const auto mask = uinteger<N, WT>(get_low_mask<N, WT>(nexp));
@@ -233,7 +223,7 @@ template <size_t N, size_t ES, class WT>
 
     if (bits.msb())
     {
-        bits = twos_complement<N, WT>(bits);
+        bits = twos_complement(bits);
     }
 
     const auto mask = uinteger<N, WT>(get_low_mask<N, WT>(nfrac));

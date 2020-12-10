@@ -1110,6 +1110,17 @@ template <typename Integer>
 }
 
 /**
+ * @brief Compute the twos complement of a given integer.
+ *
+ * @param n The integer to compute the twos complement of.
+ * @return The twos complement of n.
+ */
+template <typename Integer> [[nodiscard]] constexpr Integer twos_complement(const Integer& n)
+{
+    return (~n) + n.one();
+}
+
+/**
  * @brief Left-shift assignment operator
  * @tparam W The word_container type to work on
  * @param lhs The word_container to be shifted
