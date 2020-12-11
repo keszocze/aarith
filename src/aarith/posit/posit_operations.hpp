@@ -239,7 +239,8 @@ template <size_t N, size_t ES, class WT>
  *
  * @ The real value of p, represented as a double precision float.
  */
-template <size_t N, size_t ES, class WT> [[nodiscard]] double to_double(const posit<N, ES, WT>& p)
+template <size_t N, size_t ES, class WT>
+[[nodiscard]] constexpr double to_double(const posit<N, ES, WT>& p)
 {
     if (p == p.zero())
     {
