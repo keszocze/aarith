@@ -29,6 +29,23 @@ template <size_t N, class WT> [[nodiscard]] constexpr double to_double(const int
     return static_cast<double>(i64);
 }
 
+/**
+ * Return 2 raised to the power y.
+ */
+constexpr int64_t pow2(int64_t y)
+{
+    // XXX: use bit shifts; use version that support generic N-wide ints
+
+    int64_t p = 1;
+
+    for (int64_t i = 0; i < y; ++i)
+    {
+        p = 2 * p;
+    }
+
+    return p;
+}
+
 } // namespace internal
 
 /**
@@ -262,6 +279,276 @@ template <size_t N, size_t ES, class WT>
     const double f = (nF == 0.0) ? 1.0 : 1.0 + F / std::pow(2.0, nF);
 
     return sign * std::pow(useed, k) * std::pow(2, e) * f;
+}
+
+template <size_t N, size_t ES, class WT = uint64_t>
+[[nodiscard]] posit<N, ES, WT> from_double(const double x)
+{
+    using Posit = posit<N, ES, WT>;
+
+    // first consider the two possible special cases, zero and complex
+    // infinity
+
+    if (x == 0.0)
+    {
+        return Posit::zero();
+    }
+
+    if (std::isnan(x))
+    {
+        return Posit::complex_infinity();
+    }
+
+    // prepare some types and constants for later
+
+    using StorageType = uinteger<N, WT>;
+    const StorageType one = StorageType::one();
+
+    const double useed = std::pow(2, std::pow(2, ES));
+
+    // in this function we build up the underlying bitstring "p" bit by bit
+    // (as explained in Posit Arithmetic, Gustafson, October 2017, pp. 25)
+
+    StorageType p;
+    double y = std::abs(x);
+    size_t i = 0;
+
+    // (1) First divide by useed or multiply by useed until x is in the
+    // interval [1, useed).
+
+    if (y >= 1.0)
+    {
+        // north east
+
+        p = one;
+
+        i = 2;
+
+        while (y >= useed && i < N)
+        {
+            p = (p << 1) + one;
+            y = y / useed;
+
+            i += 1;
+        }
+
+        p = p << 1;
+        i += 1;
+    }
+    else
+    {
+        // south east
+
+        assert(false && "not implemented");
+
+        // while (y < 1.0 && i <= N)
+        // {
+        //     y = y * useed;
+
+        //     i += 1;
+        // }
+    }
+
+    // (2) Then the value is repeatedly divided by 2 until it is in the
+    // interval [1, 2) and that determines the exponent.
+
+    double e = std::pow(2, ES - 1);
+
+    while (e > 1.0 / 2.0 && i <= N)
+    {
+        p = p << 1;
+
+        if (y >= std::pow(2.0, e))
+        {
+            y /= std::pow(2.0, e);
+            p = p + one;
+        }
+
+        e = e / 2.0;
+        i += 1;
+    }
+
+    y = y - 1.0;
+
+    // (3) The fraction always has a leading 1 to the left of the binary
+    // point, eliminating the need to handle subnormal exception values that
+    // have a 0 bit to the left of the binary point.
+
+    while (y > 0.0 && i <= N)
+    {
+        y = y * 2.0;
+
+        p = (p << 1);
+
+        if (std::floor(y))
+        {
+            p = p + one;
+        }
+
+        y -= std::floor(y);
+        i += 1;
+    }
+
+    p = p << N + 1 - i;
+    i += 1;
+
+    // (4) Round to nearest even and fill up the last bits.
+
+    const auto isb = p.lsb();
+    p = p >> one;
+
+    if (isb)
+    {
+        if (y == 1 || y == 0)
+        {
+            if (p.lsb())
+            {
+                p = p + one;
+            }
+        }
+        else
+        {
+            p = p + one;
+        }
+    }
+
+    // (5) Now that we have the bitstring, wrap it in the posit type and we
+    // are ready to return.
+
+    return Posit::from_bits(p);
+}
+
+template <size_t N, size_t ES, class WT = uint64_t>
+[[deprecated]] constexpr posit<N, ES, WT> gustafson_from_double(const double x)
+{
+    using Posit = posit<N, ES, WT>;
+    constexpr size_t nbits = N;
+
+    // we do all computations with the absolute value y of x; at the end we
+    // flip the sign if necessary
+
+    // FIXME: special case where abs(x) does not fit in y (i.e. signed
+    // integers)
+
+    const double useed = std::pow(2, std::pow(2, ES));
+    double y = std::abs(x);
+
+    if (y == 0.0)
+    {
+        return Posit::zero();
+    }
+
+    if (std::isnan(y))
+    {
+        return Posit::complex_infinity();
+    }
+
+    size_t i = 0;
+    int64_t p = 0;
+    double e = std::pow(2, ES - 1);
+
+    // (1) First divide by useed or multiply by useed until x is in the
+    // interval [1, useed)
+
+    if (y >= 1.0)
+    {
+        // north east quadrant of the projective reals
+
+        p = 1;
+        i = 2;
+
+        while (y >= useed && i < nbits)
+        {
+            p = 2 * p + 1;
+            y = y / useed;
+            i = i + 1;
+        }
+
+        p = 2 * p;
+        i += 1;
+    }
+    else
+    {
+        // south east quadrant of the projective reals
+
+        p = 0;
+        i = 1;
+
+        while (y < 1.0 && i <= nbits)
+        {
+            y = y * useed;
+            i = i + 1;
+        }
+
+        if (i >= nbits)
+        {
+            p = 2;
+        }
+        else
+        {
+            i = nbits + 1;
+            p = 1;
+            i += 1;
+        }
+    }
+
+    // (2) Then the value is repeatedly divided by 2 until it is in the
+    // interval [1, 2) and that determines the exponent
+
+    while (e > 1.0 / 2.0 && i <= nbits)
+    {
+        p = 2 * p;
+
+        if (y >= std::pow(2, e))
+        {
+            y /= std::pow(2, e);
+            p += 1;
+        }
+
+        e /= 2;
+        i += 1;
+    }
+
+    y -= 1;
+
+    // (3) fraction always has a leading 1 to the left of the binary point,
+    // eliminating the need to handle subnormal exception values that have a 0
+    // bit to the left of the binary point
+
+    while (y > 0 && i <= nbits)
+    {
+        y = 2 * y;
+        p = 2 * p + std::floor(y);
+        y -= std::floor(y);
+        i += 1;
+    }
+
+    p *= std::pow(2, N + 1 - i);
+    i += 1;
+
+    // (4) round to nearest
+
+    i = p & 0x01;
+    p = p / 2;
+
+    if (i == 0)
+    {
+        p = p;
+    }
+    else if (y == 1 || y == 0)
+    {
+        p = p + p & 1;
+    }
+    else
+    {
+        p = p + 1;
+    }
+
+    // (5) return
+
+    p = (~p) + 1;
+
+    return posit<N, ES, WT>(p);
 }
 
 } // namespace aarith

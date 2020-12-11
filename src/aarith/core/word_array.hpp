@@ -162,6 +162,17 @@ public:
     }
 
     /**
+     * @brief Returns ths least significant bit.
+     *
+     * The most significant bit is index zero (i.e. the one you can get via
+     * bit(0)). This method is simply there for convenience.
+     */
+    [[nodiscard]] constexpr auto lsb() const -> bit_type
+    {
+        return bit(0);
+    }
+
+    /**
      * @brief Returns ths most significant bit.
      *
      * The most significant bit is the Width's one (i.e. the one you can get via bit(Width-1)). This

@@ -927,7 +927,7 @@ SCENARIO("Check conversion to double")
 {
     GIVEN("All posit<5, 1> values")
     {
-        THEN("Assert that converting to doulbe yields the expected result")
+        THEN("Assert that converting to double yields the expected result")
         {
             using namespace aarith;
 
@@ -968,6 +968,52 @@ SCENARIO("Check conversion to double")
             CHECK(to_double(P5(0b11101U)) == Approx(-0.125));
             CHECK(to_double(P5(0b11110U)) == Approx(-0.0625));
             CHECK(to_double(P5(0b11111U)) == Approx(-0.015625));
+        }
+    }
+}
+
+SCENARIO("Check conversion from double")
+{
+    GIVEN("All posit<6, 1> values as IEEE double")
+    {
+        THEN("Assert that converting to posit<6,1> yields the expected result")
+        {
+            using namespace aarith;
+
+            constexpr size_t N = 6;
+            constexpr size_t ES = 1;
+
+            CHECK(to_binary(from_double<N, ES>(1.0)) == "010000");
+            CHECK(to_binary(from_double<N, ES>(5.0 / 4.0)) == "010001");
+            CHECK(to_binary(from_double<N, ES>(7.0 / 4.0)) == "010011");
+            CHECK(to_binary(from_double<N, ES>(3.0 / 2.0)) == "010010");
+            CHECK(to_binary(from_double<N, ES>(2.0)) == "010100");
+            CHECK(to_binary(from_double<N, ES>(3.0)) == "010110");
+            CHECK(to_binary(from_double<N, ES>(5.0 / 2.0)) == "010101");
+            CHECK(to_binary(from_double<N, ES>(4.0)) == "011000");
+            CHECK(to_binary(from_double<N, ES>(7.0 / 2.0)) == "010111");
+            CHECK(to_binary(from_double<N, ES>(6.0)) == "011001");
+            CHECK(to_binary(from_double<N, ES>(8.0)) == "011010");
+            CHECK(to_binary(from_double<N, ES>(12.0)) == "011011");
+            CHECK(to_binary(from_double<N, ES>(16.0)) == "011100");
+            CHECK(to_binary(from_double<N, ES>(32.0)) == "011101");
+            CHECK(to_binary(from_double<N, ES>(64.0)) == "011110");
+            CHECK(to_binary(from_double<N, ES>(256.0)) == "011111");
+        }
+    }
+
+    GIVEN("Values that are way too big for a <6,1> posit")
+    {
+        THEN("Assert that converting the given double to posit<6,1> returns maxpos")
+        {
+            using namespace aarith;
+
+            constexpr size_t N = 6;
+            constexpr size_t ES = 1;
+
+            CHECK(to_binary(from_double<N, ES>(999.9999)) == "011111");
+            CHECK(to_binary(from_double<N, ES>(123456.78901592)) == "011111");
+            CHECK(to_binary(from_double<N, ES>(9999999999999.999999999)) == "011111");
         }
     }
 }

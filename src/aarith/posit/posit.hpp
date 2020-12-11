@@ -12,14 +12,32 @@ namespace aarith {
  * the description by John L. Gustafson ("Posit Arithmetic", 10
  * October 2017.)
  *
- * @tparam NBits The total width in bits of the given Posit.
- * @tparam ExponentSize The maximum width in bits of the exponent for
- * a given Posit.
+ * @tparam N The total width in bits of the given posit.
+ * @tparam ES The maximum width in bits of the exponent for a given posit.
  */
-template <size_t NBits, size_t ExponentSize, class WordType = uint64_t> class posit
+template <size_t N, size_t ES, class WordType = uint64_t> class posit
 {
 public:
-    using storage_type = uinteger<NBits, WordType>;
+    using storage_type = uinteger<N, WordType>;
+    using useed_type = uinteger<((1 << (1 << ES)) + 1), WordType>;
+
+    //
+    // Factory Methods
+    //
+
+    /**
+     * @brief Construct a new posit with given bits.
+     *
+     * Argument bits is not interpreted as an integer, rather it is used as
+     * the underlying bit pattern of the returned posit.
+     */
+    static constexpr posit from_bits(const storage_type& bits)
+    {
+        posit p;
+        p.bits = bits;
+
+        return p;
+    }
 
     //
     // Constructors
@@ -207,7 +225,7 @@ public:
 
         posit p;
 
-        p.bits.set_bit(NBits - 1, true);
+        p.bits.set_bit(N - 1, true);
         p.bits.set_bit(0, true);
 
         return p;
@@ -242,7 +260,7 @@ public:
         posit p;
 
         p.bits = p.bits.all_ones();
-        p.bits.set_bit(NBits - 1, false);
+        p.bits.set_bit(N - 1, false);
 
         return p;
     }
@@ -266,7 +284,7 @@ public:
 
         posit p;
 
-        p.bits.set_bit(NBits - 2, true);
+        p.bits.set_bit(N - 2, true);
 
         return p;
     }
@@ -280,7 +298,7 @@ public:
         // other bits set to zero
 
         posit p;
-        p.bits.set_bit(NBits - 1, true);
+        p.bits.set_bit(N - 1, true);
 
         return p;
     }
@@ -294,16 +312,16 @@ public:
      *
      * @return The number of possible bit patterns this type can take.
      */
-    [[nodiscard]] static constexpr uinteger<NBits + 1, WordType> npat()
+    [[nodiscard]] static constexpr uinteger<N + 1, WordType> npat()
     {
         // to support arbitrary template parameters, we need to be able to
         // return arbitrary large sizes; so instead of size_t we use uinteger
         // as a return type here
 
-        using SizeType = uinteger<NBits + 1, WordType>;
+        using SizeType = uinteger<N + 1, WordType>;
         const SizeType one = SizeType::one();
 
-        return one << NBits;
+        return one << N;
     }
 
     /**
@@ -313,10 +331,9 @@ public:
      * @ The useed value, which is 2 to the power of 2 to the power of the
      * exponent size.
      */
-    [[nodiscard]] static constexpr size_t useed()
+    [[nodiscard]] static constexpr useed_type useed()
     {
-        throw std::logic_error("not implemented");
-        return 0;
+        return useed_type(1 << (1 << ES));
     }
 
     //
@@ -364,7 +381,8 @@ private:
      */
     constexpr void static_assert_template_parameters() const
     {
-        static_assert(NBits >= 2, "number of bits needs to be at least 2");
+        static_assert(N >= 2, "number of bits needs to be at least 2");
+        static_assert(ES <= 5, "exponent unreasonably large");
     }
 };
 } // namespace aarith

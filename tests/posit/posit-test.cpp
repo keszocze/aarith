@@ -39,6 +39,9 @@ SCENARIO("Posit Constants")
 
             const auto npat = P8::npat();
             CHECK(to_binary(npat) == "1000000");
+
+            const auto useed = P8::useed();
+            CHECK(useed == decltype(useed)(16));
         }
     }
 }
