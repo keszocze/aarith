@@ -6,6 +6,7 @@
 #include <aarith/posit.hpp>
 #include <cmath>
 #include <iostream>
+#include <limits>
 
 using namespace aarith;
 
@@ -999,10 +1000,63 @@ SCENARIO("Check conversion from double")
             CHECK(to_binary(from_double<N, ES>(32.0)) == "011101");
             CHECK(to_binary(from_double<N, ES>(64.0)) == "011110");
             CHECK(to_binary(from_double<N, ES>(256.0)) == "011111");
+
+            CHECK(to_binary(from_double<N, ES>(7.0 / 8.0)) == "001111");
+            CHECK(to_binary(from_double<N, ES>(3.0 / 4.0)) == "001110");
+            CHECK(to_binary(from_double<N, ES>(5.0 / 8.0)) == "001101");
+            CHECK(to_binary(from_double<N, ES>(1.0 / 2.0)) == "001100");
+            CHECK(to_binary(from_double<N, ES>(7.0 / 16.0)) == "001011");
+            CHECK(to_binary(from_double<N, ES>(3.0 / 8.0)) == "001010");
+            CHECK(to_binary(from_double<N, ES>(5.0 / 16.0)) == "001001");
+            CHECK(to_binary(from_double<N, ES>(1.0 / 4.0)) == "001000");
+            CHECK(to_binary(from_double<N, ES>(3.0 / 16.0)) == "000111");
+            CHECK(to_binary(from_double<N, ES>(1.0 / 8.0)) == "000110");
+            CHECK(to_binary(from_double<N, ES>(3.0 / 32.0)) == "000101");
+            CHECK(to_binary(from_double<N, ES>(1.0 / 16.0)) == "000100");
+            CHECK(to_binary(from_double<N, ES>(1.0 / 32.0)) == "000011");
+            CHECK(to_binary(from_double<N, ES>(1.0 / 64.0)) == "000010");
+            CHECK(to_binary(from_double<N, ES>(1.0 / 256.0)) == "000001");
+
+            CHECK(to_binary(from_double<N, ES>(0.0)) == "000000");
+
+            CHECK(to_binary(from_double<N, ES>(-256)) == "100001");
+            CHECK(to_binary(from_double<N, ES>(-64)) == "100010");
+            CHECK(to_binary(from_double<N, ES>(-32)) == "100011");
+            CHECK(to_binary(from_double<N, ES>(-16)) == "100100");
+            CHECK(to_binary(from_double<N, ES>(-12)) == "100101");
+            CHECK(to_binary(from_double<N, ES>(-8)) == "100110");
+            CHECK(to_binary(from_double<N, ES>(-6)) == "100111");
+            CHECK(to_binary(from_double<N, ES>(-4)) == "101000");
+            CHECK(to_binary(from_double<N, ES>(-3.5)) == "101001");
+            CHECK(to_binary(from_double<N, ES>(-3)) == "101010");
+            CHECK(to_binary(from_double<N, ES>(-2.5)) == "101011");
+            CHECK(to_binary(from_double<N, ES>(-2)) == "101100");
+            CHECK(to_binary(from_double<N, ES>(-1.75)) == "101101");
+            CHECK(to_binary(from_double<N, ES>(-1.5)) == "101110");
+            CHECK(to_binary(from_double<N, ES>(-1.25)) == "101111");
+            CHECK(to_binary(from_double<N, ES>(-1)) == "110000");
+
+            CHECK(to_binary(from_double<N, ES>(-0.875)) == "110001");
+            CHECK(to_binary(from_double<N, ES>(-0.75)) == "110010");
+            CHECK(to_binary(from_double<N, ES>(-0.625)) == "110011");
+            CHECK(to_binary(from_double<N, ES>(-0.5)) == "110100");
+            CHECK(to_binary(from_double<N, ES>(-0.4375)) == "110101");
+            CHECK(to_binary(from_double<N, ES>(-0.375)) == "110110");
+            CHECK(to_binary(from_double<N, ES>(-0.3125)) == "110111");
+            CHECK(to_binary(from_double<N, ES>(-0.25)) == "111000");
+            CHECK(to_binary(from_double<N, ES>(-0.1875)) == "111001");
+            CHECK(to_binary(from_double<N, ES>(-0.125)) == "111010");
+            CHECK(to_binary(from_double<N, ES>(-0.09375)) == "111011");
+            CHECK(to_binary(from_double<N, ES>(-0.0625)) == "111100");
+            CHECK(to_binary(from_double<N, ES>(-0.03125)) == "111101");
+            CHECK(to_binary(from_double<N, ES>(-0.015625)) == "111110");
+            CHECK(to_binary(from_double<N, ES>(-0.00390625)) == "111111");
+
+            CHECK(to_binary(from_double<N, ES>(NAN)) == "100000");
         }
     }
 
-    GIVEN("Values that are way too big for a <6,1> posit")
+    GIVEN("Double precision values that are way too big for a <6,1> posit")
     {
         THEN("Assert that converting the given double to posit<6,1> returns maxpos")
         {
@@ -1014,6 +1068,38 @@ SCENARIO("Check conversion from double")
             CHECK(to_binary(from_double<N, ES>(999.9999)) == "011111");
             CHECK(to_binary(from_double<N, ES>(123456.78901592)) == "011111");
             CHECK(to_binary(from_double<N, ES>(9999999999999.999999999)) == "011111");
+        }
+    }
+
+    GIVEN("Double precision values that are way too small for a <6,1> posit")
+    {
+        THEN("Assert that converting the given double to posit<6,1> returns minpos")
+        {
+            using namespace aarith;
+
+            constexpr size_t N = 6;
+            constexpr size_t ES = 1;
+
+            CHECK(to_binary(from_double<N, ES>(-999.9999)) == "100001");
+            CHECK(to_binary(from_double<N, ES>(-123456.78901592)) == "100001");
+            CHECK(to_binary(from_double<N, ES>(-9999999999999.999999999)) == "100001");
+        }
+    }
+
+    GIVEN("Positive and negative infinity")
+    {
+        THEN("Assert that converting the given double to posit<6,1> returns complex infinity")
+        {
+            using namespace aarith;
+
+            constexpr size_t N = 6;
+            constexpr size_t ES = 1;
+
+            constexpr double pinf = std::numeric_limits<double>::infinity();
+            constexpr double ninf = -std::numeric_limits<double>::infinity();
+
+            CHECK(to_binary(from_double<N, ES>(pinf)) == "100000");
+            CHECK(to_binary(from_double<N, ES>(ninf)) == "100000");
         }
     }
 }

@@ -299,10 +299,17 @@ template <size_t N, size_t ES, class WT = uint64_t>
         return Posit::complex_infinity();
     }
 
+    if (std::isinf(x))
+    {
+        return Posit::complex_infinity();
+    }
+
     // prepare some types and constants for later
 
     using StorageType = uinteger<N, WT>;
-    const StorageType one = StorageType::one();
+    constexpr StorageType zero = StorageType::zero();
+    constexpr StorageType one = StorageType::one();
+    constexpr StorageType two = one + one;
 
     const double useed = std::pow(2, std::pow(2, ES));
 
@@ -339,14 +346,25 @@ template <size_t N, size_t ES, class WT = uint64_t>
     {
         // south east
 
-        assert(false && "not implemented");
+        p = zero;
+        i = 1;
 
-        // while (y < 1.0 && i <= N)
-        // {
-        //     y = y * useed;
+        while (y < 1.0 && i <= N)
+        {
+            y = y * useed;
+            i += 1;
+        }
 
-        //     i += 1;
-        // }
+        if (i >= N)
+        {
+            p = two;
+            i = N + 1;
+        }
+        else
+        {
+            p = one;
+            i += 1;
+        }
     }
 
     // (2) Then the value is repeatedly divided by 2 until it is in the
@@ -412,143 +430,18 @@ template <size_t N, size_t ES, class WT = uint64_t>
         }
     }
 
-    // (5) Now that we have the bitstring, wrap it in the posit type and we
+    // (5) If we were converting a negative number, we now need
+    // to take the 2s complement.
+
+    if (x < 0.0)
+    {
+        p = twos_complement(p);
+    }
+
+    // (6) Now that we have the bitstring, wrap it in the posit type and we
     // are ready to return.
 
     return Posit::from_bits(p);
-}
-
-template <size_t N, size_t ES, class WT = uint64_t>
-[[deprecated]] constexpr posit<N, ES, WT> gustafson_from_double(const double x)
-{
-    using Posit = posit<N, ES, WT>;
-    constexpr size_t nbits = N;
-
-    // we do all computations with the absolute value y of x; at the end we
-    // flip the sign if necessary
-
-    // FIXME: special case where abs(x) does not fit in y (i.e. signed
-    // integers)
-
-    const double useed = std::pow(2, std::pow(2, ES));
-    double y = std::abs(x);
-
-    if (y == 0.0)
-    {
-        return Posit::zero();
-    }
-
-    if (std::isnan(y))
-    {
-        return Posit::complex_infinity();
-    }
-
-    size_t i = 0;
-    int64_t p = 0;
-    double e = std::pow(2, ES - 1);
-
-    // (1) First divide by useed or multiply by useed until x is in the
-    // interval [1, useed)
-
-    if (y >= 1.0)
-    {
-        // north east quadrant of the projective reals
-
-        p = 1;
-        i = 2;
-
-        while (y >= useed && i < nbits)
-        {
-            p = 2 * p + 1;
-            y = y / useed;
-            i = i + 1;
-        }
-
-        p = 2 * p;
-        i += 1;
-    }
-    else
-    {
-        // south east quadrant of the projective reals
-
-        p = 0;
-        i = 1;
-
-        while (y < 1.0 && i <= nbits)
-        {
-            y = y * useed;
-            i = i + 1;
-        }
-
-        if (i >= nbits)
-        {
-            p = 2;
-        }
-        else
-        {
-            i = nbits + 1;
-            p = 1;
-            i += 1;
-        }
-    }
-
-    // (2) Then the value is repeatedly divided by 2 until it is in the
-    // interval [1, 2) and that determines the exponent
-
-    while (e > 1.0 / 2.0 && i <= nbits)
-    {
-        p = 2 * p;
-
-        if (y >= std::pow(2, e))
-        {
-            y /= std::pow(2, e);
-            p += 1;
-        }
-
-        e /= 2;
-        i += 1;
-    }
-
-    y -= 1;
-
-    // (3) fraction always has a leading 1 to the left of the binary point,
-    // eliminating the need to handle subnormal exception values that have a 0
-    // bit to the left of the binary point
-
-    while (y > 0 && i <= nbits)
-    {
-        y = 2 * y;
-        p = 2 * p + std::floor(y);
-        y -= std::floor(y);
-        i += 1;
-    }
-
-    p *= std::pow(2, N + 1 - i);
-    i += 1;
-
-    // (4) round to nearest
-
-    i = p & 0x01;
-    p = p / 2;
-
-    if (i == 0)
-    {
-        p = p;
-    }
-    else if (y == 1 || y == 0)
-    {
-        p = p + p & 1;
-    }
-    else
-    {
-        p = p + 1;
-    }
-
-    // (5) return
-
-    p = (~p) + 1;
-
-    return posit<N, ES, WT>(p);
 }
 
 } // namespace aarith
