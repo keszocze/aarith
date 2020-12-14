@@ -33,7 +33,7 @@ std::string to_binary(const posit<N, ES, WT>& p, const char* delim)
 
         if (i == 0)
         {
-            // do not append additional seperators at the end of the returned
+            // do not append additional separators at the end of the returned
             // string
             break;
         }

@@ -44,7 +44,7 @@ public:
     //
 
     /**
-     * Construct this posit initalized to zero.
+     * Construct this posit initialized to zero.
      */
     constexpr posit()
         : bits(0)
@@ -101,6 +101,7 @@ public:
      *
      * @param n Bits used to initialize the underlying type.
      */
+     // TODO (Schärtl) das funktioniert aber nur gut, so lange N <= 64!
     constexpr explicit posit(WordType n)
         : bits(n)
     {
@@ -142,6 +143,8 @@ public:
         // special case complex infinity
 
         const auto inf = complex_infinity();
+
+        // TODO (Schärtl) evtl. eine .is_inf() Methode hinzufügen?
 
         if (*this == inf || other == inf)
         {
