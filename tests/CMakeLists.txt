@@ -31,8 +31,10 @@ add_aarith_test(float-comparison FILES float/float_comparisons.cpp)
 add_aarith_test(float-sign_bit_operations FILES float/sign_bit_operations.cpp)
 add_aarith_test(float-random-generation FILES float/float-random-generation-test.cpp)
 
+add_aarith_test(binprod FILES posit/binprod-test.cpp)
 add_aarith_test(posit FILES posit/posit-test.cpp)
 add_aarith_test(posit-operations FILES posit/posit_operations-test.cpp)
+add_aarith_test(posit-operators FILES posit/posit_operators-test.cpp)
 
 add_aarith_test(fau-adder FILES uint-approx-test.cpp)
 

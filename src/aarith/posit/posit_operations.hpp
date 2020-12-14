@@ -2,6 +2,7 @@
 
 #include <aarith/integer.hpp>
 #include <aarith/posit.hpp>
+#include <aarith/posit/posit_internal.hpp>
 #include <algorithm>
 #include <cassert>
 #include <cctype>
@@ -27,23 +28,6 @@ template <size_t N, class WT> [[nodiscard]] constexpr double to_double(const int
 {
     const int64_t i64 = narrow_cast<int64_t>(n);
     return static_cast<double>(i64);
-}
-
-/**
- * Return 2 raised to the power y.
- */
-constexpr int64_t pow2(int64_t y)
-{
-    // XXX: use bit shifts; use version that support generic N-wide ints
-
-    int64_t p = 1;
-
-    for (int64_t i = 0; i < y; ++i)
-    {
-        p = 2 * p;
-    }
-
-    return p;
 }
 
 } // namespace internal
@@ -144,6 +128,26 @@ template <size_t N, size_t ES, class WT>
     }
 
     return N - nused;
+}
+
+/**
+ * @return The sign value of the given posit.
+ *
+ * Returns either 0 or 1.
+ */
+template <size_t N, size_t ES, class WT>
+[[nodiscard]] constexpr integer<N, WT> get_sign_value(const posit<N, ES, WT>& p)
+{
+    using Integer = integer<N, WT>;
+
+    if (p.is_negative())
+    {
+        return Integer::one();
+    }
+    else
+    {
+        return Integer::zero();
+    }
 }
 
 /**
@@ -282,7 +286,7 @@ template <size_t N, size_t ES, class WT>
 }
 
 template <size_t N, size_t ES, class WT = uint64_t>
-[[nodiscard]] posit<N, ES, WT> from_double(const double x)
+[[nodiscard]] constexpr posit<N, ES, WT> from_double(const double x)
 {
     using Posit = posit<N, ES, WT>;
 

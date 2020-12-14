@@ -1401,7 +1401,6 @@ SCENARIO("Computing the powers of integers", "[integer][signed][operation]")
     }
 }
 
-
 SCENARIO("Computing the integer logarithm of integers", "[integer][signed][operation]")
 {
     GIVEN("Some integers")
