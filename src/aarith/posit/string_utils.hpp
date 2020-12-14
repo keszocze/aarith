@@ -6,8 +6,13 @@
 
 namespace aarith {
 
+template <size_t N, size_t ES, class WT> std::string to_binary(const posit<N, ES, WT>& p)
+{
+    return to_binary(p.get_bits());
+}
+
 template <size_t N, size_t ES, class WT>
-std::string to_binary(const posit<N, ES, WT>& p, const char* delim = nullptr)
+std::string to_binary(const posit<N, ES, WT>& p, const char* delim)
 {
     if (!delim)
     {
