@@ -155,6 +155,10 @@ public:
         return Posit::from_bits(bits);
     }
 
+    template <size_t PN, size_t PES, class WT> void normalize()
+    {
+    }
+
 private:
     using param_type = std::tuple<storage_type, storage_type, storage_type, storage_type>;
 
@@ -200,7 +204,6 @@ private:
         constexpr auto one = storage_type::one();
         constexpr auto two = one + one;
         constexpr auto es = storage_type(PES);
-
         const auto h = ilog(abs(x), two);
         const auto f = abs(x) - pow(two, h);
         const auto e = absmod(m + h, pow(two, es));
@@ -274,6 +277,10 @@ template <size_t N> constexpr binprod<N> operator+(const binprod<N>& lhs, const 
 
     auto x = xa * pow(two, mmax - mb) + xb * pow(two, mmax - ma);
     auto m = ma + mb - mmax;
+
+    // normalization
+
+    // returning
 
     return binprod<N>(x, m);
 }

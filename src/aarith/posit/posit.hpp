@@ -372,9 +372,10 @@ public:
         return bits;
     }
 
-private:
+    // TODO(Schärtl): make private
     storage_type bits;
 
+private:
     /**
      * Statically assert that the created instance of a given posit
      * conforms to the requirements for legal posits.

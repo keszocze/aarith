@@ -5,6 +5,7 @@
 #include <aarith/posit/posit_internal.hpp>
 #include <aarith/posit/posit_operations.hpp>
 #include <iostream>
+#include <ostream>
 
 namespace aarith {
 
@@ -44,20 +45,9 @@ constexpr integer<N> get_global_exponent(const posit<N, ES, WT>& p)
 }
 
 template <size_t N, size_t ES, class WT = uint64_t>
-constexpr posit<N, ES, WT> operator-(const posit<N, ES, WT>& arg)
+constexpr posit<N, ES, WT>& operator+(const posit<N, ES, WT>& p)
 {
-    if (arg == arg.zero())
-    {
-        return arg;
-    }
-
-    if (arg == arg.complex_infinity())
-    {
-        return arg;
-    }
-
-    const auto bits = twos_complement(arg.get_bits());
-    return arg.from_bits(bits);
+    return p;
 }
 
 template <size_t N, size_t ES, class WT = uint64_t>
@@ -90,8 +80,102 @@ posit<N, ES, WT> operator+(const posit<N, ES, WT>& lhs, const posit<N, ES, WT>& 
     const binprod<N> lhs_binprod(lhs);
     const binprod<N> rhs_binprod(rhs);
 
-    const binprod<N> sum = lhs_binprod + rhs_binprod;
-    return sum.template to_posit<N, ES, WT>();
+    const binprod<N> bsum = lhs_binprod + rhs_binprod;
+    Posit psum = bsum.template to_posit<N, ES, WT>();
+
+    // fix overflows
+
+    if (rhs > zero && psum < lhs)
+    {
+        psum = psum.max();
+    }
+
+    // fix underflows
+
+    if (rhs < zero && psum > lhs)
+    {
+        psum = psum.min();
+    }
+
+    return psum;
+}
+
+template <size_t N, size_t ES, class WT>
+posit<N, ES, WT>& operator+=(posit<N, ES, WT>& lhs, const posit<N, ES, WT>& rhs)
+{
+    posit<N, ES, WT> sum = lhs + rhs;
+    lhs.bits = sum.get_bits();
+    return lhs;
+}
+
+template <size_t N, size_t ES, class WT> posit<N, ES, WT>& operator++(posit<N, ES, WT>& p)
+{
+    // ++x
+    p += p.one();
+    return p;
+}
+
+template <size_t N, size_t ES, class WT> posit<N, ES, WT> operator++(posit<N, ES, WT>& p, int)
+{
+    // x++
+    auto copy = p;
+    p += p.one();
+    return copy;
+}
+
+template <size_t N, size_t ES, class WT>
+constexpr posit<N, ES, WT> operator-(const posit<N, ES, WT>& arg)
+{
+    if (arg == arg.zero())
+    {
+        return arg;
+    }
+
+    if (arg == arg.complex_infinity())
+    {
+        return arg;
+    }
+
+    const auto bits = twos_complement(arg.get_bits());
+    return arg.from_bits(bits);
+}
+
+template <size_t N, size_t ES, class WT>
+constexpr posit<N, ES, WT> operator-(const posit<N, ES, WT>& lhs, const posit<N, ES, WT>& rhs)
+{
+    return lhs + (-rhs);
+}
+
+template <size_t N, size_t ES, class WT>
+posit<N, ES, WT>& operator-=(posit<N, ES, WT>& lhs, const posit<N, ES, WT>& rhs)
+{
+    posit<N, ES, WT> sum = lhs - rhs;
+    lhs.bits = sum.get_bits();
+    return lhs;
+}
+
+template <size_t N, size_t ES, class WT> posit<N, ES, WT>& operator--(posit<N, ES, WT>& p)
+{
+    // --x
+    p -= p.one();
+    return p;
+}
+
+template <size_t N, size_t ES, class WT> posit<N, ES, WT> operator--(posit<N, ES, WT>& p, int)
+{
+    // x--
+    auto copy = p;
+    p -= p.one();
+    return copy;
+}
+
+template <size_t N, size_t ES, class WT>
+std::ostream& operator<<(std::ostream& os, const posit<N, ES, WT>& p)
+{
+    // TODO(Schärtl): actually print decimal representation; to do this
+    // however we need to have arithmetic operators implemented first
+
+    return os << to_binary(p.get_bits());
 }
 
 } // namespace aarith

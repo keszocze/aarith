@@ -448,4 +448,17 @@ template <size_t N, size_t ES, class WT = uint64_t>
     return Posit::from_bits(p);
 }
 
+template <size_t N, size_t ES, class WT>
+[[nodiscard]] constexpr posit<N, ES, WT> abs(const posit<N, ES, WT>& p)
+{
+    if (p < p.zero())
+    {
+        return -p;
+    }
+    else
+    {
+        return p;
+    }
+}
+
 } // namespace aarith

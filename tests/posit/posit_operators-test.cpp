@@ -39,11 +39,11 @@ SCENARIO("Testing unary minus")
     }
 }
 
-SCENARIO("Testing addition")
+SCENARIO("Testing arithmetic")
 {
     GIVEN("Some arbitrary posit values")
     {
-        THEN("Assert that their sum is okay")
+        THEN("Assert that arithmetic operations match double arithmetic")
         {
             for (int i = -50; i <= 50; ++i)
             {
@@ -63,8 +63,64 @@ SCENARIO("Testing addition")
                     const Posit q = from_double<N, ES>(y);
 
                     CHECK(to_double(p + q) == Approx(to_double(from_double<N, ES>(x + y))));
+                    CHECK(to_double(p - q) == Approx(to_double(from_double<N, ES>(x - y))));
                 }
             }
+        }
+    }
+
+    GIVEN("Sums way too big for the given posit type")
+    {
+        THEN("Addition should not overflow")
+        {
+            using namespace aarith;
+
+            using Posit = posit<8, 2>;
+
+            constexpr auto one = Posit::one();
+            constexpr auto max = Posit::max();
+
+            REQUIRE(max + one == max);
+            REQUIRE(max + max == max);
+        }
+    }
+
+    GIVEN("Sums way too small for the given posit type")
+    {
+        THEN("Addition should not overflow")
+        {
+            using namespace aarith;
+
+            using Posit = posit<8, 2>;
+
+            constexpr auto one = Posit::one();
+            constexpr auto min = Posit::min();
+
+            REQUIRE(min - one == min);
+            REQUIRE(min + min == min);
+        }
+    }
+
+    GIVEN("Special cases")
+    {
+        THEN("Assert that arithmetic works as expected")
+        {
+            using namespace aarith;
+
+            using Posit = posit<8, 2>;
+
+            constexpr auto inf = Posit::complex_infinity();
+            constexpr auto zero = Posit::complex_infinity();
+
+            CHECK(inf + inf == inf);
+            CHECK(inf + zero == inf);
+            CHECK(zero + inf == inf);
+            CHECK(zero + zero == zero);
+
+            CHECK(inf - inf == inf);
+            CHECK(inf - zero == inf);
+            CHECK(zero - inf == inf);
+            CHECK(zero - zero == zero);
         }
     }
 }

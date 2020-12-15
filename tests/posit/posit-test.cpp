@@ -136,7 +136,6 @@ SCENARIO("Check comparison comparisons")
     {
         THEN("Assert that a given posit compares like the closest double")
         {
-
             using namespace aarith;
 
             using P8 = aarith::posit<8, 2>;
@@ -154,6 +153,29 @@ SCENARIO("Check comparison comparisons")
                     require_cmp(iposit, jposit);
                 }
             }
+        }
+    }
+
+    GIVEN("Extreme values")
+    {
+        THEN("Assert that they compare correctly")
+        {
+            using namespace aarith;
+
+            using Posit = posit<64, 2>;
+
+            constexpr Posit max = Posit::max();
+            constexpr Posit min = Posit::min();
+            constexpr Posit zero = Posit::zero();
+
+            REQUIRE(min < max);
+            REQUIRE_FALSE(max < min);
+
+            REQUIRE(zero < max);
+            REQUIRE_FALSE(max < zero);
+
+            REQUIRE(min < zero);
+            REQUIRE_FALSE(zero < min);
         }
     }
 }
