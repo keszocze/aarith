@@ -149,15 +149,6 @@ template <size_t PN, size_t PES, typename PWT>
 }
 
 template <size_t N>
-template <size_t M, class WT>
-[[nodiscard]] constexpr integer<M, WT> binprod<N>::absmod(const integer<M, WT>& k,
-                                                          const integer<M, WT>& n)
-{
-    // https://stackoverflow.com/questions/1907565/
-    return ((k % n) + n) % n;
-}
-
-template <size_t N>
 template <size_t M>
 [[nodiscard]] constexpr ssize_t binprod<N>::to_ssize_t(const integer<M>& n)
 {

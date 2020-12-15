@@ -1118,6 +1118,20 @@ constexpr integer<N, WT> ilog(const integer<N, WT>& n, const integer<N, WT>& bas
 }
 
 /**
+ * @brief Computes k mod n.
+ *
+ * Unlike the C mod operation, this operation always returns non-negative
+ * results, which is closer to what is commonly used in mathematics.
+ */
+template <size_t N, class WT>
+[[nodiscard]] constexpr integer<N, WT> absmod(const integer<N, WT>& k, const integer<N, WT>& n)
+{
+    // https://stackoverflow.com/questions/1907565/
+    return ((k % n) + n) % n;
+}
+
+
+/**
  * @brief Multiplies two unsigned integers using the Karazuba algorithm
  *
  * This implements the karazuba multiplication algorithm (divide and conquer).
