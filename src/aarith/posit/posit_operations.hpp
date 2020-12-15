@@ -12,13 +12,13 @@ namespace aarith {
 
 namespace internal {
 
-template <size_t N, class WT> [[nodiscard]] constexpr double to_double(const uinteger<N, WT>& n)
+template <size_t N, typename WT> [[nodiscard]] constexpr double to_double(const uinteger<N, WT>& n)
 {
     const uint64_t n64 = narrow_cast<uint64_t>(n);
     return static_cast<double>(n64);
 }
 
-template <size_t N, class WT> [[nodiscard]] constexpr double to_double(const integer<N, WT>& n)
+template <size_t N, typename WT> [[nodiscard]] constexpr double to_double(const integer<N, WT>& n)
 {
     const int64_t i64 = narrow_cast<int64_t>(n);
     return static_cast<double>(i64);
@@ -26,7 +26,7 @@ template <size_t N, class WT> [[nodiscard]] constexpr double to_double(const int
 
 } // namespace internal
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr size_t get_num_regime_bits(const posit<N, ES, WT>& p)
 {
     // special cases
@@ -64,7 +64,7 @@ template <size_t N, size_t ES, class WT>
     return std::min(N - 1, nregime + 1);
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr size_t get_num_exponent_bits(const posit<N, ES, WT>& p)
 {
     const size_t nregime = get_num_regime_bits<N, ES, WT>(p);
@@ -87,7 +87,7 @@ template <size_t N, size_t ES, class WT>
     return std::min(nremaining, ES);
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr size_t get_num_fraction_bits(const posit<N, ES, WT>& p)
 {
     const size_t nregime = get_num_regime_bits<N, ES, WT>(p);
@@ -115,7 +115,7 @@ template <size_t N, size_t ES, class WT>
     return N - nused;
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr integer<N, WT> get_sign_value(const posit<N, ES, WT>& p)
 {
     using Integer = integer<N, WT>;
@@ -130,7 +130,7 @@ template <size_t N, size_t ES, class WT>
     }
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr integer<N, WT> get_regime_value(const posit<N, ES, WT>& p)
 {
     // Getting the regime value means counting the number of bits in the
@@ -186,7 +186,7 @@ template <size_t N, size_t ES, class WT>
     }
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr uinteger<N, WT> get_exponent_value(const posit<N, ES, WT>& p)
 {
     const size_t nexp = get_num_exponent_bits<N, ES, WT>(p);
@@ -203,7 +203,7 @@ template <size_t N, size_t ES, class WT>
     return (bits >> nfrac) & mask;
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr uinteger<N, WT> get_fraction_value(const posit<N, ES, WT>& p)
 {
     const size_t nfrac = get_num_fraction_bits<N, ES, WT>(p);
@@ -219,7 +219,7 @@ template <size_t N, size_t ES, class WT>
     return bits & mask;
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr double to_double(const posit<N, ES, WT>& p)
 {
     if (p == p.zero())
@@ -244,7 +244,7 @@ template <size_t N, size_t ES, class WT>
     return sign * std::pow(useed, k) * std::pow(2, e) * f;
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> from_double(const double x)
 {
     using Posit = posit<N, ES, WT>;
@@ -407,7 +407,7 @@ template <size_t N, size_t ES, class WT>
     return Posit::from_bits(p);
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> abs(const posit<N, ES, WT>& p)
 {
     if (p < p.zero())
@@ -420,7 +420,7 @@ template <size_t N, size_t ES, class WT>
     }
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 constexpr integer<N> get_global_exponent(const posit<N, ES, WT>& p)
 {
     using Integer = integer<N>;

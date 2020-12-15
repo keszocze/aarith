@@ -15,7 +15,7 @@ constexpr binprod<N>::binprod(const storage_type& x, const storage_type& m)
 }
 
 template <size_t N>
-template <size_t PES, class PWT>
+template <size_t PES, typename PWT>
 constexpr binprod<N>::binprod(const posit<N, PES, PWT>& p)
 {
     // based on "Provably Correct Posit Arithmetic with Fixed-Point Big
@@ -166,7 +166,7 @@ template <size_t M>
 }
 
 template <size_t N>
-template <size_t PN, size_t PES, class PWT>
+template <size_t PN, size_t PES, typename PWT>
 [[nodiscard]] constexpr typename binprod<N>::param_type binprod<N>::decode() const
 {
     ensure_positive();
@@ -192,7 +192,7 @@ template <size_t PN, size_t PES, class PWT>
 }
 
 template <size_t N>
-template <size_t PN, size_t PES, class PWT>
+template <size_t PN, size_t PES, typename PWT>
 void binprod<N>::decode_regime(ssize_t& nregime, bool& first_regime) const
 {
     ensure_positive();

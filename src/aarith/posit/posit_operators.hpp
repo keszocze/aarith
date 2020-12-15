@@ -8,7 +8,7 @@
 
 namespace aarith {
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 std::ostream& operator<<(std::ostream& os, const posit<N, ES, WT>& p)
 {
     // TODO(Schärtl): actually print decimal representation; to do this

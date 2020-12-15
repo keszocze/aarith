@@ -8,7 +8,7 @@
 
 namespace aarith {
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 constexpr posit<N, ES, WT> posit<N, ES, WT>::from_bits(const posit<N, ES, WT>::storage_type& bits)
 {
     posit p;
@@ -17,60 +17,60 @@ constexpr posit<N, ES, WT> posit<N, ES, WT>::from_bits(const posit<N, ES, WT>::s
     return p;
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 constexpr posit<N, ES, WT>::posit()
     : bits(0)
 {
     static_assert_template_parameters();
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 constexpr posit<N, ES, WT>::posit(const posit& other)
     : bits(other.bits)
 {
     static_assert_template_parameters();
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 constexpr posit<N, ES, WT>::posit(const posit&& other)
     : bits(std::move(other.bits))
 {
     static_assert_template_parameters();
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator=(const posit& other)
 {
     bits = other.bits;
     return *this;
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator=(const posit&& other)
 {
     bits = std::move(other.bits);
     return *this;
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 constexpr posit<N, ES, WT>::posit(WT n)
     : bits(n)
 {
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 constexpr bool posit<N, ES, WT>::operator==(const posit& other) const
 {
     return bits == other.bits;
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 constexpr bool posit<N, ES, WT>::operator!=(const posit& other) const
 {
     return !(*this == other);
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 constexpr bool posit<N, ES, WT>::operator<(const posit& other) const
 {
     // special case complex infinity
@@ -111,31 +111,31 @@ constexpr bool posit<N, ES, WT>::operator<(const posit& other) const
     }
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 constexpr bool posit<N, ES, WT>::operator<=(const posit& other) const
 {
     return (*this == other) || (*this < other);
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 constexpr bool posit<N, ES, WT>::operator>(const posit& other) const
 {
     return other < *this;
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 constexpr bool posit<N, ES, WT>::operator>=(const posit& other) const
 {
     return (*this == other) || (*this > other);
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator+() const
 {
     return *this;
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 posit<N, ES, WT> posit<N, ES, WT>::operator+(const posit<N, ES, WT>& rhs) const
 {
     using Posit = posit<N, ES, WT>;
@@ -187,7 +187,7 @@ posit<N, ES, WT> posit<N, ES, WT>::operator+(const posit<N, ES, WT>& rhs) const
     return psum;
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 posit<N, ES, WT>& posit<N, ES, WT>::operator+=(const posit<N, ES, WT>& rhs)
 {
 
@@ -196,14 +196,14 @@ posit<N, ES, WT>& posit<N, ES, WT>::operator+=(const posit<N, ES, WT>& rhs)
     return *this;
 }
 
-template <size_t N, size_t ES, class WT> posit<N, ES, WT>& posit<N, ES, WT>::operator++()
+template <size_t N, size_t ES, typename WT> posit<N, ES, WT>& posit<N, ES, WT>::operator++()
 {
     // ++x
     *this += this->one();
     return *this;
 }
 
-template <size_t N, size_t ES, class WT> posit<N, ES, WT> posit<N, ES, WT>::operator++(int)
+template <size_t N, size_t ES, typename WT> posit<N, ES, WT> posit<N, ES, WT>::operator++(int)
 {
     // x++
     auto copy = *this;
@@ -211,7 +211,7 @@ template <size_t N, size_t ES, class WT> posit<N, ES, WT> posit<N, ES, WT>::oper
     return *this;
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 constexpr posit<N, ES, WT> posit<N, ES, WT>::operator-() const
 {
     if (*this == zero())
@@ -228,13 +228,13 @@ constexpr posit<N, ES, WT> posit<N, ES, WT>::operator-() const
     return posit<N, ES, WT>::from_bits(bits);
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 constexpr posit<N, ES, WT> posit<N, ES, WT>::operator-(const posit<N, ES, WT>& rhs) const
 {
     return *this + (-rhs);
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 posit<N, ES, WT>& posit<N, ES, WT>::operator-=(const posit<N, ES, WT>& rhs)
 {
     posit<N, ES, WT> sum = *this - rhs;
@@ -242,14 +242,14 @@ posit<N, ES, WT>& posit<N, ES, WT>::operator-=(const posit<N, ES, WT>& rhs)
     return *this;
 }
 
-template <size_t N, size_t ES, class WT> posit<N, ES, WT>& posit<N, ES, WT>::operator--()
+template <size_t N, size_t ES, typename WT> posit<N, ES, WT>& posit<N, ES, WT>::operator--()
 {
     // --x
     *this -= one();
     return *this;
 }
 
-template <size_t N, size_t ES, class WT> posit<N, ES, WT> posit<N, ES, WT>::operator--(int)
+template <size_t N, size_t ES, typename WT> posit<N, ES, WT> posit<N, ES, WT>::operator--(int)
 {
     // x--
     auto copy = *this;
@@ -257,7 +257,7 @@ template <size_t N, size_t ES, class WT> posit<N, ES, WT> posit<N, ES, WT>::oper
     return *this;
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::min()
 {
     // the min value is represented by 10..01
@@ -270,7 +270,7 @@ template <size_t N, size_t ES, class WT>
     return p;
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::minpos()
 {
     // minpos is presented by 0..01
@@ -282,7 +282,7 @@ template <size_t N, size_t ES, class WT>
     return p;
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::max()
 {
     // the maximum value is represented by 01..1
@@ -295,7 +295,7 @@ template <size_t N, size_t ES, class WT>
     return p;
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::zero()
 {
     // zero is represented by all bits set to zero
@@ -303,7 +303,7 @@ template <size_t N, size_t ES, class WT>
     return posit();
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::one()
 {
     // one is represented by 010...0
@@ -315,7 +315,7 @@ template <size_t N, size_t ES, class WT>
     return p;
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::complex_infinity()
 {
     // complex infinity is sign bit set to one and all
@@ -327,7 +327,7 @@ template <size_t N, size_t ES, class WT>
     return p;
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr uinteger<N + 1, WT> posit<N, ES, WT>::npat()
 {
     // to support arbitrary template parameters, we need to be able to
@@ -340,13 +340,13 @@ template <size_t N, size_t ES, class WT>
     return one << N;
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr typename posit<N, ES, WT>::useed_type posit<N, ES, WT>::useed()
 {
     return useed_type(1 << (1 << ES));
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool posit<N, ES, WT>::is_negative() const
 {
     if (*this == complex_infinity())
@@ -357,20 +357,20 @@ template <size_t N, size_t ES, class WT>
     return get_sign_bit() == storage_type(1);
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr typename posit<N, ES, WT>::storage_type
 posit<N, ES, WT>::get_sign_bit() const
 {
     return storage_type(bits.msb());
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr typename posit<N, ES, WT>::storage_type posit<N, ES, WT>::get_bits() const
 {
     return bits;
 }
 
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 constexpr void posit<N, ES, WT>::static_assert_template_parameters() const
 {
     static_assert(N >= 2, "number of bits needs to be at least 2");

@@ -31,7 +31,7 @@ namespace aarith {
  * @tparam ES The maximum width in bits of the exponent for a given posit.
  * @tparam WS The underlying word type used to store the posit.
  */
-template <size_t N, size_t ES, class WT = uint64_t> class posit
+template <size_t N, size_t ES, typename WT = uint64_t> class posit
 {
 public:
     /**
@@ -361,7 +361,7 @@ private:
  * @param p The posit to write.
  * @return A reference to os.
  */
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 std::ostream& operator<<(std::ostream& os, const posit<N, ES, WT>& p);
 
 /**
@@ -369,7 +369,7 @@ std::ostream& operator<<(std::ostream& os, const posit<N, ES, WT>& p);
  *
  * @return Number of regime bits in p.
  */
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr size_t get_num_regime_bits(const posit<N, ES, WT>& p);
 
 /**
@@ -377,7 +377,7 @@ template <size_t N, size_t ES, class WT>
  *
  * @return The number of exponent bits in the given posit.
  */
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr size_t get_num_exponent_bits(const posit<N, ES, WT>& p);
 
 /**
@@ -385,7 +385,7 @@ template <size_t N, size_t ES, class WT>
  *
  * @return The number of fraction bits in the given posit.
  */
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr size_t get_num_fraction_bits(const posit<N, ES, WT>& p);
 
 /**
@@ -393,7 +393,7 @@ template <size_t N, size_t ES, class WT>
  *
  * @return The sign bit as-is, that is either 0 or 1.
  */
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr integer<N, WT> get_sign_value(const posit<N, ES, WT>& p);
 
 /**
@@ -404,7 +404,7 @@ template <size_t N, size_t ES, class WT>
  *
  * @return The regime value of the given posit.
  */
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr integer<N, WT> get_regime_value(const posit<N, ES, WT>& p);
 
 /**
@@ -412,7 +412,7 @@ template <size_t N, size_t ES, class WT>
  *
  * @return The exponent value of the given posit.
  */
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr uinteger<N, WT> get_exponent_value(const posit<N, ES, WT>& p);
 
 /**
@@ -421,7 +421,7 @@ template <size_t N, size_t ES, class WT>
  *
  * @return The fraction of the given posit.
  */
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr uinteger<N, WT> get_fraction_value(const posit<N, ES, WT>& p);
 
 /**
@@ -433,7 +433,7 @@ template <size_t N, size_t ES, class WT>
  *
  * @return The real value of p, represented as a double precision float.
  */
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr double to_double(const posit<N, ES, WT>& p);
 
 /**
@@ -447,7 +447,7 @@ template <size_t N, size_t ES, class WT>
  * @nparam ES The exponent size of the returned posit.
  * @napram WT The underlying word type of the returned posit.
  */
-template <size_t N, size_t ES, class WT = uint64_t>
+template <size_t N, size_t ES, typename WT = uint64_t>
 [[nodiscard]] constexpr posit<N, ES, WT> from_double(const double x);
 
 /**
@@ -456,7 +456,7 @@ template <size_t N, size_t ES, class WT = uint64_t>
  * If p is complex infinity, the result is also complex infinity. If p is
  * zero, the result is also zero as there is only one representation of zero.
  */
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> abs(const posit<N, ES, WT>& p);
 
 /**
@@ -466,7 +466,7 @@ template <size_t N, size_t ES, class WT>
  * of useed^R times 2^E. This function returns k.  Knowing k can be useful to
  * estimate the value of a given posit without evaluating the fraction.
  */
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 constexpr integer<N> get_global_exponent(const posit<N, ES, WT>& p);
 
 //
@@ -483,7 +483,7 @@ constexpr integer<N> get_global_exponent(const posit<N, ES, WT>& p);
  *
  * @param p The posit from which to print the bitstring.
  */
-template <size_t N, size_t ES, class WT> std::string to_binary(const posit<N, ES, WT>& p);
+template <size_t N, size_t ES, typename WT> std::string to_binary(const posit<N, ES, WT>& p);
 
 /**
  * @brief Convert posit to printable bitstring.
@@ -502,7 +502,7 @@ template <size_t N, size_t ES, class WT> std::string to_binary(const posit<N, ES
  *
  * @param p The posit from which to print the bitstring.
  */
-template <size_t N, size_t ES, class WT>
+template <size_t N, size_t ES, typename WT>
 std::string to_binary(const posit<N, ES, WT>& p, const char* delim);
 
 //
@@ -556,7 +556,7 @@ public:
      * @nparam WT The underlying word type of the provided posit.
      * @param p The posit to convert to binprod.
      */
-    template <size_t PES, class PWT> constexpr binprod(const posit<N, PES, PWT>& p);
+    template <size_t PES, typename PWT> constexpr binprod(const posit<N, PES, PWT>& p);
 
     /**
      * @brief Convert value back to posit.
@@ -592,7 +592,8 @@ private:
      * Based on "Provably Correct Posit Arithmetic with Fixed-Point Big
      * Integer", Shin Yee Chung, 2018.
      */
-    template <size_t PN, size_t PES, class PWT> [[nodiscard]] constexpr param_type decode() const;
+    template <size_t PN, size_t PES, typename PWT>
+    [[nodiscard]] constexpr param_type decode() const;
 
     /**
      * @brief Fill in the decoded regime.
@@ -602,7 +603,7 @@ private:
      * @nparam first_regime Value of the first bit of the regime, either 1 (true)
      * or 0 (false). Will be filled in by call to this method.
      */
-    template <size_t PN, size_t PES, class PWT>
+    template <size_t PN, size_t PES, typename PWT>
     void decode_regime(ssize_t& nregime, bool& first_regime) const;
 
     /**
