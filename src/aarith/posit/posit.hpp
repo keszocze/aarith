@@ -7,386 +7,374 @@
 #include <cstdlib>
 
 namespace aarith {
-/**
- * Represents a posit number that can represent real values. Based on
- * the description by John L. Gustafson ("Posit Arithmetic", 10
- * October 2017.)
- *
- * @tparam N The total width in bits of the given posit.
- * @tparam ES The maximum width in bits of the exponent for a given posit.
- */
-template <size_t N, size_t ES, class WordType = uint64_t> class posit
+
+template <size_t N, size_t ES, class WT>
+constexpr posit<N, ES, WT> posit<N, ES, WT>::from_bits(const posit<N, ES, WT>::storage_type& bits)
 {
-public:
-    using storage_type = uinteger<N, WordType>;
-    using useed_type = uinteger<((1 << (1 << ES)) + 1), WordType>;
+    posit p;
+    p.bits = bits;
 
-    //
-    // Factory Methods
-    //
+    return p;
+}
 
-    /**
-     * @brief Construct a new posit with given bits.
-     *
-     * Argument bits is not interpreted as an integer, rather it is used as
-     * the underlying bit pattern of the returned posit.
-     */
-    static constexpr posit from_bits(const storage_type& bits)
+template <size_t N, size_t ES, class WT>
+constexpr posit<N, ES, WT>::posit()
+    : bits(0)
+{
+    static_assert_template_parameters();
+}
+
+template <size_t N, size_t ES, class WT>
+constexpr posit<N, ES, WT>::posit(const posit& other)
+    : bits(other.bits)
+{
+    static_assert_template_parameters();
+}
+
+template <size_t N, size_t ES, class WT>
+constexpr posit<N, ES, WT>::posit(const posit&& other)
+    : bits(std::move(other.bits))
+{
+    static_assert_template_parameters();
+}
+
+template <size_t N, size_t ES, class WT>
+constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator=(const posit& other)
+{
+    bits = other.bits;
+    return *this;
+}
+
+template <size_t N, size_t ES, class WT>
+constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator=(const posit&& other)
+{
+    bits = std::move(other.bits);
+    return *this;
+}
+
+template <size_t N, size_t ES, class WT>
+constexpr posit<N, ES, WT>::posit(WT n)
+    : bits(n)
+{
+}
+
+template <size_t N, size_t ES, class WT>
+constexpr bool posit<N, ES, WT>::operator==(const posit& other) const
+{
+    return bits == other.bits;
+}
+
+template <size_t N, size_t ES, class WT>
+constexpr bool posit<N, ES, WT>::operator!=(const posit& other) const
+{
+    return !(*this == other);
+}
+
+template <size_t N, size_t ES, class WT>
+constexpr bool posit<N, ES, WT>::operator<(const posit& other) const
+{
+    // special case complex infinity
+
+    const auto inf = complex_infinity();
+
+    // TODO (Schärtl) evtl. eine .is_inf() Methode hinzufügen?
+
+    if (*this == inf || other == inf)
     {
-        posit p;
-        p.bits = bits;
-
-        return p;
+        return false;
     }
 
-    //
-    // Constructors
-    //
+    // regular cases
 
-    /**
-     * Construct this posit initialized to zero.
-     */
-    constexpr posit()
-        : bits(0)
+    auto mybits = get_bits();
+    auto otherbits = other.get_bits();
+
+    if (mybits.msb() && otherbits.msb())
     {
-        static_assert_template_parameters();
+        mybits = twos_complement(mybits);
+        otherbits = twos_complement(otherbits);
+
+        return mybits > otherbits;
+    }
+    else if ((!mybits.msb()) && (!otherbits.msb()))
+    {
+        return mybits < otherbits;
+    }
+    else if (mybits.msb() && (!otherbits.msb()))
+    {
+        return true;
+    }
+    else
+    {
+        assert((!mybits.msb()) && otherbits.msb());
+        return false;
+    }
+}
+
+template <size_t N, size_t ES, class WT>
+constexpr bool posit<N, ES, WT>::operator<=(const posit& other) const
+{
+    return (*this == other) || (*this < other);
+}
+
+template <size_t N, size_t ES, class WT>
+constexpr bool posit<N, ES, WT>::operator>(const posit& other) const
+{
+    return other < *this;
+}
+
+template <size_t N, size_t ES, class WT>
+constexpr bool posit<N, ES, WT>::operator>=(const posit& other) const
+{
+    return (*this == other) || (*this > other);
+}
+
+template <size_t N, size_t ES, class WT>
+constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator+() const
+{
+    return *this;
+}
+
+template <size_t N, size_t ES, class WT>
+posit<N, ES, WT> posit<N, ES, WT>::operator+(const posit<N, ES, WT>& rhs) const
+{
+    using Posit = posit<N, ES, WT>;
+
+    constexpr Posit zero = Posit::zero();
+    constexpr Posit inf = Posit::complex_infinity();
+
+    const Posit& lhs = *this;
+
+    // special cases
+
+    if (rhs == inf || lhs == inf)
+    {
+        return inf;
     }
 
-    /**
-     * Construct this posit to be a clone of other.
-     *
-     * @param other The posit to clone.
-     */
-    constexpr posit(const posit& other)
-        : bits(other.bits)
+    if (lhs == zero)
     {
-        static_assert_template_parameters();
+        return rhs;
     }
 
-    /**
-     * Construct this posit to be a clone of other.
-     *
-     * @param other The posit to clone.
-     */
-    constexpr posit(const posit&& other)
-        : bits(std::move(other.bits))
+    if (rhs == zero)
     {
-        static_assert_template_parameters();
+        return lhs;
     }
 
-    /**
-     * Assign this posit to hold the value of other.
-     *
-     * @param The value to change to.
-     */
-    constexpr posit& operator=(const posit& other)
+    // regular cases
+
+    const binprod<N> lhs_binprod(lhs);
+    const binprod<N> rhs_binprod(rhs);
+
+    const binprod<N> bsum = lhs_binprod + rhs_binprod;
+    Posit psum = bsum.template to_posit<N, ES, WT>();
+
+    // fix overflows
+
+    if (rhs > zero && psum < lhs)
     {
-        bits = other.bits;
+        psum = psum.max();
+    }
+
+    // fix underflows
+
+    if (rhs < zero && psum > lhs)
+    {
+        psum = psum.min();
+    }
+
+    return psum;
+}
+
+template <size_t N, size_t ES, class WT>
+posit<N, ES, WT>& posit<N, ES, WT>::operator+=(const posit<N, ES, WT>& rhs)
+{
+
+    posit<N, ES, WT> sum = *this + rhs;
+    this->bits = sum.get_bits();
+    return *this;
+}
+
+template <size_t N, size_t ES, class WT> posit<N, ES, WT>& posit<N, ES, WT>::operator++()
+{
+    // ++x
+    *this += this->one();
+    return *this;
+}
+
+template <size_t N, size_t ES, class WT> posit<N, ES, WT> posit<N, ES, WT>::operator++(int)
+{
+    // x++
+    auto copy = *this;
+    *this += this->one();
+    return *this;
+}
+
+template <size_t N, size_t ES, class WT>
+constexpr posit<N, ES, WT> posit<N, ES, WT>::operator-() const
+{
+    if (*this == zero())
+    {
         return *this;
     }
 
-    /**
-     * Assign this posit to hold the value of other.
-     *
-     * @param The value to change to.
-     */
-    constexpr posit& operator=(const posit&& other)
+    if (*this == complex_infinity())
     {
-        bits = std::move(other.bits);
         return *this;
     }
 
-    /**
-     * Construct this posit with given bits.
-     *
-     * @param n Bits used to initialize the underlying type.
-     */
-     // TODO (Schärtl) das funktioniert aber nur gut, so lange N <= 64!
-    constexpr explicit posit(WordType n)
-        : bits(n)
+    const auto bits = twos_complement(this->get_bits());
+    return posit<N, ES, WT>::from_bits(bits);
+}
+
+template <size_t N, size_t ES, class WT>
+constexpr posit<N, ES, WT> posit<N, ES, WT>::operator-(const posit<N, ES, WT>& rhs) const
+{
+    return *this + (-rhs);
+}
+
+template <size_t N, size_t ES, class WT>
+posit<N, ES, WT>& posit<N, ES, WT>::operator-=(const posit<N, ES, WT>& rhs)
+{
+    posit<N, ES, WT> sum = *this - rhs;
+    this->bits = sum.get_bits();
+    return *this;
+}
+
+template <size_t N, size_t ES, class WT> posit<N, ES, WT>& posit<N, ES, WT>::operator--()
+{
+    // --x
+    *this -= one();
+    return *this;
+}
+
+template <size_t N, size_t ES, class WT> posit<N, ES, WT> posit<N, ES, WT>::operator--(int)
+{
+    // x--
+    auto copy = *this;
+    *this -= this->one();
+    return *this;
+}
+
+template <size_t N, size_t ES, class WT>
+[[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::min()
+{
+    // the min value is represented by 10..01
+
+    posit p;
+
+    p.bits.set_bit(N - 1, true);
+    p.bits.set_bit(0, true);
+
+    return p;
+}
+
+template <size_t N, size_t ES, class WT>
+[[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::minpos()
+{
+    // minpos is presented by 0..01
+
+    posit p;
+
+    p.bits.set_bit(0, true);
+
+    return p;
+}
+
+template <size_t N, size_t ES, class WT>
+[[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::max()
+{
+    // the maximum value is represented by 01..1
+
+    posit p;
+
+    p.bits = p.bits.all_ones();
+    p.bits.set_bit(N - 1, false);
+
+    return p;
+}
+
+template <size_t N, size_t ES, class WT>
+[[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::zero()
+{
+    // zero is represented by all bits set to zero
+
+    return posit();
+}
+
+template <size_t N, size_t ES, class WT>
+[[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::one()
+{
+    // one is represented by 010...0
+
+    posit p;
+
+    p.bits.set_bit(N - 2, true);
+
+    return p;
+}
+
+template <size_t N, size_t ES, class WT>
+[[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::complex_infinity()
+{
+    // complex infinity is sign bit set to one and all
+    // other bits set to zero
+
+    posit p;
+    p.bits.set_bit(N - 1, true);
+
+    return p;
+}
+
+template <size_t N, size_t ES, class WT>
+[[nodiscard]] constexpr uinteger<N + 1, WT> posit<N, ES, WT>::npat()
+{
+    // to support arbitrary template parameters, we need to be able to
+    // return arbitrary large sizes; so instead of size_t we use uinteger
+    // as a return type here
+
+    using SizeType = uinteger<N + 1, WT>;
+    const SizeType one = SizeType::one();
+
+    return one << N;
+}
+
+template <size_t N, size_t ES, class WT>
+[[nodiscard]] constexpr typename posit<N, ES, WT>::useed_type posit<N, ES, WT>::useed()
+{
+    return useed_type(1 << (1 << ES));
+}
+
+template <size_t N, size_t ES, class WT>
+[[nodiscard]] constexpr bool posit<N, ES, WT>::is_negative() const
+{
+    if (*this == complex_infinity())
     {
+        return false;
     }
 
-    //
-    // Comparison Operators
-    //
+    return get_sign_bit() == storage_type(1);
+}
 
-    /**
-     * @brief Compare this and other for equality.
-     *
-     * @return true if this and other represent the same value. Otherwise
-     * returns true.
-     */
-    constexpr bool operator==(const posit& other) const
-    {
-        return bits == other.bits;
-    }
+template <size_t N, size_t ES, class WT>
+[[nodiscard]] constexpr typename posit<N, ES, WT>::storage_type
+posit<N, ES, WT>::get_sign_bit() const
+{
+    return storage_type(bits.msb());
+}
 
-    /**
-     * @brief Compare this and other for inequality.
-     *
-     * @return true if this and other represent different values. Otherwise
-     * returns false.
-     */
-    constexpr bool operator!=(const posit& other) const
-    {
-        return !(*this == other);
-    }
+template <size_t N, size_t ES, class WT>
+[[nodiscard]] constexpr typename posit<N, ES, WT>::storage_type posit<N, ES, WT>::get_bits() const
+{
+    return bits;
+}
 
-    /**
-     * @brief Return whether this is less than other.
-     *
-     * If this or other represent complex infinity, this method returns false.
-     */
-    constexpr bool operator<(const posit& other) const
-    {
-        // special case complex infinity
+template <size_t N, size_t ES, class WT>
+constexpr void posit<N, ES, WT>::static_assert_template_parameters() const
+{
+    static_assert(N >= 2, "number of bits needs to be at least 2");
+    static_assert(ES <= 5, "exponent unreasonably large");
+}
 
-        const auto inf = complex_infinity();
-
-        // TODO (Schärtl) evtl. eine .is_inf() Methode hinzufügen?
-
-        if (*this == inf || other == inf)
-        {
-            return false;
-        }
-
-        // regular cases
-
-        auto mybits = get_bits();
-        auto otherbits = other.get_bits();
-
-        if (mybits.msb() && otherbits.msb())
-        {
-            mybits = twos_complement(mybits);
-            otherbits = twos_complement(otherbits);
-
-            return mybits > otherbits;
-        }
-        else if ((!mybits.msb()) && (!otherbits.msb()))
-        {
-            return mybits < otherbits;
-        }
-        else if (mybits.msb() && (!otherbits.msb()))
-        {
-            return true;
-        }
-        else
-        {
-            assert((!mybits.msb()) && otherbits.msb());
-            return false;
-        }
-    }
-
-    /**
-     * @brief Return whether this is less than or equal to other.
-     *
-     * If either this or other represent complex infinity, this method returns
-     * false. If both this and other represent complex infinity, this method
-     * returns true.
-     */
-    constexpr bool operator<=(const posit& other) const
-    {
-        return (*this == other) || (*this < other);
-    }
-
-    /**
-     * @brief Return whether this is greater than other.
-     *
-     * If this or other represent complex infinity, this method returns false.
-     */
-    constexpr bool operator>(const posit& other) const
-    {
-        return other < *this;
-    }
-
-    /**
-     * @brief Return whether this is greater than or equal to other.
-     *
-     * If either this or other represent complex infinity, this method returns
-     * false. If both this and other represent complex infinity, this method
-     * returns true.
-     */
-    constexpr bool operator>=(const posit& other) const
-    {
-        return (*this == other) || (*this > other);
-    }
-
-    //
-    // Constants
-    //
-
-    /**
-     * Return the minimum value of this posit type. The minimum is the
-     * negative posit that has the greatest magnitude.
-     *
-     * @return The smallest representable posit that represents a real number.
-     */
-    [[nodiscard]] static constexpr posit min()
-    {
-        // the min value is represented by 10..01
-
-        posit p;
-
-        p.bits.set_bit(N - 1, true);
-        p.bits.set_bit(0, true);
-
-        return p;
-    }
-
-    /**
-     * Return the smallest representable positive value that is not zero.
-     *
-     * @return Smallest positive non-zero posit that represents a real number.
-     */
-    [[nodiscard]] static constexpr posit minpos()
-    {
-        // minpos is presented by 0..01
-
-        posit p;
-
-        p.bits.set_bit(0, true);
-
-        return p;
-    }
-
-    /**
-     * Return the maximum value of this posit type. The maximum is the
-     * positive posit that has the greatest magnitude.
-     *
-     * @return The biggest representable posit that represents a real number.
-     */
-    [[nodiscard]] static constexpr posit max()
-    {
-        // the maximum value is represented by 01..1
-
-        posit p;
-
-        p.bits = p.bits.all_ones();
-        p.bits.set_bit(N - 1, false);
-
-        return p;
-    }
-
-    /**
-     * @return Representation of the real number zero.
-     */
-    [[nodiscard]] static constexpr posit zero()
-    {
-        // zero is represented by all bits set to zero
-
-        return posit();
-    }
-
-    /**
-     * @return Representation of the real number one.
-     */
-    [[nodiscard]] static constexpr posit one()
-    {
-        // one is represented by 010...0
-
-        posit p;
-
-        p.bits.set_bit(N - 2, true);
-
-        return p;
-    }
-
-    /**
-     * @return Representation of complex infinity.
-     */
-    [[nodiscard]] static constexpr posit complex_infinity()
-    {
-        // complex infinity is sign bit set to one and all
-        // other bits set to zero
-
-        posit p;
-        p.bits.set_bit(N - 1, true);
-
-        return p;
-    }
-
-    //
-    // Posit-Specific Constants
-    //
-
-    /**
-     * @brief Return the npat for this type as defined in unum literature.
-     *
-     * @return The number of possible bit patterns this type can take.
-     */
-    [[nodiscard]] static constexpr uinteger<N + 1, WordType> npat()
-    {
-        // to support arbitrary template parameters, we need to be able to
-        // return arbitrary large sizes; so instead of size_t we use uinteger
-        // as a return type here
-
-        using SizeType = uinteger<N + 1, WordType>;
-        const SizeType one = SizeType::one();
-
-        return one << N;
-    }
-
-    /**
-     * @brief Return the useed for this type as used in official unum
-     * literature.
-     *
-     * @ The useed value, which is 2 to the power of 2 to the power of the
-     * exponent size.
-     */
-    [[nodiscard]] static constexpr useed_type useed()
-    {
-        return useed_type(1 << (1 << ES));
-    }
-
-    //
-    // Getters
-    //
-
-    /**
-     * @return Whether this posit represents a negative real number.
-     */
-    [[nodiscard]] constexpr bool is_negative() const
-    {
-        if (*this == complex_infinity())
-        {
-            return false;
-        }
-
-        return get_sign_bit() == storage_type(1);
-    }
-
-    /**
-     * @return The sign bit. The returned integer is either set to 0 or 1.
-     */
-    [[nodiscard]] constexpr storage_type get_sign_bit() const
-    {
-        return storage_type(bits.msb());
-    }
-
-    /**
-     * @return The underlying storage.
-     */
-    [[nodiscard]] constexpr storage_type get_bits() const
-    {
-        return bits;
-    }
-
-    // TODO(Schärtl): make private
-    storage_type bits;
-
-private:
-    /**
-     * Statically assert that the created instance of a given posit
-     * conforms to the requirements for legal posits.
-     *
-     * We call this method in the constructor so it is guaranteed
-     * to get generated on template instantiation.
-     */
-    constexpr void static_assert_template_parameters() const
-    {
-        static_assert(N >= 2, "number of bits needs to be at least 2");
-        static_assert(ES <= 5, "exponent unreasonably large");
-    }
-};
 } // namespace aarith

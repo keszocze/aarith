@@ -2,17 +2,11 @@
 
 #include <aarith/integer.hpp>
 #include <aarith/posit.hpp>
-#include <aarith/posit/posit_internal.hpp>
-#include <algorithm>
 #include <cassert>
-#include <cctype>
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
-#include <cstring>
 #include <stdexcept>
-
-#include <iostream>
 
 namespace aarith {
 
@@ -32,9 +26,6 @@ template <size_t N, class WT> [[nodiscard]] constexpr double to_double(const int
 
 } // namespace internal
 
-/**
- * @return The number of regime bits in the given posit.
- */
 template <size_t N, size_t ES, class WT>
 [[nodiscard]] constexpr size_t get_num_regime_bits(const posit<N, ES, WT>& p)
 {
@@ -73,9 +64,6 @@ template <size_t N, size_t ES, class WT>
     return std::min(N - 1, nregime + 1);
 }
 
-/**
- * @return The number of exponent bits in the given posit.
- */
 template <size_t N, size_t ES, class WT>
 [[nodiscard]] constexpr size_t get_num_exponent_bits(const posit<N, ES, WT>& p)
 {
@@ -99,9 +87,6 @@ template <size_t N, size_t ES, class WT>
     return std::min(nremaining, ES);
 }
 
-/**
- * @return The number of fraction bits in the given posit.
- */
 template <size_t N, size_t ES, class WT>
 [[nodiscard]] constexpr size_t get_num_fraction_bits(const posit<N, ES, WT>& p)
 {
@@ -130,11 +115,6 @@ template <size_t N, size_t ES, class WT>
     return N - nused;
 }
 
-/**
- * @return The sign value of the given posit.
- *
- * Returns either 0 or 1.
- */
 template <size_t N, size_t ES, class WT>
 [[nodiscard]] constexpr integer<N, WT> get_sign_value(const posit<N, ES, WT>& p)
 {
@@ -150,9 +130,6 @@ template <size_t N, size_t ES, class WT>
     }
 }
 
-/**
- * @return The regime value of the given posit.
- */
 template <size_t N, size_t ES, class WT>
 [[nodiscard]] constexpr integer<N, WT> get_regime_value(const posit<N, ES, WT>& p)
 {
@@ -209,9 +186,6 @@ template <size_t N, size_t ES, class WT>
     }
 }
 
-/**
- * @return The exponent value of the given posit.
- */
 template <size_t N, size_t ES, class WT>
 [[nodiscard]] constexpr uinteger<N, WT> get_exponent_value(const posit<N, ES, WT>& p)
 {
@@ -229,12 +203,6 @@ template <size_t N, size_t ES, class WT>
     return (bits >> nfrac) & mask;
 }
 
-/**
- * Return the fraction of the given posit. The fraction is the fractional part
- * of the posit interpreted as an unsigned integer.
- *
- * @return The fraction of the given posit.
- */
 template <size_t N, size_t ES, class WT>
 [[nodiscard]] constexpr uinteger<N, WT> get_fraction_value(const posit<N, ES, WT>& p)
 {
@@ -251,15 +219,6 @@ template <size_t N, size_t ES, class WT>
     return bits & mask;
 }
 
-/**
- * Evaluate the given posit to compute the represented real value.  Uses
- * double precision IEEE floats for computation.
- *
- * The special value posit::complex_infinity gets translated to NaN
- * by this function.
- *
- * @ The real value of p, represented as a double precision float.
- */
 template <size_t N, size_t ES, class WT>
 [[nodiscard]] constexpr double to_double(const posit<N, ES, WT>& p)
 {
@@ -285,7 +244,7 @@ template <size_t N, size_t ES, class WT>
     return sign * std::pow(useed, k) * std::pow(2, e) * f;
 }
 
-template <size_t N, size_t ES, class WT = uint64_t>
+template <size_t N, size_t ES, class WT>
 [[nodiscard]] constexpr posit<N, ES, WT> from_double(const double x)
 {
     using Posit = posit<N, ES, WT>;
@@ -459,6 +418,19 @@ template <size_t N, size_t ES, class WT>
     {
         return p;
     }
+}
+
+template <size_t N, size_t ES, class WT>
+constexpr integer<N> get_global_exponent(const posit<N, ES, WT>& p)
+{
+    using Integer = integer<N>;
+
+    constexpr auto rscale = Integer(1 << ES);
+
+    const auto R = Integer(get_regime_value<N, ES, WT>(p));
+    const auto E = Integer(get_exponent_value<N, ES, WT>(p));
+
+    return rscale * R + E;
 }
 
 } // namespace aarith
