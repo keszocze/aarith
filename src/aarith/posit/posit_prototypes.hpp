@@ -270,12 +270,12 @@ public:
     /**
      * @brief Return width of the given posit type.
      */
-    [[nodiscard]] static constexpr size_t n();
+    [[nodiscard]] static constexpr size_t width();
 
     /**
      * @brief Return the maximum exponent size of the given posit type.
      */
-    [[nodiscard]] static constexpr size_t es();
+    [[nodiscard]] static constexpr size_t exponent_size();
 
     /**
      * Return the minimum value of this posit type. The minimum is the

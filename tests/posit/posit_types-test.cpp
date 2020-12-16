@@ -12,18 +12,18 @@ SCENARIO("Standard Posit Types")
 
         THEN("Check that N is correct")
         {
-            CHECK(posit8::n() == 8);
-            CHECK(posit16::n() == 16);
-            CHECK(posit32::n() == 32);
-            CHECK(posit64::n() == 64);
+            CHECK(posit8::width() == 8);
+            CHECK(posit16::width() == 16);
+            CHECK(posit32::width() == 32);
+            CHECK(posit64::width() == 64);
         }
 
         THEN("Check that ES is correct")
         {
-            CHECK(posit8::es() == 2);
-            CHECK(posit16::es() == 2);
-            CHECK(posit32::es() == 2);
-            CHECK(posit64::es() == 2);
+            CHECK(posit8::exponent_size() == 2);
+            CHECK(posit16::exponent_size() == 2);
+            CHECK(posit32::exponent_size() == 2);
+            CHECK(posit64::exponent_size() == 2);
         }
     }
 }

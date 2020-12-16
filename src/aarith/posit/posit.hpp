@@ -316,12 +316,13 @@ posit<N, ES, WT>& posit<N, ES, WT>::operator*=(const posit<N, ES, WT>& rhs)
     return *this;
 }
 
-template <size_t N, size_t ES, typename WT> [[nodiscard]] constexpr size_t posit<N, ES, WT>::n()
+template <size_t N, size_t ES, typename WT> [[nodiscard]] constexpr size_t posit<N, ES, WT>::width()
 {
     return N;
 }
 
-template <size_t N, size_t ES, typename WT> [[nodiscard]] constexpr size_t posit<N, ES, WT>::es()
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr size_t posit<N, ES, WT>::exponent_size()
 {
     return ES;
 }
