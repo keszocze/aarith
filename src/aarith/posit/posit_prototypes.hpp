@@ -258,6 +258,16 @@ public:
     //
 
     /**
+     * @brief Return width of the given posit type.
+     */
+    [[nodiscard]] static constexpr size_t n();
+
+    /**
+     * @brief Return the maximum exponent size of the given posit type.
+     */
+    [[nodiscard]] static constexpr size_t es();
+
+    /**
      * Return the minimum value of this posit type. The minimum is the
      * negative posit that has the greatest magnitude.
      *
@@ -633,4 +643,5 @@ template <size_t N> constexpr binprod<N> operator+(const binprod<N>& lhs, const 
 #include <aarith/posit/binprod_operators.hpp>
 #include <aarith/posit/posit.hpp>
 #include <aarith/posit/posit_operators.hpp>
+#include <aarith/posit/posit_types.hpp>
 #include <aarith/posit/string_utils.hpp>

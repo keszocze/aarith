@@ -184,6 +184,8 @@ posit<N, ES, WT> posit<N, ES, WT>::operator+(const posit<N, ES, WT>& rhs) const
         psum = psum.min();
     }
 
+    // return
+
     return psum;
 }
 
@@ -255,6 +257,16 @@ template <size_t N, size_t ES, typename WT> posit<N, ES, WT> posit<N, ES, WT>::o
     auto copy = *this;
     *this -= this->one();
     return *this;
+}
+
+template <size_t N, size_t ES, typename WT> [[nodiscard]] constexpr size_t posit<N, ES, WT>::n()
+{
+    return N;
+}
+
+template <size_t N, size_t ES, typename WT> [[nodiscard]] constexpr size_t posit<N, ES, WT>::es()
+{
+    return ES;
 }
 
 template <size_t N, size_t ES, typename WT>
