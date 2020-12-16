@@ -81,7 +81,8 @@ template <size_t E, size_t M>
     const auto mantissa_sum =
         approx_expanding_sub_post_masking(lhs.get_full_mantissa(), new_mantissa, bits + 1);
 
-    normalized_float<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(), mantissa_sum);
+    normalized_float<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(),
+                                                      mantissa_sum);
 
     return normalize<E, mantissa_sum.width() - 1, M>(sum);
 }
@@ -112,8 +113,10 @@ template <size_t E, size_t M>
     // compute sign
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
-    if (lhs.is_inf() || rhs.is_inf()) {
-        return sign ? normalized_float<E,M>::neg_infinity() : normalized_float<E,M>::pos_infinity();
+    if (lhs.is_inf() || rhs.is_inf())
+    {
+        return sign ? normalized_float<E, M>::neg_infinity()
+                    : normalized_float<E, M>::pos_infinity();
     }
 
     // compute exponent

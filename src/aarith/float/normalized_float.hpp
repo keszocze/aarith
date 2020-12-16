@@ -390,11 +390,25 @@ public:
         return exponent;
     }
 
+    /**
+     * @brief Tests whether the floating-point number is positive.
+     *
+     * This returns true for zeros and NaNs as well.
+     *
+     * @return True iff the sign bit is not set
+     */
     [[nodiscard]] constexpr bool is_positive() const
     {
         return !sign_neg;
     }
 
+    /**
+     * @brief Tests whether the floating-point number is negative.
+     *
+     * This returns true for zeros and NaNs as well.
+     *
+     * @return True iff the sign bit is set
+     */
     [[nodiscard]] constexpr bool is_negative() const
     {
         return sign_neg;
@@ -418,6 +432,11 @@ public:
                width_cast<M>(mantissa) == uinteger<M>::zero();
     }
 
+    [[nodiscard]] constexpr bool is_finite() const
+    {
+        return !is_inf();
+    }
+
     /**
      * @brief Checks whether the floating point number is not a number
      *
@@ -428,8 +447,7 @@ public:
     [[nodiscard]] constexpr bool is_nan() const
     {
         const bool exp_ones = exponent == IntegerExp ::all_ones();
-        constexpr auto zero = uinteger<M>::zero();
-        const bool mant_zero = get_mantissa() != zero;
+        const bool mant_zero = !get_mantissa().is_zero();
         return exp_ones && mant_zero;
     }
 
@@ -500,27 +518,42 @@ public:
     }
 
     /**
-     * @brief Checks whether the number is normalized
+     * @brief Checks whether the number is normal
      *
-     * @note The NaNs are also considered normalized!
+     * This is true if and only if the floating-point number  is normal (not zero, subnormal,
+     * infinite, or NaN).
      *
      * @return True iff the number is normalized
      */
     [[nodiscard]] constexpr bool is_normalized() const
     {
-        return exponent != IntegerExp::all_zeroes();
+        const bool denormalized = (exponent == IntegerExp::all_zeroes());
+        const bool exception = (exponent == IntegerExp::all_ones());
+
+        return !(denormalized || exception);
     }
 
     /**
-     * @brief Returns if the number is denormalized or NaN/Inf
-     * @return
+     * @brief Returns if the number is zero, denormalized, NaN, or Inf (i.e. not normal)
+     * @return True iff is the number is special (i.e. not normal)
      */
     [[nodiscard]] constexpr bool is_special() const
     {
-        const bool denormalized = (exponent == IntegerExp::all_zeroes());
-        const bool exception = (exponent == IntegerExp::all_ones());
-        const bool result = (denormalized || exception);
-        return result;
+        return !is_normalized();
+    }
+
+    /**
+     * @brief Tests if the number is subnormal
+     *
+     * @note Zero is *not* considered subnormal!
+     *
+     * @return True iff the number is subnormal
+     */
+    [[nodiscard]] constexpr bool is_subnormal() const
+    {
+        const bool denormalized = exponent.is_zero();
+        const bool not_zero = !mantissa.is_zero();
+        return denormalized && not_zero;
     }
 
     /**

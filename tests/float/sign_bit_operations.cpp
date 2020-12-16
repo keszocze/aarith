@@ -83,7 +83,7 @@ TEMPLATE_TEST_CASE_SIG("Copying a floating-point number with the sign of another
             THEN("The result compares equal")
             {
                 REQUIRE(c.get_sign() == b.get_sign());
-                if(!a.is_nan())
+                if (!a.is_nan())
                 {
                     REQUIRE(abs(c) == abs(a));
                 }
