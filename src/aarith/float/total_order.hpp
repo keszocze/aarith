@@ -14,12 +14,12 @@ namespace aarith {
  * @tparam M Mantissa width
  * @tparam WordType The data type the underlying data is stored in
  * @param x The first/lhs floating-point number
- * @param y The scond/rhs floating-point number
+ * @param y The second/rhs floating-point number
  * @return true iff x < y
  */
 template <size_t E, size_t M, typename WordType>
 bool constexpr totalOrder(const normalized_float<E, M, WordType>& x,
-                const normalized_float<E, M, WordType>& y)
+                          const normalized_float<E, M, WordType>& y)
 {
 
     //    d) If x and y are unordered numerically because x or y is a NaN:
@@ -57,7 +57,8 @@ bool constexpr totalOrder(const normalized_float<E, M, WordType>& x,
         {
             return true;
         }
-        if (x.is_positive() && y.is_negative()) {
+        if (x.is_positive() && y.is_negative())
+        {
             return false;
         }
 
@@ -126,5 +127,24 @@ bool constexpr totalOrder(const normalized_float<E, M, WordType>& x,
     // This *should* be unreachable code as all cases as shown in the standard document have been
     // taken care of. Returning false seems to be a reasonable thing to do.
     return false;
+}
+
+/**
+ * @brief Checks for total ordering abs(x) < abs(y) of two floating-point numbers.
+ *
+ * These numbers *may* be NaNs or infinities.
+ *
+ * @tparam E Exponent width
+ * @tparam M Mantissa width
+ * @tparam WordType The data type the underlying data is stored in
+ * @param x The first/lhs floating-point number
+ * @param y The second/rhs floating-point number
+ * @return true iff abs(x) < abs(y)
+ */
+template <size_t E, size_t M, typename WordType>
+bool constexpr totalOrderMag(const normalized_float<E, M, WordType>& x,
+                             const normalized_float<E, M, WordType>& y)
+{
+    return totalOrder(abs(x), abs(y));
 }
 } // namespace aarith

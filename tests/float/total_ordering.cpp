@@ -16,7 +16,7 @@ TEMPLATE_TEST_CASE_SIG("Total ordering +/- zero", "[normalized_float][comparison
         constexpr F pos_zero{F::zero()};
         constexpr F neg_zero{F::neg_zero()};
 
-        THEN("The cordering behaves as defined in the standard")
+        THEN("The ordering behaves as defined in the standard")
         {
             constexpr bool v = totalOrder(neg_zero, pos_zero);
             REQUIRE(v);
