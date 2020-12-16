@@ -17,6 +17,8 @@ template <size_t Width, class WordType = uint64_t>
 class uinteger : public word_array<Width, WordType>
 {
 public:
+    using word_type = WordType;
+
     constexpr uinteger() = default;
 
     constexpr explicit uinteger(WordType n)
@@ -79,6 +81,11 @@ public:
     /*
      * Constants
      */
+
+    [[nodiscard]] static constexpr size_t width()
+    {
+        return Width;
+    }
 
     [[nodiscard]] static constexpr uinteger min()
     {
@@ -238,6 +245,8 @@ template <size_t Width, class WordType = uint64_t>
 class integer : public word_array<Width, WordType>
 {
 public:
+    using word_type = WordType;
+
     constexpr integer() = default;
 
     explicit constexpr integer(WordType n)
@@ -282,6 +291,11 @@ public:
     constexpr integer<Width, WordType>(const word_array<V, WordType>& other)
         : word_array<Width, WordType>(width_cast<Width, V, WordType>(other))
     {
+    }
+
+    [[nodiscard]] static constexpr size_t width()
+    {
+        return Width;
     }
 
     [[nodiscard]] static constexpr integer min()

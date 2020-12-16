@@ -6,6 +6,57 @@
 namespace aarith {
 
 /**
+ * @brief Expands the bit width of unsigned integer as signed integer.
+ *
+ * The value of the integer remains unchanged. To achive this,
+ * DestinationWidth needs to be at least SourceWidth + 1.
+ *
+ * @tparam DestinationWidth Number of bits to convert to
+ * @tparam DestinationWordType Word type to use in returned integer
+ * @tparam SourceWidth Number of bits to convert from
+ * @tparam SourceWordType Word type used in argument
+ * @param source The integer whose width is changed
+ * @return signed integer with specified bit width
+ */
+template <size_t DestinationWidth, typename DestinationWordType, size_t SourceWidth,
+          typename SourceWordType>
+[[nodiscard]] constexpr integer<DestinationWidth, DestinationWordType>
+signed_width_cast(const uinteger<SourceWidth, SourceWordType>& source)
+{
+    using RetType = integer<DestinationWidth, DestinationWordType>;
+    return signed_width_cast<RetType>(source);
+}
+
+/**
+ * @brief Expands the bit width of unsigned integer as signed integer.
+ *
+ * The value of the integer remains unchanged. To achive this,
+ * DestinationWidth needs to be at least SourceWidth + 1.
+ *
+ * @tparam SourceInteger Specialization of an integer type to convert to
+ * @param source The integer whose width is changed
+ * @return signed integer with specified bit width
+ */
+template <typename DestinationInteger, size_t SourceWidth, typename SourceWordType>
+[[nodiscard]] constexpr DestinationInteger
+signed_width_cast(const uinteger<SourceWidth, SourceWordType>& source)
+{
+    // TODO (Schärtl): Handle this correctly w/ concepts
+
+    constexpr size_t DestinationWidth = DestinationInteger::width();
+    using DestinationWordType = typename DestinationInteger::word_type;
+
+    static_assert(DestinationWidth > SourceWidth,
+                  "conversion from unsigned to signed integer requires return type to be at least "
+                  "one bit greater to fit the argument");
+
+    const auto array = static_cast<word_array<SourceWidth, DestinationWordType>>(source);
+    const auto extended = width_cast<DestinationWidth, SourceWidth, DestinationWordType>(array);
+
+    return integer<DestinationWidth, DestinationWordType>(extended);
+}
+
+/**
  * @brief Performs a runtime-checked conversion.
  *
  * @warning The conversion will throw a runtime exception of the value does

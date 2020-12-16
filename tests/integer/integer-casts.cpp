@@ -639,3 +639,34 @@ SCENARIO("Casting signed integers to uint8_t", "[integer][unsigned][casting]")
         }
     }
 }
+
+SCENARIO("Casting uinteger<16> to integer<32>", "[integer][unsigned][signed][casting]")
+{
+    GIVEN("All of the 16 bit unsigned integers")
+    {
+        using U16 = uinteger<16, uint16_t>;
+        using I32 = integer<32, uint32_t>;
+
+        constexpr int32_t min16 = std::numeric_limits<uint16_t>::min();
+        constexpr int32_t max16 = std::numeric_limits<uint16_t>::max();
+
+        THEN("Assert that the signed cast does not change the value")
+        {
+            for (int32_t i = min16; i <= max16; ++i)
+            {
+                const uint16_t u = static_cast<uint16_t>(i);
+                const U16 aarith_unsigned = u;
+
+                const I32 expected = i;
+
+                // try both template overloads
+                const I32 aarith_signed_easy = signed_width_cast<I32>(aarith_unsigned);
+                const I32 aarith_signed_explicit =
+                    signed_width_cast<32, uint32_t, 16, uint16_t>(aarith_unsigned);
+
+                CHECK(aarith_signed_easy == expected);
+                CHECK(aarith_signed_explicit == expected);
+            }
+        }
+    }
+}
