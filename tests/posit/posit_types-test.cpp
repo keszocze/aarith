@@ -25,13 +25,5 @@ SCENARIO("Standard Posit Types")
             CHECK(posit32::es() == 2);
             CHECK(posit64::es() == 2);
         }
-
-        THEN("Check that the types are not bigger than necessary")
-        {
-            CHECK(sizeof(posit8) == 1);
-            CHECK(sizeof(posit16) == 2);
-            CHECK(sizeof(posit32) == 4);
-            CHECK(sizeof(posit64) == 8);
-        }
     }
 }

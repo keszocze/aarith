@@ -253,6 +253,11 @@ public:
      */
     posit operator--(int);
 
+    /**
+     * @brief Return the product of this multipled with rhs.
+     */
+    posit operator*(const posit& rhs) const;
+
     //
     // Constants
     //
@@ -636,6 +641,11 @@ private:
  * @brief Return the sum of two binary products.
  */
 template <size_t N> constexpr binprod<N> operator+(const binprod<N>& lhs, const binprod<N>& rhs);
+
+/**
+ * @brief Return the product of two binary products.
+ */
+template <size_t N> constexpr binprod<N> operator*(const binprod<N>& lhs, const binprod<N>& rhs);
 
 } // namespace aarith
 

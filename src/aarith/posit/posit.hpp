@@ -259,6 +259,55 @@ template <size_t N, size_t ES, typename WT> posit<N, ES, WT> posit<N, ES, WT>::o
     return *this;
 }
 
+template <size_t N, size_t ES, typename WT>
+posit<N, ES, WT> posit<N, ES, WT>::operator*(const posit<N, ES, WT>& rhs) const
+{
+    using Posit = posit<N, ES, WT>;
+
+    constexpr Posit zero = Posit::zero();
+    constexpr Posit inf = Posit::complex_infinity();
+
+    const Posit& lhs = *this;
+
+    // special cases
+
+    if (rhs == inf || lhs == inf)
+    {
+        return inf;
+    }
+
+    if (lhs == zero || rhs == zero)
+    {
+        return zero;
+    }
+
+    // regular cases
+
+    const binprod<N> lhs_binprod(lhs);
+    const binprod<N> rhs_binprod(rhs);
+
+    const binprod<N> bprod = lhs_binprod * rhs_binprod;
+    Posit pprod = bprod.template to_posit<N, ES, WT>();
+
+    // fix overflows
+
+    if (rhs > zero && pprod < lhs)
+    {
+        pprod = pprod.max();
+    }
+
+    // fix underflows
+
+    if (rhs < zero && pprod > lhs)
+    {
+        pprod = pprod.min();
+    }
+
+    // return
+
+    return pprod;
+}
+
 template <size_t N, size_t ES, typename WT> [[nodiscard]] constexpr size_t posit<N, ES, WT>::n()
 {
     return N;

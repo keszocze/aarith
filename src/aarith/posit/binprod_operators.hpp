@@ -37,4 +37,12 @@ template <size_t N> constexpr binprod<N> operator+(const binprod<N>& lhs, const 
     return binprod<N>(x, m);
 }
 
+template <size_t N> constexpr binprod<N> operator*(const binprod<N>& lhs, const binprod<N>& rhs)
+{
+    const auto x = lhs.x * rhs.x;
+    const auto m = lhs.m + rhs.m;
+
+    return binprod<N>(x, m);
+}
+
 } // namespace aarith
