@@ -308,6 +308,14 @@ posit<N, ES, WT> posit<N, ES, WT>::operator*(const posit<N, ES, WT>& rhs) const
     return pprod;
 }
 
+template <size_t N, size_t ES, typename WT>
+posit<N, ES, WT>& posit<N, ES, WT>::operator*=(const posit<N, ES, WT>& rhs)
+{
+    const auto product = *this * rhs;
+    bits = product.get_bits();
+    return *this;
+}
+
 template <size_t N, size_t ES, typename WT> [[nodiscard]] constexpr size_t posit<N, ES, WT>::n()
 {
     return N;

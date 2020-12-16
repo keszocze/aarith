@@ -258,6 +258,11 @@ public:
      */
     posit operator*(const posit& rhs) const;
 
+    /**
+     * @brief Set this to this multiplied with rhs.
+     */
+    posit& operator*=(const posit& rhs);
+
     //
     // Constants
     //
