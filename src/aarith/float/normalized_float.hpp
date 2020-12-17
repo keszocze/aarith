@@ -199,6 +199,12 @@ public:
         //does not correctly insert -0
         //sign_neg = (f < 0);
         sign_neg = value_disassembled.is_neg;
+        
+        if(f == static_cast<F>(0.))
+        {
+            return;
+        }
+
 
         // if the mantissa of the normalized float can store at least as many bit as the
         // mantissa of the supplied native data type, it has to be shifted by the

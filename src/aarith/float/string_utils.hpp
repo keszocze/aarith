@@ -186,55 +186,70 @@ auto to_sci_string(const normalized_float<E, M, WordType> nf) -> std::string
         return str.str();
     }
 
-    auto fl_mantissa = nf.get_mantissa();
-    uinteger<23, WordType> flc_mantissa;
-    if constexpr (M >= 23)
+    if constexpr (E <= 8 && M <= 23)
     {
-        auto shift_mantissa = M - 23;
-        fl_mantissa = fl_mantissa >> shift_mantissa;
-        flc_mantissa = width_cast<23, M>(fl_mantissa);
+        auto f = static_cast<float>(nf);
+        str << f;
+        return str.str();
+    }
+    else if constexpr (E <= 11 && M <= 52)
+    {
+        auto f = static_cast<double>(nf);
+        str << f;
+        return str.str();
     }
     else
     {
-        auto shift_mantissa = 23 - M;
-        flc_mantissa = width_cast<23, M>(fl_mantissa);
-        flc_mantissa = (flc_mantissa << shift_mantissa);
-    }
-    // construct a float with the given mantissa and an exponent of 0
-    // to leech on float's inherent decimal output
-    uint32_t ui_mantissa = (static_cast<uint32_t>(flc_mantissa.word(0)) & 0x7fffff) | 0x3f800000;
-    float* mantissa = reinterpret_cast<float*>(&ui_mantissa);
-    auto conv = compute_nearest_exponent10(nf);
-    *mantissa = *mantissa * conv.conversion;
-
-    const integer<E + 1, WordType> exp{nf.get_exponent()};
-    const integer<E + 1, WordType> bias{nf.bias};
-
-    if (conv.not_supported)
-    {
-        str << "E = " << E << " is not supported for to_sci_string()";
-        return str.str();
-    }
-
-    if (*mantissa <= 1.f && conv.dec_exponent != 0)
-    {
-        *mantissa *= 10.f;
-        if (conv.neg_exponent)
+        auto fl_mantissa = nf.get_mantissa();
+        uinteger<23, WordType> flc_mantissa;
+        if constexpr (M >= 23)
         {
-            conv.dec_exponent += 1;
+            auto shift_mantissa = M - 23;
+            fl_mantissa = fl_mantissa >> shift_mantissa;
+            flc_mantissa = width_cast<23, M>(fl_mantissa);
         }
         else
         {
-            conv.dec_exponent -= 1;
+            auto shift_mantissa = 23 - M;
+            flc_mantissa = width_cast<23, M>(fl_mantissa);
+            flc_mantissa = (flc_mantissa << shift_mantissa);
         }
-    }
-    str << *mantissa;
-    if (conv.dec_exponent != 0)
-    {
-        str << "e" << (conv.neg_exponent ? "-" : "+") << conv.dec_exponent;
-    }
+        // construct a float with the given mantissa and an exponent of 0
+        // to leech on float's inherent decimal output
+        uint32_t ui_mantissa = (static_cast<uint32_t>(flc_mantissa.word(0)) & 0x7fffff) | 0x3f800000;
+        float* mantissa = reinterpret_cast<float*>(&ui_mantissa);
+        auto conv = compute_nearest_exponent10(nf);
+        *mantissa = *mantissa * conv.conversion;
 
-    return str.str();
+        const integer<E + 1, WordType> exp{nf.get_exponent()};
+        const integer<E + 1, WordType> bias{nf.bias};
+
+        if (conv.not_supported)
+        {
+            str << "E = " << E << " is not supported for to_sci_string()";
+            return str.str();
+        }
+
+        if (*mantissa <= 1.f && conv.dec_exponent != 0)
+        {
+            *mantissa *= 10.f;
+            if (conv.neg_exponent)
+            {
+                conv.dec_exponent += 1;
+            }
+            else
+            {
+                conv.dec_exponent -= 1;
+            }
+        }
+        str << *mantissa;
+        if (conv.dec_exponent != 0)
+        {
+            str << "e" << (conv.neg_exponent ? "-" : "+") << conv.dec_exponent;
+        }
+
+        return str.str();
+    }
 }
 
 template <size_t E, size_t M, typename WordType>
