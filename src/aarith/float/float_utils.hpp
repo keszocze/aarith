@@ -11,8 +11,6 @@
 
 namespace aarith {
 
-
-
 /**
  * @brief Tests whether a floating-point number is negative.
  *
@@ -136,7 +134,6 @@ template <typename F> bool constexpr isQuiet(const F& f)
     return f.is_nan();
 }
 
-
 /**
  * @brief Enumeration of the different types of floating-points
  *
@@ -156,23 +153,72 @@ enum class IEEEClass
     positiveInfinity
 };
 
+/**
+ * @brief Determines the class (e.g. NaN, positive subnormal) of a floating-point number.
+ *
+ * This method corresponds to the "class" method described in Section 5.7.2 of the 2019 standard.
+ * The function name had to be changed as C++ does not allow to name functions "class".
+ *
+ * @tparam F The floating-point type
+ * @param f The floating-point number to test
+ * @return The class of the floating-point number
+ */
 template <typename F> constexpr IEEEClass fp_class(const F& f)
 {
-    if (f.is_neg_inf()) {
+
+    if (f.is_qNaN())
+    {
+        return IEEEClass::quietNaN;
+    }
+
+    if (f.is_sNaN())
+    {
+        return IEEEClass::signalingNaN;
+    }
+
+    if (f.is_neg_inf())
+    {
         return IEEEClass::negativeInfinity;
     }
 
-    if (f.is_pos_inf()) {
+    if (f.is_pos_inf())
+    {
         return IEEEClass::positiveInfinity;
     }
 
-    if (isNormal(f)) {
-        // TODO fix this
-        return IEEEClass::negativeNormal;
+    if (f.is_neg_zero())
+    {
+        return IEEEClass::negativeZero;
     }
 
-    // TODO zeroes, NaNs
+    if (f.is_pos_zero())
+    {
+        return IEEEClass::positiveZero;
+    }
 
+    if (f.is_normalized())
+    {
+        if (f.is_positive())
+        {
+            return IEEEClass::positiveNormal;
+        }
+        else
+        {
+            return IEEEClass::negativeNormal;
+        }
+    }
+
+    if (f.is_subnormal())
+    {
+        if (f.is_positive())
+        {
+            return IEEEClass::positiveSubnormal;
+        }
+        else
+        {
+            return IEEEClass::negativeSubnormal;
+        }
+    }
 }
 
 /**
