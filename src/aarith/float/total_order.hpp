@@ -63,23 +63,23 @@ bool constexpr totalOrder(const normalized_float<E, M, WordType>& x,
         }
 
         // ii) signaling orders below quiet for +NaN, reverse for −NaN
-        if (x.is_positive() && y.is_positive())
+        if (x.is_sNaN() && y.is_qNaN())
         {
-            return x.is_sNaN() && y.is_qNaN();
+            return x.is_positive() && y.is_positive() ;
         }
 
         // ii) signaling orders below quiet for +NaN, reverse for −NaN
 
         // I am guessing that this is meant by "reverse"
-        if (x.is_negative() && y.is_negative())
+        if (x.is_qNaN() && y.is_sNaN())
         {
-            return x.is_qNaN() && y.is_sNaN();
+            return x.is_negative() && y.is_negative();
         }
 
         // iii) otherwise, the order of NaNs is implementation-defined
 
-        // as we can do as we like we opt for the positive and return true
-        return true;
+        // x < x should always be false
+        return false;
     }
 
     // a) If x < y, totalOrder(x, y) is true.
