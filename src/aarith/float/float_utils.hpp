@@ -89,7 +89,7 @@ template <typename F> bool constexpr isSubnormal(const F& f)
  */
 template <typename F> bool constexpr isInfinite(const F& f)
 {
-    return f.is_infinite();
+    return f.is_inf();
 }
 
 /**
@@ -115,8 +115,7 @@ template <typename F> bool constexpr isNaN(const F& f)
  */
 template <typename F> bool constexpr isSignaling(const F& f)
 {
-    // TODO (keszcoze) Choose the correct is_nan method
-    return f.is_nan();
+    return f.is_sNaN();
 }
 
 /**
@@ -130,8 +129,7 @@ template <typename F> bool constexpr isSignaling(const F& f)
  */
 template <typename F> bool constexpr isQuiet(const F& f)
 {
-    // TODO (keszcoze) Choose the correct is_nan method
-    return f.is_nan();
+    return f.is_qNaN();
 }
 
 /**
@@ -150,7 +148,8 @@ enum class IEEEClass
     positiveZero,
     positiveSubnormal,
     positiveNormal,
-    positiveInfinity
+    positiveInfinity,
+    UNCLASSIFIED // error case that should never be reached!
 };
 
 /**
@@ -219,6 +218,9 @@ template <typename F> constexpr IEEEClass fp_class(const F& f)
             return IEEEClass::negativeSubnormal;
         }
     }
+
+    // we should never reach this!
+    return IEEEClass::UNCLASSIFIED;
 }
 
 /**

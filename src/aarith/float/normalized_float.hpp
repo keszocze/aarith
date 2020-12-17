@@ -472,7 +472,7 @@ public:
 
     [[nodiscard]] constexpr bool is_finite() const
     {
-        return !is_inf();
+        return exponent != uinteger<E>::all_ones();
     }
 
     /**
