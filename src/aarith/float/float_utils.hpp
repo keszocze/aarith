@@ -11,19 +11,7 @@
 
 namespace aarith {
 
-enum class IEEEClass
-{
-    signalingNaN,
-    quietNaN,
-    negativeInfinity,
-    negativeNormal,
-    negativeSubnormal,
-    negativeZero,
-    positiveZero,
-    positiveSubnormal,
-    positiveNormal,
-    positiveInfinity
-};
+
 
 /**
  * @brief Tests whether a floating-point number is negative.
@@ -146,6 +134,45 @@ template <typename F> bool constexpr isQuiet(const F& f)
 {
     // TODO (keszcoze) Choose the correct is_nan method
     return f.is_nan();
+}
+
+
+/**
+ * @brief Enumeration of the different types of floating-points
+ *
+ * These are defined in Section 5.7.2. of the 2019 standard
+ */
+enum class IEEEClass
+{
+    signalingNaN,
+    quietNaN,
+    negativeInfinity,
+    negativeNormal,
+    negativeSubnormal,
+    negativeZero,
+    positiveZero,
+    positiveSubnormal,
+    positiveNormal,
+    positiveInfinity
+};
+
+template <typename F> constexpr IEEEClass fp_class(const F& f)
+{
+    if (f.is_neg_inf()) {
+        return IEEEClass::negativeInfinity;
+    }
+
+    if (f.is_pos_inf()) {
+        return IEEEClass::positiveInfinity;
+    }
+
+    if (isNormal(f)) {
+        // TODO fix this
+        return IEEEClass::negativeNormal;
+    }
+
+    // TODO zeroes, NaNs
+
 }
 
 /**
