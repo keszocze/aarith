@@ -3,6 +3,7 @@
 #include <aarith/core.hpp>
 #include <aarith/float/float_utils.hpp>
 #include <aarith/integer_no_operators.hpp>
+#include <assert.h>
 #include <cstdint>
 #include <iostream>
 #include <string>
@@ -348,12 +349,40 @@ public:
     }
 
     /**
-     * @brief Returns a floating point number indicating not a number.
+     * @brief Creates a quiet NaN value
+     * @param payload The payload to store in the NaN
+     * @return The bit representation of the quiet NaN containing the payload
+     */
+    [[nodiscard]] static constexpr normalized_float
+    qNaN(const IntegerFrac& payload = IntegerFrac::msb_one())
+    {
+        IntegerFrac payload_{payload};
+        payload_.set_msb(true);
+        return normalized_float(false, IntegerExp::all_ones(), IntegerMant{payload_});
+    }
+
+    /**
+     * @brief Creates a signalling NaN value
+     * @param payload The payload to store in the NaN (must not be zero)
+     * @return The bit representation of the signalling NaN containing the payload
+     */
+    [[nodiscard]] static constexpr normalized_float
+    sNaN(const IntegerFrac& payload = IntegerFrac::one())
+    {
+
+        IntegerFrac payload_{payload};
+        payload_.set_msb(false);
+        assert(!payload_.is_zero() && "NaN must have a payload");
+        return normalized_float(false, IntegerExp::all_ones(), payload_);
+    }
+
+    /**
+     * @brief Returns a floating point number indicating not a number (NaN).
      * @return A non-signalling not a number value
      */
     [[nodiscard]] static constexpr normalized_float NaN()
     {
-        return normalized_float(false, IntegerExp::all_ones(), IntegerMant{IntegerFrac::msb_one()});
+        return qNaN();
     }
 
     static constexpr auto exponent_width() -> size_t
@@ -368,7 +397,6 @@ public:
 
     [[nodiscard]] static constexpr integer<E + 1, WordType> denorm_exponent()
     {
-
         const integer<E + 1, WordType> b{bias};
         const integer<E + 1, WordType> neg_bias = sub(integer<E + 1, WordType>::zero(), b);
 
@@ -419,7 +447,7 @@ public:
     }
 
     /**
-     * @brief Checks whether the floating point number is not a number
+     * @brief Checks whether the floating point number is NaN (not a number)
      *
      * @note There is no distinction between signalling and non-signalling NaN
      *
@@ -428,9 +456,32 @@ public:
     [[nodiscard]] constexpr bool is_nan() const
     {
         const bool exp_ones = exponent == IntegerExp ::all_ones();
-        constexpr auto zero = uinteger<M>::zero();
-        const bool mant_zero = get_mantissa() != zero;
-        return exp_ones && mant_zero;
+        const bool mant_zero = get_mantissa() == uinteger<M>::zero();
+        return exp_ones && !mant_zero;
+    }
+
+    /**
+     * @brief Checks if the number is a quiet NaN
+     * @return True iff the number is a quiet NaN
+     */
+    constexpr bool is_qNaN() const
+    {
+        const bool exp_all_ones = exponent == IntegerExp ::all_ones();
+        const bool first_bit_set = width_cast<M>(mantissa).msb();
+        return exp_all_ones && first_bit_set;
+    }
+
+    /**
+     * @brief Checks if the number is a signalling NaN
+     * @return True iff the number is a signalling NaN
+     */
+    constexpr bool is_sNaN() const
+    {
+        const bool exp_all_ones = exponent == IntegerExp ::all_ones();
+        const auto fraction = width_cast<M>(mantissa);
+        const bool first_bit_unset = !fraction.msb();
+        const bool not_zero = fraction != IntegerFrac::zero();
+        return exp_all_ones && first_bit_unset && not_zero;
     }
 
     [[nodiscard]] constexpr auto unbiased_exponent() const -> integer<E + 1, WordType>
@@ -454,17 +505,39 @@ public:
         return exponent.is_zero() && mantissa.is_zero();
     }
 
+    /**
+     * @brief Checks whether the floating point number is positive zero
+     *
+     *
+     * @return True iff the floating point is positive zero
+     */
+    [[nodiscard]] constexpr bool is_pos_zero() const
+    {
+        return !sign_neg && exponent.is_zero() && mantissa.is_zero();
+    }
+
+    /**
+     * @brief Checks whether the floating point number is negative zero
+     *
+     *
+     * @return True iff the floating point is negative zero
+     */
+    [[nodiscard]] constexpr bool is_neg_zero() const
+    {
+        return sign_neg && exponent.is_zero() && mantissa.is_zero();
+    }
+
     void set_exponent(const uinteger<E, WordType>& set_to)
     {
         exponent = set_to;
     }
 
-    auto get_full_mantissa() const -> uinteger<MW, WordType>
+    auto constexpr get_full_mantissa() const -> uinteger<MW, WordType>
     {
         return mantissa;
     }
 
-    auto get_mantissa() const -> uinteger<M, WordType>
+    auto constexpr get_mantissa() const -> uinteger<M, WordType>
     {
         return width_cast<M>(mantissa);
     }
@@ -565,7 +638,6 @@ private:
      */
     template <typename To> [[nodiscard]] constexpr To generic_cast() const
     {
-
         static_assert(std::is_floating_point<To>(), "Can only convert to float or double.");
 
         using namespace aarith;
@@ -855,6 +927,38 @@ template <class uint> auto find_leading_one(const uint mantissa) -> typename uin
     }
 
     return one_at;
+}
+
+// ironically, defining the functions below makes the implementation conform more to the standard
+
+/**
+ * @brief Indicates whether this floating-point implementation conforms to the IEEE 754 (1985)
+ * standard
+ * @return false
+ */
+constexpr bool is754version1985()
+{
+    return false;
+}
+
+/**
+ * @brief Indicates whether this floating-point implementation conforms to the IEEE 754 (2008)
+ * standard
+ * @return false
+ */
+constexpr bool is754version2008()
+{
+    return false;
+}
+
+/**
+ * @brief Indicates whether this floating-point implementation conforms to the IEEE 754 (2019)
+ * standard
+ * @return false
+ */
+constexpr bool is754version2019()
+{
+    return false;
 }
 
 } // namespace aarith
