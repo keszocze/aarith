@@ -152,12 +152,12 @@ posit<N, ES, WT> posit<N, ES, WT>::operator+(const posit<N, ES, WT>& rhs) const
         return inf;
     }
 
-    if (lhs == zero)
+    if (lhs.is_zero())
     {
         return rhs;
     }
 
-    if (rhs == zero)
+    if (rhs.is_zero())
     {
         return lhs;
     }
@@ -216,12 +216,12 @@ template <size_t N, size_t ES, typename WT> posit<N, ES, WT> posit<N, ES, WT>::o
 template <size_t N, size_t ES, typename WT>
 constexpr posit<N, ES, WT> posit<N, ES, WT>::operator-() const
 {
-    if (*this == zero())
+    if (is_zero())
     {
         return *this;
     }
 
-    if (*this == complex_infinity())
+    if (is_complex_infinity())
     {
         return *this;
     }
@@ -276,7 +276,7 @@ posit<N, ES, WT> posit<N, ES, WT>::operator*(const posit<N, ES, WT>& rhs) const
         return inf;
     }
 
-    if (lhs == zero || rhs == zero)
+    if (lhs.is_zero() || rhs.is_zero())
     {
         return zero;
     }
@@ -419,12 +419,24 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool posit<N, ES, WT>::is_negative() const
 {
-    if (*this == complex_infinity())
+    if (is_complex_infinity())
     {
         return false;
     }
 
     return get_sign_bit() == storage_type(1);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool posit<N, ES, WT>::is_zero() const
+{
+    return (*this == zero());
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool posit<N, ES, WT>::is_complex_infinity() const
+{
+    return (*this == complex_infinity());
 }
 
 template <size_t N, size_t ES, typename WT>

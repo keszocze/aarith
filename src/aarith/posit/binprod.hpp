@@ -21,7 +21,7 @@ constexpr binprod<N>::binprod(const posit<N, PES, PWT>& p)
     // based on "Provably Correct Posit Arithmetic with Fixed-Point Big
     // Integer", Shin Yee Chung, 2018, p. 3
 
-    if (p == p.zero())
+    if (p.is_zero())
     {
         x = x.zero();
         m = m.one();
@@ -29,7 +29,7 @@ constexpr binprod<N>::binprod(const posit<N, PES, PWT>& p)
         return;
     }
 
-    if (p == p.complex_infinity())
+    if (p.is_complex_infinity())
     {
         throw std::invalid_argument("p has to represent a real value");
     }
@@ -70,7 +70,7 @@ template <size_t PN, size_t PES, typename PWT>
     // handling special cases
     //
 
-    if (x == x.zero())
+    if (x.is_zero())
     {
         return Posit::zero();
     }

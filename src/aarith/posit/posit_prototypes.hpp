@@ -254,7 +254,7 @@ public:
     posit operator--(int);
 
     /**
-     * @brief Return the product of this multipled with rhs.
+     * @brief Return the product of this multiplied with rhs.
      */
     posit operator*(const posit& rhs) const;
 
@@ -343,6 +343,16 @@ public:
      * @return Whether this posit represents a negative real number.
      */
     [[nodiscard]] constexpr bool is_negative() const;
+
+    /**
+     * @return Whether this posit represents the number zero.
+     */
+    [[nodiscard]] constexpr bool is_zero() const;
+
+    /**
+     * @return Whether this posit represents complex infinity.
+     */
+    [[nodiscard]] constexpr bool is_complex_infinity() const;
 
     /**
      * @return The sign bit. The returned integer is either set to 0 or 1.

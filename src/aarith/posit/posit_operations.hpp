@@ -31,7 +31,7 @@ template <size_t N, size_t ES, typename WT>
 {
     // special cases
 
-    if (p == p.zero() || p == p.complex_infinity())
+    if (p.is_zero() || p.is_complex_infinity())
     {
         return N - 1;
     }
@@ -222,12 +222,12 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr double to_double(const posit<N, ES, WT>& p)
 {
-    if (p == p.zero())
+    if (p.is_zero())
     {
         return 0.0;
     }
 
-    if (p == p.complex_infinity())
+    if (p.is_complex_infinity())
     {
         return NAN;
     }
