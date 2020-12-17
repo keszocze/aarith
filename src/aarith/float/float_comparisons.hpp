@@ -6,7 +6,7 @@
 namespace aarith {
 
 template <size_t E, size_t M>
-auto operator<(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
+auto constexpr operator<(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
 {
 
     if (lhs.is_nan() || rhs.is_nan())
@@ -61,7 +61,7 @@ auto operator<(const normalized_float<E, M> lhs, const normalized_float<E, M> rh
  * @return True iff the floats match in every single bit
  */
 template <size_t E, size_t M>
-bool bitwise_equality(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
+bool constexpr bitwise_equality(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
 {
     const bool equal_sign = (lhs.get_sign() == rhs.get_sign());
     const bool equal_exponent = (lhs.get_exponent() == rhs.get_exponent());
@@ -73,7 +73,7 @@ bool bitwise_equality(const normalized_float<E, M> lhs, const normalized_float<E
 }
 
 template <size_t E, size_t M>
-auto operator==(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
+auto constexpr operator==(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
 {
     if (lhs.is_nan() || rhs.is_nan())
     {
@@ -91,7 +91,7 @@ auto operator==(const normalized_float<E, M> lhs, const normalized_float<E, M> r
 
 template <size_t E, size_t M, size_t E_, size_t M_,
           typename = std::enable_if_t<(E != E_) || (M != M_)>>
-bool logical_equality(const normalized_float<E, M> lhs, const normalized_float<E_, M_> rhs)
+bool constexpr logical_equality(const normalized_float<E, M> lhs, const normalized_float<E_, M_> rhs)
 {
 
     bool equal_mantissa = false;
@@ -120,7 +120,7 @@ bool logical_equality(const normalized_float<E, M> lhs, const normalized_float<E
 
 template <size_t E, size_t M, size_t E_, size_t M_,
           typename = std::enable_if_t<(E != E_) || (M != M_)>>
-auto operator==(const normalized_float<E, M> lhs, const normalized_float<E_, M_> rhs) -> bool
+auto constexpr operator==(const normalized_float<E, M> lhs, const normalized_float<E_, M_> rhs) -> bool
 {
     //    std::cout << "spec float op==\n";
     if (lhs.is_nan() || rhs.is_nan())
@@ -145,7 +145,7 @@ auto operator==(const normalized_float<E, M> lhs, const normalized_float<E_, M_>
 
 template <size_t E, size_t M, size_t E_, size_t M_,
           typename = std::enable_if_t<(E != E_) || (M != M_)>>
-bool operator<(const normalized_float<E, M> lhs, const normalized_float<E_, M_> rhs)
+bool constexpr operator<(const normalized_float<E, M> lhs, const normalized_float<E_, M_> rhs)
 {
     if (lhs.is_nan() || rhs.is_nan())
     {
@@ -190,25 +190,25 @@ bool operator<(const normalized_float<E, M> lhs, const normalized_float<E_, M_> 
 }
 
 template <size_t E, size_t M, size_t E_, size_t M_>
-auto operator!=(const normalized_float<E, M> lhs, const normalized_float<E_, M_> rhs) -> bool
+auto constexpr operator!=(const normalized_float<E, M> lhs, const normalized_float<E_, M_> rhs) -> bool
 {
     return !(lhs == rhs);
 }
 
 template <size_t E, size_t M>
-auto operator>(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
+auto constexpr operator>(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
 {
     return rhs < lhs;
 }
 
 template <size_t e, size_t m>
-auto operator>=(const normalized_float<e, m> lhs, const normalized_float<e, m> rhs) -> bool
+auto constexpr operator>=(const normalized_float<e, m> lhs, const normalized_float<e, m> rhs) -> bool
 {
     return rhs < lhs || lhs == rhs;
 }
 
 template <size_t e, size_t m>
-auto operator<=(const normalized_float<e, m> lhs, const normalized_float<e, m> rhs) -> bool
+auto constexpr operator<=(const normalized_float<e, m> lhs, const normalized_float<e, m> rhs) -> bool
 {
     return lhs < rhs || lhs == rhs;
 }
