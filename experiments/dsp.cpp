@@ -67,8 +67,8 @@ bool test_single_packing(const aint4& w1, const aint4& w2, const auint4& a1, con
     for (size_t i = 0; i < 4; ++i)
     {
         error |= res_correct[i] != res_dsp[i];
-        std::cout << res_correct[i] << ";" << res_dsp[i] << ";" << (res_correct[i] - res_dsp[i]) << ";";
-
+        std::cout << res_correct[i] << ";" << res_dsp[i] << ";" << (res_correct[i] - res_dsp[i])
+                  << ";";
     }
 
     std::cout << "\n";
@@ -76,8 +76,10 @@ bool test_single_packing(const aint4& w1, const aint4& w2, const auint4& a1, con
     return error;
 }
 
-void test_packing() {
-    for (aint4 w1: integer_range<aint4>(aint4::min(),6)) {
+void test_packing()
+{
+    for (aint4 w1 : integer_range<aint4>(aint4::min(), 6))
+    {
         std::cout << w1 << "\n";
     }
 }
@@ -91,7 +93,7 @@ int main()
     const auint4 a1 = auint4::one();
     const auint4 a2 = auint4::one();
 
-    test_single_packing(w1,w2,a1,a2);
+    test_single_packing(w1, w2, a1, a2);
     test_packing();
     return 0;
 }
