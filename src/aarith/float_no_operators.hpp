@@ -7,3 +7,4 @@
 #include <aarith/float/normalized_float.hpp>
 #include <aarith/float/string_utils.hpp>
 #include <aarith/float/total_order.hpp>
+#include <aarith/float/nan_payload.hpp>

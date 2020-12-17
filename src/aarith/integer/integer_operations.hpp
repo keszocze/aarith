@@ -1072,7 +1072,7 @@ IntegerType pow(const IntegerType& base, const IntegerType& exponent)
 
     IntegerType result = IntegerType::one();
     IntegerType iter = IntegerType::zero();
-    while (iter <= exponent)
+    while (iter < exponent)
     {
         result = mul(result, base);
         iter = add(iter, IntegerType::one());
