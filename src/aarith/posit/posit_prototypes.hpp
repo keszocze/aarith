@@ -707,6 +707,15 @@ private:
 //
 
 /**
+ * @brief Output product to stream.
+ *
+ * The format is "(x, m, B)" where x and m are the parameters of the given
+ * binprod and B is the approximated product x * 2^m computed with floating
+ * point arithmetic.
+ */
+template <size_t N> constexpr std::ostream& operator<<(std::ostream& os, const binprod<N>& rhs);
+
+/**
  * @brief Return the sum of two binary products.
  */
 template <size_t N> constexpr binprod<N> operator+(const binprod<N>& lhs, const binprod<N>& rhs);

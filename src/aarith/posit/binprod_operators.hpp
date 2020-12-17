@@ -1,9 +1,19 @@
 #pragma once
 
 #include <aarith/posit.hpp>
+#include <aarith/posit/posit_operations.hpp>
 #include <cstdlib>
 
 namespace aarith {
+
+template <size_t N> constexpr std::ostream& operator<<(std::ostream& os, const binprod<N>& rhs)
+{
+    const double xd = internal::to_double(rhs.x);
+    const double md = internal::to_double(rhs.m);
+    const double B = xd * std::pow(2.0, md);
+
+    return os << "(" << rhs.x << ", " << rhs.m << ", " << B << ")";
+}
 
 template <size_t N> constexpr binprod<N> operator+(const binprod<N>& lhs, const binprod<N>& rhs)
 {
