@@ -31,7 +31,7 @@ template <size_t N, size_t ES, typename WT>
 {
     // special cases
 
-    if (p.is_zero() || p.is_complex_infinity())
+    if (p.is_zero() || p.is_nar())
     {
         return N - 1;
     }
@@ -227,7 +227,7 @@ template <size_t N, size_t ES, typename WT>
         return 0.0;
     }
 
-    if (p.is_complex_infinity())
+    if (p.is_nar())
     {
         return NAN;
     }
@@ -249,8 +249,7 @@ template <size_t N, size_t ES, typename WT>
 {
     using Posit = posit<N, ES, WT>;
 
-    // first consider the two possible special cases, zero and complex
-    // infinity
+    // first consider the two possible special cases, zero NaR
 
     if (x == 0.0)
     {
@@ -259,12 +258,12 @@ template <size_t N, size_t ES, typename WT>
 
     if (std::isnan(x))
     {
-        return Posit::complex_infinity();
+        return Posit::nar();
     }
 
     if (std::isinf(x))
     {
-        return Posit::complex_infinity();
+        return Posit::nar();
     }
 
     // prepare some types and constants for later

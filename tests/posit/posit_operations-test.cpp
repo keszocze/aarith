@@ -1088,7 +1088,7 @@ SCENARIO("Check conversion from double")
 
     GIVEN("Positive and negative infinity")
     {
-        THEN("Assert that converting the given double to posit<6,1> returns complex infinity")
+        THEN("Assert that converting the given double to posit<6,1> returns NaR")
         {
             using namespace aarith;
 

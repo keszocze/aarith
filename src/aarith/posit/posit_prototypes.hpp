@@ -111,7 +111,7 @@ public:
      * @brief Compare this and other for equality.
      *
      * Two posits are equal if they share the same exact bit patterns.
-     * In particular, complex infinite compares equal to itself.
+     * In particular, NaR compares equal to itself.
      *
      * @return true if this and other represent the same value. Otherwise
      * returns true.
@@ -131,15 +131,15 @@ public:
     /**
      * @brief Return whether this is less than other.
      *
-     * If this or other represent complex infinity, this method returns false.
+     * If this or other represent NaR, this method returns false.
      */
     constexpr bool operator<(const posit& other) const;
 
     /**
      * @brief Return whether this is less than or equal to other.
      *
-     * If either this or other represent complex infinity, this method returns
-     * false. If both this and other represent complex infinity, this method
+     * If either this or other represent NaR, this method returns
+     * false. If both this and other represent NaR, this method
      * returns true.
      */
     constexpr bool operator<=(const posit& other) const;
@@ -147,15 +147,15 @@ public:
     /**
      * @brief Return whether this is greater than other.
      *
-     * If this or other represent complex infinity, this method returns false.
+     * If this or other represent NaR, this method returns false.
      */
     constexpr bool operator>(const posit& other) const;
 
     /**
      * @brief Return whether this is greater than or equal to other.
      *
-     * If either this or other represent complex infinity, this method returns
-     * false. If both this and other represent complex infinity, this method
+     * If either this or other represent NaR, this method returns
+     * false. If both this and other represent NaR, this method
      * returns true.
      */
     constexpr bool operator>=(const posit& other) const;
@@ -171,17 +171,15 @@ public:
      * about the sign of variables or literals. In these cases, an unary plus
      * is useful.
      *
-     * If this posit represents complex infinity, the result is also complex
-     * infinity.
+     * If this posit represents NaR, the result is also NaR.
      */
     constexpr posit& operator+() const;
 
     /**
      * @brief Sum of two posits.
      *
-     * If either operand is complex infinity, the result is also complex
-     * infinity. If neither operands are complex infinity, the result is
-     * guaranteed not to be complex infinity.
+     * If either operand is NaR, the result is also NaR. If neither operands
+     * are NaR, the result is guaranteed not to be NaR.
      *
      * @param rhs The posit to add to this posit.
      * @return The sum of this and rhs.
@@ -212,17 +210,15 @@ public:
     /**
      * @brief Unary minus.
      *
-     * If this posit represents complex infinity, the result is also complex
-     * infinity.
+     * If this posit represents NaR, the result is also NaR.
      */
     constexpr posit operator-() const;
 
     /**
      * @brief Sum of two posits.
      *
-     * If either operand is complex infinity, the result is also complex
-     * infinity. If neither operands are complex infinity, the result is
-     * guaranteed not to be complex infinity.
+     * If either operand is NaR, the result is also NaR. If neither operands
+     * are NaR, the result is guaranteed not to be NaR.
      *
      * As posits only have one unique representation of zero, calling this
      * operator on a posit that represents zero again returns zero.
@@ -311,9 +307,9 @@ public:
     [[nodiscard]] static constexpr posit one();
 
     /**
-     * @return Representation of complex infinity.
+     * @return Representation of NaR.
      */
-    [[nodiscard]] static constexpr posit complex_infinity();
+    [[nodiscard]] static constexpr posit nar();
 
     //
     // Posit-Specific Constants
@@ -350,9 +346,9 @@ public:
     [[nodiscard]] constexpr bool is_zero() const;
 
     /**
-     * @return Whether this posit represents complex infinity.
+     * @return Whether this posit represents NaR.
      */
-    [[nodiscard]] constexpr bool is_complex_infinity() const;
+    [[nodiscard]] constexpr bool is_nar() const;
 
     /**
      * @return The sign bit. The returned integer is either set to 0 or 1.
@@ -458,7 +454,7 @@ template <size_t N, size_t ES, typename WT>
  * Evaluate the given posit to compute the represented real value.  Uses
  * double precision IEEE floats for computation.
  *
- * The special value posit::complex_infinity gets translated to NaN
+ * The special value posit::nar gets translated to NaN
  * by this function.
  *
  * @return The real value of p, represented as a double precision float.
@@ -483,7 +479,7 @@ template <size_t N, size_t ES, typename WT = uint64_t>
 /**
  * @brief Return absolute value of a given posit.
  *
- * If p is complex infinity, the result is also complex infinity. If p is
+ * If p is NaR, the result is also NaR. If p is
  * zero, the result is also zero as there is only one representation of zero.
  */
 template <size_t N, size_t ES, typename WT>

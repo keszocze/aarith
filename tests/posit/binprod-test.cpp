@@ -20,7 +20,7 @@ SCENARIO("Encoding and decoding between posit and binprod")
                 const uint8_t actual = static_cast<uint8_t>(bits);
                 const Posit p = Posit(actual);
 
-                if (p != p.complex_infinity())
+                if (p != p.nar())
                 {
                     std::cout << "p=" << to_binary(p, " ") << std::endl;
 

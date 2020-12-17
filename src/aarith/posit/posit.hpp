@@ -73,9 +73,9 @@ constexpr bool posit<N, ES, WT>::operator!=(const posit& other) const
 template <size_t N, size_t ES, typename WT>
 constexpr bool posit<N, ES, WT>::operator<(const posit& other) const
 {
-    // special case complex infinity
+    // special case NaR
 
-    const auto inf = complex_infinity();
+    const auto inf = nar();
 
     // TODO (Schärtl) evtl. eine .is_inf() Methode hinzufügen?
 
@@ -141,7 +141,7 @@ posit<N, ES, WT> posit<N, ES, WT>::operator+(const posit<N, ES, WT>& rhs) const
     using Posit = posit<N, ES, WT>;
 
     constexpr Posit zero = Posit::zero();
-    constexpr Posit inf = Posit::complex_infinity();
+    constexpr Posit inf = Posit::nar();
 
     const Posit& lhs = *this;
 
@@ -221,7 +221,7 @@ constexpr posit<N, ES, WT> posit<N, ES, WT>::operator-() const
         return *this;
     }
 
-    if (is_complex_infinity())
+    if (is_nar())
     {
         return *this;
     }
@@ -265,7 +265,7 @@ posit<N, ES, WT> posit<N, ES, WT>::operator*(const posit<N, ES, WT>& rhs) const
     using Posit = posit<N, ES, WT>;
 
     constexpr Posit zero = Posit::zero();
-    constexpr Posit inf = Posit::complex_infinity();
+    constexpr Posit inf = Posit::nar();
 
     const Posit& lhs = *this;
 
@@ -386,9 +386,9 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::complex_infinity()
+[[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::nar()
 {
-    // complex infinity is sign bit set to one and all
+    // NaR is sign bit set to one and all
     // other bits set to zero
 
     posit p;
@@ -419,7 +419,7 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool posit<N, ES, WT>::is_negative() const
 {
-    if (is_complex_infinity())
+    if (is_nar())
     {
         return false;
     }
@@ -434,9 +434,9 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool posit<N, ES, WT>::is_complex_infinity() const
+[[nodiscard]] constexpr bool posit<N, ES, WT>::is_nar() const
 {
-    return (*this == complex_infinity());
+    return (*this == nar());
 }
 
 template <size_t N, size_t ES, typename WT>

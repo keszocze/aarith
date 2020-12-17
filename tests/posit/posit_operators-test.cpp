@@ -34,7 +34,7 @@ SCENARIO("Testing unary minus")
             using Posit = posit<16, 3>;
 
             CHECK(Posit::zero() == -Posit::zero());
-            CHECK(Posit::complex_infinity() == -Posit::complex_infinity());
+            CHECK(Posit::nar() == -Posit::nar());
         }
     }
 }
@@ -109,8 +109,8 @@ SCENARIO("Testing arithmetic")
 
             using Posit = posit<8, 2>;
 
-            constexpr auto inf = Posit::complex_infinity();
-            constexpr auto zero = Posit::complex_infinity();
+            constexpr auto inf = Posit::nar();
+            constexpr auto zero = Posit::nar();
 
             CHECK(inf + inf == inf);
             CHECK(inf + zero == inf);

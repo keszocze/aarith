@@ -29,7 +29,7 @@ constexpr binprod<N>::binprod(const posit<N, PES, PWT>& p)
         return;
     }
 
-    if (p.is_complex_infinity())
+    if (p.is_nar())
     {
         throw std::invalid_argument("p has to represent a real value");
     }
