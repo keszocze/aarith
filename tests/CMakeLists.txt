@@ -35,6 +35,7 @@ add_aarith_test(float-random-generation FILES float/float-random-generation-test
 
 add_aarith_test(binprod FILES posit/binprod-test.cpp)
 add_aarith_test(posit FILES posit/posit-test.cpp)
+add_aarith_test(posit-casts FILES posit/posit_casts-test.cpp)
 add_aarith_test(posit-operations FILES posit/posit_operations-test.cpp)
 add_aarith_test(posit-operators FILES posit/posit_operators-test.cpp)
 add_aarith_test(posit-types FILES posit/posit_types-test.cpp)

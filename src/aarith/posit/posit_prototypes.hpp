@@ -41,6 +41,12 @@ public:
     using storage_type = uinteger<N, WT>;
 
     /**
+     * Type used to store the fragments of actual bits of a given posit.  This
+     * information is required by some cast operators.
+     */
+    using word_type = WT;
+
+    /**
      * Type returned when the useed constant is requested. As useed can get
      * quite large, we do not use standard C types such as size_t here.
      */
@@ -524,6 +530,30 @@ template <size_t N, size_t ES, typename WT>
 constexpr integer<N> get_global_exponent(const posit<N, ES, WT>& p);
 
 //
+// Casts for posit Class.
+//
+// For implementation, look at posit/posit_casts.hpp
+//
+
+/**
+ * @brief Convert posit to a posit type with more bits.
+ *
+ * All posits representable in an <N, ES> environment are also perfectly
+ * representable in an <M, ES>, M > N environment.
+ *
+ * @tparam DestinationPosit The posit type to convert to. You must ensure that
+ * the exponent size of DestinationPosit and SourceExponentSize match.
+ * @tparam SourceWidth Width of the posit to be converted.
+ * @tparam SourceExponentSize Exponent size of the posit to be converted.
+ * @tparam SourceWordType Word type of the posit to be converted.
+ * @param p The posit to convert.
+ */
+template <typename DestinationPosit, size_t SourceWidth, size_t SourceExponentSize,
+          typename SourceWordType>
+constexpr DestinationPosit
+width_cast(const posit<SourceWidth, SourceExponentSize, SourceWordType>& p);
+
+//
 // String Utilities for posit Class.
 //
 // For implementation, look at posit/string_utils.hpp
@@ -691,6 +721,7 @@ template <size_t N> constexpr binprod<N> operator*(const binprod<N>& lhs, const 
 #include <aarith/posit/binprod.hpp>
 #include <aarith/posit/binprod_operators.hpp>
 #include <aarith/posit/posit.hpp>
+#include <aarith/posit/posit_casts.hpp>
 #include <aarith/posit/posit_operators.hpp>
 #include <aarith/posit/posit_types.hpp>
 #include <aarith/posit/string_utils.hpp>
