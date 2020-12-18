@@ -71,6 +71,20 @@ constexpr bool posit<N, ES, WT>::operator!=(const posit& other) const
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] posit<N, ES, WT> posit<N, ES, WT>::incremented() const
+{
+    auto bits = get_bits();
+    return bits + bits.one();
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] posit<N, ES, WT> posit<N, ES, WT>::decremented() const
+{
+    auto bits = get_bits();
+    return bits - bits.one();
+}
+
+template <size_t N, size_t ES, typename WT>
 constexpr bool posit<N, ES, WT>::operator<(const posit& other) const
 {
     // special case NaR

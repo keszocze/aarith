@@ -356,6 +356,34 @@ public:
     [[nodiscard]] constexpr storage_type get_sign_bit() const;
 
     /**
+     * @brief Compute the bitwise increment.
+     *
+     * This method does not return this + one, rather it returns a posit that
+     * has the bitstring of this incremented by one. Note that the result may
+     * exhibit overflow.
+     *
+     * Getting the increment of a given posit can be useful when computing
+     * rounding.
+     *
+     * @return The posit bits plus one
+     */
+    [[nodiscard]] posit incremented() const;
+
+    /**
+     * @brief Compute the bitwise decrement.
+     *
+     * This method does not return this - one, rather it returns a posit that
+     * has the bitstring of this decremented by one. Note that the result may
+     * exhibit underflow.
+     *
+     * Getting the decrement of a given posit can be useful when computing
+     * rounding.
+     *
+     * @return The posit bits minus one
+     */
+    [[nodiscard]] posit decremented() const;
+
+    /**
      * @return The underlying storage.
      */
     [[nodiscard]] constexpr storage_type get_bits() const;
