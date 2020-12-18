@@ -1,4 +1,5 @@
 #include <aarith/float.hpp>
+#include <aarith/integer.hpp>
 #include <iostream>
 #include <numeric>
 #include <vector>
@@ -7,27 +8,10 @@
 int main()
 {
     using namespace aarith;
-
-    using nf_t = normalized_float<8, 23>;
-    float a = 0.0117647f;
-    float b = 0.385671f;
-    nf_t nf_a(0.0117647f);
-    nf_t nf_b(0.385671f);
-
-    auto result_f = a * b;
-    auto result = mul(nf_a, nf_b);
-    std::cout << result << "\n";
-    std::cout << to_binary(nf_t(result_f)) << "\n";
-    std::cout << to_binary(result) << "\n";
-
-
-    nf_t lhs{5.0f};
-    nf_t rhs{-2.0f};
-
-
-    std::cout << lhs << "\t" << rhs << "\n";
-    std::cout << (lhs < rhs) << "\n";
-
+    uint64_t a = 10, b=20;
+    uinteger<64> a_=10, b_=20;
+    std::cout << "a+b=" << (a+b) << "\n";
+    std::cout << "a_+b_=" << (a_+b_) << "\n";
 
     return 0;
 }

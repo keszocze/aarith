@@ -49,20 +49,13 @@ struct DSPInput
 [[nodiscard]] PPort dsp(const APort& A, const DPort& D, const BPort& B,
                          const CPort C = CPort::zero(), const PinPort Pin = PinPort::zero() )
 {
-
     const APort sum = A + D;
-
 
     const APort B_{B};
 
-
-    // TODO ask Akif about preferred automatic width extension
     const PPort prod = expanding_mul(sum, B_);
 
-
-    const PPort result = prod + C;
-
-    // TODO ask Akif how this P_in input actually works
+    const PPort result = prod + C + Pin;
 
     return result;
 }

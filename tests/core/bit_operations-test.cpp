@@ -815,12 +815,16 @@ TEMPLATE_TEST_CASE_SIG("Bit operations are performed correctly", "[word_array][b
                 {
                     CHECK(prepended_w.word(i) == w.word(i));
                 }
-                CHECK(prepended_w.word(w.word_count()) == static_cast<WordType>(0U));
+                if constexpr (prepended_w.word_count() > w.word_count())
+                {
+                    CHECK(prepended_w.word(w.word_count()) == static_cast<WordType>(0U));
+                }
             }
         }
         WHEN("The size is doubled")
         {
-            const auto doubled = width_cast<2 * W>(w);
+            // const auto doubled = width_cast<2 * W>(w);
+            auto doubled = width_cast<2 * W>(w);
             THEN("The result should have twice the bits of the original word_array")
             {
                 CHECK(doubled.width() == 2 * w.width());
@@ -839,7 +843,10 @@ TEMPLATE_TEST_CASE_SIG("Bit operations are performed correctly", "[word_array][b
                 {
                     CHECK(doubled.word(i) == w.word(i));
                 }
-                CHECK(doubled.word(w.word_count()) == static_cast<WordType>(0U));
+                if constexpr (doubled.word_count() > w.word_count())
+                {
+                    CHECK(doubled.word(w.word_count()) == static_cast<WordType>(0U));
+                }
             }
         }
     }

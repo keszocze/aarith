@@ -1,3 +1,5 @@
+#include "../test-signature-ranges.hpp"
+
 #include <aarith/float.hpp>
 #include <bitset>
 #include <catch.hpp>
@@ -144,6 +146,27 @@ TEMPLATE_TEST_CASE_SIG("Width-casting special values into larger normalized floa
                     REQUIRE(j.is_nan());
                 }
             }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Investigating the minimal exponent",
+                       "[normalized_float][invariant][constructor]", AARITH_FLOAT_TEST_SIGNATURE,
+                       AARIHT_FLOAT_TEMPLATE_RANGE)
+{
+    using F = normalized_float<E, M>;
+    using Exp = typename F::IntegerUnbiasedExp;
+
+    GIVEN("A floating-point number")
+    {
+        THEN("Its minimal exponent is larger than -bias")
+        {
+
+            Exp b{F::bias};
+            b = negate(b);
+            constexpr Exp min_exp{F::min_exp};
+
+            REQUIRE(min_exp > b);
         }
     }
 }

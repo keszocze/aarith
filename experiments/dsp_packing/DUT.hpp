@@ -24,12 +24,18 @@ public:
     static constexpr size_t W = WWidth;
     static constexpr size_t A = AWidth;
 
+    /**
+     * @brief DUT with a user specified post-processing procedure
+     */
     DUT(Packing packing, std::function<PPort(PPort)> post_proc)
         : packing(packing)
         , post_proc(post_proc)
     {
     }
 
+    /**
+     * @brief DUT using no post-processing
+     */
     DUT(Packing packing)
         : packing(packing)
         , post_proc([](const w_val& w1, const w_val& w2,
@@ -143,7 +149,9 @@ public:
                 //                    print_int(res_correct[i], "korrekt");
                 //                    print_int(res_dsp[i], "dsp");
                 //                }
-                max_error = max(max_error, diff);
+                if (abs(diff) > abs(max_error)) {
+                    max_error = diff;
+                }
             }
         }
 

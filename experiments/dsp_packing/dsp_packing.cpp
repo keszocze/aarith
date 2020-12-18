@@ -49,7 +49,7 @@ DSPInput pack_xilinx(const aint4& w1, const aint4& w2, const auint4& a1, const a
  * @param a2 Activation value 2
  * @return Input packed so that it can be fed to the DSP
  */
-DSPInput pack_akif(const aint4& w1, const aint4& w2, const auint4& a1, const auint4& a2)
+DSPInput pack_partially_correcting(const aint4& w1, const aint4& w2, const auint4& a1, const auint4& a2)
 {
     DSPInput params = pack_xilinx(w1, w2, a1, a2);
 
@@ -73,7 +73,7 @@ int main()
 
     using namespace dsp_packing;
 
-    DUT design_under_test(pack_akif);
+    DUT design_under_test(pack_partially_correcting);
 
 
     evaluate(design_under_test, true);

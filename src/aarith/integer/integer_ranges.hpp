@@ -113,7 +113,8 @@ template <typename Integer> class integer_range
     };
 
 public:
-    integer_range(const Integer start=Integer::min(), const Integer end=Integer::max(), const Integer stride = Integer::one())
+    integer_range(const Integer start = Integer::min(), const Integer end = Integer::max(),
+                  const Integer stride = Integer::one())
         : start_(start)
         , end_(end)
         , stride_(stride)
