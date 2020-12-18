@@ -815,7 +815,7 @@ TEMPLATE_TEST_CASE_SIG("Bit operations are performed correctly", "[word_array][b
                 {
                     CHECK(prepended_w.word(i) == w.word(i));
                 }
-                if constexpr(prepended_w.word_count() > w.word_count())
+                if constexpr (prepended_w.word_count() > w.word_count())
                 {
                     CHECK(prepended_w.word(w.word_count()) == static_cast<WordType>(0U));
                 }
@@ -823,7 +823,7 @@ TEMPLATE_TEST_CASE_SIG("Bit operations are performed correctly", "[word_array][b
         }
         WHEN("The size is doubled")
         {
-            //const auto doubled = width_cast<2 * W>(w);
+            // const auto doubled = width_cast<2 * W>(w);
             auto doubled = width_cast<2 * W>(w);
             THEN("The result should have twice the bits of the original word_array")
             {
@@ -843,7 +843,7 @@ TEMPLATE_TEST_CASE_SIG("Bit operations are performed correctly", "[word_array][b
                 {
                     CHECK(doubled.word(i) == w.word(i));
                 }
-                if constexpr(doubled.word_count() > w.word_count())
+                if constexpr (doubled.word_count() > w.word_count())
                 {
                     CHECK(doubled.word(w.word_count()) == static_cast<WordType>(0U));
                 }

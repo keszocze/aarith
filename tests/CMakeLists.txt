@@ -32,6 +32,7 @@ add_aarith_test(float-total_ordering FILES float/total_ordering.cpp)
 add_aarith_test(float-sign_bit_operations FILES float/sign_bit_operations.cpp)
 add_aarith_test(float-NaN-payloads FILES float/nan_payload.cpp)
 add_aarith_test(float-random-generation FILES float/float-random-generation-test.cpp)
+add_aarith_test(float-classify-methods FILES float/classify-methods.cpp)
 
 add_aarith_test(fau-adder FILES uint-approx-test.cpp)
 
