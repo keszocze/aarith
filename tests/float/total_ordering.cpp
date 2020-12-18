@@ -18,7 +18,7 @@ TEMPLATE_TEST_CASE_SIG("Total ordering +/- zero", "[normalized_float][comparison
 
         THEN("The ordering behaves as defined in the standard")
         {
-            constexpr bool v = totalOrder(neg_zero, pos_zero);
+            const bool v = totalOrder(neg_zero, pos_zero);
             REQUIRE(v);
         }
     }
@@ -199,7 +199,7 @@ TEMPLATE_TEST_CASE_SIG("Total ordering mag +/- zero", "[normalized_float][compar
 
         THEN("The ordering behaves as defined in the standard")
         {
-            constexpr bool v = totalOrderMag(neg_zero, pos_zero);
+            const bool v = totalOrderMag(neg_zero, pos_zero);
             REQUIRE(v);
         }
     }
