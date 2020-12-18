@@ -368,7 +368,7 @@ public:
 
     /**
      *
-     * @return Smallest positive normalized value
+     * @return Smallest positive denormalized value
      */
     [[nodiscard]] static constexpr normalized_float smallest_denormalized()
     {
@@ -426,6 +426,7 @@ public:
 
     [[nodiscard]] static constexpr integer<E + 1, WordType> denorm_exponent()
     {
+
         const integer<E + 1, WordType> b{bias};
         const integer<E + 1, WordType> neg_bias = sub(integer<E + 1, WordType>::zero(), b);
 
@@ -447,11 +448,25 @@ public:
         return exponent;
     }
 
+    /**
+     * @brief Tests whether the floating-point number is positive.
+     *
+     * This returns true for zeros and NaNs as well.
+     *
+     * @return True iff the sign bit is not set
+     */
     [[nodiscard]] constexpr bool is_positive() const
     {
         return !sign_neg;
     }
 
+    /**
+     * @brief Tests whether the floating-point number is negative.
+     *
+     * This returns true for zeros and NaNs as well.
+     *
+     * @return True iff the sign bit is set
+     */
     [[nodiscard]] constexpr bool is_negative() const
     {
         return sign_neg;
@@ -497,7 +512,7 @@ public:
     [[nodiscard]] constexpr bool is_nan() const
     {
         const bool exp_ones = exponent == IntegerExp ::all_ones();
-        const bool mant_zero = get_mantissa() == uinteger<M>::zero();
+        const bool mant_zero = get_mantissa().is_zero();
         return exp_ones && !mant_zero;
     }
 
@@ -618,9 +633,10 @@ public:
     }
 
     /**
-     * @brief Returns whether the number is normalized
+     * @brief Checks whether the number is normal
      *
-     * @note Normalized numbers do *not* include: NaN, +/- inf and, surprisingly, zero.
+     * This is true if and only if the floating-point number  is normal (not zero, subnormal,
+     * infinite, or NaN).
      *
      * @return True iff the number is normalized
      */
@@ -648,17 +664,18 @@ public:
     }
 
     /**
-     * @brief Returns whether the number is subnormal
+     * @brief Tests if the number is subnormal
      *
-     * @note This method is an alias for {@see is_denormalized}
-     *
-     * @note Denormalized numbers do *not* include: NaN, +/- inf and, surprisingly, zero.
+     * @note Zero is *not* considered subnormal!
      *
      * @return True iff the number is subnormal
      */
     [[nodiscard]] constexpr bool is_subnormal() const
     {
-        return is_denormalized();
+        const bool denormalized = exponent.is_zero();
+        const bool not_zero = !mantissa.is_zero();
+        const bool result = denormalized && not_zero;
+        return result;
     }
 
     /**
@@ -667,10 +684,7 @@ public:
      */
     [[nodiscard]] constexpr bool is_special() const
     {
-        const bool denormalized = (exponent == IntegerExp::all_zeroes());
-        const bool exception = (exponent == IntegerExp::all_ones());
-        const bool result = (denormalized || exception);
-        return result;
+        return !is_normalized();
     }
 
     /**
@@ -724,6 +738,7 @@ private:
      */
     template <typename To> [[nodiscard]] constexpr To generic_cast() const
     {
+
         static_assert(std::is_floating_point<To>(), "Can only convert to float or double.");
 
         using namespace aarith;

@@ -15,7 +15,7 @@ enum class FloatGenerationModes
     /**
      * @brief Generates normalized numbers only.
      *
-     * This does *not* include NaN and +/- infinity.
+     * This does *not* include zero, NaN and +/- infinity.
      *
      * @warning This mode does *not* generate the number zero!
      */

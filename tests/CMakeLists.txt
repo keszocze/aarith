@@ -37,6 +37,7 @@ add_aarith_test(float-division FILES float/float_division.cpp)
 add_aarith_test(float-multiplication FILES float/float_mul.cpp)
 add_aarith_test(float-addition FILES float/float_addition.cpp)
 add_aarith_test(float-subtraction FILES float/float_subtraction.cpp)
+add_aarith_test(float-classify-methods FILES float/classify-methods.cpp)
 
 add_aarith_test(fau-adder FILES uint-approx-test.cpp)
 
