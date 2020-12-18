@@ -66,9 +66,7 @@ TEMPLATE_TEST_CASE_SIG("Comparing two signed integers of different bit width",
     {
         I a = GENERATE(take(300, random_integer<W, WordType>()));
 
-        V b{a};
-
-        b = add(b, V::one());
+        V b{expanding_add(a, I::one())};
 
         THEN("operator< returns true")
         {

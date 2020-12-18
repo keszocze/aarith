@@ -1386,3 +1386,21 @@ SCENARIO("Computing the signum of an non-zero integer", "[integer][signed][opera
         }
     }
 }
+
+SCENARIO("Computing the powers of integers", "[integer][signed][operation]")
+{
+
+    GIVEN("Base and exponent values")
+    {
+        THEN("Compute the correct power")
+        {
+            using Integer = integer<32>;
+
+            CHECK(pow(Integer(2), Integer(0)) == Integer(1));
+            CHECK(pow(Integer(2), Integer(1)) == Integer(2));
+            CHECK(pow(Integer(2), Integer(2)) == Integer(4));
+            CHECK(pow(Integer(2), Integer(3)) == Integer(8));
+            CHECK(pow(Integer(2), Integer(4)) == Integer(16));
+        }
+    }
+}
