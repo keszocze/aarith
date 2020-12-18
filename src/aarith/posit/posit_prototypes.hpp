@@ -613,7 +613,7 @@ public:
      */
     // TODO (Schärtl): Find a real bound for N or maybe find a better way of
     // doing arithmetic all-together.
-    using storage_type = integer<2 * N>;
+    using storage_type = integer<16 * N>;
 
     /**
      * Fractional part x of product x * 2^m.
@@ -689,6 +689,11 @@ private:
      */
     template <size_t PN, size_t PES, typename PWT>
     void decode_regime(ssize_t& nregime, bool& first_regime) const;
+
+    /**
+     * @brief Return the integer maginutde of this product.
+     */
+    constexpr storage_type magnitude() const;
 
     /**
      * @brief Assert that this binprod represents a non-negative value.

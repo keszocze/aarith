@@ -41,34 +41,6 @@ SCENARIO("Testing unary minus")
 
 SCENARIO("Testing arithmetic")
 {
-    GIVEN("Some arbitrary posit values")
-    {
-        THEN("Assert that arithmetic operations match double arithmetic")
-        {
-            for (int i = -50; i <= 50; ++i)
-            {
-                for (int j = -50; j <= 50; ++j)
-                {
-                    using namespace aarith;
-
-                    constexpr size_t N = 32;
-                    constexpr size_t ES = 3;
-
-                    using Posit = posit<32, ES>;
-
-                    const double x = static_cast<double>(i);
-                    const double y = static_cast<double>(j);
-
-                    const Posit p = from_double<N, ES>(x);
-                    const Posit q = from_double<N, ES>(y);
-
-                    CHECK(to_double(p + q) == Approx(to_double(from_double<N, ES>(x + y))));
-                    CHECK(to_double(p - q) == Approx(to_double(from_double<N, ES>(x - y))));
-                }
-            }
-        }
-    }
-
     GIVEN("Sums way too big for the given posit type")
     {
         THEN("Addition should not overflow")

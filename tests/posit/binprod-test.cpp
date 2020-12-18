@@ -22,12 +22,10 @@ SCENARIO("Encoding and decoding between posit and binprod")
 
                 if (p != p.nar())
                 {
-                    std::cout << "p=" << to_binary(p, " ") << std::endl;
-
                     const binprod<8> bp(p);
                     const Posit converted_back = bp.to_posit<8, 2, uint64_t>();
 
-                    REQUIRE(to_binary(p, " ") == to_binary(converted_back, " "));
+                    REQUIRE(p == converted_back);
                 }
             }
         }

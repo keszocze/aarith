@@ -64,10 +64,11 @@ template <size_t PN, size_t PES, typename PWT>
     // Integer", Shin Yee Chung, 2018, p. 4
 
     using Posit = posit<PN, PES, PWT>;
+    // using PositPlusOne = posit<PN + 1, PES, PWT>;
     using Storage = uinteger<PN>;
 
     //
-    // handling special cases
+    // handling zero
     //
 
     if (x.is_zero())
@@ -75,15 +76,32 @@ template <size_t PN, size_t PES, typename PWT>
         return Posit::zero();
     }
 
+    //
+    // negative values are handled by looking at their absolute value
+    // and then applying the twos complement at the end
+    //
+
     if (x < x.zero())
     {
-        // negative numbers are handled by looking at their absolut value
 
         const binprod absprod(-x, m);
         return -absprod.to_posit<PN, PES, PWT>();
     }
 
     ensure_positive();
+
+    //
+    // handling limits
+    //
+
+    constexpr auto max = binprod(Posit::max()).magnitude();
+    const auto my_magnitude = magnitude();
+
+    if (my_magnitude > max)
+    {
+        std::cout << "[falling back to max maginitude]" << std::endl;
+        return Posit::max();
+    }
 
     //
     // converting to posit, one bit at a time
@@ -100,22 +118,24 @@ template <size_t PN, size_t PES, typename PWT>
     // then fill them in
     //
 
-    ssize_t nregime;
-    bool first_regime;
-
-    decode_regime<PN, PES, PWT>(nregime, first_regime);
-
-    for (ssize_t ridx = 0; ridx < nregime && i >= 0; ++ridx, --i)
     {
-        const bool last_regime_bit = (ridx == (nregime - 1));
+        ssize_t nregime = 0;
+        bool first_regime = false;
 
-        if (last_regime_bit)
+        decode_regime<PN, PES, PWT>(nregime, first_regime);
+
+        for (ssize_t ridx = 0; ridx < nregime && i >= 0; ++ridx, --i)
         {
-            bits.set_bit(i, !first_regime);
-        }
-        else
-        {
-            bits.set_bit(i, first_regime);
+            const bool last_regime_bit = (ridx == (nregime - 1));
+
+            if (last_regime_bit)
+            {
+                bits.set_bit(i, !first_regime);
+            }
+            else
+            {
+                bits.set_bit(i, first_regime);
+            }
         }
     }
 
@@ -124,12 +144,14 @@ template <size_t PN, size_t PES, typename PWT>
     // integer
     //
 
-    const ssize_t nexp = std::min(static_cast<ssize_t>(PES), i + 1);
-
-    for (ssize_t eidx = nexp - 1; eidx >= 0 && i >= 0; --eidx, --i)
     {
-        const auto exponent_bit = e.bit(eidx);
-        bits.set_bit(i, exponent_bit);
+        const ssize_t nexp = std::min(static_cast<ssize_t>(PES), i + 1);
+
+        for (ssize_t eidx = nexp - 1; eidx >= 0 && i >= 0; --eidx, --i)
+        {
+            const auto exponent_bit = e.bit(eidx);
+            bits.set_bit(i, exponent_bit);
+        }
     }
 
     //
@@ -137,13 +159,33 @@ template <size_t PN, size_t PES, typename PWT>
     // integer into the bitstring
     //
 
-    const ssize_t nfrac = static_cast<size_t>(uinteger<2 * N>(h));
-
-    for (ssize_t fidx = nfrac - 1; fidx >= 0 && i >= 0; --fidx, --i)
     {
-        const auto fraction_bit = f.bit(fidx);
-        bits.set_bit(i, fraction_bit);
+        const ssize_t nfrac = static_cast<size_t>(uinteger<16 * N>(h));
+
+        for (ssize_t fidx = nfrac - 1; fidx >= 0 && i >= 0; --fidx, --i)
+        {
+            const auto fraction_bit = f.bit(fidx);
+            bits.set_bit(i, fraction_bit);
+        }
     }
+
+    //
+    // (4) now for the hard part, rounding...
+    //
+
+    {
+        // const Posit p = Posit::from_bits(bits);
+        // const PositPlusOne X = width_cast<PositPlusOne>(p);
+        // const PositPlusOne u = width_cast<PositPlusOne>(X.decremented());
+        // const PositPlusOne v = width_cast<PositPlusOne>(X.incremented());
+
+        //(void) u;
+        //(void) v;
+    }
+
+    //
+    // (5) construct posit from bits
+    //
 
     return Posit::from_bits(bits);
 }
@@ -210,6 +252,12 @@ void binprod<N>::decode_regime(ssize_t& nregime, bool& first_regime) const
         nregime = k + 2;
         first_regime = true;
     }
+}
+
+template <size_t N> constexpr typename binprod<N>::storage_type binprod<N>::magnitude() const
+{
+    constexpr auto two = storage_type::one() + storage_type::one();
+    return x * pow(two, m);
 }
 
 template <size_t N> void binprod<N>::ensure_positive() const

@@ -74,14 +74,14 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] posit<N, ES, WT> posit<N, ES, WT>::incremented() const
 {
     auto bits = get_bits();
-    return bits + bits.one();
+    return from_bits(bits + bits.one());
 }
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] posit<N, ES, WT> posit<N, ES, WT>::decremented() const
 {
     auto bits = get_bits();
-    return bits - bits.one();
+    return from_bits(bits - bits.one());
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -184,10 +184,13 @@ posit<N, ES, WT> posit<N, ES, WT>::operator+(const posit<N, ES, WT>& rhs) const
     const binprod<N> bsum = lhs_binprod + rhs_binprod;
     Posit psum = bsum.template to_posit<N, ES, WT>();
 
+    std::cout << lhs_binprod << " " << rhs_binprod << " " << bsum << std::endl;
+
     // fix overflows
 
     if (rhs > zero && psum < lhs)
     {
+        std::cout << "[preventing overflow]" << std::endl;
         psum = psum.max();
     }
 
@@ -195,6 +198,7 @@ posit<N, ES, WT> posit<N, ES, WT>::operator+(const posit<N, ES, WT>& rhs) const
 
     if (rhs < zero && psum > lhs)
     {
+        std::cout << "[preventing underflow]" << std::endl;
         psum = psum.min();
     }
 

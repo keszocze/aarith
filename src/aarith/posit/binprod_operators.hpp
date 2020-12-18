@@ -15,7 +15,7 @@ template <size_t N> constexpr std::ostream& operator<<(std::ostream& os, const b
     return os << "(" << rhs.x << ", " << rhs.m << ", " << B << ")";
 }
 
-template <size_t N> constexpr binprod<N> operator+(const binprod<N>& lhs, const binprod<N>& rhs)
+template <size_t N> binprod<N> constexpr operator+(const binprod<N>& lhs, const binprod<N>& rhs)
 {
     // based on "Provably Correct Posit Arithmetic with Fixed-Point Big
     // Integer", Shin Yee Chung, 2018, p. 4
@@ -33,14 +33,24 @@ template <size_t N> constexpr binprod<N> operator+(const binprod<N>& lhs, const 
     const auto& ma = lhs.m;
     const auto& mb = rhs.m;
 
-    // computation
+    // compute parameters of result
 
     const auto mmax = max(ma, mb);
+
+    // TODO: Use shifts!!! The integers are way way way too slow!
 
     auto x = xa * pow(two, mmax - mb) + xb * pow(two, mmax - ma);
     auto m = ma + mb - mmax;
 
     // normalization
+
+    while (x > two)
+    {
+        // x * 2^m == (x / 2) * 2^(m + 1)
+
+        x = x / two;
+        m = m + one;
+    }
 
     // returning
 

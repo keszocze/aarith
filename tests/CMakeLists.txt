@@ -39,6 +39,7 @@ add_aarith_test(posit-casts FILES posit/posit_casts-test.cpp)
 add_aarith_test(posit-operations FILES posit/posit_operations-test.cpp)
 add_aarith_test(posit-operators FILES posit/posit_operators-test.cpp)
 add_aarith_test(posit-types FILES posit/posit_types-test.cpp)
+#add_aarith_test(posit-universal FILES posit/posit-universal-test.cpp)
 
 add_aarith_test(fau-adder FILES uint-approx-test.cpp)
 
