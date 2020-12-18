@@ -1012,7 +1012,8 @@ auto constexpr expanding_mul(const I& a, const I& b)
  * @param exponent
  * @return The base to the power of the exponent
  */
-template <typename IntegerType> IntegerType pow(const IntegerType& base, const size_t exponent)
+template <typename IntegerType>
+constexpr IntegerType pow(const IntegerType& base, const size_t exponent)
 {
 
     if (exponent == std::numeric_limits<size_t>::max())
@@ -1052,7 +1053,7 @@ template <typename IntegerType> IntegerType pow(const IntegerType& base, const s
  * @return The base to the power of the exponent
  */
 template <typename IntegerType>
-IntegerType pow(const IntegerType& base, const IntegerType& exponent)
+constexpr IntegerType pow(const IntegerType& base, const IntegerType& exponent)
 {
 
     static_assert(aarith::is_integral_v<IntegerType>,
@@ -1129,7 +1130,6 @@ template <size_t N, class WT>
     // https://stackoverflow.com/questions/1907565/
     return ((k % n) + n) % n;
 }
-
 
 /**
  * @brief Multiplies two unsigned integers using the Karazuba algorithm
