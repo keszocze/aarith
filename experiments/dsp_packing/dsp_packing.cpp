@@ -1,19 +1,30 @@
+#include "DUT.hpp"
 #include <aarith/integer.hpp>
 
-// TODO allow for wider activation values
-
-#include "DUT.hpp"
+/**
+ * @brief Experiments for evaluating multiple multiplications within a single DSP.
+ *
+ * The idea comes from the following whitepaper:
+ *
+ * Xilinx. 2020. „Convolutional Neural Network with INT4 Optimization on Xilinx Devices“.
+ * Whitepaper. https://www.xilinx.com/support/documentation/white_papers/wp521-4bit-optimization.pdf
+ */
 
 namespace dsp_packing {
 
 using namespace aarith;
 
-using aint8 = integer<8>;
-using aint4 = integer<4>;
-using auint4 = uinteger<4>;
+constexpr size_t weight_size = 5;
+constexpr size_t activation_size = 4;
+
+using weight_t = integer<weight_size>;
+using activation_t = uinteger<activation_size>;
+using res_t = integer<weight_size + activation_size>;
 
 /**
- * @brief Packs the two signed weights and two unsigned activation values as proposed by Xilinx
+ * @brief Packs the two signed weights and two unsigned activation values as proposed by Xilinx.
+ *
+ *
  *
  * Note that this packing is incorrect
  *
@@ -23,7 +34,8 @@ using auint4 = uinteger<4>;
  * @param a2 Activation value 2
  * @return Input packed so that it can be fed to the DSP
  */
-DSPInput pack_xilinx(const aint4& w1, const aint4& w2, const auint4& a1, const auint4& a2)
+DSPInput pack_xilinx(const weight_t& w1, const weight_t& w2, const activation_t& a1,
+                     const activation_t& a2)
 {
     const APort A{w1};
     APort D{w2};
@@ -49,7 +61,8 @@ DSPInput pack_xilinx(const aint4& w1, const aint4& w2, const auint4& a1, const a
  * @param a2 Activation value 2
  * @return Input packed so that it can be fed to the DSP
  */
-DSPInput pack_partially_correcting(const aint4& w1, const aint4& w2, const auint4& a1, const auint4& a2)
+DSPInput pack_partially_correcting(const weight_t& w1, const weight_t& w2, const activation_t& a1,
+                                   const activation_t& a2)
 {
     DSPInput params = pack_xilinx(w1, w2, a1, a2);
 
@@ -62,21 +75,53 @@ DSPInput pack_partially_correcting(const aint4& w1, const aint4& w2, const auint
     return params;
 }
 
-// TODO Implement other simple addition correction
-// TODO Implement Akif's correction circuit
+// as C++ is not really a modern language, we have to manually wrap the function in this type
+// ourselves
+using post_proc_t = std::function<std::array<res_t, 4>(
+    const weight_t&, const weight_t&, const activation_t&, const activation_t&, const PPort&)>;
+
+/**
+ * @brief A post-processing method that fixes all off-by-one errors introduced in the original
+ * Xilinx implementation.
+ */
+post_proc_t fix_dsp_result = [](const weight_t& w1, const weight_t& w2, const activation_t& a1,
+                                const activation_t& a2, const PPort& dsp_result) {
+    auto [a2w2, a1w2, a2w1, a1w1] = extract_results<weight_size,activation_size>(dsp_result);
+
+    if (dsp_result.bit(10))
+    {
+        a2w1 = add(a2w1, res_t::one());
+    }
+
+    if (dsp_result.bit(21))
+    {
+        a1w2 = add(a1w2, res_t::one());
+    }
+
+    if (dsp_result.bit(32))
+    {
+        a2w2 = add(a2w2, res_t::one());
+    }
+
+    return std::array<res_t, 4>{a2w2, a1w2, a2w1, a1w1};
+};
 
 } // namespace dsp_packing
-
 
 int main()
 {
 
     using namespace dsp_packing;
 
-    DUT design_under_test(pack_partially_correcting);
+    DUT xilinx(pack_xilinx);
 
+    DUT no_cost_correction(pack_partially_correcting);
 
-    evaluate(design_under_test, true);
+    DUT fully_corrected(pack_xilinx, fix_dsp_result);
+
+    evaluate(xilinx, false);
+    evaluate(no_cost_correction, false);
+    evaluate(fully_corrected, false);
 
     return 0;
 }

@@ -5,86 +5,84 @@
 
 namespace dsp_packing {
 
+/**
+ * @brief Helper function the extracts the individual results from the DSP's output bitstring
+ * @param result The result computed by the DSP
+ * @return The individual extracted results
+ */
+template <size_t WWidth = 4, size_t AWidth = 4>
+[[nodiscard]] static std::array<aarith::integer<AWidth + WWidth>, 4> extract_results(const PPort result)
+{
+
+    using ret_val = aarith::integer<AWidth + WWidth>;
+
+    static_assert(WWidth + AWidth < 12, "Using more than 11 bits (combined) for the weights and "
+                                        "activation values would lead to overlapping values");
+
+    using E = ret_val;
+
+    static constexpr size_t n_guards = 11 - (WWidth + AWidth);
+    static constexpr size_t offset = (WWidth + AWidth) - 1;
+
+    const E a1w1{aarith::bit_range<offset, 0>(result)};
+    const E a2w1{aarith::bit_range<11 + offset, 11>(result)};
+    const E a1w2{aarith::bit_range<22 + offset, 22>(result)};
+    const E a2w2{aarith::bit_range<33 + offset, 33>(result)};
+
+    return {a2w2, a1w2, a2w1, a1w1};
+}
+
 template <typename Packing, size_t WWidth = 4, size_t AWidth = 4> class DUT
 {
 public:
     using ret_val = aarith::integer<AWidth + WWidth>;
     using w_val = aarith::integer<WWidth>;
     using a_val = aarith::uinteger<AWidth>;
+    using post_proc_t = std::function<std::array<ret_val, 4>(
+        const w_val&, const w_val&, const a_val&, const a_val&, const PPort&)>;
 
 private:
     Packing packing;
-    std::function<std::array<ret_val, 4>(
-        const w_val&, const w_val&,
-        const a_val&, const a_val&, const ret_val&,
-        const ret_val&, const ret_val&, const ret_val&)>
-        post_proc;
+    post_proc_t post_proc;
 
 public:
     static constexpr size_t W = WWidth;
     static constexpr size_t A = AWidth;
 
     /**
-     * @brief DUT with a user specified post-processing procedure
+     * @brief Simply extracts the results from the DSP result without any further post-processing
+     * @param dsp_result
+     * @return
      */
-    DUT(Packing packing, std::function<PPort(PPort)> post_proc)
+    static std::array<ret_val, 4> default_post_proc([[maybe_unused]] const w_val&,
+                                                    [[maybe_unused]] const w_val&,
+                                                    [[maybe_unused]] const a_val&,
+                                                    [[maybe_unused]] const a_val&,
+                                                    const PPort& dsp_result)
+    {
+        const auto [a2w2, a1w2, a2w1, a1w1] = extract_results(dsp_result);
+        return std::array<ret_val, 4>{a2w2, a1w2, a2w1, a1w1};
+    }
+
+    /**
+     * @brief DUT with a user specified post-processing procedure (defaults to only extracting the
+     * products without any further post-processing).
+     */
+    DUT(Packing packing, post_proc_t post_proc = default_post_proc)
         : packing(packing)
         , post_proc(post_proc)
     {
     }
 
-    /**
-     * @brief DUT using no post-processing
-     */
-    DUT(Packing packing)
-        : packing(packing)
-        , post_proc([](const w_val& w1, const w_val& w2,
-                       const a_val& a1, const a_val& a2,
-                       const ret_val& a2w2, const ret_val& a1w2, const ret_val& a2w1,
-                       const ret_val& a1w1) {
-            return std::array<ret_val, 4>{a2w2, a1w2, a2w1, a1w1};
-        })
-    {
-    }
-
-    /**
-     * @brief Helper function the extracts the individual results from the DSP's output bitstring
-     * @param result The result computed by the DSP
-     * @return The individual extracted results
-     */
-    [[nodiscard]] std::array<ret_val, 4> extract_results(const PPort result)
-    {
-
-        static_assert(WWidth + AWidth < 12,
-                      "Using more than 11 bits (combined) for the weights and "
-                      "activation values would lead to overlapping values");
-
-        using E = ret_val;
-
-        static constexpr size_t n_guards = 11 - (WWidth + AWidth);
-        static constexpr size_t offset = (WWidth + AWidth) - 1;
-
-        const E a1w1{aarith::bit_range<offset, 0>(result)};
-        const E a2w1{aarith::bit_range<11 + offset, 11>(result)};
-        const E a1w2{aarith::bit_range<22 + offset, 22>(result)};
-        const E a2w2{aarith::bit_range<33 + offset, 33>(result)};
-
-        return {a2w2, a1w2, a2w1, a1w1};
-    }
-
-    std::array<aarith::integer<WWidth + AWidth>, 4> operator()(const w_val& w1,
-                                                               const w_val& w2,
-                                                               const a_val& a1,
-                                                               const a_val& a2)
+    std::array<aarith::integer<WWidth + AWidth>, 4> operator()(const w_val& w1, const w_val& w2,
+                                                               const a_val& a1, const a_val& a2)
     {
 
         const DSPInput in = packing(w1, w2, a1, a2);
 
         const PPort dsp_result = dsp(in);
 
-        const auto [a2w2_, a1w2_, a2w1_, a1w1_] = extract_results(dsp_result);
-
-        return post_proc(w1, w2, a1, a2, a2w2_, a1w2_, a2w1_, a1w1_);
+        return post_proc(w1, w2, a1, a2, dsp_result);
     }
 };
 
@@ -149,7 +147,8 @@ public:
                 //                    print_int(res_correct[i], "korrekt");
                 //                    print_int(res_dsp[i], "dsp");
                 //                }
-                if (abs(diff) > abs(max_error)) {
+                if (abs(diff) > abs(max_error))
+                {
                     max_error = diff;
                 }
             }
