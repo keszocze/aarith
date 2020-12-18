@@ -51,7 +51,7 @@ template <typename I, typename T>
     return sum;
 }
 
-template <typename I, typename T>[[nodiscard]] constexpr auto expanding_add(const I& a, const T& b)
+template <typename I, typename T> [[nodiscard]] constexpr auto expanding_add(const I& a, const T& b)
 {
 
     return expanding_add(a, b, false);
@@ -65,7 +65,7 @@ template <typename I, typename T>[[nodiscard]] constexpr auto expanding_add(cons
  * @param b Subtrahend
  * @return Difference between a and b
  */
-template <typename I>[[nodiscard]] constexpr auto sub(const I& a, const I& b) -> I
+template <typename I> [[nodiscard]] constexpr auto sub(const I& a, const I& b) -> I
 {
     static_assert(::aarith::is_integral_v<I>);
 
@@ -97,7 +97,7 @@ template <typename I>[[nodiscard]] constexpr auto sub(const I& a, const I& b) ->
  */
 // template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(const I& a, const T&
 // b, const bool initial_borrow = false)
-template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(const I& a, const T& b)
+template <typename I, typename T> [[nodiscard]] constexpr auto expanding_sub(const I& a, const T& b)
 {
 
     static_assert(::aarith::same_signedness<I, T>);
@@ -117,7 +117,7 @@ template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(cons
  * @param b Second summand
  * @return Sum of a and b
  */
-template <typename I>[[nodiscard]] I constexpr add(const I& a, const I& b)
+template <typename I> [[nodiscard]] I constexpr add(const I& a, const I& b)
 {
     constexpr size_t W = I::width();
 
@@ -395,7 +395,8 @@ template <typename I>
  * @param denominator The number that divides the other number
  * @return The quotient of the division operation
  */
-template <typename I>[[nodiscard]] constexpr auto div(const I& numerator, const I& denominator) -> I
+template <typename I>
+[[nodiscard]] constexpr auto div(const I& numerator, const I& denominator) -> I
 {
     return restoring_division(numerator, denominator).first;
 }
@@ -866,7 +867,7 @@ constexpr auto negate(const integer<W, WordType>& n) -> integer<W, WordType>
  * @param n The integer
  * @return The sign of the integer
  */
-template <size_t W, typename WordType>[[nodiscard]] constexpr int8_t signum(integer<W, WordType> n)
+template <size_t W, typename WordType> [[nodiscard]] constexpr int8_t signum(integer<W, WordType> n)
 {
     if (n.is_zero())
     {
@@ -891,7 +892,8 @@ template <size_t W, typename WordType>[[nodiscard]] constexpr int8_t signum(inte
  * @param n The integer
  * @return The sign of the integer
  */
-template <size_t W, typename WordType>[[nodiscard]] constexpr int8_t signum(uinteger<W, WordType> n)
+template <size_t W, typename WordType>
+[[nodiscard]] constexpr int8_t signum(uinteger<W, WordType> n)
 {
     return n.is_zero() ? 0 : 1;
 }
@@ -1070,7 +1072,7 @@ IntegerType pow(const IntegerType& base, const IntegerType& exponent)
 
     IntegerType result = IntegerType::one();
     IntegerType iter = IntegerType::zero();
-    while (iter <= exponent)
+    while (iter < exponent)
     {
         result = mul(result, base);
         iter = add(iter, IntegerType::one());

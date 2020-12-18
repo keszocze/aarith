@@ -205,9 +205,9 @@ TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts"
         }
         std::cout << a << " + " << b << " = " << res_ << "\n";
         std::cout << to_binary(a) << " + \n" << to_binary(b) << " = \n" << to_binary(res) << "\n";
-        //std::cout << to_compute_string(a) << "\t+\t" << to_compute_string(b) << " = "
+        // std::cout << to_compute_string(a) << "\t+\t" << to_compute_string(b) << " = "
         //          << to_compute_string(res) << "\n";
-    
+
         std::cout << a_native << " + " << b_native << " = " << res_native << "\n";
         std::cout << to_binary(res) << "\n" << to_binary(res_native_) << "\n";
     }
@@ -478,10 +478,13 @@ TEMPLATE_TEST_CASE_SIG("Floating point subtraction matches its native counterpar
     if (!equal_except_rounding(res_native_, res))
     {
         F res_dbg = a - b;
-        if (equal_except_rounding(res_native_, res_dbg)){}
+        if (equal_except_rounding(res_native_, res_dbg))
+        {
+        }
 
         std::cout << "a - b\n"
-                  << to_binary(F(a)) << " - \n" << to_binary(F(b)) << "\n"
+                  << to_binary(F(a)) << " - \n"
+                  << to_binary(F(b)) << "\n"
                   << to_binary(res) << "(normalized_float) !=\n"
                   << to_binary(F(res_native_)) << "(float)\n\n";
     }
@@ -512,10 +515,13 @@ TEMPLATE_TEST_CASE_SIG("Floating point multiplication matches its native counter
     if (!equal_except_rounding(res_native_, res))
     {
         F res_dbg = a * b;
-        if (equal_except_rounding(res_native_, res_dbg)){}
+        if (equal_except_rounding(res_native_, res_dbg))
+        {
+        }
 
         std::cout << "a * b\n"
-                  << to_binary(a) << " * \n" << to_binary(b) << "\n"
+                  << to_binary(a) << " * \n"
+                  << to_binary(b) << "\n"
                   << to_binary(res) << "(normalized_float) !=\n"
                   << to_binary(res_native_) << "(float)\n\n";
     }
@@ -529,7 +535,6 @@ TEMPLATE_TEST_CASE_SIG("Floating point division matches its native counterparts"
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, double))
 {
-
 
     using F = normalized_float<E, M>;
 

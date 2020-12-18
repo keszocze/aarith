@@ -15,8 +15,7 @@ TEMPLATE_TEST_CASE_SIG("Generating exactly one number works as intended",
 
     const I val{Num};
 
-    // the numbers should be in the range [Num,Num+1[ = [Num,Num]
-    UIntegerGenerator<W, WordType> gen(val, I{Num + 1U});
+    UIntegerGenerator<W, WordType> gen(val, val);
 
     REQUIRE(gen.get() == val);
 
@@ -36,8 +35,7 @@ TEMPLATE_TEST_CASE_SIG("Generating exactly one number with more than one word wo
 
     const I val = I::from_words(1U, 0U, 0U);
 
-    // the numbers should be in the range [Num,Num+1[ = [Num,Num]
-    UIntegerGenerator<W, WordType> gen(val, add(val, I::one()));
+    UIntegerGenerator<W, WordType> gen(val, val);
 
     REQUIRE(gen.get() == val);
 
@@ -58,17 +56,16 @@ TEMPLATE_TEST_CASE_SIG("The generated numbers are in the given range",
     const I lower{L};
     const I upper{U};
 
-    // the numbers should be in the range [Num,Num+1[ = [Num,Num]
     UIntegerGenerator<W, WordType> gen(lower, upper);
 
     REQUIRE(gen.get() >= lower);
-    REQUIRE(gen.get() < upper);
+    REQUIRE(gen.get() <= upper);
 
     for ([[maybe_unused]] int i = 0; i < 1000; ++i)
     {
         gen.next();
         REQUIRE(gen.get() >= lower);
-        REQUIRE(gen.get() < upper);
+        REQUIRE(gen.get() <= upper);
     }
 }
 
@@ -84,12 +81,11 @@ TEMPLATE_TEST_CASE_SIG("Generating two numbers with constraints works",
     const I lower_{U + 10};
     const I upper_{U + 100};
 
-    // the numbers should be in the range [Num,Num+1[ = [Num,Num]
     UIntegerGenerator<W, WordType> gen(lower, upper);
     UIntegerGenerator<W, WordType> gen_(lower_, upper_);
 
     REQUIRE(gen.get() >= lower);
-    REQUIRE(gen.get() < upper);
+    REQUIRE(gen.get() <= upper);
 
     for ([[maybe_unused]] int i = 0; i < 1000; ++i)
     {
@@ -98,9 +94,9 @@ TEMPLATE_TEST_CASE_SIG("Generating two numbers with constraints works",
         const auto a = gen.get();
         const auto a_ = gen_.get();
         REQUIRE(a >= lower);
-        REQUIRE(a < upper);
+        REQUIRE(a <= upper);
         REQUIRE(a_ >= lower_);
-        REQUIRE(a_ < upper_);
-        REQUIRE(a < a_);
+        REQUIRE(a_ <= upper_);
+        REQUIRE(a <= a_);
     }
 }

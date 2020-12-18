@@ -3,6 +3,7 @@
 #include <aarith/core.hpp>
 #include <aarith/float/float_utils.hpp>
 #include <aarith/integer_no_operators.hpp>
+#include <assert.h>
 #include <cstdint>
 #include <iostream>
 #include <string>
@@ -111,10 +112,19 @@ public:
     static constexpr size_t MW = M + 1;
 
     using IntegerExp = uinteger<E, WordType>;
+    using IntegerUnbiasedExp = integer<E + 1, WordType>;
     using IntegerMant = uinteger<MW, WordType>;
     using IntegerFrac = uinteger<M, WordType>;
 
     static constexpr IntegerExp bias = uinteger<E - 1, WordType>::all_ones();
+    static constexpr IntegerUnbiasedExp max_exp = uinteger<E - 1, WordType>::all_ones();
+    static constexpr IntegerUnbiasedExp min_exp = []() {
+        const IntegerExp bias_ = uinteger<E - 1, WordType>::all_ones();
+        IntegerUnbiasedExp min_exp_{bias_};
+        IntegerUnbiasedExp one = IntegerUnbiasedExp::one();
+        min_exp_ = negate(sub(min_exp_, one));
+        return min_exp_;
+    }();
 
     explicit constexpr normalized_float()
         : sign_neg(false)
@@ -338,21 +348,50 @@ public:
 
     /**
      *
-     * @return Smallest positive normalized value
+     * @return Smallest positive denormalized value
      */
     [[nodiscard]] static constexpr normalized_float smallest_denormalized()
     {
-        constexpr normalized_float small_denorm(false, IntegerExp::all_zeroes(), IntegerMant::one());
+        constexpr normalized_float small_denorm(false, IntegerExp::all_zeroes(),
+                                                IntegerMant::one());
         return small_denorm;
     }
 
     /**
-     * @brief Returns a floating point number indicating not a number.
+     * @brief Creates a quiet NaN value
+     * @param payload The payload to store in the NaN
+     * @return The bit representation of the quiet NaN containing the payload
+     */
+    [[nodiscard]] static constexpr normalized_float
+    qNaN(const IntegerFrac& payload = IntegerFrac::msb_one())
+    {
+        IntegerFrac payload_{payload};
+        payload_.set_msb(true);
+        return normalized_float(false, IntegerExp::all_ones(), IntegerMant{payload_});
+    }
+
+    /**
+     * @brief Creates a signalling NaN value
+     * @param payload The payload to store in the NaN (must not be zero)
+     * @return The bit representation of the signalling NaN containing the payload
+     */
+    [[nodiscard]] static constexpr normalized_float
+    sNaN(const IntegerFrac& payload = IntegerFrac::one())
+    {
+
+        IntegerFrac payload_{payload};
+        payload_.set_msb(false);
+        assert(!payload_.is_zero() && "NaN must have a payload");
+        return normalized_float(false, IntegerExp::all_ones(), payload_);
+    }
+
+    /**
+     * @brief Returns a floating point number indicating not a number (NaN).
      * @return A non-signalling not a number value
      */
     [[nodiscard]] static constexpr normalized_float NaN()
     {
-        return normalized_float(false, IntegerExp::all_ones(), IntegerMant{IntegerFrac::msb_one()});
+        return qNaN();
     }
 
     static constexpr auto exponent_width() -> size_t
@@ -365,10 +404,6 @@ public:
         return M;
     }
 
-    /**
-     * @warn The absolute value of the
-     * @return
-     */
     [[nodiscard]] static constexpr integer<E + 1, WordType> denorm_exponent()
     {
 
@@ -393,11 +428,25 @@ public:
         return exponent;
     }
 
+    /**
+     * @brief Tests whether the floating-point number is positive.
+     *
+     * This returns true for zeros and NaNs as well.
+     *
+     * @return True iff the sign bit is not set
+     */
     [[nodiscard]] constexpr bool is_positive() const
     {
         return !sign_neg;
     }
 
+    /**
+     * @brief Tests whether the floating-point number is negative.
+     *
+     * This returns true for zeros and NaNs as well.
+     *
+     * @return True iff the sign bit is set
+     */
     [[nodiscard]] constexpr bool is_negative() const
     {
         return sign_neg;
@@ -421,8 +470,13 @@ public:
                width_cast<M>(mantissa) == uinteger<M>::zero();
     }
 
+    [[nodiscard]] constexpr bool is_finite() const
+    {
+        return exponent != uinteger<E>::all_ones();
+    }
+
     /**
-     * @brief Checks whether the floating point number is not a number
+     * @brief Checks whether the floating point number is NaN (not a number)
      *
      * @note There is no distinction between signalling and non-signalling NaN
      *
@@ -431,17 +485,44 @@ public:
     [[nodiscard]] constexpr bool is_nan() const
     {
         const bool exp_ones = exponent == IntegerExp ::all_ones();
-        constexpr auto zero = uinteger<M>::zero();
-        const bool mant_zero = get_mantissa() != zero;
-        return exp_ones && mant_zero;
+        const bool mant_zero = get_mantissa().is_zero();
+        return exp_ones && !mant_zero;
+    }
+
+    /**
+     * @brief Checks if the number is a quiet NaN
+     * @return True iff the number is a quiet NaN
+     */
+    constexpr bool is_qNaN() const
+    {
+        const bool exp_all_ones = exponent == IntegerExp ::all_ones();
+        const bool first_bit_set = width_cast<M>(mantissa).msb();
+        return exp_all_ones && first_bit_set;
+    }
+
+    /**
+     * @brief Checks if the number is a signalling NaN
+     * @return True iff the number is a signalling NaN
+     */
+    constexpr bool is_sNaN() const
+    {
+        const bool exp_all_ones = exponent == IntegerExp ::all_ones();
+        const auto fraction = width_cast<M>(mantissa);
+        const bool first_bit_unset = !fraction.msb();
+        const bool not_zero = fraction != IntegerFrac::zero();
+        return exp_all_ones && first_bit_unset && not_zero;
     }
 
     [[nodiscard]] constexpr auto unbiased_exponent() const -> integer<E + 1, WordType>
     {
-        const integer<E + 1, WordType> signed_bias{bias};
-        const integer<E + 1, WordType> signed_exponent{get_exponent()};
+        if (!this->is_normalized()) {
+            return min_exp;
+        }
 
-        const integer<E + 1, WordType> real_exponent = sub(signed_exponent, signed_bias);
+        const IntegerUnbiasedExp signed_bias{bias};
+        const IntegerUnbiasedExp signed_exponent{get_exponent()};
+
+        const IntegerUnbiasedExp real_exponent = sub(signed_exponent, signed_bias);
         return real_exponent;
     }
 
@@ -457,17 +538,39 @@ public:
         return exponent.is_zero() && mantissa.is_zero();
     }
 
+    /**
+     * @brief Checks whether the floating point number is positive zero
+     *
+     *
+     * @return True iff the floating point is positive zero
+     */
+    [[nodiscard]] constexpr bool is_pos_zero() const
+    {
+        return !sign_neg && exponent.is_zero() && mantissa.is_zero();
+    }
+
+    /**
+     * @brief Checks whether the floating point number is negative zero
+     *
+     *
+     * @return True iff the floating point is negative zero
+     */
+    [[nodiscard]] constexpr bool is_neg_zero() const
+    {
+        return sign_neg && exponent.is_zero() && mantissa.is_zero();
+    }
+
     void set_exponent(const uinteger<E, WordType>& set_to)
     {
         exponent = set_to;
     }
 
-    auto get_full_mantissa() const -> uinteger<MW, WordType>
+    auto constexpr get_full_mantissa() const -> uinteger<MW, WordType>
     {
         return mantissa;
     }
 
-    auto get_mantissa() const -> uinteger<M, WordType>
+    auto constexpr get_mantissa() const -> uinteger<M, WordType>
     {
         return width_cast<M>(mantissa);
     }
@@ -503,27 +606,42 @@ public:
     }
 
     /**
-     * @brief Checks whether the number is normalized
+     * @brief Checks whether the number is normal
      *
-     * @note The NaNs are also considered normalized!
+     * This is true if and only if the floating-point number  is normal (not zero, subnormal,
+     * infinite, or NaN).
      *
      * @return True iff the number is normalized
      */
     [[nodiscard]] constexpr bool is_normalized() const
     {
-        return exponent != IntegerExp::all_zeroes();
+        const bool denormalized = (exponent == IntegerExp::all_zeroes());
+        const bool exception = (exponent == IntegerExp::all_ones());
+
+        return !(denormalized || exception);
     }
 
     /**
-     * @brief Returns if the number is denormalized or NaN/Inf
-     * @return
+     * @brief Returns if the number is zero, denormalized, NaN, or Inf (i.e. not normal)
+     * @return True iff is the number is special (i.e. not normal)
      */
     [[nodiscard]] constexpr bool is_special() const
     {
-        const bool denormalized = (exponent == IntegerExp::all_zeroes());
-        const bool exception = (exponent == IntegerExp::all_ones());
-        const bool result = (denormalized || exception);
-        return result;
+        return !is_normalized();
+    }
+
+    /**
+     * @brief Tests if the number is subnormal
+     *
+     * @note Zero is *not* considered subnormal!
+     *
+     * @return True iff the number is subnormal
+     */
+    [[nodiscard]] constexpr bool is_subnormal() const
+    {
+        const bool denormalized = exponent.is_zero();
+        const bool not_zero = !mantissa.is_zero();
+        return denormalized && not_zero;
     }
 
     /**
@@ -566,7 +684,7 @@ private:
      * @tparam To Either float or double
      * @return Float/Double representation of the number
      */
-    template <typename To>[[nodiscard]] constexpr To generic_cast() const
+    template <typename To> [[nodiscard]] constexpr To generic_cast() const
     {
 
         static_assert(std::is_floating_point<To>(), "Can only convert to float or double.");
@@ -687,6 +805,20 @@ auto equal_except_rounding(const normalized_float<E, M1, WordType> lhs,
     return false;
 }
 
+/**
+ * @brief Computes the asbolute value of the floating point number
+ *
+ * Quoting the standard: "copies a floating-point operand x to a destination in the same format,
+ * setting the sign bit to 0 (positive)"
+ *
+ * @note This method ignores NaN values in the sense that they are also copied and the sign bit set
+ * to zero.
+ *
+ * @tparam E Width of exponent
+ * @tparam M Width of mantissa
+ * @tparam WordType The word type used to internally store the data
+ * @return The absolute value of the provided number
+ */
 template <size_t E, size_t M, typename WordType = uint64_t>
 auto constexpr abs(const normalized_float<E, M, WordType> nf) -> normalized_float<E, M, WordType>
 {
@@ -844,6 +976,38 @@ template <class uint> auto find_leading_one(const uint mantissa) -> typename uin
     }
 
     return one_at;
+}
+
+// ironically, defining the functions below makes the implementation conform more to the standard
+
+/**
+ * @brief Indicates whether this floating-point implementation conforms to the IEEE 754 (1985)
+ * standard
+ * @return false
+ */
+constexpr bool is754version1985()
+{
+    return false;
+}
+
+/**
+ * @brief Indicates whether this floating-point implementation conforms to the IEEE 754 (2008)
+ * standard
+ * @return false
+ */
+constexpr bool is754version2008()
+{
+    return false;
+}
+
+/**
+ * @brief Indicates whether this floating-point implementation conforms to the IEEE 754 (2019)
+ * standard
+ * @return false
+ */
+constexpr bool is754version2019()
+{
+    return false;
 }
 
 } // namespace aarith

@@ -852,23 +852,26 @@ TEMPLATE_TEST_CASE_SIG("Invariants for the signed integer division",
         {
             THEN("The result should be zero")
             {
-                // Adding one is safe as I::max() will not be returned by the generator
-                const I c = add(a, I::one());
-                if (c != I::zero() && c != I::one())
+                if (a != I::max())
                 {
-                    if (c.is_negative())
+                    const I c = add(a, I::one());
+                    if (c != I::zero() && c != I::one() && c != -I::one())
                     {
-                        // flaky test, I need to find out, why this fails from time to time
-                        if (div(a, c) != I::one())
+                        if (c.is_negative())
                         {
-                            std::cout << a << " / " << c << " = " << div(a, c) << " != " << I::one()
-                                      << "\n";
+                            // flaky test, I need to find out, why this fails from time to time
+                            // it *should* have been the missing test for max() above
+                            if (div(a, c) != I::one())
+                            {
+                                std::cout << a << " / " << c << " = " << div(a, c)
+                                          << " != " << I::one() << "\n";
+                            }
+                            REQUIRE(div(a, c) == I::one());
                         }
-                        REQUIRE(div(a, c) == I::one());
-                    }
-                    else
-                    {
-                        REQUIRE(div(a, c) == I::zero());
+                        else
+                        {
+                            REQUIRE(div(a, c) == I::zero());
+                        }
                     }
                 }
             }
@@ -1376,6 +1379,24 @@ SCENARIO("Computing the signum of an non-zero integer", "[integer][signed][opera
             REQUIRE(signum(integer<32>{val_a}) == -1);
             REQUIRE(signum(integer<64>{val_a}) == -1);
             REQUIRE(signum(integer<128>{val_a}) == -1);
+        }
+    }
+}
+
+SCENARIO("Computing the powers of integers", "[integer][signed][operation]")
+{
+
+    GIVEN("Base and exponent values")
+    {
+        THEN("Compute the correct power")
+        {
+            using Integer = integer<32>;
+
+            CHECK(pow(Integer(2), Integer(0)) == Integer(1));
+            CHECK(pow(Integer(2), Integer(1)) == Integer(2));
+            CHECK(pow(Integer(2), Integer(2)) == Integer(4));
+            CHECK(pow(Integer(2), Integer(3)) == Integer(8));
+            CHECK(pow(Integer(2), Integer(4)) == Integer(16));
         }
     }
 }
