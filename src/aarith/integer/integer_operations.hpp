@@ -403,6 +403,49 @@ template <typename I>
 }
 
 /**
+ * @brief Divides one integer by another integer with floor division
+ *
+ * Floor division rounds towards negative infinity. For example, when
+ * computing 4/5, the result is 0 and when computing -4/5 the result is -1.
+ *
+ * @note integer<W>::min/integer<W>(-1) will return <integer<W>::min,0>,
+ * i.e. some weird overflow happens for signed integers
+ *
+ * @tparam I Integer type to work on
+ * @param numerator The number that is to be divided
+ * @param denominator The number that divides the other number
+ * @return The quotient of the division operation
+ */
+template <typename I>
+[[nodiscard]] constexpr auto floordiv(const I& numerator, const I& denominator) -> I
+{
+    const bool result_is_negative = numerator.msb() ^ denominator.msb();
+    const auto [quotient, remainder] = restoring_division(numerator, denominator);
+
+    if (result_is_negative)
+    {
+        // for negative quotients, round towards -inf if the numerator does
+        // not perfectly divide by denominator
+
+        if (remainder.is_zero())
+        {
+            return quotient;
+        }
+        else
+        {
+            return quotient - quotient.one();
+        }
+    }
+    else
+    {
+        // for positive quotients, floor division behaves like normal
+        // (truncating) division
+
+        return quotient;
+    }
+}
+
+/**
  * @brief Computes the absolute value of a given signed integer.
  *
  * @warn There is a potential loss of precision as abs(integer::min) > integer::max
