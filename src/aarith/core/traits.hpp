@@ -22,6 +22,7 @@ public:
 
 template <class Type> inline constexpr bool is_integral_v = is_integral<Type>::value;
 
+
 template <class Type> class is_unsigned
 {
 public:
@@ -29,6 +30,15 @@ public:
 };
 
 template <class Type> inline constexpr bool is_unsigned_v = is_unsigned<Type>::value;
+
+
+template <class Type> class is_signed
+{
+public:
+    static constexpr bool value = false;
+};
+
+template <class Type> inline constexpr bool is_signed_v = is_signed<Type>::value;
 
 template <class Type> class is_float
 {
