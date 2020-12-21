@@ -8,10 +8,8 @@ option(BUILD_CORRECTNESS_EXPERIMENTS "build correctness experiments" OFF)
 option(BUILD_TESTS "build tests" ON)
 option(BUILD_EXAMPLES "build examples" ON)
 
-#set(CMAKE_CXX_CLANG_TIDY
-#        clang-tidy;
-#        -header-filter=.;
-#        -checks=*;)
+set(CMAKE_CXX_CLANG_TIDY
+        clang-tidy;)
 
 
 

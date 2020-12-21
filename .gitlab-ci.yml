@@ -1,6 +1,5 @@
 variables:
     GIT_DEPTH: 0
-    GIT_STRATEGY: recursive
     GIT_SUBMODULE_STRATEGY: recursive
     MPIR_PARAMS: "-DMPIR_INCLUDE_DIR=/opt/software/usr/local/include -DMPIR_LIBRARIES=/opt/software/usr/local/lib/libmpir.a"
     BUILD_PARAMS: "-DBUILD_BENCHMARKS=OFF -DBUILD_TESTS=ON -DUSE_FULL_RANGE_IN_TESTS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_EXPERIMENTS=OFF -DBENCHMARK_ENABLE_GTEST_TESTS=OFF -DBENCHMARK_ENABLE_TESTING=OFF"
@@ -25,6 +24,8 @@ compile_gcc:
     script:
         - mkdir -p build/gcc/bw_output
         - cd build/gcc
+        - echo ${BUILD_PARAMS}
+        - echo ${MPIR_PARAMS}
         - CC=gcc-9 CXX=g++-9 cmake ${BUILD_PARAMS} ${MPIR_PARAMS}  ../..
         - /opt/sonar-build-wrapper/build-wrapper-linux-x86-64 --out-dir bw_output make -j $(nproc) all
 
@@ -38,12 +39,16 @@ compile_clang:
     script:
         - mkdir -p build/clang
         - cd build/clang
+        - echo ${BUILD_PARAMS}
+        - echo ${MPIR_PARAMS}
         - CC=clang-9 CXX=clang++-9 cmake ${BUILD_PARAMS} ${MPIR_PARAMS} ../..
         - make -j $(nproc)
 
 .run_sonarqube:
   extends: .ciconf
   stage: quality
+  variables:
+    GIT_STRATEGY: none
   dependencies:
       - test_gcc
   needs:
@@ -53,6 +58,8 @@ compile_clang:
       - chmod +x scripts/mk_sonar_config.sh
       - scripts/mk_sonar_config.sh $CI_COMMIT_REF_NAME > sonar-project.properties
       - scripts/mk_sonar_config.sh $CI_COMMIT_REF_NAME
+      - ls .
+      - ls build
       - /opt/sonar-scanner/bin/sonar-scanner
 
 
