@@ -222,6 +222,7 @@ public:
     static constexpr bool value = true;
 };
 
+
 template <size_t Width, typename WordType> class is_unsigned<uinteger<Width, WordType>>
 {
 public:
@@ -274,7 +275,7 @@ public:
 
     template <size_t V>
     constexpr integer<Width, WordType>(const integer<V, WordType>& other) // NOLINT
-        : word_array<Width, WordType>(width_cast<Width, integer, V, WordType>(other))
+        : word_array<Width, WordType>(width_cast<Width>(other))
     {
     }
 
@@ -341,6 +342,12 @@ template <size_t Width, typename WordType> class is_unsigned<integer<Width, Word
 {
 public:
     static constexpr bool value = false;
+};
+
+template <size_t Width, typename WordType> class is_signed<integer<Width, WordType>>
+{
+public:
+    static constexpr bool value = true;
 };
 
 template <size_t Width, typename WordType> class is_word_array<integer<Width, WordType>>

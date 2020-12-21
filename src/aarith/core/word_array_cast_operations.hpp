@@ -19,10 +19,13 @@ namespace aarith {
  * @return integer with specified bit width
  */
 template <size_t DestinationWidth, template <size_t, typename> typename Container,
-          size_t SourceWidth, typename WordType>
+          size_t SourceWidth, typename WordType,
+          typename = std::enable_if_t<is_word_array_v<Container<DestinationWidth, WordType>> &&
+                                      !is_signed_v<Container<DestinationWidth, WordType>>>>
 [[nodiscard]] auto constexpr width_cast(const Container<SourceWidth, WordType>& source)
     -> Container<DestinationWidth, WordType>
 {
+
     if constexpr (SourceWidth == DestinationWidth)
     {
         return source;

@@ -81,7 +81,8 @@ TEMPLATE_TEST_CASE_SIG("Comparing two signed integers of different bit width",
         THEN("operator> returns false")
         {
             bool comp = a > b;
-            if (comp) {
+            if (comp)
+            {
                 std::cout << "a > b failed for\n";
                 std::cout << "a: " << a << "\t" << to_binary(a) << "\n";
                 std::cout << "b: " << b << "\t" << to_binary(b) << "\n";
@@ -236,7 +237,7 @@ SCENARIO("Comparing two positive integers with different bit widths",
 }
 
 TEMPLATE_TEST_CASE_SIG("Investigating the comparison of max and min values",
-                       "[integer][signed][utility][comparison]", AARITH_INT_TEST_SIGNATURE,
+                       "[integer][signed][utility][comparison][foo]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using T = integer<W, WordType>;
@@ -265,8 +266,11 @@ TEMPLATE_TEST_CASE_SIG("Investigating the comparison of max and min values",
 
     WHEN("Constructing min and max value into a larger integer")
     {
-        integer<W + 1, WordType> min_{T::min()};
+        integer<W + 1, WordType> min_= T::min();
         integer<W + 1, WordType> max_ = T::max();
+
+        std::cout << width_cast<W+1>(min) << "\n";
+        std::cout << width_cast<W+1>(min) << "\n";
 
         THEN("min should be negative")
         {
