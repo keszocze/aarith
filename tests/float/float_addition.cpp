@@ -65,40 +65,54 @@ TEMPLATE_TEST_CASE_SIG("Addition is commutative",
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
-                       "[normalized_float][arithmetic][addition][invariant]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+TEMPLATE_TEST_CASE_SIG("Floating point addition works for special values",
+                       "[normalized_float][arithmetic][addition]",
+                       AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
+                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
+
     using F = normalized_float<E, M>;
 
-    GIVEN("A normalized_float  created from native data types and the number zero")
+    GIVEN("Random NaN and infinity values")
     {
 
-        F a = GENERATE(take(15, random_float<E, M, FloatGenerationModes::FullyRandom>()));
+        F a = GENERATE(take(30, random_float<E, M, FloatGenerationModes::Special>()));
+        F b = GENERATE(take(30, random_float<E, M, FloatGenerationModes::Special>()));
 
-        WHEN("Adding these numbers")
+        WHEN("Adding them")
         {
-            F res{a + F::zero()};
-            THEN("The result should have left the number untouched")
+
+            F res = a + b;
+
+            THEN("The special cases should be respected")
             {
-                if (!a.is_nan())
+
+                if (a.is_nan() || b.is_nan())
                 {
-                    if (res != a)
+                    REQUIRE(res.is_nan());
+                }
+                if (a.is_inf() && b.is_inf())
+                {
+                    if (a.get_sign() != b.get_sign())
                     {
-                        std::cout << "a:   " << to_binary(a) << "\n"
-                                  << "res: " << to_binary(res) << "\n";
+                        REQUIRE(res.is_nan());
                     }
-                    REQUIRE(res == a);
+                    else
+                    {
+                        const bool same_sign = res.get_sign() == a.get_sign();
+                        const bool result = res.is_inf() && same_sign;
+                        REQUIRE(result);
+                    }
                 }
             }
         }
     }
 }
 
-TEMPLATE_TEST_CASE_SIG(
-    "Floating point addition works for special values",
-    "[normalized_float][arithmetic][addition]", AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-    AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+TEMPLATE_TEST_CASE_SIG("Floating point addition works for special values",
+                       "[normalized_float][arithmetic][addition]",
+                       AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
+                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
     using F = normalized_float<E, M>;
