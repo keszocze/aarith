@@ -38,7 +38,13 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
     const auto exponent_delta =
         sub(width_cast<E + 1>(lhs.get_exponent()), width_cast<E + 1>(rhs.get_exponent()));
 
-    const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
+    auto extra_shift = 0U;
+    if (lhs.is_normalized() && !rhs.is_normalized())
+    {
+        extra_shift = 1;
+    }
+
+    const auto new_mantissa = rhs.get_full_mantissa() >> (exponent_delta.word(0) - extra_shift);
     const auto mantissa_sum = fun_add(lhs.get_full_mantissa(), new_mantissa);
 
     normalized_float<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(),
@@ -78,7 +84,13 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
     }
 
     const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
-    const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
+    auto extra_shift = 0U;
+    if (lhs.is_normalized() && !rhs.is_normalized())
+    {
+        extra_shift = 1;
+    }
+
+    const auto new_mantissa = rhs.get_full_mantissa() >> (exponent_delta.word(0) - extra_shift);
     const auto mantissa_sum = fun_sub(lhs.get_full_mantissa(), new_mantissa);
 
     normalized_float<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(),
@@ -102,6 +114,15 @@ template <size_t E, size_t M>
 [[nodiscard]] auto add(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
     -> normalized_float<E, M>
 {
+    if (lhs.is_nan())
+    {
+        return lhs.make_quiet_nan();
+    }
+
+    if (rhs.is_nan())
+    {
+        return rhs.make_quiet_nan();
+    }
 
     if ((lhs.is_nan() || rhs.is_nan()) || (lhs.is_neg_inf() && rhs.is_pos_inf()) ||
         (lhs.is_pos_inf() && rhs.is_neg_inf()))
@@ -152,6 +173,16 @@ template <size_t E, size_t M>
     // return sub_<E, M>(lhs, rhs, expanding_add<uinteger<M+1>, uinteger<M+1>>,
     // expanding_sub<uinteger<M+1>, uinteger<M+1>>);
 
+    if (lhs.is_nan())
+    {
+        return lhs.make_quiet_nan();
+    }
+
+    if (rhs.is_nan())
+    {
+        return rhs.make_quiet_nan();
+    }
+
     if ((lhs.is_nan() || rhs.is_nan()) || (lhs.is_pos_inf() && rhs.is_pos_inf()) ||
         (lhs.is_neg_inf() && rhs.is_neg_inf()))
     {
@@ -184,6 +215,16 @@ template <size_t E, size_t M, typename WordType>
                        const normalized_float<E, M, WordType> rhs)
     -> normalized_float<E, M, WordType>
 {
+    if (lhs.is_nan())
+    {
+        return lhs.make_quiet_nan();
+    }
+
+    if (rhs.is_nan())
+    {
+        return rhs.make_quiet_nan();
+    }
+
     if ((lhs.is_nan() || rhs.is_nan()) || (lhs.is_zero() && rhs.is_inf()) ||
         (lhs.is_inf() && rhs.is_zero()))
     {
@@ -229,7 +270,8 @@ template <size_t E, size_t M, typename WordType>
                 product.set_full_mantissa(width_cast<M + 1>(mproduct));
             }
         }
-        return normalize<E, M, M>(product);
+        // return normalize<E, M, M>(product);
+        return product;
     }
 
     auto esum = width_cast<E>(ext_esum);
@@ -256,46 +298,125 @@ template <size_t E, size_t M, typename WordType>
     -> normalized_float<E, M, WordType>
 {
 
-    if ((lhs.is_nan() || rhs.is_nan()) || (lhs.is_zero() && rhs.is_zero()) ||
-        (lhs.is_inf() && rhs.is_inf()))
+    /*=================================
+     * 7.2. Invalid Operation
+     */
+    // TODO (keszocze) make this calls use the corresponding 754 std function once the branch is
+    // merged
+    if (lhs.is_nan())
+    {
+        return lhs.make_quiet_nan();
+    }
+
+    if (rhs.is_nan())
+    {
+        return rhs.make_quiet_nan();
+    }
+
+    if ((lhs.is_zero() && rhs.is_zero()) || (lhs.is_inf() && rhs.is_inf()))
     {
         return normalized_float<E, M>::NaN();
+    }
+    //==========================================
+
+    const auto result_is_negative = lhs.get_sign() ^ rhs.get_sign();
+
+    if (rhs.is_zero())
+    {
+        return result_is_negative ? normalized_float<E, M>::neg_infinity()
+                                  : normalized_float<E, M>::pos_infinity();
     }
 
     if (lhs.is_inf())
     {
-        return lhs;
+        // due to the checks above, we already know that rhs is finite
+        return result_is_negative ? normalized_float<E, M>::neg_zero()
+                                  : normalized_float<E, M>::zero();
     }
-
-    const bool neg_result = lhs.is_negative() ^ rhs.is_negative();
 
     if (rhs.is_inf() || lhs.is_zero())
     {
-        return neg_result ? normalized_float<E, M>::neg_zero() : normalized_float<E, M>::zero();
-    }
-    if (rhs.is_zero())
-    {
-        return neg_result ? normalized_float<E, M>::neg_infinity()
-                          : normalized_float<E, M>::pos_infinity();
+        return result_is_negative ? normalized_float<E, M>::neg_zero()
+                                  : normalized_float<E, M>::zero();
     }
 
+    size_t denorm_exponent_lhs = 0;
+    const bool lhs_is_denormal = !lhs.is_normalized();
+    if (lhs_is_denormal)
+    {
+        // more precision of the computation with denormal numbers
+        //        denorm_exponent_lhs = M - find_leading_one(lhs.get_full_mantissa());
+
+        denorm_exponent_lhs = [&lhs]() {
+            const std::optional<size_t> one_at = first_set_bit(lhs.get_full_mantissa());
+            if (one_at)
+            {
+                return size_t(M - (*one_at));
+            }
+            else
+            {
+                return size_t(0);
+            }
+        }();
+    }
     auto dividend = width_cast<2 * M + 1>(lhs.get_full_mantissa());
     auto divisor = width_cast<2 * M + 1>(rhs.get_full_mantissa());
-    dividend = dividend << M;
+    // shift to use integer division for producing 1,M
+    dividend = dividend << M + denorm_exponent_lhs;
     auto mquotient = div(dividend, divisor);
 
-    auto esum = expanding_add(lhs.get_exponent(), lhs.bias);
-    if (esum <= rhs.get_exponent())
+    auto exponent_tmp = expanding_add(lhs.get_exponent(), lhs.bias);
+    if (lhs_is_denormal)
     {
-        esum = esum.zero();
-    }
-    else
-    {
-        esum = width_cast<E>(sub(esum, width_cast<E + 1>(rhs.get_exponent())));
+        denorm_exponent_lhs -= 1U;
+        exponent_tmp = sub(exponent_tmp, uinteger<E + 1>(denorm_exponent_lhs));
     }
 
-    auto sign = lhs.get_sign() ^ rhs.get_sign();
-    normalized_float<E, mquotient.width() - 1> quotient(sign, esum, mquotient);
+    bool overflow = exponent_tmp.bit(E) == 1;
+
+    exponent_tmp = sub(exponent_tmp, width_cast<E + 1>(rhs.get_exponent()));
+    uinteger<E + 1> denorm_exponent_correction{1U};
+    if (!rhs.is_normalized())
+    {
+        exponent_tmp = sub(exponent_tmp, denorm_exponent_correction);
+    }
+
+    auto esum = width_cast<E>(exponent_tmp);
+    overflow &= exponent_tmp.bit(E) == 1;
+    const bool underflow = !overflow && exponent_tmp.bit(E) == 1;
+
+    // check for over or underflow and break
+    if (underflow || overflow)
+    {
+        normalized_float<E, M> quotient;
+        quotient.set_sign(result_is_negative);
+        // apparently float div does not produce -0
+        if (overflow)
+        {
+            quotient.set_exponent(uinteger<E>::all_ones());
+        }
+        else
+        {
+            // shift mantissa of subnormal number
+            // in case some part of the mantissa can be expressed as subnormal number
+            exponent_tmp = ~exponent_tmp;
+            exponent_tmp = add(exponent_tmp, uinteger<exponent_tmp.width()>(2));
+            if (exponent_tmp < uinteger<sizeof(M) * 8>(M + 1))
+            {
+                mquotient = rshift_and_round(mquotient, exponent_tmp.word(0));
+                quotient.set_full_mantissa(width_cast<M + 1>(mquotient));
+            }
+        }
+        return quotient;
+    }
+    else if (esum == uinteger<esum.width()>::zero())
+    {
+        normalized_float<E, M> quotient{result_is_negative, esum,
+                                        width_cast<M + 1>(rshift_and_round(mquotient, 1))};
+        return quotient;
+    }
+
+    normalized_float<E, mquotient.width() - 1> quotient(result_is_negative, esum, mquotient);
 
     return normalize<E, mquotient.width() - 1, M>(quotient);
 }

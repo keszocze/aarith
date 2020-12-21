@@ -196,9 +196,11 @@ public:
         constexpr size_t ext_exp_width = get_exponent_width<F>();
         constexpr size_t ext_mant_width = get_mantissa_width<F>();
 
-        sign_neg = (f < 0);
+        using E_ = decltype(extracted_exp);
 
-        // if the mantissa of the normalized float can store at least as many bit as the
+        sign_neg = std::signbit(f);
+
+        // if the mantissa of the float can store at least as many bit as the
         // mantissa of the supplied native data type, it has to be shifted by the
         // difference in widths (which may be zero!)
         if constexpr (ext_mant_width <= M)
@@ -222,13 +224,18 @@ public:
             // biases to the old exponent to get the old value
 
             // we need to make sure that inf/NaN remains the same
-            if (extracted_exp == decltype(extracted_exp)::all_ones())
+            if (extracted_exp == E_::all_ones())
             {
                 exponent = uinteger<E>::all_ones();
             }
+            // the other special case is for zero and denormalized numbers: the exponent has to
+            // remain zeroes only as well
+            else if (extracted_exp == E_::all_zeroes()) {
+                exponent = uinteger<E>::all_zeroes();
+            }
             else
             {
-
+                // no special case left -> we can adjust the exponent
                 constexpr IntegerExp smaller_bias =
                     uinteger<ext_exp_width - 1, WordType>::all_ones();
                 constexpr IntegerExp diff = sub(bias, smaller_bias);
@@ -240,28 +247,41 @@ public:
             // a smaller exponent means a lower bias, so we subtract the difference between the two
             // biases from the original bias
             // in case of over- or underflow we set the value to infinity or 0
-            // TODO handle denormalized numbers?
-            using OExp = uinteger<ext_exp_width + 1, WordType>;
-            constexpr OExp bigger_bias = uinteger<ext_exp_width - 1, WordType>::all_ones();
-            constexpr OExp smaller_bias = bias;
-            constexpr OExp diff = sub(bigger_bias, smaller_bias);
-            const auto exp = sub(OExp(extracted_exp), diff);
-            const bool overflow =
-                exp >= OExp(IntegerExp::all_ones()) && exp.bit(ext_exp_width) == 0;
-            const bool underflow = exp.bit(ext_exp_width) == 1;
-            if (underflow)
+
+
+            // we need to make sure that inf/NaN remains the same
+            if (extracted_exp == E_::all_ones())
             {
-                mantissa = mantissa.all_zeroes();
-                exponent = exponent.all_zeroes();
+                exponent = uinteger<E>::all_ones();
             }
-            else if (overflow)
-            {
-                mantissa = mantissa.all_zeroes();
-                exponent = exponent.all_ones();
+                // the other special case is for zero and denormalized numbers: the exponent has to
+                // remain zeroes only as well
+            else if (extracted_exp == E_::all_zeroes()) {
+                exponent = uinteger<E>::all_zeroes();
             }
-            else
-            {
-                exponent = width_cast<E>(exp);
+            else {
+                using OExp = uinteger<ext_exp_width + 1, WordType>;
+                constexpr OExp bigger_bias = uinteger<ext_exp_width - 1, WordType>::all_ones();
+                constexpr OExp smaller_bias = bias;
+                constexpr OExp diff = sub(bigger_bias, smaller_bias);
+                const auto exp = sub(OExp(extracted_exp), diff);
+                const bool overflow =
+                    exp >= OExp(IntegerExp::all_ones()) && exp.bit(ext_exp_width) == 0;
+                const bool underflow = exp.bit(ext_exp_width) == 1;
+                if (underflow)
+                {
+                    mantissa = mantissa.all_zeroes();
+                    exponent = exponent.all_zeroes();
+                }
+                else if (overflow)
+                {
+                    mantissa = mantissa.all_zeroes();
+                    exponent = exponent.all_ones();
+                }
+                else
+                {
+                    exponent = width_cast<E>(exp);
+                }
             }
         }
         else
@@ -342,7 +362,7 @@ public:
     [[nodiscard]] static constexpr normalized_float smallest_normalized()
     {
         constexpr normalized_float small_normalized(false, IntegerExp::one(),
-                                                    IntegerMant::all_zeroes());
+                                                    IntegerFrac::all_zeroes());
         return small_normalized;
     }
 
@@ -452,6 +472,18 @@ public:
         return sign_neg;
     }
 
+    /**
+     * @brief Returns whether the number is finite
+     *
+     * @note NaNs are *not* considered finite
+     *
+     * @return True iff the number is finite
+     */
+    [[nodiscard]] constexpr bool is_finite() const
+    {
+        return (exponent != uinteger<E>::all_ones());
+    }
+
     [[nodiscard]] constexpr bool is_inf() const
     {
         return exponent == uinteger<E>::all_ones() &&
@@ -468,11 +500,6 @@ public:
     {
         return sign_neg && exponent == uinteger<E>::all_ones() &&
                width_cast<M>(mantissa) == uinteger<M>::zero();
-    }
-
-    [[nodiscard]] constexpr bool is_finite() const
-    {
-        return exponent != uinteger<E>::all_ones();
     }
 
     /**
@@ -617,17 +644,23 @@ public:
     {
         const bool denormalized = (exponent == IntegerExp::all_zeroes());
         const bool exception = (exponent == IntegerExp::all_ones());
-
-        return !(denormalized || exception);
+        const bool result = !denormalized && !exception;
+        return result;
     }
 
     /**
-     * @brief Returns if the number is zero, denormalized, NaN, or Inf (i.e. not normal)
-     * @return True iff is the number is special (i.e. not normal)
+     * @brief Returns whether the number is denormalized
+     *
+     * @note Denormalized numbers do *not* include: NaN, +/- inf and, surprisingly, zero.
+     *
+     * @return True iff the number is denormalized
      */
-    [[nodiscard]] constexpr bool is_special() const
+    [[nodiscard]] constexpr bool is_denormalized() const
     {
-        return !is_normalized();
+        const bool denormalized = (exponent == IntegerExp::all_zeroes());
+        const bool exception = (exponent == IntegerExp::all_ones());
+        const bool result = denormalized && !exception;
+        return result;
     }
 
     /**
@@ -641,7 +674,17 @@ public:
     {
         const bool denormalized = exponent.is_zero();
         const bool not_zero = !mantissa.is_zero();
-        return denormalized && not_zero;
+        const bool result = denormalized && not_zero;
+        return result;
+    }
+
+    /**
+     * @brief Returns whether the number is denormalized or NaN/Inf
+     * @return True iff the number is denornmalized, infinite or a NaN
+     */
+    [[nodiscard]] constexpr bool is_special() const
+    {
+        return !is_normalized();
     }
 
     /**
@@ -673,6 +716,15 @@ public:
     {
         const auto tmp{as_word_array<ETarget, MTarget>(*this)};
         return normalized_float<ETarget, MTarget, WordType>{tmp};
+    }
+
+    [[nodiscard]] normalized_float<E, M> make_quiet_nan() const
+    {
+        auto nan_mantissa = mantissa;
+        nan_mantissa.set_bit(M - 1, static_cast<WordType>(1U));
+        const auto nan_exponent = uinteger<E>::all_ones();
+        normalized_float<E, M> nan{sign_neg, nan_exponent, nan_mantissa};
+        return nan;
     }
 
 private:
@@ -728,6 +780,14 @@ template <size_t E, size_t M, typename WordType> class is_unsigned<normalized_fl
 public:
     static constexpr bool value = false;
 };
+
+template <size_t E, size_t M1, size_t M2, typename WordType = uint64_t>
+auto bit_equal(const normalized_float<E, M1, WordType> lhs, const normalized_float<E, M2, WordType> rhs)
+    -> bool
+{
+    return lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent() &&
+           lhs.get_mantissa() == rhs.get_mantissa();
+}
 
 template <size_t E, size_t M1, size_t M2, typename WordType = uint64_t>
 auto equal_except_rounding(const normalized_float<E, M1, WordType> lhs,
@@ -871,43 +931,38 @@ auto rshift_and_round(const uinteger<M, WordType>& m, const size_t shift_by)
 template <size_t E, size_t M1, size_t M2 = M1, typename WordType = uint64_t>
 auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<E, M2, WordType>
 {
-    if (nf.is_inf() || nf.is_nan())
-    {
-        auto inf = normalized_float<E, M2, WordType>::pos_infinity();
-        inf.set_sign(nf.get_sign());
-        return inf;
-    }
-
     auto denormalized = nf;
 
-    auto exponent = denormalized.get_exponent();
+    auto exponent = width_cast<E + 1>(denormalized.get_exponent());
     auto mantissa = denormalized.get_full_mantissa();
 
-    auto one_at = find_leading_one(mantissa);
+    const auto one_at = first_set_bit(mantissa);
 
-    if (one_at > M1)
+    // i.e. there was no one in the mantissa at all
+    if (!one_at)
     {
+        // if mantissa is zero
         exponent = exponent.all_zeroes();
     }
-    else if (one_at >= M2)
+    else if (*one_at >= M2)
     {
-        auto shift_by = one_at - M2;
+        auto shift_by = *one_at - M2;
         mantissa = rshift_and_round(mantissa, shift_by);
         if (exponent == exponent.all_zeroes())
         {
-            exponent = add(exponent, uinteger<E, WordType>(shift_by + 1));
+            exponent = add(exponent, uinteger<E + 1, WordType>(shift_by + 1));
         }
         else
         {
-            exponent = add(exponent, uinteger<E, WordType>(shift_by));
+            exponent = add(exponent, uinteger<E + 1, WordType>(shift_by));
         }
     }
     else
     {
-        auto shift_by = M2 - one_at;
+        auto shift_by = M2 - *one_at;
         if (exponent != exponent.all_zeroes())
         {
-            if (exponent <= uinteger<E>(shift_by))
+            if (exponent <= uinteger<E + 1>(shift_by))
             {
                 // shift_by -= 1;
                 mantissa = (mantissa << (exponent.word(0) - 1));
@@ -916,66 +971,22 @@ auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<
             else
             {
                 mantissa = (mantissa << shift_by);
-                exponent = sub(exponent, uinteger<E, WordType>(shift_by));
+                exponent = sub(exponent, uinteger<E + 1, WordType>(shift_by));
             }
         }
     }
 
-    normalized_float<E, M2, WordType> normalized_float(denormalized.get_sign(), exponent,
-                                                       width_cast<M2 + 1>(mantissa));
+    normalized_float<E, M2, WordType> normalized(denormalized.get_sign(), width_cast<E>(exponent),
+                                                 width_cast<M2 + 1>(mantissa));
 
-    /*
-    normalized_float.set_sign(denormalized.get_sign());
-    normalized_float.set_exponent(exponent);
-    normalized_float.set_full_mantissa(width_cast<M2 + 1>(mantissa));
-    */
-
-    return normalized_float;
-}
-
-template <class uint> auto find_leading_one(const uint mantissa) -> typename uint::word_type
-{
-    static_assert(::aarith::is_integral_v<uint>);
-    static_assert(::aarith::is_unsigned_v<uint>);
-
-    const auto width = uint::width();
-    auto one_at = width;
-
-    for (auto i = uint::word_count(); i > 0; --i)
+    if (normalized.is_nan() || exponent.bit(E) == 1)
     {
-        if (mantissa.word(i - 1) == 0)
-        {
-            if (i == uint::word_count())
-            {
-                auto const modulo = width % (sizeof(typename uint::word_type) * 8);
-                one_at -= modulo == 0 ? sizeof(typename uint::word_type) * 8 : modulo;
-            }
-            else
-            {
-                one_at -= sizeof(typename uint::word_type) * 8;
-            }
-        }
-        else
-        {
-            break;
-        }
+        auto inf = normalized_float<E, M2, WordType>::pos_infinity();
+        inf.set_sign(normalized.get_sign());
+        return inf;
     }
 
-    while (one_at > 0)
-    {
-        --one_at;
-        if (mantissa.bit(one_at) == 1)
-        {
-            break;
-        }
-    }
-
-    if (one_at == 0 && mantissa.bit(0) == 0)
-    {
-        one_at = width;
-    }
-
-    return one_at;
+    return normalized;
 }
 
 // ironically, defining the functions below makes the implementation conform more to the standard
