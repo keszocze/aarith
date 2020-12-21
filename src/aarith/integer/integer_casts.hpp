@@ -46,6 +46,16 @@ template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
     }
 }
 
+/**
+ *
+ * @tparam Left
+ * @tparam Right
+ * @tparam W
+ * @tparam SourceWidth
+ * @tparam WordType
+ * @param source
+ * @return
+ */
 template <size_t Left, size_t Right, template <size_t, typename> class W, size_t SourceWidth,
     typename WordType>
 [[nodiscard]] constexpr auto expand(const W<SourceWidth, WordType>& source)
