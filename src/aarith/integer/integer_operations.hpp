@@ -1111,7 +1111,6 @@ template <typename Integer>
     return (a <= b) ? sub(b, a) : sub(a, b);
 }
 
-
 /**
  * @brief Left-shift assignment operator
  * @tparam W The word_container type to work on

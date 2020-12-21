@@ -565,7 +565,6 @@ constexpr W& rotate_through_carry_right(W& lhs, const bool carry_in, const size_
     return lhs;
 }
 
-
 /**
  * @brief Rotates the word_array to the right using a specified carry-in
  * @param lhs The word_array that will be rotated

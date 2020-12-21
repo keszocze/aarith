@@ -28,37 +28,36 @@ TEMPLATE_TEST_CASE_SIG("Floating point subtraction matches its native counterpar
     F res_native_{res_native};
     Native res_ = static_cast<Native>(res);
 
-//    if (!equal_except_rounding(res_native_, res))
-//    {
-//        std::cout << "a - b\n"
-//                  << to_binary(a) << " - \n"
-//                  << to_binary(b) << "\n"
-//                  << to_binary(res) << "(normalized_float) !=\n"
-//                  << to_binary(res_native_) << "(native)\n\n";
-//
-//        std::cout << a << " - " << b << " = " << res << "\n";
-//        std::cout << a_native << " - " << b_native << " = " << res_native << "\n";
-//        std::cout << to_binary(F{a_native}, true) << " - " << to_binary(F{b_native}, true) << "\n";
-//        std::cout << to_binary(a, true) << " - " << to_binary(b, true) << "\n";
-//
-//        std::bitset<32> bs_a = bit_cast<uint32_t>(a_native);
-//        std::bitset<32> bs_b = bit_cast<uint32_t>(b_native);
-//        std::cout << bs_a << " - " << bs_b << "\n";
-//
-//        std::cout << "\n";
-//        std::bitset<32> bs_res_native = bit_cast<uint32_t>(res_native);
-//        std::bitset<32> bs_res = bit_cast<uint32_t>(res_);
-//        std::cout << bs_res_native << " != \n" << bs_res << "\n";
-//        exit(0);
-//    }
+    //    if (!equal_except_rounding(res_native_, res))
+    //    {
+    //        std::cout << "a - b\n"
+    //                  << to_binary(a) << " - \n"
+    //                  << to_binary(b) << "\n"
+    //                  << to_binary(res) << "(normalized_float) !=\n"
+    //                  << to_binary(res_native_) << "(native)\n\n";
+    //
+    //        std::cout << a << " - " << b << " = " << res << "\n";
+    //        std::cout << a_native << " - " << b_native << " = " << res_native << "\n";
+    //        std::cout << to_binary(F{a_native}, true) << " - " << to_binary(F{b_native}, true) <<
+    //        "\n"; std::cout << to_binary(a, true) << " - " << to_binary(b, true) << "\n";
+    //
+    //        std::bitset<32> bs_a = bit_cast<uint32_t>(a_native);
+    //        std::bitset<32> bs_b = bit_cast<uint32_t>(b_native);
+    //        std::cout << bs_a << " - " << bs_b << "\n";
+    //
+    //        std::cout << "\n";
+    //        std::bitset<32> bs_res_native = bit_cast<uint32_t>(res_native);
+    //        std::bitset<32> bs_res = bit_cast<uint32_t>(res_);
+    //        std::cout << bs_res_native << " != \n" << bs_res << "\n";
+    //        exit(0);
+    //    }
 
     CHECK(equal_except_rounding(res_native_, res));
     REQUIRE(equal_except_rounding(F{res_}, F{res_native}));
 }
 
 TEMPLATE_TEST_CASE_SIG("Floating point subtraction involving zero",
-                       "[normalized_float][arithmetic][subtraction]",
-                       AARITH_FLOAT_TEST_SIGNATURE,
+                       "[normalized_float][arithmetic][subtraction]", AARITH_FLOAT_TEST_SIGNATURE,
                        AARIHT_FLOAT_TEMPLATE_RANGE)
 {
 

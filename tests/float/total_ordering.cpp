@@ -170,7 +170,8 @@ TEMPLATE_TEST_CASE_SIG("Total ordering with a two NaN values",
                 CHECK(totalOrder(nqNaN, nsNaN));
                 CHECK_FALSE(totalOrder(nsNaN, nqNaN));
             }
-            THEN("iii) otherwise, the order of NaNs is implementation-defined. (false in our case)") {
+            THEN("iii) otherwise, the order of NaNs is implementation-defined. (false in our case)")
+            {
                 CHECK_FALSE(totalOrder(psNaN, psNaN));
                 CHECK_FALSE(totalOrder(nsNaN, nsNaN));
                 CHECK_FALSE(totalOrder(nqNaN, nqNaN));
@@ -179,12 +180,6 @@ TEMPLATE_TEST_CASE_SIG("Total ordering with a two NaN values",
         }
     }
 }
-
-
-
-
-
-
 
 TEMPLATE_TEST_CASE_SIG("Total ordering mag +/- zero", "[normalized_float][comparison][utility]",
                        AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
