@@ -288,17 +288,25 @@ SCENARIO("Casting to a larger native data type does not change the value",
         float f = GENERATE(take(50, random<float>(std::numeric_limits<float>::min(),
                                                   std::numeric_limits<float>::max())));
 
+        float neg_f = -f;
+
         WHEN("Casting it to a normalized_float<8,23>")
         {
             F f_cast{f};
+            F f_neg_cast{neg_f};
 
             AND_THEN("Casting it to a double")
             {
-                double d = static_cast<double>(f_cast);
+                float d = static_cast<float>(f_cast);
+                float neg_d = static_cast<float>(f_neg_cast);
 
                 THEN("The value should not have changed")
                 {
                     REQUIRE(f == d);
+                    REQUIRE(neg_f == neg_d);
+                    REQUIRE(-f == neg_d);
+                    REQUIRE(-d == neg_d);
+                    REQUIRE(-f == neg_f);
                 }
             }
         }

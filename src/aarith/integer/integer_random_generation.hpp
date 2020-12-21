@@ -57,7 +57,6 @@ private:
 
 /**
  * Implements random number generation interface similar to std::uniform_int_distribution.
- * @note the interval returned is
  */
 template <size_t BitWidth, typename WordType = uint64_t> class uniform_integer_distribution
 {
