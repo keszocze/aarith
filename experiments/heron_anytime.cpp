@@ -96,62 +96,79 @@ int main(int argc, char** argv)
 {
     using namespace aarith;
 
+    // change to 'true' for the full range of experiments
+    // greatly increases compilation time
+    static constexpr bool full_experiments = false;
+
     constexpr size_t value_iter = 8800;
     constexpr int starting_value = 65;
 
     compare_heron<starting_value, value_iter, 1, 22>();
     compare_heron<starting_value, value_iter, 2, 22>();
-    compare_heron<starting_value, value_iter, 3, 22>();
-    compare_heron<starting_value, value_iter, 4, 22>();
-    compare_heron<starting_value, value_iter, 5, 22>();
-    compare_heron<starting_value, value_iter, 6, 22>();
-    compare_heron<starting_value, value_iter, 7, 22>();
-    compare_heron<starting_value, value_iter, 10, 22>();
-    compare_heron<starting_value, value_iter, 100, 22>();
-    compare_heron<starting_value, value_iter, 1000, 22>();
-    compare_heron<starting_value, value_iter, 2000, 22>();
+
+
+    if constexpr (full_experiments) // NOLINT
+    {
+        compare_heron<starting_value, value_iter, 3, 22>();
+        compare_heron<starting_value, value_iter, 4, 22>();
+        compare_heron<starting_value, value_iter, 5, 22>();
+        compare_heron<starting_value, value_iter, 6, 22>();
+        compare_heron<starting_value, value_iter, 7, 22>();
+        compare_heron<starting_value, value_iter, 10, 22>();
+        compare_heron<starting_value, value_iter, 100, 22>();
+        compare_heron<starting_value, value_iter, 1000, 22>();
+        compare_heron<starting_value, value_iter, 2000, 22>();
+    }
 
     constexpr size_t heron_iter = 5;
     compare_heron<starting_value, value_iter, heron_iter, 6>();
-    compare_heron<starting_value, value_iter, heron_iter, 7>();
-    compare_heron<starting_value, value_iter, heron_iter, 8>();
-    compare_heron<starting_value, value_iter, heron_iter, 9>();
-    compare_heron<starting_value, value_iter, heron_iter, 10>();
-    compare_heron<starting_value, value_iter, heron_iter, 11>();
-    compare_heron<starting_value, value_iter, heron_iter, 12>();
-    compare_heron<starting_value, value_iter, heron_iter, 13>();
-    compare_heron<starting_value, value_iter, heron_iter, 14>();
-    compare_heron<starting_value, value_iter, heron_iter, 15>();
-    compare_heron<starting_value, value_iter, heron_iter, 16>();
-    compare_heron<starting_value, value_iter, heron_iter, 17>();
-    compare_heron<starting_value, value_iter, heron_iter, 18>();
-    compare_heron<starting_value, value_iter, heron_iter, 19>();
-    compare_heron<starting_value, value_iter, heron_iter, 20>();
-    compare_heron<starting_value, value_iter, heron_iter, 21>();
-    compare_heron<starting_value, value_iter, heron_iter, 22>();
-    compare_heron<starting_value, value_iter, heron_iter, 23>();
-    compare_heron<starting_value, value_iter, heron_iter, 24>();
+
+    if constexpr (full_experiments) // NOLINT
+    {
+        compare_heron<starting_value, value_iter, heron_iter, 7>();
+        compare_heron<starting_value, value_iter, heron_iter, 8>();
+        compare_heron<starting_value, value_iter, heron_iter, 9>();
+        compare_heron<starting_value, value_iter, heron_iter, 10>();
+        compare_heron<starting_value, value_iter, heron_iter, 11>();
+        compare_heron<starting_value, value_iter, heron_iter, 12>();
+        compare_heron<starting_value, value_iter, heron_iter, 13>();
+        compare_heron<starting_value, value_iter, heron_iter, 14>();
+        compare_heron<starting_value, value_iter, heron_iter, 15>();
+        compare_heron<starting_value, value_iter, heron_iter, 16>();
+        compare_heron<starting_value, value_iter, heron_iter, 17>();
+        compare_heron<starting_value, value_iter, heron_iter, 18>();
+        compare_heron<starting_value, value_iter, heron_iter, 19>();
+        compare_heron<starting_value, value_iter, heron_iter, 20>();
+        compare_heron<starting_value, value_iter, heron_iter, 21>();
+        compare_heron<starting_value, value_iter, heron_iter, 22>();
+        compare_heron<starting_value, value_iter, heron_iter, 23>();
+        compare_heron<starting_value, value_iter, heron_iter, 24>();
+    }
 
     constexpr size_t heron_iter_15 = 15;
     compare_heron<starting_value, value_iter, heron_iter_15, 6>();
     compare_heron<starting_value, value_iter, heron_iter_15, 7>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 8>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 9>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 10>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 11>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 12>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 13>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 14>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 15>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 16>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 17>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 18>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 19>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 20>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 21>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 22>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 23>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 24>();
+
+    if constexpr (full_experiments) // NOLINT
+    {
+        compare_heron<starting_value, value_iter, heron_iter_15, 8>();
+        compare_heron<starting_value, value_iter, heron_iter_15, 9>();
+        compare_heron<starting_value, value_iter, heron_iter_15, 10>();
+        compare_heron<starting_value, value_iter, heron_iter_15, 11>();
+        compare_heron<starting_value, value_iter, heron_iter_15, 12>();
+        compare_heron<starting_value, value_iter, heron_iter_15, 13>();
+        compare_heron<starting_value, value_iter, heron_iter_15, 14>();
+        compare_heron<starting_value, value_iter, heron_iter_15, 15>();
+        compare_heron<starting_value, value_iter, heron_iter_15, 16>();
+        compare_heron<starting_value, value_iter, heron_iter_15, 17>();
+        compare_heron<starting_value, value_iter, heron_iter_15, 18>();
+        compare_heron<starting_value, value_iter, heron_iter_15, 19>();
+        compare_heron<starting_value, value_iter, heron_iter_15, 20>();
+        compare_heron<starting_value, value_iter, heron_iter_15, 21>();
+        compare_heron<starting_value, value_iter, heron_iter_15, 22>();
+        compare_heron<starting_value, value_iter, heron_iter_15, 23>();
+        compare_heron<starting_value, value_iter, heron_iter_15, 24>();
+    }
 
     return 0;
 }
