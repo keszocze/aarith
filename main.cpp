@@ -5,13 +5,18 @@
 
 int main()
 {
-    using aarith::uinteger;
+    using namespace aarith;
 
-    uint64_t a = 10, b=20;
-    uinteger<64> a_=10, b_=20;
-    std::cout << "a+b=" << (a+b) << "\n";
-    std::cout << "a_+b_=" << (a_+b_) << "\n";
+    using I16 = integer<16>;
+    using U16 = uinteger<16>;
+
+    I16 word;
+    U16 other_word, shift;
+
+    I16 shifted_size_t = word << size_t(45);
+    I16 shifted = word << shift;
+    U16 shifted_ = other_word << shift;
+    (void) shifted;
 
     return 0;
 }
-
