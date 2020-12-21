@@ -26,12 +26,12 @@ public:
 
     // Constructor for unsigned ints that are *not* the WordType
     template <typename Val, typename = std::enable_if_t<::aarith::is_unsigned_int<Val> &&
-                                                        (sizeof(Val) * 8) <= Width>>
+                                                        (sizeof(Val) * CHAR_BIT) <= Width>>
     constexpr explicit uinteger(Val n)
         : word_array<Width, WordType>(0U)
     {
 
-        constexpr size_t size_of_val = sizeof(Val) * 8;
+        constexpr size_t size_of_val = sizeof(Val) * CHAR_BIT;
         constexpr size_t word_size = uinteger<Width, WordType>::word_width();
 
         if constexpr (size_of_val <= word_size)
@@ -58,13 +58,13 @@ public:
     }
 
     template <size_t V>
-    constexpr uinteger<Width, WordType>(const uinteger<V, WordType>& other)
+    constexpr uinteger<Width, WordType>(const uinteger<V, WordType>& other) // NOLINT
         : word_array<Width, WordType>(width_cast<Width, V, WordType>(other))
     {
     }
 
     template <size_t V>
-    constexpr uinteger<Width, WordType>(const word_array<V, WordType>& other)
+    constexpr uinteger<Width, WordType>(const word_array<V, WordType>& other) // NOLINT
         : word_array<Width, WordType>(other)
     {
     }
@@ -246,7 +246,7 @@ public:
     }
 
     template <typename T, typename = std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>>>
-    explicit constexpr integer(T t)
+    explicit constexpr integer(T t) // NOLINT
         : word_array<Width, WordType>(static_cast<WordType>(t))
     {
         if (t < 0)
@@ -267,19 +267,19 @@ public:
     }
 
     template <class... Args>
-    constexpr integer(WordType fst, Args... args)
+    constexpr explicit integer(WordType fst, Args... args)
         : word_array<Width, WordType>(fst, args...)
     {
     }
 
     template <size_t V>
-    constexpr integer<Width, WordType>(const integer<V, WordType>& other)
+    constexpr integer<Width, WordType>(const integer<V, WordType>& other) // NOLINT
         : word_array<Width, WordType>(width_cast<Width, V, WordType>(other))
     {
     }
 
     template <size_t V>
-    constexpr integer<Width, WordType>(const word_array<V, WordType>& other)
+    constexpr integer<Width, WordType>(const word_array<V, WordType>& other) // NOLINT
         : word_array<Width, WordType>(width_cast<Width, V, WordType>(other))
     {
     }
@@ -379,7 +379,7 @@ public:
     static constexpr int digits = W; // TODO what happens if W > max_int?
     static constexpr int digits10 =
         ::aarith::ceil<int>(std::numeric_limits<::aarith::uinteger<W>>::digits *
-                            ::aarith::log<10, 2>()) -
+                            ::aarith::log<10, 2>()) - // NOLINT
         1;
 
     // weird decision but https://en.cppreference.com/w/cpp/types/numeric_limits/max_digits10 says

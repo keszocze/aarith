@@ -26,25 +26,70 @@ constexpr size_t count_leading_zeroes(const word_array<Width, WordType>& value)
 }
 
 /**
+ * @brief  Counts the number of bits set to one before the first zero appears (from MSB to LSB)
+ * @tparam Width Width of the word_array
+ * @param value The word to count the leading ones in
+ * @return
+ */
+template <size_t Width, typename WordType>
+constexpr size_t count_leading_ones(const word_array<Width, WordType>& value)
+{
+    for (auto i = Width; i > 0; --i)
+    {
+        if (!value.bit(i - 1))
+        {
+            return (Width - i);
+        }
+    }
+    return Width;
+}
+
+/**
  * @brief Computes the position of the first set bit (i.e. a bit set to one) in the word_array from
- * MSB to LSB
+ * MSB to LSB and returns an empty optional if the word_array contains zeroes only.
  *
  * @tparam Width Width of the word_array
  * @param value The word_array whose first set bit should be found
  * @return The index of the first set bit in value
  */
 template <size_t Width, typename WordType>
-size_t first_set_bit(const word_array<Width, WordType>& value)
+std::optional<size_t> first_set_bit(const word_array<Width, WordType>& value)
 {
-    size_t first_bit = 0UL;
+    const size_t leading_zeroes = count_leading_zeroes(value);
 
-    // we have the operator bool checking whether (value >> first_bit) != 0
-    while (value >> first_bit)
+    if (leading_zeroes == Width)
     {
-        ++first_bit;
+        return std::nullopt;
     }
-    return first_bit;
+    else
+    {
+        return Width - (leading_zeroes + 1);
+    }
 }
+
+/**
+ * @brief Computes the index of the first unset bit (i.e. a bit set to zero) in the word_array from
+ * MSB to LSB and returns an empty optional if the word_array contains ones only.
+ *
+ * @tparam Width Width of the word_array
+ * @param value The word_array whose first set bit should be found
+ * @return The index of the first set bit in value
+ */
+template <size_t Width, typename WordType>
+std::optional<size_t> first_unset_bit(const word_array<Width, WordType>& value)
+{
+    const size_t leading_ones = count_leading_ones(value);
+
+    if (leading_ones == Width)
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        return Width - (leading_ones + 1);
+    }
+}
+
 
 /**
  * @brief Sets the most significant bit to one
@@ -57,7 +102,6 @@ size_t first_set_bit(const word_array<Width, WordType>& value)
 template <template <size_t, typename> class W, size_t V, typename WordType = uint64_t>
 [[nodiscard]] constexpr W<V, WordType> msb_one(const W<V, WordType>& w)
 {
-
     constexpr W<V, WordType> msbone{word_array<V, WordType>::msb_one()};
     return (w | msbone);
 }
@@ -124,5 +168,6 @@ split(const word_array<W, WordType>& w)
 
     return std::make_pair(lhs, rhs);
 }
+
 
 } // namespace aarith

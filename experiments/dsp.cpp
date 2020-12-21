@@ -78,7 +78,7 @@ bool test_single_packing(const aint4& w1, const aint4& w2, const auint4& a1, con
 
 void test_packing()
 {
-    for (aint4 w1 : integer_range<aint4>(aint4::min(), 6))
+    for (aint4 w1 : integer_range<aint4>(aint4::min(), aint4{6}))
     {
         std::cout << w1 << "\n";
     }

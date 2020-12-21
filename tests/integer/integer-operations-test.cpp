@@ -848,27 +848,30 @@ TEMPLATE_TEST_CASE_SIG("Invariants for the signed integer division",
                 REQUIRE(div(a, I::one()) == a);
             }
         }
-        WHEN("Dividing the number by a larger number")
+        WHEN("Dividing the number by a larger number (in absolute terms)")
         {
             THEN("The result should be zero")
             {
-                if (a != I::max())
+
+                if (a.is_negative())
                 {
-                    const I c = add(a, I::one());
-                    if (c != I::zero() && c != I::one() && c != -I::one())
+                    if (a != I::min())
                     {
-                        if (c.is_negative())
+                        const I c = sub(a, I::one());
+                        if (div(a, c) != I::zero())
                         {
-                            // flaky test, I need to find out, why this fails from time to time
-                            // it *should* have been the missing test for max() above
-                            if (div(a, c) != I::one())
-                            {
-                                std::cout << a << " / " << c << " = " << div(a, c)
-                                          << " != " << I::one() << "\n";
-                            }
-                            REQUIRE(div(a, c) == I::one());
+                            std::cout << a << "/" << c << " == " << div(a, c) << " should be 1"
+                                      << "\n";
                         }
-                        else
+                        REQUIRE(div(a, c) == I::zero());
+                    }
+                }
+                else
+                {
+                    if (a != I::max())
+                    {
+                        const I c = add(a, I::one());
+                        if (c != I::one())
                         {
                             REQUIRE(div(a, c) == I::zero());
                         }
@@ -908,6 +911,7 @@ SCENARIO("Multiplying signed integers using Booth's algorithm",
                     static constexpr auto res_inplace = booth_inplace_expanding_mul(m, r);
 
                     static constexpr R expected{-12};
+
                     CHECK(res == expected);
                     CHECK(res == res_inplace);
                     REQUIRE(res == res_naive);
