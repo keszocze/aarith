@@ -197,22 +197,7 @@ public:
     }
 };
 
-//template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
-//[[nodiscard]] auto constexpr width_cast(const uinteger<SourceWidth, WordType>& source)
-//    -> uinteger<DestinationWidth, WordType>
-//{
-//    if constexpr (DestinationWidth == SourceWidth)
-//    {
-//        return source;
-//    }
-//    else
-//    {
-//        word_array<DestinationWidth, WordType> result =
-//            width_cast<DestinationWidth, SourceWidth, WordType>(
-//                static_cast<word_array<SourceWidth, WordType>>(source));
-//        return uinteger<DestinationWidth, WordType>{result};
-//    }
-//}
+
 /*
  * Traits
  */

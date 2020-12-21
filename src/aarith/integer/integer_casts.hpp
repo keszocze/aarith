@@ -7,49 +7,6 @@ namespace aarith {
 
 
 /**
- *
- * @brief Expands/shrinks the bit width of the integer
- *
- * The value of the integer remains unchanged if the bit width is increased.
- *
- * @note Reducing the bit width performs a hard truncation. This means that the sign of the integer
- * might change as a result of this operation. This might be surprising in some situations.
- *
- * @tparam DestinationWidth The width to which the input is expanded/shrunk
- * @tparam SourceWidth The input width of the integer
- * @param source The integer that whose width is changed
- * @return integer with specified bit width
- */
-template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
-[[nodiscard]] constexpr auto width_cast(const integer<SourceWidth, WordType>& source)
--> integer<DestinationWidth, WordType>
-{
-    word_array<DestinationWidth, WordType> result =
-        width_cast<DestinationWidth>(
-            static_cast<word_array<SourceWidth, WordType>>(source));
-    if constexpr (DestinationWidth > SourceWidth)
-    {
-        const bool is_negative = source.is_negative();
-
-        if (is_negative)
-        {
-            for (size_t i = SourceWidth; i < DestinationWidth; ++i)
-            {
-                result.set_bit(i);
-            }
-        }
-        return integer<DestinationWidth, WordType>{result};
-    }
-    else
-    {
-        return integer<DestinationWidth, WordType>{result};
-    }
-}
-
-
-
-
-/**
  * @brief Performs a runtime-checked conversion.
  *
  * @warning The conversion will throw a runtime exception of the value does not fit into the desired

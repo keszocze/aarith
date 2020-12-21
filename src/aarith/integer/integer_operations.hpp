@@ -962,8 +962,8 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
         Q = negate(Q);
     }
 
-    Integer Q_cast = width_cast<W, W + 1, WordType>(Q);
-    Integer remainder_cast = width_cast<W, W + 1, WordType>(remainder_);
+    Integer Q_cast = width_cast<W>(Q);
+    Integer remainder_cast = width_cast<W>(remainder_);
 
     if (numerator.is_negative())
     {

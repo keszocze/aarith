@@ -269,9 +269,6 @@ TEMPLATE_TEST_CASE_SIG("Investigating the comparison of max and min values",
         integer<W + 1, WordType> min_= T::min();
         integer<W + 1, WordType> max_ = T::max();
 
-        std::cout << width_cast<W+1>(min) << "\n";
-        std::cout << width_cast<W+1>(min) << "\n";
-
         THEN("min should be negative")
         {
             CHECK(min_.is_negative());

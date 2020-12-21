@@ -7,9 +7,10 @@ namespace aarith {
 
 /**
  *
- * @brief Expands/shrinks the bit width of a word_array or unsigned integer
+ * @brief Expands/shrinks the bit width of a word_array or (unsigned) integer
  *
- * The value of an integer remains unchanged if the bit width is increased.
+ * @note Expanding a negative signed number will change the stored value as the negative sign is
+ * lost.
  *
  * @note Reducing the bit width performs a hard truncation.
  *
@@ -19,12 +20,12 @@ namespace aarith {
  * @return integer with specified bit width
  */
 template <size_t DestinationWidth, template <size_t, typename> typename Container,
-          size_t SourceWidth, typename WordType,
-          typename = std::enable_if_t<is_word_array_v<Container<DestinationWidth, WordType>> &&
-                                      !is_signed_v<Container<DestinationWidth, WordType>>>>
-[[nodiscard]] auto constexpr width_cast(const Container<SourceWidth, WordType>& source)
+          size_t SourceWidth, typename WordType>
+[[nodiscard]] auto constexpr logical_width_cast_left(const Container<SourceWidth, WordType>& source)
     -> Container<DestinationWidth, WordType>
 {
+
+    static_assert(is_word_array_v<Container<SourceWidth, WordType>>);
 
     if constexpr (SourceWidth == DestinationWidth)
     {
@@ -54,6 +55,82 @@ template <size_t DestinationWidth, template <size_t, typename> typename Containe
 
 /**
  *
+ * @brief Expands/shrinks the bit width of a word_array or (unsigned) integer
+ *
+ *
+ * The first bit (i.e. the MSB) will be used to fill the new bits in case of extenting the width of
+ * the source. This means that for signed integers, the value of the number remains the same.
+ *
+ * @note Reducing the bit width performs a hard truncation.
+ *
+ * @tparam DestinationWidth The width to which the input is expanded/shrunk
+ * @tparam SourceWidth The input width of the integer
+ * @param source The integer that whose width is changed
+ * @return integer with specified bit width
+ */
+template <size_t DestinationWidth, template <size_t, typename> typename Container,
+          size_t SourceWidth, typename WordType>
+[[nodiscard]] auto constexpr arithmetic_width_cast_left(
+    const Container<SourceWidth, WordType>& source) -> Container<DestinationWidth, WordType>
+{
+
+    static_assert(is_word_array_v<Container<SourceWidth, WordType>>);
+
+    using D = Container<DestinationWidth, WordType>;
+
+    word_array<DestinationWidth, WordType> result =
+        logical_width_cast_left<DestinationWidth, word_array>(source);
+
+    if constexpr (DestinationWidth > SourceWidth)
+    {
+        const bool is_negative = source.msb();
+
+        if (is_negative)
+        {
+            for (size_t i = SourceWidth; i < DestinationWidth; ++i)
+            {
+                result.set_bit(i);
+            }
+        }
+        return D{result};
+    }
+    else
+    {
+        return D{result};
+    }
+}
+
+/**
+ *
+ * @brief Expands/shrinks the bit width of a word_array or (unsigned) integer
+ *
+ * The value of an integer remains unchanged if the bit width is increased.
+ *
+ * @note Reducing the bit width performs a hard truncation.
+ *
+ * @tparam DestinationWidth The width to which the input is expanded/shrunk
+ * @tparam SourceWidth The input width of the integer
+ * @param source The integer that whose width is changed
+ * @return integer with specified bit width
+ */
+template <size_t DestinationWidth, template <size_t, typename> typename Container,
+          size_t SourceWidth, typename WordType,
+          typename = std::enable_if_t<is_word_array_v<Container<DestinationWidth, WordType>>>>
+[[nodiscard]] auto constexpr width_cast(const Container<SourceWidth, WordType>& source)
+    -> Container<DestinationWidth, WordType>
+{
+    if constexpr (is_signed_v<Container<SourceWidth, WordType>>)
+    {
+        return arithmetic_width_cast_left<DestinationWidth, Container, SourceWidth, WordType>(source);
+    }
+    else
+    {
+        return logical_width_cast_left<DestinationWidth, Container, SourceWidth, WordType>(source);
+    }
+}
+
+/**
+ *
  * @brief Expands/shrinks the bit width of a word_array or unsigned integer from the right
  *
  * The value of an integer remains unchanged if the bit width is increased.
@@ -65,9 +142,11 @@ template <size_t DestinationWidth, template <size_t, typename> typename Containe
  * @param source The integer that whose width is changed
  * @return integer with specified bit width
  */
-template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
-[[nodiscard]] auto constexpr width_cast_right(const word_array<SourceWidth, WordType>& source)
-    -> word_array<DestinationWidth, WordType>
+template <size_t DestinationWidth, template <size_t, typename> typename Container,
+    size_t SourceWidth, typename WordType,
+    typename = std::enable_if_t<is_word_array_v<Container<DestinationWidth, WordType>>>>
+[[nodiscard]] auto constexpr width_cast_right(const Container<SourceWidth, WordType>& source)
+    -> Container<DestinationWidth, WordType>
 {
     if constexpr (SourceWidth == DestinationWidth)
     {
@@ -75,23 +154,19 @@ template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
     }
     else
     {
-        word_array<DestinationWidth, WordType> word_container;
+        Container<DestinationWidth, WordType> result;
 
         if constexpr (DestinationWidth >= SourceWidth)
         {
-            for (auto i = 0U; i < source.word_count(); ++i)
-            {
-                word_container.set_word(i, source.word(i));
-            }
+            result=source;
+            result <<= (DestinationWidth-SourceWidth);
         }
         else
         {
-            for (auto i = 0U; i < word_container.word_count(); ++i)
-            {
-                word_container.set_word(i, source.word(i));
-            }
+            source >>= (SourceWidth-DestinationWidth);
+            result=width_cast<DestinationWidth>(source);
         }
-        return word_container;
+        return result;
     }
 }
 
