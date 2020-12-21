@@ -1,13 +1,12 @@
 #include <aarith/float.hpp>
 #include <aarith/integer.hpp>
+#include <cmath>
 #include <iostream>
-#include <numeric>
-#include <vector>
-
 
 int main()
 {
-    using namespace aarith;
+    using aarith::uinteger;
+
     uint64_t a = 10, b=20;
     uinteger<64> a_=10, b_=20;
     std::cout << "a+b=" << (a+b) << "\n";
@@ -15,3 +14,4 @@ int main()
 
     return 0;
 }
+

@@ -302,10 +302,12 @@ template <typename F> struct bit_cast_to_type_trait;
 template <> struct bit_cast_to_type_trait<float>
 {
     using type = uint32_t;
+    static constexpr size_t width = 32;
 };
 template <> struct bit_cast_to_type_trait<double>
 {
     using type = uint64_t;
+    static constexpr size_t width = 64;
 };
 
 } // namespace float_extraction_helper
@@ -343,5 +345,6 @@ inline constexpr auto extract_mantissa(F num)
 
     return uinteger<mantissa_width, Wordtype>{mantissa};
 }
+
 
 } // namespace aarith

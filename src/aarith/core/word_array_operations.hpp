@@ -2,6 +2,7 @@
 
 #include <aarith/core/traits.hpp>
 #include <aarith/core/word_array.hpp>
+#include <optional>
 
 namespace aarith {
 
@@ -90,24 +91,68 @@ constexpr size_t count_leading_zeroes(const word_array<Width, WordType>& value)
 }
 
 /**
+ * @brief  Counts the number of bits set to one before the first zero appears (from MSB to LSB)
+ * @tparam Width Width of the word_array
+ * @param value The word to count the leading ones in
+ * @return
+ */
+template <size_t Width, typename WordType>
+constexpr size_t count_leading_ones(const word_array<Width, WordType>& value)
+{
+    for (auto i = Width; i > 0; --i)
+    {
+        if (!value.bit(i - 1))
+        {
+            return (Width - i);
+        }
+    }
+    return Width;
+}
+
+/**
  * @brief Computes the position of the first set bit (i.e. a bit set to one) in the word_array from
- * MSB to LSB
+ * MSB to LSB and returns an empty optional if the word_array contains zeroes only.
  *
  * @tparam Width Width of the word_array
  * @param value The word_array whose first set bit should be found
  * @return The index of the first set bit in value
  */
 template <size_t Width, typename WordType>
-size_t first_set_bit(const word_array<Width, WordType>& value)
+std::optional<size_t> first_set_bit(const word_array<Width, WordType>& value)
 {
-    size_t first_bit = 0UL;
+    const size_t leading_zeroes = count_leading_zeroes(value);
 
-    // we have the operator bool checking whether (value >> first_bit) != 0
-    while (value >> first_bit)
+    if (leading_zeroes == Width)
     {
-        ++first_bit;
+        return std::nullopt;
     }
-    return first_bit;
+    else
+    {
+        return Width - (leading_zeroes + 1);
+    }
+}
+
+/**
+ * @brief Computes the index of the first unset bit (i.e. a bit set to zero) in the word_array from
+ * MSB to LSB and returns an empty optional if the word_array contains ones only.
+ *
+ * @tparam Width Width of the word_array
+ * @param value The word_array whose first set bit should be found
+ * @return The index of the first set bit in value
+ */
+template <size_t Width, typename WordType>
+std::optional<size_t> first_unset_bit(const word_array<Width, WordType>& value)
+{
+    const size_t leading_ones = count_leading_ones(value);
+
+    if (leading_ones == Width)
+    {
+        return std::nullopt;
+    }
+    else
+    {
+        return Width - (leading_ones + 1);
+    }
 }
 
 /**
@@ -425,6 +470,15 @@ bit_range(const word_array<W, WordType>& w)
     return width_cast<(S - E) + 1, W, WordType>(w >> E);
 }
 
+/**
+ * @brief Concatenates two word_arrays.
+ * @tparam W Width of the first word_array  w
+ * @tparam V Width of the second word_array v
+ * @tparam WordType The underlying data type to store the word_array data in
+ * @param w First word_array
+ * @param v Second word_array
+ * @return Word array of length W+V containing the data <w,v>
+ */
 template <size_t W, size_t V, typename WordType>
 word_array<W + V, WordType> concat(const word_array<W, WordType>& w,
                                    const word_array<V, WordType>& v)
@@ -457,7 +511,10 @@ split(const word_array<W, WordType>& w)
 
 /**
  * @brief Rotates the word_array to the left using a specified carry-in
- * @tparam W
+ * @param lhs The word_array that will be rotated
+ * @param carry_in The initial carry that will be used in the rotation
+ * @param rotate_by By how many bits the word_array will be rotated
+ * @tparam W word_array type
  */
 template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
 constexpr W& rotate_through_carry_left(W& lhs, const bool carry_in, const size_t rotate = 1)
@@ -474,68 +531,78 @@ constexpr W& rotate_through_carry_left(W& lhs, const bool carry_in, const size_t
 
 /**
  * @brief Rotates the word_array to the left using a specified carry-in
- * @tparam W
+ * @param lhs The word_array that will be rotated
+ * @param carry_in The initial carry that will be used in the rotation
+ * @param rotate_by By how many bits the word_array will be rotated
+ * @tparam W word_array type
+ * @tparam U uinteger type
  */
 template <typename W, typename U,
           typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
-constexpr W& rotate_through_carry_left(W& lhs, const bool carry_in, const U& rotate = U::one())
+constexpr W& rotate_through_carry_left(W& lhs, const bool carry_in, const U& rotate_by = U::one())
 {
 
-    return rotate_through_carry_left(lhs, carry_in, static_cast<size_t>(rotate));
+    return rotate_through_carry_left(lhs, carry_in, static_cast<size_t>(rotate_by));
 }
 
 /**
  * @brief Rotates the word_array to the right using a specified carry-in
- * @tparam W
+ * @param lhs The word_array that will be rotated
+ * @param carry_in The initial carry that will be used in the rotation
+ * @param rotate_by By how many bits the word_array will be rotated
+ * @tparam W word_array type
  */
 template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
-constexpr W& rotate_through_carry_right(W& lhs, const bool carry_in, const size_t rotate = 1)
+constexpr W& rotate_through_carry_right(W& lhs, const bool carry_in, const size_t rotate_by = 1)
 {
 
-    const size_t left_shift = lhs.width() - (rotate - 1);
+    const size_t left_shift = lhs.width() - (rotate_by - 1);
     auto slice = lhs << left_shift;
-    slice.set_bit(lhs.width() - rotate, carry_in);
-    lhs >>= rotate;
+    slice.set_bit(lhs.width() - rotate_by, carry_in);
+    lhs >>= rotate_by;
     lhs |= slice;
 
     return lhs;
 }
 
+
 /**
  * @brief Rotates the word_array to the right using a specified carry-in
- * @tparam W
+ * @param lhs The word_array that will be rotated
+ * @param carry_in The initial carry that will be used in the rotation
+ * @param rotate_by By how many bits the word_array will be rotated
+ * @tparam W word_array type
+ * @tparam U uinteger type
  */
 template <typename W, typename U,
           typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
-constexpr W& rotate_through_carry_right(W& lhs, const bool carry_in, const U& rotate = U::one())
+constexpr W& rotate_through_carry_right(W& lhs, const bool carry_in, const U& rotate_by = U::one())
 {
-    return rotate_through_carry_right(lhs, carry_in, static_cast<size_t>(rotate));
+    return rotate_through_carry_right(lhs, carry_in, static_cast<size_t>(rotate_by));
 }
 
 /**
  * @brief Rotates the word_array to the left
  *
- * This shift preserves the signedness of the integer.
- *
- * @tparam Width The width of the signed integer
- * @param lhs The integer to be shifted
- * @param rhs The number of bits to be shifted
+ * @tparam W The data type that is to be rotated
+ * @param lhs The word_array to be rotated
+ * @param rotate_by The number of bits to be rotated by
  * @return The shifted integer
  */
 template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
-constexpr W& rotate_left(W& lhs, size_t rotate = 1)
+constexpr W& rotate_left(W& lhs, const size_t rotate_by = 1)
 {
 
-    // TODO offer this as a compile-time optimized version?
+    // TODO (keszocze) offer this as a compile-time optimized version?
     //    constexpr size_t width = W::width();
     //    const auto slice = bit_range<width-1, width-R>(lhs);
     //
     //    lhs <<= R;
     //    lhs.set_bits(0, slice);
 
-    const size_t right_shift = lhs.width() - rotate;
+    const size_t right_shift = lhs.width() - rotate_by;
     const auto slice = lhs >> right_shift;
-    lhs <<= rotate;
+    lhs <<= rotate_by;
     lhs |= slice;
 
     return lhs;
@@ -544,36 +611,32 @@ constexpr W& rotate_left(W& lhs, size_t rotate = 1)
 /**
  * @brief Rotates the word_array to the left
  *
- * This shift preserves the signedness of the integer.
- *
- * @tparam Width The width of the signed integer
- * @param lhs The integer to be shifted
- * @param rhs The number of bits to be shifted
- * @return The shifted integer
+ * @tparam W The data type that is to be rotated
+ * @param lhs The word_array to be rotated
+ * @param rotate_by The number of bits to be rotated by
+ * @return The rotated word_array
  */
 template <typename W, typename U,
           typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
-constexpr W& rotate_left(W& lhs, const U& rotate = U::one())
+constexpr W& rotate_left(W& lhs, const U& rorate_by = U::one())
 {
-    return rotate_left(lhs, static_cast<size_t>(rotate));
+    return rotate_left(lhs, static_cast<size_t>(rorate_by));
 }
 
 /**
  * @brief Rotates the word_array to the right
  *
- * This shift preserves the signedness of the integer.
- *
- * @tparam Width The width of the signed integer
- * @param lhs The integer to be shifted
- * @param rhs The number of bits to be shifted
+ * @tparam W The data type that is to be rotated
+ * @param lhs The word_array to be rotated
+ * @param rotate_by The number of bits to be rotated by
  * @return The shifted integer
  */
 template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
-constexpr W& rotate_right(W& lhs, size_t rotate = 1)
+constexpr W& rotate_right(W& lhs, const size_t rotate_by = 1)
 {
-    const size_t left_shift = lhs.width() - rotate;
+    const size_t left_shift = lhs.width() - rotate_by;
     const auto slice = lhs << left_shift;
-    lhs >>= rotate;
+    lhs >>= rotate_by;
     lhs |= slice;
 
     return lhs;
@@ -584,22 +647,23 @@ constexpr W& rotate_right(W& lhs, size_t rotate = 1)
  *
  * This shift preserves the signedness of the integer.
  *
- * @tparam Width The width of the signed integer
- * @param lhs The integer to be shifted
- * @param rhs The number of bits to be shifted
- * @return The shifted integer
+ * @tparam W The data type to be rotated
+ * @param lhs The word_array to be rotated
+ * @param rotate_by The number of bits to be rotated by
+ * @return The rotated word_array
  */
 template <typename W, typename U,
           typename = std::enable_if_t<is_word_array_v<W> && is_unsigned_v<U>>>
-constexpr W& rotate_right(W& lhs, const U& rotate = U::one())
+constexpr W& rotate_right(W& lhs, const U& rotate_by = U::one())
 {
-    return rotate_right(lhs, static_cast<size_t>(rotate));
+    return rotate_right(lhs, static_cast<size_t>(rotate_by));
 }
 
 /**
  * @brief Applies a given function to all words within the word_array
  * @tparam F "Catch-all" parameter for functions operating on the words of the word_array
  * @tparam W Bit width of the word_array to operate on
+ * @tparam WordType The underlying data type to store the word_array data in
  * @param w The word_array to operate on
  * @param f Function of type word_array<W>::word_type -> word_array<W>::word_type
  * @return A new word_array with the transformed words
@@ -625,6 +689,7 @@ template <class F, size_t W, typename WordType>
  * @tparam F "Catch-all" parameter for functions operating on the words of the word_array
  * @tparam W Bit width of the first word_array to operate on
  * @tparam V Bit width of the second word_array to operate on
+ * @tparam WordType The underlying data type to store the word_array data in
  * @param w The first word_array to operate on
  * @param v The second word_array to operate on
  * @param f Function of type (word_array<W>::word_type, word_array<W>::word_type) ->
@@ -857,8 +922,6 @@ template <class R, class F, size_t W, size_t V, typename WordType>
                                   const word_array<V, WordType>& v, const F f,
                                   const R initial_value)
 {
-
-    R result = initial_value;
 
     constexpr size_t wc = w.word_count();
     constexpr size_t vc = v.word_count();
