@@ -25,7 +25,7 @@ template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
 -> integer<DestinationWidth, WordType>
 {
     word_array<DestinationWidth, WordType> result =
-        width_cast<DestinationWidth, SourceWidth, WordType>(
+        width_cast<DestinationWidth>(
             static_cast<word_array<SourceWidth, WordType>>(source));
     if constexpr (DestinationWidth > SourceWidth)
     {
@@ -46,43 +46,7 @@ template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
     }
 }
 
-/**
- *
- * @tparam Left
- * @tparam Right
- * @tparam W
- * @tparam SourceWidth
- * @tparam WordType
- * @param source
- * @return
- */
-template <size_t Left, size_t Right, template <size_t, typename> class W, size_t SourceWidth,
-    typename WordType>
-[[nodiscard]] constexpr auto expand(const W<SourceWidth, WordType>& source)
-{
 
-    using L = W<SourceWidth + Left, WordType>;
-    using R = W<SourceWidth + Left + Right, WordType>;
-    L left_expanded;
-
-    if constexpr (Left > 0)
-    {
-        left_expanded = width_cast<SourceWidth + Left>(source);
-    }
-    else
-    {
-        left_expanded = source;
-    }
-
-    R right_expanded{left_expanded};
-
-    if constexpr (Right > 0)
-    {
-        right_expanded <<= Right;
-    }
-
-    return right_expanded;
-}
 
 
 /**

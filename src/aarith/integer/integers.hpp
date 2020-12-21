@@ -59,7 +59,7 @@ public:
 
     template <size_t V>
     constexpr uinteger<Width, WordType>(const uinteger<V, WordType>& other) // NOLINT
-        : word_array<Width, WordType>(width_cast<Width, V, WordType>(other))
+        : word_array<Width, WordType>(width_cast<Width, uinteger, V, WordType>(other))
     {
     }
 
@@ -197,22 +197,22 @@ public:
     }
 };
 
-template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
-[[nodiscard]] auto constexpr width_cast(const uinteger<SourceWidth, WordType>& source)
-    -> uinteger<DestinationWidth, WordType>
-{
-    if constexpr (DestinationWidth == SourceWidth)
-    {
-        return source;
-    }
-    else
-    {
-        word_array<DestinationWidth, WordType> result =
-            width_cast<DestinationWidth, SourceWidth, WordType>(
-                static_cast<word_array<SourceWidth, WordType>>(source));
-        return uinteger<DestinationWidth, WordType>{result};
-    }
-}
+//template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
+//[[nodiscard]] auto constexpr width_cast(const uinteger<SourceWidth, WordType>& source)
+//    -> uinteger<DestinationWidth, WordType>
+//{
+//    if constexpr (DestinationWidth == SourceWidth)
+//    {
+//        return source;
+//    }
+//    else
+//    {
+//        word_array<DestinationWidth, WordType> result =
+//            width_cast<DestinationWidth, SourceWidth, WordType>(
+//                static_cast<word_array<SourceWidth, WordType>>(source));
+//        return uinteger<DestinationWidth, WordType>{result};
+//    }
+//}
 /*
  * Traits
  */
@@ -274,13 +274,13 @@ public:
 
     template <size_t V>
     constexpr integer<Width, WordType>(const integer<V, WordType>& other) // NOLINT
-        : word_array<Width, WordType>(width_cast<Width, V, WordType>(other))
+        : word_array<Width, WordType>(width_cast<Width, integer, V, WordType>(other))
     {
     }
 
     template <size_t V>
     constexpr integer<Width, WordType>(const word_array<V, WordType>& other) // NOLINT
-        : word_array<Width, WordType>(width_cast<Width, V, WordType>(other))
+        : word_array<Width, WordType>(width_cast<Width, word_array, V, WordType>(other))
     {
     }
 
