@@ -206,12 +206,12 @@ auto to_sci_string(const normalized_float<E, M, WordType> nf) -> std::string
         {
             auto shift_mantissa = M - 23;
             fl_mantissa = fl_mantissa >> shift_mantissa;
-            flc_mantissa = width_cast<23, M>(fl_mantissa);
+            flc_mantissa = width_cast<23>(fl_mantissa);
         }
         else
         {
             auto shift_mantissa = 23 - M;
-            flc_mantissa = width_cast<23, M>(fl_mantissa);
+            flc_mantissa = width_cast<23>(fl_mantissa);
             flc_mantissa = (flc_mantissa << shift_mantissa);
         }
         // construct a float with the given mantissa and an exponent of 0
@@ -230,7 +230,7 @@ auto to_sci_string(const normalized_float<E, M, WordType> nf) -> std::string
             return str.str();
         }
 
-        if (*mantissa <= 1.f && conv.dec_exponent != 0)
+        if (*mantissa <= 1.F && conv.dec_exponent != 0)
         {
             *mantissa *= 10.f;
             if (conv.neg_exponent)
