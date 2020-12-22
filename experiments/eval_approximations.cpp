@@ -124,28 +124,28 @@ template <size_t A, typename WordType = uint64_t> void test_a()
 int main()
 {
 
-        test_a<23>();
-        test_a<22>();
-        test_a<21>();
-        test_a<20>();
-        test_a<19>();
-        test_a<18>();
-        test_a<17>();
-        test_a<16>();
-        test_a<15>();
-        test_a<14>();
-        test_a<13>();
-        test_a<12>();
-        test_a<11>();
-        test_a<10>();
-        test_a<9>();
-        test_a<8>();
-        test_a<7>();
-        test_a<6>();
-        test_a<5>();
-        test_a<4>();
-        test_a<3>();
-        test_a<2>();
+    test_a<23>();
+    test_a<22>();
+    test_a<21>();
+    test_a<20>();
+    test_a<19>();
+    test_a<18>();
+    test_a<17>();
+    test_a<16>();
+    test_a<15>();
+    test_a<14>();
+    test_a<13>();
+    test_a<12>();
+    test_a<11>();
+    test_a<10>();
+    test_a<9>();
+    test_a<8>();
+    test_a<7>();
+    test_a<6>();
+    test_a<5>();
+    test_a<4>();
+    test_a<3>();
+    test_a<2>();
     test_a<1>();
     return EXIT_SUCCESS;
 }

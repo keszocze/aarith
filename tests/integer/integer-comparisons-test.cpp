@@ -201,8 +201,6 @@ SCENARIO("Comparing two positive integers with different bit widths",
         constexpr integer<small> a_neg{-number_a};
         constexpr integer<big> b = integer<big>::from_words(number_b, 0U, 0U);
 
-        constexpr integer<big> c_neg{-number_b};
-
         THEN("operator< returns true")
         {
             REQUIRE(a_neg < b);
@@ -237,7 +235,7 @@ SCENARIO("Comparing two positive integers with different bit widths",
 }
 
 TEMPLATE_TEST_CASE_SIG("Investigating the comparison of max and min values",
-                       "[integer][signed][utility][comparison]", AARITH_INT_TEST_SIGNATURE,
+                       "[integer][signed][utility][comparison][foo]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
 {
     using T = integer<W, WordType>;
@@ -266,7 +264,7 @@ TEMPLATE_TEST_CASE_SIG("Investigating the comparison of max and min values",
 
     WHEN("Constructing min and max value into a larger integer")
     {
-        integer<W + 1, WordType> min_{T::min()};
+        integer<W + 1, WordType> min_ = T::min();
         integer<W + 1, WordType> max_ = T::max();
 
         THEN("min should be negative")

@@ -24,7 +24,6 @@ TEMPLATE_TEST_CASE_SIG("Generating NaN as a result", "[normalized_float][arithme
 
     GIVEN("NaN and +/- infinity")
     {
-        const F nan{F::NaN()};
         const F neg_inf{F::neg_infinity()};
         const F pos_inf{F::pos_infinity()};
         WHEN("Adding/subtracting")
@@ -33,9 +32,6 @@ TEMPLATE_TEST_CASE_SIG("Generating NaN as a result", "[normalized_float][arithme
             F res_add2 = pos_inf + neg_inf;
             F res_sub1 = pos_inf - pos_inf;
             F res_sub2 = neg_inf - neg_inf;
-            //            std::cout << to_binary(neg_inf) << "\n";
-            //            std::cout << to_binary(pos_inf) << "\n";
-            //            std::cout << to_binary(res_add) << "\n";
 
             CHECK(res_add1.is_nan());
             CHECK(res_add2.is_nan());

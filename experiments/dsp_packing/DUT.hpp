@@ -110,7 +110,8 @@ public:
     }
     void teardown()
     {
-        std::cout << n_errors << ";" << n_tests << ";" << (static_cast<float>(n_errors) / static_cast<float>(n_tests)) << ";"
+        std::cout << n_errors << ";" << n_tests << ";"
+                  << (static_cast<float>(n_errors) / static_cast<float>(n_tests)) << ";"
                   << n_individual_errors << ";" << max_error << "\n";
     }
 

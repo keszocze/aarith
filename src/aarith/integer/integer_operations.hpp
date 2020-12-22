@@ -290,8 +290,8 @@ template <std::size_t W, std::size_t V, typename WordType>
     {
         constexpr std::size_t max_width = std::max(W, V);
 
-        const auto a_ = width_cast<max_width, W, WordType>(a);
-        const auto b_ = width_cast<max_width, V, WordType>(b);
+        const auto a_ = width_cast<max_width>(a);
+        const auto b_ = width_cast<max_width>(b);
 
         const auto res = expanding_karazuba(a_, b_);
 
@@ -961,8 +961,8 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
         Q = negate(Q);
     }
 
-    Integer Q_cast = width_cast<W, W + 1, WordType>(Q);
-    Integer remainder_cast = width_cast<W, W + 1, WordType>(remainder_);
+    Integer Q_cast = width_cast<W>(Q);
+    Integer remainder_cast = width_cast<W>(remainder_);
 
     if (numerator.is_negative())
     {

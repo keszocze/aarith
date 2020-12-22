@@ -130,6 +130,5 @@ int main()
     evaluate(no_cost_correction, false);
     evaluate(fully_corrected, false);
 
-
     return 0;
 }
