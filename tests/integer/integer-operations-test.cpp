@@ -283,17 +283,14 @@ SCENARIO("Adding two positive integers", "[integer][signed][arithmetic][addition
     {
         constexpr integer<16> a(15);
         constexpr integer<16> a_(-16);
-        constexpr integer<16> zero16(0);
         const integer<16> sum16 = add(a, a_);
 
         constexpr integer<64> b(150);
         constexpr integer<64> b_(-235);
-        constexpr integer<64> zero64(0);
         const integer<64> sum64 = add(b, b_);
 
         constexpr integer<150> c(1337);
         constexpr integer<150> c_(-5000);
-        constexpr integer<150> zero150(0);
         const integer<150> sum150 = add(c, c_);
 
         THEN("The sum should be negative")

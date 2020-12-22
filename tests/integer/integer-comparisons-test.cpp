@@ -201,8 +201,6 @@ SCENARIO("Comparing two positive integers with different bit widths",
         constexpr integer<small> a_neg{-number_a};
         constexpr integer<big> b = integer<big>::from_words(number_b, 0U, 0U);
 
-        constexpr integer<big> c_neg{-number_b};
-
         THEN("operator< returns true")
         {
             REQUIRE(a_neg < b);
