@@ -11,7 +11,7 @@ using namespace aarith;
 TEMPLATE_TEST_CASE_SIG(
     "Floating point division matches its native counterparts (special values only)",
     "[floating_point][arithmetic][division]", AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-    AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+    AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
     using F = floating_point<E, M>;
@@ -43,7 +43,7 @@ TEMPLATE_TEST_CASE_SIG(
 }
 
 TEMPLATE_TEST_CASE_SIG("Dividing by one", "[floating_point][arithmetic][division]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
     GIVEN("A random floating point number")
     {
@@ -75,7 +75,7 @@ TEMPLATE_TEST_CASE_SIG("Dividing by one", "[floating_point][arithmetic][division
 }
 
 TEMPLATE_TEST_CASE_SIG("Dividing by infinity", "[floating_point][arithmetic][division]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
     // I haven't found easily readable official documents that motivate these test cases. They are
     // based on the following web sites:
@@ -137,7 +137,7 @@ TEMPLATE_TEST_CASE_SIG("Dividing by infinity", "[floating_point][arithmetic][div
 }
 
 TEMPLATE_TEST_CASE_SIG("Dividing by zero", "[floating_point][arithmetic][division]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
     // I haven't found easily readable official documents that motivate these test cases. They are
     // based on the following web sites:
@@ -293,7 +293,7 @@ SCENARIO("Hand-picked division examples", "[floating_point][arithmetic][division
 TEMPLATE_TEST_CASE_SIG("Floating point division matches its native counterparts",
                        "[floating_point][arithmetic][division]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+                       AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
     using F = floating_point<E, M>;

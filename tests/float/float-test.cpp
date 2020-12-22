@@ -152,7 +152,7 @@ TEMPLATE_TEST_CASE_SIG("Width-casting special values into larger normalized floa
 
 TEMPLATE_TEST_CASE_SIG("Investigating the minimal exponent",
                        "[floating_point][invariant][constructor]", AARITH_FLOAT_TEST_SIGNATURE,
-                       AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEMPLATE_RANGE)
 {
     using F = floating_point<E, M>;
     using Exp = typename F::IntegerUnbiasedExp;

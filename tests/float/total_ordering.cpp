@@ -6,7 +6,7 @@
 using namespace aarith;
 
 TEMPLATE_TEST_CASE_SIG("Total ordering +/- zero", "[floating_point][comparison][utility]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
     using F = floating_point<E, M>;
 
@@ -25,7 +25,7 @@ TEMPLATE_TEST_CASE_SIG("Total ordering +/- zero", "[floating_point][comparison][
 }
 
 TEMPLATE_TEST_CASE_SIG("Total ordering with itself", "[floating_point][comparison][utility]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
     using F = floating_point<E, M>;
 
@@ -49,7 +49,7 @@ TEMPLATE_TEST_CASE_SIG("Total ordering with itself", "[floating_point][compariso
 
 TEMPLATE_TEST_CASE_SIG("Total ordering with a single NaN value",
                        "[floating_point][comparison][utility]", AARITH_FLOAT_TEST_SIGNATURE,
-                       AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEMPLATE_RANGE)
 {
     using F = floating_point<E, M>;
     constexpr F pqNaN = F::qNaN();
@@ -138,7 +138,7 @@ TEMPLATE_TEST_CASE_SIG("Total ordering with a single NaN value",
 
 TEMPLATE_TEST_CASE_SIG("Total ordering with a two NaN values",
                        "[floating_point][comparison][utility]", AARITH_FLOAT_TEST_SIGNATURE,
-                       AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEMPLATE_RANGE)
 {
     using F = floating_point<E, M>;
     constexpr F pqNaN = F::qNaN();
@@ -182,7 +182,7 @@ TEMPLATE_TEST_CASE_SIG("Total ordering with a two NaN values",
 }
 
 TEMPLATE_TEST_CASE_SIG("Total ordering mag +/- zero", "[floating_point][comparison][utility]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
     using F = floating_point<E, M>;
 
@@ -201,7 +201,7 @@ TEMPLATE_TEST_CASE_SIG("Total ordering mag +/- zero", "[floating_point][comparis
 }
 
 TEMPLATE_TEST_CASE_SIG("Total ordering mag with itself", "[floating_point][comparison][utility]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
     using F = floating_point<E, M>;
 
@@ -225,7 +225,7 @@ TEMPLATE_TEST_CASE_SIG("Total ordering mag with itself", "[floating_point][compa
 
 TEMPLATE_TEST_CASE_SIG("Total ordering mag with a single NaN value",
                        "[floating_point][comparison][utility]", AARITH_FLOAT_TEST_SIGNATURE,
-                       AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEMPLATE_RANGE)
 {
     using F = floating_point<E, M>;
     constexpr F pqNaN = F::qNaN();
@@ -314,7 +314,7 @@ TEMPLATE_TEST_CASE_SIG("Total ordering mag with a single NaN value",
 
 TEMPLATE_TEST_CASE_SIG("Total ordering mag with a two NaN values",
                        "[floating_point][comparison][utility]", AARITH_FLOAT_TEST_SIGNATURE,
-                       AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEMPLATE_RANGE)
 {
     using F = floating_point<E, M>;
     constexpr F pqNaN = F::qNaN();

@@ -7,7 +7,7 @@ using namespace aarith;
 
 TEMPLATE_TEST_CASE_SIG("Anytime addition", "[floating_point][arithmetic][constexpr]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+                       AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
     using F = floating_point<E, M>;
 

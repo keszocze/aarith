@@ -12,7 +12,7 @@ using namespace aarith;
 TEMPLATE_TEST_CASE_SIG("Floating point subtraction matches its native counterparts",
                        "[floating_point][arithmetic][subtraction]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+                       AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
     using F = floating_point<E, M>;
@@ -58,7 +58,7 @@ TEMPLATE_TEST_CASE_SIG("Floating point subtraction matches its native counterpar
 
 TEMPLATE_TEST_CASE_SIG("Floating point subtraction involving zero",
                        "[floating_point][arithmetic][subtraction]", AARITH_FLOAT_TEST_SIGNATURE,
-                       AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEMPLATE_RANGE)
 {
 
     using F = floating_point<E, M>;
@@ -98,7 +98,7 @@ TEMPLATE_TEST_CASE_SIG("Floating point subtraction involving zero",
 TEMPLATE_TEST_CASE_SIG(
     "Floating point subtraction matches its native counterparts (special values only)",
     "[floating_point][arithmetic][subtraction]", AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-    AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+    AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
     using F = floating_point<E, M>;

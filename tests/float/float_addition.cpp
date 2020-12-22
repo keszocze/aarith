@@ -10,7 +10,7 @@ using namespace aarith;
 
 TEMPLATE_TEST_CASE_SIG("Addition is commutative",
                        "[floating_point][arithmetic][addition][invariant]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
     using F = floating_point<E, M>;
 
@@ -67,7 +67,7 @@ TEMPLATE_TEST_CASE_SIG("Addition is commutative",
 
 TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
                        "[floating_point][arithmetic][addition][invariant]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
     using F = floating_point<E, M>;
 
@@ -98,7 +98,7 @@ TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
 TEMPLATE_TEST_CASE_SIG("Floating point addition works for special values",
                        "[floating_point][arithmetic][addition]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+                       AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
     using F = floating_point<E, M>;
@@ -142,7 +142,7 @@ TEMPLATE_TEST_CASE_SIG("Floating point addition works for special values",
 TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts",
                        "[floating_point][arithmetic][addition]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+                       AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
     using F = floating_point<E, M>;
@@ -188,7 +188,7 @@ TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts"
 }
 
 TEMPLATE_TEST_CASE_SIG("Adding to infinity", "[floating_point][arithmetic][addition]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
     using F = floating_point<E, M>;
     constexpr F neg_inf{F::neg_infinity()};

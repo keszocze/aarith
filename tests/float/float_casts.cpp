@@ -11,7 +11,7 @@ using namespace aarith;
 TEMPLATE_TEST_CASE_SIG("IEEE-754 arithmetic conversion: float, double",
                        "[floating_point][conversion][ieee-754][casting]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+                       AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
     using F = floating_point<E, M>;
@@ -264,7 +264,7 @@ SCENARIO("Creating aarith floats from native negative zeros")
 TEMPLATE_TEST_CASE_SIG("Casting from and to the native data types should be lossless",
                        "[floating_point][casting][utility]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+                       AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
     using F = floating_point<E, M>;
 
@@ -316,7 +316,7 @@ SCENARIO("Casting to a larger native data type does not change the value",
 TEMPLATE_TEST_CASE_SIG("Casting to a larger data type does not change the value",
                        "[floating_point][casting][utility]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+                       AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
     using F = floating_point<E, M>;
     using G = floating_point<E + 80, M>;
@@ -356,7 +356,7 @@ TEMPLATE_TEST_CASE_SIG("Casting to a larger data type does not change the value"
 TEMPLATE_TEST_CASE_SIG("Infinity and NaNs are created correctly",
                        "[floating_point][casting][utility]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+                       AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
     using F = floating_point<E, M>;
 

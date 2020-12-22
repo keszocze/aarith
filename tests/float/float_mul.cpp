@@ -78,7 +78,7 @@ TEMPLATE_TEST_CASE_SIG("Multiplication is commutative",
 TEMPLATE_TEST_CASE_SIG("Zero makes the multiplication result zero",
                        "[floating_point][arithmetic][multiplication][invariant]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+                       AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
     using F = floating_point<E, M>;
 
@@ -103,7 +103,7 @@ TEMPLATE_TEST_CASE_SIG("Zero makes the multiplication result zero",
 TEMPLATE_TEST_CASE_SIG("Floating point multiplication works for special values",
                        "[floating_point][arithmetic][multiplication]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+                       AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
     using F = floating_point<E, M>;
@@ -146,7 +146,7 @@ TEMPLATE_TEST_CASE_SIG("Floating point multiplication works for special values",
 
 TEMPLATE_TEST_CASE_SIG("Multiplying with infinity", "[floating_point][arithmetic][multiplication]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+                       AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
     using F = floating_point<E, M>;
     constexpr F neg_inf{F::neg_infinity()};

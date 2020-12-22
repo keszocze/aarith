@@ -6,7 +6,7 @@
 using namespace aarith;
 
 TEMPLATE_TEST_CASE_SIG("Setting a quiet NaN payload +/- zero", "[floating_point][NaN][utility]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
     using F = floating_point<E, M>;
 
@@ -47,7 +47,7 @@ TEMPLATE_TEST_CASE_SIG("Setting a quiet NaN payload +/- zero", "[floating_point]
 
 TEMPLATE_TEST_CASE_SIG("Setting a signalling NaN payload +/- zero",
                        "[floating_point][NaN][utility]", AARITH_FLOAT_TEST_SIGNATURE,
-                       AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEMPLATE_RANGE)
 {
     using F = floating_point<E, M>;
 

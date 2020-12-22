@@ -9,7 +9,7 @@ using namespace aarith;
 
 TEMPLATE_TEST_CASE_SIG("Negation works as intended",
                        "[floating_point][negate][sig_bit_operation][invariant]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
     using F = floating_point<E, M>;
 
@@ -33,7 +33,7 @@ TEMPLATE_TEST_CASE_SIG("Negation works as intended",
 
 TEMPLATE_TEST_CASE_SIG("Copying a floating-point number works",
                        "[floating_point][copy][sig_bit_operation][invariant]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
     using F = floating_point<E, M>;
 
@@ -57,7 +57,7 @@ TEMPLATE_TEST_CASE_SIG("Copying a floating-point number works",
 
 TEMPLATE_TEST_CASE_SIG("Copying a floating-point number with the sign of another number works",
                        "[floating_point][copySign][sig_bit_operation][invariant]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
     using F = floating_point<E, M>;
 

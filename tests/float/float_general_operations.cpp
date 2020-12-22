@@ -15,7 +15,7 @@ auto full_native_range()
 }
 
 TEMPLATE_TEST_CASE_SIG("Generating NaN as a result", "[floating_point][arithmetic][addition]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
     // these tests are modeled after the information presented on
     // https://www.doc.ic.ac.uk/~eedwards/compsys/float/nan.html
