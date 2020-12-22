@@ -190,11 +190,20 @@ public:
     template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
     explicit normalized_float(const F f)
     {
-
-        auto extracted_exp = extract_exponent<F, WordType>(f);
-        auto extracted_mantissa = extract_mantissa<F, WordType>(f);
+        const float_disassembly value_disassembled = disassemble_float<F>(f);
         constexpr size_t ext_exp_width = get_exponent_width<F>();
         constexpr size_t ext_mant_width = get_mantissa_width<F>();
+        uinteger<ext_exp_width, WordType> extracted_exp {value_disassembled.exponent};
+        uinteger<ext_mant_width, WordType> extracted_mantissa {value_disassembled.mantissa};
+
+        //does not correctly insert -0
+        //sign_neg = (f < 0);
+        sign_neg = value_disassembled.is_neg;
+        
+        if(f == static_cast<F>(0.))
+        {
+            return;
+        }
 
         using E_ = decltype(extracted_exp);
 
