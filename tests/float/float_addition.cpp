@@ -9,10 +9,10 @@
 using namespace aarith;
 
 TEMPLATE_TEST_CASE_SIG("Addition is commutative",
-                       "[normalized_float][arithmetic][addition][invariant]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+                       "[floating_point][arithmetic][addition][invariant]",
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("Two random floating-point numbers")
     {
@@ -66,12 +66,12 @@ TEMPLATE_TEST_CASE_SIG("Addition is commutative",
 }
 
 TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
-                       "[normalized_float][arithmetic][addition][invariant]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+                       "[floating_point][arithmetic][addition][invariant]",
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
-    GIVEN("A normalized_float  created from native data types and the number zero")
+    GIVEN("A floating_point  created from native data types and the number zero")
     {
 
         F a = GENERATE(take(15, random_float<E, M, FloatGenerationModes::FullyRandom>()));
@@ -96,12 +96,12 @@ TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
 }
 
 TEMPLATE_TEST_CASE_SIG("Floating point addition works for special values",
-                       "[normalized_float][arithmetic][addition]",
+                       "[floating_point][arithmetic][addition]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+                       AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("Random NaN and infinity values")
     {
@@ -140,12 +140,12 @@ TEMPLATE_TEST_CASE_SIG("Floating point addition works for special values",
 }
 
 TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts",
-                       "[normalized_float][arithmetic][addition]",
+                       "[floating_point][arithmetic][addition]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+                       AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     F a = GENERATE(take(150, random_float<E, M, FloatGenerationModes::FullyRandom>()));
     F b = GENERATE(take(150, random_float<E, M, FloatGenerationModes::FullyRandom>()));
@@ -187,10 +187,10 @@ TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts"
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("Adding to infinity", "[normalized_float][arithmetic][addition]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+TEMPLATE_TEST_CASE_SIG("Adding to infinity", "[floating_point][arithmetic][addition]",
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
     constexpr F neg_inf{F::neg_infinity()};
     constexpr F pos_inf{F::pos_infinity()};
 
@@ -255,7 +255,7 @@ TEMPLATE_TEST_CASE_SIG("Adding to infinity", "[normalized_float][arithmetic][add
     }
 }
 
-SCENARIO("Adding two floating-point numbers", "[normalized_float][arithmetic][addition]")
+SCENARIO("Adding two floating-point numbers", "[floating_point][arithmetic][addition]")
 {
     GIVEN("Single precision floats (E = 8, M = 23)")
     {
@@ -266,22 +266,22 @@ SCENARIO("Adding two floating-point numbers", "[normalized_float][arithmetic][ad
         {
             static constexpr float number_a = 93.211546F;
             static constexpr float number_b = -number_a;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("The result should be 0")
             {
-                REQUIRE(result == normalized_float<E, M>(0.f));
+                REQUIRE(result == floating_point<E, M>(0.f));
             }
         }
         WHEN("The second operand is 0.")
         {
             static constexpr float number_a = 93.211546F;
             static constexpr float number_b = 0;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("The result should be a")
             {
@@ -292,9 +292,9 @@ SCENARIO("Adding two floating-point numbers", "[normalized_float][arithmetic][ad
         {
             static constexpr float number_a = -93.211546F;
             static constexpr float number_b = 0;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("The result should be a")
             {
@@ -305,9 +305,9 @@ SCENARIO("Adding two floating-point numbers", "[normalized_float][arithmetic][ad
         {
             static constexpr float number_a = 0;
             static constexpr float number_b = 93.211546F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("The result should be b")
             {
@@ -318,9 +318,9 @@ SCENARIO("Adding two floating-point numbers", "[normalized_float][arithmetic][ad
         {
             static constexpr float number_a = 0;
             static constexpr float number_b = -93.211546F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("The result should be b")
             {
@@ -332,13 +332,13 @@ SCENARIO("Adding two floating-point numbers", "[normalized_float][arithmetic][ad
         {
             static constexpr float number_a = 213.22154F;
             static constexpr float number_b = 93.211546F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a + number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -346,13 +346,13 @@ SCENARIO("Adding two floating-point numbers", "[normalized_float][arithmetic][ad
         {
             static constexpr float number_a = -213.22154F;
             static constexpr float number_b = 93.211546F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a + number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -360,13 +360,13 @@ SCENARIO("Adding two floating-point numbers", "[normalized_float][arithmetic][ad
         {
             static constexpr float number_a = 213.22154F;
             static constexpr float number_b = -93.211546F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a + number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -374,13 +374,13 @@ SCENARIO("Adding two floating-point numbers", "[normalized_float][arithmetic][ad
         {
             static constexpr float number_a = -213.22154F;
             static constexpr float number_b = -93.211546F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a + number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -388,13 +388,13 @@ SCENARIO("Adding two floating-point numbers", "[normalized_float][arithmetic][ad
         {
             static constexpr float number_a = 93.211546F;
             static constexpr float number_b = 213.22154F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a + number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -402,13 +402,13 @@ SCENARIO("Adding two floating-point numbers", "[normalized_float][arithmetic][ad
         {
             static constexpr float number_a = -93.211546F;
             static constexpr float number_b = 213.22154F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a + number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -416,13 +416,13 @@ SCENARIO("Adding two floating-point numbers", "[normalized_float][arithmetic][ad
         {
             static constexpr float number_a = 93.211546F;
             static constexpr float number_b = -213.22154F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a + number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -430,37 +430,37 @@ SCENARIO("Adding two floating-point numbers", "[normalized_float][arithmetic][ad
         {
             static constexpr float number_a = -93.211546F;
             static constexpr float number_b = -213.22154F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a + number_b)));
             }
         }
         WHEN("When one operand is a > 1 and the other is 0 < b < 1.")
         {
             static constexpr float number_a = 2.75F;
             static constexpr float number_b = 0.5F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a + number_b)));
             }
         }
     }
 }
 
 SCENARIO("IEEE-754 denormalized number computations: float, double",
-         "[normalized_float][denormalized][ieee-754][computation]")
+         "[floating_point][denormalized][ieee-754][computation]")
 {
     GIVEN("Two denormalized float numbers")
     {
-        using nfloat = normalized_float<8, 23>;
+        using nfloat = floating_point<8, 23>;
         WHEN("The result of the addition is still denormalized > 0")
         {
             unsigned int a_i = 0b00000000000000000000000000000010;

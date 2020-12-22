@@ -9,12 +9,12 @@
 using namespace aarith;
 
 TEMPLATE_TEST_CASE_SIG("IEEE-754 arithmetic conversion: float, double",
-                       "[normalized_float][conversion][ieee-754][casting]",
+                       "[floating_point][conversion][ieee-754][casting]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+                       AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("A random number in the native format")
     {
@@ -61,10 +61,10 @@ TEMPLATE_TEST_CASE_SIG("IEEE-754 arithmetic conversion: float, double",
 
 SCENARIO("Creating aarith floats from native +/- infinity")
 {
-    using Single = normalized_float<8, 23>;
-    using Double = normalized_float<11, 52>;
-    using Large = normalized_float<20, 70>;
-    using Small = normalized_float<3, 10>;
+    using Single = floating_point<8, 23>;
+    using Double = floating_point<11, 52>;
+    using Large = floating_point<20, 70>;
+    using Small = floating_point<3, 10>;
 
     GIVEN("The infinities in IEEE 754 single precision")
     {
@@ -190,10 +190,10 @@ SCENARIO("Creating aarith floats from native +/- infinity")
 
 SCENARIO("Creating aarith floats from native negative zeros")
 {
-    using Single = normalized_float<8, 23>;
-    using Double = normalized_float<11, 52>;
-    using Large = normalized_float<20, 70>;
-    using Small = normalized_float<3, 10>;
+    using Single = floating_point<8, 23>;
+    using Double = floating_point<11, 52>;
+    using Large = floating_point<20, 70>;
+    using Small = floating_point<3, 10>;
 
     GIVEN("Negative zero in IEEE 754 single precision")
     {
@@ -262,11 +262,11 @@ SCENARIO("Creating aarith floats from native negative zeros")
 }
 
 TEMPLATE_TEST_CASE_SIG("Casting from and to the native data types should be lossless",
-                       "[normalized_float][casting][utility]",
+                       "[floating_point][casting][utility]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+                       AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     Native native = GENERATE(take(30, random<Native>(std::numeric_limits<Native>::min(),
                                                      std::numeric_limits<Native>::max())));
@@ -279,9 +279,9 @@ TEMPLATE_TEST_CASE_SIG("Casting from and to the native data types should be loss
 }
 
 SCENARIO("Casting to a larger native data type does not change the value",
-         "[normalized_float][casting][utility]")
+         "[floating_point][casting][utility]")
 {
-    using F = normalized_float<8, 23>;
+    using F = floating_point<8, 23>;
     GIVEN("A random floating point value")
     {
 
@@ -290,7 +290,7 @@ SCENARIO("Casting to a larger native data type does not change the value",
 
         float neg_f = -f;
 
-        WHEN("Casting it to a normalized_float<8,23>")
+        WHEN("Casting it to a floating_point<8,23>")
         {
             F f_cast{f};
             F f_neg_cast{neg_f};
@@ -314,21 +314,21 @@ SCENARIO("Casting to a larger native data type does not change the value",
 }
 
 TEMPLATE_TEST_CASE_SIG("Casting to a larger data type does not change the value",
-                       "[normalized_float][casting][utility]",
+                       "[floating_point][casting][utility]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+                       AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
-    using F = normalized_float<E, M>;
-    using G = normalized_float<E + 80, M>;
-    using H = normalized_float<M, M + 80>;
-    using J = normalized_float<E + 80, M + 80>;
+    using F = floating_point<E, M>;
+    using G = floating_point<E + 80, M>;
+    using H = floating_point<M, M + 80>;
+    using J = floating_point<E + 80, M + 80>;
 
     GIVEN("A random floating point value")
     {
         Native f_ = GENERATE(take(50, random<float>(std::numeric_limits<Native>::min(),
                                                     std::numeric_limits<Native>::max())));
 
-        WHEN("Casting it to a normalized_float<8,23>")
+        WHEN("Casting it to a floating_point<8,23>")
         {
             F f{f_};
 
@@ -354,11 +354,11 @@ TEMPLATE_TEST_CASE_SIG("Casting to a larger data type does not change the value"
 }
 
 TEMPLATE_TEST_CASE_SIG("Infinity and NaNs are created correctly",
-                       "[normalized_float][casting][utility]",
+                       "[floating_point][casting][utility]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+                       AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     Native nan_native = std::numeric_limits<Native>::quiet_NaN();
     Native pos_inf_native = std::numeric_limits<Native>::infinity();

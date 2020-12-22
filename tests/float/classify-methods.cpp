@@ -5,11 +5,10 @@
 #include <catch.hpp>
 using namespace aarith;
 
-TEMPLATE_TEST_CASE_SIG("Testing the classification methods",
-                       "[normalized_float][classify][utility]", AARITH_FLOAT_TEST_SIGNATURE,
-                       AARIHT_FLOAT_TEMPLATE_RANGE)
+TEMPLATE_TEST_CASE_SIG("Testing the classification methods", "[floating_point][classify][utility]",
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("A random subnormal number")
     {
@@ -229,10 +228,10 @@ TEMPLATE_TEST_CASE_SIG("Testing the classification methods",
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("Testing the fp_class method", "[normalized_float][classify][utility]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+TEMPLATE_TEST_CASE_SIG("Testing the fp_class method", "[floating_point][classify][utility]",
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("A random subnormal number")
     {

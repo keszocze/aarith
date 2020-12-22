@@ -7,10 +7,10 @@ namespace aarith {
 
 template <size_t E, size_t M, FloatGenerationModes Mode = FloatGenerationModes::NonSpecial,
           typename WordType = uint64_t>
-class FloatGenerator : public Catch::Generators::IGenerator<normalized_float<E, M, WordType>>
+class FloatGenerator : public Catch::Generators::IGenerator<floating_point<E, M, WordType>>
 {
 public:
-    using F = normalized_float<E, M, WordType>;
+    using F = floating_point<E, M, WordType>;
 
     explicit FloatGenerator()
         : rng{std::random_device{}()}
@@ -32,16 +32,16 @@ public:
 
 private:
     std::minstd_rand rng;
-    normalized_float_distribution<E, M, Mode, WordType> random_number;
+    floating_point_distribution<E, M, Mode, WordType> random_number;
     F current_number;
 };
 
 template <size_t E, size_t M, FloatGenerationModes Mode = FloatGenerationModes::NonSpecial,
           typename WordType = uint64_t>
-auto random_float() -> Catch::Generators::GeneratorWrapper<normalized_float<E, M, WordType>>
+auto random_float() -> Catch::Generators::GeneratorWrapper<floating_point<E, M, WordType>>
 {
-    return Catch::Generators::GeneratorWrapper<normalized_float<E, M, WordType>>(
-        std::unique_ptr<Catch::Generators::IGenerator<normalized_float<E, M, WordType>>>(
+    return Catch::Generators::GeneratorWrapper<floating_point<E, M, WordType>>(
+        std::unique_ptr<Catch::Generators::IGenerator<floating_point<E, M, WordType>>>(
             new FloatGenerator<E, M, Mode, WordType>()));
 }
 

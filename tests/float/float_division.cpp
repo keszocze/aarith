@@ -10,11 +10,11 @@ using namespace aarith;
 
 TEMPLATE_TEST_CASE_SIG(
     "Floating point division matches its native counterparts (special values only)",
-    "[normalized_float][arithmetic][division]", AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-    AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+    "[floating_point][arithmetic][division]", AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
+    AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("Random NaN and infinity values")
     {
@@ -42,13 +42,13 @@ TEMPLATE_TEST_CASE_SIG(
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("Dividing by one", "[normalized_float][arithmetic][division]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+TEMPLATE_TEST_CASE_SIG("Dividing by one", "[floating_point][arithmetic][division]",
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
     GIVEN("A random floating point number")
     {
 
-        using F = normalized_float<E, M>;
+        using F = floating_point<E, M>;
 
         F f = GENERATE(take(100, random_float<E, M, FloatGenerationModes::NonSpecial>()));
 
@@ -74,8 +74,8 @@ TEMPLATE_TEST_CASE_SIG("Dividing by one", "[normalized_float][arithmetic][divisi
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("Dividing by infinity", "[normalized_float][arithmetic][division]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+TEMPLATE_TEST_CASE_SIG("Dividing by infinity", "[floating_point][arithmetic][division]",
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
     // I haven't found easily readable official documents that motivate these test cases. They are
     // based on the following web sites:
@@ -86,7 +86,7 @@ TEMPLATE_TEST_CASE_SIG("Dividing by infinity", "[normalized_float][arithmetic][d
     GIVEN("A random floating point number")
     {
 
-        using F = normalized_float<E, M>;
+        using F = floating_point<E, M>;
 
         F f = GENERATE(take(100, random_float<E, M, FloatGenerationModes::FullyRandom>()));
 
@@ -136,8 +136,8 @@ TEMPLATE_TEST_CASE_SIG("Dividing by infinity", "[normalized_float][arithmetic][d
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("Dividing by zero", "[normalized_float][arithmetic][division]",
-                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+TEMPLATE_TEST_CASE_SIG("Dividing by zero", "[floating_point][arithmetic][division]",
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
     // I haven't found easily readable official documents that motivate these test cases. They are
     // based on the following web sites:
@@ -148,7 +148,7 @@ TEMPLATE_TEST_CASE_SIG("Dividing by zero", "[normalized_float][arithmetic][divis
     GIVEN("A random floating point number")
     {
 
-        using F = normalized_float<E, M>;
+        using F = floating_point<E, M>;
 
         F f = GENERATE(take(100, random_float<E, M, FloatGenerationModes::FullyRandom>()));
 
@@ -201,7 +201,7 @@ TEMPLATE_TEST_CASE_SIG("Dividing by zero", "[normalized_float][arithmetic][divis
     }
 }
 
-SCENARIO("Hand-picked division examples", "[normalized_float][arithmetic][division][current]")
+SCENARIO("Hand-picked division examples", "[floating_point][arithmetic][division][current]")
 {
 
     GIVEN("Two fixed single-precision floating-point numbers a and b")
@@ -209,7 +209,7 @@ SCENARIO("Hand-picked division examples", "[normalized_float][arithmetic][divisi
 
         static constexpr size_t E_ = 8;
         static constexpr size_t M_ = 23;
-        using F = normalized_float<E_, M_>;
+        using F = floating_point<E_, M_>;
         using E = uinteger<E_>;
         using M = uinteger<M_>;
 
@@ -247,7 +247,7 @@ SCENARIO("Hand-picked division examples", "[normalized_float][arithmetic][divisi
 
         static constexpr size_t E_ = 11;
         static constexpr size_t M_ = 52;
-        using F = normalized_float<E_, M_>;
+        using F = floating_point<E_, M_>;
         using E = uinteger<E_>;
         using M = uinteger<M_>;
 
@@ -291,12 +291,12 @@ SCENARIO("Hand-picked division examples", "[normalized_float][arithmetic][divisi
 }
 
 TEMPLATE_TEST_CASE_SIG("Floating point division matches its native counterparts",
-                       "[normalized_float][arithmetic][division]",
+                       "[floating_point][arithmetic][division]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+                       AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     F a = GENERATE(take(100, random_float<E, M, FloatGenerationModes::FullyRandom>()));
     F b = GENERATE(take(100, random_float<E, M, FloatGenerationModes::FullyRandom>()));
@@ -347,9 +347,9 @@ TEMPLATE_TEST_CASE_SIG("Floating point division matches its native counterparts"
 }
 
 SCENARIO("Manual test case for floating point division",
-         "[normalized_float][arithmetic][division][bar]")
+         "[floating_point][arithmetic][division][bar]")
 {
-    using F = normalized_float<8, 23>;
+    using F = floating_point<8, 23>;
     GIVEN("The number one and the smallest normalised number")
     {
         F one{F::one()};
@@ -395,7 +395,7 @@ SCENARIO("Manual test case for floating point division",
 }
 
 SCENARIO("Division of two floating-point numbers (hand picked examples)",
-         "[normalized_float][arithmetic][division]")
+         "[floating_point][arithmetic][division]")
 {
     GIVEN("Single precision floats (E = 8, M = 23)")
     {
@@ -407,13 +407,13 @@ SCENARIO("Division of two floating-point numbers (hand picked examples)",
         {
             static constexpr float number_a = 213.22154F;
             static constexpr float number_b = 93.211546F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = div(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = div(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a / number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -421,13 +421,13 @@ SCENARIO("Division of two floating-point numbers (hand picked examples)",
         {
             static constexpr float number_a = -213.22154F;
             static constexpr float number_b = 93.211546F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = div(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = div(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a / number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -435,13 +435,13 @@ SCENARIO("Division of two floating-point numbers (hand picked examples)",
         {
             static constexpr float number_a = 213.22154F;
             static constexpr float number_b = -93.211546F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = div(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = div(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a / number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -449,13 +449,13 @@ SCENARIO("Division of two floating-point numbers (hand picked examples)",
         {
             static constexpr float number_a = -213.22154F;
             static constexpr float number_b = -93.211546F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = div(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = div(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a / number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -463,13 +463,13 @@ SCENARIO("Division of two floating-point numbers (hand picked examples)",
         {
             static constexpr float number_a = 93.211546F;
             static constexpr float number_b = 213.22154F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = div(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = div(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a / number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -477,13 +477,13 @@ SCENARIO("Division of two floating-point numbers (hand picked examples)",
         {
             static constexpr float number_a = -93.211546F;
             static constexpr float number_b = 213.22154F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = div(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = div(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a / number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -491,13 +491,13 @@ SCENARIO("Division of two floating-point numbers (hand picked examples)",
         {
             static constexpr float number_a = 93.211546F;
             static constexpr float number_b = -213.22154F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = div(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = div(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a / number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -505,13 +505,13 @@ SCENARIO("Division of two floating-point numbers (hand picked examples)",
         {
             static constexpr float number_a = -93.211546F;
             static constexpr float number_b = -213.22154F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = div(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = div(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a / number_b)));
             }
         }
     }

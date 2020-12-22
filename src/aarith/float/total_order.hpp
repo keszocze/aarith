@@ -1,7 +1,7 @@
 #pragma once
 
 #include <aarith/core/traits.hpp>
-#include <aarith/float/normalized_float.hpp>
+#include <aarith/float/floating_point.hpp>
 
 namespace aarith {
 
@@ -18,8 +18,8 @@ namespace aarith {
  * @return true iff x < y
  */
 template <size_t E, size_t M, typename WordType>
-bool constexpr totalOrder(const normalized_float<E, M, WordType>& x,
-                          const normalized_float<E, M, WordType>& y)
+bool constexpr totalOrder(const floating_point<E, M, WordType>& x,
+                          const floating_point<E, M, WordType>& y)
 {
 
     //    d) If x and y are unordered numerically because x or y is a NaN:
@@ -142,8 +142,8 @@ bool constexpr totalOrder(const normalized_float<E, M, WordType>& x,
  * @return true iff abs(x) < abs(y)
  */
 template <size_t E, size_t M, typename WordType>
-bool constexpr totalOrderMag(const normalized_float<E, M, WordType>& x,
-                             const normalized_float<E, M, WordType>& y)
+bool constexpr totalOrderMag(const floating_point<E, M, WordType>& x,
+                             const floating_point<E, M, WordType>& y)
 {
     return totalOrder(abs(x), abs(y));
 }

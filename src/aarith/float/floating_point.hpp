@@ -12,7 +12,15 @@
 
 namespace aarith {
 
-template <size_t E, size_t M, typename WordType = uint64_t> class normalized_float;
+template <size_t E, size_t M, typename WordType = uint64_t> class floating_point;
+
+template <typename WordType = uint64_t> using half_precision = floating_point<5, 10, WordType>;
+template <typename WordType = uint64_t> using single_precision = floating_point<8, 23, WordType>;
+template <typename WordType = uint64_t> using double_precison = floating_point<11, 52, WordType>;
+template <typename WordType = uint64_t>
+using quadruple_precision = floating_point<15, 112, WordType>;
+template <typename WordType = uint64_t> using bfloat16 = floating_point<8, 7, WordType>;
+template <typename WordType = uint64_t> using tensorfloat32 = floating_point<8, 10, WordType>;
 
 /**
  * @brief Expands the mantissa by correctly shifting the bits in the larger uinteger
@@ -21,7 +29,7 @@ template <size_t E, size_t M, typename WordType = uint64_t> class normalized_flo
  */
 template <size_t MS, size_t E, size_t M, typename WordType>
 [[nodiscard]] uinteger<MS, WordType> constexpr expand_mantissa(
-    const normalized_float<E, M, WordType>& f)
+    const floating_point<E, M, WordType>& f)
 {
     static_assert(MS >= M, "Expanded mantissa must not be shorter than the original mantissa");
     uinteger<MS, WordType> mantissa_{f.get_mantissa()};
@@ -38,7 +46,7 @@ template <size_t MS, size_t E, size_t M, typename WordType>
  */
 template <size_t MS, size_t E, size_t M, typename WordType>
 [[nodiscard]] uinteger<MS, WordType> constexpr expand_full_mantissa(
-    const normalized_float<E, M, WordType>& f)
+    const floating_point<E, M, WordType>& f)
 {
     static_assert(MS >= M + 1, "Expanded mantissa must not be shorter than the original mantissa");
     uinteger<MS, WordType> mantissa_{f.get_full_mantissa()};
@@ -53,7 +61,7 @@ template <size_t MS, size_t E, size_t M, typename WordType>
  */
 template <size_t ES, size_t E, size_t M, typename WordType>
 [[nodiscard]] uinteger<ES, WordType> constexpr expand_exponent(
-    const normalized_float<E, M, WordType>& f)
+    const floating_point<E, M, WordType>& f)
 {
     static_assert(ES >= E, "Expanded exponent must not be shorter than the original exponent");
 
@@ -68,7 +76,7 @@ template <size_t ES, size_t E, size_t M, typename WordType>
     else
     {
         const exp_type in_bias{f.bias};
-        const auto out_bias = normalized_float<ES, M, WordType>::bias;
+        const auto out_bias = floating_point<ES, M, WordType>::bias;
         auto bias_difference = sub(out_bias, in_bias);
 
         exp_type exponent_ = exp_type{exp_f};
@@ -89,7 +97,7 @@ template <size_t ES, size_t E, size_t M, typename WordType>
  */
 template <size_t ES, size_t MS, size_t E, size_t M, typename WordType>
 [[nodiscard]] word_array<1 + ES + MS, WordType> constexpr as_word_array(
-    const normalized_float<E, M, WordType>& f)
+    const floating_point<E, M, WordType>& f)
 {
     using namespace aarith;
 
@@ -103,7 +111,7 @@ template <size_t ES, size_t MS, size_t E, size_t M, typename WordType>
     return with_sign;
 }
 
-template <size_t E, size_t M, typename WordType> class normalized_float
+template <size_t E, size_t M, typename WordType> class floating_point
 {
 public:
     static_assert(M > 0, "Mantissa width has to be greater zero.");
@@ -126,14 +134,14 @@ public:
         return min_exp_;
     }();
 
-    explicit constexpr normalized_float()
+    explicit constexpr floating_point()
         : sign_neg(false)
         , exponent(IntegerExp::zero())
         , mantissa(IntegerMant::zero())
     {
     }
 
-    explicit constexpr normalized_float(const word_array<1 + E + M>& w)
+    explicit constexpr floating_point(const word_array<1 + E + M>& w)
         : sign_neg(w.msb())
         , exponent(bit_range<(E + M) - 1, M>(w))
         , mantissa(exponent == IntegerExp::all_zeroes()
@@ -142,8 +150,8 @@ public:
     {
     }
 
-    explicit constexpr normalized_float(const bool is_neg, IntegerExp exp,
-                                        word_array<M, WordType> frac)
+    explicit constexpr floating_point(const bool is_neg, IntegerExp exp,
+                                      word_array<M, WordType> frac)
         : sign_neg(is_neg)
         , exponent(exp)
         , mantissa((exponent == IntegerExp::zero()) ? IntegerMant{frac}
@@ -151,16 +159,16 @@ public:
     {
     }
 
-    explicit constexpr normalized_float(const bool is_neg, IntegerExp exp,
-                                        word_array<MW, WordType> mant)
+    explicit constexpr floating_point(const bool is_neg, IntegerExp exp,
+                                      word_array<MW, WordType> mant)
         : sign_neg(is_neg)
         , exponent(exp)
         , mantissa(mant)
     {
     }
 
-    explicit constexpr normalized_float(const unsigned int is_neg, IntegerExp exp,
-                                        word_array<M, WordType> frac)
+    explicit constexpr floating_point(const unsigned int is_neg, IntegerExp exp,
+                                      word_array<M, WordType> frac)
         : sign_neg(is_neg)
         , exponent(exp)
         , mantissa((exponent == IntegerExp::zero()) ? IntegerMant{frac}
@@ -168,8 +176,8 @@ public:
     {
     }
 
-    explicit constexpr normalized_float(const unsigned int is_neg, IntegerExp exp,
-                                        word_array<MW, WordType> mant)
+    explicit constexpr floating_point(const unsigned int is_neg, IntegerExp exp,
+                                      word_array<MW, WordType> mant)
         : sign_neg(is_neg)
         , exponent(exp)
         , mantissa(mant)
@@ -177,7 +185,7 @@ public:
     }
 
     template <size_t E_, size_t M_>
-    explicit normalized_float(const normalized_float<E_, M_, WordType> f)
+    explicit floating_point(const floating_point<E_, M_, WordType> f)
         : sign_neg(f.is_negative())
         , exponent(expand_exponent<E>(f))
         , mantissa(expand_full_mantissa<MW>(f))
@@ -188,7 +196,7 @@ public:
     }
 
     template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
-    explicit normalized_float(const F f)
+    explicit floating_point(const F f)
     {
         const float_disassembly value_disassembled = disassemble_float<F>(f);
         constexpr size_t ext_exp_width = get_exponent_width<F>();
@@ -311,48 +319,47 @@ public:
      *
      * @return The value zero
      */
-    [[nodiscard]] static constexpr normalized_float zero()
+    [[nodiscard]] static constexpr floating_point zero()
     {
-        return normalized_float{};
+        return floating_point{};
     }
 
     /**
      *
      * @return The value negative zero
      */
-    [[nodiscard]] static constexpr normalized_float neg_zero()
+    [[nodiscard]] static constexpr floating_point neg_zero()
     {
-        return normalized_float(true, IntegerExp::all_zeroes(), IntegerMant::all_zeroes());
+        return floating_point(true, IntegerExp::all_zeroes(), IntegerMant::all_zeroes());
     }
 
     /**
      *
      * @return The value one
      */
-    [[nodiscard]] static constexpr normalized_float one()
+    [[nodiscard]] static constexpr floating_point one()
     {
         constexpr word_array<E, WordType> exp{word_array<E - 1, WordType>::all_ones()};
-        return normalized_float(false, exp, IntegerMant::msb_one());
+        return floating_point(false, exp, IntegerMant::msb_one());
     }
 
     /**
      *
      * @return The value one
      */
-    [[nodiscard]] static constexpr normalized_float neg_one()
+    [[nodiscard]] static constexpr floating_point neg_one()
     {
         constexpr word_array<E, WordType> exp{word_array<E - 1, WordType>::all_ones()};
-        return normalized_float(true, exp, IntegerMant::msb_one());
+        return floating_point(true, exp, IntegerMant::msb_one());
     }
 
     /**
      *
      * @return positive infinity
      */
-    [[nodiscard]] static constexpr normalized_float pos_infinity()
+    [[nodiscard]] static constexpr floating_point pos_infinity()
     {
-        constexpr normalized_float pos_inf(false, IntegerExp::all_ones(),
-                                           IntegerMant::all_zeroes());
+        constexpr floating_point pos_inf(false, IntegerExp::all_ones(), IntegerMant::all_zeroes());
         return pos_inf;
     }
 
@@ -360,9 +367,9 @@ public:
      *
      * @return negative infinity
      */
-    [[nodiscard]] static constexpr normalized_float neg_infinity()
+    [[nodiscard]] static constexpr floating_point neg_infinity()
     {
-        constexpr normalized_float neg_inf(true, IntegerExp::all_ones(), IntegerMant::all_zeroes());
+        constexpr floating_point neg_inf(true, IntegerExp::all_ones(), IntegerMant::all_zeroes());
         return neg_inf;
     }
 
@@ -370,10 +377,10 @@ public:
      *
      * @return Smallest positive normalized value
      */
-    [[nodiscard]] static constexpr normalized_float smallest_normalized()
+    [[nodiscard]] static constexpr floating_point smallest_normalized()
     {
-        constexpr normalized_float small_normalized(false, IntegerExp::one(),
-                                                    IntegerFrac::all_zeroes());
+        constexpr floating_point small_normalized(false, IntegerExp::one(),
+                                                  IntegerFrac::all_zeroes());
         return small_normalized;
     }
 
@@ -381,10 +388,9 @@ public:
      *
      * @return Smallest positive denormalized value
      */
-    [[nodiscard]] static constexpr normalized_float smallest_denormalized()
+    [[nodiscard]] static constexpr floating_point smallest_denormalized()
     {
-        constexpr normalized_float small_denorm(false, IntegerExp::all_zeroes(),
-                                                IntegerMant::one());
+        constexpr floating_point small_denorm(false, IntegerExp::all_zeroes(), IntegerMant::one());
         return small_denorm;
     }
 
@@ -393,12 +399,12 @@ public:
      * @param payload The payload to store in the NaN
      * @return The bit representation of the quiet NaN containing the payload
      */
-    [[nodiscard]] static constexpr normalized_float
+    [[nodiscard]] static constexpr floating_point
     qNaN(const IntegerFrac& payload = IntegerFrac::msb_one())
     {
         IntegerFrac payload_{payload};
         payload_.set_msb(true);
-        return normalized_float(false, IntegerExp::all_ones(), IntegerMant{payload_});
+        return floating_point(false, IntegerExp::all_ones(), IntegerMant{payload_});
     }
 
     /**
@@ -406,21 +412,21 @@ public:
      * @param payload The payload to store in the NaN (must not be zero)
      * @return The bit representation of the signalling NaN containing the payload
      */
-    [[nodiscard]] static constexpr normalized_float
+    [[nodiscard]] static constexpr floating_point
     sNaN(const IntegerFrac& payload = IntegerFrac::one())
     {
 
         IntegerFrac payload_{payload};
         payload_.set_msb(false);
         assert(!payload_.is_zero() && "NaN must have a payload");
-        return normalized_float(false, IntegerExp::all_ones(), payload_);
+        return floating_point(false, IntegerExp::all_ones(), payload_);
     }
 
     /**
      * @brief Returns a floating point number indicating not a number (NaN).
      * @return A non-signalling not a number value
      */
-    [[nodiscard]] static constexpr normalized_float NaN()
+    [[nodiscard]] static constexpr floating_point NaN()
     {
         return qNaN();
     }
@@ -724,18 +730,18 @@ public:
     }
 
     template <size_t ETarget, size_t MTarget>
-    [[nodiscard]] explicit constexpr operator normalized_float<ETarget, MTarget, WordType>() const
+    [[nodiscard]] explicit constexpr operator floating_point<ETarget, MTarget, WordType>() const
     {
         const auto tmp{as_word_array<ETarget, MTarget>(*this)};
-        return normalized_float<ETarget, MTarget, WordType>{tmp};
+        return floating_point<ETarget, MTarget, WordType>{tmp};
     }
 
-    [[nodiscard]] normalized_float<E, M> make_quiet_nan() const
+    [[nodiscard]] floating_point<E, M> make_quiet_nan() const
     {
         auto nan_mantissa = mantissa;
         nan_mantissa.set_bit(M - 1, static_cast<WordType>(1U));
         const auto nan_exponent = uinteger<E>::all_ones();
-        normalized_float<E, M> nan{sign_neg, nan_exponent, nan_mantissa};
+        floating_point<E, M> nan{sign_neg, nan_exponent, nan_mantissa};
         return nan;
     }
 
@@ -775,35 +781,35 @@ private:
     uinteger<MW, WordType> mantissa;
 };
 
-template <size_t E, size_t M, typename WordType> class is_integral<normalized_float<E, M, WordType>>
+template <size_t E, size_t M, typename WordType> class is_integral<floating_point<E, M, WordType>>
 {
 public:
     static constexpr bool value = false;
 };
 
-template <size_t E, size_t M, typename WordType> class is_float<normalized_float<E, M, WordType>>
+template <size_t E, size_t M, typename WordType> class is_float<floating_point<E, M, WordType>>
 {
 public:
     static constexpr bool value = true;
 };
 
-template <size_t E, size_t M, typename WordType> class is_unsigned<normalized_float<E, M, WordType>>
+template <size_t E, size_t M, typename WordType> class is_unsigned<floating_point<E, M, WordType>>
 {
 public:
     static constexpr bool value = false;
 };
 
 template <size_t E, size_t M1, size_t M2, typename WordType = uint64_t>
-auto bit_equal(const normalized_float<E, M1, WordType> lhs,
-               const normalized_float<E, M2, WordType> rhs) -> bool
+auto bit_equal(const floating_point<E, M1, WordType> lhs, const floating_point<E, M2, WordType> rhs)
+    -> bool
 {
     return lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent() &&
            lhs.get_mantissa() == rhs.get_mantissa();
 }
 
 template <size_t E, size_t M1, size_t M2, typename WordType = uint64_t>
-auto equal_except_rounding(const normalized_float<E, M1, WordType> lhs,
-                           const normalized_float<E, M2, WordType> rhs) -> bool
+auto equal_except_rounding(const floating_point<E, M1, WordType> lhs,
+                           const floating_point<E, M2, WordType> rhs) -> bool
 {
     if (lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent())
     {
@@ -892,7 +898,7 @@ auto equal_except_rounding(const normalized_float<E, M1, WordType> lhs,
  * @return The absolute value of the provided number
  */
 template <size_t E, size_t M, typename WordType = uint64_t>
-auto constexpr abs(const normalized_float<E, M, WordType> nf) -> normalized_float<E, M, WordType>
+auto constexpr abs(const floating_point<E, M, WordType> nf) -> floating_point<E, M, WordType>
 {
     auto absolute = nf;
     absolute.set_sign(0U);
@@ -941,7 +947,7 @@ auto rshift_and_round(const uinteger<M, WordType>& m, const size_t shift_by)
 }
 
 template <size_t E, size_t M1, size_t M2 = M1, typename WordType = uint64_t>
-auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<E, M2, WordType>
+auto normalize(const floating_point<E, M1, WordType>& nf) -> floating_point<E, M2, WordType>
 {
     auto denormalized = nf;
 
@@ -988,12 +994,12 @@ auto normalize(const normalized_float<E, M1, WordType>& nf) -> normalized_float<
         }
     }
 
-    normalized_float<E, M2, WordType> normalized(denormalized.get_sign(), width_cast<E>(exponent),
-                                                 width_cast<M2 + 1>(mantissa));
+    floating_point<E, M2, WordType> normalized(denormalized.get_sign(), width_cast<E>(exponent),
+                                               width_cast<M2 + 1>(mantissa));
 
     if (normalized.is_nan() || exponent.bit(E) == 1)
     {
-        auto inf = normalized_float<E, M2, WordType>::pos_infinity();
+        auto inf = floating_point<E, M2, WordType>::pos_infinity();
         inf.set_sign(normalized.get_sign());
         return inf;
     }

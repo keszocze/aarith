@@ -6,9 +6,9 @@
 
 namespace aarith {
 
-/// Convert the given normalized_float to a string with digits to the power of 2
+/// Convert the given floating_point to a string with digits to the power of 2
 template <size_t N, size_t E, size_t M, typename WordType>
-auto to_base_2n(const normalized_float<E, M, WordType> nf, const bool show_hidden_bit = false)
+auto to_base_2n(const floating_point<E, M, WordType> nf, const bool show_hidden_bit = false)
     -> std::string
 {
     std::string str;
@@ -26,32 +26,32 @@ auto to_base_2n(const normalized_float<E, M, WordType> nf, const bool show_hidde
     return str;
 }
 
-/// Convert the given normalized_float value into a hexadecimal string representation.
+/// Convert the given floating_point value into a hexadecimal string representation.
 template <size_t E, size_t M, typename WordType>
-auto to_hex(const normalized_float<E, M, WordType>& value, const bool show_hidden_bit = false)
+auto to_hex(const floating_point<E, M, WordType>& value, const bool show_hidden_bit = false)
     -> std::string
 {
     return to_base_2n<4>(value, show_hidden_bit);
 }
 
-/// Convert the given normalized_float value into a octal string representation.
+/// Convert the given floating_point value into a octal string representation.
 template <size_t E, size_t M, typename WordType>
-auto to_octal(const normalized_float<E, M, WordType>& value, const bool show_hidden_bit = false)
+auto to_octal(const floating_point<E, M, WordType>& value, const bool show_hidden_bit = false)
     -> std::string
 {
     return to_base_2n<3>(value, show_hidden_bit);
 }
 
-/// Convert the given normalized_float value into a binary string representation.
+/// Convert the given floating_point value into a binary string representation.
 template <size_t E, size_t M, typename WordType>
-auto to_binary(const normalized_float<E, M, WordType>& value, const bool show_hidden_bit = false)
+auto to_binary(const floating_point<E, M, WordType>& value, const bool show_hidden_bit = false)
     -> std::string
 {
     return to_base_2n<1>(value, show_hidden_bit);
 }
 
 template <size_t E, size_t M, typename WordType>
-auto to_compute_string(const normalized_float<E, M, WordType> nf) -> std::string
+auto to_compute_string(const floating_point<E, M, WordType> nf) -> std::string
 {
 
     if (nf.is_nan())
@@ -114,7 +114,7 @@ struct decimal_conversion
 };
 
 template <size_t E, size_t M, typename WordType>
-auto compute_nearest_exponent10(const normalized_float<E, M, WordType>& nf) -> decimal_conversion
+auto compute_nearest_exponent10(const floating_point<E, M, WordType>& nf) -> decimal_conversion
 {
     // TODO float pow and log functions
     if constexpr (E > sizeof(size_t) * 8)
@@ -158,9 +158,9 @@ auto compute_nearest_exponent10(const normalized_float<E, M, WordType>& nf) -> d
     return conv_struct;
 }
 
-/// Convert the given normalized_float to a scientific string representation
+/// Convert the given floating_point to a scientific string representation
 template <size_t E, size_t M, typename WordType>
-auto to_sci_string(const normalized_float<E, M, WordType> nf) -> std::string
+auto to_sci_string(const floating_point<E, M, WordType> nf) -> std::string
 {
     std::stringstream str;
 
@@ -251,7 +251,7 @@ auto to_sci_string(const normalized_float<E, M, WordType> nf) -> std::string
 }
 
 template <size_t E, size_t M, typename WordType>
-auto operator<<(std::ostream& out, const normalized_float<E, M, WordType>& value) -> std::ostream&
+auto operator<<(std::ostream& out, const floating_point<E, M, WordType>& value) -> std::ostream&
 {
     if (out.flags() & std::ios::hex)
     {
