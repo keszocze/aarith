@@ -5,9 +5,8 @@
 #include <catch.hpp>
 using namespace aarith;
 
-TEMPLATE_TEST_CASE_SIG("Testing the classification methods",
-                       "[floating_point][classify][utility]", AARITH_FLOAT_TEST_SIGNATURE,
-                       AARIHT_FLOAT_TEMPLATE_RANGE)
+TEMPLATE_TEST_CASE_SIG("Testing the classification methods", "[floating_point][classify][utility]",
+                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
 {
     using F = floating_point<E, M>;
 

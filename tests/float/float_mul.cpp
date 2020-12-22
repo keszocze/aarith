@@ -144,8 +144,7 @@ TEMPLATE_TEST_CASE_SIG("Floating point multiplication works for special values",
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("Multiplying with infinity",
-                       "[floating_point][arithmetic][multiplication]",
+TEMPLATE_TEST_CASE_SIG("Multiplying with infinity", "[floating_point][arithmetic][multiplication]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
                        AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {

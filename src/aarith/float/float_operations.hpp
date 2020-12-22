@@ -48,7 +48,7 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
     const auto mantissa_sum = fun_add(lhs.get_full_mantissa(), new_mantissa);
 
     floating_point<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(),
-                                                      mantissa_sum);
+                                                    mantissa_sum);
 
     return normalize<E, mantissa_sum.width() - 1, M>(sum);
 }
@@ -94,7 +94,7 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
     const auto mantissa_sum = fun_sub(lhs.get_full_mantissa(), new_mantissa);
 
     floating_point<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(),
-                                                      mantissa_sum);
+                                                    mantissa_sum);
 
     return normalize<E, mantissa_sum.width() - 1, M>(sum);
 }
@@ -212,8 +212,7 @@ template <size_t E, size_t M>
  */
 template <size_t E, size_t M, typename WordType>
 [[nodiscard]] auto mul(const floating_point<E, M, WordType> lhs,
-                       const floating_point<E, M, WordType> rhs)
-    -> floating_point<E, M, WordType>
+                       const floating_point<E, M, WordType> rhs) -> floating_point<E, M, WordType>
 {
     if (lhs.is_nan())
     {
@@ -236,8 +235,7 @@ template <size_t E, size_t M, typename WordType>
 
     if (lhs.is_inf() || rhs.is_inf())
     {
-        return sign ? floating_point<E, M>::neg_infinity()
-                    : floating_point<E, M>::pos_infinity();
+        return sign ? floating_point<E, M>::neg_infinity() : floating_point<E, M>::pos_infinity();
     }
 
     // compute exponent
@@ -294,8 +292,7 @@ template <size_t E, size_t M, typename WordType>
  */
 template <size_t E, size_t M, typename WordType>
 [[nodiscard]] auto div(const floating_point<E, M, WordType> lhs,
-                       const floating_point<E, M, WordType> rhs)
-    -> floating_point<E, M, WordType>
+                       const floating_point<E, M, WordType> rhs) -> floating_point<E, M, WordType>
 {
 
     /*=================================
@@ -330,14 +327,12 @@ template <size_t E, size_t M, typename WordType>
     if (lhs.is_inf())
     {
         // due to the checks above, we already know that rhs is finite
-        return result_is_negative ? floating_point<E, M>::neg_zero()
-                                  : floating_point<E, M>::zero();
+        return result_is_negative ? floating_point<E, M>::neg_zero() : floating_point<E, M>::zero();
     }
 
     if (rhs.is_inf() || lhs.is_zero())
     {
-        return result_is_negative ? floating_point<E, M>::neg_zero()
-                                  : floating_point<E, M>::zero();
+        return result_is_negative ? floating_point<E, M>::neg_zero() : floating_point<E, M>::zero();
     }
 
     size_t denorm_exponent_lhs = 0;
@@ -412,7 +407,7 @@ template <size_t E, size_t M, typename WordType>
     else if (esum == uinteger<esum.width()>::zero())
     {
         floating_point<E, M> quotient{result_is_negative, esum,
-                                        width_cast<M + 1>(rshift_and_round(mquotient, 1))};
+                                      width_cast<M + 1>(rshift_and_round(mquotient, 1))};
         return quotient;
     }
 
@@ -464,8 +459,7 @@ negate(const floating_point<E, M, WordType>& x)
  * @return The copied value
  */
 template <size_t E, size_t M, typename WordType = uint64_t>
-[[nodiscard]] constexpr floating_point<E, M, WordType>
-copy(const floating_point<E, M, WordType>& x)
+[[nodiscard]] constexpr floating_point<E, M, WordType> copy(const floating_point<E, M, WordType>& x)
 {
     floating_point<E, M, WordType> copied{x};
 
@@ -521,29 +515,29 @@ bit_range(const floating_point<E, M, WordType>& f)
 namespace float_operators {
 
 template <size_t E, size_t M, typename WordType>
-auto operator+(const floating_point<E, M, WordType>& lhs,
-               const floating_point<E, M, WordType>& rhs) -> floating_point<E, M, WordType>
+auto operator+(const floating_point<E, M, WordType>& lhs, const floating_point<E, M, WordType>& rhs)
+    -> floating_point<E, M, WordType>
 {
     return add(lhs, rhs);
 }
 
 template <size_t E, size_t M, typename WordType>
-auto operator-(const floating_point<E, M, WordType>& lhs,
-               const floating_point<E, M, WordType>& rhs) -> floating_point<E, M, WordType>
+auto operator-(const floating_point<E, M, WordType>& lhs, const floating_point<E, M, WordType>& rhs)
+    -> floating_point<E, M, WordType>
 {
     return sub(lhs, rhs);
 }
 
 template <size_t E, size_t M, typename WordType>
-auto operator*(const floating_point<E, M, WordType>& lhs,
-               const floating_point<E, M, WordType>& rhs) -> floating_point<E, M, WordType>
+auto operator*(const floating_point<E, M, WordType>& lhs, const floating_point<E, M, WordType>& rhs)
+    -> floating_point<E, M, WordType>
 {
     return mul(lhs, rhs);
 }
 
 template <size_t E, size_t M, typename WordType>
-auto operator/(const floating_point<E, M, WordType>& lhs,
-               const floating_point<E, M, WordType>& rhs) -> floating_point<E, M, WordType>
+auto operator/(const floating_point<E, M, WordType>& lhs, const floating_point<E, M, WordType>& rhs)
+    -> floating_point<E, M, WordType>
 {
     return div(lhs, rhs);
 }

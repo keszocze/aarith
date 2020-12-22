@@ -73,8 +73,7 @@ bool constexpr bitwise_equality(const floating_point<E, M> lhs, const floating_p
 }
 
 template <size_t E, size_t M>
-auto constexpr operator==(const floating_point<E, M> lhs, const floating_point<E, M> rhs)
-    -> bool
+auto constexpr operator==(const floating_point<E, M> lhs, const floating_point<E, M> rhs) -> bool
 {
     if (lhs.is_nan() || rhs.is_nan())
     {
@@ -92,8 +91,7 @@ auto constexpr operator==(const floating_point<E, M> lhs, const floating_point<E
 
 template <size_t E, size_t M, size_t E_, size_t M_,
           typename = std::enable_if_t<(E != E_) || (M != M_)>>
-bool constexpr logical_equality(const floating_point<E, M> lhs,
-                                const floating_point<E_, M_> rhs)
+bool constexpr logical_equality(const floating_point<E, M> lhs, const floating_point<E_, M_> rhs)
 {
 
     bool equal_mantissa = false;
@@ -122,8 +120,7 @@ bool constexpr logical_equality(const floating_point<E, M> lhs,
 
 template <size_t E, size_t M, size_t E_, size_t M_,
           typename = std::enable_if_t<(E != E_) || (M != M_)>>
-auto constexpr operator==(const floating_point<E, M> lhs, const floating_point<E_, M_> rhs)
-    -> bool
+auto constexpr operator==(const floating_point<E, M> lhs, const floating_point<E_, M_> rhs) -> bool
 {
     //    std::cout << "spec float op==\n";
     if (lhs.is_nan() || rhs.is_nan())
@@ -193,8 +190,7 @@ bool constexpr operator<(const floating_point<E, M> lhs, const floating_point<E_
 }
 
 template <size_t E, size_t M, size_t E_, size_t M_>
-auto constexpr operator!=(const floating_point<E, M> lhs, const floating_point<E_, M_> rhs)
-    -> bool
+auto constexpr operator!=(const floating_point<E, M> lhs, const floating_point<E_, M_> rhs) -> bool
 {
     return !(lhs == rhs);
 }
@@ -206,15 +202,13 @@ auto constexpr operator>(const floating_point<E, M> lhs, const floating_point<E,
 }
 
 template <size_t e, size_t m>
-auto constexpr operator>=(const floating_point<e, m> lhs, const floating_point<e, m> rhs)
-    -> bool
+auto constexpr operator>=(const floating_point<e, m> lhs, const floating_point<e, m> rhs) -> bool
 {
     return rhs < lhs || lhs == rhs;
 }
 
 template <size_t e, size_t m>
-auto constexpr operator<=(const floating_point<e, m> lhs, const floating_point<e, m> rhs)
-    -> bool
+auto constexpr operator<=(const floating_point<e, m> lhs, const floating_point<e, m> rhs) -> bool
 {
     return lhs < rhs || lhs == rhs;
 }

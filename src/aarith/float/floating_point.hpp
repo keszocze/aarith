@@ -143,7 +143,7 @@ public:
     }
 
     explicit constexpr floating_point(const bool is_neg, IntegerExp exp,
-                                        word_array<M, WordType> frac)
+                                      word_array<M, WordType> frac)
         : sign_neg(is_neg)
         , exponent(exp)
         , mantissa((exponent == IntegerExp::zero()) ? IntegerMant{frac}
@@ -152,7 +152,7 @@ public:
     }
 
     explicit constexpr floating_point(const bool is_neg, IntegerExp exp,
-                                        word_array<MW, WordType> mant)
+                                      word_array<MW, WordType> mant)
         : sign_neg(is_neg)
         , exponent(exp)
         , mantissa(mant)
@@ -160,7 +160,7 @@ public:
     }
 
     explicit constexpr floating_point(const unsigned int is_neg, IntegerExp exp,
-                                        word_array<M, WordType> frac)
+                                      word_array<M, WordType> frac)
         : sign_neg(is_neg)
         , exponent(exp)
         , mantissa((exponent == IntegerExp::zero()) ? IntegerMant{frac}
@@ -169,7 +169,7 @@ public:
     }
 
     explicit constexpr floating_point(const unsigned int is_neg, IntegerExp exp,
-                                        word_array<MW, WordType> mant)
+                                      word_array<MW, WordType> mant)
         : sign_neg(is_neg)
         , exponent(exp)
         , mantissa(mant)
@@ -351,8 +351,7 @@ public:
      */
     [[nodiscard]] static constexpr floating_point pos_infinity()
     {
-        constexpr floating_point pos_inf(false, IntegerExp::all_ones(),
-                                           IntegerMant::all_zeroes());
+        constexpr floating_point pos_inf(false, IntegerExp::all_ones(), IntegerMant::all_zeroes());
         return pos_inf;
     }
 
@@ -373,7 +372,7 @@ public:
     [[nodiscard]] static constexpr floating_point smallest_normalized()
     {
         constexpr floating_point small_normalized(false, IntegerExp::one(),
-                                                    IntegerFrac::all_zeroes());
+                                                  IntegerFrac::all_zeroes());
         return small_normalized;
     }
 
@@ -383,8 +382,7 @@ public:
      */
     [[nodiscard]] static constexpr floating_point smallest_denormalized()
     {
-        constexpr floating_point small_denorm(false, IntegerExp::all_zeroes(),
-                                                IntegerMant::one());
+        constexpr floating_point small_denorm(false, IntegerExp::all_zeroes(), IntegerMant::one());
         return small_denorm;
     }
 
@@ -794,8 +792,8 @@ public:
 };
 
 template <size_t E, size_t M1, size_t M2, typename WordType = uint64_t>
-auto bit_equal(const floating_point<E, M1, WordType> lhs,
-               const floating_point<E, M2, WordType> rhs) -> bool
+auto bit_equal(const floating_point<E, M1, WordType> lhs, const floating_point<E, M2, WordType> rhs)
+    -> bool
 {
     return lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent() &&
            lhs.get_mantissa() == rhs.get_mantissa();
@@ -989,7 +987,7 @@ auto normalize(const floating_point<E, M1, WordType>& nf) -> floating_point<E, M
     }
 
     floating_point<E, M2, WordType> normalized(denormalized.get_sign(), width_cast<E>(exponent),
-                                                 width_cast<M2 + 1>(mantissa));
+                                               width_cast<M2 + 1>(mantissa));
 
     if (normalized.is_nan() || exponent.bit(E) == 1)
     {

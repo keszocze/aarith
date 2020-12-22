@@ -41,7 +41,7 @@ template <size_t E, size_t M>
         approx_expanding_add_post_masking(lhs.get_full_mantissa(), new_mantissa, bits);
 
     floating_point<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(),
-                                                      mantissa_sum);
+                                                    mantissa_sum);
 
     return normalize<E, mantissa_sum.width() - 1, M>(sum);
 }
@@ -82,7 +82,7 @@ template <size_t E, size_t M>
         approx_expanding_sub_post_masking(lhs.get_full_mantissa(), new_mantissa, bits + 1);
 
     floating_point<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(),
-                                                      mantissa_sum);
+                                                    mantissa_sum);
 
     return normalize<E, mantissa_sum.width() - 1, M>(sum);
 }
@@ -125,8 +125,7 @@ template <size_t E, size_t M>
 
     if (lhs.is_inf() || rhs.is_inf())
     {
-        return sign ? floating_point<E, M>::neg_infinity()
-                    : floating_point<E, M>::pos_infinity();
+        return sign ? floating_point<E, M>::neg_infinity() : floating_point<E, M>::pos_infinity();
     }
 
     // compute exponent
