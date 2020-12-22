@@ -11,13 +11,17 @@ namespace dsp_packing {
  * @return The individual extracted results
  */
 template <size_t WWidth = 4, size_t AWidth = 4>
-[[nodiscard]] static std::array<aarith::integer<AWidth + WWidth>, 4> extract_results(const PPort result)
+[[nodiscard]] static std::array<aarith::integer<AWidth + WWidth>, 4>
+extract_results(const PPort result)
 {
 
     using ret_val = aarith::integer<AWidth + WWidth>;
 
-    static_assert(WWidth + AWidth < 12, "Using more than 11 bits (combined) for the weights and "
-                                        "activation values would lead to overlapping values");
+    static constexpr size_t MAX_COMBINED_WIDTH = 12;
+
+    static_assert(WWidth + AWidth < MAX_COMBINED_WIDTH,
+                  "Using more than 11 bits (combined) for the weights and "
+                  "activation values would lead to overlapping values");
 
     using E = ret_val;
 
@@ -68,7 +72,7 @@ public:
      * @brief DUT with a user specified post-processing procedure (defaults to only extracting the
      * products without any further post-processing).
      */
-    DUT(Packing packing, post_proc_t post_proc = default_post_proc)
+    explicit DUT(Packing packing, post_proc_t post_proc = default_post_proc)
         : packing(packing)
         , post_proc(post_proc)
     {
@@ -106,11 +110,11 @@ public:
     }
     void teardown()
     {
-        std::cout << n_errors << ";" << n_tests << ";" << ((float)n_errors / (float)n_tests) << ";"
+        std::cout << n_errors << ";" << n_tests << ";" << (static_cast<float>(n_errors) / static_cast<float>(n_tests)) << ";"
                   << n_individual_errors << ";" << max_error << "\n";
     }
 
-    DefaultEvaluator(Design design, const bool print_individual_results = false)
+    explicit DefaultEvaluator(Design design, const bool print_individual_results = false)
         : design(design)
         , print_individual_results(print_individual_results)
     {

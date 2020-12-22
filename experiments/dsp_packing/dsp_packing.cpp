@@ -12,7 +12,8 @@
 
 namespace dsp_packing {
 
-using namespace aarith;
+using aarith::integer;
+using aarith::uinteger;
 
 constexpr size_t weight_size = 5;
 constexpr size_t activation_size = 4;
@@ -20,6 +21,10 @@ constexpr size_t activation_size = 4;
 using weight_t = integer<weight_size>;
 using activation_t = uinteger<activation_size>;
 using res_t = integer<weight_size + activation_size>;
+
+static constexpr size_t SND_POS = 11;
+static constexpr size_t THRD_POS = 22;
+static constexpr size_t FOURTH_POS = 33;
 
 /**
  * @brief Packs the two signed weights and two unsigned activation values as proposed by Xilinx.
@@ -39,11 +44,11 @@ DSPInput pack_xilinx(const weight_t& w1, const weight_t& w2, const activation_t&
 {
     const APort A{w1};
     APort D{w2};
-    D <<= 22;
+    D <<= THRD_POS;
 
     const BPort A1{a1};
     BPort A2{a2};
-    A2 <<= 11;
+    A2 <<= SND_POS;
     const BPort B = A1 + A2;
 
     return {A, D, B};
@@ -67,9 +72,9 @@ DSPInput pack_partially_correcting(const weight_t& w1, const weight_t& w2, const
     DSPInput params = pack_xilinx(w1, w2, a1, a2);
 
     CPort C = CPort::zero();
-    C.set_bit(11, w1.msb());
-    C.set_bit(22, w1.msb());
-    C.set_bit(33, w2.msb());
+    C.set_bit(SND_POS, w1.msb());
+    C.set_bit(THRD_POS, w1.msb());
+    C.set_bit(FOURTH_POS, w2.msb());
 
     params.C = C;
     return params;
@@ -84,21 +89,23 @@ using post_proc_t = std::function<std::array<res_t, 4>(
  * @brief A post-processing method that fixes all off-by-one errors introduced in the original
  * Xilinx implementation.
  */
-post_proc_t fix_dsp_result = [](const weight_t& w1, const weight_t& w2, const activation_t& a1,
-                                const activation_t& a2, const PPort& dsp_result) {
-    auto [a2w2, a1w2, a2w1, a1w1] = extract_results<weight_size,activation_size>(dsp_result);
+post_proc_t fix_dsp_result = []([[maybe_unused]] const weight_t& w1, // NOLINT
+                                [[maybe_unused]] const weight_t& w2,
+                                [[maybe_unused]] const activation_t& a1,
+                                [[maybe_unused]] const activation_t& a2, const PPort& dsp_result) {
+    auto [a2w2, a1w2, a2w1, a1w1] = extract_results<weight_size, activation_size>(dsp_result);
 
-    if (dsp_result.bit(10))
+    if (dsp_result.bit(10)) // NOLINT
     {
         a2w1 = add(a2w1, res_t::one());
     }
 
-    if (dsp_result.bit(21))
+    if (dsp_result.bit(21)) // NOLINT
     {
         a1w2 = add(a1w2, res_t::one());
     }
 
-    if (dsp_result.bit(32))
+    if (dsp_result.bit(32)) // NOLINT
     {
         a2w2 = add(a2w2, res_t::one());
     }
@@ -111,7 +118,7 @@ post_proc_t fix_dsp_result = [](const weight_t& w1, const weight_t& w2, const ac
 int main()
 {
 
-    using namespace dsp_packing;
+    using namespace dsp_packing; // NOLINT
 
     DUT xilinx(pack_xilinx);
 
@@ -122,6 +129,7 @@ int main()
     evaluate(xilinx, false);
     evaluate(no_cost_correction, false);
     evaluate(fully_corrected, false);
+
 
     return 0;
 }

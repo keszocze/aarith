@@ -1,8 +1,6 @@
 #pragma once
 
-
 #include "util.hpp"
-
 
 #include <aarith/integer.hpp>
 
@@ -22,21 +20,17 @@ using CPort = aarith::integer<CPortWidth>;
 using PinPort = aarith::integer<PinPortWidth>;
 using PPort = aarith::integer<PPortWidth>;
 
-
-
 /**
  * @brief Struct storing the inputs to the DSP
  */
 struct DSPInput
 {
-    APort A;                //! First of the summands
-    DPort D;                //! Second of the summands
-    BPort B;               //! The other half of the multiplication
-    CPort C = CPort::zero(); //! The optional carry
+    APort A;                       //! First of the summands
+    DPort D;                       //! Second of the summands
+    BPort B;                       //! The other half of the multiplication
+    CPort C = CPort::zero();       //! The optional carry
     PinPort Pin = PinPort::zero(); //! The optional chained input
 };
-
-
 
 /**
  * @brief Models the DSP's behaviour
@@ -47,7 +41,7 @@ struct DSPInput
  * @return ((A+D)*B)+C
  */
 [[nodiscard]] PPort dsp(const APort& A, const DPort& D, const BPort& B,
-                         const CPort C = CPort::zero(), const PinPort Pin = PinPort::zero() )
+                        const CPort C = CPort::zero(), const PinPort Pin = PinPort::zero())
 {
     const APort sum = A + D;
 
@@ -70,8 +64,4 @@ struct DSPInput
     return dsp(input.A, input.D, input.B, input.C, input.Pin);
 }
 
-
-
-
-}
-
+} // namespace dsp_packing

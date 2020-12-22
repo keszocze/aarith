@@ -12,7 +12,7 @@ namespace dsp_packing {
  * @param n The number to display
  * @param name
  */
-template <typename I> void print_int(const I& n, const std::string name)
+template <typename I> void print_int(const I& n, const std::string& name)
 {
     std::cout << aarith::to_binary(n) << "\t" << n << "\t(" << name << ")\n";
 }
@@ -35,7 +35,8 @@ template <typename T, size_t WWidth = 4, size_t AWidth = 4> void iterate_inputs(
         {
             for (aarith::uinteger<AWidth> a1 : aarith::integer_range<aarith::uinteger<AWidth>>())
             {
-                for (aarith::uinteger<AWidth> a2 : aarith::integer_range<aarith::uinteger<AWidth>>())
+                for (aarith::uinteger<AWidth> a2 :
+                     aarith::integer_range<aarith::uinteger<AWidth>>())
                 {
                     functor(w1, w2, a1, a2);
                 }
@@ -52,8 +53,8 @@ template <typename T, size_t WWidth = 4, size_t AWidth = 4> void iterate_inputs(
 template <size_t WWidth = 4, size_t AWidth = 4> void print_inputs(const bool print_header = false)
 {
     auto output = [](auto a1, auto a2, auto w1, auto w2) {
-      std::cout << aarith::to_binary(a1) << " " << aarith::to_binary(a2) << " " << aarith::to_binary(w1) << " "
-                << aarith::to_binary(w2) << "\n";
+        std::cout << aarith::to_binary(a1) << " " << aarith::to_binary(a2) << " "
+                  << aarith::to_binary(w1) << " " << aarith::to_binary(w2) << "\n";
     };
 
     if (print_header)
@@ -64,5 +65,4 @@ template <size_t WWidth = 4, size_t AWidth = 4> void print_inputs(const bool pri
     iterate_inputs<decltype(output), WWidth, AWidth>(output);
 }
 
-
-}
+} // namespace dsp_packing
