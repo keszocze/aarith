@@ -65,6 +65,36 @@ TEMPLATE_TEST_CASE_SIG("Addition is commutative",
     }
 }
 
+TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
+                       "[normalized_float][arithmetic][addition][invariant]",
+                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
+{
+    using F = normalized_float<E, M>;
+
+    GIVEN("A normalized_float  created from native data types and the number zero")
+    {
+
+        F a = GENERATE(take(15, random_float<E, M, FloatGenerationModes::FullyRandom>()));
+
+        WHEN("Adding these numbers")
+        {
+            F res{a + F::zero()};
+            THEN("The result should have left the number untouched")
+            {
+                if (!a.is_nan())
+                {
+                    if (res != a)
+                    {
+                        std::cout << "a:   " << to_binary(a) << "\n"
+                                  << "res: " << to_binary(res) << "\n";
+                    }
+                    REQUIRE(res == a);
+                }
+            }
+        }
+    }
+}
+
 TEMPLATE_TEST_CASE_SIG("Floating point addition works for special values",
                        "[normalized_float][arithmetic][addition]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,

@@ -3,6 +3,7 @@
 #include <aarith/core/traits.hpp>
 #include <aarith/core/word_array.hpp>
 #include <aarith/core/word_array_cast_operations.hpp>
+#include <optional>
 
 namespace aarith {
 

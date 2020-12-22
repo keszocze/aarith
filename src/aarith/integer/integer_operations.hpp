@@ -1119,37 +1119,6 @@ template <typename Integer>
  */
 template <typename W, typename I,
           typename = std::enable_if_t<is_word_array_v<W> && is_integral_v<I> && is_unsigned_v<I>>>
-constexpr auto operator<<=(W& lhs, const I rhs) -> W
-{
-    const size_t shift = static_cast<size_t>(rhs);
-    lhs <<= shift;
-    return lhs;
-}
-
-/**
- * @brief Left-shift assignment operator
- * @tparam W The word_container type to work on
- * @param lhs The word_container to be shifted
- * @param rhs The number of bits to shift
- * @return The shifted word_container
- */
-template <typename W, typename I,
-          typename = std::enable_if_t<is_word_array_v<W> && is_integral_v<I> && is_unsigned_v<I>>>
-constexpr auto operator<<(const W& lhs, const I rhs) -> W
-{
-    W cpy{lhs};
-    return (cpy <<= rhs);
-}
-
-/**
- * @brief Left-shift assignment operator
- * @tparam W The word_container type to work on
- * @param lhs The word_container to be shifted
- * @param rhs The number of bits to shift
- * @return The shifted word_container
- */
-template <typename W, typename I,
-          typename = std::enable_if_t<is_word_array_v<W> && is_integral_v<I> && is_unsigned_v<I>>>
 constexpr auto operator>>=(W& lhs, const I rhs) -> W
 {
     const size_t shift = static_cast<size_t>(rhs);
