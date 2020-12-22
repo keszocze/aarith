@@ -26,7 +26,7 @@ compile_gcc:
         - cd build/gcc
         - echo ${BUILD_PARAMS}
         - echo ${MPIR_PARAMS}
-        - clang-tidy --version
+        - ls /usr/bin/clang-tidy*
         - CC=gcc-9 CXX=g++-9 cmake ${BUILD_PARAMS} ${MPIR_PARAMS}  ../..
         - /opt/sonar-build-wrapper/build-wrapper-linux-x86-64 --out-dir bw_output make -j $(nproc) all
 
