@@ -2,8 +2,8 @@
 #include <bitset>
 #include <catch.hpp>
 
-#include "gen_float.hpp"
 #include "../test-signature-ranges.hpp"
+#include "gen_float.hpp"
 using namespace aarith;
 
 template <typename N>
@@ -13,8 +13,6 @@ auto full_native_range()
     return Catch::Generators::random<N>(std::numeric_limits<N>::lowest() / 100.0f,
                                         std::numeric_limits<N>::max() / 100.0f);
 }
-
-
 
 TEMPLATE_TEST_CASE_SIG("Generating NaN as a result", "[normalized_float][arithmetic][addition]",
                        AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
@@ -73,4 +71,3 @@ TEMPLATE_TEST_CASE_SIG("Generating NaN as a result", "[normalized_float][arithme
         }
     }
 }
-

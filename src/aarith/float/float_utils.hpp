@@ -375,5 +375,4 @@ inline constexpr auto extract_mantissa(F num)
     return uinteger<mantissa_width, Wordtype>{mantissa};
 }
 
-
 } // namespace aarith

@@ -95,10 +95,10 @@ TEMPLATE_TEST_CASE_SIG("Zero is the neutral element of the addition",
     }
 }
 
-TEMPLATE_TEST_CASE_SIG(
-    "Floating point addition works for special values",
-    "[normalized_float][arithmetic][addition]", AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-    AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+TEMPLATE_TEST_CASE_SIG("Floating point addition works for special values",
+                       "[normalized_float][arithmetic][addition]",
+                       AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
+                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
     using F = normalized_float<E, M>;

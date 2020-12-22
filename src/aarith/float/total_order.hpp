@@ -65,7 +65,7 @@ bool constexpr totalOrder(const normalized_float<E, M, WordType>& x,
         // ii) signaling orders below quiet for +NaN, reverse for −NaN
         if (x.is_sNaN() && y.is_qNaN())
         {
-            return x.is_positive() && y.is_positive() ;
+            return x.is_positive() && y.is_positive();
         }
 
         // ii) signaling orders below quiet for +NaN, reverse for −NaN

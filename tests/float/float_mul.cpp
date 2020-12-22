@@ -100,10 +100,10 @@ TEMPLATE_TEST_CASE_SIG("Zero makes the multiplication result zero",
     }
 }
 
-TEMPLATE_TEST_CASE_SIG(
-    "Floating point multiplication works for special values",
-    "[normalized_float][arithmetic][multiplication]", AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
-    AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
+TEMPLATE_TEST_CASE_SIG("Floating point multiplication works for special values",
+                       "[normalized_float][arithmetic][multiplication]",
+                       AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
+                       AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
     using F = normalized_float<E, M>;
@@ -119,7 +119,8 @@ TEMPLATE_TEST_CASE_SIG(
 
             F res = a * b;
 
-            THEN("The result should match the native result bit by bit") {
+            THEN("The result should match the native result bit by bit")
+            {
                 if (a.is_nan() || b.is_nan())
                 {
                     REQUIRE(res.is_nan());

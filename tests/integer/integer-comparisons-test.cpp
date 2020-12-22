@@ -81,7 +81,8 @@ TEMPLATE_TEST_CASE_SIG("Comparing two signed integers of different bit width",
         THEN("operator> returns false")
         {
             bool comp = a > b;
-            if (comp) {
+            if (comp)
+            {
                 std::cout << "a > b failed for\n";
                 std::cout << "a: " << a << "\t" << to_binary(a) << "\n";
                 std::cout << "b: " << b << "\t" << to_binary(b) << "\n";
