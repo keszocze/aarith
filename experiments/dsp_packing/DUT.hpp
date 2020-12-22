@@ -2,6 +2,7 @@
 
 #include "DSP.hpp"
 #include "util.hpp"
+#include <functional>
 
 namespace dsp_packing {
 

@@ -18,7 +18,7 @@ template <typename WordType = uint64_t> using half_precision = floating_point<5,
 template <typename WordType = uint64_t> using single_precision = floating_point<8, 23, WordType>;
 template <typename WordType = uint64_t> using double_precison = floating_point<11, 52, WordType>;
 template <typename WordType = uint64_t>
-using quandruple_precision = floating_point<15, 112, WordType>;
+using quadruple_precision = floating_point<15, 112, WordType>;
 template <typename WordType = uint64_t> using bfloat16 = floating_point<8, 7, WordType>;
 template <typename WordType = uint64_t> using tensorfloat32 = floating_point<8, 10, WordType>;
 
