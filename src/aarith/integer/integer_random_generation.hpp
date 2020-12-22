@@ -36,7 +36,7 @@ public:
         }
         // Modulo is slightly biased towards smaller numbers. Possible fix: e.g. use "Java's
         // algorithm.
-        using namespace aarith::integer_operators;
+        using namespace aarith::integer_operators; // NOLINT
         //        std::cout << min << " + (" << uint << " % " << length << ") = " << min << " + "
         //                  << (uint % length) << "\n";
         return width_cast<BitWidth>(min + (uint % length));

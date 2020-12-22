@@ -264,7 +264,7 @@ template <std::size_t W, std::size_t V, typename WordType>
         const auto s2 = expanding_add(bh, bl);
 
         // prevent infinite call loop
-        // TODO find a better way to do this
+        // TODO (keszocze) find a better way to do this
         uinteger<2 * (karazuba_width + 1), WordType> p3;
         if (s1.bit(s1.width() - 1) == 1 || s2.bit(s2.width() - 1) == 1)
         {
@@ -455,7 +455,6 @@ template <class IntA, class IntB>
     static_assert(::aarith::is_integral_v<IntA>);
     static_assert(::aarith::is_integral_v<IntB>);
 
-    // TODO do we need this assertion?
     static_assert(::aarith::same_signedness<IntA, IntB>);
     static_assert(::aarith::same_word_type<IntA, IntB>);
 
