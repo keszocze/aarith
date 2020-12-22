@@ -469,7 +469,9 @@ private:
     std::string gen_oob_msg(size_t index, bool accessed_bit = true)
     {
 
-        std::string msg, head, foot;
+        std::string msg;
+        std::string head;
+        std::string foot;
         if (accessed_bit)
         {
             head = "Trying to access bit with index ";
