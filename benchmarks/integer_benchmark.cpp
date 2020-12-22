@@ -102,7 +102,6 @@ public:
     }
 };
 
-
 template <typename I> class Mod
 {
 public:

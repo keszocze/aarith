@@ -502,5 +502,4 @@ public:
     static constexpr bool value = true;
 };
 
-
 } // namespace aarith

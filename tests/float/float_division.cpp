@@ -52,19 +52,22 @@ TEMPLATE_TEST_CASE_SIG("Dividing by one", "[normalized_float][arithmetic][divisi
 
         F f = GENERATE(take(100, random_float<E, M, FloatGenerationModes::NonSpecial>()));
 
-        WHEN("Dividing the number by 1") {
+        WHEN("Dividing the number by 1")
+        {
             const F res = f / F::one();
 
-
-            THEN("The result should be unchanged") {
+            THEN("The result should be unchanged")
+            {
                 REQUIRE(res == f);
             }
         }
 
-        WHEN("Dividing the number by -1") {
+        WHEN("Dividing the number by -1")
+        {
             const F res = f / F::neg_one();
 
-            THEN("The number should have switched its sign") {
+            THEN("The number should have switched its sign")
+            {
                 REQUIRE(res == -f);
             }
         }

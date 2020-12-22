@@ -5,7 +5,6 @@
 
 namespace aarith {
 
-
 /**
  * @brief Performs a runtime-checked conversion.
  *

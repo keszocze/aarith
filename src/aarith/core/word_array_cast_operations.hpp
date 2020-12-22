@@ -121,7 +121,8 @@ template <size_t DestinationWidth, template <size_t, typename> typename Containe
 {
     if constexpr (is_signed_v<Container<SourceWidth, WordType>>)
     {
-        return arithmetic_width_cast_left<DestinationWidth, Container, SourceWidth, WordType>(source);
+        return arithmetic_width_cast_left<DestinationWidth, Container, SourceWidth, WordType>(
+            source);
     }
     else
     {
@@ -143,8 +144,8 @@ template <size_t DestinationWidth, template <size_t, typename> typename Containe
  * @return integer with specified bit width
  */
 template <size_t DestinationWidth, template <size_t, typename> typename Container,
-    size_t SourceWidth, typename WordType,
-    typename = std::enable_if_t<is_word_array_v<Container<DestinationWidth, WordType>>>>
+          size_t SourceWidth, typename WordType,
+          typename = std::enable_if_t<is_word_array_v<Container<DestinationWidth, WordType>>>>
 [[nodiscard]] auto constexpr width_cast_right(const Container<SourceWidth, WordType>& source)
     -> Container<DestinationWidth, WordType>
 {
@@ -158,13 +159,13 @@ template <size_t DestinationWidth, template <size_t, typename> typename Containe
 
         if constexpr (DestinationWidth >= SourceWidth)
         {
-            result=source;
-            result <<= (DestinationWidth-SourceWidth);
+            result = source;
+            result <<= (DestinationWidth - SourceWidth);
         }
         else
         {
-            source >>= (SourceWidth-DestinationWidth);
-            result=width_cast<DestinationWidth>(source);
+            source >>= (SourceWidth - DestinationWidth);
+            result = width_cast<DestinationWidth>(source);
         }
         return result;
     }

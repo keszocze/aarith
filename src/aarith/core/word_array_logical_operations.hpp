@@ -3,9 +3,7 @@
 #include <aarith/core/traits.hpp>
 #include <aarith/core/word_array.hpp>
 
-
 namespace aarith {
-
 
 template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
 constexpr W& operator&=(W& a, const W& b)
@@ -72,5 +70,4 @@ template <typename W> [[nodiscard]] constexpr auto operator~(const W& rhs) -> W
     return bitwise_not;
 }
 
-
-}
+} // namespace aarith

@@ -5,7 +5,6 @@
 #include <iomanip>
 #include <sstream>
 
-
 using aarith::normalized_float;
 
 using F = normalized_float<8, 23>; // NOLINT

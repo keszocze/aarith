@@ -197,7 +197,6 @@ public:
     }
 };
 
-
 /*
  * Traits
  */
@@ -206,7 +205,6 @@ template <size_t Width, typename WordType> class is_integral<uinteger<Width, Wor
 public:
     static constexpr bool value = true;
 };
-
 
 template <size_t Width, typename WordType> class is_unsigned<uinteger<Width, WordType>>
 {
@@ -340,8 +338,6 @@ template <size_t Width, typename WordType> class is_word_array<integer<Width, Wo
 public:
     static constexpr bool value = true;
 };
-
-
 
 } // namespace aarith
 

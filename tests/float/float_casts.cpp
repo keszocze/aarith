@@ -59,7 +59,6 @@ TEMPLATE_TEST_CASE_SIG("IEEE-754 arithmetic conversion: float, double",
     }
 }
 
-
 SCENARIO("Creating aarith floats from native +/- infinity")
 {
     using Single = normalized_float<8, 23>;
@@ -107,8 +106,6 @@ SCENARIO("Creating aarith floats from native +/- infinity")
                 REQUIRE(lneginf.is_negative());
                 REQUIRE(lneginf.is_neg_inf());
                 REQUIRE(lneginf.is_inf());
-
-
             }
         }
         WHEN("Creating aarith foating-point numbers with enough bits from the infinities")
@@ -139,7 +136,6 @@ SCENARIO("Creating aarith floats from native +/- infinity")
             const Double dposinf(native_pos_inf);
             const Large lposinf(native_pos_inf);
 
-
             const Double dneginf(native_neg_inf);
             const Large lneginf(native_neg_inf);
 
@@ -168,7 +164,6 @@ SCENARIO("Creating aarith floats from native +/- infinity")
             {
                 const Small smallposinf(native_pos_inf);
                 const Single sposinf(native_pos_inf);
-
 
                 const Small smallneginf(native_neg_inf);
                 const Single sneginf(native_neg_inf);

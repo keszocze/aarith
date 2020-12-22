@@ -73,7 +73,8 @@ bool constexpr bitwise_equality(const normalized_float<E, M> lhs, const normaliz
 }
 
 template <size_t E, size_t M>
-auto constexpr operator==(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs) -> bool
+auto constexpr operator==(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
+    -> bool
 {
     if (lhs.is_nan() || rhs.is_nan())
     {
@@ -91,7 +92,8 @@ auto constexpr operator==(const normalized_float<E, M> lhs, const normalized_flo
 
 template <size_t E, size_t M, size_t E_, size_t M_,
           typename = std::enable_if_t<(E != E_) || (M != M_)>>
-bool constexpr logical_equality(const normalized_float<E, M> lhs, const normalized_float<E_, M_> rhs)
+bool constexpr logical_equality(const normalized_float<E, M> lhs,
+                                const normalized_float<E_, M_> rhs)
 {
 
     bool equal_mantissa = false;
@@ -120,7 +122,8 @@ bool constexpr logical_equality(const normalized_float<E, M> lhs, const normaliz
 
 template <size_t E, size_t M, size_t E_, size_t M_,
           typename = std::enable_if_t<(E != E_) || (M != M_)>>
-auto constexpr operator==(const normalized_float<E, M> lhs, const normalized_float<E_, M_> rhs) -> bool
+auto constexpr operator==(const normalized_float<E, M> lhs, const normalized_float<E_, M_> rhs)
+    -> bool
 {
     //    std::cout << "spec float op==\n";
     if (lhs.is_nan() || rhs.is_nan())
@@ -190,7 +193,8 @@ bool constexpr operator<(const normalized_float<E, M> lhs, const normalized_floa
 }
 
 template <size_t E, size_t M, size_t E_, size_t M_>
-auto constexpr operator!=(const normalized_float<E, M> lhs, const normalized_float<E_, M_> rhs) -> bool
+auto constexpr operator!=(const normalized_float<E, M> lhs, const normalized_float<E_, M_> rhs)
+    -> bool
 {
     return !(lhs == rhs);
 }
@@ -202,13 +206,15 @@ auto constexpr operator>(const normalized_float<E, M> lhs, const normalized_floa
 }
 
 template <size_t e, size_t m>
-auto constexpr operator>=(const normalized_float<e, m> lhs, const normalized_float<e, m> rhs) -> bool
+auto constexpr operator>=(const normalized_float<e, m> lhs, const normalized_float<e, m> rhs)
+    -> bool
 {
     return rhs < lhs || lhs == rhs;
 }
 
 template <size_t e, size_t m>
-auto constexpr operator<=(const normalized_float<e, m> lhs, const normalized_float<e, m> rhs) -> bool
+auto constexpr operator<=(const normalized_float<e, m> lhs, const normalized_float<e, m> rhs)
+    -> bool
 {
     return lhs < rhs || lhs == rhs;
 }

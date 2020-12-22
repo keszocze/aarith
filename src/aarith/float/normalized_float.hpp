@@ -193,14 +193,14 @@ public:
         const float_disassembly value_disassembled = disassemble_float<F>(f);
         constexpr size_t ext_exp_width = get_exponent_width<F>();
         constexpr size_t ext_mant_width = get_mantissa_width<F>();
-        uinteger<ext_exp_width, WordType> extracted_exp {value_disassembled.exponent};
-        uinteger<ext_mant_width, WordType> extracted_mantissa {value_disassembled.mantissa};
+        uinteger<ext_exp_width, WordType> extracted_exp{value_disassembled.exponent};
+        uinteger<ext_mant_width, WordType> extracted_mantissa{value_disassembled.mantissa};
 
-        //does not correctly insert -0
-        //sign_neg = (f < 0);
+        // does not correctly insert -0
+        // sign_neg = (f < 0);
         sign_neg = value_disassembled.is_neg;
-        
-        if(f == static_cast<F>(0.))
+
+        if (f == static_cast<F>(0.))
         {
             return;
         }
@@ -239,7 +239,8 @@ public:
             }
             // the other special case is for zero and denormalized numbers: the exponent has to
             // remain zeroes only as well
-            else if (extracted_exp == E_::all_zeroes()) {
+            else if (extracted_exp == E_::all_zeroes())
+            {
                 exponent = uinteger<E>::all_zeroes();
             }
             else
@@ -257,18 +258,19 @@ public:
             // biases from the original bias
             // in case of over- or underflow we set the value to infinity or 0
 
-
             // we need to make sure that inf/NaN remains the same
             if (extracted_exp == E_::all_ones())
             {
                 exponent = uinteger<E>::all_ones();
             }
-                // the other special case is for zero and denormalized numbers: the exponent has to
-                // remain zeroes only as well
-            else if (extracted_exp == E_::all_zeroes()) {
+            // the other special case is for zero and denormalized numbers: the exponent has to
+            // remain zeroes only as well
+            else if (extracted_exp == E_::all_zeroes())
+            {
                 exponent = uinteger<E>::all_zeroes();
             }
-            else {
+            else
+            {
                 using OExp = uinteger<ext_exp_width + 1, WordType>;
                 constexpr OExp bigger_bias = uinteger<ext_exp_width - 1, WordType>::all_ones();
                 constexpr OExp smaller_bias = bias;
@@ -551,7 +553,8 @@ public:
 
     [[nodiscard]] constexpr auto unbiased_exponent() const -> integer<E + 1, WordType>
     {
-        if (!this->is_normalized()) {
+        if (!this->is_normalized())
+        {
             return min_exp;
         }
 
@@ -791,8 +794,8 @@ public:
 };
 
 template <size_t E, size_t M1, size_t M2, typename WordType = uint64_t>
-auto bit_equal(const normalized_float<E, M1, WordType> lhs, const normalized_float<E, M2, WordType> rhs)
-    -> bool
+auto bit_equal(const normalized_float<E, M1, WordType> lhs,
+               const normalized_float<E, M2, WordType> rhs) -> bool
 {
     return lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent() &&
            lhs.get_mantissa() == rhs.get_mantissa();

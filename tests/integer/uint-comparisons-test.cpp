@@ -122,7 +122,6 @@ TEMPLATE_TEST_CASE_SIG("Comparing two unsigned integers of identical bit-width",
     }
 }
 
-
 TEMPLATE_TEST_CASE_SIG("Comparing two unsigned integers with different bit-widths",
                        "[integer][unsigned][utility][comparison]", AARITH_INT_TEST_SIGNATURE,
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
@@ -137,7 +136,6 @@ TEMPLATE_TEST_CASE_SIG("Comparing two unsigned integers with different bit-width
         I a = GENERATE(take(10, random_uinteger<W, WordType>(I::zero(), div(I::max(), I{2U}))));
         S b = GENERATE(take(10, random_uinteger<2 * W + 1, WordType>(
                                     expanding_add(div(I::max(), I{2U}), S::one()), S::max())));
-
 
         THEN("operator< returns true")
         {

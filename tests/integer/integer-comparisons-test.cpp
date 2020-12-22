@@ -264,7 +264,7 @@ TEMPLATE_TEST_CASE_SIG("Investigating the comparison of max and min values",
 
     WHEN("Constructing min and max value into a larger integer")
     {
-        integer<W + 1, WordType> min_= T::min();
+        integer<W + 1, WordType> min_ = T::min();
         integer<W + 1, WordType> max_ = T::max();
 
         THEN("min should be negative")

@@ -216,7 +216,8 @@ auto to_sci_string(const normalized_float<E, M, WordType> nf) -> std::string
         }
         // construct a float with the given mantissa and an exponent of 0
         // to leech on float's inherent decimal output
-        uint32_t ui_mantissa = (static_cast<uint32_t>(flc_mantissa.word(0)) & 0x7fffff) | 0x3f800000;
+        uint32_t ui_mantissa =
+            (static_cast<uint32_t>(flc_mantissa.word(0)) & 0x7fffff) | 0x3f800000;
         float* mantissa = reinterpret_cast<float*>(&ui_mantissa);
         auto conv = compute_nearest_exponent10(nf);
         *mantissa = *mantissa * conv.conversion;

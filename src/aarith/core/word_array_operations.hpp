@@ -90,7 +90,6 @@ std::optional<size_t> first_unset_bit(const word_array<Width, WordType>& value)
     }
 }
 
-
 /**
  * @brief Sets the most significant bit to one
  * @tparam W Type that behaves like a word array (can, e.g., also be an uinteger)
@@ -168,6 +167,5 @@ split(const word_array<W, WordType>& w)
 
     return std::make_pair(lhs, rhs);
 }
-
 
 } // namespace aarith

@@ -108,18 +108,18 @@ template <size_t E, size_t M>
     {
         return lhs.make_quiet_nan();
     }
- 
+
     if (rhs.is_nan())
     {
         return rhs.make_quiet_nan();
     }
- 
+
     if ((lhs.is_nan() || rhs.is_nan()) || (lhs.is_zero() && rhs.is_inf()) ||
         (lhs.is_inf() && rhs.is_zero()))
     {
         return normalized_float<E, M>::NaN();
     }
- 
+
     // compute sign
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
@@ -128,7 +128,7 @@ template <size_t E, size_t M>
         return sign ? normalized_float<E, M>::neg_infinity()
                     : normalized_float<E, M>::pos_infinity();
     }
- 
+
     // compute exponent
     auto ext_esum = expanding_add(lhs.get_exponent(), rhs.get_exponent());
     bool overflow = ext_esum.bit(E) == 1;

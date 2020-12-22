@@ -92,7 +92,8 @@ SCENARIO("Performing common functional operations", "[word_array][functional][ut
 
                     constexpr auto result = zip_with(a, b, f);
 
-                    constexpr auto uinteger_result = add(uinteger<half_width>(a), uinteger<half_width>(b));
+                    constexpr auto uinteger_result =
+                        add(uinteger<half_width>(a), uinteger<half_width>(b));
 
                     CHECK(uinteger<192>(result) == uinteger_result);
                 }
@@ -118,7 +119,8 @@ SCENARIO("Performing common functional operations", "[word_array][functional][ut
 
                     constexpr auto result = zip_with_state(a, b, f);
 
-                    constexpr auto uinteger_result = add(uinteger<half_width>(a), uinteger<half_width>(b));
+                    constexpr auto uinteger_result =
+                        add(uinteger<half_width>(a), uinteger<half_width>(b));
 
                     CHECK(uinteger<192>(result) == uinteger_result);
                 }
@@ -219,7 +221,8 @@ SCENARIO("Performing common functional operations", "[word_array][functional][ut
 
                     const std::vector<uint64_t> ns{8U, 15U, 5743U, 0U};
 
-                    const auto f = [](word_array<full_width>::word_type a, word_array<full_width>::word_type b,
+                    const auto f = [](word_array<full_width>::word_type a,
+                                      word_array<full_width>::word_type b,
                                       uint64_t m) { return a + b + m; };
 
                     for (const auto n : ns)

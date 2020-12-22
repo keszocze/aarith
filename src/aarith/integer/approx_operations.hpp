@@ -1,8 +1,8 @@
 #pragma once
 
 #include <aarith/core/word_array.hpp>
-#include <aarith/core/word_array_operations.hpp>
 #include <aarith/core/word_array_functional.hpp>
+#include <aarith/core/word_array_operations.hpp>
 #include <aarith/integer/integer_operations.hpp>
 #include <aarith/integer/integers.hpp>
 #include <cstdint>
