@@ -221,9 +221,6 @@ auto to_sci_string(const normalized_float<E, M, WordType> nf) -> std::string
         auto conv = compute_nearest_exponent10(nf);
         *mantissa = *mantissa * conv.conversion;
 
-        const integer<E + 1, WordType> exp{nf.get_exponent()};
-        const integer<E + 1, WordType> bias{nf.bias};
-
         if (conv.not_supported)
         {
             str << "E = " << E << " is not supported for to_sci_string()";
