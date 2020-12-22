@@ -15,7 +15,7 @@ enum class FloatGenerationModes
     /**
      * @brief Generates normalized numbers only.
      *
-     * This does *not* include NaN and +/- infinity.
+     * This does *not* include zero, NaN and +/- infinity.
      *
      * @warning This mode does *not* generate the number zero!
      */
@@ -49,7 +49,12 @@ enum class FloatGenerationModes
      *  - Not a number
      *  - +/- infinity
      */
-    FullyRandom
+    FullyRandom,
+
+    /**
+     * @brief Generates +/- inf and NaNs only
+     */
+    Special
 };
 
 /**
@@ -63,7 +68,7 @@ class normalized_float_distribution
 public:
     using F = normalized_float<E, M, WordType>;
     using IntExp = typename F::IntegerExp;
-    using IntMant = typename F::IntegerMant;
+    using IntFrac = typename F::IntegerFrac;
 
     explicit normalized_float_distribution()
     {
@@ -90,13 +95,17 @@ public:
         {
             e = random_norm_exp(g);
         }
+        else if constexpr (Mode == FloatGenerationModes::Special)
+        {
+            e = IntExp::all_ones();
+        }
         else
         {
             // Mode == FloatGenerationModes::DenormalizedOnly
             // nothing needs to be done here as e already is zero
         }
 
-        IntMant m = random_mant(g);
+        IntFrac m = random_mant(g);
         bool sign = random_sign(g);
 
         return F{sign, e, m};

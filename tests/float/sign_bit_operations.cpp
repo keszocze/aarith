@@ -1,3 +1,4 @@
+#include "../test-signature-ranges.hpp"
 #include "gen_float.hpp"
 #include <aarith/float.hpp>
 #include <bitset>
@@ -6,11 +7,9 @@
 
 using namespace aarith;
 
-
 TEMPLATE_TEST_CASE_SIG("Negation works as intended",
                        "[normalized_float][negate][sig_bit_operation][invariant]",
-                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
-                       (11, 52, double))
+                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
 {
     using F = normalized_float<E, M>;
 
@@ -34,8 +33,7 @@ TEMPLATE_TEST_CASE_SIG("Negation works as intended",
 
 TEMPLATE_TEST_CASE_SIG("Copying a floating-point number works",
                        "[normalized_float][copy][sig_bit_operation][invariant]",
-                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
-                       (11, 52, double))
+                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
 {
     using F = normalized_float<E, M>;
 
@@ -56,10 +54,10 @@ TEMPLATE_TEST_CASE_SIG("Copying a floating-point number works",
         }
     }
 }
+
 TEMPLATE_TEST_CASE_SIG("Copying a floating-point number with the sign of another number works",
                        "[normalized_float][copySign][sig_bit_operation][invariant]",
-                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
-                       (11, 52, double))
+                       AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
 {
     using F = normalized_float<E, M>;
 
@@ -76,8 +74,7 @@ TEMPLATE_TEST_CASE_SIG("Copying a floating-point number with the sign of another
             THEN("The result compares equal")
             {
                 REQUIRE(c.get_sign() == b.get_sign());
-                REQUIRE(c.get_mantissa() == a.get_mantissa());
-                REQUIRE(c.get_exponent() == a.get_exponent());
+                REQUIRE(bitwise_equality(abs(c), abs(a)));
             }
         }
     }

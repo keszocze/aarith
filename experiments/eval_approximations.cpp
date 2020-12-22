@@ -1,157 +1,151 @@
 #include <aarith/float.hpp>
 #include <aarith/float/approx_operations.hpp>
+#include <aarith/integer.hpp>
 #include <chrono>
 #include <cmath>
-#include <iomanip>
+#include <random>
 #include <sstream>
 
 using namespace aarith;
 
 using F = normalized_float<8, 23>;
 
-template <size_t iterations> F heron_exact(const F& num)
+template <size_t A, typename WordType = uint64_t> void test_a()
 {
 
-    const F one{1.0f};
-    const F two{2.0f};
-    F result = add(num, one);
-    result = div(result, two);
+    constexpr size_t N = 200;
+    constexpr size_t NDenorm = 100;
 
-    for (size_t i = 0; i < iterations; ++i)
-    {
-        const F quot = div(num, result);
-        result = add(result, quot);
-        result = div(result, two);
-    }
+    std::random_device rd;
+    std::mt19937 mt(rd());
 
-    return result;
-}
+    using ExpInt = uinteger<8, WordType>;
+    using MantInt = uinteger<A, WordType>;
+    using F = normalized_float<8, A, WordType>;
+    using Float = normalized_float<8, 23, WordType>;
 
-template <size_t iterations, size_t C> F heron_anytime(const F& num)
-{
+    // do not generate special cases, i.e. inf, nan, denormalized numbers
+    uniform_uinteger_distribution exp_dist =
+        uniform_uinteger_distribution<8, WordType>(ExpInt::one(), ExpInt::max() - ExpInt::one());
+    uniform_uinteger_distribution mant_dist = uniform_uinteger_distribution<A, WordType>();
 
-    const F one{1.0f};
-    const F two{2.0f};
-    F result = anytime_add(num, one, C + 1);
-    result = anytime_div(result, two, C + 1);
+    const auto gen = [&rd, &mt, &exp_dist, &mant_dist]() {
+        std::vector<F> values{F::zero(),
+                              F::neg_zero(),
+                              F::one(),
+                              F::neg_one(),
+                              F::smallest_normalized(),
+                              F::smallest_denormalized(),
+                              F::neg_infinity(),
+                              F::pos_infinity(),
+                              F::NaN()};
 
-    for (size_t i = 0; i < iterations; ++i)
-    {
-        const F quot = anytime_div(num, result, C + 1);
-        result = anytime_add(result, quot, C + 1);
-        result = anytime_div(result, two, C + 1);
-    }
+        for (size_t i = 0; i < N; ++i)
+        {
+            ExpInt e = exp_dist(mt);
+            MantInt m = mant_dist(mt);
+            F pos(false, e, m);
+            F neg(true, e, m);
 
-    return result;
-}
+            values.push_back(pos);
+            values.push_back(neg);
+        }
 
-template <int start, size_t iters, size_t heron_iter, size_t C> void compare_heron()
-{
+        for (size_t i = 0; i < NDenorm; ++i)
+        {
+            ExpInt e = ExpInt::zero();
+            MantInt m = mant_dist(mt);
+            F pos(false, e, m);
+            F neg(true, e, m);
 
-    auto t1 = std::chrono::high_resolution_clock::now();
+            std::cout << to_binary(pos) << "\n";
 
-    F a{static_cast<float>(start)};
+            values.push_back(pos);
+            values.push_back(neg);
+        }
+        return values;
+    };
 
-    const F delta{0.014324f / 2.0f};
+    const std::vector<F> vals_a = gen();
+    const std::vector<F> vals_b = gen();
 
-    double max_abs_diff{0};
-    double max_abs_diff_float{0};
-
-    for ([[maybe_unused]] size_t i = 0; i < iters; ++i)
-    {
-        const F res_anytime = heron_anytime<heron_iter, C>(a);
-        const F res_exact = heron_exact<heron_iter>(a);
-
-        const double abs_diff = static_cast<double>(abs(sub(res_exact, res_anytime)));
-
-        const double res_anytime_float = static_cast<double>(res_anytime);
-        const double a_float = static_cast<double>(a);
-        const double res_float = static_cast<double>(sqrtf(a_float));
-        const double abs_diff_correct = std::abs(res_anytime_float - res_float);
-
-        max_abs_diff = std::max(max_abs_diff, abs_diff);
-        max_abs_diff_float = std::max(max_abs_diff_float, abs_diff_correct);
-        //        std::cout << "value iter: " << i << "\n";
-        //        std::cout << "sqrt_e(" << static_cast<float>(a) << ") = " <<
-        //        static_cast<float>(res_exact)
-        //                  << "\n";
-        //        std::cout << "sqrt_a(" << static_cast<float>(a) << ") = " <<
-        //        static_cast<float>(res_anytime)
-        //                  << "\n";
-        //        std::cout << "sqrt_f(" << a_float << ") = " << res_float << "\n";
-        //        std::cout << "diff: " << abs_diff << "\n";
-        //        std::cout << "diff_float: " << abs_diff_correct << "\n\n";
-
-        a = add(a, delta);
-    }
-    auto t2 = std::chrono::high_resolution_clock::now();
-
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
-    std::cout << std::fixed << std::setprecision(30) << heron_iter << ";" << C << ";"
-              << static_cast<double>(max_abs_diff) << ";" << max_abs_diff_float << ";" << duration
+    std::cout << "a;a float;b float;a aarith; b aarith;a in float width;b in float width;"
+              << "a+b float;a-b float;a*b float;a+b float bits;a-b float bits;a*b float bits;"
+              << "a+b aarith;a-b aarith;a*b aarith;a+b in float width;a-b in float width;a*b in "
+                 "float width;"
+              << "anytime a+b aarith;anytime a-b aarith;anytime a*b aarith;anytime a+b in float "
+                 "width;anytime a-b in float width;anytime a*b in float width;"
               << "\n";
+    for (const F& f : vals_a)
+    {
+        const float f_float = static_cast<float>(f);
+
+        for (const F& g : vals_b)
+        {
+
+            const float g_float = static_cast<float>(g);
+
+            const float add_float = f_float + g_float;
+            const float sub_float = f_float - g_float;
+            const float mul_float = f_float * g_float;
+
+            const Float add_float_F{add_float};
+            const Float sub_float_F{sub_float};
+            const Float mul_float_F{mul_float};
+
+            const F add = f + g;
+            const F sub = f - g;
+            const F mul = f * g;
+
+            const F any_add = anytime_add(f, g, A + 1);
+            const F any_sub = anytime_sub(f, g, A + 1);
+            const F any_mul = anytime_mul(f, g, A + 1);
+
+            std::cout << A << ";" << f_float << ";" << g_float << ";" << as_word_array<8, A>(f)
+                      << ";" << as_word_array<8, A>(g) << ";";
+            std::cout << as_word_array<8, 23>(f) << ";" << as_word_array<8, 23>(g) << ";";
+            std::cout << add_float << ";" << sub_float << ";" << mul_float << ";";
+            std::cout << as_word_array<8, 23>(add_float_F) << ";"
+                      << as_word_array<8, 23>(sub_float_F) << ";"
+                      << as_word_array<8, 23>(mul_float_F) << ";";
+            std::cout << as_word_array<8, A>(add) << ";" << as_word_array<8, A>(sub) << ";"
+                      << as_word_array<8, A>(mul) << ";" << as_word_array<8, 23>(add) << ";"
+                      << as_word_array<8, 23>(sub) << ";" << as_word_array<8, 23>(mul) << ";";
+            std::cout << as_word_array<8, A>(any_add) << ";" << as_word_array<8, A>(any_sub) << ";"
+                      << as_word_array<8, A>(any_mul) << ";" << as_word_array<8, 23>(any_add) << ";"
+                      << as_word_array<8, 23>(any_sub) << ";" << as_word_array<8, 23>(any_mul)
+                      << ";";
+
+            std::cout << "\n";
+        }
+    }
 }
 
-int main(int argc, char** argv)
+int main()
 {
-    using namespace aarith;
 
-    constexpr size_t value_iter = 8800;
-    constexpr int starting_value = 65;
-
-    compare_heron<starting_value, value_iter, 1, 22>();
-    compare_heron<starting_value, value_iter, 2, 22>();
-    compare_heron<starting_value, value_iter, 3, 22>();
-    compare_heron<starting_value, value_iter, 4, 22>();
-    compare_heron<starting_value, value_iter, 5, 22>();
-    compare_heron<starting_value, value_iter, 6, 22>();
-    compare_heron<starting_value, value_iter, 7, 22>();
-    compare_heron<starting_value, value_iter, 10, 22>();
-    compare_heron<starting_value, value_iter, 100, 22>();
-    compare_heron<starting_value, value_iter, 1000, 22>();
-    compare_heron<starting_value, value_iter, 2000, 22>();
-
-    constexpr size_t heron_iter = 5;
-    compare_heron<starting_value, value_iter, heron_iter, 6>();
-    compare_heron<starting_value, value_iter, heron_iter, 7>();
-    compare_heron<starting_value, value_iter, heron_iter, 8>();
-    compare_heron<starting_value, value_iter, heron_iter, 9>();
-    compare_heron<starting_value, value_iter, heron_iter, 10>();
-    compare_heron<starting_value, value_iter, heron_iter, 11>();
-    compare_heron<starting_value, value_iter, heron_iter, 12>();
-    compare_heron<starting_value, value_iter, heron_iter, 13>();
-    compare_heron<starting_value, value_iter, heron_iter, 14>();
-    compare_heron<starting_value, value_iter, heron_iter, 15>();
-    compare_heron<starting_value, value_iter, heron_iter, 16>();
-    compare_heron<starting_value, value_iter, heron_iter, 17>();
-    compare_heron<starting_value, value_iter, heron_iter, 18>();
-    compare_heron<starting_value, value_iter, heron_iter, 19>();
-    compare_heron<starting_value, value_iter, heron_iter, 20>();
-    compare_heron<starting_value, value_iter, heron_iter, 21>();
-    compare_heron<starting_value, value_iter, heron_iter, 22>();
-    compare_heron<starting_value, value_iter, heron_iter, 23>();
-    compare_heron<starting_value, value_iter, heron_iter, 24>();
-
-    constexpr size_t heron_iter_15 = 15;
-    compare_heron<starting_value, value_iter, heron_iter_15, 6>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 7>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 8>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 9>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 10>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 11>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 12>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 13>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 14>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 15>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 16>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 17>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 18>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 19>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 20>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 21>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 22>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 23>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 24>();
-
-    return 0;
+        test_a<23>();
+        test_a<22>();
+        test_a<21>();
+        test_a<20>();
+        test_a<19>();
+        test_a<18>();
+        test_a<17>();
+        test_a<16>();
+        test_a<15>();
+        test_a<14>();
+        test_a<13>();
+        test_a<12>();
+        test_a<11>();
+        test_a<10>();
+        test_a<9>();
+        test_a<8>();
+        test_a<7>();
+        test_a<6>();
+        test_a<5>();
+        test_a<4>();
+        test_a<3>();
+        test_a<2>();
+    test_a<1>();
+    return EXIT_SUCCESS;
 }
