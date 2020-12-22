@@ -4,11 +4,11 @@
 using namespace aarith;
 
 TEMPLATE_TEST_CASE_SIG("Arithmetic should match the native data types",
-                       "[normalized_float][arithmetic][constexpr][checking]",
+                       "[floating_point][arithmetic][constexpr][checking]",
                        ((size_t E, size_t M, typename native), E, M, native), (8, 23, float),
                        (11, 52, double))
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     native a_float{-1337.35f};
     native b_float{420815.0f};
@@ -46,7 +46,7 @@ TEMPLATE_TEST_CASE_SIG("Arithmetic should match the native data types",
     }
 }
 
-SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithmetic][addition]")
+SCENARIO("Adding two floating-point numbers exactly", "[floating_point][arithmetic][addition]")
 {
     GIVEN("Single precision floats (E = 8, M = 23)")
     {
@@ -57,24 +57,24 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         {
             static constexpr float number_a = 93.211546f;
             static constexpr float number_b = -number_a;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             std::cout << "result: " << to_binary(result) << std::endl;
-            std::cout << "zero: " << to_binary(normalized_float<E, M>(0.f)) << std::endl;
+            std::cout << "zero: " << to_binary(floating_point<E, M>(0.f)) << std::endl;
             THEN("The result should be 0")
             {
-                REQUIRE(result == normalized_float<E, M>(0.f));
+                REQUIRE(result == floating_point<E, M>(0.f));
             }
         }
         WHEN("The second operand is 0.")
         {
             static constexpr float number_a = 93.211546f;
             static constexpr float number_b = 0;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("The result should be a")
             {
@@ -86,9 +86,9 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         {
             static constexpr float number_a = -93.211546f;
             static constexpr float number_b = 0;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("The result should be a")
             {
@@ -99,9 +99,9 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         {
             static constexpr float number_a = 0;
             static constexpr float number_b = 93.211546f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("The result should be b")
             {
@@ -112,9 +112,9 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         {
             static constexpr float number_a = 0;
             static constexpr float number_b = -93.211546f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("The result should be b")
             {
@@ -126,13 +126,13 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         {
             static constexpr float number_a = 213.22154f;
             static constexpr float number_b = 93.211546f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a + number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -140,13 +140,13 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         {
             static constexpr float number_a = -213.22154f;
             static constexpr float number_b = 93.211546f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a + number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -154,13 +154,13 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         {
             static constexpr float number_a = 213.22154f;
             static constexpr float number_b = -93.211546f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a + number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -168,13 +168,13 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         {
             static constexpr float number_a = -213.22154f;
             static constexpr float number_b = -93.211546f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a + number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -182,13 +182,13 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         {
             static constexpr float number_a = 93.211546f;
             static constexpr float number_b = 213.22154f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a + number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -196,13 +196,13 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         {
             static constexpr float number_a = -93.211546f;
             static constexpr float number_b = 213.22154f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a + number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -210,13 +210,13 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         {
             static constexpr float number_a = 93.211546f;
             static constexpr float number_b = -213.22154f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a + number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -224,33 +224,33 @@ SCENARIO("Adding two floating-point numbers exactly", "[normalized_float][arithm
         {
             static constexpr float number_a = -93.211546f;
             static constexpr float number_b = -213.22154f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a + number_b)));
             }
         }
         WHEN("When one operand is a > 1 and the other is 0 < b < 1.")
         {
             static constexpr float number_a = 2.75f;
             static constexpr float number_b = 0.5f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = add(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = add(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a + number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a + number_b)));
             }
         }
     }
 }
 
 SCENARIO("Subtracting two floating-point numbers exactly",
-         "[normalized_float][arithmetic][subtraction]")
+         "[floating_point][arithmetic][subtraction]")
 {
     GIVEN("Single precision floats (E = 8, M = 23)")
     {
@@ -261,22 +261,22 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         {
             static constexpr float number_a = 93.211546f;
             static constexpr float number_b = number_a;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("The result should be 0")
             {
-                REQUIRE(result == normalized_float<E, M>(0.f));
+                REQUIRE(result == floating_point<E, M>(0.f));
             }
         }
         WHEN("The second operand is 0.")
         {
             static constexpr float number_a = 93.211546f;
             static constexpr float number_b = 0;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("The result should be a")
             {
@@ -287,9 +287,9 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         {
             static constexpr float number_a = -93.211546f;
             static constexpr float number_b = 0;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("The result should be a")
             {
@@ -301,13 +301,13 @@ SCENARIO("Subtracting two floating-point numbers exactly",
             static constexpr float number_a = 0;
             static constexpr float number_b = 93.211546f;
             static constexpr float res = -number_b;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("The result should be -b")
             {
-                REQUIRE(result == normalized_float<E, M>(res));
+                REQUIRE(result == floating_point<E, M>(res));
             }
         }
         WHEN("The first operand is 0, and the second operand is negative.")
@@ -315,13 +315,13 @@ SCENARIO("Subtracting two floating-point numbers exactly",
             static constexpr float number_a = 0;
             static constexpr float number_b = -93.211546f;
             static constexpr float res = -number_b;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("The result should be -b")
             {
-                REQUIRE(result == normalized_float<E, M>(res));
+                REQUIRE(result == floating_point<E, M>(res));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -329,13 +329,13 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         {
             static constexpr float number_a = 213.22154f;
             static constexpr float number_b = 93.211546f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a - number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -343,13 +343,13 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         {
             static constexpr float number_a = -213.22154f;
             static constexpr float number_b = 93.211546f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a - number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -357,13 +357,13 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         {
             static constexpr float number_a = 213.22154f;
             static constexpr float number_b = -93.211546f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a - number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -371,13 +371,13 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         {
             static constexpr float number_a = -213.22154f;
             static constexpr float number_b = -93.211546f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a - number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -385,13 +385,13 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         {
             static constexpr float number_a = 93.211546f;
             static constexpr float number_b = 213.22154f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a - number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -399,13 +399,13 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         {
             static constexpr float number_a = -93.211546f;
             static constexpr float number_b = 213.22154f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a - number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -413,13 +413,13 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         {
             static constexpr float number_a = 93.211546f;
             static constexpr float number_b = -213.22154f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a - number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -427,20 +427,20 @@ SCENARIO("Subtracting two floating-point numbers exactly",
         {
             static constexpr float number_a = -93.211546f;
             static constexpr float number_b = -213.22154f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a - number_b)));
             }
         }
     }
 }
 
 SCENARIO("Exact multiplication of two floating-point numbers",
-         "[normalized_float][arithmetic][multiplication]")
+         "[floating_point][arithmetic][multiplication]")
 {
     GIVEN("Single precision floats (E = 8, M = 23)")
     {
@@ -452,10 +452,10 @@ SCENARIO("Exact multiplication of two floating-point numbers",
         {
             static constexpr float number_a = 213.22154f;
             static constexpr float number_b = 93.211546f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result_float{number_a * number_b};
-            const normalized_float<E, M> result = mul(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result_float{number_a * number_b};
+            const floating_point<E, M> result = mul(a, b);
 
             THEN("It should be the correct product.")
             {
@@ -463,7 +463,7 @@ SCENARIO("Exact multiplication of two floating-point numbers",
                 std::cout << (number_a * number_b) << "\n";
                 std::cout << result_float << "\n";
                 std::cout << result << "\n";
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -471,13 +471,13 @@ SCENARIO("Exact multiplication of two floating-point numbers",
         {
             static constexpr float number_a = -213.22154f;
             static constexpr float number_b = 93.211546f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = mul(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = mul(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -485,13 +485,13 @@ SCENARIO("Exact multiplication of two floating-point numbers",
         {
             static constexpr float number_a = 213.22154f;
             static constexpr float number_b = -93.211546f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = mul(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = mul(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -499,13 +499,13 @@ SCENARIO("Exact multiplication of two floating-point numbers",
         {
             static constexpr float number_a = -213.22154f;
             static constexpr float number_b = -93.211546f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = mul(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = mul(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -513,13 +513,13 @@ SCENARIO("Exact multiplication of two floating-point numbers",
         {
             static constexpr float number_a = 93.211546f;
             static constexpr float number_b = 213.22154f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = mul(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = mul(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -527,13 +527,13 @@ SCENARIO("Exact multiplication of two floating-point numbers",
         {
             static constexpr float number_a = -93.211546f;
             static constexpr float number_b = 213.22154f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = mul(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = mul(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -541,13 +541,13 @@ SCENARIO("Exact multiplication of two floating-point numbers",
         {
             static constexpr float number_a = 93.211546f;
             static constexpr float number_b = -213.22154f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = mul(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = mul(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -555,32 +555,32 @@ SCENARIO("Exact multiplication of two floating-point numbers",
         {
             static constexpr float number_a = -93.211546f;
             static constexpr float number_b = -213.22154f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = mul(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = mul(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("When one operand is a > 1 and the other is 0 < b < 1.")
         {
             static constexpr float number_a = 2.75f;
             static constexpr float number_b = 0.5f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = mul(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = mul(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
             }
         }
     }
 }
 
-SCENARIO("Exact division of two floating-point numbers", "[normalized_float][arithmetic][division]")
+SCENARIO("Exact division of two floating-point numbers", "[floating_point][arithmetic][division]")
 {
     GIVEN("Single precision floats (E = 8, M = 23)")
     {
@@ -592,13 +592,13 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
         {
             static constexpr float number_a = 213.22154f;
             static constexpr float number_b = 93.211546f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = div(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = div(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a / number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -606,13 +606,13 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
         {
             static constexpr float number_a = -213.22154f;
             static constexpr float number_b = 93.211546f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = div(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = div(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a / number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -620,13 +620,13 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
         {
             static constexpr float number_a = 213.22154f;
             static constexpr float number_b = -93.211546f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = div(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = div(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a / number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -634,13 +634,13 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
         {
             static constexpr float number_a = -213.22154f;
             static constexpr float number_b = -93.211546f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = div(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = div(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a / number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -648,13 +648,13 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
         {
             static constexpr float number_a = 93.211546f;
             static constexpr float number_b = 213.22154f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = div(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = div(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a / number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -662,13 +662,13 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
         {
             static constexpr float number_a = -93.211546f;
             static constexpr float number_b = 213.22154f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = div(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = div(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a / number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -676,13 +676,13 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
         {
             static constexpr float number_a = 93.211546f;
             static constexpr float number_b = -213.22154f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = div(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = div(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a / number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -690,20 +690,20 @@ SCENARIO("Exact division of two floating-point numbers", "[normalized_float][ari
         {
             static constexpr float number_a = -93.211546f;
             static constexpr float number_b = -213.22154f;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = div(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = div(a, b);
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a / number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a / number_b)));
             }
         }
     }
 }
 
 SCENARIO("IEEE-754 arithmetic conversion: float, double",
-         "[normalized_float][conversion][ieee-754][casting]")
+         "[floating_point][conversion][ieee-754][casting]")
 {
     GIVEN("A float number")
     {
@@ -711,9 +711,9 @@ SCENARIO("IEEE-754 arithmetic conversion: float, double",
         {
             float a = 0.f;
 
-            THEN("The normalized_float should convert back to the original number.")
+            THEN("The floating_point should convert back to the original number.")
             {
-                REQUIRE(static_cast<float>(normalized_float<8, 23>(a)) == a);
+                REQUIRE(static_cast<float>(floating_point<8, 23>(a)) == a);
             }
         }
     }
@@ -723,9 +723,9 @@ SCENARIO("IEEE-754 arithmetic conversion: float, double",
         {
             double a = 0.;
 
-            THEN("The normalized_float should convert back to the original number.")
+            THEN("The floating_point should convert back to the original number.")
             {
-                REQUIRE(static_cast<double>(normalized_float<11, 52>(a)) == a);
+                REQUIRE(static_cast<double>(floating_point<11, 52>(a)) == a);
             }
         }
     }
@@ -733,18 +733,18 @@ SCENARIO("IEEE-754 arithmetic conversion: float, double",
     {
         float a = GENERATE(take(10, random(float(1.0), std::numeric_limits<float>::max())));
 
-        THEN("The normalized_float should convert back to the original number.")
+        THEN("The floating_point should convert back to the original number.")
         {
-            REQUIRE(static_cast<float>(normalized_float<8, 23>(a)) == a);
+            REQUIRE(static_cast<float>(floating_point<8, 23>(a)) == a);
         }
     }
     GIVEN("A random double number")
     {
         double a = GENERATE(take(10, random(double(1.0), std::numeric_limits<double>::max())));
 
-        THEN("The normalized_float should convert back to the original number.")
+        THEN("The floating_point should convert back to the original number.")
         {
-            REQUIRE(static_cast<double>(normalized_float<11, 52>(a)) == a);
+            REQUIRE(static_cast<double>(floating_point<11, 52>(a)) == a);
         }
     }
 }

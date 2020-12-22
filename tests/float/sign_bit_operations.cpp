@@ -8,10 +8,10 @@
 using namespace aarith;
 
 TEMPLATE_TEST_CASE_SIG("Negation works as intended",
-                       "[normalized_float][negate][sig_bit_operation][invariant]",
+                       "[floating_point][negate][sig_bit_operation][invariant]",
                        AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("A random floating-point number")
     {
@@ -32,10 +32,10 @@ TEMPLATE_TEST_CASE_SIG("Negation works as intended",
 }
 
 TEMPLATE_TEST_CASE_SIG("Copying a floating-point number works",
-                       "[normalized_float][copy][sig_bit_operation][invariant]",
+                       "[floating_point][copy][sig_bit_operation][invariant]",
                        AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("A random floating-point number")
     {
@@ -56,10 +56,10 @@ TEMPLATE_TEST_CASE_SIG("Copying a floating-point number works",
 }
 
 TEMPLATE_TEST_CASE_SIG("Copying a floating-point number with the sign of another number works",
-                       "[normalized_float][copySign][sig_bit_operation][invariant]",
+                       "[floating_point][copySign][sig_bit_operation][invariant]",
                        AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("A random floating-point number")
     {

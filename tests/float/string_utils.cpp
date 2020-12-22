@@ -6,11 +6,11 @@
 using namespace aarith;
 
 TEMPLATE_TEST_CASE_SIG("String generation for the zeros",
-                       "[normalized_float][utility][string][invariant]",
+                       "[floating_point][utility][string][invariant]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, double))
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("Positive and negative zero")
     {

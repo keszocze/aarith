@@ -14,13 +14,13 @@ auto full_native_range()
                                         std::numeric_limits<N>::max() / 100.0f);
 }
 
-TEMPLATE_TEST_CASE_SIG("Generating NaN as a result", "[normalized_float][arithmetic][addition]",
+TEMPLATE_TEST_CASE_SIG("Generating NaN as a result", "[floating_point][arithmetic][addition]",
                        AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
 {
     // these tests are modeled after the information presented on
     // https://www.doc.ic.ac.uk/~eedwards/compsys/float/nan.html
 
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("NaN and +/- infinity")
     {

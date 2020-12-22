@@ -15,20 +15,20 @@ auto full_native_range()
 }
 
 TEMPLATE_TEST_CASE_SIG("Constructing larger normalized floats from smaller ones",
-                       "[normalized_float][casting][constructor]",
+                       "[floating_point][casting][constructor]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, float), (11, 52, double))
 {
-    using F = normalized_float<E, M>;
-    using G = normalized_float<E + 80, M>;
-    using H = normalized_float<M, M + 80>;
-    using J = normalized_float<E + 80, M + 80>;
+    using F = floating_point<E, M>;
+    using G = floating_point<E + 80, M>;
+    using H = floating_point<M, M + 80>;
+    using J = floating_point<E + 80, M + 80>;
 
     GIVEN("A random floating point value")
     {
         Native f_ = GENERATE(take(50, full_native_range<Native>()));
 
-        WHEN("Casting it to a normalized_float<8,23>")
+        WHEN("Casting it to a floating_point<8,23>")
         {
             F f{f_};
 
@@ -54,10 +54,10 @@ TEMPLATE_TEST_CASE_SIG("Constructing larger normalized floats from smaller ones"
 }
 
 TEMPLATE_TEST_CASE_SIG("Creating constant values is a constexpr",
-                       "[normalized_float][constant][constexpr]", ((size_t E, size_t M), E, M),
+                       "[floating_point][constant][constexpr]", ((size_t E, size_t M), E, M),
                        (8, 23), (11, 52), (3, 3), (80, 80))
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     WHEN("Creating some constant values")
     {
@@ -82,20 +82,20 @@ TEMPLATE_TEST_CASE_SIG("Creating constant values is a constexpr",
 }
 
 TEMPLATE_TEST_CASE_SIG("Width-casting special values into larger normalized floats",
-                       "[normalized_float][casting][constructor]",
+                       "[floating_point][casting][constructor]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, float), (11, 52, double))
 {
-    using F = normalized_float<E, M>;
-    using G = normalized_float<E + 80, M>;
-    using H = normalized_float<M, M + 80>;
-    using J = normalized_float<E + 80, M + 80>;
+    using F = floating_point<E, M>;
+    using G = floating_point<E + 80, M>;
+    using H = floating_point<M, M + 80>;
+    using J = floating_point<E + 80, M + 80>;
 
     GIVEN("Infinity")
     {
         Native inf_ = std::numeric_limits<Native>::infinity();
 
-        WHEN("Casting it to a normalized_float<8,23>")
+        WHEN("Casting it to a floating_point<8,23>")
         {
             F inf{inf_};
 
@@ -127,7 +127,7 @@ TEMPLATE_TEST_CASE_SIG("Width-casting special values into larger normalized floa
     }
     GIVEN("NaN")
     {
-        WHEN("Casting it to a normalized_float<8,23>")
+        WHEN("Casting it to a floating_point<8,23>")
         {
             F nan{std::nanf("")};
 
@@ -151,10 +151,10 @@ TEMPLATE_TEST_CASE_SIG("Width-casting special values into larger normalized floa
 }
 
 TEMPLATE_TEST_CASE_SIG("Investigating the minimal exponent",
-                       "[normalized_float][invariant][constructor]", AARITH_FLOAT_TEST_SIGNATURE,
+                       "[floating_point][invariant][constructor]", AARITH_FLOAT_TEST_SIGNATURE,
                        AARIHT_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
     using Exp = typename F::IntegerUnbiasedExp;
 
     GIVEN("A floating-point number")

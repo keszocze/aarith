@@ -8,7 +8,7 @@
 namespace aarith {
 
 /**
- * @brief Different modes for generating normalized_floats
+ * @brief Different modes for generating floating_points
  */
 enum class FloatGenerationModes
 {
@@ -63,14 +63,14 @@ enum class FloatGenerationModes
  */
 template <size_t E, size_t M, FloatGenerationModes Mode = FloatGenerationModes::NonSpecial,
           typename WordType = uint64_t>
-class normalized_float_distribution
+class floating_point_distribution
 {
 public:
-    using F = normalized_float<E, M, WordType>;
+    using F = floating_point<E, M, WordType>;
     using IntExp = typename F::IntegerExp;
     using IntFrac = typename F::IntegerFrac;
 
-    explicit normalized_float_distribution()
+    explicit floating_point_distribution()
     {
     }
 

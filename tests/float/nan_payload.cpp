@@ -5,10 +5,10 @@
 #include <catch.hpp>
 using namespace aarith;
 
-TEMPLATE_TEST_CASE_SIG("Setting a quiet NaN payload +/- zero", "[normalized_float][NaN][utility]",
+TEMPLATE_TEST_CASE_SIG("Setting a quiet NaN payload +/- zero", "[floating_point][NaN][utility]",
                        AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("A random floating-point number")
     {
@@ -46,10 +46,10 @@ TEMPLATE_TEST_CASE_SIG("Setting a quiet NaN payload +/- zero", "[normalized_floa
 }
 
 TEMPLATE_TEST_CASE_SIG("Setting a signalling NaN payload +/- zero",
-                       "[normalized_float][NaN][utility]", AARITH_FLOAT_TEST_SIGNATURE,
+                       "[floating_point][NaN][utility]", AARITH_FLOAT_TEST_SIGNATURE,
                        AARIHT_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("A random floating-point number")
     {

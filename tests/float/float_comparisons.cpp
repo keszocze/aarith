@@ -12,13 +12,13 @@ auto full_native_range()
 }
 
 TEMPLATE_TEST_CASE_SIG("Comparisons should match the native counterparts",
-                       "[normalized_float][comparison][utility]",
+                       "[floating_point][comparison][utility]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, double))
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
-    GIVEN("A normalized_float created from native data types")
+    GIVEN("A floating_point created from native data types")
     {
 
         Native a_native = GENERATE(take(10, full_native_range<Native>()));
@@ -125,11 +125,11 @@ TEMPLATE_TEST_CASE_SIG("Comparisons should match the native counterparts",
 }
 
 TEMPLATE_TEST_CASE_SIG("Constants should be stored correctly",
-                       "[normalized_float][comparison][utility]",
+                       "[floating_point][comparison][utility]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, double))
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("The number zero in the native data type and as aarith float")
     {
@@ -159,14 +159,14 @@ TEMPLATE_TEST_CASE_SIG("Constants should be stored correctly",
 }
 
 TEMPLATE_TEST_CASE_SIG("Comparing differently sized floating points works as expected",
-                       "[normalized_float][casting][constructor]",
+                       "[floating_point][casting][constructor]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, float), (11, 52, double))
 {
-    using F = normalized_float<E, M>;
-    using G = normalized_float<E + 80, M>;
-    using H = normalized_float<M, M + 80>;
-    using J = normalized_float<E + 80, M + 80>;
+    using F = floating_point<E, M>;
+    using G = floating_point<E + 80, M>;
+    using H = floating_point<M, M + 80>;
+    using J = floating_point<E + 80, M + 80>;
 
     GIVEN("A random floating point value")
     {

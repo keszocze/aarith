@@ -5,9 +5,9 @@
 #include <iomanip>
 #include <sstream>
 
-using aarith::normalized_float;
+using aarith::floating_point;
 
-using F = normalized_float<8, 23>; // NOLINT
+using F = floating_point<8, 23>; // NOLINT
 
 template <size_t iterations> F heron_exact(const F& num)
 {

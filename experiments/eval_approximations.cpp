@@ -8,7 +8,7 @@
 
 using namespace aarith;
 
-using F = normalized_float<8, 23>;
+using F = floating_point<8, 23>;
 
 template <size_t A, typename WordType = uint64_t> void test_a()
 {
@@ -21,8 +21,8 @@ template <size_t A, typename WordType = uint64_t> void test_a()
 
     using ExpInt = uinteger<8, WordType>;
     using MantInt = uinteger<A, WordType>;
-    using F = normalized_float<8, A, WordType>;
-    using Float = normalized_float<8, 23, WordType>;
+    using F = floating_point<8, A, WordType>;
+    using Float = floating_point<8, 23, WordType>;
 
     // do not generate special cases, i.e. inf, nan, denormalized numbers
     uniform_uinteger_distribution exp_dist =

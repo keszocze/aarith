@@ -17,13 +17,13 @@ auto full_native_range()
 }
 
 TEMPLATE_TEST_CASE_SIG("One is the neutral element of the multiplication",
-                       "[normalized_float][arithmetic][multiplication][invariant]",
+                       "[floating_point][arithmetic][multiplication][invariant]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, double))
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
-    GIVEN("A normalized_float created from native data types and the number one")
+    GIVEN("A floating_point created from native data types and the number one")
     {
 
         F a = GENERATE(take(100, random_float<E, M, FloatGenerationModes::NonSpecial>()));
@@ -51,13 +51,13 @@ TEMPLATE_TEST_CASE_SIG("One is the neutral element of the multiplication",
 }
 
 TEMPLATE_TEST_CASE_SIG("Multiplication is commutative",
-                       "[normalized_float][arithmetic][multiplication][invariant]",
+                       "[floating_point][arithmetic][multiplication][invariant]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, double))
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
-    GIVEN("Tow normalized_floats created from native data types")
+    GIVEN("Tow floating_points created from native data types")
     {
 
         F a = GENERATE(take(30, random_float<E, M, FloatGenerationModes::FullyRandom>()));
@@ -76,11 +76,11 @@ TEMPLATE_TEST_CASE_SIG("Multiplication is commutative",
 }
 
 TEMPLATE_TEST_CASE_SIG("Zero makes the multiplication result zero",
-                       "[normalized_float][arithmetic][multiplication][invariant]",
+                       "[floating_point][arithmetic][multiplication][invariant]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
                        AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("A normalized floating-point number")
     {
@@ -101,12 +101,12 @@ TEMPLATE_TEST_CASE_SIG("Zero makes the multiplication result zero",
 }
 
 TEMPLATE_TEST_CASE_SIG("Floating point multiplication works for special values",
-                       "[normalized_float][arithmetic][multiplication]",
+                       "[floating_point][arithmetic][multiplication]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
                        AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("Random NaN and infinity values")
     {
@@ -145,11 +145,11 @@ TEMPLATE_TEST_CASE_SIG("Floating point multiplication works for special values",
 }
 
 TEMPLATE_TEST_CASE_SIG("Multiplying with infinity",
-                       "[normalized_float][arithmetic][multiplication]",
+                       "[floating_point][arithmetic][multiplication]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
                        AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
     constexpr F neg_inf{F::neg_infinity()};
     constexpr F pos_inf{F::pos_infinity()};
 
@@ -228,11 +228,11 @@ TEMPLATE_TEST_CASE_SIG("Multiplying with infinity",
 }
 
 SCENARIO("Multiplication should work correctly (hand picked example)",
-         "[normalized_float][arithmetic][multiplication]")
+         "[floating_point][arithmetic][multiplication]")
 {
     GIVEN("Two numbers in in <8,23> format")
     {
-        using nf_t = normalized_float<8, 23>;
+        using nf_t = floating_point<8, 23>;
 
         nf_t nf_a(0.0117647f);
         nf_t nf_b(0.385671f);
@@ -256,12 +256,12 @@ SCENARIO("Multiplication should work correctly (hand picked example)",
 }
 
 TEMPLATE_TEST_CASE_SIG("Floating point multiplication matches its native counterparts",
-                       "[normalized_float][arithmetic][multiplication]",
+                       "[floating_point][arithmetic][multiplication]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, double))
 {
 
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     Native a_native = GENERATE(take(30, full_native_range<Native>()));
     Native b_native = GENERATE(take(30, full_native_range<Native>()));
@@ -277,14 +277,14 @@ TEMPLATE_TEST_CASE_SIG("Floating point multiplication matches its native counter
 }
 
 SCENARIO("Exact multiplication of two floating-point numbers (hand picked examples)",
-         "[normalized_float][arithmetic][multiplication]")
+         "[floating_point][arithmetic][multiplication]")
 {
     GIVEN("Single precision floats (E = 8, M = 23)")
     {
         static constexpr size_t E = 8;
         static constexpr size_t M = 23;
 
-        using F = normalized_float<E, M>;
+        using F = floating_point<E, M>;
 
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
              "both operands are positive and the result is smaller infinity.")
@@ -298,7 +298,7 @@ SCENARIO("Exact multiplication of two floating-point numbers (hand picked exampl
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -312,7 +312,7 @@ SCENARIO("Exact multiplication of two floating-point numbers (hand picked exampl
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -326,7 +326,7 @@ SCENARIO("Exact multiplication of two floating-point numbers (hand picked exampl
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -340,7 +340,7 @@ SCENARIO("Exact multiplication of two floating-point numbers (hand picked exampl
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -354,7 +354,7 @@ SCENARIO("Exact multiplication of two floating-point numbers (hand picked exampl
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -368,7 +368,7 @@ SCENARIO("Exact multiplication of two floating-point numbers (hand picked exampl
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -382,7 +382,7 @@ SCENARIO("Exact multiplication of two floating-point numbers (hand picked exampl
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -396,7 +396,7 @@ SCENARIO("Exact multiplication of two floating-point numbers (hand picked exampl
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a * number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("When one operand is a > 1 and the other is 0 < b < 1.")
@@ -409,7 +409,7 @@ SCENARIO("Exact multiplication of two floating-point numbers (hand picked exampl
 
             THEN("It should be the correct product.")
             {
-                const F res_ = normalized_float<E, M>(number_a * number_b);
+                const F res_ = floating_point<E, M>(number_a * number_b);
                 REQUIRE(equal_except_rounding(result, res_));
             }
         }
@@ -417,11 +417,11 @@ SCENARIO("Exact multiplication of two floating-point numbers (hand picked exampl
 }
 
 SCENARIO("IEEE-754 denormalized number computations: float, double (hand picked examples)",
-         "[normalized_float][denormalized][ieee-754][computation]")
+         "[floating_point][denormalized][ieee-754][computation]")
 {
     GIVEN("Two denormalized float numbers")
     {
-        using nfloat = normalized_float<8, 23>;
+        using nfloat = floating_point<8, 23>;
         WHEN("The result of the multiplcation is still denormalized > 0")
         {
             unsigned int a_i = 0b00000000000000000000000000000010;
@@ -463,7 +463,7 @@ SCENARIO("IEEE-754 denormalized number computations: float, double (hand picked 
     }
     GIVEN("Two normalized float numbers")
     {
-        using nfloat = normalized_float<8, 23>;
+        using nfloat = floating_point<8, 23>;
         WHEN("The result of the multiplication should be denormalized > 0")
         {
             unsigned int a_i = 0b00011111111111111111111111111111;

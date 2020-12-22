@@ -6,9 +6,9 @@ using namespace aarith;
 
 int main()
 {
-    using nsingle = normalized_float<8, 23>;
-    using ndouble = normalized_float<11, 52>;
-    using nddouble = normalized_float<22, 104>;
+    using nsingle = floating_point<8, 23>;
+    using ndouble = floating_point<11, 52>;
+    using nddouble = floating_point<22, 104>;
     const float base = 3.1415f;
     float ref = base;
     double dref = base;

@@ -5,10 +5,10 @@
 #include <catch.hpp>
 using namespace aarith;
 
-TEMPLATE_TEST_CASE_SIG("Total ordering +/- zero", "[normalized_float][comparison][utility]",
+TEMPLATE_TEST_CASE_SIG("Total ordering +/- zero", "[floating_point][comparison][utility]",
                        AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("+/- zero")
     {
@@ -24,10 +24,10 @@ TEMPLATE_TEST_CASE_SIG("Total ordering +/- zero", "[normalized_float][comparison
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("Total ordering with itself", "[normalized_float][comparison][utility]",
+TEMPLATE_TEST_CASE_SIG("Total ordering with itself", "[floating_point][comparison][utility]",
                        AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("A random, non NaN, non infinity floating-point number x")
     {
@@ -48,10 +48,10 @@ TEMPLATE_TEST_CASE_SIG("Total ordering with itself", "[normalized_float][compari
 }
 
 TEMPLATE_TEST_CASE_SIG("Total ordering with a single NaN value",
-                       "[normalized_float][comparison][utility]", AARITH_FLOAT_TEST_SIGNATURE,
+                       "[floating_point][comparison][utility]", AARITH_FLOAT_TEST_SIGNATURE,
                        AARIHT_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
     constexpr F pqNaN = F::qNaN();
     constexpr F psNaN = F::sNaN();
 
@@ -137,10 +137,10 @@ TEMPLATE_TEST_CASE_SIG("Total ordering with a single NaN value",
 }
 
 TEMPLATE_TEST_CASE_SIG("Total ordering with a two NaN values",
-                       "[normalized_float][comparison][utility]", AARITH_FLOAT_TEST_SIGNATURE,
+                       "[floating_point][comparison][utility]", AARITH_FLOAT_TEST_SIGNATURE,
                        AARIHT_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
     constexpr F pqNaN = F::qNaN();
     constexpr F psNaN = F::sNaN();
 
@@ -181,10 +181,10 @@ TEMPLATE_TEST_CASE_SIG("Total ordering with a two NaN values",
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("Total ordering mag +/- zero", "[normalized_float][comparison][utility]",
+TEMPLATE_TEST_CASE_SIG("Total ordering mag +/- zero", "[floating_point][comparison][utility]",
                        AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("+/- zero")
     {
@@ -200,10 +200,10 @@ TEMPLATE_TEST_CASE_SIG("Total ordering mag +/- zero", "[normalized_float][compar
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("Total ordering mag with itself", "[normalized_float][comparison][utility]",
+TEMPLATE_TEST_CASE_SIG("Total ordering mag with itself", "[floating_point][comparison][utility]",
                        AARITH_FLOAT_TEST_SIGNATURE, AARIHT_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("A random, non NaN, non infinity floating-point number x")
     {
@@ -224,10 +224,10 @@ TEMPLATE_TEST_CASE_SIG("Total ordering mag with itself", "[normalized_float][com
 }
 
 TEMPLATE_TEST_CASE_SIG("Total ordering mag with a single NaN value",
-                       "[normalized_float][comparison][utility]", AARITH_FLOAT_TEST_SIGNATURE,
+                       "[floating_point][comparison][utility]", AARITH_FLOAT_TEST_SIGNATURE,
                        AARIHT_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
     constexpr F pqNaN = F::qNaN();
     constexpr F psNaN = F::sNaN();
 
@@ -313,10 +313,10 @@ TEMPLATE_TEST_CASE_SIG("Total ordering mag with a single NaN value",
 }
 
 TEMPLATE_TEST_CASE_SIG("Total ordering mag with a two NaN values",
-                       "[normalized_float][comparison][utility]", AARITH_FLOAT_TEST_SIGNATURE,
+                       "[floating_point][comparison][utility]", AARITH_FLOAT_TEST_SIGNATURE,
                        AARIHT_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
     constexpr F pqNaN = F::qNaN();
     constexpr F psNaN = F::sNaN();
 

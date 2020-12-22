@@ -10,12 +10,12 @@
 using namespace aarith;
 
 TEMPLATE_TEST_CASE_SIG("Floating point subtraction matches its native counterparts",
-                       "[normalized_float][arithmetic][subtraction]",
+                       "[floating_point][arithmetic][subtraction]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
                        AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     F a = GENERATE(take(100, random_float<E, M, FloatGenerationModes::NonSpecial>()));
     F b = GENERATE(take(100, random_float<E, M, FloatGenerationModes::NonSpecial>()));
@@ -33,7 +33,7 @@ TEMPLATE_TEST_CASE_SIG("Floating point subtraction matches its native counterpar
     //        std::cout << "a - b\n"
     //                  << to_binary(a) << " - \n"
     //                  << to_binary(b) << "\n"
-    //                  << to_binary(res) << "(normalized_float) !=\n"
+    //                  << to_binary(res) << "(floating_point) !=\n"
     //                  << to_binary(res_native_) << "(native)\n\n";
     //
     //        std::cout << a << " - " << b << " = " << res << "\n";
@@ -57,11 +57,11 @@ TEMPLATE_TEST_CASE_SIG("Floating point subtraction matches its native counterpar
 }
 
 TEMPLATE_TEST_CASE_SIG("Floating point subtraction involving zero",
-                       "[normalized_float][arithmetic][subtraction]", AARITH_FLOAT_TEST_SIGNATURE,
+                       "[floating_point][arithmetic][subtraction]", AARITH_FLOAT_TEST_SIGNATURE,
                        AARIHT_FLOAT_TEMPLATE_RANGE)
 {
 
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     constexpr F zero = F::zero();
     constexpr F neg_zero = F::neg_zero();
@@ -97,11 +97,11 @@ TEMPLATE_TEST_CASE_SIG("Floating point subtraction involving zero",
 
 TEMPLATE_TEST_CASE_SIG(
     "Floating point subtraction matches its native counterparts (special values only)",
-    "[normalized_float][arithmetic][subtraction]", AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
+    "[floating_point][arithmetic][subtraction]", AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
     AARIHT_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
 
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("Random NaN and infinity values")
     {
@@ -130,7 +130,7 @@ TEMPLATE_TEST_CASE_SIG(
 }
 
 SCENARIO("Subtracting two floating-point numbers (hand picked examples)",
-         "[normalized_float][arithmetic][subtraction]")
+         "[floating_point][arithmetic][subtraction]")
 {
     GIVEN("Single precision floats (E = 8, M = 23)")
     {
@@ -141,22 +141,22 @@ SCENARIO("Subtracting two floating-point numbers (hand picked examples)",
         {
             static constexpr float number_a = 93.211546F;
             static constexpr float number_b = number_a;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("The result should be 0")
             {
-                REQUIRE(result == normalized_float<E, M>(0.f));
+                REQUIRE(result == floating_point<E, M>(0.f));
             }
         }
         WHEN("The second operand is 0.")
         {
             static constexpr float number_a = 93.211546F;
             static constexpr float number_b = 0;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("The result should be a")
             {
@@ -167,9 +167,9 @@ SCENARIO("Subtracting two floating-point numbers (hand picked examples)",
         {
             static constexpr float number_a = -93.211546F;
             static constexpr float number_b = 0;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("The result should be a")
             {
@@ -181,13 +181,13 @@ SCENARIO("Subtracting two floating-point numbers (hand picked examples)",
             static constexpr float number_a = 0;
             static constexpr float number_b = 93.211546F;
             static constexpr float res = -number_b;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("The result should be -b")
             {
-                REQUIRE(result == normalized_float<E, M>(res));
+                REQUIRE(result == floating_point<E, M>(res));
             }
         }
         WHEN("The first operand is 0, and the second operand is negative.")
@@ -195,13 +195,13 @@ SCENARIO("Subtracting two floating-point numbers (hand picked examples)",
             static constexpr float number_a = 0;
             static constexpr float number_b = -93.211546F;
             static constexpr float res = -number_b;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("The result should be -b")
             {
-                REQUIRE(result == normalized_float<E, M>(res));
+                REQUIRE(result == floating_point<E, M>(res));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -209,13 +209,13 @@ SCENARIO("Subtracting two floating-point numbers (hand picked examples)",
         {
             static constexpr float number_a = 213.22154F;
             static constexpr float number_b = 93.211546F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a - number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -223,13 +223,13 @@ SCENARIO("Subtracting two floating-point numbers (hand picked examples)",
         {
             static constexpr float number_a = -213.22154F;
             static constexpr float number_b = 93.211546F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a - number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -237,13 +237,13 @@ SCENARIO("Subtracting two floating-point numbers (hand picked examples)",
         {
             static constexpr float number_a = 213.22154F;
             static constexpr float number_b = -93.211546F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a - number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -251,13 +251,13 @@ SCENARIO("Subtracting two floating-point numbers (hand picked examples)",
         {
             static constexpr float number_a = -213.22154F;
             static constexpr float number_b = -93.211546F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a - number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -265,13 +265,13 @@ SCENARIO("Subtracting two floating-point numbers (hand picked examples)",
         {
             static constexpr float number_a = 93.211546F;
             static constexpr float number_b = 213.22154F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a - number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -279,13 +279,13 @@ SCENARIO("Subtracting two floating-point numbers (hand picked examples)",
         {
             static constexpr float number_a = -93.211546F;
             static constexpr float number_b = 213.22154F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a - number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -293,13 +293,13 @@ SCENARIO("Subtracting two floating-point numbers (hand picked examples)",
         {
             static constexpr float number_a = 93.211546F;
             static constexpr float number_b = -213.22154F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a - number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -307,13 +307,13 @@ SCENARIO("Subtracting two floating-point numbers (hand picked examples)",
         {
             static constexpr float number_a = -93.211546F;
             static constexpr float number_b = -213.22154F;
-            const normalized_float<E, M> a{number_a};
-            const normalized_float<E, M> b{number_b};
-            const normalized_float<E, M> result = sub(a, b);
+            const floating_point<E, M> a{number_a};
+            const floating_point<E, M> b{number_b};
+            const floating_point<E, M> result = sub(a, b);
 
             THEN("It should be the correct sum.")
             {
-                REQUIRE(equal_except_rounding(result, normalized_float<E, M>(number_a - number_b)));
+                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a - number_b)));
             }
         }
     }
