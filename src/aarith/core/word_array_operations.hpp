@@ -486,6 +486,52 @@ bit_range(const word_array<W, WordType>& w)
     return width_cast<(S - E) + 1, W, WordType>(w >> E);
 }
 
+template <size_t W, typename WordType>
+[[nodiscard]] constexpr word_array<W, WordType> dynamic_bit_range(const word_array<W, WordType>& w, size_t start_idx, size_t end_idx_exclusive)
+{
+    // check arguments
+
+    if (end_idx_exclusive < start_idx)
+    {
+        throw std::invalid_argument("end_idx must be greater or equal to start_idx");
+    }
+
+    if (start_idx >= W)
+    {
+        throw std::invalid_argument("start_idx must be a valid index of a W-bit word array");
+    }
+
+    if (end_idx_exclusive > W)
+    {
+        throw std::invalid_argument("end_idx must be a valid index of a W-bit word array");
+    }
+
+    // arguments are okay; do copying
+
+    word_array<W, WordType> result;
+
+    for (size_t i = start_idx; i < end_idx_exclusive; ++i)
+    {
+        result.set_bit(i, w.bit(i));
+    }
+
+    return result;
+}
+
+template <size_t W, typename WordType>
+[[nodiscard]] constexpr word_array<W, WordType> flip(const word_array<W, WordType>& w)
+{
+    word_array<W, WordType> copy;
+
+    for (size_t widx = 0; widx < W; ++widx)
+    {
+        const size_t copyidx = W - 1 - widx;
+        copy.set_bit(copyidx, w.bit(widx));
+    }
+
+    return copy;
+}
+
 template <size_t W, size_t V, typename WordType>
 word_array<W + V, WordType> concat(const word_array<W, WordType>& w,
                                    const word_array<V, WordType>& v)

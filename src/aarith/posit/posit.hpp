@@ -1,7 +1,6 @@
 #pragma once
 
-#include <aarith/core/word_array.hpp>
-#include <aarith/integer.hpp>
+#include <aarith/posit.hpp>
 #include <cassert>
 #include <cstdint>
 #include <cstdlib>
@@ -73,15 +72,51 @@ constexpr bool posit<N, ES, WT>::operator!=(const posit& other) const
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] posit<N, ES, WT> posit<N, ES, WT>::incremented() const
 {
-    auto bits = get_bits();
+    const auto bits = get_bits();
     return from_bits(bits + bits.one());
 }
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] posit<N, ES, WT> posit<N, ES, WT>::decremented() const
 {
-    auto bits = get_bits();
+    const auto bits = get_bits();
     return from_bits(bits - bits.one());
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] posit<N, ES, WT> posit<N, ES, WT>::incremented_real() const
+{
+    if (is_zero() || is_nar())
+    {
+        return *this;
+    }
+
+    const auto increment = incremented();
+
+    if (increment.is_zero() || increment.is_nar())
+    {
+        return *this;
+    }
+
+    return increment;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] posit<N, ES, WT> posit<N, ES, WT>::decremented_real() const
+{
+    if (is_zero() || is_nar())
+    {
+        return *this;
+    }
+
+    const auto decrement = decremented();
+
+    if (decrement.is_zero() || decrement.is_nar())
+    {
+        return *this;
+    }
+
+    return decrement;
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -178,19 +213,14 @@ posit<N, ES, WT> posit<N, ES, WT>::operator+(const posit<N, ES, WT>& rhs) const
 
     // regular cases
 
-    const binprod<N> lhs_binprod(lhs);
-    const binprod<N> rhs_binprod(rhs);
+    const auto lparams = positparams<N, ES, WT>(lhs);
+    const auto rparams = positparams<N, ES, WT>(rhs);
 
-    const binprod<N> bsum = lhs_binprod + rhs_binprod;
-    Posit psum = bsum.template to_posit<N, ES, WT>();
-
-    std::cout << lhs_binprod << " " << rhs_binprod << " " << bsum << std::endl;
-
-    // fix overflows
+    const auto sumparams = lparams + rparams;
+    auto psum = Posit(sumparams);
 
     if (rhs > zero && psum < lhs)
     {
-        std::cout << "[preventing overflow]" << std::endl;
         psum = psum.max();
     }
 
@@ -198,7 +228,6 @@ posit<N, ES, WT> posit<N, ES, WT>::operator+(const posit<N, ES, WT>& rhs) const
 
     if (rhs < zero && psum > lhs)
     {
-        std::cout << "[preventing underflow]" << std::endl;
         psum = psum.min();
     }
 
@@ -280,50 +309,7 @@ template <size_t N, size_t ES, typename WT> posit<N, ES, WT> posit<N, ES, WT>::o
 template <size_t N, size_t ES, typename WT>
 posit<N, ES, WT> posit<N, ES, WT>::operator*(const posit<N, ES, WT>& rhs) const
 {
-    using Posit = posit<N, ES, WT>;
-
-    constexpr Posit zero = Posit::zero();
-    constexpr Posit inf = Posit::nar();
-
-    const Posit& lhs = *this;
-
-    // special cases
-
-    if (rhs == inf || lhs == inf)
-    {
-        return inf;
-    }
-
-    if (lhs.is_zero() || rhs.is_zero())
-    {
-        return zero;
-    }
-
-    // regular cases
-
-    const binprod<N> lhs_binprod(lhs);
-    const binprod<N> rhs_binprod(rhs);
-
-    const binprod<N> bprod = lhs_binprod * rhs_binprod;
-    Posit pprod = bprod.template to_posit<N, ES, WT>();
-
-    // fix overflows
-
-    if (rhs > zero && pprod < lhs)
-    {
-        pprod = pprod.max();
-    }
-
-    // fix underflows
-
-    if (rhs < zero && pprod > lhs)
-    {
-        pprod = pprod.min();
-    }
-
-    // return
-
-    return pprod;
+    throw std::logic_error("not implementated");
 }
 
 template <size_t N, size_t ES, typename WT>

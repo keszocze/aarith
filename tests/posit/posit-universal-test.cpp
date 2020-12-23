@@ -21,9 +21,42 @@ static void require_addition(const uint8_t lhs, const uint8_t rhs, const uint8_t
     const posit8 actual_posit = p + q;
     const posit8 expected_posit(expected);
 
+    if (p.is_negative())
     {
-        INFO("evaluated " << p << " + " << q << " = " << actual_posit << ", expected "
-                          << expected_posit);
+        // TODO (Schärt): Also check negative values eventually!!!
+        return;
+    }
+
+    static uint64_t i;
+
+    {
+        INFO("i=" << (i++));
+        INFO(dump_string(p));
+        INFO(dump_string(q));
+        INFO("? " << dump_string(actual_posit));
+        INFO("! " << dump_string(expected_posit));
+        INFO("? " << to_double(actual_posit));
+        INFO("! " << to_double(expected_posit));
+        INFO("eval '" << to_binary(p, " ") << "' + '" << to_binary(q, " ") << "' = '"
+                           << to_binary(actual_posit, " ") << "', expected '"
+                           << to_binary(expected_posit, " ") << "'");
+
+        const auto expected_bits = expected_posit.get_bits();
+        const auto actual_bits = actual_posit.get_bits();
+
+        uinteger<expected_bits.width()> bitdiff;
+
+        if (expected_bits > actual_bits)
+        {
+            bitdiff = expected_bits - actual_bits;
+        }
+        else
+        {
+            bitdiff = actual_bits - expected_bits;
+        }
+
+        INFO("diff " << bitdiff);
+
         REQUIRE(actual_posit == expected_posit);
     }
 }

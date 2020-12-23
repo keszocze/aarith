@@ -1,9 +1,6 @@
 #pragma once
 
-#include <aarith/posit/binprod.hpp>
 #include <aarith/posit/posit.hpp>
-#include <aarith/posit/posit_operations.hpp>
-#include <iostream>
 #include <ostream>
 
 namespace aarith {

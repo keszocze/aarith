@@ -1,11 +1,11 @@
 #pragma once
 
-#include <aarith/integer.hpp>
 #include <aarith/posit.hpp>
 #include <cassert>
 #include <cmath>
 #include <cstdint>
 #include <cstdlib>
+#include <sstream>
 #include <stdexcept>
 
 namespace aarith {
@@ -429,17 +429,68 @@ template <size_t N, size_t ES, typename WT>
     }
 }
 
-template <size_t N, size_t ES, typename WT>
-constexpr integer<N> get_global_exponent(const posit<N, ES, WT>& p)
+template <size_t N, size_t ES, typename WT> integer<N> get_scale_value(const posit<N, ES, WT>& p)
 {
     using Integer = integer<N>;
 
-    constexpr auto rscale = Integer(1 << ES);
+    constexpr Integer rscale = Integer(1 << ES);
 
-    const auto R = Integer(get_regime_value<N, ES, WT>(p));
-    const auto E = Integer(get_exponent_value<N, ES, WT>(p));
+    const Integer R = Integer(get_regime_value<N, ES, WT>(p));
+    const Integer E = Integer(get_exponent_value<N, ES, WT>(p));
 
     return rscale * R + E;
+}
+
+template <size_t N, size_t ES, typename WT>
+posit<N, ES, WT> add(const posit<N, ES, WT>& lhs, const posit<N, ES, WT>& rhs)
+{
+    if (lhs.is_nar() || rhs.is_nar())
+    {
+        return lhs.nar();
+    }
+
+    if (lhs.is_zero())
+    {
+        return rhs;
+    }
+
+    if (rhs.is_zero())
+    {
+        return lhs;
+    }
+
+    const positparams lhv = normalize(lhs);
+    const positparams rhv = normalize(rhs);
+
+    throw std::logic_error("not implemented");
+}
+
+template <size_t N, size_t ES, typename WT>
+void dump_meta(std::ostream& os, const posit<N, ES, WT>& p)
+{
+    const auto bits = to_binary(p);
+
+    const auto nregime = get_num_regime_bits(p);
+    const auto nexp = get_num_exponent_bits(p);
+    const auto nfrac = get_num_fraction_bits(p);
+
+    const auto regime = get_regime_value(p);
+    const auto exponent = get_exponent_value(p);
+    const auto fraction = get_fraction_value(p);
+    const auto scale = get_scale_value(p);
+
+    os << bits << " nregime=" << nregime << " nexp=" << nexp << " nfrac=" << nfrac
+       << " regime=" << regime << " exponent=" << exponent << " fraction=" << fraction
+       << " scale=" << scale
+       << std::endl;
+    ;
+}
+
+template <size_t N, size_t ES, typename WT> std::string dump_string(const posit<N, ES, WT>& p)
+{
+    std::stringstream ss;
+    dump_meta(ss, p);
+    return ss.str();
 }
 
 } // namespace aarith

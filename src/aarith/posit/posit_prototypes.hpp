@@ -2,6 +2,8 @@
 
 #include <aarith/integer.hpp>
 #include <cstdint>
+#include <optional>
+#include <tuple>
 
 //
 // This file is for prototypes and forward declarations of the posit
@@ -389,6 +391,9 @@ public:
      */
     [[nodiscard]] posit decremented() const;
 
+    [[nodiscard]] posit incremented_real() const;
+    [[nodiscard]] posit decremented_real() const;
+
     /**
      * @return The underlying storage.
      */
@@ -423,6 +428,12 @@ private:
  */
 template <size_t N, size_t ES, typename WT>
 std::ostream& operator<<(std::ostream& os, const posit<N, ES, WT>& p);
+
+//
+// Additional operations for posit Class.
+//
+// For implementations, look at posit/posit_operations.hpp.
+//
 
 /**
  * @brief Compute number of regime bits.
@@ -526,8 +537,25 @@ template <size_t N, size_t ES, typename WT>
  * of useed^R times 2^E. This function returns k.  Knowing k can be useful to
  * estimate the value of a given posit without evaluating the fraction.
  */
+template <size_t N, size_t ES, typename WT> integer<N> get_scale_value(const posit<N, ES, WT>& p);
+
 template <size_t N, size_t ES, typename WT>
-constexpr integer<N> get_global_exponent(const posit<N, ES, WT>& p);
+posit<N, ES, WT> add(const posit<N, ES, WT>& lhs, const posit<N, ES, WT>& rhs);
+
+/**
+ * @brief Dump posit information to stream.
+ *
+ * This function dumps various interesting parameters to a stream. It is
+ * useful for debugging. After it has dumped the posit information, std::endl
+ * is also written to the stream.
+ *
+ * @param os the stream to dump to
+ * @param p The posit to dump
+ */
+template <size_t N, size_t ES, typename WT>
+void dump_meta(std::ostream& os, const posit<N, ES, WT>& p);
+
+template <size_t N, size_t ES, typename WT> std::string dump_string(const posit<N, ES, WT>& p);
 
 //
 // Casts for posit Class.
@@ -590,152 +618,134 @@ template <size_t N, size_t ES, typename WT>
 std::string to_binary(const posit<N, ES, WT>& p, const char* delim);
 
 //
-// Binprod Class
+// Fractional Class
 //
-// For implementation, look at posit/binprod.hpp
+// For implementation, look at posit/fractional.hpp
 //
 
-/**
- * @brief Helper class that represents a product x * 2^m.
- *
- * One way to do arithmetic on posit values is to first convert them to
- * binprod, do the arithmetic and then convert them back to posit.
- *
- * @tparam N Determines the width of the underlying storage type. If used
- * together with posits<PN, PES, PWT> N should match PN.
- */
-template <size_t N> class binprod
+template <size_t N, size_t ES, typename WT>
+class fractional
 {
 public:
-    /**
-     * Underlying storage type for scratch calculations. To avoid loss of
-     * precision during arithmetic operations, it is twice is large as N.
-     */
-    // TODO (Schärtl): Find a real bound for N or maybe find a better way of
-    // doing arithmetic all-together.
-    using storage_type = integer<16 * N>;
+    static fractional zero();
 
-    /**
-     * Fractional part x of product x * 2^m.
-     */
-    storage_type x;
+    fractional();
+    fractional(const fractional &other);
+    fractional(const posit<N, ES, WT>& p);
 
-    /**
-     * Exponent part m of product x * 2^m.
-     */
-    storage_type m;
+    fractional& operator=(const fractional<N, ES, WT>& other);
 
-    /**
-     * @brief Construct new binprod with given parameters.
-     *
-     * @param x The fractional part to copy.
-     * @param m The exponent part to copy.
-     */
-    constexpr binprod(const storage_type& x, const storage_type& m);
+    bool operator==(const fractional<N, ES, WT>& other) const;
+    bool operator!=(const fractional<N, ES, WT>& other) const;
 
-    /**
-     * @brief Construct a new binprod from given posit.
-     *
-     * @nparam PES The exponent size of the provided posit.
-     * @nparam WT The underlying word type of the provided posit.
-     * @param p The posit to convert to binprod.
-     */
-    template <size_t PES, typename PWT> constexpr binprod(const posit<N, PES, PWT>& p);
+    bool operator<(const fractional<N, ES, WT>& other) const;
+    bool operator<=(const fractional<N, ES, WT>& other) const;
 
-    /**
-     * @brief Convert value back to posit.
-     *
-     * @nparam PN Width of the returned posit.
-     * @nparam PES Exponent size of the returned posit.
-     * @nparam PWT Underlying storage type of the returned posit.
-     */
-    template <size_t PN, size_t PES, typename PWT>
-    [[nodiscard]] posit<PN, PES, PWT> to_posit() const;
+    bool operator>(const fractional<N, ES, WT>& other) const;
+    bool operator>=(const fractional<N, ES, WT>& other) const;
+
+    fractional operator+(const fractional<N, ES, WT>& other) const;
+    fractional operator-(const fractional<N, ES, WT>& other) const;
+
+    fractional operator<<(const size_t shift) const;
+    fractional operator<<(const uinteger<N, WT>& shift) const;
+
+    fractional operator>>(const size_t shift) const;
+    fractional operator>>(const uinteger<N, WT>& shift) const;
+
+    uinteger<N, WT> integer_bits() const;
+    uinteger<N, WT> fraction_bits() const;
+
+    // printing
+    template <size_t SN, size_t SES, typename SWT>
+    friend std::ostream& operator<<(std::ostream& os, const fractional<SN, SES, SWT>& f);
 
 private:
-    /**
-     * Binary product x * 2^m can be constructed from parameters h, f, k, e as
-     * explained in "Provably Correct Posit Arithmetic with Fixed-Point Big
-     * Integer", Shin Yee Chung, 2018. This tuple represents storage for these
-     * parameters.
-     */
-    using param_type = std::tuple<storage_type, storage_type, storage_type, storage_type>;
+    static constexpr size_t HiddenBitIndex = N;
+    static constexpr size_t ScratchSize = 2  * N;
 
-    /**
-     * @brief Convert integer to ssize_t.
-     *
-     * Helper function only used here.
-     */
-    // TODO (Schärtl): Either move something like this to the integer directory
-    // or find the real way to do it. Maybe file an issue.
-    template <size_t M> [[nodiscard]] static constexpr ssize_t to_ssize_t(const integer<M>& n);
-
-    /**
-     * @brief Return the decoded parameters (h, f, k, e).
-     *
-     * Based on "Provably Correct Posit Arithmetic with Fixed-Point Big
-     * Integer", Shin Yee Chung, 2018.
-     */
-    template <size_t PN, size_t PES, typename PWT>
-    [[nodiscard]] constexpr param_type decode() const;
-
-    /**
-     * @brief Fill in the decoded regime.
-     *
-     * @nparam nregime The number of regime bits. Will be filled in by call to
-     * this method.
-     * @nparam first_regime Value of the first bit of the regime, either 1 (true)
-     * or 0 (false). Will be filled in by call to this method.
-     */
-    template <size_t PN, size_t PES, typename PWT>
-    void decode_regime(ssize_t& nregime, bool& first_regime) const;
-
-    /**
-     * @brief Return the integer maginutde of this product.
-     */
-    constexpr storage_type magnitude() const;
-
-    /**
-     * @brief Assert that this binprod represents a non-negative value.
-     *
-     * Many internal methods only work on positive values. These methods
-     * should call ensure_positive to check whether the value they are dealing
-     * with is actually positive.
-     */
-    void ensure_positive() const;
+    uinteger<ScratchSize, WT> bits;
 };
 
 //
-// Additional operators for binprod Class.
+// Positparam Class
 //
-// For implementations, look at posit/binprod_operators.hpp.
+// For implementation, look at posit/positparams.hpp
 //
 
-/**
- * @brief Output product to stream.
- *
- * The format is "(x, m, B)" where x and m are the parameters of the given
- * binprod and B is the approximated product x * 2^m computed with floating
- * point arithmetic.
- */
-template <size_t N> constexpr std::ostream& operator<<(std::ostream& os, const binprod<N>& rhs);
+template <size_t N, size_t ES, typename WT> class positparams
+{
+public:
+    // normalize
+    constexpr positparams(const posit<N, ES, WT>& p);
 
-/**
- * @brief Return the sum of two binary products.
- */
-template <size_t N> constexpr binprod<N> operator+(const binprod<N>& lhs, const binprod<N>& rhs);
+    // copy
+    constexpr positparams(const positparams& other);
 
-/**
- * @brief Return the product of two binary products.
- */
-template <size_t N> constexpr binprod<N> operator*(const binprod<N>& lhs, const binprod<N>& rhs);
+    // assign
+    constexpr positparams& operator=(const positparams& other);
+
+    // destruct
+    ~positparams();
+
+    // denormalize
+    explicit constexpr operator posit<N, ES, WT>() const;
+
+    // eq
+    bool operator==(const positparams& other) const;
+
+    // neq
+    bool operator!=(const positparams& other) const;
+
+    // lt
+    bool operator<(const positparams& other) const;
+
+    // addition
+    positparams operator+(const positparams& rhs) const;
+
+    // printing
+    template <size_t SN, size_t SES, typename SWT>
+    friend std::ostream& operator<<(std::ostream& os, const positparams<SN, SES, SWT>& p);
+
+private:
+    bool is_nar;
+    bool is_zero;
+    bool sign_bit;
+
+    // global scale of the posit
+    integer<N, WT> scale;
+
+    fractional<N, ES, WT> fraction;
+
+    // null the flags
+    constexpr positparams();
+
+    static positparams<N, ES, WT> zero();
+
+    static std::tuple<positparams*, positparams*> ordered(positparams* p, positparams* q);
+    static void match_scale_of(positparams& p, positparams& q);
+
+    static void sum_fractions(positparams &dst, const positparams<N, ES, WT>& lhs, const positparams<N, ES, WT>& rhs);
+    static void add_fractions(positparams &dst, const fractional<N, ES, WT>& lfrac, const fractional<N, ES, WT>& rfrac);
+    static void sub_fractions(positparams &dst, const fractional<N, ES, WT>& lfrac, const fractional<N, ES, WT>& rfrac);
+
+    template <size_t M>
+    static std::optional<size_t> get_hidden_bit_idx(const uinteger<M, WT>& fraction);
+};
 
 } // namespace aarith
 
-#include <aarith/posit/binprod.hpp>
-#include <aarith/posit/binprod_operators.hpp>
+//
+// Now we include the headers. Because we have prototypes for all methods and
+// functions, these imports can be in any order and reference each other as
+// they wish.
+//
+
+#include <aarith/posit/fractional.hpp>
 #include <aarith/posit/posit.hpp>
 #include <aarith/posit/posit_casts.hpp>
+#include <aarith/posit/posit_operations.hpp>
 #include <aarith/posit/posit_operators.hpp>
 #include <aarith/posit/posit_types.hpp>
+#include <aarith/posit/positparams.hpp>
 #include <aarith/posit/string_utils.hpp>

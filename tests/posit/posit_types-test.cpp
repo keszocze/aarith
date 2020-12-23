@@ -1,8 +1,5 @@
-#include <catch.hpp>
-#include <iostream>
-
 #include <aarith/posit.hpp>
-#include <iostream>
+#include <catch.hpp>
 
 SCENARIO("Standard Posit Types")
 {

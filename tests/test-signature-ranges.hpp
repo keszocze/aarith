@@ -103,3 +103,7 @@
 #define AARITH_NATIVE_BITWIDTHS 8, 16, 32, 64
 #define AARITH_NATIVE_TYPES_SMALL uint8_t, int8_t, uint16_t, int16_t
 #define AARITH_NATIVE_TYPES uint8_t, int8_t, uint16_t, int16_t, uint32_t, int32_t, uint64_t, int64_t
+
+#define AARITH_POSIT_TEST_TEMPLATE_EXHAUSTABLE                                                     \
+    (5, 0), (5, 1), (5, 2), (6, 0), (6, 1), (6, 2), (8, 0), (8, 1), (8, 2), (8, 3),                \
+    (16, 0), (16, 1), (16, 2)
