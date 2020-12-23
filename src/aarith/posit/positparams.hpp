@@ -62,8 +62,6 @@ constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
 {
     // positparams -> posit
 
-    std::cout << "converting " << *this << std::endl;
-
     using Posit = posit<N, ES, WT>;
     using Integer = integer<N, WT>;
 
@@ -90,8 +88,6 @@ constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
 
     const Integer regime = floordiv(scale, powes);
     const Integer exponent = absmod(scale, powes);
-
-    //std::cout << "regime=" << regime << " exponent=" << exponent<< std::endl;
 
     //
     // set bits; keep count of the currently bit being set with 'i'
@@ -148,7 +144,7 @@ constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
     //
 
     const ssize_t nexp = es;
-    assert(nexp == es);  // should always have enough space in bits as it's extra large
+    assert(nexp == es); // should always have enough space in bits as it's extra large
 
     for (ssize_t eprinted = 0; eprinted < nexp && i >= 0; ++eprinted, --i)
     {
@@ -174,9 +170,7 @@ constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
     //
 
     const uinteger<N, WT> posit_bits = width_cast<N>(bits >> (ES + 3));
-    const uinteger<ES + 3, WT> truncated  = width_cast<ES + 3>(bits);
-
-    std::cout << to_binary(posit_bits) << " " << to_binary(truncated) << std::endl;
+    const uinteger<ES + 3, WT> truncated = width_cast<ES + 3>(bits);
 
     const Posit x = Posit::from_bits(posit_bits);
     const positparams<N, ES, WT> Px(x);
@@ -185,18 +179,14 @@ constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
     const bool after = truncated.bit(truncated.width() - 1);
     const bool sticky = !width_cast<ES + 3 - 1>(truncated).is_zero(); // maybe -2 instead of - 1...
 
-    fprintf(stdout, "last=%d after=%d sticky=%d\n", (int) last, (int) after, (int) sticky);
-
     //
     // do exponent rounding
     //
 
     if ((last && after) || (after && sticky))
     {
-        //std::cout << "scale does not match!" << std::endl;
         if ((last && after))
         {
-            std::cout << "ROUNDING EXPONENT!" << std::endl;
             return x.incremented_real();
         }
     }
@@ -207,11 +197,8 @@ constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
 
     if (fraction != Px.fraction)
     {
-        //std::cout << "fraction does not match!" << std::endl;
-
         if ((last && after) || (after && sticky))
         {
-            std::cout << "ROUNDING FRACTION!" << std::endl;
             return x.incremented_real();
         }
     }
@@ -233,7 +220,8 @@ constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
 template <size_t N, size_t ES, typename WT>
 bool positparams<N, ES, WT>::operator==(const positparams<N, ES, WT>& other) const
 {
-    return is_nar == other.is_nar && is_zero == other.is_zero && sign_bit == other.sign_bit && scale == other.scale && fraction == other.fraction;
+    return is_nar == other.is_nar && is_zero == other.is_zero && sign_bit == other.sign_bit &&
+           scale == other.scale && fraction == other.fraction;
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -243,37 +231,8 @@ bool positparams<N, ES, WT>::operator!=(const positparams<N, ES, WT>& other) con
 }
 
 template <size_t N, size_t ES, typename WT>
-bool positparams<N, ES, WT>::operator<(const positparams<N, ES, WT>& other) const
-{
-    if (is_nar || other.is_nar)
-    {
-        return false;
-    }
-
-    if (is_zero && other.is_zero)
-    {
-        return scale > other.scale;
-    }
-    else if (!is_zero && !other.is_zero)
-    {
-        return scale < other.scale;
-    }
-    else if (is_zero && !other.is_zero)
-    {
-        return true;
-    }
-    else
-    {
-        assert(!is_zero && other.is_zero);
-        return false;
-    }
-}
-
-template <size_t N, size_t ES, typename WT>
 positparams<N, ES, WT> positparams<N, ES, WT>::operator+(const positparams<N, ES, WT>& other) const
 {
-    std::cout << std::endl;
-
     //
     // first we handle special cases; zero as arguments and result in
     // particular are always kind of special when it comes to posit arithmetic
@@ -309,14 +268,12 @@ positparams<N, ES, WT> positparams<N, ES, WT>::operator+(const positparams<N, ES
 
     positparams<N, ES, WT> lhs = *this;
     positparams<N, ES, WT> rhs = other;
-    std::cout << "after extracting arguments lhs=" << lhs << " rhs=" << rhs << std::endl;
 
     //
     // do addition
     //
 
     match_scale_of(lhs, rhs);
-    std::cout << "after matching scale:      lhs=" << lhs << " rhs=" << rhs << std::endl;
 
     positparams<N, ES, WT> sum;
     sum_fractions(sum, lhs, rhs);
@@ -365,14 +322,16 @@ void positparams<N, ES, WT>::match_scale_of(positparams<N, ES, WT>& p, positpara
 }
 
 template <size_t N, size_t ES, typename WT>
-void positparams<N, ES, WT>::sum_fractions(positparams<N, ES, WT>& dest, const positparams<N, ES, WT>& lhs, const positparams<N, ES, WT>& rhs)
+void positparams<N, ES, WT>::sum_fractions(positparams<N, ES, WT>& dest,
+                                           const positparams<N, ES, WT>& lhs,
+                                           const positparams<N, ES, WT>& rhs)
 {
     dest.is_nar = false;
     dest.is_zero = false;
     dest.sign_bit = false;
 
     assert(lhs.scale == rhs.scale);
-    dest.scale = lhs.scale;  // == rhs.scale
+    dest.scale = lhs.scale; // == rhs.scale
 
     if (lhs.sign_bit && rhs.sign_bit)
     {
@@ -439,7 +398,9 @@ void positparams<N, ES, WT>::sum_fractions(positparams<N, ES, WT>& dest, const p
 }
 
 template <size_t N, size_t ES, typename WT>
-void positparams<N, ES, WT>::add_fractions(positparams<N, ES, WT>& dest, const fractional<N, ES, WT>& lfrac, const fractional<N, ES, WT>& rfrac)
+void positparams<N, ES, WT>::add_fractions(positparams<N, ES, WT>& dest,
+                                           const fractional<N, ES, WT>& lfrac,
+                                           const fractional<N, ES, WT>& rfrac)
 {
     dest.fraction = lfrac + rfrac;
 
@@ -453,24 +414,13 @@ void positparams<N, ES, WT>::add_fractions(positparams<N, ES, WT>& dest, const f
 }
 
 template <size_t N, size_t ES, typename WT>
-void positparams<N, ES, WT>::sub_fractions(positparams<N, ES, WT>& dest, const fractional<N, ES, WT>& lfrac, const fractional<N, ES, WT>& rfrac)
+void positparams<N, ES, WT>::sub_fractions(positparams<N, ES, WT>& dest,
+                                           const fractional<N, ES, WT>& lfrac,
+                                           const fractional<N, ES, WT>& rfrac)
 {
     dest.fraction = lfrac - rfrac;
 
     // TODO (Schärtl): handle underflow(?)
-}
-
-template <size_t N, size_t ES, typename WT>
-template <size_t M>
-std::optional<size_t> positparams<N, ES, WT>::get_hidden_bit_idx(const uinteger<M, WT>& fraction)
-{
-    if (fraction.is_zero())
-    {
-        return std::nullopt;
-    }
-
-    const size_t leading_zeroes = count_leading_zeroes(fraction);
-    return std::make_optional(N - leading_zeroes - 1);
 }
 
 template <size_t SN, size_t SES, typename SWT>

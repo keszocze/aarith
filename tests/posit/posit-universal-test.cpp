@@ -21,7 +21,7 @@ static void require_addition(const uint8_t lhs, const uint8_t rhs, const uint8_t
     const posit8 actual_posit = p + q;
     const posit8 expected_posit(expected);
 
-    if (p.is_negative())
+    if (p.is_negative() || q.is_negative())
     {
         // TODO (Schärt): Also check negative values eventually!!!
         return;

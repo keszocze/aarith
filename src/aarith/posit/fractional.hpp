@@ -1,19 +1,15 @@
 #pragma once
 
 #include <aarith/posit.hpp>
-#include <iostream>
 
-namespace aarith
-{
+namespace aarith {
 
-template <size_t N, size_t ES, typename WT>
-fractional<N, ES, WT> fractional<N, ES, WT>::zero()
+template <size_t N, size_t ES, typename WT> fractional<N, ES, WT> fractional<N, ES, WT>::zero()
 {
     return fractional<N, ES, WT>();
 }
 
-template <size_t N, size_t ES, typename WT>
-fractional<N, ES, WT>::fractional()
+template <size_t N, size_t ES, typename WT> fractional<N, ES, WT>::fractional()
 {
 }
 
@@ -168,4 +164,4 @@ std::ostream& operator<<(std::ostream& os, const fractional<SN, SES, SWT>& f)
     return os;
 }
 
-}  // namespace aarith
+} // namespace aarith

@@ -442,30 +442,6 @@ template <size_t N, size_t ES, typename WT> integer<N> get_scale_value(const pos
 }
 
 template <size_t N, size_t ES, typename WT>
-posit<N, ES, WT> add(const posit<N, ES, WT>& lhs, const posit<N, ES, WT>& rhs)
-{
-    if (lhs.is_nar() || rhs.is_nar())
-    {
-        return lhs.nar();
-    }
-
-    if (lhs.is_zero())
-    {
-        return rhs;
-    }
-
-    if (rhs.is_zero())
-    {
-        return lhs;
-    }
-
-    const positparams lhv = normalize(lhs);
-    const positparams rhv = normalize(rhs);
-
-    throw std::logic_error("not implemented");
-}
-
-template <size_t N, size_t ES, typename WT>
 void dump_meta(std::ostream& os, const posit<N, ES, WT>& p)
 {
     const auto bits = to_binary(p);
@@ -481,8 +457,7 @@ void dump_meta(std::ostream& os, const posit<N, ES, WT>& p)
 
     os << bits << " nregime=" << nregime << " nexp=" << nexp << " nfrac=" << nfrac
        << " regime=" << regime << " exponent=" << exponent << " fraction=" << fraction
-       << " scale=" << scale
-       << std::endl;
+       << " scale=" << scale << std::endl;
     ;
 }
 

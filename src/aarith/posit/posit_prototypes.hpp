@@ -391,7 +391,32 @@ public:
      */
     [[nodiscard]] posit decremented() const;
 
+    /**
+     * @brief Compute the bitwise increment that represents a real value.
+     *
+     * This method does not return this + one, rather it returns a posit that
+     * has the bitstring of this incremented by one. If incrementing would lead
+     * to NaR, this function returns the original posit.
+     *
+     * Getting the increment of a given posit can be useful when computing
+     * rounding.
+     *
+     * @return The posit bits plus one
+     */
     [[nodiscard]] posit incremented_real() const;
+
+    /**
+     * @brief Compute the bitwise decrement that represents a real value.
+     *
+     * This method does not return this - one, rather it returns a posit that
+     * has the bitstring of this decremented by one. If decrementing would lead
+     * to NaR, this function returns the original posit.
+     *
+     * Getting the decrement of a given posit can be useful when computing
+     * rounding.
+     *
+     * @return The posit bits plus one
+     */
     [[nodiscard]] posit decremented_real() const;
 
     /**
@@ -539,9 +564,6 @@ template <size_t N, size_t ES, typename WT>
  */
 template <size_t N, size_t ES, typename WT> integer<N> get_scale_value(const posit<N, ES, WT>& p);
 
-template <size_t N, size_t ES, typename WT>
-posit<N, ES, WT> add(const posit<N, ES, WT>& lhs, const posit<N, ES, WT>& rhs);
-
 /**
  * @brief Dump posit information to stream.
  *
@@ -555,6 +577,14 @@ posit<N, ES, WT> add(const posit<N, ES, WT>& lhs, const posit<N, ES, WT>& rhs);
 template <size_t N, size_t ES, typename WT>
 void dump_meta(std::ostream& os, const posit<N, ES, WT>& p);
 
+/**
+ * @brief Dump posit information to a string.
+ *
+ * This function dumps various interesting parameters to a string. It is
+ * useful for debugging. The returned string contains a newline character.
+ *
+ * @param p The posit to dump
+ */
 template <size_t N, size_t ES, typename WT> std::string dump_string(const posit<N, ES, WT>& p);
 
 //
@@ -623,47 +653,165 @@ std::string to_binary(const posit<N, ES, WT>& p, const char* delim);
 // For implementation, look at posit/fractional.hpp
 //
 
-template <size_t N, size_t ES, typename WT>
-class fractional
+/**
+ * @brief Class to handle fractional values.
+ *
+ * This represents an unsigned fixed point fraction as used by posits. Unlike
+ * posits, this class uses an explicit hidden bit.
+ *
+ * @tparam N The width of associated posits
+ * @tparam ES The exponent size of associated posits
+ * @tparam WT The word type of associated posits
+ */
+template <size_t N, size_t ES, typename WT> class fractional
 {
 public:
+    /**
+     * @return A fraction that represents the number zero.
+     */
     static fractional zero();
 
+    /**
+     * @brief Construct a new zero fraction.
+     *
+     * The returned fraction has all bits set to zero. Meaning the
+     * constructed fractional represents zero.
+     */
     fractional();
-    fractional(const fractional &other);
+
+    /**
+     * @brief Copy constructor.
+     */
+    fractional(const fractional& other);
+
+    /**
+     * @brief Construct fractional from posit.
+     *
+     * Extract the fractional part from p and construct this fractional to
+     * represent that number.
+     *
+     * @param p The posit to import the fraction from.
+     */
     fractional(const posit<N, ES, WT>& p);
 
+    /**
+     * @brief Assignment operator.
+     */
     fractional& operator=(const fractional<N, ES, WT>& other);
 
+    /**
+     * @return Whether this and other are equal.
+     */
     bool operator==(const fractional<N, ES, WT>& other) const;
+
+    /**
+     * @return Whether this and other are not equal.
+     */
     bool operator!=(const fractional<N, ES, WT>& other) const;
 
+    /**
+     * @return Whether this is less than other.
+     */
     bool operator<(const fractional<N, ES, WT>& other) const;
+
+    /**
+     * @return Whether this is less than or equal to other.
+     */
     bool operator<=(const fractional<N, ES, WT>& other) const;
 
+    /**
+     * @return Whether this is greater than other.
+     */
     bool operator>(const fractional<N, ES, WT>& other) const;
+
+    /**
+     * @return Whether this is greater than or equal to other.
+     */
     bool operator>=(const fractional<N, ES, WT>& other) const;
 
+    /**
+     * @brief Addition of two fractional values.
+     *
+     * If the result is too large or too small to fit in the underlying
+     * storage, the overflowed/underflowed bits are discarded.
+     *
+     * @return The sum of this and other.
+     */
     fractional operator+(const fractional<N, ES, WT>& other) const;
+
+    /**
+     * @brief Subtraction of two fractional values.
+     *
+     * If the result is too large or too small to fit in the underlying
+     * storage, the overflowed/underflowed bits are discarded.
+     *
+     * @return other subtracted from this.
+     */
     fractional operator-(const fractional<N, ES, WT>& other) const;
 
+    /**
+     * @param shift The number of places to shift.
+     * @return This fractional shifted to the left.
+     */
     fractional operator<<(const size_t shift) const;
+
+    /**
+     * @param shift The number of places to shift.
+     * @return This fractional shifted to the left.
+     */
     fractional operator<<(const uinteger<N, WT>& shift) const;
 
+    /**
+     * @param shift The number of places to shift.
+     * @return This fractional shifted to the right.
+     */
     fractional operator>>(const size_t shift) const;
+
+    /**
+     * @param shift The number of places to shift.
+     * @return This fractional shifted to the right.
+     */
     fractional operator>>(const uinteger<N, WT>& shift) const;
 
+    /**
+     * @brief Return the integer part of this fractional value.
+     *
+     * If this fractional represents 00001010.11110000, then this function
+     * returns 00001010.
+     */
     uinteger<N, WT> integer_bits() const;
+
+    /**
+     * @brief Return the integer part of this fractional value.
+     *
+     * If this fractional represents 00001010.11110000, then this function
+     * returns 11110000.
+     */
     uinteger<N, WT> fraction_bits() const;
 
-    // printing
+    /**
+     * @brief Overload for writing fractional values to a stream.
+     */
     template <size_t SN, size_t SES, typename SWT>
     friend std::ostream& operator<<(std::ostream& os, const fractional<SN, SES, SWT>& f);
 
 private:
+    /**
+     * The index of the hidden bit, that is the bit that represents the value
+     * 2^0 = 1.
+     */
     static constexpr size_t HiddenBitIndex = N;
-    static constexpr size_t ScratchSize = 2  * N;
 
+    /**
+     * Size of the underlying scratch memory.
+     */
+    static constexpr size_t ScratchSize = 2 * N;
+
+    /**
+     * The actual fractional value as an unsigned integer. We use an unsigned
+     * integer (instead of, say, word array) to use the built-in arithmetic
+     * operations.
+     */
     uinteger<ScratchSize, WT> bits;
 };
 
@@ -673,64 +821,171 @@ private:
 // For implementation, look at posit/positparams.hpp
 //
 
+/**
+ * @brief Parameterized representation of a given posit.
+ *
+ * While posits use a more involved encoding, they actually represent a
+ * product of fraction * 2^scale. This type represents posits in this format
+ * rather than the original encoding. Translating posits to a positparam
+ * representation is an intermediate step when doing arithmetic.
+ *
+ * @tparam N The width of associated posits
+ * @tparam ES The exponent size of associated posits
+ * @tparam WT The word type of associated posits
+ */
 template <size_t N, size_t ES, typename WT> class positparams
 {
 public:
-    // normalize
+    /**
+     * @brief Construct from posit.
+     *
+     * Construct this object to represent the value of p. Conversion from
+     * posit to positparams is referred to normalization in some posit
+     * literature.
+     *
+     * @param p The posit to convert.
+     */
     constexpr positparams(const posit<N, ES, WT>& p);
 
-    // copy
+    /**
+     * @brief Copy constructor.
+     */
     constexpr positparams(const positparams& other);
 
-    // assign
+    /**
+     * @brief Assignment operator.
+     */
     constexpr positparams& operator=(const positparams& other);
 
-    // destruct
+    /**
+     * @brief Destructor.
+     */
     ~positparams();
 
-    // denormalize
+    /**
+     * @brief Convert back to posit.
+     *
+     * Convert the underlying parameters back to a posit. Conversion from
+     * positparams to posit is reference to as denormaliziation in some posit
+     * literature.
+     *
+     * If there exists not posit to represent this positparams exactly,
+     * rounding is applied.
+     */
     explicit constexpr operator posit<N, ES, WT>() const;
 
-    // eq
+    /**
+     * @return Whether this and other are equal.
+     */
     bool operator==(const positparams& other) const;
 
-    // neq
+    /**
+     * @return Whether this and other are not equal.
+     */
     bool operator!=(const positparams& other) const;
 
-    // lt
-    bool operator<(const positparams& other) const;
-
-    // addition
+    /**
+     * @brief Addition of two posit in parameter representation.
+     *
+     * @return The sum of this and other.
+     */
     positparams operator+(const positparams& rhs) const;
 
-    // printing
+    /**
+     * @brief Overload for writing fractional values to a stream.
+     */
     template <size_t SN, size_t SES, typename SWT>
     friend std::ostream& operator<<(std::ostream& os, const positparams<SN, SES, SWT>& p);
 
 private:
+    /**
+     * Whether this posit represents NaR.
+     */
     bool is_nar;
+
+    /**
+     * Whether this posit represents zero. Zero is often considered a special
+     * case in posit operations. Here, we make that explicit.
+     */
     bool is_zero;
+
+    /**
+     * Sign bit of the posit. If the sign bit is true, the represented posit
+     * is negative. Otherwise it is positive.
+     */
     bool sign_bit;
 
-    // global scale of the posit
+    /**
+     * Scale parameter. Can be both positive (for big numbers) and negative
+     * (for numbers close to zero).
+     */
     integer<N, WT> scale;
 
+    /**
+     * Fraction parameter.
+     */
     fractional<N, ES, WT> fraction;
 
-    // null the flags
+    /**
+     * @brief Private constructor for constructing empty parameter objects.
+     *
+     * The constructed object has all flags set to false.
+     */
     constexpr positparams();
 
+    /**
+     * @return Return parameter object that represents zero.
+     */
     static positparams<N, ES, WT> zero();
 
+    /**
+     * @brief Return p, q in order of scale.
+     * @return A tuple that contains p, q ordered by scale.
+     */
     static std::tuple<positparams*, positparams*> ordered(positparams* p, positparams* q);
+
+    /**
+     * @brief Match scale for addition.
+     *
+     * Ensures that both p and q have the same scale value. During matching,
+     * the object with smaller scale will have its fraction shifted to match
+     * the new scale.
+     */
     static void match_scale_of(positparams& p, positparams& q);
 
-    static void sum_fractions(positparams &dst, const positparams<N, ES, WT>& lhs, const positparams<N, ES, WT>& rhs);
-    static void add_fractions(positparams &dst, const fractional<N, ES, WT>& lfrac, const fractional<N, ES, WT>& rfrac);
-    static void sub_fractions(positparams &dst, const fractional<N, ES, WT>& lfrac, const fractional<N, ES, WT>& rfrac);
+    /**
+     * @brief Add up two positparams.
+     *
+     * @param dst Where to write the result to.
+     * @param lhs First operand of the addition.
+     * @Param rhs Second operand of the addition.
+     */
+    static void sum_fractions(positparams& dst, const positparams<N, ES, WT>& lhs,
+                              const positparams<N, ES, WT>& rhs);
 
-    template <size_t M>
-    static std::optional<size_t> get_hidden_bit_idx(const uinteger<M, WT>& fraction);
+    /**
+     * @brief Add up two fractions.
+     *
+     * If overflow occurs, the scale of dest is updated accordingly.
+     *
+     * @param dst Where to write the result to.
+     * @param lhs First operand of the addition.
+     * @Param rhs Second operand of the addition.
+     */
+    static void add_fractions(positparams& dst, const fractional<N, ES, WT>& lfrac,
+                              const fractional<N, ES, WT>& rfrac);
+
+    /**
+     * @brief Subtract one fraction from the other.
+     *
+     * If underflow occurs, the scale of dest is updated accordingly.
+     *
+     * @param dst Where to write the result to.
+     * @param lhs First operand of the addition.
+     * @Param rhs Second operand of the addition. Will be subtracted from lhs.
+     */
+    static void sub_fractions(positparams& dst, const fractional<N, ES, WT>& lfrac,
+                              const fractional<N, ES, WT>& rfrac);
 };
 
 } // namespace aarith
