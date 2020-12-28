@@ -181,7 +181,7 @@ constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
     const bool after = truncated.bit(truncated.width() - 1);
     const bool tail = !width_cast<ES + 3 - 1>(truncated).is_zero();
 
-    if (last && after || after && tail)
+    if ((last && after) || (after && tail))
     {
         x = x.incremented_real();
     }
