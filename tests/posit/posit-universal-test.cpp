@@ -38,8 +38,8 @@ static void require_addition(const uint8_t lhs, const uint8_t rhs, const uint8_t
         INFO("? " << to_double(actual_posit));
         INFO("! " << to_double(expected_posit));
         INFO("eval '" << to_binary(p, " ") << "' + '" << to_binary(q, " ") << "' = '"
-                           << to_binary(actual_posit, " ") << "', expected '"
-                           << to_binary(expected_posit, " ") << "'");
+                      << to_binary(actual_posit, " ") << "', expected '"
+                      << to_binary(expected_posit, " ") << "'");
 
         const auto expected_bits = expected_posit.get_bits();
         const auto actual_bits = actual_posit.get_bits();

@@ -21,11 +21,12 @@ namespace aarith {
  * @return The number of zeroes
  */
 template <size_t Width, typename WordType>
-constexpr size_t count_leading_zeroes(const word_array<Width, WordType>& value, size_t offset=0)
+constexpr size_t count_leading_zeroes(const word_array<Width, WordType>& value, size_t offset = 0)
 {
     // if offset is chosen too big, skip all bits, counting none
 
-    if (offset >= Width) {
+    if (offset >= Width)
+    {
         return 0;
     }
 
@@ -58,7 +59,7 @@ constexpr size_t count_leading_zeroes(const word_array<Width, WordType>& value, 
  * @return The number of ones
  */
 template <size_t Width, typename WordType>
-constexpr size_t count_leading_ones(const word_array<Width, WordType>& value, size_t offset=0)
+constexpr size_t count_leading_ones(const word_array<Width, WordType>& value, size_t offset = 0)
 {
     return count_leading_zeroes(~value, offset);
 }
@@ -172,7 +173,8 @@ bit_range(const word_array<W, WordType>& w)
 }
 
 template <size_t W, typename WordType>
-[[nodiscard]] constexpr word_array<W, WordType> dynamic_bit_range(const word_array<W, WordType>& w, size_t start_idx, size_t end_idx_exclusive)
+[[nodiscard]] constexpr word_array<W, WordType>
+dynamic_bit_range(const word_array<W, WordType>& w, size_t start_idx, size_t end_idx_exclusive)
 {
     // check arguments
 
