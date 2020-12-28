@@ -108,7 +108,7 @@ constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
     //
 
     Integer nregime;
-    bool first_regime_bit;
+    bool first_regime_bit = false;
 
     if (scale < scale.zero())
     {

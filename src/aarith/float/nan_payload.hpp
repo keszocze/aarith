@@ -11,9 +11,9 @@ namespace aarith {
  * @return The payload or -1, when x is not NaN
  */
 template <size_t E, size_t M, typename WordType>
-normalized_float<E, M, WordType> constexpr getPayload(const normalized_float<E, M, WordType>& x)
+floating_point<E, M, WordType> constexpr getPayload(const floating_point<E, M, WordType>& x)
 {
-    using F = normalized_float<E, M, WordType>;
+    using F = floating_point<E, M, WordType>;
     if (!x.is_nan())
     {
         return F::neg_one();
@@ -34,9 +34,9 @@ normalized_float<E, M, WordType> constexpr getPayload(const normalized_float<E, 
  * @return A quiet NaN with the specified payload, +0 in case of error
  */
 template <size_t E, size_t M, typename WordType>
-normalized_float<E, M, WordType> constexpr setPayload(const normalized_float<E, M, WordType>& x)
+floating_point<E, M, WordType> constexpr setPayload(const floating_point<E, M, WordType>& x)
 {
-    using F = normalized_float<E, M, WordType>;
+    using F = floating_point<E, M, WordType>;
 
     if (x.is_nan() || x.is_negative())
     {
@@ -50,7 +50,6 @@ normalized_float<E, M, WordType> constexpr setPayload(const normalized_float<E, 
     return qNaN;
 }
 
-
 /**
  * @brief Creates signaling NaN with a specified payload
  *
@@ -63,9 +62,10 @@ normalized_float<E, M, WordType> constexpr setPayload(const normalized_float<E, 
  * @return A signaling NaN with the specified payload, +0 in case of error
  */
 template <size_t E, size_t M, typename WordType>
-normalized_float<E, M, WordType> constexpr setPayloadSignaling(const normalized_float<E, M, WordType>& x)
+floating_point<E, M, WordType> constexpr setPayloadSignaling(
+    const floating_point<E, M, WordType>& x)
 {
-    using F = normalized_float<E, M, WordType>;
+    using F = floating_point<E, M, WordType>;
 
     if (x.is_nan() || x.is_negative())
     {
@@ -78,7 +78,8 @@ normalized_float<E, M, WordType> constexpr setPayloadSignaling(const normalized_
 
     // when the mantissa has become zeros only, we need to catch this as otherwise
     // positive infinity would be returned
-    if (new_mantissa == F::IntegerFrac::zero()) {
+    if (new_mantissa == F::IntegerFrac::zero())
+    {
         return F::zero();
     }
     const F sNaN = F{false, F::IntegerExp::all_ones(), new_mantissa};

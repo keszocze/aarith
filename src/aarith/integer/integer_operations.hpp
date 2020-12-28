@@ -265,7 +265,7 @@ template <std::size_t W, std::size_t V, typename WordType>
         const auto s2 = expanding_add(bh, bl);
 
         // prevent infinite call loop
-        // TODO find a better way to do this
+        // TODO (keszocze) find a better way to do this
         uinteger<2 * (karazuba_width + 1), WordType> p3;
         if (s1.bit(s1.width() - 1) == 1 || s2.bit(s2.width() - 1) == 1)
         {
@@ -291,8 +291,8 @@ template <std::size_t W, std::size_t V, typename WordType>
     {
         constexpr std::size_t max_width = std::max(W, V);
 
-        const auto a_ = width_cast<max_width, W, WordType>(a);
-        const auto b_ = width_cast<max_width, V, WordType>(b);
+        const auto a_ = width_cast<max_width>(a);
+        const auto b_ = width_cast<max_width>(b);
 
         const auto res = expanding_karazuba(a_, b_);
 
@@ -499,7 +499,6 @@ template <class IntA, class IntB>
     static_assert(::aarith::is_integral_v<IntA>);
     static_assert(::aarith::is_integral_v<IntB>);
 
-    // TODO do we need this assertion?
     static_assert(::aarith::same_signedness<IntA, IntB>);
     static_assert(::aarith::same_word_type<IntA, IntB>);
 
@@ -1006,8 +1005,8 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
         Q = negate(Q);
     }
 
-    Integer Q_cast = width_cast<W, W + 1, WordType>(Q);
-    Integer remainder_cast = width_cast<W, W + 1, WordType>(remainder_);
+    Integer Q_cast = width_cast<W>(Q);
+    Integer remainder_cast = width_cast<W>(remainder_);
 
     if (numerator.is_negative())
     {
@@ -1142,9 +1141,9 @@ constexpr integer<N, WT> ilog(const integer<N, WT>& n, const integer<N, WT>& bas
     constexpr auto max = IntegerType::max();
     const auto factor = BoundType(base);
 
-    BoundType i = BoundType(-1);
+    BoundType i = -BoundType::one();
     BoundType x = n;
-    BoundType p = 1;
+    BoundType p = BoundType::one();
 
     for (; i <= max; ++i)
     {

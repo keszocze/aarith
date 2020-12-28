@@ -6,7 +6,7 @@
 namespace aarith {
 
 /**
- * @brief Expands the bit width of unsigned integer as signed integer.
+ * @brief Performs a runtime-checked conversion.
  *
  * The value of the integer remains unchanged. To achive this,
  * DestinationWidth needs to be at least SourceWidth + 1.
@@ -51,7 +51,7 @@ signed_width_cast(const uinteger<SourceWidth, SourceWordType>& source)
                   "one bit greater to fit the argument");
 
     const auto array = static_cast<word_array<SourceWidth, DestinationWordType>>(source);
-    const auto extended = width_cast<DestinationWidth, SourceWidth, DestinationWordType>(array);
+    const auto extended = width_cast<DestinationWidth>(array);
 
     return integer<DestinationWidth, DestinationWordType>(extended);
 }

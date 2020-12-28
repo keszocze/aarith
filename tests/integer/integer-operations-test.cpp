@@ -283,17 +283,14 @@ SCENARIO("Adding two positive integers", "[integer][signed][arithmetic][addition
     {
         constexpr integer<16> a(15);
         constexpr integer<16> a_(-16);
-        constexpr integer<16> zero16(0);
         const integer<16> sum16 = add(a, a_);
 
         constexpr integer<64> b(150);
         constexpr integer<64> b_(-235);
-        constexpr integer<64> zero64(0);
         const integer<64> sum64 = add(b, b_);
 
         constexpr integer<150> c(1337);
         constexpr integer<150> c_(-5000);
-        constexpr integer<150> zero150(0);
         const integer<150> sum150 = add(c, c_);
 
         THEN("The sum should be negative")
@@ -848,27 +845,30 @@ TEMPLATE_TEST_CASE_SIG("Invariants for the signed integer division",
                 REQUIRE(div(a, I::one()) == a);
             }
         }
-        WHEN("Dividing the number by a larger number")
+        WHEN("Dividing the number by a larger number (in absolute terms)")
         {
             THEN("The result should be zero")
             {
-                if (a != I::max())
+
+                if (a.is_negative())
                 {
-                    const I c = add(a, I::one());
-                    if (c != I::zero() && c != I::one() && c != -I::one())
+                    if (a != I::min())
                     {
-                        if (c.is_negative())
+                        const I c = sub(a, I::one());
+                        if (div(a, c) != I::zero())
                         {
-                            // flaky test, I need to find out, why this fails from time to time
-                            // it *should* have been the missing test for max() above
-                            if (div(a, c) != I::one())
-                            {
-                                std::cout << a << " / " << c << " = " << div(a, c)
-                                          << " != " << I::one() << "\n";
-                            }
-                            REQUIRE(div(a, c) == I::one());
+                            std::cout << a << "/" << c << " == " << div(a, c) << " should be 1"
+                                      << "\n";
                         }
-                        else
+                        REQUIRE(div(a, c) == I::zero());
+                    }
+                }
+                else
+                {
+                    if (a != I::max())
+                    {
+                        const I c = add(a, I::one());
+                        if (c != I::one())
                         {
                             REQUIRE(div(a, c) == I::zero());
                         }
@@ -908,6 +908,7 @@ SCENARIO("Multiplying signed integers using Booth's algorithm",
                     static constexpr auto res_inplace = booth_inplace_expanding_mul(m, r);
 
                     static constexpr R expected{-12};
+
                     CHECK(res == expected);
                     CHECK(res == res_inplace);
                     REQUIRE(res == res_naive);

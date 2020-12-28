@@ -1,33 +1,22 @@
 #include <aarith/float.hpp>
+#include <aarith/integer.hpp>
+#include <cmath>
 #include <iostream>
-#include <numeric>
-#include <vector>
-
 
 int main()
 {
     using namespace aarith;
 
-    using nf_t = normalized_float<8, 23>;
-    float a = 0.0117647f;
-    float b = 0.385671f;
-    nf_t nf_a(0.0117647f);
-    nf_t nf_b(0.385671f);
+    using I16 = integer<16>;
+    using U16 = uinteger<16>;
 
-    auto result_f = a * b;
-    auto result = mul(nf_a, nf_b);
-    std::cout << result << "\n";
-    std::cout << to_binary(nf_t(result_f)) << "\n";
-    std::cout << to_binary(result) << "\n";
+    I16 word;
+    U16 other_word, shift;
 
-
-    nf_t lhs{5.0f};
-    nf_t rhs{-2.0f};
-
-
-    std::cout << lhs << "\t" << rhs << "\n";
-    std::cout << (lhs < rhs) << "\n";
-
+    I16 shifted_size_t = word << size_t(45);
+    I16 shifted = word << shift;
+    U16 shifted_ = other_word << shift;
+    (void) shifted;
 
     return 0;
 }

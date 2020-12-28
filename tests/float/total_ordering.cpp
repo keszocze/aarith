@@ -1,45 +1,45 @@
+#include "../test-signature-ranges.hpp"
 #include "gen_float.hpp"
 #include <aarith/float.hpp>
 #include <bitset>
 #include <catch.hpp>
 using namespace aarith;
 
-
-
-TEMPLATE_TEST_CASE_SIG("Total ordering +/- zero",
-                       "[normalized_float][comparison][utility]",
-                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
-                       (11, 52, double))
+TEMPLATE_TEST_CASE_SIG("Total ordering +/- zero", "[floating_point][comparison][utility]",
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
-    GIVEN("+/- zero") {
+    GIVEN("+/- zero")
+    {
 
         constexpr F pos_zero{F::zero()};
         constexpr F neg_zero{F::neg_zero()};
 
-        THEN("The cordering behaves as defined in the standard") {
-            constexpr bool v = totalOrder(neg_zero,pos_zero);
+        THEN("The ordering behaves as defined in the standard")
+        {
+            const bool v = totalOrder(neg_zero, pos_zero);
             REQUIRE(v);
         }
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("Total ordering with itself",
-                       "[normalized_float][comparison][utility]",
-                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
-                       (11, 52, double))
+TEMPLATE_TEST_CASE_SIG("Total ordering with itself", "[floating_point][comparison][utility]",
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
 
     GIVEN("A random, non NaN, non infinity floating-point number x")
     {
         F x = GENERATE(take(100, random_float<E, M, FloatGenerationModes::FullyRandom>()));
 
-        if (!x.is_nan()) {
-            WHEN("ordering the number with itself") {
-                THEN("The result should be true") {
-                    const bool b = totalOrder(x,x);
+        if (!x.is_nan())
+        {
+            WHEN("ordering the number with itself")
+            {
+                THEN("The result should be true")
+                {
+                    const bool b = totalOrder(x, x);
                     REQUIRE(b);
                 }
             }
@@ -48,11 +48,10 @@ TEMPLATE_TEST_CASE_SIG("Total ordering with itself",
 }
 
 TEMPLATE_TEST_CASE_SIG("Total ordering with a single NaN value",
-                       "[normalized_float][comparison][utility]",
-                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
-                       (11, 52, double))
+                       "[floating_point][comparison][utility]", AARITH_FLOAT_TEST_SIGNATURE,
+                       AARITH_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
     constexpr F pqNaN = F::qNaN();
     constexpr F psNaN = F::sNaN();
 
@@ -63,7 +62,7 @@ TEMPLATE_TEST_CASE_SIG("Total ordering with a single NaN value",
     {
         F x = GENERATE(take(100, random_float<E, M, FloatGenerationModes::NonSpecial>()));
 
-        WHEN("totally odering the number x with NaN")
+        WHEN("totally ordering the number x with NaN")
         {
             AND_WHEN("the NaN is 'positive'")
             {
@@ -138,11 +137,10 @@ TEMPLATE_TEST_CASE_SIG("Total ordering with a single NaN value",
 }
 
 TEMPLATE_TEST_CASE_SIG("Total ordering with a two NaN values",
-                       "[normalized_float][comparison][utility]",
-                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
-                       (11, 52, double))
+                       "[floating_point][comparison][utility]", AARITH_FLOAT_TEST_SIGNATURE,
+                       AARITH_FLOAT_TEMPLATE_RANGE)
 {
-    using F = normalized_float<E, M>;
+    using F = floating_point<E, M>;
     constexpr F pqNaN = F::qNaN();
     constexpr F psNaN = F::sNaN();
 
@@ -171,6 +169,182 @@ TEMPLATE_TEST_CASE_SIG("Total ordering with a two NaN values",
 
                 CHECK(totalOrder(nqNaN, nsNaN));
                 CHECK_FALSE(totalOrder(nsNaN, nqNaN));
+            }
+            THEN("iii) otherwise, the order of NaNs is implementation-defined. (false in our case)")
+            {
+                CHECK_FALSE(totalOrder(psNaN, psNaN));
+                CHECK_FALSE(totalOrder(nsNaN, nsNaN));
+                CHECK_FALSE(totalOrder(nqNaN, nqNaN));
+                REQUIRE_FALSE(totalOrder(pqNaN, pqNaN));
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Total ordering mag +/- zero", "[floating_point][comparison][utility]",
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
+{
+    using F = floating_point<E, M>;
+
+    GIVEN("+/- zero")
+    {
+
+        constexpr F pos_zero{F::zero()};
+        constexpr F neg_zero{F::neg_zero()};
+
+        THEN("The ordering behaves as defined in the standard")
+        {
+            const bool v = totalOrderMag(neg_zero, pos_zero);
+            REQUIRE(v);
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Total ordering mag with itself", "[floating_point][comparison][utility]",
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
+{
+    using F = floating_point<E, M>;
+
+    GIVEN("A random, non NaN, non infinity floating-point number x")
+    {
+        F x = GENERATE(take(100, random_float<E, M, FloatGenerationModes::FullyRandom>()));
+
+        if (!x.is_nan())
+        {
+            WHEN("ordering the number with itself")
+            {
+                THEN("The result should be true")
+                {
+                    const bool b = totalOrderMag(x, x);
+                    REQUIRE(b);
+                }
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Total ordering mag with a single NaN value",
+                       "[floating_point][comparison][utility]", AARITH_FLOAT_TEST_SIGNATURE,
+                       AARITH_FLOAT_TEMPLATE_RANGE)
+{
+    using F = floating_point<E, M>;
+    constexpr F pqNaN = F::qNaN();
+    constexpr F psNaN = F::sNaN();
+
+    constexpr F nqNaN = negate(F::qNaN());
+    constexpr F nsNaN = negate(F::sNaN());
+
+    GIVEN("A random, non NaN, non infinity floating-point number x")
+    {
+        F x = GENERATE(take(100, random_float<E, M, FloatGenerationModes::NonSpecial>()));
+
+        WHEN("totally ordering the number x with NaN")
+        {
+            AND_WHEN("the NaN is 'positive'")
+            {
+                THEN("x < NaN")
+                {
+                    CHECK(totalOrderMag(x, pqNaN));
+                    REQUIRE(totalOrderMag(x, psNaN));
+                }
+                THEN("!(NaN < x)")
+                {
+                    CHECK_FALSE(totalOrderMag(pqNaN, x));
+                    REQUIRE_FALSE(totalOrderMag(psNaN, x));
+                }
+            }
+            AND_WHEN("the NaN is 'negative'")
+            {
+                THEN("!(abs(NaN) < abs(x))")
+                {
+                    CHECK_FALSE(totalOrderMag(nqNaN, x));
+                    REQUIRE_FALSE(totalOrderMag(nsNaN, x));
+                }
+                THEN("(abs(x) < abs(NaN))")
+                {
+                    CHECK(totalOrderMag(x, nqNaN));
+                    REQUIRE(totalOrderMag(x, nsNaN));
+                }
+            }
+        }
+    }
+    GIVEN("+/- infinity")
+    {
+        constexpr F pos_inf = F::pos_infinity();
+        constexpr F neg_inf = F::neg_infinity();
+        WHEN("totally odering the infinities with NaN")
+        {
+            AND_WHEN("the NaN is 'positive'")
+            {
+                THEN("+/- inf < NaN")
+                {
+                    CHECK(totalOrderMag(pos_inf, pqNaN));
+                    REQUIRE(totalOrderMag(pos_inf, psNaN));
+                    CHECK(totalOrderMag(neg_inf, pqNaN));
+                    REQUIRE(totalOrderMag(neg_inf, psNaN));
+                }
+                THEN("!(NaN < +/- inf)")
+                {
+                    CHECK_FALSE(totalOrderMag(pqNaN, pos_inf));
+                    REQUIRE_FALSE(totalOrderMag(psNaN, pos_inf));
+                    CHECK_FALSE(totalOrderMag(pqNaN, neg_inf));
+                    REQUIRE_FALSE(totalOrderMag(psNaN, neg_inf));
+                }
+            }
+            AND_WHEN("the NaN is 'negative'")
+            {
+                THEN("!(abs(NaN) < abs(+/- inf))")
+                {
+                    CHECK_FALSE(totalOrderMag(nqNaN, pos_inf));
+                    CHECK_FALSE(totalOrderMag(nsNaN, pos_inf));
+                    CHECK_FALSE(totalOrderMag(nqNaN, neg_inf));
+                    REQUIRE_FALSE(totalOrderMag(nsNaN, neg_inf));
+                }
+                THEN("abs(+/- inf) < abs(NaN)")
+                {
+                    CHECK(totalOrderMag(pos_inf, nqNaN));
+                    REQUIRE(totalOrderMag(pos_inf, nsNaN));
+                    CHECK(totalOrderMag(neg_inf, nqNaN));
+                    REQUIRE(totalOrderMag(neg_inf, nsNaN));
+                }
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Total ordering mag with a two NaN values",
+                       "[floating_point][comparison][utility]", AARITH_FLOAT_TEST_SIGNATURE,
+                       AARITH_FLOAT_TEMPLATE_RANGE)
+{
+    using F = floating_point<E, M>;
+    constexpr F pqNaN = F::qNaN();
+    constexpr F psNaN = F::sNaN();
+
+    constexpr F nqNaN = negate(F::qNaN());
+    constexpr F nsNaN = negate(F::sNaN());
+
+    GIVEN("All four types of NaNs (ignoring any payloads)")
+    {
+        WHEN("Totally ordering them")
+        {
+            THEN("i) negative sign orders below positive sign")
+            {
+                CHECK_FALSE(totalOrderMag(nqNaN, pqNaN));
+                CHECK_FALSE(totalOrderMag(nqNaN, psNaN));
+                CHECK_FALSE(totalOrderMag(nsNaN, psNaN));
+                CHECK(totalOrderMag(nsNaN, pqNaN));
+                CHECK_FALSE(totalOrderMag(pqNaN, nqNaN));
+                CHECK_FALSE(totalOrderMag(pqNaN, nsNaN));
+                CHECK_FALSE(totalOrderMag(psNaN, nsNaN));
+                CHECK(totalOrderMag(psNaN, nqNaN));
+            }
+            THEN("ii) signaling orders below quiet for +NaN, reverse for −NaN")
+            {
+                CHECK(totalOrderMag(psNaN, pqNaN));
+                CHECK_FALSE(totalOrderMag(pqNaN, psNaN));
+
+                CHECK_FALSE(totalOrderMag(nqNaN, nsNaN));
+                CHECK(totalOrderMag(nsNaN, nqNaN));
             }
         }
     }

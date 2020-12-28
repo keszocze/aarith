@@ -1,7 +1,7 @@
 #pragma once
 
 #include <aarith/core/traits.hpp>
-#include <aarith/float/normalized_float.hpp>
+#include <aarith/float/floating_point.hpp>
 
 namespace aarith {
 
@@ -14,12 +14,12 @@ namespace aarith {
  * @tparam M Mantissa width
  * @tparam WordType The data type the underlying data is stored in
  * @param x The first/lhs floating-point number
- * @param y The scond/rhs floating-point number
+ * @param y The second/rhs floating-point number
  * @return true iff x < y
  */
 template <size_t E, size_t M, typename WordType>
-bool constexpr totalOrder(const normalized_float<E, M, WordType>& x,
-                const normalized_float<E, M, WordType>& y)
+bool constexpr totalOrder(const floating_point<E, M, WordType>& x,
+                          const floating_point<E, M, WordType>& y)
 {
 
     //    d) If x and y are unordered numerically because x or y is a NaN:
@@ -57,28 +57,29 @@ bool constexpr totalOrder(const normalized_float<E, M, WordType>& x,
         {
             return true;
         }
-        if (x.is_positive() && y.is_negative()) {
+        if (x.is_positive() && y.is_negative())
+        {
             return false;
         }
 
         // ii) signaling orders below quiet for +NaN, reverse for −NaN
-        if (x.is_positive() && y.is_positive())
+        if (x.is_sNaN() && y.is_qNaN())
         {
-            return x.is_sNaN() && y.is_qNaN();
+            return x.is_positive() && y.is_positive();
         }
 
         // ii) signaling orders below quiet for +NaN, reverse for −NaN
 
         // I am guessing that this is meant by "reverse"
-        if (x.is_negative() && y.is_negative())
+        if (x.is_qNaN() && y.is_sNaN())
         {
-            return x.is_qNaN() && y.is_sNaN();
+            return x.is_negative() && y.is_negative();
         }
 
         // iii) otherwise, the order of NaNs is implementation-defined
 
-        // as we can do as we like we opt for the positive and return true
-        return true;
+        // x < x should always be false
+        return false;
     }
 
     // a) If x < y, totalOrder(x, y) is true.
@@ -126,5 +127,24 @@ bool constexpr totalOrder(const normalized_float<E, M, WordType>& x,
     // This *should* be unreachable code as all cases as shown in the standard document have been
     // taken care of. Returning false seems to be a reasonable thing to do.
     return false;
+}
+
+/**
+ * @brief Checks for total ordering abs(x) < abs(y) of two floating-point numbers.
+ *
+ * These numbers *may* be NaNs or infinities.
+ *
+ * @tparam E Exponent width
+ * @tparam M Mantissa width
+ * @tparam WordType The data type the underlying data is stored in
+ * @param x The first/lhs floating-point number
+ * @param y The second/rhs floating-point number
+ * @return true iff abs(x) < abs(y)
+ */
+template <size_t E, size_t M, typename WordType>
+bool constexpr totalOrderMag(const floating_point<E, M, WordType>& x,
+                             const floating_point<E, M, WordType>& y)
+{
+    return totalOrder(abs(x), abs(y));
 }
 } // namespace aarith

@@ -5,15 +5,18 @@
 #include <iomanip>
 #include <sstream>
 
-using namespace aarith;
+using aarith::floating_point;
 
-using F = normalized_float<8, 23>;
+using F = floating_point<8, 23>; // NOLINT
 
 template <size_t iterations> F heron_exact(const F& num)
 {
 
-    const F one{1.0f};
-    const F two{2.0f};
+    using aarith::anytime_add;
+    using aarith::anytime_div;
+
+    const F one{1.0f}; // NOLINT
+    const F two{2.0f}; // NOLINT
     F result = add(num, one);
     result = div(result, two);
 
@@ -30,8 +33,11 @@ template <size_t iterations> F heron_exact(const F& num)
 template <size_t iterations, size_t C> F heron_anytime(const F& num)
 {
 
-    const F one{1.0f};
-    const F two{2.0f};
+    using aarith::anytime_add;
+    using aarith::anytime_div;
+
+    const F one{1.0f}; // NOLINT
+    const F two{2.0f}; // NOLINT
     F result = anytime_add(num, one, C + 1);
     result = anytime_div(result, two, C + 1);
 
@@ -52,7 +58,7 @@ template <int start, size_t iters, size_t heron_iter, size_t C> void compare_her
 
     F a{static_cast<float>(start)};
 
-    const F delta{0.014324f / 2.0f};
+    const F delta{0.014324f / 2.0f}; // NOLINT
 
     double max_abs_diff{0};
     double max_abs_diff_float{0};
@@ -66,7 +72,7 @@ template <int start, size_t iters, size_t heron_iter, size_t C> void compare_her
 
         const double res_anytime_float = static_cast<double>(res_anytime);
         const double a_float = static_cast<double>(a);
-        const double res_float = static_cast<double>(sqrtf(a_float));
+        const double res_float = static_cast<double>(sqrtf(a_float)); // NOLINT
         const double abs_diff_correct = std::abs(res_anytime_float - res_float);
 
         max_abs_diff = std::max(max_abs_diff, abs_diff);
@@ -87,71 +93,86 @@ template <int start, size_t iters, size_t heron_iter, size_t C> void compare_her
     auto t2 = std::chrono::high_resolution_clock::now();
 
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
-    std::cout << std::fixed << std::setprecision(30) << heron_iter << ";" << C << ";"
+    std::cout << std::fixed << std::setprecision(30) << heron_iter << ";" << C << ";" // NOLINT
               << static_cast<double>(max_abs_diff) << ";" << max_abs_diff_float << ";" << duration
               << "\n";
 }
 
-int main(int argc, char** argv)
+int main()
 {
-    using namespace aarith;
+
+    // change to 'true' for the full range of experiments
+    // greatly increases compilation time
+    static constexpr bool full_experiments = false;
 
     constexpr size_t value_iter = 8800;
     constexpr int starting_value = 65;
 
-    compare_heron<starting_value, value_iter, 1, 22>();
-    compare_heron<starting_value, value_iter, 2, 22>();
-    compare_heron<starting_value, value_iter, 3, 22>();
-    compare_heron<starting_value, value_iter, 4, 22>();
-    compare_heron<starting_value, value_iter, 5, 22>();
-    compare_heron<starting_value, value_iter, 6, 22>();
-    compare_heron<starting_value, value_iter, 7, 22>();
-    compare_heron<starting_value, value_iter, 10, 22>();
-    compare_heron<starting_value, value_iter, 100, 22>();
-    compare_heron<starting_value, value_iter, 1000, 22>();
-    compare_heron<starting_value, value_iter, 2000, 22>();
+    compare_heron<starting_value, value_iter, 1, 22>(); // NOLINT
+    compare_heron<starting_value, value_iter, 2, 22>(); // NOLINT
+
+    if constexpr (full_experiments) // NOLINT
+    {
+        compare_heron<starting_value, value_iter, 3, 22>();    // NOLINT
+        compare_heron<starting_value, value_iter, 4, 22>();    // NOLINT
+        compare_heron<starting_value, value_iter, 5, 22>();    // NOLINT
+        compare_heron<starting_value, value_iter, 6, 22>();    // NOLINT
+        compare_heron<starting_value, value_iter, 7, 22>();    // NOLINT
+        compare_heron<starting_value, value_iter, 10, 22>();   // NOLINT
+        compare_heron<starting_value, value_iter, 100, 22>();  // NOLINT
+        compare_heron<starting_value, value_iter, 1000, 22>(); // NOLINT
+        compare_heron<starting_value, value_iter, 2000, 22>(); // NOLINT
+    }
 
     constexpr size_t heron_iter = 5;
     compare_heron<starting_value, value_iter, heron_iter, 6>();
-    compare_heron<starting_value, value_iter, heron_iter, 7>();
-    compare_heron<starting_value, value_iter, heron_iter, 8>();
-    compare_heron<starting_value, value_iter, heron_iter, 9>();
-    compare_heron<starting_value, value_iter, heron_iter, 10>();
-    compare_heron<starting_value, value_iter, heron_iter, 11>();
-    compare_heron<starting_value, value_iter, heron_iter, 12>();
-    compare_heron<starting_value, value_iter, heron_iter, 13>();
-    compare_heron<starting_value, value_iter, heron_iter, 14>();
-    compare_heron<starting_value, value_iter, heron_iter, 15>();
-    compare_heron<starting_value, value_iter, heron_iter, 16>();
-    compare_heron<starting_value, value_iter, heron_iter, 17>();
-    compare_heron<starting_value, value_iter, heron_iter, 18>();
-    compare_heron<starting_value, value_iter, heron_iter, 19>();
-    compare_heron<starting_value, value_iter, heron_iter, 20>();
-    compare_heron<starting_value, value_iter, heron_iter, 21>();
-    compare_heron<starting_value, value_iter, heron_iter, 22>();
-    compare_heron<starting_value, value_iter, heron_iter, 23>();
-    compare_heron<starting_value, value_iter, heron_iter, 24>();
+
+    if constexpr (full_experiments) // NOLINT
+    {
+        compare_heron<starting_value, value_iter, heron_iter, 7>();  // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter, 8>();  // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter, 9>();  // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter, 10>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter, 11>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter, 12>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter, 13>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter, 14>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter, 15>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter, 16>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter, 17>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter, 18>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter, 19>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter, 20>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter, 21>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter, 22>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter, 23>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter, 24>(); // NOLINT
+    }
 
     constexpr size_t heron_iter_15 = 15;
-    compare_heron<starting_value, value_iter, heron_iter_15, 6>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 7>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 8>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 9>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 10>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 11>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 12>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 13>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 14>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 15>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 16>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 17>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 18>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 19>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 20>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 21>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 22>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 23>();
-    compare_heron<starting_value, value_iter, heron_iter_15, 24>();
+    compare_heron<starting_value, value_iter, heron_iter_15, 6>(); // NOLINT
+    compare_heron<starting_value, value_iter, heron_iter_15, 7>(); // NOLINT
+
+    if constexpr (full_experiments) // NOLINT
+    {
+        compare_heron<starting_value, value_iter, heron_iter_15, 8>();  // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter_15, 9>();  // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter_15, 10>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter_15, 11>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter_15, 12>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter_15, 13>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter_15, 14>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter_15, 15>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter_15, 16>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter_15, 17>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter_15, 18>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter_15, 19>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter_15, 20>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter_15, 21>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter_15, 22>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter_15, 23>(); // NOLINT
+        compare_heron<starting_value, value_iter, heron_iter_15, 24>(); // NOLINT
+    }
 
     return 0;
 }

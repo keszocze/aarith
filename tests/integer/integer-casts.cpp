@@ -657,15 +657,15 @@ SCENARIO("Casting uinteger<16> to integer<32>", "[integer][unsigned][signed][cas
                 const uint16_t u = static_cast<uint16_t>(i);
                 const U16 aarith_unsigned = u;
 
-                const I32 expected = i;
+                const I32 expected(i);
 
                 // try both template overloads
                 const I32 aarith_signed_easy = signed_width_cast<I32>(aarith_unsigned);
                 const I32 aarith_signed_explicit =
                     signed_width_cast<32, uint32_t, 16, uint16_t>(aarith_unsigned);
 
-                CHECK(aarith_signed_easy == expected);
-                CHECK(aarith_signed_explicit == expected);
+                REQUIRE(aarith_signed_easy == expected);
+                REQUIRE(aarith_signed_explicit == expected);
             }
         }
     }

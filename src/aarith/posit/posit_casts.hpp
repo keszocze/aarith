@@ -1,5 +1,6 @@
 #pragma once
 
+#include <aarith/core/word_array_cast_operations.hpp>
 #include <aarith/posit.hpp>
 
 namespace aarith {
@@ -13,7 +14,6 @@ width_cast(const posit<SourceWidth, SourceExponentSize, SourceWordType>& p)
 
     constexpr size_t DestinationWidth = DestinationPosit::width();
     constexpr size_t DestinationExponentSize = DestinationPosit::exponent_size();
-    using DestinationWordType = typename DestinationPosit::word_type;
 
     // assert that we are upcasting, not downcasting
 
@@ -26,7 +26,7 @@ width_cast(const posit<SourceWidth, SourceExponentSize, SourceWordType>& p)
     // extend bits and construct new posit
 
     const auto bits = p.get_bits();
-    const auto extended = width_cast<DestinationWidth, SourceWidth, DestinationWordType>(bits);
+    const auto extended = width_cast<DestinationWidth>(bits);
 
     constexpr size_t shift = DestinationWidth - SourceWidth;
     const auto shifted = extended << shift;
