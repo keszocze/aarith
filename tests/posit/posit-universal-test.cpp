@@ -13,6 +13,8 @@
 
 static void require_addition(const uint8_t lhs, const uint8_t rhs, const uint8_t expected)
 {
+    std::cout << std::endl;
+
     using namespace aarith;
 
     const posit8 p(lhs);

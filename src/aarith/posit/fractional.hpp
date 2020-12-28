@@ -55,6 +55,20 @@ uinteger<N, WT> fractional<N, ES, WT>::fraction_bits() const
     return width_cast<N>(bits);
 }
 
+template <size_t N, size_t ES, typename WT> bool fractional<N, ES, WT>::is_zero() const
+{
+    return (*this == zero());
+}
+
+template <size_t N, size_t ES, typename WT>
+fractional<N, ES, WT> fractional<N, ES, WT>::incremented() const
+{
+    fractional<N, ES, WT> ret;
+    ret.bits = bits + bits.one();
+
+    return ret;
+}
+
 template <size_t N, size_t ES, typename WT>
 fractional<N, ES, WT>& fractional<N, ES, WT>::operator=(const fractional<N, ES, WT>& other)
 {

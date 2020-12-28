@@ -8,8 +8,6 @@ namespace aarith {
 template <size_t N, size_t ES, typename WT>
 constexpr positparams<N, ES, WT>::positparams(const posit<N, ES, WT>& p)
 {
-    // posit -> positparams
-
     if (p.is_nar())
     {
         is_nar = true;
@@ -60,8 +58,6 @@ template <size_t N, size_t ES, typename WT> positparams<N, ES, WT>::~positparams
 template <size_t N, size_t ES, typename WT>
 constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
 {
-    // positparams -> posit
-
     using Posit = posit<N, ES, WT>;
     using Integer = integer<N, WT>;
 
@@ -80,7 +76,7 @@ constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
     }
 
     //
-    // compute parameters
+    // compute parameters necessary to construct the posit
     //
 
     constexpr Integer powes = Integer(1 << ES);
@@ -97,8 +93,9 @@ constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
     ssize_t i = bits.width() - 1;
 
     //
-    // set sign bit; as we are dealing with the absolute value, there is
-    // actually nothing to do but increment i
+    // set sign bit; as we are dealing with the absolute value and only set
+    // the sign bit at the end, there is actually nothing to do but increment
+    // the counter i
     //
 
     i -= 1;
@@ -143,10 +140,7 @@ constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
     // set exponent bits
     //
 
-    const ssize_t nexp = es;
-    assert(nexp == es); // should always have enough space in bits as it's extra large
-
-    for (ssize_t eprinted = 0; eprinted < nexp && i >= 0; ++eprinted, --i)
+    for (ssize_t eprinted = 0; eprinted < es && i >= 0; ++eprinted, --i)
     {
         const ssize_t eidx = es - 1 - eprinted;
         const auto exponent_bit = exponent.bit(eidx);
@@ -159,62 +153,53 @@ constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
 
     const auto fraction_bits = fraction.fraction_bits();
 
-    for (ssize_t fidx = N - 1; fidx >= 0 && i >= 0; --fidx, --i)
+    for (ssize_t fidx = fraction_bits.width() - 1; fidx >= 0 && i >= 0; --fidx, --i)
     {
         const auto fraction_bit = fraction_bits.bit(fidx);
         bits.set_bit(i, fraction_bit);
     }
 
     //
-    // construct posit and parameters for rounding
+    // split up bitstring into "posit_bits" which we use to construct the
+    // posit and "truncated" which we have to take a look at for rounding
     //
 
     const uinteger<N, WT> posit_bits = width_cast<N>(bits >> (ES + 3));
     const uinteger<ES + 3, WT> truncated = width_cast<ES + 3>(bits);
 
-    const Posit x = Posit::from_bits(posit_bits);
-    const positparams<N, ES, WT> Px(x);
+    //
+    // construct the unrounded posit
+    //
+
+    Posit x = Posit::from_bits(posit_bits);
+
+    //
+    // do rounding if necessary
+    //
 
     const bool last = posit_bits.bit(0);
     const bool after = truncated.bit(truncated.width() - 1);
-    const bool sticky = !width_cast<ES + 3 - 1>(truncated).is_zero(); // maybe -2 instead of - 1...
+    const bool tail = !width_cast<ES + 3 - 1>(truncated).is_zero();
 
-    //
-    // do exponent rounding
-    //
-
-    if ((last && after) || (after && sticky))
+    if (last && after || after && tail)
     {
-        if ((last && after))
-        {
-            return x.incremented_real();
-        }
+        x = x.incremented_real();
     }
 
     //
-    // do fraction rounding
-    //
-
-    if (fraction != Px.fraction)
-    {
-        if ((last && after) || (after && sticky))
-        {
-            return x.incremented_real();
-        }
-    }
-
-    //
-    // return; set sign bit if necessary
+    // apply twos complement for negative values
     //
 
     if (sign_bit)
     {
-        return -x;
+        x = -x;
     }
-    else
-    {
-        return x;
-    }
+
+    //
+    // return
+    //
+
+    return x;
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -234,8 +219,8 @@ template <size_t N, size_t ES, typename WT>
 positparams<N, ES, WT> positparams<N, ES, WT>::operator+(const positparams<N, ES, WT>& other) const
 {
     //
-    // first we handle special cases; zero as arguments and result in
-    // particular are always kind of special when it comes to posit arithmetic
+    // special arguments, that is either NaR or zero, both of which are weird
+    // and special
     //
 
     if (is_nar || other.is_nar)
@@ -251,14 +236,6 @@ positparams<N, ES, WT> positparams<N, ES, WT>::operator+(const positparams<N, ES
     if (other.is_zero)
     {
         return *this;
-    }
-
-    const bool value_equal = (scale == other.scale && fraction == other.fraction);
-    const bool product_sign = sign_bit ^ other.sign_bit;
-
-    if (value_equal && product_sign)
-    {
-        return zero();
     }
 
     //
@@ -404,9 +381,9 @@ void positparams<N, ES, WT>::add_fractions(positparams<N, ES, WT>& dest,
 {
     dest.fraction = lfrac + rfrac;
 
-    // handle overflow
+    // handle overflow aka normalize
 
-    if (dest.fraction.integer_bits().bit(1))
+    while (dest.fraction.integer_bits().bit(1))
     {
         dest.fraction = dest.fraction >> 1;
         dest.scale = dest.scale + dest.scale.one();
@@ -420,7 +397,16 @@ void positparams<N, ES, WT>::sub_fractions(positparams<N, ES, WT>& dest,
 {
     dest.fraction = lfrac - rfrac;
 
-    // TODO (Schärtl): handle underflow(?)
+    // handle underflow aka normalize
+
+    if (!dest.fraction.fraction_bits().is_zero())
+    {
+        while (!dest.fraction.integer_bits().bit(0))
+        {
+            dest.fraction = dest.fraction << 1;
+            dest.scale = dest.scale - dest.scale.one();
+        }
+    }
 }
 
 template <size_t SN, size_t SES, typename SWT>

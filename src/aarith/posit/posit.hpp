@@ -187,51 +187,30 @@ constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator+() const
 template <size_t N, size_t ES, typename WT>
 posit<N, ES, WT> posit<N, ES, WT>::operator+(const posit<N, ES, WT>& rhs) const
 {
-    using Posit = posit<N, ES, WT>;
-
-    constexpr Posit zero = Posit::zero();
-    constexpr Posit inf = Posit::nar();
-
-    const Posit& lhs = *this;
-
     // special cases
 
-    if (rhs == inf || lhs == inf)
+    if (this->is_nar() || rhs.is_nar())
     {
-        return inf;
+        return nar();
     }
 
-    if (lhs.is_zero())
+    if (this->is_zero())
     {
         return rhs;
     }
 
     if (rhs.is_zero())
     {
-        return lhs;
+        return *this;
     }
 
     // regular cases
 
-    const auto lparams = positparams<N, ES, WT>(lhs);
+    const auto lparams = positparams<N, ES, WT>(*this);
     const auto rparams = positparams<N, ES, WT>(rhs);
 
     const auto sumparams = lparams + rparams;
-    auto psum = Posit(sumparams);
-
-    if (rhs > zero && psum < lhs)
-    {
-        psum = psum.max();
-    }
-
-    // fix underflows
-
-    if (rhs < zero && psum > lhs)
-    {
-        psum = psum.min();
-    }
-
-    // return
+    auto psum = posit(sumparams);
 
     return psum;
 }

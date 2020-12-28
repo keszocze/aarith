@@ -774,6 +774,16 @@ public:
     fractional operator>>(const uinteger<N, WT>& shift) const;
 
     /**
+     * @return Whether this object equals zero.
+     */
+    bool is_zero() const;
+
+    /**
+     * @return A fractional with the underlying bits incremented by one.
+     */
+    fractional incremented() const;
+
+    /**
      * @brief Return the integer part of this fractional value.
      *
      * If this fractional represents 00001010.11110000, then this function
