@@ -709,32 +709,46 @@ public:
     fractional& operator=(const fractional<N, ES, WT>& other);
 
     /**
+     * @brief Check for equality.
+     *
+     * Two fractional objects are equal if their integer and fractional part
+     * are identical. The truncated flag is not taken into account.
+     *
      * @return Whether this and other are equal.
      */
     bool operator==(const fractional<N, ES, WT>& other) const;
 
     /**
+     * @brief Check for not equal.
+     *
+     * Two fractional objects are equal if their integer and fractional part
+     * are identical. The truncated flag is not taken into account.
+     *
      * @return Whether this and other are not equal.
      */
     bool operator!=(const fractional<N, ES, WT>& other) const;
 
     /**
-     * @return Whether this is less than other.
+     * @return Whether this is less than other. The truncated flag is not
+     * taken into account.
      */
     bool operator<(const fractional<N, ES, WT>& other) const;
 
     /**
-     * @return Whether this is less than or equal to other.
+     * @return Whether this is less than or equal to other. The truncated flag
+     * is not taken into account.
      */
     bool operator<=(const fractional<N, ES, WT>& other) const;
 
     /**
-     * @return Whether this is greater than other.
+     * @return Whether this is greater than other. The truncated flag is not
+     * taken into account.
      */
     bool operator>(const fractional<N, ES, WT>& other) const;
 
     /**
-     * @return Whether this is greater than or equal to other.
+     * @return Whether this is greater than or equal to other. The truncated flag
+     * is not taken into account.
      */
     bool operator>=(const fractional<N, ES, WT>& other) const;
 
@@ -743,6 +757,9 @@ public:
      *
      * If the result is too large or too small to fit in the underlying
      * storage, the overflowed/underflowed bits are discarded.
+     *
+     * The returned fractional has the truncated flag set only if any of the
+     * two operands also have the truncated flag set.
      *
      * @return The sum of this and other.
      */
@@ -753,6 +770,9 @@ public:
      *
      * If the result is too large or too small to fit in the underlying
      * storage, the overflowed/underflowed bits are discarded.
+
+     * The returned fractional has the truncated flag set only if any of the
+     * two operands also have the truncated flag set.
      *
      * @return other subtracted from this.
      */
@@ -781,6 +801,17 @@ public:
      * @return This fractional shifted to the right.
      */
     fractional operator>>(const uinteger<N, WT>& shift) const;
+
+    /**
+     * @brief Return whether this fractional has truncated precision.
+     *
+     * During left or right shifts, bits set to one can be truncated.  If that
+     * happens, the internal truncated flag of the given fractional object is
+     * set to true and remains true until destruction.
+     *
+     * @return Truncated flag.
+     */
+    bool has_been_truncated() const;
 
     /**
      * @return Whether this object equals zero.
@@ -832,6 +863,15 @@ private:
      * operations.
      */
     uinteger<ScratchSize, WT> bits;
+
+    /**
+     * Keep track whether shifting left or right truncated any one bits away.
+     * During construction from posit or default constructor, truncated is set
+     * to false.  Any shift operations that truncate '1' bits set this flag to
+     * one. It cannot be reset and in particular assignments copy the state of
+     * the truncated flag.
+     */
+    bool truncated;
 };
 
 //
@@ -894,11 +934,15 @@ public:
     explicit constexpr operator posit<N, ES, WT>() const;
 
     /**
+     * @brief Check for equality.
+     *
      * @return Whether this and other are equal.
      */
     bool operator==(const positparams& other) const;
 
     /**
+     * @brief Check for not equal.
+     *
      * @return Whether this and other are not equal.
      */
     bool operator!=(const positparams& other) const;

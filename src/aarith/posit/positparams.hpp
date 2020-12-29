@@ -12,11 +12,13 @@ constexpr positparams<N, ES, WT>::positparams(const posit<N, ES, WT>& p)
     {
         is_nar = true;
         is_zero = false;
+        sign_bit = false;
     }
     else if (p.is_zero())
     {
         is_nar = false;
         is_zero = true;
+        sign_bit = false;
     }
     else
     {
@@ -235,7 +237,7 @@ positparams<N, ES, WT> positparams<N, ES, WT>::operator+(const positparams<N, ES
 
     if (is_nar || other.is_nar)
     {
-        return *this;
+        return nar();
     }
 
     if (is_zero)

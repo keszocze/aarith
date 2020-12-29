@@ -187,25 +187,6 @@ constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator+() const
 template <size_t N, size_t ES, typename WT>
 posit<N, ES, WT> posit<N, ES, WT>::operator+(const posit<N, ES, WT>& rhs) const
 {
-    // special cases
-
-    if (this->is_nar() || rhs.is_nar())
-    {
-        return nar();
-    }
-
-    if (this->is_zero())
-    {
-        return rhs;
-    }
-
-    if (rhs.is_zero())
-    {
-        return *this;
-    }
-
-    // regular cases
-
     const auto lparams = positparams<N, ES, WT>(*this);
     const auto rparams = positparams<N, ES, WT>(rhs);
 
