@@ -44,9 +44,16 @@ add_aarith_test(posit FILES posit/posit-test.cpp)
 add_aarith_test(posit-casts FILES posit/posit_casts-test.cpp)
 add_aarith_test(posit-operations FILES posit/posit_operations-test.cpp)
 add_aarith_test(posit-operators FILES posit/posit_operators-test.cpp)
-add_aarith_test(posit-softposit FILES posit/posit-softposit-test.cpp)
+add_aarith_test(posit-softposit-16-2-addition FILES posit/posit-softposit-16-2-addition-test.cpp)
+add_aarith_test(posit-softposit-32-2-addition FILES posit/posit-softposit-32-2-addition-test.cpp)
+add_aarith_test(posit-softposit-8-0-addition FILES posit/posit-softposit-8-0-addition-test.cpp)
+add_aarith_test(posit-softposit-8-0-subtraction FILES posit/posit-softposit-8-0-subtraction-test.cpp)
+add_aarith_test(posit-softposit-8-2-addition FILES posit/posit-softposit-8-2-addition-test.cpp)
+add_aarith_test(posit-softposit-8-2-subtraction FILES posit/posit-softposit-8-2-subtraction-test.cpp)
 add_aarith_test(posit-types FILES posit/posit_types-test.cpp)
 add_aarith_test(positparams FILES posit/positparams-test.cpp)
+
+
 
 add_aarith_test(fau-adder FILES uint-approx-test.cpp)
 
