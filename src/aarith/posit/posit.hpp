@@ -38,14 +38,14 @@ constexpr posit<N, ES, WT>::posit(const posit&& other)
 }
 
 template <size_t N, size_t ES, typename WT>
-constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator=(const posit& other)
+posit<N, ES, WT>& posit<N, ES, WT>::operator=(const posit& other)
 {
     bits = other.bits;
     return *this;
 }
 
 template <size_t N, size_t ES, typename WT>
-constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator=(const posit&& other)
+posit<N, ES, WT>& posit<N, ES, WT>::operator=(const posit&& other)
 {
     bits = std::move(other.bits);
     return *this;
@@ -58,33 +58,33 @@ constexpr posit<N, ES, WT>::posit(WT n)
 }
 
 template <size_t N, size_t ES, typename WT>
-constexpr bool posit<N, ES, WT>::operator==(const posit& other) const
+[[nodiscard]] constexpr bool posit<N, ES, WT>::operator==(const posit& other) const
 {
     return bits == other.bits;
 }
 
 template <size_t N, size_t ES, typename WT>
-constexpr bool posit<N, ES, WT>::operator!=(const posit& other) const
+[[nodiscard]] constexpr bool posit<N, ES, WT>::operator!=(const posit& other) const
 {
     return !(*this == other);
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] posit<N, ES, WT> posit<N, ES, WT>::incremented() const
+[[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::incremented() const
 {
     const auto bits = get_bits();
     return from_bits(bits + bits.one());
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] posit<N, ES, WT> posit<N, ES, WT>::decremented() const
+[[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::decremented() const
 {
     const auto bits = get_bits();
     return from_bits(bits - bits.one());
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] posit<N, ES, WT> posit<N, ES, WT>::incremented_real() const
+[[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::incremented_real() const
 {
     if (is_zero() || is_nar())
     {
@@ -102,7 +102,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] posit<N, ES, WT> posit<N, ES, WT>::decremented_real() const
+[[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::decremented_real() const
 {
     if (is_zero() || is_nar())
     {
@@ -161,31 +161,32 @@ constexpr bool posit<N, ES, WT>::operator<(const posit& other) const
 }
 
 template <size_t N, size_t ES, typename WT>
-constexpr bool posit<N, ES, WT>::operator<=(const posit& other) const
+[[nodiscard]] constexpr bool posit<N, ES, WT>::operator<=(const posit& other) const
 {
     return (*this == other) || (*this < other);
 }
 
 template <size_t N, size_t ES, typename WT>
-constexpr bool posit<N, ES, WT>::operator>(const posit& other) const
+[[nodiscard]] constexpr bool posit<N, ES, WT>::operator>(const posit& other) const
 {
     return other < *this;
 }
 
 template <size_t N, size_t ES, typename WT>
-constexpr bool posit<N, ES, WT>::operator>=(const posit& other) const
+[[nodiscard]] constexpr bool posit<N, ES, WT>::operator>=(const posit& other) const
 {
     return (*this == other) || (*this > other);
 }
 
 template <size_t N, size_t ES, typename WT>
-constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator+() const
+[[nodiscard]] constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator+() const
 {
     return *this;
 }
 
 template <size_t N, size_t ES, typename WT>
-posit<N, ES, WT> posit<N, ES, WT>::operator+(const posit<N, ES, WT>& rhs) const
+[[nodiscard]] constexpr posit<N, ES, WT>
+posit<N, ES, WT>::operator+(const posit<N, ES, WT>& rhs) const
 {
     const auto lparams = positparams<N, ES, WT>(*this);
     const auto rparams = positparams<N, ES, WT>(rhs);
@@ -197,7 +198,7 @@ posit<N, ES, WT> posit<N, ES, WT>::operator+(const posit<N, ES, WT>& rhs) const
 }
 
 template <size_t N, size_t ES, typename WT>
-posit<N, ES, WT>& posit<N, ES, WT>::operator+=(const posit<N, ES, WT>& rhs)
+[[nodiscard]] constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator+=(const posit<N, ES, WT>& rhs)
 {
 
     posit<N, ES, WT> sum = *this + rhs;
@@ -205,14 +206,16 @@ posit<N, ES, WT>& posit<N, ES, WT>::operator+=(const posit<N, ES, WT>& rhs)
     return *this;
 }
 
-template <size_t N, size_t ES, typename WT> posit<N, ES, WT>& posit<N, ES, WT>::operator++()
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator++()
 {
     // ++x
     *this += this->one();
     return *this;
 }
 
-template <size_t N, size_t ES, typename WT> posit<N, ES, WT> posit<N, ES, WT>::operator++(int)
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::operator++(int)
 {
     // x++
     auto copy = *this;
@@ -221,7 +224,7 @@ template <size_t N, size_t ES, typename WT> posit<N, ES, WT> posit<N, ES, WT>::o
 }
 
 template <size_t N, size_t ES, typename WT>
-constexpr posit<N, ES, WT> posit<N, ES, WT>::operator-() const
+[[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::operator-() const
 {
     if (is_zero())
     {
@@ -238,27 +241,30 @@ constexpr posit<N, ES, WT> posit<N, ES, WT>::operator-() const
 }
 
 template <size_t N, size_t ES, typename WT>
-constexpr posit<N, ES, WT> posit<N, ES, WT>::operator-(const posit<N, ES, WT>& rhs) const
+[[nodiscard]] constexpr posit<N, ES, WT>
+posit<N, ES, WT>::operator-(const posit<N, ES, WT>& rhs) const
 {
     return *this + (-rhs);
 }
 
 template <size_t N, size_t ES, typename WT>
-posit<N, ES, WT>& posit<N, ES, WT>::operator-=(const posit<N, ES, WT>& rhs)
+[[nodiscard]] constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator-=(const posit<N, ES, WT>& rhs)
 {
     posit<N, ES, WT> sum = *this - rhs;
     this->bits = sum.get_bits();
     return *this;
 }
 
-template <size_t N, size_t ES, typename WT> posit<N, ES, WT>& posit<N, ES, WT>::operator--()
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator--()
 {
     // --x
     *this -= one();
     return *this;
 }
 
-template <size_t N, size_t ES, typename WT> posit<N, ES, WT> posit<N, ES, WT>::operator--(int)
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::operator--(int)
 {
     // x--
     auto copy = *this;
@@ -267,13 +273,14 @@ template <size_t N, size_t ES, typename WT> posit<N, ES, WT> posit<N, ES, WT>::o
 }
 
 template <size_t N, size_t ES, typename WT>
-posit<N, ES, WT> posit<N, ES, WT>::operator*(const posit<N, ES, WT>& rhs) const
+[[nodiscard]] constexpr posit<N, ES, WT>
+posit<N, ES, WT>::operator*(const posit<N, ES, WT>& rhs) const
 {
     throw std::logic_error("not implementated");
 }
 
 template <size_t N, size_t ES, typename WT>
-posit<N, ES, WT>& posit<N, ES, WT>::operator*=(const posit<N, ES, WT>& rhs)
+[[nodiscard]] constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator*=(const posit<N, ES, WT>& rhs)
 {
     const auto product = *this * rhs;
     bits = product.get_bits();

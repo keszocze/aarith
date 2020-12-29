@@ -93,14 +93,14 @@ public:
      *
      * @param The value to change to.
      */
-    constexpr posit& operator=(const posit& other);
+    posit& operator=(const posit& other);
 
     /**
      * @brief Assign this posit to hold the value of other.
      *
      * @param The value to change to.
      */
-    constexpr posit& operator=(const posit&& other);
+    posit& operator=(const posit&& other);
 
     /**
      * @brief Construct this posit with given bits.
@@ -123,7 +123,7 @@ public:
      * @return true if this and other represent the same value. Otherwise
      * returns true.
      */
-    constexpr bool operator==(const posit& other) const;
+    [[nodiscard]] constexpr bool operator==(const posit& other) const;
 
     /**
      * @brief Compare this and other for inequality.
@@ -133,14 +133,14 @@ public:
      * @return true if this and other represent different values. Otherwise
      * returns false.
      */
-    constexpr bool operator!=(const posit& other) const;
+    [[nodiscard]] constexpr bool operator!=(const posit& other) const;
 
     /**
      * @brief Return whether this is less than other.
      *
      * If this or other represent NaR, this method returns false.
      */
-    constexpr bool operator<(const posit& other) const;
+    [[nodiscard]] constexpr bool operator<(const posit& other) const;
 
     /**
      * @brief Return whether this is less than or equal to other.
@@ -149,14 +149,14 @@ public:
      * false. If both this and other represent NaR, this method
      * returns true.
      */
-    constexpr bool operator<=(const posit& other) const;
+    [[nodiscard]] constexpr bool operator<=(const posit& other) const;
 
     /**
      * @brief Return whether this is greater than other.
      *
      * If this or other represent NaR, this method returns false.
      */
-    constexpr bool operator>(const posit& other) const;
+    [[nodiscard]] constexpr bool operator>(const posit& other) const;
 
     /**
      * @brief Return whether this is greater than or equal to other.
@@ -165,7 +165,7 @@ public:
      * false. If both this and other represent NaR, this method
      * returns true.
      */
-    constexpr bool operator>=(const posit& other) const;
+    [[nodiscard]] constexpr bool operator>=(const posit& other) const;
 
     //
     // Arithmetic Operators
@@ -180,7 +180,7 @@ public:
      *
      * If this posit represents NaR, the result is also NaR.
      */
-    constexpr posit& operator+() const;
+    [[nodiscard]] constexpr posit& operator+() const;
 
     /**
      * @brief Sum of two posits.
@@ -191,35 +191,35 @@ public:
      * @param rhs The posit to add to this posit.
      * @return The sum of this and rhs.
      */
-    posit operator+(const posit& rhs) const;
+    [[nodiscard]] constexpr posit operator+(const posit& rhs) const;
 
     /**
      * @brief Add rhs to this.
      *
      * @param rhs The posit to add to this posit.
      */
-    posit& operator+=(const posit& rhs);
+    [[nodiscard]] constexpr posit& operator+=(const posit& rhs);
 
     /**
      * @brief Pre-Increment.
      *
      * @return A reference to the incremented value.
      */
-    posit& operator++();
+    [[nodiscard]] constexpr posit& operator++();
 
     /**
      * @brief Post-Increment.
      *
      * @return A copy of the value before it was incremented.
      */
-    posit operator++(int);
+    [[nodiscard]] constexpr posit operator++(int);
 
     /**
      * @brief Unary minus.
      *
      * If this posit represents NaR, the result is also NaR.
      */
-    constexpr posit operator-() const;
+    [[nodiscard]] constexpr posit operator-() const;
 
     /**
      * @brief Sum of two posits.
@@ -233,38 +233,38 @@ public:
      * @param rhs The posit to add to this posit.
      * @return The sum of this and rhs.
      */
-    constexpr posit operator-(const posit& rhs) const;
+    [[nodiscard]] constexpr posit operator-(const posit& rhs) const;
 
     /**
      * @brief Subtract rhs from this.
      *
      * @param rhs The posit to subtract.
      */
-    posit& operator-=(const posit& rhs);
+    [[nodiscard]] constexpr posit& operator-=(const posit& rhs);
 
     /**
      * @brief Pre-Decrement
      *
      * @return A reference to the decremented value.
      */
-    posit& operator--();
+    [[nodiscard]] constexpr posit& operator--();
 
     /**
      * @brief Post-Decrement.
      *
      * @return A copy of the value before it was decremented.
      */
-    posit operator--(int);
+    [[nodiscard]] constexpr posit operator--(int);
 
     /**
      * @brief Return the product of this multiplied with rhs.
      */
-    posit operator*(const posit& rhs) const;
+    [[nodiscard]] constexpr posit operator*(const posit& rhs) const;
 
     /**
      * @brief Set this to this multiplied with rhs.
      */
-    posit& operator*=(const posit& rhs);
+    [[nodiscard]] constexpr posit& operator*=(const posit& rhs);
 
     //
     // Constants
@@ -374,7 +374,7 @@ public:
      *
      * @return The posit bits plus one
      */
-    [[nodiscard]] posit incremented() const;
+    [[nodiscard]] constexpr posit incremented() const;
 
     /**
      * @brief Compute the bitwise decrement.
@@ -388,7 +388,7 @@ public:
      *
      * @return The posit bits minus one
      */
-    [[nodiscard]] posit decremented() const;
+    [[nodiscard]] constexpr posit decremented() const;
 
     /**
      * @brief Compute the bitwise increment that represents a real value.
@@ -402,7 +402,7 @@ public:
      *
      * @return The posit bits plus one
      */
-    [[nodiscard]] posit incremented_real() const;
+    [[nodiscard]] constexpr posit incremented_real() const;
 
     /**
      * @brief Compute the bitwise decrement that represents a real value.
@@ -416,17 +416,19 @@ public:
      *
      * @return The posit bits plus one
      */
-    [[nodiscard]] posit decremented_real() const;
+    [[nodiscard]] constexpr posit decremented_real() const;
 
     /**
      * @return The underlying storage.
      */
     [[nodiscard]] constexpr storage_type get_bits() const;
 
-    // TODO (Schärtl): make private
+private:
+    /**
+     * The underlying bitstring that makes up the posit.
+     */
     storage_type bits;
 
-private:
     /**
      * Statically assert that the created instance of a given posit
      * conforms to the requirements for legal posits.
@@ -561,7 +563,8 @@ template <size_t N, size_t ES, typename WT>
  * of useed^R times 2^E. This function returns k.  Knowing k can be useful to
  * estimate the value of a given posit without evaluating the fraction.
  */
-template <size_t N, size_t ES, typename WT> integer<N> get_scale_value(const posit<N, ES, WT>& p);
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr integer<N> get_scale_value(const posit<N, ES, WT>& p);
 
 /**
  * @brief Dump posit information to stream.
@@ -584,7 +587,8 @@ void dump_meta(std::ostream& os, const posit<N, ES, WT>& p);
  *
  * @param p The posit to dump
  */
-template <size_t N, size_t ES, typename WT> std::string dump_string(const posit<N, ES, WT>& p);
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] std::string dump_string(const posit<N, ES, WT>& p);
 
 //
 // Casts for posit Class.
@@ -678,7 +682,7 @@ public:
     /**
      * @return A fraction that represents the number zero.
      */
-    static fractional zero();
+    [[nodiscard]] static constexpr fractional zero();
 
     /**
      * @brief Construct a new zero fraction.
@@ -686,12 +690,12 @@ public:
      * The returned fraction has all bits set to zero. Meaning the
      * constructed fractional represents zero.
      */
-    fractional();
+    constexpr fractional();
 
     /**
      * @brief Copy constructor.
      */
-    fractional(const fractional& other);
+    constexpr fractional(const fractional& other);
 
     /**
      * @brief Construct fractional from posit.
@@ -701,7 +705,7 @@ public:
      *
      * @param p The posit to import the fraction from.
      */
-    fractional(const posit<N, ES, WT>& p);
+    constexpr fractional(const posit<N, ES, WT>& p);
 
     /**
      * @brief Assignment operator.
@@ -716,7 +720,7 @@ public:
      *
      * @return Whether this and other are equal.
      */
-    bool operator==(const fractional<N, ES, WT>& other) const;
+    [[nodiscard]] constexpr bool operator==(const fractional<N, ES, WT>& other) const;
 
     /**
      * @brief Check for not equal.
@@ -726,31 +730,31 @@ public:
      *
      * @return Whether this and other are not equal.
      */
-    bool operator!=(const fractional<N, ES, WT>& other) const;
+    [[nodiscard]] constexpr bool operator!=(const fractional<N, ES, WT>& other) const;
 
     /**
      * @return Whether this is less than other. The truncated flag is not
      * taken into account.
      */
-    bool operator<(const fractional<N, ES, WT>& other) const;
+    [[nodiscard]] constexpr bool operator<(const fractional<N, ES, WT>& other) const;
 
     /**
      * @return Whether this is less than or equal to other. The truncated flag
      * is not taken into account.
      */
-    bool operator<=(const fractional<N, ES, WT>& other) const;
+    [[nodiscard]] constexpr bool operator<=(const fractional<N, ES, WT>& other) const;
 
     /**
      * @return Whether this is greater than other. The truncated flag is not
      * taken into account.
      */
-    bool operator>(const fractional<N, ES, WT>& other) const;
+    [[nodiscard]] constexpr bool operator>(const fractional<N, ES, WT>& other) const;
 
     /**
      * @return Whether this is greater than or equal to other. The truncated flag
      * is not taken into account.
      */
-    bool operator>=(const fractional<N, ES, WT>& other) const;
+    [[nodiscard]] constexpr bool operator>=(const fractional<N, ES, WT>& other) const;
 
     /**
      * @brief Addition of two fractional values.
@@ -763,7 +767,7 @@ public:
      *
      * @return The sum of this and other.
      */
-    fractional operator+(const fractional<N, ES, WT>& other) const;
+    [[nodiscard]] constexpr fractional operator+(const fractional<N, ES, WT>& other) const;
 
     /**
      * @brief Subtraction of two fractional values.
@@ -776,31 +780,31 @@ public:
      *
      * @return other subtracted from this.
      */
-    fractional operator-(const fractional<N, ES, WT>& other) const;
+    [[nodiscard]] constexpr fractional operator-(const fractional<N, ES, WT>& other) const;
 
     /**
      * @param shift The number of places to shift.
      * @return This fractional shifted to the left.
      */
-    fractional operator<<(const size_t shift) const;
+    [[nodiscard]] constexpr fractional operator<<(const size_t shift) const;
 
     /**
      * @param shift The number of places to shift.
      * @return This fractional shifted to the left.
      */
-    fractional operator<<(const uinteger<N, WT>& shift) const;
+    [[nodiscard]] constexpr fractional operator<<(const uinteger<N, WT>& shift) const;
 
     /**
      * @param shift The number of places to shift.
      * @return This fractional shifted to the right.
      */
-    fractional operator>>(const size_t shift) const;
+    [[nodiscard]] constexpr fractional operator>>(const size_t shift) const;
 
     /**
      * @param shift The number of places to shift.
      * @return This fractional shifted to the right.
      */
-    fractional operator>>(const uinteger<N, WT>& shift) const;
+    [[nodiscard]] constexpr fractional operator>>(const uinteger<N, WT>& shift) const;
 
     /**
      * @brief Return whether this fractional has truncated precision.
@@ -811,17 +815,17 @@ public:
      *
      * @return Truncated flag.
      */
-    bool has_been_truncated() const;
+    [[nodiscard]] constexpr bool has_been_truncated() const;
 
     /**
      * @return Whether this object equals zero.
      */
-    bool is_zero() const;
+    [[nodiscard]] constexpr bool is_zero() const;
 
     /**
      * @return A fractional with the underlying bits incremented by one.
      */
-    fractional incremented() const;
+    [[nodiscard]] constexpr fractional incremented() const;
 
     /**
      * @brief Return the integer part of this fractional value.
@@ -829,7 +833,7 @@ public:
      * If this fractional represents 00001010.11110000, then this function
      * returns 00001010.
      */
-    uinteger<IntegerSize, WT> integer_bits() const;
+    [[nodiscard]] constexpr uinteger<IntegerSize, WT> integer_bits() const;
 
     /**
      * @brief Return the integer part of this fractional value.
@@ -837,7 +841,7 @@ public:
      * If this fractional represents 00001010.11110000, then this function
      * returns 11110000.
      */
-    uinteger<FractionSize, WT> fraction_bits() const;
+    [[nodiscard]] constexpr uinteger<FractionSize, WT> fraction_bits() const;
 
     /**
      * @brief Overload for writing fractional values to a stream.
@@ -914,7 +918,7 @@ public:
     /**
      * @brief Assignment operator.
      */
-    constexpr positparams& operator=(const positparams& other);
+    positparams& operator=(const positparams& other);
 
     /**
      * @brief Destructor.
@@ -931,28 +935,28 @@ public:
      * If there exists not posit to represent this positparams exactly,
      * rounding is applied.
      */
-    explicit constexpr operator posit<N, ES, WT>() const;
+    [[nodiscard]] explicit constexpr operator posit<N, ES, WT>() const;
 
     /**
      * @brief Check for equality.
      *
      * @return Whether this and other are equal.
      */
-    bool operator==(const positparams& other) const;
+    [[nodiscard]] constexpr bool operator==(const positparams& other) const;
 
     /**
      * @brief Check for not equal.
      *
      * @return Whether this and other are not equal.
      */
-    bool operator!=(const positparams& other) const;
+    [[nodiscard]] constexpr bool operator!=(const positparams& other) const;
 
     /**
      * @brief Addition of two posit in parameter representation.
      *
      * @return The sum of this and other.
      */
-    positparams operator+(const positparams& rhs) const;
+    [[nodiscard]] constexpr positparams operator+(const positparams& rhs) const;
 
     /**
      * @brief Overload for writing fractional values to a stream.
@@ -999,12 +1003,12 @@ private:
     /**
      * @return Return parameter object that represents zero.
      */
-    static positparams<N, ES, WT> zero();
+    [[nodiscard]] static constexpr positparams<N, ES, WT> zero();
 
     /**
      * @return Return parameter object that represents NaR.
      */
-    static positparams<N, ES, WT> nar();
+    [[nodiscard]] static constexpr positparams<N, ES, WT> nar();
 
     /**
      * @brief Return p, q in order of scale.

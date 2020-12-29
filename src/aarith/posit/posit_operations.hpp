@@ -429,7 +429,8 @@ template <size_t N, size_t ES, typename WT>
     }
 }
 
-template <size_t N, size_t ES, typename WT> integer<N> get_scale_value(const posit<N, ES, WT>& p)
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr integer<N> get_scale_value(const posit<N, ES, WT>& p)
 {
     using Integer = integer<N>;
 
@@ -462,7 +463,8 @@ void dump_meta(std::ostream& os, const posit<N, ES, WT>& p)
     ;
 }
 
-template <size_t N, size_t ES, typename WT> std::string dump_string(const posit<N, ES, WT>& p)
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] std::string dump_string(const posit<N, ES, WT>& p)
 {
     std::stringstream ss;
     dump_meta(ss, p);

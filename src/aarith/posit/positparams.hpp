@@ -40,8 +40,7 @@ constexpr positparams<N, ES, WT>::positparams(const positparams<N, ES, WT>& othe
 }
 
 template <size_t N, size_t ES, typename WT>
-constexpr positparams<N, ES, WT>&
-positparams<N, ES, WT>::operator=(const positparams<N, ES, WT>& other)
+positparams<N, ES, WT>& positparams<N, ES, WT>::operator=(const positparams<N, ES, WT>& other)
 {
     is_nar = other.is_nar;
     is_zero = other.is_zero;
@@ -57,7 +56,7 @@ template <size_t N, size_t ES, typename WT> positparams<N, ES, WT>::~positparams
 }
 
 template <size_t N, size_t ES, typename WT>
-constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
+[[nodiscard]] constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
 {
     using Posit = posit<N, ES, WT>;
     using Integer = integer<N, WT>;
@@ -169,7 +168,8 @@ constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
     constexpr size_t truncated_width = bits.width() - posit_bits_width;
     constexpr size_t tail_width = truncated_width - 1;
 
-    const uinteger<posit_bits_width, WT> posit_bits = width_cast<posit_bits_width>(bits >> truncated_width);
+    const uinteger<posit_bits_width, WT> posit_bits =
+        width_cast<posit_bits_width>(bits >> truncated_width);
     const uinteger<truncated_width, WT> truncated = width_cast<truncated_width>(bits);
     const uinteger<tail_width, WT> tail = width_cast<tail_width>(truncated);
 
@@ -216,20 +216,23 @@ constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
 }
 
 template <size_t N, size_t ES, typename WT>
-bool positparams<N, ES, WT>::operator==(const positparams<N, ES, WT>& other) const
+[[nodiscard]] constexpr bool
+positparams<N, ES, WT>::operator==(const positparams<N, ES, WT>& other) const
 {
     return is_nar == other.is_nar && is_zero == other.is_zero && sign_bit == other.sign_bit &&
            scale == other.scale && fraction == other.fraction;
 }
 
 template <size_t N, size_t ES, typename WT>
-bool positparams<N, ES, WT>::operator!=(const positparams<N, ES, WT>& other) const
+[[nodiscard]] constexpr bool
+positparams<N, ES, WT>::operator!=(const positparams<N, ES, WT>& other) const
 {
     return !(*this == other);
 }
 
 template <size_t N, size_t ES, typename WT>
-positparams<N, ES, WT> positparams<N, ES, WT>::operator+(const positparams<N, ES, WT>& other) const
+[[nodiscard]] constexpr positparams<N, ES, WT>
+positparams<N, ES, WT>::operator+(const positparams<N, ES, WT>& other) const
 {
     //
     // special arguments, that is either NaR or zero, both of which are weird
@@ -279,14 +282,16 @@ constexpr positparams<N, ES, WT>::positparams()
 {
 }
 
-template <size_t N, size_t ES, typename WT> positparams<N, ES, WT> positparams<N, ES, WT>::zero()
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr positparams<N, ES, WT> positparams<N, ES, WT>::zero()
 {
     positparams<N, ES, WT> result;
     result.is_zero = true;
     return result;
 }
 
-template <size_t N, size_t ES, typename WT> positparams<N, ES, WT> positparams<N, ES, WT>::nar()
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr positparams<N, ES, WT> positparams<N, ES, WT>::nar()
 {
     positparams<N, ES, WT> result;
     result.is_nar = true;

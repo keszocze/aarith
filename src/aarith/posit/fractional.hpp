@@ -4,26 +4,27 @@
 
 namespace aarith {
 
-template <size_t N, size_t ES, typename WT> fractional<N, ES, WT> fractional<N, ES, WT>::zero()
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr fractional<N, ES, WT> fractional<N, ES, WT>::zero()
 {
     return fractional<N, ES, WT>();
 }
 
 template <size_t N, size_t ES, typename WT>
-fractional<N, ES, WT>::fractional()
+constexpr fractional<N, ES, WT>::fractional()
     : truncated(false)
 {
 }
 
 template <size_t N, size_t ES, typename WT>
-fractional<N, ES, WT>::fractional(const fractional<N, ES, WT>& other)
+constexpr fractional<N, ES, WT>::fractional(const fractional<N, ES, WT>& other)
     : bits(other.bits)
     , truncated(other.truncated)
 {
 }
 
 template <size_t N, size_t ES, typename WT>
-fractional<N, ES, WT>::fractional(const posit<N, ES, WT>& p)
+constexpr fractional<N, ES, WT>::fractional(const posit<N, ES, WT>& p)
 {
     // get fraction bits
 
@@ -51,18 +52,20 @@ fractional<N, ES, WT>::fractional(const posit<N, ES, WT>& p)
     truncated = false;
 }
 
-template <size_t N, size_t ES, typename WT> bool fractional<N, ES, WT>::has_been_truncated() const
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool fractional<N, ES, WT>::has_been_truncated() const
 {
     return truncated;
 }
 
-template <size_t N, size_t ES, typename WT> bool fractional<N, ES, WT>::is_zero() const
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool fractional<N, ES, WT>::is_zero() const
 {
     return (*this == zero());
 }
 
 template <size_t N, size_t ES, typename WT>
-fractional<N, ES, WT> fractional<N, ES, WT>::incremented() const
+[[nodiscard]] constexpr fractional<N, ES, WT> fractional<N, ES, WT>::incremented() const
 {
     fractional<N, ES, WT> ret;
     ret.bits = bits + bits.one();
@@ -71,13 +74,15 @@ fractional<N, ES, WT> fractional<N, ES, WT>::incremented() const
 }
 
 template <size_t N, size_t ES, typename WT>
-uinteger<fractional<N, ES, WT>::IntegerSize, WT> fractional<N, ES, WT>::integer_bits() const
+[[nodiscard]] constexpr uinteger<fractional<N, ES, WT>::IntegerSize, WT>
+fractional<N, ES, WT>::integer_bits() const
 {
     return width_cast<IntegerSize>(bits >> FractionSize);
 }
 
 template <size_t N, size_t ES, typename WT>
-uinteger<fractional<N, ES, WT>::FractionSize, WT> fractional<N, ES, WT>::fraction_bits() const
+[[nodiscard]] constexpr uinteger<fractional<N, ES, WT>::FractionSize, WT>
+fractional<N, ES, WT>::fraction_bits() const
 {
     return width_cast<FractionSize>(bits);
 }
@@ -92,43 +97,50 @@ fractional<N, ES, WT>& fractional<N, ES, WT>::operator=(const fractional<N, ES, 
 }
 
 template <size_t N, size_t ES, typename WT>
-bool fractional<N, ES, WT>::operator==(const fractional<N, ES, WT>& other) const
+[[nodiscard]] constexpr bool
+fractional<N, ES, WT>::operator==(const fractional<N, ES, WT>& other) const
 {
     return bits == other.bits;
 }
 
 template <size_t N, size_t ES, typename WT>
-bool fractional<N, ES, WT>::operator!=(const fractional<N, ES, WT>& other) const
+[[nodiscard]] constexpr bool
+fractional<N, ES, WT>::operator!=(const fractional<N, ES, WT>& other) const
 {
     return !(*this == other);
 }
 
 template <size_t N, size_t ES, typename WT>
-bool fractional<N, ES, WT>::operator<(const fractional<N, ES, WT>& other) const
+[[nodiscard]] constexpr bool
+fractional<N, ES, WT>::operator<(const fractional<N, ES, WT>& other) const
 {
     return bits < other.bits;
 }
 
 template <size_t N, size_t ES, typename WT>
-bool fractional<N, ES, WT>::operator<=(const fractional<N, ES, WT>& other) const
+[[nodiscard]] constexpr bool
+fractional<N, ES, WT>::operator<=(const fractional<N, ES, WT>& other) const
 {
     return (*this < other) || (*this == other);
 }
 
 template <size_t N, size_t ES, typename WT>
-bool fractional<N, ES, WT>::operator>(const fractional<N, ES, WT>& other) const
+[[nodiscard]] constexpr bool
+fractional<N, ES, WT>::operator>(const fractional<N, ES, WT>& other) const
 {
     return other < *this;
 }
 
 template <size_t N, size_t ES, typename WT>
-bool fractional<N, ES, WT>::operator>=(const fractional<N, ES, WT>& other) const
+[[nodiscard]] constexpr bool
+fractional<N, ES, WT>::operator>=(const fractional<N, ES, WT>& other) const
 {
     return (*this > other) || (*this == other);
 }
 
 template <size_t N, size_t ES, typename WT>
-fractional<N, ES, WT> fractional<N, ES, WT>::operator+(const fractional& other) const
+[[nodiscard]] constexpr fractional<N, ES, WT>
+fractional<N, ES, WT>::operator+(const fractional& other) const
 {
     fractional<N, ES, WT> f;
 
@@ -139,7 +151,8 @@ fractional<N, ES, WT> fractional<N, ES, WT>::operator+(const fractional& other) 
 }
 
 template <size_t N, size_t ES, typename WT>
-fractional<N, ES, WT> fractional<N, ES, WT>::operator-(const fractional& other) const
+[[nodiscard]] constexpr fractional<N, ES, WT>
+fractional<N, ES, WT>::operator-(const fractional& other) const
 {
     fractional<N, ES, WT> f;
 
@@ -150,7 +163,8 @@ fractional<N, ES, WT> fractional<N, ES, WT>::operator-(const fractional& other) 
 }
 
 template <size_t N, size_t ES, typename WT>
-fractional<N, ES, WT> fractional<N, ES, WT>::operator<<(const size_t shift) const
+[[nodiscard]] constexpr fractional<N, ES, WT>
+fractional<N, ES, WT>::operator<<(const size_t shift) const
 {
     const auto truncated_bits = bits >> (N - shift);
 
@@ -162,7 +176,8 @@ fractional<N, ES, WT> fractional<N, ES, WT>::operator<<(const size_t shift) cons
 }
 
 template <size_t N, size_t ES, typename WT>
-fractional<N, ES, WT> fractional<N, ES, WT>::operator<<(const uinteger<N, WT>& shift) const
+[[nodiscard]] constexpr fractional<N, ES, WT>
+fractional<N, ES, WT>::operator<<(const uinteger<N, WT>& shift) const
 {
     constexpr auto n = uinteger<N, WT>(N);
     const auto truncated_bits = bits >> (n - shift);
@@ -175,7 +190,8 @@ fractional<N, ES, WT> fractional<N, ES, WT>::operator<<(const uinteger<N, WT>& s
 }
 
 template <size_t N, size_t ES, typename WT>
-fractional<N, ES, WT> fractional<N, ES, WT>::operator>>(const size_t shift) const
+[[nodiscard]] constexpr fractional<N, ES, WT>
+fractional<N, ES, WT>::operator>>(const size_t shift) const
 {
     const auto truncated_bits = bits << (N - shift);
 
@@ -187,7 +203,8 @@ fractional<N, ES, WT> fractional<N, ES, WT>::operator>>(const size_t shift) cons
 }
 
 template <size_t N, size_t ES, typename WT>
-fractional<N, ES, WT> fractional<N, ES, WT>::operator>>(const uinteger<N, WT>& shift) const
+[[nodiscard]] constexpr fractional<N, ES, WT>
+fractional<N, ES, WT>::operator>>(const uinteger<N, WT>& shift) const
 {
     constexpr auto n = uinteger<N, WT>(N);
     const auto truncated_bits = bits << (n - shift);
