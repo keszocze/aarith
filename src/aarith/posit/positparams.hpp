@@ -283,6 +283,13 @@ template <size_t N, size_t ES, typename WT> positparams<N, ES, WT> positparams<N
     return result;
 }
 
+template <size_t N, size_t ES, typename WT> positparams<N, ES, WT> positparams<N, ES, WT>::nar()
+{
+    positparams<N, ES, WT> result;
+    result.is_nar = true;
+    return result;
+}
+
 template <size_t N, size_t ES, typename WT>
 std::tuple<positparams<N, ES, WT>*, positparams<N, ES, WT>*>
 positparams<N, ES, WT>::ordered(positparams<N, ES, WT>* p, positparams<N, ES, WT>* q)

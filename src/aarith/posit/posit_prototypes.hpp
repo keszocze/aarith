@@ -958,6 +958,11 @@ private:
     static positparams<N, ES, WT> zero();
 
     /**
+     * @return Return parameter object that represents NaR.
+     */
+    static positparams<N, ES, WT> nar();
+
+    /**
      * @brief Return p, q in order of scale.
      * @return A tuple that contains p, q ordered by scale.
      */
