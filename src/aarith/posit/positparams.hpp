@@ -1,7 +1,6 @@
 #pragma once
 
 #include <aarith/posit.hpp>
-#include <sstream>
 
 namespace aarith {
 
@@ -168,9 +167,11 @@ constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
 
     constexpr size_t posit_bits_width = N;
     constexpr size_t truncated_width = bits.width() - posit_bits_width;
+    constexpr size_t tail_width = truncated_width - 1;
 
-    const uinteger<N, WT> posit_bits = width_cast<posit_bits_width>(bits >> truncated_width);
-    const uinteger<ES + N, WT> truncated = width_cast<truncated_width>(bits);
+    const uinteger<posit_bits_width, WT> posit_bits = width_cast<posit_bits_width>(bits >> truncated_width);
+    const uinteger<truncated_width, WT> truncated = width_cast<truncated_width>(bits);
+    const uinteger<tail_width, WT> tail = width_cast<tail_width>(truncated);
 
     //
     // construct the unrounded posit
@@ -184,9 +185,9 @@ constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
 
     const bool last = posit_bits.bit(0);
     const bool after = truncated.bit(truncated.width() - 1);
-    const bool tail = !width_cast<ES + N - 1>(truncated).is_zero();
+    const bool tailbit = !tail.is_zero();
 
-    if ((last && after) || (after && tail))
+    if ((last && after) || (after && tailbit))
     {
 #ifdef NDEBUG
         // we should really only round if the generated posit is not as
