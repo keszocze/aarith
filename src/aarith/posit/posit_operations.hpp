@@ -444,20 +444,21 @@ template <size_t N, size_t ES, typename WT> integer<N> get_scale_value(const pos
 template <size_t N, size_t ES, typename WT>
 void dump_meta(std::ostream& os, const posit<N, ES, WT>& p)
 {
-    const auto bits = to_binary(p);
+    const auto bits = p.get_bits();
 
-    const auto nregime = get_num_regime_bits(p);
-    const auto nexp = get_num_exponent_bits(p);
-    const auto nfrac = get_num_fraction_bits(p);
+    auto decoded = bits;
+    if (p.is_negative())
+    {
+        decoded = twos_complement(decoded);
+    }
 
     const auto regime = get_regime_value(p);
     const auto exponent = get_exponent_value(p);
     const auto fraction = get_fraction_value(p);
     const auto scale = get_scale_value(p);
 
-    os << bits << " nregime=" << nregime << " nexp=" << nexp << " nfrac=" << nfrac
-       << " regime=" << regime << " exponent=" << exponent << " fraction=" << fraction
-       << " scale=" << scale << std::endl;
+    os << to_binary(bits) << " decoded=" << to_binary(decoded) << " regime=" << regime
+       << " exponent=" << exponent << " fraction=" << fraction << " scale=" << scale << std::endl;
     ;
 }
 

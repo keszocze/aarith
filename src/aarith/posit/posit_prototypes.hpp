@@ -2,7 +2,6 @@
 
 #include <aarith/integer.hpp>
 #include <cstdint>
-#include <optional>
 #include <tuple>
 
 //
@@ -667,6 +666,16 @@ template <size_t N, size_t ES, typename WT> class fractional
 {
 public:
     /**
+     * Size of the integer part.
+     */
+    static constexpr size_t IntegerSize = N;
+
+    /**
+     * Size of the fractional part.
+     */
+    static constexpr size_t FractionSize = 2 * N;
+
+    /**
      * @return A fraction that represents the number zero.
      */
     static fractional zero();
@@ -789,7 +798,7 @@ public:
      * If this fractional represents 00001010.11110000, then this function
      * returns 00001010.
      */
-    uinteger<N, WT> integer_bits() const;
+    uinteger<IntegerSize, WT> integer_bits() const;
 
     /**
      * @brief Return the integer part of this fractional value.
@@ -797,7 +806,7 @@ public:
      * If this fractional represents 00001010.11110000, then this function
      * returns 11110000.
      */
-    uinteger<N, WT> fraction_bits() const;
+    uinteger<FractionSize, WT> fraction_bits() const;
 
     /**
      * @brief Overload for writing fractional values to a stream.
@@ -810,12 +819,12 @@ private:
      * The index of the hidden bit, that is the bit that represents the value
      * 2^0 = 1.
      */
-    static constexpr size_t HiddenBitIndex = N;
+    static constexpr size_t HiddenBitIndex = 2 * N;
 
     /**
      * Size of the underlying scratch memory.
      */
-    static constexpr size_t ScratchSize = 2 * N;
+    static constexpr size_t ScratchSize = IntegerSize + FractionSize;
 
     /**
      * The actual fractional value as an unsigned integer. We use an unsigned

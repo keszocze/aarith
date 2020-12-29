@@ -89,7 +89,7 @@ constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
     // set bits; keep count of the currently bit being set with 'i'
     //
 
-    uinteger<N + ES + 3> bits;
+    uinteger<N + ES + N> bits;
     ssize_t i = bits.width() - 1;
 
     //
@@ -164,8 +164,11 @@ constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
     // posit and "truncated" which we have to take a look at for rounding
     //
 
-    const uinteger<N, WT> posit_bits = width_cast<N>(bits >> (ES + 3));
-    const uinteger<ES + 3, WT> truncated = width_cast<ES + 3>(bits);
+    constexpr size_t posit_bits_width = N;
+    constexpr size_t truncated_width = bits.width() - posit_bits_width;
+
+    const uinteger<N, WT> posit_bits = width_cast<posit_bits_width>(bits >> truncated_width);
+    const uinteger<ES + N, WT> truncated = width_cast<truncated_width>(bits);
 
     //
     // construct the unrounded posit
@@ -179,10 +182,17 @@ constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
 
     const bool last = posit_bits.bit(0);
     const bool after = truncated.bit(truncated.width() - 1);
-    const bool tail = !width_cast<ES + 3 - 1>(truncated).is_zero();
+    const bool tail = !width_cast<ES + N - 1>(truncated).is_zero();
 
     if ((last && after) || (after && tail))
     {
+#ifdef NDEBUG
+        // we should really only round if the generated posit is not as
+        // expected
+        positparams px(x);
+        assert(px.scale != scale || px.fraction != fraction);
+#endif
+
         x = x.incremented_real();
     }
 

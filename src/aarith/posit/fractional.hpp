@@ -36,23 +36,11 @@ fractional<N, ES, WT>::fractional(const posit<N, ES, WT>& p)
 
     // copy into our bits
 
-    bits = bits | width_cast<ScratchSize>(extracted);
+    bits = bits | (width_cast<ScratchSize>(extracted) << N);
 
     // make hidden bit explicit
 
     bits.set_bit(HiddenBitIndex, true);
-}
-
-template <size_t N, size_t ES, typename WT>
-uinteger<N, WT> fractional<N, ES, WT>::integer_bits() const
-{
-    return width_cast<N>(bits >> N);
-}
-
-template <size_t N, size_t ES, typename WT>
-uinteger<N, WT> fractional<N, ES, WT>::fraction_bits() const
-{
-    return width_cast<N>(bits);
 }
 
 template <size_t N, size_t ES, typename WT> bool fractional<N, ES, WT>::is_zero() const
@@ -67,6 +55,18 @@ fractional<N, ES, WT> fractional<N, ES, WT>::incremented() const
     ret.bits = bits + bits.one();
 
     return ret;
+}
+
+template <size_t N, size_t ES, typename WT>
+uinteger<fractional<N, ES, WT>::IntegerSize, WT> fractional<N, ES, WT>::integer_bits() const
+{
+    return width_cast<IntegerSize>(bits >> FractionSize);
+}
+
+template <size_t N, size_t ES, typename WT>
+uinteger<fractional<N, ES, WT>::FractionSize, WT> fractional<N, ES, WT>::fraction_bits() const
+{
+    return width_cast<FractionSize>(bits);
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -169,11 +169,9 @@ fractional<N, ES, WT> fractional<N, ES, WT>::operator>>(const uinteger<N, WT>& s
 template <size_t SN, size_t SES, typename SWT>
 std::ostream& operator<<(std::ostream& os, const fractional<SN, SES, SWT>& f)
 {
-    const auto [integer_part, fractional_part] = split<SN - 1>(f.bits);
-
-    os << to_binary(integer_part);
+    os << to_binary(f.integer_bits());
     os << ".";
-    os << to_binary(fractional_part);
+    os << to_binary(f.fraction_bits());
 
     return os;
 }
