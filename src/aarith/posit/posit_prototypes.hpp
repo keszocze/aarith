@@ -2,6 +2,8 @@
 
 #include <aarith/integer.hpp>
 #include <cstdint>
+#include <stdexcept>
+#include <string>
 #include <tuple>
 
 //
@@ -63,16 +65,139 @@ public:
      * Argument bits is not interpreted as an integer, rather it is used as
      * the underlying bit pattern of the returned posit.
      */
-    static constexpr posit from_bits(const storage_type& bits);
+    [[nodiscard]] static constexpr posit from(const storage_type& bits);
+
+    /**
+     * @brief Construct this posit with given bits.
+     *
+     * Argument bits is not interpreted as an integer, rather it is used as
+     * the underlying bit pattern of the returned posit.
+     *
+     * @param n Bits used to initialize the underlying type.
+     */
+    // TODO (Schärtl) das funktioniert aber nur gut, so lange N <= 64!
+    [[nodiscard]] static constexpr posit from(const WT bits);
 
     //
     // Constructors
     //
 
     /**
-     * @brief Construct this posit initialized to zero.
+     * @brief Construct posit initialized to zero.
      */
     constexpr posit();
+
+    /**
+     * @brief Construct posit from value.
+     *
+     * Depending on the parameters N and WT of the given posit type, the
+     * returned posit might not represent value exactly.
+     *
+     * @praram value The value to represent with the constructed posit.
+     */
+    explicit constexpr posit(int8_t value);
+
+    /**
+     * @brief Construct posit from value.
+     *
+     * Depending on the parameters N and WT of the given posit type, the
+     * returned posit might not represent value exactly.
+     *
+     * @praram value The value to represent with the constructed posit.
+     */
+    explicit constexpr posit(int16_t value);
+
+    /**
+     * @brief Construct posit from value.
+     *
+     * Depending on the parameters N and WT of the given posit type, the
+     * returned posit might not represent value exactly.
+     *
+     * @praram value The value to represent with the constructed posit.
+     */
+    explicit constexpr posit(int32_t value);
+
+    /**
+     * @brief Construct posit from value.
+     *
+     * Depending on the parameters N and WT of the given posit type, the
+     * returned posit might not represent value exactly.
+     *
+     * @praram value The value to represent with the constructed posit.
+     */
+    explicit constexpr posit(int64_t value);
+
+    /**
+     * @brief Construct posit from value.
+     *
+     * Depending on the parameters N and WT of the given posit type, the
+     * returned posit might not represent value exactly.
+     *
+     * @praram value The value to represent with the constructed posit.
+     */
+    template <size_t ValueWidth, typename ValueWordType>
+    explicit constexpr posit(const integer<ValueWidth, ValueWordType>& value);
+
+    /**
+     * @brief Construct posit from value.
+     *
+     * Depending on the parameters N and WT of the given posit type, the
+     * returned posit might not represent value exactly.
+     *
+     * @praram value The value to represent with the constructed posit.
+     */
+    explicit constexpr posit(uint8_t value);
+
+    /**
+     * @brief Construct posit from value.
+     *
+     * Depending on the parameters N and WT of the given posit type, the
+     * returned posit might not represent value exactly.
+     *
+     * @praram value The value to represent with the constructed posit.
+     */
+    explicit constexpr posit(uint16_t value);
+
+    /**
+     * @brief Construct posit from value.
+     *
+     * Depending on the parameters N and WT of the given posit type, the
+     * returned posit might not represent value exactly.
+     *
+     * @praram value The value to represent with the constructed posit.
+     */
+    explicit constexpr posit(uint32_t value);
+
+    /**
+     * @brief Construct posit from value.
+     *
+     * Depending on the parameters N and WT of the given posit type, the
+     * returned posit might not represent value exactly.
+     *
+     * @praram value The value to represent with the constructed posit.
+     */
+    explicit constexpr posit(uint64_t value);
+
+    /**
+     * @brief Construct posit from value.
+     *
+     * Depending on the parameters N and WT of the given posit type, the
+     * returned posit might not represent value exactly.
+     *
+     * @praram value The value to represent with the constructed posit.
+     */
+    template <size_t ValueWidth, typename ValueWordType>
+    explicit constexpr posit(const uinteger<ValueWidth, ValueWordType>& value);
+
+    /**
+     * @brief Construct posit from value.
+     *
+     * Depending on the parameters N and WT of the given posit type, the
+     * returned posit might not represent value exactly.
+     *
+     * @praram value The value to represent with the constructed posit.
+     */
+    explicit constexpr posit(double value);
 
     /**
      * @brief Construct this posit to be a clone of other.
@@ -102,13 +227,140 @@ public:
      */
     posit& operator=(const posit&& other);
 
+    //
+    // Conversion Operators
+    //
+
     /**
-     * @brief Construct this posit with given bits.
+     * @brief Convert to integer.
      *
-     * @param n Bits used to initialize the underlying type.
+     * @note It is the callers responsibility to ensure that the value represented
+     * by this posit actually fits in the returned integer type. If it does not,
+     * under or overflow will occur.
+     *
+     * @throws nar_error If this posits represents NaR. NaR cannot be
+     * converted to an integer.
      */
-    // TODO (Schärtl) das funktioniert aber nur gut, so lange N <= 64!
-    constexpr explicit posit(WT n);
+    [[nodiscard]] explicit constexpr operator int8_t() const;
+
+    /**
+     * @brief Convert to integer.
+     *
+     * @note It is the callers responsibility to ensure that the value represented
+     * by this posit actually fits in the returned integer type. If it does not,
+     * under or overflow will occur.
+     *
+     * @throws nar_error If this posits represents NaR. NaR cannot be
+     * converted to an integer.
+     */
+    [[nodiscard]] explicit constexpr operator int16_t() const;
+
+    /**
+     * @brief Convert to integer.
+     *
+     * @note It is the callers responsibility to ensure that the value represented
+     * by this posit actually fits in the returned integer type. If it does not,
+     * under or overflow will occur.
+     *
+     * @throws nar_error If this posits represents NaR. NaR cannot be
+     * converted to an integer.
+     */
+    [[nodiscard]] explicit constexpr operator int32_t() const;
+
+    /**
+     * @brief Convert to integer.
+     *
+     * @note It is the callers responsibility to ensure that the value represented
+     * by this posit actually fits in the returned integer type. If it does not,
+     * under or overflow will occur.
+     *
+     * @throws nar_error If this posits represents NaR. NaR cannot be
+     * converted to an integer.
+     */
+    [[nodiscard]] explicit constexpr operator int64_t() const;
+
+    /**
+     * @brief Convert to unsigned integer.
+     *
+     * @note It is the callers responsibility to ensure that the value represented
+     * by this posit actually fits in the returned uinteger type. If it does not,
+     * under or overflow will occur.
+     *
+     * @throws nar_error If this posits represents NaR. NaR cannot be
+     * converted to an unsigned integer.
+     */
+    [[nodiscard]] explicit constexpr operator uint8_t() const;
+
+    /**
+     * @brief Convert to unsigned integer.
+     *
+     * @note It is the callers responsibility to ensure that the value represented
+     * by this posit actually fits in the returned uinteger type. If it does not,
+     * under or overflow will occur.
+     *
+     * @throws nar_error If this posits represents NaR. NaR cannot be
+     * converted to an unsigned integer.
+     */
+    [[nodiscard]] explicit constexpr operator uint16_t() const;
+
+    /**
+     * @brief Convert to unsigned integer.
+     *
+     * @note It is the callers responsibility to ensure that the value represented
+     * by this posit actually fits in the returned uinteger type. If it does not,
+     * under or overflow will occur.
+     *
+     * @throws nar_error If this posits represents NaR. NaR cannot be
+     * converted to an unsigned integer.
+     */
+    [[nodiscard]] explicit constexpr operator uint32_t() const;
+
+    /**
+     * @brief Convert to unsigned integer.
+     *
+     * @note It is the callers responsibility to ensure that the value represented
+     * by this posit actually fits in the returned uinteger type. If it does not,
+     * under or overflow will occur.
+     *
+     * @throws nar_error If this posits represents NaR. NaR cannot be
+     * converted to an unsigned integer.
+     */
+    [[nodiscard]] explicit constexpr operator uint64_t() const;
+
+    /**
+     * @brief Convert to unsigned integer.
+     *
+     * @note It is the callers responsibility to ensure that the value represented
+     * by this posit actually fits in the returned uinteger type. If it does not,
+     * under or overflow will occur.
+     *
+     * @throws nar_error If this posits represents NaR. NaR cannot be
+     * converted to an unsigned integer.
+     */
+    template <size_t TargetWidth, typename TargetWordType>
+    [[nodiscard]] explicit constexpr operator uinteger<TargetWidth, TargetWordType>() const;
+
+    /**
+     * @brief Convert to integer.
+     *
+     * @note It is the callers responsibility to ensure that the value represented
+     * by this posit actually fits in the returned integer type. If it does not,
+     * under or overflow will occur.
+     *
+     * @throws nar_error If this posits represents NaR. NaR cannot be
+     * converted to an integer.
+     */
+    template <size_t TargetWidth, typename TargetWordType>
+    [[nodiscard]] explicit constexpr operator integer<TargetWidth, TargetWordType>() const;
+
+    /**
+     * @brief Convert to IEEE double precision.
+     *
+     * @note It is the callers responsibility to ensure that the value
+     * represented by this posit actually fits in the returned type. If it
+     * does not, under or overflow will occur.
+     */
+    [[nodiscard]] explicit constexpr operator double() const;
 
     //
     // Comparison Operators
@@ -430,6 +682,22 @@ private:
     storage_type bits;
 
     /**
+     * @brief Internal helper for converting integers to double.
+     *
+     * @return Argument n converted to double.
+     */
+    template <size_t IN, typename IWT>
+    [[nodiscard]] static constexpr double to_double(const uinteger<IN, IWT>& n);
+
+    /**
+     * @brief Internal helper for converting integers to double.
+     *
+     * @return Argument n converted to double.
+     */
+    template <size_t IN, typename IWT>
+    [[nodiscard]] static constexpr double to_double(const integer<IN, IWT>& n);
+
+    /**
      * Statically assert that the created instance of a given posit
      * conforms to the requirements for legal posits.
      *
@@ -532,20 +800,6 @@ template <size_t N, size_t ES, typename WT>
  */
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr double to_double(const posit<N, ES, WT>& p);
-
-/**
- * @brief Convert an IEEE double to posit.
- *
- * Depending on the specific value and the width of posit and exponent, loss
- * of information can occur. Do not expect the returned posit to match
- * argument x exactly.
- *
- * @nparam N The width of the returned posit.
- * @nparam ES The exponent size of the returned posit.
- * @napram WT The underlying word type of the returned posit.
- */
-template <size_t N, size_t ES, typename WT = uint64_t>
-[[nodiscard]] constexpr posit<N, ES, WT> from_double(const double x);
 
 /**
  * @brief Return absolute value of a given posit.
@@ -651,6 +905,52 @@ template <size_t N, size_t ES, typename WT>
 std::string to_binary(const posit<N, ES, WT>& p, const char* delim);
 
 //
+// Define custom exception types for use with posit operations
+//
+// For implementation, look at posit/errors.hpp
+//
+
+/**
+ * @brief Base class for posit errors.
+ *
+ * While our posit implementation will try its best not to throw
+ * exceptions and instead return reasonable results, sometimes there
+ * is no way but to stop execution with an error.
+ *
+ * All exceptions thrown by the posit implementation inherit from
+ * posit_error, but posit_error is never thrown directly.
+ */
+class posit_error : std::runtime_error
+{
+public:
+    /**
+     * @brief Construct a new error.
+     *
+     * @param whatarg A short explanation of what caused this error.
+     */
+    explicit posit_error(const std::string& whatarg);
+};
+
+/**
+ * @brief Error thrown when trying to do illegal operations on NaR values.
+ *
+ * While most operations handle NaR values just fine, some do not. In
+ * particular, it is not possible to convert a posit representing NaR to a
+ * integer as there is no "error state" for integers. In those cases,
+ * nar_error will be thrown to signal that an illegal operation was attempted.
+ */
+class nar_error : posit_error
+{
+public:
+    /**
+     * @brief Construct a new error.
+     *
+     * @param whatarg A short explanation of what caused this error.
+     */
+    explicit nar_error(const std::string& whatarg);
+};
+
+//
 // Fractional Class
 //
 // For implementation, look at posit/fractional.hpp
@@ -678,6 +978,17 @@ public:
      * Size of the fractional part.
      */
     static constexpr size_t FractionSize = 2 * N;
+
+    /**
+     * The index of the hidden bit in scratch memory, that is the bit that
+     * represents the value 2^0 = 1.
+     */
+    static constexpr size_t HiddenBitIndex = 2 * N;
+
+    /**
+     * Size of the underlying scratch memory.
+     */
+    static constexpr size_t ScratchSize = IntegerSize + FractionSize;
 
     /**
      * @return A fraction that represents the number zero.
@@ -830,7 +1141,7 @@ public:
     /**
      * @brief Return the integer part of this fractional value.
      *
-     * If this fractional represents 00001010.11110000, then this function
+     * If this fractional represents 00001010.11110000, then this method
      * returns 00001010.
      */
     [[nodiscard]] constexpr uinteger<IntegerSize, WT> integer_bits() const;
@@ -838,10 +1149,15 @@ public:
     /**
      * @brief Return the integer part of this fractional value.
      *
-     * If this fractional represents 00001010.11110000, then this function
+     * If this fractional represents 00001010.11110000, then this method
      * returns 11110000.
      */
     [[nodiscard]] constexpr uinteger<FractionSize, WT> fraction_bits() const;
+
+    /**
+     * @brief Return the underlying scratch memory.
+     */
+    [[nodiscard]] constexpr uinteger<ScratchSize, WT> scratch_bits() const;
 
     /**
      * @brief Overload for writing fractional values to a stream.
@@ -850,17 +1166,6 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const fractional<SN, SES, SWT>& f);
 
 private:
-    /**
-     * The index of the hidden bit, that is the bit that represents the value
-     * 2^0 = 1.
-     */
-    static constexpr size_t HiddenBitIndex = 2 * N;
-
-    /**
-     * Size of the underlying scratch memory.
-     */
-    static constexpr size_t ScratchSize = IntegerSize + FractionSize;
-
     /**
      * The actual fractional value as an unsigned integer. We use an unsigned
      * integer (instead of, say, word array) to use the built-in arithmetic
@@ -911,6 +1216,16 @@ public:
     constexpr positparams(const posit<N, ES, WT>& p);
 
     /**
+     * @brief Construct from signed integer.
+     *
+     * Construct this object to represent the given value.
+     *
+     * @param value The integer to convert.
+     */
+    template <size_t ValueWidth, typename ValueWordType>
+    constexpr positparams(const integer<ValueWidth, ValueWordType>& value);
+
+    /**
      * @brief Copy constructor.
      */
     constexpr positparams(const positparams& other);
@@ -936,6 +1251,14 @@ public:
      * rounding is applied.
      */
     [[nodiscard]] explicit constexpr operator posit<N, ES, WT>() const;
+
+    /**
+     * @brief Convert to integer.
+     *
+     * Convert the underlying parameters back to an integer representation.
+     */
+    template <size_t TargetWidth, typename TargetWordType>
+    [[nodiscard]] explicit constexpr operator integer<TargetWidth, TargetWordType>() const;
 
     /**
      * @brief Check for equality.
@@ -1068,6 +1391,7 @@ private:
 // they wish.
 //
 
+#include <aarith/posit/errors.hpp>
 #include <aarith/posit/fractional.hpp>
 #include <aarith/posit/posit.hpp>
 #include <aarith/posit/posit_casts.hpp>

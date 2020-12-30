@@ -49,8 +49,8 @@ SCENARIO("Posit Constants")
 template <size_t N, size_t ES, class WT>
 static void require_cmp(const aarith::posit<N, ES, WT>& x, const aarith::posit<N, ES, WT>& y)
 {
-    const double xdouble = aarith::to_double(x);
-    const double ydouble = aarith::to_double(y);
+    const double xdouble = double(x);
+    const double ydouble = double(y);
 
     if (xdouble > ydouble)
     {
@@ -95,12 +95,12 @@ SCENARIO("Check comparison comparisons")
             for (uint16_t i = 0; i <= 0xffU; ++i)
             {
                 const uint8_t iactual = i;
-                const P8 iposit(iactual);
+                const P8 iposit = P8::from(iactual);
 
                 for (uint16_t j = 0; j < 0xffU; ++j)
                 {
                     const uint8_t jactual = j;
-                    const P8 jposit(jactual);
+                    const P8 jposit = P8::from(jactual);
 
                     require_cmp(iposit, jposit);
                 }
@@ -119,12 +119,12 @@ SCENARIO("Check comparison comparisons")
             for (uint16_t i = 0; i <= 0xffU; ++i)
             {
                 const uint8_t iactual = i;
-                const P8 iposit(iactual);
+                const P8 iposit = P8::from(iactual);
 
                 for (uint16_t j = 0; j < 0xffU; ++j)
                 {
                     const uint8_t jactual = j;
-                    const P8 jposit(jactual);
+                    const P8 jposit = P8::from(jactual);
 
                     require_cmp(iposit, jposit);
                 }
@@ -143,12 +143,12 @@ SCENARIO("Check comparison comparisons")
             for (uint16_t i = 0; i < 0xffU; ++i)
             {
                 const uint8_t iactual = i;
-                const P8 iposit(iactual);
+                const P8 iposit = P8::from(iactual);
 
                 for (uint16_t j = 0; j <= 0xffU; ++j)
                 {
                     const uint8_t jactual = j;
-                    const P8 jposit(jactual);
+                    const P8 jposit = P8::from(jactual);
 
                     require_cmp(iposit, jposit);
                 }

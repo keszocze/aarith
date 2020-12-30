@@ -31,7 +31,7 @@ width_cast(const posit<SourceWidth, SourceExponentSize, SourceWordType>& p)
     constexpr size_t shift = DestinationWidth - SourceWidth;
     const auto shifted = extended << shift;
 
-    return DestinationPosit::from_bits(shifted);
+    return DestinationPosit::from(shifted);
 }
 
 } // namespace aarith

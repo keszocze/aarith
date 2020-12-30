@@ -30,6 +30,45 @@ constexpr positparams<N, ES, WT>::positparams(const posit<N, ES, WT>& p)
 }
 
 template <size_t N, size_t ES, typename WT>
+template <size_t ValueWidth, typename ValueWordType>
+constexpr positparams<N, ES, WT>::positparams(const integer<ValueWidth, ValueWordType>& value)
+{
+    //
+    // first set up some constants ands type defintions
+    //
+
+    using ValueType = decltype(value);
+
+    constexpr ValueType es(ES);
+    constexpr ValueType powes = ValueType::one() << es;
+
+    //
+    // initalize flags
+    //
+
+    is_nar = false;
+    is_zero = value.is_zero();
+    sign_bit = value.is_negative();
+
+    //
+    // for zero we have to do nothing
+    //
+
+    if (value.is_zero())
+    {
+        return;
+    }
+
+    //
+    // compute scale; if scale is already too big to represent, just set
+    // scale to the maximum value
+    //
+
+    const ValueType scale = ilog(value, powes);
+    (void)scale;
+}
+
+template <size_t N, size_t ES, typename WT>
 constexpr positparams<N, ES, WT>::positparams(const positparams<N, ES, WT>& other)
     : is_nar(other.is_nar)
     , is_zero(other.is_zero)
@@ -177,7 +216,7 @@ template <size_t N, size_t ES, typename WT>
     // construct the unrounded posit
     //
 
-    Posit x = Posit::from_bits(posit_bits);
+    Posit x = Posit::from(posit_bits);
 
     //
     // do rounding if necessary
@@ -213,6 +252,95 @@ template <size_t N, size_t ES, typename WT>
     //
 
     return x;
+}
+
+template <size_t N, size_t ES, typename WT>
+template <size_t TargetWidth, typename TargetWordType>
+[[nodiscard]] constexpr positparams<N, ES, WT>::operator integer<TargetWidth, TargetWordType>()
+    const
+{
+    // We need at least one sign bit and one "payload bit". Honestly for small
+    // values like N=2 or N=3 we will hardly get reasonable results in most
+    // cases, but it is up to the user to decide what they want.
+    static_assert(TargetWidth >= 2, "conversion to integer requires at least two integer bits");
+
+    //
+    // handle special cases
+    //
+
+    using TargetType = integer<TargetWidth, TargetWordType>;
+
+    if (is_zero)
+    {
+        return TargetType::zero();
+    }
+
+    if (scale < scale.zero())
+    {
+        return TargetType::zero();
+    }
+
+    if (is_nar)
+    {
+        // TODO (Schärt): We ignore over/underflows during conversion. Should
+        // we not also ignore NaR then, which is a way more rare case?
+        throw nar_error("tried to convert NaR to integer");
+    }
+
+    //
+    // handle regular case
+    //
+
+    // To get the integer, all we really need to do is take the fraction and
+    // shift it to fit the scale. Say we represent a value of
+    //
+    //   1.01010010 ✕ 2³.
+    //
+    // We first set variable "intfrac" to represent that number without a
+    // seperation dot, e.g.
+    //
+    //   101010010 ✕ 2³⁻⁸,
+    //
+    // where we subtract 8 from the scale as the dot was shifted 8 places
+    // (FractionSize) to the right.
+
+    constexpr integer<N, WT> fraction_size(fraction.FractionSize);
+
+    auto intfrac = fraction.scratch_bits();
+    integer<N, WT> intscale = scale - fraction_size;
+
+    // Now as we want to return an integer, we only have to shift "intfrac" such
+    // that intscale is zero. This might result in bits being truncated.
+
+    const auto shift = expanding_abs(intscale);
+
+    if (intscale.is_negative())
+    {
+        intfrac = intfrac >> shift;
+    }
+    else
+    {
+        intfrac = intfrac << shift;
+    }
+
+    // Truncate to expected size. From the TargetWidth-many bits we can
+    // use TargetWidth - 1 bits to represent the absolute value. One bit
+    // is reserved for the sign which is masked away.
+
+    TargetType abs_result = width_cast<TargetType::width()>(intfrac);
+    abs_result.set_bit(intfrac.width() - 1, false);
+
+    // Now that we have constructed the absolute value, we can handle negative
+    // values and return.
+
+    if (sign_bit)
+    {
+        return twos_complement(abs_result);
+    }
+    else
+    {
+        return abs_result;
+    }
 }
 
 template <size_t N, size_t ES, typename WT>

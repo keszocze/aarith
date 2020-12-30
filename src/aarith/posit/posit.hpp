@@ -8,7 +8,8 @@
 namespace aarith {
 
 template <size_t N, size_t ES, typename WT>
-constexpr posit<N, ES, WT> posit<N, ES, WT>::from_bits(const posit<N, ES, WT>::storage_type& bits)
+[[nodiscard]] constexpr posit<N, ES, WT>
+posit<N, ES, WT>::from(const posit<N, ES, WT>::storage_type& bits)
 {
     posit p;
     p.bits = bits;
@@ -17,10 +18,236 @@ constexpr posit<N, ES, WT> posit<N, ES, WT>::from_bits(const posit<N, ES, WT>::s
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::from(const WT first_word)
+{
+    const storage_type bits(first_word);
+    return posit<N, ES, WT>::from(bits);
+}
+
+template <size_t N, size_t ES, typename WT>
 constexpr posit<N, ES, WT>::posit()
     : bits(0)
 {
     static_assert_template_parameters();
+}
+
+template <size_t N, size_t ES, typename WT>
+constexpr posit<N, ES, WT>::posit(int8_t value)
+    : posit(static_cast<int64_t>(value))
+{
+}
+
+template <size_t N, size_t ES, typename WT>
+constexpr posit<N, ES, WT>::posit(int16_t value)
+    : posit(static_cast<int64_t>(value))
+{
+}
+
+template <size_t N, size_t ES, typename WT>
+constexpr posit<N, ES, WT>::posit(int32_t value)
+    : posit(static_cast<int64_t>(value))
+{
+}
+
+template <size_t N, size_t ES, typename WT>
+constexpr posit<N, ES, WT>::posit(int64_t value)
+    : posit(integer<64>(value))
+{
+}
+
+template <size_t N, size_t ES, typename WT>
+template <size_t ValueWidth, typename ValueWordType>
+constexpr posit<N, ES, WT>::posit(const integer<ValueWidth, ValueWordType>& value)
+{
+    const positparams<N, ES, WT> parameters(value);
+    *this = posit(parameters);
+}
+
+template <size_t N, size_t ES, typename WT>
+constexpr posit<N, ES, WT>::posit(uint8_t value)
+    : posit(static_cast<uint64_t>(value))
+{
+}
+
+template <size_t N, size_t ES, typename WT>
+constexpr posit<N, ES, WT>::posit(uint16_t value)
+    : posit(static_cast<uint64_t>(value))
+{
+}
+
+template <size_t N, size_t ES, typename WT>
+constexpr posit<N, ES, WT>::posit(uint32_t value)
+    : posit(static_cast<uint64_t>(value))
+{
+}
+
+template <size_t N, size_t ES, typename WT>
+constexpr posit<N, ES, WT>::posit(uint64_t value)
+    : posit(uinteger<64>(value))
+{
+}
+
+template <size_t N, size_t ES, typename WT>
+template <size_t ValueWidth, typename ValueWordType>
+constexpr posit<N, ES, WT>::posit(const uinteger<ValueWidth, ValueWordType>& value)
+{
+    static_assert_template_parameters();
+    throw std::logic_error("not implemented");
+}
+
+template <size_t N, size_t ES, typename WT> constexpr posit<N, ES, WT>::posit(double x)
+{
+    // first consider the two possible special cases, zero NaR
+
+    if (x == 0.0)
+    {
+        *this = zero();
+        return;
+    }
+
+    if (std::isnan(x) || std::isinf(x))
+    {
+        *this = nar();
+        return;
+    }
+
+    // prepare some types and constants for later
+
+    constexpr storage_type zero = storage_type::zero();
+    constexpr storage_type one = storage_type::one();
+    constexpr storage_type two = one + one;
+
+    const double useed = std::pow(2, std::pow(2, ES));
+
+    // in this function we build up the underlying bitstring "p" bit by bit
+    // (as explained in Posit Arithmetic, Gustafson, October 2017, pp. 25)
+
+    storage_type p;
+    double y = std::abs(x);
+    size_t i = 0;
+
+    // (1) First divide by useed or multiply by useed until x is in the
+    // interval [1, useed).
+
+    if (y >= 1.0)
+    {
+        // north east
+
+        p = one;
+
+        i = 2;
+
+        while (y >= useed && i < N)
+        {
+            p = (p << 1) + one;
+            y = y / useed;
+
+            i += 1;
+        }
+
+        p = p << 1;
+        i += 1;
+    }
+    else
+    {
+        // south east
+
+        p = zero;
+        i = 1;
+
+        while (y < 1.0 && i <= N)
+        {
+            y = y * useed;
+            i += 1;
+        }
+
+        if (i >= N)
+        {
+            p = two;
+            i = N + 1;
+        }
+        else
+        {
+            p = one;
+            i += 1;
+        }
+    }
+
+    // (2) Then the value is repeatedly divided by 2 until it is in the
+    // interval [1, 2) and that determines the exponent.
+
+    double e = std::pow(2, ES - 1);
+
+    while (e > 1.0 / 2.0 && i <= N)
+    {
+        p = p << 1;
+
+        if (y >= std::pow(2.0, e))
+        {
+            y /= std::pow(2.0, e);
+            p = p + one;
+        }
+
+        e = e / 2.0;
+        i += 1;
+    }
+
+    y = y - 1.0;
+
+    // (3) The fraction always has a leading 1 to the left of the binary
+    // point, eliminating the need to handle subnormal exception values that
+    // have a 0 bit to the left of the binary point.
+
+    while (y > 0.0 && i <= N)
+    {
+        y = y * 2.0;
+
+        p = (p << 1);
+
+        if (std::floor(y))
+        {
+            p = p + one;
+        }
+
+        y -= std::floor(y);
+        i += 1;
+    }
+
+    p = p << N + 1 - i;
+    i += 1;
+
+    // (4) Round to nearest even and fill up the last bits.
+
+    const auto isb = p.lsb();
+    p = p >> one;
+
+    if (isb)
+    {
+        if (y == 1 || y == 0)
+        {
+            if (p.lsb())
+            {
+                p = p + one;
+            }
+        }
+        else
+        {
+            p = p + one;
+        }
+    }
+
+    // (5) If we were converting a negative number, we now need
+    // to take the 2s complement.
+
+    if (x < 0.0)
+    {
+        p = twos_complement(p);
+    }
+
+    // (6) Now that we have the bitstring, we can construct the underlying
+    // bitstring
+
+    bits = p;
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -52,9 +279,109 @@ posit<N, ES, WT>& posit<N, ES, WT>::operator=(const posit&& other)
 }
 
 template <size_t N, size_t ES, typename WT>
-constexpr posit<N, ES, WT>::posit(WT n)
-    : bits(n)
+[[nodiscard]] constexpr posit<N, ES, WT>::operator int8_t() const
 {
+    const int64_t converted = int64_t(*this);
+    return static_cast<int8_t>(converted);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT>::operator int16_t() const
+{
+    const int64_t converted = int64_t(*this);
+    return static_cast<int16_t>(converted);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT>::operator int32_t() const
+{
+    const int64_t converted = int64_t(*this);
+    return static_cast<int32_t>(converted);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT>::operator int64_t() const
+{
+    // TODO (Schärtl): Find a better way for this...
+
+    const integer<64> signed64 = integer<64>(*this);
+    const uinteger<64> unsigned64 = signed64;
+    const uint64_t unsigned_stdint = uint64_t(unsigned64);
+    const int64_t signed_stdint = static_cast<int64_t>(unsigned_stdint);
+
+    return signed_stdint;
+}
+
+template <size_t N, size_t ES, typename WT>
+template <size_t TargetWidth, typename TargetWordType>
+[[nodiscard]] constexpr posit<N, ES, WT>::operator integer<TargetWidth, TargetWordType>() const
+{
+    const positparams<N, ES, WT> parameterized(*this);
+    return integer<TargetWidth, TargetWordType>(parameterized);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT>::operator uint8_t() const
+{
+    const uint64_t converted = uint64_t(*this);
+    return static_cast<uint8_t>(converted);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT>::operator uint16_t() const
+{
+    const uint64_t converted = uint64_t(*this);
+    return static_cast<uint16_t>(converted);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT>::operator uint32_t() const
+{
+    const uint64_t converted = uint64_t(*this);
+    return static_cast<uint32_t>(converted);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT>::operator uint64_t() const
+{
+    const uinteger<64> aarith_integer = uinteger<64>(*this);
+    return uint64_t(aarith_integer);
+}
+
+template <size_t N, size_t ES, typename WT>
+template <size_t TargetWidth, typename TargetWordType>
+[[nodiscard]] constexpr posit<N, ES, WT>::operator uinteger<TargetWidth, TargetWordType>() const
+{
+    // convert uinteger to integer (w/ additional sign bit), run the standard
+    // conversion and then clip away the sign bit
+
+    const auto sresult = integer<TargetWidth + 1, TargetWordType>(*this);
+    return width_cast<TargetWidth>(sresult);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT>::operator double() const
+{
+    if (is_zero())
+    {
+        return 0.0;
+    }
+
+    if (is_nar())
+    {
+        return NAN;
+    }
+
+    const double sign = is_negative() ? -1.0 : 1.0;
+    const double useed = std::pow(2.0, std::pow(2.0, ES));
+    const double k = to_double(get_regime_value(*this));
+    const double e = to_double(get_exponent_value(*this));
+
+    const double F = to_double(get_fraction_value(*this));
+    const double nF = get_num_fraction_bits(*this);
+    const double f = (nF == 0.0) ? 1.0 : 1.0 + F / std::pow(2.0, nF);
+
+    return sign * std::pow(useed, k) * std::pow(2, e) * f;
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -73,14 +400,14 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::incremented() const
 {
     const auto bits = get_bits();
-    return from_bits(bits + bits.one());
+    return from(bits + bits.one());
 }
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::decremented() const
 {
     const auto bits = get_bits();
-    return from_bits(bits - bits.one());
+    return from(bits - bits.one());
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -122,13 +449,9 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 constexpr bool posit<N, ES, WT>::operator<(const posit& other) const
 {
-    // special case NaR
+    // special case
 
-    const auto inf = nar();
-
-    // TODO (Schärtl) evtl. eine .is_inf() Methode hinzufügen?
-
-    if (*this == inf || other == inf)
+    if (is_nar() || other.is_nar())
     {
         return false;
     }
@@ -237,7 +560,7 @@ template <size_t N, size_t ES, typename WT>
     }
 
     const auto bits = twos_complement(this->get_bits());
-    return posit<N, ES, WT>::from_bits(bits);
+    return posit<N, ES, WT>::from(bits);
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -276,7 +599,7 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT>
 posit<N, ES, WT>::operator*(const posit<N, ES, WT>& rhs) const
 {
-    throw std::logic_error("not implementated");
+    throw std::logic_error("not implemented");
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -421,6 +744,22 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr typename posit<N, ES, WT>::storage_type posit<N, ES, WT>::get_bits() const
 {
     return bits;
+}
+
+template <size_t N, size_t ES, typename WT>
+template <size_t IN, typename IWT>
+[[nodiscard]] constexpr double posit<N, ES, WT>::to_double(const uinteger<IN, IWT>& n)
+{
+    const uint64_t n64 = narrow_cast<uint64_t>(n);
+    return static_cast<double>(n64);
+}
+
+template <size_t N, size_t ES, typename WT>
+template <size_t IN, typename IWT>
+[[nodiscard]] constexpr double posit<N, ES, WT>::to_double(const integer<IN, IWT>& n)
+{
+    const int64_t i64 = narrow_cast<int64_t>(n);
+    return static_cast<double>(i64);
 }
 
 template <size_t N, size_t ES, typename WT>

@@ -17,9 +17,9 @@ SCENARIO("Testing unary minus")
             {
                 const double x = static_cast<double>(i);
 
-                const auto p = from_double<8, 2, uint64_t>(x);
+                const auto p = posit<8, 2, uint64_t>(x);
 
-                CHECK(to_double(-p) == Approx((-1.0) * to_double(p)));
+                CHECK(double(-p) == Approx((-1.0) * double(p)));
                 CHECK(-(-p) == p);
             }
         }

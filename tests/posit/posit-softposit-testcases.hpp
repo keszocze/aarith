@@ -7,21 +7,21 @@ static void require_addition(const unsigned lhs, const unsigned rhs, const unsig
 {
     using namespace aarith;
 
-    const posit<N, ES> p(lhs);
-    const posit<N, ES> q(rhs);
+    const posit<N, ES> p = posit<N, ES>::from(lhs);
+    const posit<N, ES> q = posit<N, ES>::from(rhs);
 
     const posit<N, ES> actual_posit = p + q;
-    const posit<N, ES> expected_posit(expected);
+    const posit<N, ES> expected_posit = posit<N, ES>::from(expected);
 
     {
         INFO("  " << dump_string(p));
         INFO("+ " << dump_string(q));
-        INFO("  " << to_double(p));
-        INFO("+ " << to_double(q));
+        INFO("  " << double(p));
+        INFO("+ " << double(q));
         INFO("? " << dump_string(actual_posit));
         INFO("! " << dump_string(expected_posit));
-        INFO("? " << to_double(actual_posit));
-        INFO("! " << to_double(expected_posit));
+        INFO("? " << double(actual_posit));
+        INFO("! " << double(expected_posit));
 
         REQUIRE(actual_posit == expected_posit);
     }
@@ -32,21 +32,21 @@ static void require_subtraction(const unsigned lhs, const unsigned rhs, const un
 {
     using namespace aarith;
 
-    const posit<N, ES> p(lhs);
-    const posit<N, ES> q(rhs);
+    const posit<N, ES> p = posit<N, ES>::from(lhs);
+    const posit<N, ES> q = posit<N, ES>::from(rhs);
 
     const posit<N, ES> actual_posit = p - q;
-    const posit<N, ES> expected_posit(expected);
+    const posit<N, ES> expected_posit = posit<N, ES>::from(expected);
 
     {
         INFO("  " << dump_string(p));
         INFO("- " << dump_string(q));
-        INFO("  " << to_double(p));
-        INFO("- " << to_double(q));
+        INFO("  " << double(p));
+        INFO("- " << double(q));
         INFO("? " << dump_string(actual_posit));
         INFO("! " << dump_string(expected_posit));
-        INFO("? " << to_double(actual_posit));
-        INFO("! " << to_double(expected_posit));
+        INFO("? " << double(actual_posit));
+        INFO("! " << double(expected_posit));
 
         REQUIRE(actual_posit == expected_posit);
     }

@@ -15,10 +15,10 @@ SCENARIO("Extend size of posits")
             {
                 const uint8_t u8 = static_cast<uint8_t>(u16);
 
-                const posit8 p8(u8);
+                const posit8 p8 = posit8::from(u8);
 
                 const posit16 extended = width_cast<posit16>(p8);
-                const posit16 actual(u16 << 8);
+                const posit16 actual = posit16::from(u16 << 8);
 
                 REQUIRE(extended == actual);
             }

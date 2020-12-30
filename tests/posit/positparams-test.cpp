@@ -13,7 +13,7 @@ TEMPLATE_TEST_CASE_SIG("conversion to and from positparam preserves value", "[po
 
     for (uint64_t bits = 0; bits < (1ULL << Posit::width()); ++bits)
     {
-        const Posit expected(bits);
+        const Posit expected = Posit::from(bits);
 
         const auto pp = positparams<N, ES, WT>(expected);
         const Posit actual = static_cast<Posit>(pp);

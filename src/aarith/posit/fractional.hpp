@@ -88,6 +88,13 @@ fractional<N, ES, WT>::fraction_bits() const
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr uinteger<fractional<N, ES, WT>::ScratchSize, WT>
+fractional<N, ES, WT>::scratch_bits() const
+{
+    return bits;
+}
+
+template <size_t N, size_t ES, typename WT>
 fractional<N, ES, WT>& fractional<N, ES, WT>::operator=(const fractional<N, ES, WT>& other)
 {
     bits = other.bits;
