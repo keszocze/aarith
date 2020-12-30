@@ -7,26 +7,11 @@ namespace aarith {
 template <size_t N, size_t ES, typename WT>
 constexpr positparams<N, ES, WT>::positparams(const posit<N, ES, WT>& p)
 {
-    if (p.is_nar())
-    {
-        is_nar = true;
-        is_zero = false;
-        sign_bit = false;
-    }
-    else if (p.is_zero())
-    {
-        is_nar = false;
-        is_zero = true;
-        sign_bit = false;
-    }
-    else
-    {
-        is_nar = false;
-        is_zero = false;
-        sign_bit = p.is_negative();
-        scale = get_scale_value(p);
-        fraction = fractional(p);
-    }
+    is_nar = p.is_nar();
+    is_zero = p.is_zero();
+    sign_bit = p.is_negative();
+    scale = get_scale_value(p);
+    fraction = fractional(p);
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -264,26 +249,21 @@ template <size_t TargetWidth, typename TargetWordType>
     // cases, but it is up to the user to decide what they want.
     static_assert(TargetWidth >= 2, "conversion to integer requires at least two integer bits");
 
-    //
-    // handle special cases
-    //
-
     using TargetType = integer<TargetWidth, TargetWordType>;
+
+    //
+    // handle special values zero and NaR
+    //
 
     if (is_zero)
     {
         return TargetType::zero();
     }
 
-    if (scale < scale.zero())
-    {
-        return TargetType::zero();
-    }
-
     if (is_nar)
     {
-        // TODO (Schärt): We ignore over/underflows during conversion. Should
-        // we not also ignore NaR then, which is a way more rare case?
+        // NaR cannot be represented by an integer; unlike floating points
+        // there is no NaN or smiliar to return
         throw nar_error("tried to convert NaR to integer");
     }
 
