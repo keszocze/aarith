@@ -7,8 +7,8 @@
 #include <limits>
 #include <vector>
 
-#include "posit-integers.hpp"
 #include "../test-signature-ranges.hpp"
+#include "posit-integers.hpp"
 
 SCENARIO("Posit Constants")
 {
@@ -59,6 +59,36 @@ TEMPLATE_TEST_CASE_SIG("conversion from integer to <8, 2> and back", "[posit][te
     constexpr int64_t max_int = std::numeric_limits<Int>::max();
     constexpr int64_t min_int = std::numeric_limits<Int>::min();
 
+    for (const int64_t n : integers80)
+    {
+        if (n >= min_int && n <= max_int)
+        {
+            // only if n is reprsentable w/ Int run the test
+
+            const Int test_integer = static_cast<Int>(n);
+
+            const posit<8, 0> converted_to_posit(test_integer);
+            const Int converted_back_to_int = Int(converted_to_posit);
+
+            CHECK(test_integer == converted_back_to_int);
+        }
+    }
+
+    for (const int64_t n : integers81)
+    {
+        if (n >= min_int && n <= max_int)
+        {
+            // only if n is reprsentable w/ Int run the test
+
+            const Int test_integer = static_cast<Int>(n);
+
+            const posit<8, 1> converted_to_posit(test_integer);
+            const Int converted_back_to_int = Int(converted_to_posit);
+
+            CHECK(test_integer == converted_back_to_int);
+        }
+    }
+
     for (const int64_t n : integers82)
     {
         if (n >= min_int && n <= max_int)
@@ -67,7 +97,60 @@ TEMPLATE_TEST_CASE_SIG("conversion from integer to <8, 2> and back", "[posit][te
 
             const Int test_integer = static_cast<Int>(n);
 
-            const posit8 converted_to_posit(test_integer);
+            const posit<8, 2> converted_to_posit(test_integer);
+            const Int converted_back_to_int = Int(converted_to_posit);
+
+            CHECK(test_integer == converted_back_to_int);
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("conversion from unsigned integer to <8, 2> and back", "[posit][template]",
+                       ((typename Int)), AARITH_POSIT_TEST_TEMPLATE_UNSIGNED_INTEGERS)
+{
+    using namespace aarith;
+
+    constexpr uint64_t max_int = std::numeric_limits<Int>::max();
+
+    for (const uint64_t n : uintegers80)
+    {
+        if (n <= max_int)
+        {
+            // only if n is reprsentable w/ Int run the test
+
+            const Int test_integer = static_cast<Int>(n);
+
+            const posit<8, 0> converted_to_posit(test_integer);
+            const Int converted_back_to_int = Int(converted_to_posit);
+
+            CHECK(test_integer == converted_back_to_int);
+        }
+    }
+
+    for (const uint64_t n : uintegers81)
+    {
+        if (n <= max_int)
+        {
+            // only if n is reprsentable w/ Int run the test
+
+            const Int test_integer = static_cast<Int>(n);
+
+            const posit<8, 1> converted_to_posit(test_integer);
+            const Int converted_back_to_int = Int(converted_to_posit);
+
+            CHECK(test_integer == converted_back_to_int);
+        }
+    }
+
+    for (const uint64_t n : uintegers82)
+    {
+        if (n <= max_int)
+        {
+            // only if n is reprsentable w/ Int run the test
+
+            const Int test_integer = static_cast<Int>(n);
+
+            const posit<8, 2> converted_to_posit(test_integer);
             const Int converted_back_to_int = Int(converted_to_posit);
 
             CHECK(test_integer == converted_back_to_int);
