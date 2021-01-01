@@ -975,15 +975,28 @@ public:
     static constexpr size_t IntegerSize = N;
 
     /**
-     * Size of the fractional part.
+     * @brief Size of the fractional part.
+     *
+     * The biggest representable integer by a posit<N, ES> type
+     * type is
+     *
+     *   max := (2^(2^ES))^(N - 2) = 2^((2^ES) * (N -2)
+     *
+     * which means to represent that value we need at last
+     *
+     *   s := ⌈ Pd max ⌉ = ⌈ 2ᵉˢ (N - 2) ⌉
+     *
+     * bits to represent max. As such we pick this weird looking
+     * fraction size. It means that we can easily use this fraction
+     * class when converting from integer to posit.
      */
-    static constexpr size_t FractionSize = 2 * N;
+    static constexpr size_t FractionSize = (1 << ES) * N + 1;
 
     /**
      * The index of the hidden bit in scratch memory, that is the bit that
      * represents the value 2^0 = 1.
      */
-    static constexpr size_t HiddenBitIndex = 2 * N;
+    static constexpr size_t HiddenBitIndex = FractionSize;
 
     /**
      * Size of the underlying scratch memory.
@@ -1017,6 +1030,17 @@ public:
      * @param p The posit to import the fraction from.
      */
     constexpr fractional(const posit<N, ES, WT>& p);
+
+    /**
+     * @brief Construct fractional from integer fraction.
+     *
+     * If argument frac is 00110010, then the fractional is constructed to
+     * 0.00110010, that is the argument frac is taken as-is. The integer
+     * part of the fractional is initalized to zero.
+     *
+     * @param frac The fraction to import.
+     */
+    constexpr fractional(const uinteger<FractionSize, WT>& frac);
 
     /**
      * @brief Assignment operator.
@@ -1181,6 +1205,15 @@ private:
      * the truncated flag.
      */
     bool truncated;
+
+    /**
+     * @brief Import integer fraction.
+     *
+     * If fraction_bits are set to 01100100, then after the call the fraction
+     * is set to 0.01100100.
+     */
+    template <size_t IN, typename IWT>
+    void import_fraction_bits(const uinteger<IN, IWT>& fraction_bits);
 };
 
 //
@@ -1223,7 +1256,7 @@ public:
      * @param value The integer to convert.
      */
     template <size_t ValueWidth, typename ValueWordType>
-    constexpr positparams(const integer<ValueWidth, ValueWordType>& value);
+    positparams(const integer<ValueWidth, ValueWordType>& value);
 
     /**
      * @brief Copy constructor.
@@ -1381,6 +1414,8 @@ private:
      */
     static void sub_fractions(positparams& dst, const fractional<N, ES, WT>& lfrac,
                               const fractional<N, ES, WT>& rfrac);
+
+    void ensure_standard_form();
 };
 
 } // namespace aarith

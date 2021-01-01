@@ -35,12 +35,12 @@ constexpr fractional<N, ES, WT>::fractional(const posit<N, ES, WT>& p)
     if (!extracted.is_zero())
     {
         const size_t nfrac = get_num_fraction_bits(p);
-        extracted = extracted << (N - nfrac);
+        extracted = extracted << (extracted.width() - nfrac);
     }
 
     // copy into our bits
 
-    bits = bits | (width_cast<ScratchSize>(extracted) << N);
+    import_fraction_bits(extracted);
 
     // make hidden bit explicit
 
@@ -50,6 +50,13 @@ constexpr fractional<N, ES, WT>::fractional(const posit<N, ES, WT>& p)
     // as we have done no shift operations so far
 
     truncated = false;
+}
+
+template <size_t N, size_t ES, typename WT>
+constexpr fractional<N, ES, WT>::fractional(
+    const uinteger<fractional<N, ES, WT>::FractionSize, WT>& frac)
+{
+    import_fraction_bits(frac);
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -231,6 +238,18 @@ std::ostream& operator<<(std::ostream& os, const fractional<SN, SES, SWT>& f)
     os << to_binary(f.fraction_bits());
 
     return os;
+}
+
+template <size_t N, size_t ES, typename WT>
+template <size_t IN, typename IWT>
+void fractional<N, ES, WT>::import_fraction_bits(const uinteger<IN, IWT>& fraction_bits)
+{
+    static_assert(FractionSize >= fraction_bits.width(), "unexpected displacement");
+
+    constexpr size_t displacement = FractionSize - fraction_bits.width();
+    const auto extended = width_cast<ScratchSize>(fraction_bits);
+
+    bits = extended << displacement;
 }
 
 } // namespace aarith

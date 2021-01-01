@@ -479,6 +479,24 @@ template <size_t Width, typename WordType>
 }
 
 /**
+ * @brief Computes the absolute value of a given integer.
+ *
+ * Overload for unsigned integers. As all arguments are unsigned, this
+ * function returns the argument extended by one bit.
+ *
+ * Having this overloard is useful when writing generic template code.
+ *
+ * @tparam Width The width of the integer
+ * @param n The integer to be "absolute valued"
+ * @return The absolute value of the integer
+ */
+template <size_t Width, typename WordType>
+[[nodiscard]] constexpr auto expanding_abs(const uinteger<Width, WordType>& n) -> uinteger<Width, WordType>
+{
+    return n;
+}
+
+/**
  * @brief Adds two signed integers of, possibly, different bit widths.
  *
  * This is an implementation using a more functional style of programming. It is not particularly
@@ -1158,6 +1176,28 @@ constexpr integer<N, WT> ilog(const integer<N, WT>& n, const integer<N, WT>& bas
     assert(i <= max);
 
     return IntegerType(i);
+}
+
+template <size_t N, class WT>
+constexpr uinteger<N, WT> ilog(const uinteger<N, WT>& n, const uinteger<N, WT>& base)
+{
+    const integer<N + 1, WT> signed_n = width_cast<N + 1>(n);
+    const integer<N + 1, WT> signed_base = width_cast<N + 1>(base);
+
+    const auto signed_result = ilog(signed_n, signed_base);
+    return width_cast<N>(signed_result);
+}
+
+/**
+ * @brief Compute the integer logarithm to base 2.
+ *
+ * This function computes ceil(log_2(n)).
+ */
+template <typename Integer>
+constexpr Integer ilog2(const Integer& n)
+{
+    constexpr auto two = n.one() + n.one();
+    return ilog(n, two);
 }
 
 /**

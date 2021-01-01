@@ -90,9 +90,8 @@ constexpr posit<N, ES, WT>::posit(uint64_t value)
 template <size_t N, size_t ES, typename WT>
 template <size_t ValueWidth, typename ValueWordType>
 constexpr posit<N, ES, WT>::posit(const uinteger<ValueWidth, ValueWordType>& value)
+    : posit(integer<ValueWidth + 1, ValueWordType>(value))
 {
-    static_assert_template_parameters();
-    throw std::logic_error("not implemented");
 }
 
 template <size_t N, size_t ES, typename WT> constexpr posit<N, ES, WT>::posit(double x)
@@ -599,7 +598,7 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT>
 posit<N, ES, WT>::operator*(const posit<N, ES, WT>& rhs) const
 {
-    throw std::logic_error("not implemented");
+    throw std::logic_error("operator*(posit, posit) not implemented");
 }
 
 template <size_t N, size_t ES, typename WT>

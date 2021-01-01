@@ -107,3 +107,9 @@
 #define AARITH_POSIT_TEST_TEMPLATE_EXHAUSTABLE                                                     \
     (5, 0), (5, 1), (5, 2), (6, 0), (6, 1), (6, 2), (8, 0), (8, 1), (8, 2), (8, 3), (16, 0),       \
         (16, 1), (16, 2)
+
+#define AARITH_POSIT_TEST_TEMPLATE_SIGNED_INTEGERS                                                 \
+    (int8_t), (int16_t), (int32_t), (int64_t)
+
+#define AARITH_POSIT_TEST_TEMPLATE_UNSIGNED_INTEGERS                                               \
+    (uint8_t), (uint16_t), (uint32_t), (uint64_t)

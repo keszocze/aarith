@@ -1,9 +1,14 @@
 #include <catch.hpp>
-#include <iostream>
 
 #include <aarith/integer.hpp>
 #include <aarith/posit.hpp>
+#include <cstdint>
 #include <iostream>
+#include <limits>
+#include <vector>
+
+#include "posit-integers.hpp"
+#include "../test-signature-ranges.hpp"
 
 SCENARIO("Posit Constants")
 {
@@ -42,6 +47,30 @@ SCENARIO("Posit Constants")
 
             const auto useed = P8::useed();
             CHECK(useed == decltype(useed)(16));
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("conversion from integer to <8, 2> and back", "[posit][template]",
+                       ((typename Int)), AARITH_POSIT_TEST_TEMPLATE_SIGNED_INTEGERS)
+{
+    using namespace aarith;
+
+    constexpr int64_t max_int = std::numeric_limits<Int>::max();
+    constexpr int64_t min_int = std::numeric_limits<Int>::min();
+
+    for (const int64_t n : integers82)
+    {
+        if (n >= min_int && n <= max_int)
+        {
+            // only if n is reprsentable w/ Int run the test
+
+            const Int test_integer = static_cast<Int>(n);
+
+            const posit8 converted_to_posit(test_integer);
+            const Int converted_back_to_int = Int(converted_to_posit);
+
+            CHECK(test_integer == converted_back_to_int);
         }
     }
 }

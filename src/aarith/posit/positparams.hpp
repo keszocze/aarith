@@ -12,21 +12,14 @@ constexpr positparams<N, ES, WT>::positparams(const posit<N, ES, WT>& p)
     sign_bit = p.is_negative();
     scale = get_scale_value(p);
     fraction = fractional(p);
+
+    ensure_standard_form();
 }
 
 template <size_t N, size_t ES, typename WT>
 template <size_t ValueWidth, typename ValueWordType>
-constexpr positparams<N, ES, WT>::positparams(const integer<ValueWidth, ValueWordType>& value)
+positparams<N, ES, WT>::positparams(const integer<ValueWidth, ValueWordType>& value)
 {
-    //
-    // first set up some constants ands type defintions
-    //
-
-    using ValueType = decltype(value);
-
-    constexpr ValueType es(ES);
-    constexpr ValueType powes = ValueType::one() << es;
-
     //
     // initalize flags
     //
@@ -36,7 +29,7 @@ constexpr positparams<N, ES, WT>::positparams(const integer<ValueWidth, ValueWor
     sign_bit = value.is_negative();
 
     //
-    // for zero we have to do nothing
+    // handle edge cases
     //
 
     if (value.is_zero())
@@ -44,13 +37,54 @@ constexpr positparams<N, ES, WT>::positparams(const integer<ValueWidth, ValueWor
         return;
     }
 
+    /*
+      // TODO (Schärtl): Enable once dependencies are implemented.
+    using PositType = posit<N, ES, WT>;
+    using ValueType = integer<ValueWidth, ValueWordType>;
+
+    constexpr auto posit_max = PositType::max();
+    constexpr auto posit_min = PositType::min();
+
+    // TODO (Schärtl): Ensure constexpr
+    const auto integer_max = ValueType(posit_max);
+    const auto integer_min = ValueType(posit_min);
+
+    if (value >= integer_max)
+    {
+        *this = positparams(posit_max);
+        return;
+    }
+
+    if (value <= integer_min)
+    {
+        *this = positparams(posit_min);
+        return;
+    }
+    */
+
     //
-    // compute scale; if scale is already too big to represent, just set
-    // scale to the maximum value
+    // convert integer to fraction
     //
 
-    const ValueType scale = ilog(value, powes);
-    (void)scale;
+    const auto abs_value = expanding_abs(value);
+
+    constexpr size_t fs = decltype(fraction)::FractionSize;
+    const auto intfraction = width_cast<fs>(abs_value);
+
+    const auto leading_zeroes = count_leading_zeroes(intfraction);
+    fraction = fractional<N, ES, WT>(intfraction << leading_zeroes);
+
+    //
+    // set correct scale
+    //
+
+    scale = ilog2(abs_value) + abs_value.one();
+
+    //
+    // normalize
+    //
+
+    ensure_standard_form();
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -379,6 +413,11 @@ positparams<N, ES, WT>::operator+(const positparams<N, ES, WT>& other) const
     positparams<N, ES, WT> sum;
     sum_fractions(sum, lhs, rhs);
 
+    //
+    // return standard representation
+    //
+
+    sum.ensure_standard_form();
     return sum;
 }
 
@@ -548,5 +587,37 @@ std::ostream& operator<<(std::ostream& os, const positparams<SN, SES, SWT>& p)
     return os << "(nar=" << p.is_nar << " is_zero=" << p.is_zero << " sign=" << p.sign_bit
               << " scale=" << p.scale << " fraction=" << p.fraction << ")";
 }
+
+template <size_t N, size_t ES, typename WT>
+void positparams<N, ES, WT>::ensure_standard_form()
+{
+    if (fraction.integer_bits())
+    {
+        // integer part is non-zero; shift fraction around such that we get
+        // the standard form 0001.xxxx
+
+        constexpr auto hidden_bit_format = decltype(fraction.integer_bits())::one();
+
+        while (fraction.integer_bits() != hidden_bit_format)
+        {
+            fraction = fraction >> 1;
+            scale = scale + scale.one();
+        }
+    }
+    else if (fraction.fraction_bits())
+    {
+        // the integer part is zero, but the fraction part is non-zero; shift
+        // fraction around such that we get the standard form 0001.xxxx
+
+        assert(!fraction.integer_bits());
+
+        while (!fraction.integer_bits().lsb())
+        {
+            fraction = fraction << 1;
+            scale = scale - scale.one();
+        }
+    }
+}
+
 
 } // namespace aarith
