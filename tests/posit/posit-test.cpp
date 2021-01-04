@@ -103,6 +103,21 @@ TEMPLATE_TEST_CASE_SIG("conversion from integer to <8, 2> and back", "[posit][te
             CHECK(test_integer == converted_back_to_int);
         }
     }
+
+    for (const int64_t n : integers162)
+    {
+        if (n >= min_int && n <= max_int)
+        {
+            // only if n is reprsentable w/ Int run the test
+
+            const Int test_integer = static_cast<Int>(n);
+
+            const posit<16, 2> converted_to_posit(test_integer);
+            const Int converted_back_to_int = Int(converted_to_posit);
+
+            CHECK(test_integer == converted_back_to_int);
+        }
+    }
 }
 
 TEMPLATE_TEST_CASE_SIG("conversion from unsigned integer to <8, 2> and back", "[posit][template]",
@@ -151,6 +166,21 @@ TEMPLATE_TEST_CASE_SIG("conversion from unsigned integer to <8, 2> and back", "[
             const Int test_integer = static_cast<Int>(n);
 
             const posit<8, 2> converted_to_posit(test_integer);
+            const Int converted_back_to_int = Int(converted_to_posit);
+
+            CHECK(test_integer == converted_back_to_int);
+        }
+    }
+
+    for (const uint64_t n : uintegers162)
+    {
+        if (n <= max_int)
+        {
+            // only if n is reprsentable w/ Int run the test
+
+            const Int test_integer = static_cast<Int>(n);
+
+            const posit<16, 2> converted_to_posit(test_integer);
             const Int converted_back_to_int = Int(converted_to_posit);
 
             CHECK(test_integer == converted_back_to_int);
