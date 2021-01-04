@@ -1256,7 +1256,7 @@ public:
      * @param value The integer to convert.
      */
     template <size_t ValueWidth, typename ValueWordType>
-    positparams(const integer<ValueWidth, ValueWordType>& value);
+    constexpr positparams(const integer<ValueWidth, ValueWordType>& value);
 
     /**
      * @brief Copy constructor.

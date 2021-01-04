@@ -190,6 +190,55 @@ static void require_cmp(const aarith::posit<N, ES, WT>& x, const aarith::posit<N
     }
 }
 
+SCENARIO("Integer conversion limits")
+{
+    GIVEN("Standard integers too big to represent with a given posit type")
+    {
+        THEN("Assert that the result is the maximum representable posit")
+        {
+            using namespace aarith;
+
+            using P80 = posit<8, 0>;
+            using P81 = posit<8, 1>;
+            using P82 = posit<8, 2>;
+
+            constexpr int32_t max_int = std::numeric_limits<int32_t>::max();
+            constexpr int32_t min_int = std::numeric_limits<int32_t>::min();
+
+            REQUIRE(P80(64) == P80::max());
+            REQUIRE(P80(65) == P80::max());
+            REQUIRE(P80(64000) == P80::max());
+            REQUIRE(P80(64000000) == P80::max());
+            REQUIRE(P80(max_int) == P80::max());
+
+            REQUIRE(P80(-64) == P80::min());
+            REQUIRE(P80(-65) == P80::min());
+            REQUIRE(P80(-64000) == P80::min());
+            REQUIRE(P80(min_int) == P80::min());
+
+            REQUIRE(P81(4096) == P81::max());
+            REQUIRE(P81(4097) == P81::max());
+            REQUIRE(P81(6666666) == P81::max());
+            REQUIRE(P81(max_int) == P81::max());
+
+            REQUIRE(P81(-4096) == P81::min());
+            REQUIRE(P81(-4097) == P81::min());
+            REQUIRE(P81(-6666666) == P81::min());
+            REQUIRE(P81(min_int) == P81::min());
+
+            REQUIRE(P82(16777216) == P82::max());
+            REQUIRE(P82(16777217) == P82::max());
+            REQUIRE(P82(66666666) == P82::max());
+            REQUIRE(P82(max_int) == P82::max());
+
+            REQUIRE(P82(-16777216) == P82::min());
+            REQUIRE(P82(-16777217) == P82::min());
+            REQUIRE(P82(-66666666) == P82::min());
+            REQUIRE(P82(min_int) == P82::min());
+        }
+    }
+}
+
 SCENARIO("Check comparison comparisons")
 {
     // we have no trouble representing all values of a <8,2> posit with double

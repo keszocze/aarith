@@ -18,7 +18,7 @@ constexpr positparams<N, ES, WT>::positparams(const posit<N, ES, WT>& p)
 
 template <size_t N, size_t ES, typename WT>
 template <size_t ValueWidth, typename ValueWordType>
-positparams<N, ES, WT>::positparams(const integer<ValueWidth, ValueWordType>& value)
+constexpr positparams<N, ES, WT>::positparams(const integer<ValueWidth, ValueWordType>& value)
 {
     //
     // initalize flags
@@ -36,31 +36,6 @@ positparams<N, ES, WT>::positparams(const integer<ValueWidth, ValueWordType>& va
     {
         return;
     }
-
-    /*
-      // TODO (Schärtl): Enable once dependencies are implemented.
-    using PositType = posit<N, ES, WT>;
-    using ValueType = integer<ValueWidth, ValueWordType>;
-
-    constexpr auto posit_max = PositType::max();
-    constexpr auto posit_min = PositType::min();
-
-    // TODO (Schärtl): Ensure constexpr
-    const auto integer_max = ValueType(posit_max);
-    const auto integer_min = ValueType(posit_min);
-
-    if (value >= integer_max)
-    {
-        *this = positparams(posit_max);
-        return;
-    }
-
-    if (value <= integer_min)
-    {
-        *this = positparams(posit_min);
-        return;
-    }
-    */
 
     //
     // convert integer to fraction
@@ -588,8 +563,7 @@ std::ostream& operator<<(std::ostream& os, const positparams<SN, SES, SWT>& p)
               << " scale=" << p.scale << " fraction=" << p.fraction << ")";
 }
 
-template <size_t N, size_t ES, typename WT>
-void positparams<N, ES, WT>::ensure_standard_form()
+template <size_t N, size_t ES, typename WT> void positparams<N, ES, WT>::ensure_standard_form()
 {
     if (fraction.integer_bits())
     {
@@ -618,6 +592,5 @@ void positparams<N, ES, WT>::ensure_standard_form()
         }
     }
 }
-
 
 } // namespace aarith
