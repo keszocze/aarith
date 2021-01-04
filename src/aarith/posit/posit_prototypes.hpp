@@ -970,7 +970,7 @@ template <size_t N, size_t ES, typename WT> class fractional
 {
 public:
     /**
-     * Size of the integer part.
+     * @brief Size of the integer part.
      */
     static constexpr size_t IntegerSize = N;
 
@@ -984,13 +984,13 @@ public:
      *
      * which means to represent that value we need at last
      *
-     *   s := ⌈ Pd max ⌉ = ⌈ 2ᵉˢ (N - 2) ⌉
+     *   s := ⌈ ld max ⌉ = ⌈ 2ᵉˢ (N - 2) ⌉
      *
      * bits to represent max. As such we pick this weird looking
      * fraction size. It means that we can easily use this fraction
      * class when converting from integer to posit.
      */
-    static constexpr size_t FractionSize = (1 << ES) * N + 1;
+    static constexpr size_t FractionSize = (1 << ES) * 2 * N;
 
     /**
      * The index of the hidden bit in scratch memory, that is the bit that
@@ -1117,6 +1117,8 @@ public:
      */
     [[nodiscard]] constexpr fractional operator-(const fractional<N, ES, WT>& other) const;
 
+    [[nodiscard]] constexpr fractional operator*(const fractional<N, ES, WT>& other) const;
+
     /**
      * @param shift The number of places to shift.
      * @return This fractional shifted to the left.
@@ -1151,6 +1153,8 @@ public:
      * @return Truncated flag.
      */
     [[nodiscard]] constexpr bool has_been_truncated() const;
+
+    void set_not_truncated();
 
     /**
      * @return Whether this object equals zero.
@@ -1201,8 +1205,7 @@ private:
      * Keep track whether shifting left or right truncated any one bits away.
      * During construction from posit or default constructor, truncated is set
      * to false.  Any shift operations that truncate '1' bits set this flag to
-     * one. It cannot be reset and in particular assignments copy the state of
-     * the truncated flag.
+     * one.
      */
     bool truncated;
 
@@ -1315,6 +1318,13 @@ public:
     [[nodiscard]] constexpr positparams operator+(const positparams& rhs) const;
 
     /**
+     * @brief Multiplication of two posit in parameter representation.
+     *
+     * @return The product of this and other.
+     */
+    [[nodiscard]] constexpr positparams operator*(const positparams& rhs) const;
+
+    /**
      * @brief Overload for writing fractional values to a stream.
      */
     template <size_t SN, size_t SES, typename SWT>
@@ -1357,14 +1367,19 @@ private:
     constexpr positparams();
 
     /**
-     * @return Return parameter object that represents zero.
+     * @return Parameter object that represents zero.
      */
     [[nodiscard]] static constexpr positparams<N, ES, WT> zero();
 
     /**
-     * @return Return parameter object that represents NaR.
+     * @return Parameter object that represents NaR.
      */
     [[nodiscard]] static constexpr positparams<N, ES, WT> nar();
+
+    /**
+     * @return Parameter object that represent the smallest positive value.
+     */
+    [[nodiscard]] static constexpr positparams<N, ES, WT> minpos();
 
     /**
      * @brief Return p, q in order of scale.

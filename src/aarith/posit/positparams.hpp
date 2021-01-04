@@ -95,7 +95,7 @@ template <size_t N, size_t ES, typename WT>
     using Integer = integer<N, WT>;
 
     //
-    // if the result is nar or zero, things are easy
+    // If the result is nar or zero, things are easy.
     //
 
     if (is_nar)
@@ -109,7 +109,7 @@ template <size_t N, size_t ES, typename WT>
     }
 
     //
-    // compute parameters necessary to construct the posit
+    // Compute parameters necessary to construct the posit.
     //
 
     constexpr Integer powes = Integer(1 << ES);
@@ -119,22 +119,22 @@ template <size_t N, size_t ES, typename WT>
     const Integer exponent = absmod(scale, powes);
 
     //
-    // set bits; keep count of the currently bit being set with 'i'
+    // Set bits. Keep count of the currently bit being set with 'i'.
     //
 
     uinteger<N + ES + N> bits;
     ssize_t i = bits.width() - 1;
 
     //
-    // set sign bit; as we are dealing with the absolute value and only set
+    // Set sign bit. As we are dealing with the absolute value and only set
     // the sign bit at the end, there is actually nothing to do but increment
-    // the counter i
+    // the counter i.
     //
 
     i -= 1;
 
     //
-    // set regime bits
+    // Set regime bits.
     //
 
     Integer nregime;
@@ -170,7 +170,7 @@ template <size_t N, size_t ES, typename WT>
     }
 
     //
-    // set exponent bits
+    // Set exponent bits.
     //
 
     for (ssize_t eprinted = 0; eprinted < es && i >= 0; ++eprinted, --i)
@@ -181,7 +181,7 @@ template <size_t N, size_t ES, typename WT>
     }
 
     //
-    // set fraction bits
+    // Set fraction bits.
     //
 
     const auto fraction_bits = fraction.fraction_bits();
@@ -193,8 +193,8 @@ template <size_t N, size_t ES, typename WT>
     }
 
     //
-    // split up bitstring into "posit_bits" which we use to construct the
-    // posit and "truncated" which we have to take a look at for rounding
+    // Split up bitstring into "posit_bits" which we use to construct the
+    // posit and "truncated" which we have to take a look at for rounding.
     //
 
     constexpr size_t posit_bits_width = N;
@@ -207,13 +207,13 @@ template <size_t N, size_t ES, typename WT>
     const uinteger<tail_width, WT> tail = width_cast<tail_width>(truncated);
 
     //
-    // construct the unrounded posit
+    // Construct the unrounded posit.
     //
 
     Posit x = Posit::from(posit_bits);
 
     //
-    // do rounding if necessary
+    // Do rounding if necessary.
     //
 
     const bool last = posit_bits.bit(0);
@@ -222,18 +222,25 @@ template <size_t N, size_t ES, typename WT>
 
     if ((last && after) || (after && tailbit))
     {
-#ifdef NDEBUG
-        // we should really only round if the generated posit is not as
-        // expected
-        positparams px(x);
-        assert(px.scale != scale || px.fraction != fraction);
-#endif
-
         x = x.incremented_real();
     }
 
     //
-    // apply twos complement for negative values
+    // Handle special case zero in return. Zero should only be returned when
+    // the result is actually zero (e.g. when multiplying with zero). When the
+    // result is very close to zero, but not quite zero, we have to return
+    // minpos instead to indicate that the result is something close but not
+    // quite zero.
+    //
+
+    if (x.is_zero())
+    {
+        assert(!is_zero); // already taken care of at the beginning
+        x = x.minpos();
+    }
+
+    //
+    // Apply twos complement for negative values.
     //
 
     if (sign_bit)
@@ -397,6 +404,41 @@ positparams<N, ES, WT>::operator+(const positparams<N, ES, WT>& other) const
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr positparams<N, ES, WT>
+positparams<N, ES, WT>::operator*(const positparams<N, ES, WT>& other) const
+{
+    //
+    // handle special cases NaR and zero
+    //
+
+    if (is_nar || other.is_nar)
+    {
+        return nar();
+    }
+
+    if (is_zero || other.is_zero)
+    {
+        return zero();
+    }
+
+    //
+    // do multiplication
+    //
+
+    positparams<N, ES, WT> lhs = *this;
+    positparams<N, ES, WT> rhs = other;
+    positparams<N, ES, WT> prod;
+
+    prod.sign_bit = lhs.sign_bit ^ rhs.sign_bit;
+    prod.scale = lhs.scale + rhs.scale;
+    prod.fraction = lhs.fraction * rhs.fraction;
+
+    prod.ensure_standard_form();
+
+    return prod;
+}
+
+template <size_t N, size_t ES, typename WT>
 constexpr positparams<N, ES, WT>::positparams()
     : is_nar(false)
     , is_zero(false)
@@ -418,6 +460,12 @@ template <size_t N, size_t ES, typename WT>
     positparams<N, ES, WT> result;
     result.is_nar = true;
     return result;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr positparams<N, ES, WT> positparams<N, ES, WT>::minpos()
+{
+    return positparams(posit<N, ES, WT>::minpos());
 }
 
 template <size_t N, size_t ES, typename WT>

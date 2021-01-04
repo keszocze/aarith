@@ -513,10 +513,7 @@ posit<N, ES, WT>::operator+(const posit<N, ES, WT>& rhs) const
     const auto lparams = positparams<N, ES, WT>(*this);
     const auto rparams = positparams<N, ES, WT>(rhs);
 
-    const auto sumparams = lparams + rparams;
-    auto psum = posit(sumparams);
-
-    return psum;
+    return posit(lparams + rparams);
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -598,7 +595,10 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT>
 posit<N, ES, WT>::operator*(const posit<N, ES, WT>& rhs) const
 {
-    throw std::logic_error("operator*(posit, posit) not implemented");
+    const auto lparams = positparams<N, ES, WT>(*this);
+    const auto rparams = positparams<N, ES, WT>(rhs);
+
+    return posit(lparams * rparams);
 }
 
 template <size_t N, size_t ES, typename WT>

@@ -65,6 +65,11 @@ template <size_t N, size_t ES, typename WT>
     return truncated;
 }
 
+template <size_t N, size_t ES, typename WT> void fractional<N, ES, WT>::set_not_truncated()
+{
+    truncated = false;
+}
+
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool fractional<N, ES, WT>::is_zero() const
 {
@@ -172,6 +177,44 @@ fractional<N, ES, WT>::operator-(const fractional& other) const
 
     f.bits = bits - other.bits;
     f.truncated = truncated || other.truncated;
+
+    return f;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr fractional<N, ES, WT>
+fractional<N, ES, WT>::operator*(const fractional& other) const
+{
+    //
+    // Start by computing the product of the two fractions. We
+    // need enough scratch space so we don't lose precision.
+    //
+    // When computing the product p = n * m of two unsigned
+    // integers n and m of length l, the resulting p will require
+    // at most
+    //
+    //   ⌈ log₂(p) ⌉ = 2l
+    //
+    // bits to represent the product.
+    //
+
+    constexpr size_t multiply_scratch_size = 2 * ScratchSize;
+
+    const auto lhs = width_cast<multiply_scratch_size>(bits);
+    const auto rhs = width_cast<multiply_scratch_size>(other.bits);
+
+    const auto product = lhs * rhs;
+    const auto truncated_product_bits = width_cast<FractionSize>(product);
+    const auto scaled = product >> FractionSize;
+
+    //
+    // Now we can write the result back into a fractional value.
+    //
+
+    fractional<N, ES, WT> f;
+
+    f.bits = width_cast<ScratchSize>(scaled);
+    f.truncated = truncated_product_bits || truncated || other.truncated;
 
     return f;
 }
