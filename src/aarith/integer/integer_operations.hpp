@@ -491,7 +491,8 @@ template <size_t Width, typename WordType>
  * @return The absolute value of the integer
  */
 template <size_t Width, typename WordType>
-[[nodiscard]] constexpr auto expanding_abs(const uinteger<Width, WordType>& n) -> uinteger<Width, WordType>
+[[nodiscard]] constexpr auto expanding_abs(const uinteger<Width, WordType>& n)
+    -> uinteger<Width, WordType>
 {
     return n;
 }
@@ -1193,10 +1194,9 @@ constexpr uinteger<N, WT> ilog(const uinteger<N, WT>& n, const uinteger<N, WT>& 
  *
  * This function computes ceil(log_2(n)).
  */
-template <typename Integer>
-constexpr Integer ilog2(const Integer& n)
+template <typename Integer> constexpr Integer ilog2(const Integer& n)
 {
-    constexpr auto two = n.one() + n.one();
+    const auto two = n.one() + n.one();
     return ilog(n, two);
 }
 

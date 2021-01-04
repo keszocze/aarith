@@ -289,7 +289,7 @@ void fractional<N, ES, WT>::import_fraction_bits(const uinteger<IN, IWT>& fracti
 {
     static_assert(FractionSize >= IN, "unexpected displacement");
 
-    constexpr size_t displacement = FractionSize - fraction_bits.width();
+    const size_t displacement = FractionSize - fraction_bits.width();
     const auto extended = width_cast<ScratchSize>(fraction_bits);
 
     bits = extended << displacement;

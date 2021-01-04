@@ -300,7 +300,7 @@ template <size_t TargetWidth, typename TargetWordType>
     // where we subtract 8 from the scale as the dot was shifted 8 places
     // (FractionSize) to the right.
 
-    constexpr integer<N, WT> fraction_size(fraction.FractionSize);
+    const integer<N, WT> fraction_size(fraction.FractionSize);
 
     auto intfrac = fraction.scratch_bits();
     integer<N, WT> intscale = scale - fraction_size;
