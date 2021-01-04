@@ -287,7 +287,7 @@ template <size_t N, size_t ES, typename WT>
 template <size_t IN, typename IWT>
 void fractional<N, ES, WT>::import_fraction_bits(const uinteger<IN, IWT>& fraction_bits)
 {
-    static_assert(FractionSize >= fraction_bits.width(), "unexpected displacement");
+    static_assert(FractionSize >= IN, "unexpected displacement");
 
     constexpr size_t displacement = FractionSize - fraction_bits.width();
     const auto extended = width_cast<ScratchSize>(fraction_bits);
