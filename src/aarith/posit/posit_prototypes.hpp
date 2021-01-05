@@ -518,6 +518,16 @@ public:
      */
     [[nodiscard]] constexpr posit& operator*=(const posit& rhs);
 
+    /**
+     * @brief Return this divided by other.
+     */
+    [[nodiscard]] constexpr posit operator/(const posit& rhs) const;
+
+    /**
+     * @brief Set this to this divided by other.
+     */
+    [[nodiscard]] constexpr posit& operator/=(const posit& rhs);
+
     //
     // Constants
     //
@@ -1109,7 +1119,7 @@ public:
      *
      * If the result is too large or too small to fit in the underlying
      * storage, the overflowed/underflowed bits are discarded.
-
+     *
      * The returned fractional has the truncated flag set only if any of the
      * two operands also have the truncated flag set.
      *
@@ -1117,7 +1127,25 @@ public:
      */
     [[nodiscard]] constexpr fractional operator-(const fractional<N, ES, WT>& other) const;
 
+    /**
+     * @brief Multiplication of two fractional values.
+     *
+     * If the result is too large or too small to fit in the underlying
+     * storage, the overflowed/underflowed bits are discarded.
+     *
+     * @return this multiplied with other.
+     */
     [[nodiscard]] constexpr fractional operator*(const fractional<N, ES, WT>& other) const;
+
+    /**
+     * @brief Division of two fractional values.
+     *
+     * If the result is too large or too small to fit in the underlying
+     * storage, the overflowed/underflowed bits are discarded.
+     *
+     * @return this divided by other.
+     */
+    [[nodiscard]] constexpr fractional operator/(const fractional<N, ES, WT>& other) const;
 
     /**
      * @param shift The number of places to shift.
@@ -1323,6 +1351,13 @@ public:
      * @return The product of this and other.
      */
     [[nodiscard]] constexpr positparams operator*(const positparams& rhs) const;
+
+    /**
+     * @brief Division of two posit in parameter representation.
+     *
+     * @return This divided by rhs.
+     */
+    [[nodiscard]] constexpr positparams operator/(const positparams& rhs) const;
 
     /**
      * @brief Overload for writing fractional values to a stream.

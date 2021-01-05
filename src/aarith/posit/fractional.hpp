@@ -221,6 +221,28 @@ fractional<N, ES, WT>::operator*(const fractional& other) const
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr fractional<N, ES, WT>
+fractional<N, ES, WT>::operator/(const fractional& other) const
+{
+    // compute w/o loss
+
+    constexpr size_t division_scratch_size = FractionSize + ScratchSize;
+
+    const auto lhs = width_cast<division_scratch_size>(bits);
+    const auto rhs = width_cast<division_scratch_size>(other.bits);
+    const auto result = (lhs << FractionSize) / rhs;
+
+    // write back
+
+    fractional<N, ES, WT> f;
+
+    f.bits = width_cast<ScratchSize>(result);
+    f.truncated = truncated || other.truncated;
+
+    return f;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr fractional<N, ES, WT>
 fractional<N, ES, WT>::operator<<(const size_t shift) const
 {
     const auto truncated_bits = bits >> (N - shift);

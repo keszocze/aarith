@@ -439,6 +439,41 @@ positparams<N, ES, WT>::operator*(const positparams<N, ES, WT>& other) const
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr positparams<N, ES, WT>
+positparams<N, ES, WT>::operator/(const positparams<N, ES, WT>& other) const
+{
+    //
+    // handle special cases NaR and zero
+    //
+
+    if (is_nar || other.is_nar || other.is_zero)
+    {
+        return nar();
+    }
+
+    if (is_zero)
+    {
+        return zero();
+    }
+
+    //
+    // do division
+    //
+
+    positparams<N, ES, WT> lhs = *this;
+    positparams<N, ES, WT> rhs = other;
+    positparams<N, ES, WT> prod;
+
+    prod.sign_bit = lhs.sign_bit ^ rhs.sign_bit;
+    prod.scale = lhs.scale - rhs.scale;
+    prod.fraction = lhs.fraction / rhs.fraction;
+
+    prod.ensure_standard_form();
+
+    return prod;
+}
+
+template <size_t N, size_t ES, typename WT>
 constexpr positparams<N, ES, WT>::positparams()
     : is_nar(false)
     , is_zero(false)
