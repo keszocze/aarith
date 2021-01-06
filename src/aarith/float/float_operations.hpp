@@ -1,25 +1,25 @@
 #pragma once
 
 #include <aarith/core/traits.hpp>
-#include <aarith/float/normalized_float.hpp>
+#include <aarith/float/floating_point.hpp>
 
 namespace aarith {
 
 /**
- * @brief Addition of two normalized_floats using the FAU adder: lhs+rhs
+ * @brief Addition of two floating_points using the FAU adder: lhs+rhs
  *
  * @param lhs The first number that is to be summed up
  * @param rhs The second number that is to be summed up
  * @param bits The number of most-significant bits that are calculated of the mantissa addition
  * @tparam E Width of exponent
- * @tparam M Width of mantissa including the leading 1
+ * @tparam M Width of mantissa
  *
  * @return The sum
  *
  */
 template <size_t E, size_t M, class Function_add, class Function_sub>
-[[nodiscard]] auto add_(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs,
-                        Function_add fun_add, Function_sub fun_sub) -> normalized_float<E, M>
+[[nodiscard]] auto add_(const floating_point<E, M> lhs, const floating_point<E, M> rhs,
+                        Function_add fun_add, Function_sub fun_sub) -> floating_point<E, M>
 {
     // order operands
     if (abs(lhs) < abs(rhs))
@@ -38,17 +38,23 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
     const auto exponent_delta =
         sub(width_cast<E + 1>(lhs.get_exponent()), width_cast<E + 1>(rhs.get_exponent()));
 
-    const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
+    auto extra_shift = 0U;
+    if (lhs.is_normalized() && !rhs.is_normalized())
+    {
+        extra_shift = 1;
+    }
+
+    const auto new_mantissa = rhs.get_full_mantissa() >> (exponent_delta.word(0) - extra_shift);
     const auto mantissa_sum = fun_add(lhs.get_full_mantissa(), new_mantissa);
 
-    normalized_float<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(),
-                                                      mantissa_sum);
+    floating_point<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(),
+                                                    mantissa_sum);
 
     return normalize<E, mantissa_sum.width() - 1, M>(sum);
 }
 
 /**
- * @brief Subtraction with normalized_floats using the FAU adder: lhs-rhs.
+ * @brief Subtraction with floating_points using the FAU adder: lhs-rhs.
  *
  * @param lhs The minuend
  * @param rhs The subtrahend
@@ -60,8 +66,8 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
  *
  */
 template <size_t E, size_t M, class Function_add, class Function_sub>
-[[nodiscard]] auto sub_(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs,
-                        Function_add fun_add, Function_sub fun_sub) -> normalized_float<E, M>
+[[nodiscard]] auto sub_(const floating_point<E, M> lhs, const floating_point<E, M> rhs,
+                        Function_add fun_add, Function_sub fun_sub) -> floating_point<E, M>
 {
     if (abs(lhs) < abs(rhs))
     {
@@ -78,16 +84,23 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
     }
 
     const auto exponent_delta = sub(lhs.get_exponent(), rhs.get_exponent());
-    const auto new_mantissa = rhs.get_full_mantissa() >> exponent_delta.word(0);
+    auto extra_shift = 0U;
+    if (lhs.is_normalized() && !rhs.is_normalized())
+    {
+        extra_shift = 1;
+    }
+
+    const auto new_mantissa = rhs.get_full_mantissa() >> (exponent_delta.word(0) - extra_shift);
     const auto mantissa_sum = fun_sub(lhs.get_full_mantissa(), new_mantissa);
 
-    normalized_float<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(), mantissa_sum);
+    floating_point<E, mantissa_sum.width() - 1> sum(lhs.get_sign(), lhs.get_exponent(),
+                                                    mantissa_sum);
 
     return normalize<E, mantissa_sum.width() - 1, M>(sum);
 }
 
 /**
- * @brief Adds to normalized_floats.
+ * @brief Adds to floating_points.
  *
  * @param lhs The first number that is to be summed up
  * @param rhs The second number that is to be summed up
@@ -98,14 +111,23 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
  *
  */
 template <size_t E, size_t M>
-[[nodiscard]] auto add(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
-    -> normalized_float<E, M>
+[[nodiscard]] auto add(const floating_point<E, M> lhs, const floating_point<E, M> rhs)
+    -> floating_point<E, M>
 {
+    if (lhs.is_nan())
+    {
+        return lhs.make_quiet_nan();
+    }
+
+    if (rhs.is_nan())
+    {
+        return rhs.make_quiet_nan();
+    }
 
     if ((lhs.is_nan() || rhs.is_nan()) || (lhs.is_neg_inf() && rhs.is_pos_inf()) ||
         (lhs.is_pos_inf() && rhs.is_neg_inf()))
     {
-        return normalized_float<E, M>::NaN();
+        return floating_point<E, M>::NaN();
     }
 
     if (lhs.is_inf())
@@ -134,7 +156,7 @@ template <size_t E, size_t M>
 }
 
 /**
- * @brief Subtraction with normalized_floats: lhs-rhs.
+ * @brief Subtraction with floating_points: lhs-rhs.
  *
  * @param lhs The minuend
  * @param rhs The subtrahend
@@ -145,16 +167,26 @@ template <size_t E, size_t M>
  *
  */
 template <size_t E, size_t M>
-[[nodiscard]] auto sub(const normalized_float<E, M> lhs, const normalized_float<E, M> rhs)
-    -> normalized_float<E, M>
+[[nodiscard]] auto sub(const floating_point<E, M> lhs, const floating_point<E, M> rhs)
+    -> floating_point<E, M>
 {
     // return sub_<E, M>(lhs, rhs, expanding_add<uinteger<M+1>, uinteger<M+1>>,
     // expanding_sub<uinteger<M+1>, uinteger<M+1>>);
 
+    if (lhs.is_nan())
+    {
+        return lhs.make_quiet_nan();
+    }
+
+    if (rhs.is_nan())
+    {
+        return rhs.make_quiet_nan();
+    }
+
     if ((lhs.is_nan() || rhs.is_nan()) || (lhs.is_pos_inf() && rhs.is_pos_inf()) ||
         (lhs.is_neg_inf() && rhs.is_neg_inf()))
     {
-        return normalized_float<E, M>::NaN();
+        return floating_point<E, M>::NaN();
     }
 
     return sub_<
@@ -168,7 +200,7 @@ template <size_t E, size_t M>
 }
 
 /**
- * @brief Multiplication with normalized_floats: lhs*rhs.
+ * @brief Multiplication with floating_points: lhs*rhs.
  *
  * @param lhs The multiplicand
  * @param rhs The multiplicator
@@ -179,21 +211,31 @@ template <size_t E, size_t M>
  *
  */
 template <size_t E, size_t M, typename WordType>
-[[nodiscard]] auto mul(const normalized_float<E, M, WordType> lhs,
-                       const normalized_float<E, M, WordType> rhs)
-    -> normalized_float<E, M, WordType>
+[[nodiscard]] auto mul(const floating_point<E, M, WordType> lhs,
+                       const floating_point<E, M, WordType> rhs) -> floating_point<E, M, WordType>
 {
+    if (lhs.is_nan())
+    {
+        return lhs.make_quiet_nan();
+    }
+
+    if (rhs.is_nan())
+    {
+        return rhs.make_quiet_nan();
+    }
+
     if ((lhs.is_nan() || rhs.is_nan()) || (lhs.is_zero() && rhs.is_inf()) ||
         (lhs.is_inf() && rhs.is_zero()))
     {
-        return normalized_float<E, M>::NaN();
+        return floating_point<E, M>::NaN();
     }
 
     // compute sign
     auto sign = lhs.get_sign() ^ rhs.get_sign();
 
-    if (lhs.is_inf() || rhs.is_inf()) {
-        return sign ? normalized_float<E,M>::neg_infinity() : normalized_float<E,M>::pos_infinity();
+    if (lhs.is_inf() || rhs.is_inf())
+    {
+        return sign ? floating_point<E, M>::neg_infinity() : floating_point<E, M>::pos_infinity();
     }
 
     // compute exponent
@@ -210,7 +252,7 @@ template <size_t E, size_t M, typename WordType>
     // check for over or underflow and break
     if (underflow || overflow)
     {
-        normalized_float<E, M> product;
+        floating_point<E, M> product;
         product.set_sign(sign);
         if (overflow)
         {
@@ -226,67 +268,227 @@ template <size_t E, size_t M, typename WordType>
                 product.set_full_mantissa(width_cast<M + 1>(mproduct));
             }
         }
-        return normalize<E, M, M>(product);
+        // return normalize<E, M, M>(product);
+        return product;
     }
 
     auto esum = width_cast<E>(ext_esum);
 
-    normalized_float<E, mproduct.width() - 1> product(sign, esum, mproduct);
+    floating_point<E, mproduct.width() - 1> product(sign, esum, mproduct);
 
     return normalize<E, mproduct.width() - 1, M>(product);
 }
 
 /**
- * @brief Division with normalized_floats: lhs/rhs.
+ * @brief Division with floating_points: lhs/rhs.
  *
  * @param lhs The dividend
  * @param rhs The divisor
  * @tparam E Width of exponent
  * @tparam M Width of mantissa including the leading 1
- *
+ * @tparam WordType The word type used to internally store the data
  * @return The quotient lhs/rhs
  *
  */
 template <size_t E, size_t M, typename WordType>
-[[nodiscard]] auto div(const normalized_float<E, M, WordType> lhs,
-                       const normalized_float<E, M, WordType> rhs)
-    -> normalized_float<E, M, WordType>
+[[nodiscard]] auto div(const floating_point<E, M, WordType> lhs,
+                       const floating_point<E, M, WordType> rhs) -> floating_point<E, M, WordType>
 {
 
-    if ((lhs.is_nan() || rhs.is_nan()) || (lhs.is_zero() && rhs.is_zero()) ||
-        (lhs.is_inf() && rhs.is_inf()))
+    /*=================================
+     * 7.2. Invalid Operation
+     */
+    // TODO (keszocze) make this calls use the corresponding 754 std function once the branch is
+    // merged
+    if (lhs.is_nan())
     {
-        return normalized_float<E, M>::NaN();
+        return lhs.make_quiet_nan();
+    }
+
+    if (rhs.is_nan())
+    {
+        return rhs.make_quiet_nan();
+    }
+
+    if ((lhs.is_zero() && rhs.is_zero()) || (lhs.is_inf() && rhs.is_inf()))
+    {
+        return floating_point<E, M>::NaN();
+    }
+    //==========================================
+
+    const auto result_is_negative = lhs.get_sign() ^ rhs.get_sign();
+
+    if (rhs.is_zero())
+    {
+        return result_is_negative ? floating_point<E, M>::neg_infinity()
+                                  : floating_point<E, M>::pos_infinity();
     }
 
     if (lhs.is_inf())
     {
-        return lhs;
+        // due to the checks above, we already know that rhs is finite
+        return result_is_negative ? floating_point<E, M>::neg_zero() : floating_point<E, M>::zero();
     }
-
-    const bool neg_result = lhs.is_negative() ^ rhs.is_negative();
 
     if (rhs.is_inf() || lhs.is_zero())
     {
-        return neg_result ? normalized_float<E, M>::neg_zero() : normalized_float<E, M>::zero();
-    }
-    if (rhs.is_zero())
-    {
-        return neg_result ? normalized_float<E, M>::neg_infinity()
-                          : normalized_float<E, M>::pos_infinity();
+        return result_is_negative ? floating_point<E, M>::neg_zero() : floating_point<E, M>::zero();
     }
 
+    size_t denorm_exponent_lhs = 0;
+    const bool lhs_is_denormal = !lhs.is_normalized();
+    if (lhs_is_denormal)
+    {
+        // more precision of the computation with denormal numbers
+        //        denorm_exponent_lhs = M - find_leading_one(lhs.get_full_mantissa());
+
+        denorm_exponent_lhs = [&lhs]() {
+            const std::optional<size_t> one_at = first_set_bit(lhs.get_full_mantissa());
+            if (one_at)
+            {
+                return size_t(M - (*one_at));
+            }
+            else
+            {
+                return size_t(0);
+            }
+        }();
+    }
     auto dividend = width_cast<2 * M + 1>(lhs.get_full_mantissa());
     auto divisor = width_cast<2 * M + 1>(rhs.get_full_mantissa());
-    dividend = dividend << M;
+    // shift to use integer division for producing 1,M
+    dividend = dividend << M + denorm_exponent_lhs;
     auto mquotient = div(dividend, divisor);
 
-    auto esum = width_cast<E>(
-        sub(expanding_add(lhs.get_exponent(), lhs.bias), width_cast<E + 1>(rhs.get_exponent())));
-    auto sign = lhs.get_sign() ^ rhs.get_sign();
-    normalized_float<E, mquotient.width() - 1> quotient(sign, esum, mquotient);
+    auto exponent_tmp = expanding_add(lhs.get_exponent(), lhs.bias);
+    if (lhs_is_denormal)
+    {
+        denorm_exponent_lhs -= 1U;
+        exponent_tmp = sub(exponent_tmp, uinteger<E + 1>(denorm_exponent_lhs));
+    }
+
+    bool overflow = exponent_tmp.bit(E) == 1;
+
+    exponent_tmp = sub(exponent_tmp, width_cast<E + 1>(rhs.get_exponent()));
+    uinteger<E + 1> denorm_exponent_correction{1U};
+    if (!rhs.is_normalized())
+    {
+        exponent_tmp = sub(exponent_tmp, denorm_exponent_correction);
+    }
+
+    auto esum = width_cast<E>(exponent_tmp);
+    overflow &= exponent_tmp.bit(E) == 1;
+    const bool underflow = !overflow && exponent_tmp.bit(E) == 1;
+
+    // check for over or underflow and break
+    if (underflow || overflow)
+    {
+        floating_point<E, M> quotient;
+        quotient.set_sign(result_is_negative);
+        // apparently float div does not produce -0
+        if (overflow)
+        {
+            quotient.set_exponent(uinteger<E>::all_ones());
+        }
+        else
+        {
+            // shift mantissa of subnormal number
+            // in case some part of the mantissa can be expressed as subnormal number
+            exponent_tmp = ~exponent_tmp;
+            exponent_tmp = add(exponent_tmp, uinteger<exponent_tmp.width()>(2));
+            if (exponent_tmp < uinteger<sizeof(M) * 8>(M + 1))
+            {
+                mquotient = rshift_and_round(mquotient, exponent_tmp.word(0));
+                quotient.set_full_mantissa(width_cast<M + 1>(mquotient));
+            }
+        }
+        return quotient;
+    }
+    else if (esum == uinteger<esum.width()>::zero())
+    {
+        floating_point<E, M> quotient{result_is_negative, esum,
+                                      width_cast<M + 1>(rshift_and_round(mquotient, 1))};
+        return quotient;
+    }
+
+    floating_point<E, mquotient.width() - 1> quotient(result_is_negative, esum, mquotient);
 
     return normalize<E, mquotient.width() - 1, M>(quotient);
+}
+
+/**
+ * @brief Computes the negative value of the floating-point number
+ *
+ * Quoting the standard: "copies a floating-point operand x to a destination in the same format,
+ * reversing the sign bit. negate(x) is not the same as subtraction(0, x)"
+ *
+ * @note This method ignores NaN values in the sense that they are also copied and the sign bit
+ * flipped.
+ *
+ * @tparam E Width of exponent
+ * @tparam M Width of mantissa
+ * @tparam WordType The word type used to internally store the data
+ * @return The negated value of the provided number
+ */
+template <size_t E, size_t M, typename WordType = uint64_t>
+[[nodiscard]] constexpr floating_point<E, M, WordType>
+negate(const floating_point<E, M, WordType>& x)
+{
+    floating_point<E, M, WordType> negated{x};
+
+    negated.set_sign(!x.get_sign());
+
+    return negated;
+}
+
+/**
+ * @brief Copies the floating-point number
+ *
+ * Quoting the standard: "copies a floating-point operand x to a destination in the same format,
+ * with no change to the sign bit."
+ *
+ * @note This method ignores NaN values in the sense that they are also copied not signalling any
+ * error.
+ *
+ * @note This is a rather useless method that only exists to be more compliant with the IEEE 754
+ * (2019) standard.
+ *
+ * @tparam E Width of exponent
+ * @tparam M Width of mantissa
+ * @tparam WordType The word type used to internally store the data
+ * @return The copied value
+ */
+template <size_t E, size_t M, typename WordType = uint64_t>
+[[nodiscard]] constexpr floating_point<E, M, WordType> copy(const floating_point<E, M, WordType>& x)
+{
+    floating_point<E, M, WordType> copied{x};
+
+    return copied;
+}
+
+/**
+ * @brief Copies a floating-point number using the sign of another number
+ *
+ * Quoting the standard: "copies a floating-point operand x to a destination in the same format as
+ * x, but with the sign bit of y."
+ *
+ * @note This method ignores NaN values in the sense that they are also copied not signalling any
+ * error.
+ *
+ * @tparam E Width of exponent
+ * @tparam M Width of mantissa
+ * @tparam WordType The word type used to internally store the data
+ * @return The copied value
+ */
+template <size_t E, size_t M, typename WordType = uint64_t>
+[[nodiscard]] constexpr floating_point<E, M, WordType>
+copySign(const floating_point<E, M, WordType>& x, const floating_point<E, M, WordType>& y)
+{
+    floating_point<E, M, WordType> copied{x};
+
+    copied.set_sign(y.get_sign());
+
+    return copied;
 }
 
 /**
@@ -305,7 +507,7 @@ template <size_t E, size_t M, typename WordType>
  */
 template <size_t Start, size_t End, size_t E, size_t M, typename WordType>
 [[nodiscard]] constexpr word_array<(Start - End) + 1, WordType>
-bit_range(const normalized_float<E, M, WordType>& f)
+bit_range(const floating_point<E, M, WordType>& f)
 {
     return bit_range<Start, End>(f.as_word_array());
 }
@@ -313,31 +515,37 @@ bit_range(const normalized_float<E, M, WordType>& f)
 namespace float_operators {
 
 template <size_t E, size_t M, typename WordType>
-auto operator+(const normalized_float<E, M, WordType>& lhs,
-               const normalized_float<E, M, WordType>& rhs) -> normalized_float<E, M, WordType>
+auto operator+(const floating_point<E, M, WordType>& lhs, const floating_point<E, M, WordType>& rhs)
+    -> floating_point<E, M, WordType>
 {
     return add(lhs, rhs);
 }
 
 template <size_t E, size_t M, typename WordType>
-auto operator-(const normalized_float<E, M, WordType>& lhs,
-               const normalized_float<E, M, WordType>& rhs) -> normalized_float<E, M, WordType>
+auto operator-(const floating_point<E, M, WordType>& lhs, const floating_point<E, M, WordType>& rhs)
+    -> floating_point<E, M, WordType>
 {
     return sub(lhs, rhs);
 }
 
 template <size_t E, size_t M, typename WordType>
-auto operator*(const normalized_float<E, M, WordType>& lhs,
-               const normalized_float<E, M, WordType>& rhs) -> normalized_float<E, M, WordType>
+auto operator*(const floating_point<E, M, WordType>& lhs, const floating_point<E, M, WordType>& rhs)
+    -> floating_point<E, M, WordType>
 {
     return mul(lhs, rhs);
 }
 
 template <size_t E, size_t M, typename WordType>
-auto operator/(const normalized_float<E, M, WordType>& lhs,
-               const normalized_float<E, M, WordType>& rhs) -> normalized_float<E, M, WordType>
+auto operator/(const floating_point<E, M, WordType>& lhs, const floating_point<E, M, WordType>& rhs)
+    -> floating_point<E, M, WordType>
 {
     return div(lhs, rhs);
+}
+
+template <size_t E, size_t M, typename WordType>
+auto operator-(const floating_point<E, M, WordType>& x) -> floating_point<E, M, WordType>
+{
+    return negate(x);
 }
 
 } // namespace float_operators

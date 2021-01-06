@@ -51,7 +51,7 @@ template <typename I, typename T>
     return sum;
 }
 
-template <typename I, typename T>[[nodiscard]] constexpr auto expanding_add(const I& a, const T& b)
+template <typename I, typename T> [[nodiscard]] constexpr auto expanding_add(const I& a, const T& b)
 {
 
     return expanding_add(a, b, false);
@@ -65,7 +65,7 @@ template <typename I, typename T>[[nodiscard]] constexpr auto expanding_add(cons
  * @param b Subtrahend
  * @return Difference between a and b
  */
-template <typename I>[[nodiscard]] constexpr auto sub(const I& a, const I& b) -> I
+template <typename I> [[nodiscard]] constexpr auto sub(const I& a, const I& b) -> I
 {
     static_assert(::aarith::is_integral_v<I>);
 
@@ -97,7 +97,7 @@ template <typename I>[[nodiscard]] constexpr auto sub(const I& a, const I& b) ->
  */
 // template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(const I& a, const T&
 // b, const bool initial_borrow = false)
-template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(const I& a, const T& b)
+template <typename I, typename T> [[nodiscard]] constexpr auto expanding_sub(const I& a, const T& b)
 {
 
     static_assert(::aarith::same_signedness<I, T>);
@@ -117,8 +117,7 @@ template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(cons
  * @param b Second summand
  * @return Sum of a and b
  */
-template <typename I, typename = std::enable_if_t<is_integral_v<I>>>
-[[nodiscard]] I constexpr add(const I& a, const I& b)
+template <typename I> [[nodiscard]] I constexpr add(const I& a, const I& b)
 {
     constexpr size_t W = I::width();
 
@@ -265,7 +264,7 @@ template <std::size_t W, std::size_t V, typename WordType>
         const auto s2 = expanding_add(bh, bl);
 
         // prevent infinite call loop
-        // TODO find a better way to do this
+        // TODO (keszocze) find a better way to do this
         uinteger<2 * (karazuba_width + 1), WordType> p3;
         if (s1.bit(s1.width() - 1) == 1 || s2.bit(s2.width() - 1) == 1)
         {
@@ -291,8 +290,8 @@ template <std::size_t W, std::size_t V, typename WordType>
     {
         constexpr std::size_t max_width = std::max(W, V);
 
-        const auto a_ = width_cast<max_width, W, WordType>(a);
-        const auto b_ = width_cast<max_width, V, WordType>(b);
+        const auto a_ = width_cast<max_width>(a);
+        const auto b_ = width_cast<max_width>(b);
 
         const auto res = expanding_karazuba(a_, b_);
 
@@ -396,7 +395,8 @@ template <typename I>
  * @param denominator The number that divides the other number
  * @return The quotient of the division operation
  */
-template <typename I>[[nodiscard]] constexpr auto div(const I& numerator, const I& denominator) -> I
+template <typename I>
+[[nodiscard]] constexpr auto div(const I& numerator, const I& denominator) -> I
 {
     return restoring_division(numerator, denominator).first;
 }
@@ -455,7 +455,6 @@ template <class IntA, class IntB>
     static_assert(::aarith::is_integral_v<IntA>);
     static_assert(::aarith::is_integral_v<IntB>);
 
-    // TODO do we need this assertion?
     static_assert(::aarith::same_signedness<IntA, IntB>);
     static_assert(::aarith::same_word_type<IntA, IntB>);
 
@@ -867,7 +866,7 @@ constexpr auto negate(const integer<W, WordType>& n) -> integer<W, WordType>
  * @param n The integer
  * @return The sign of the integer
  */
-template <size_t W, typename WordType>[[nodiscard]] constexpr int8_t signum(integer<W, WordType> n)
+template <size_t W, typename WordType> [[nodiscard]] constexpr int8_t signum(integer<W, WordType> n)
 {
     if (n.is_zero())
     {
@@ -892,7 +891,8 @@ template <size_t W, typename WordType>[[nodiscard]] constexpr int8_t signum(inte
  * @param n The integer
  * @return The sign of the integer
  */
-template <size_t W, typename WordType>[[nodiscard]] constexpr int8_t signum(uinteger<W, WordType> n)
+template <size_t W, typename WordType>
+[[nodiscard]] constexpr int8_t signum(uinteger<W, WordType> n)
 {
     return n.is_zero() ? 0 : 1;
 }
@@ -961,8 +961,8 @@ restoring_division(const integer<W, WordType>& numerator, const integer<V, WordT
         Q = negate(Q);
     }
 
-    Integer Q_cast = width_cast<W, W + 1, WordType>(Q);
-    Integer remainder_cast = width_cast<W, W + 1, WordType>(remainder_);
+    Integer Q_cast = width_cast<W>(Q);
+    Integer remainder_cast = width_cast<W>(remainder_);
 
     if (numerator.is_negative())
     {
@@ -1071,7 +1071,7 @@ IntegerType pow(const IntegerType& base, const IntegerType& exponent)
 
     IntegerType result = IntegerType::one();
     IntegerType iter = IntegerType::zero();
-    while (iter <= exponent)
+    while (iter < exponent)
     {
         result = mul(result, base);
         iter = add(iter, IntegerType::one());
@@ -1108,37 +1108,6 @@ template <typename Integer>
 [[nodiscard]] constexpr Integer distance(const Integer& a, const Integer& b)
 {
     return (a <= b) ? sub(b, a) : sub(a, b);
-}
-
-/**
- * @brief Left-shift assignment operator
- * @tparam W The word_container type to work on
- * @param lhs The word_container to be shifted
- * @param rhs The number of bits to shift
- * @return The shifted word_container
- */
-template <typename W, typename I,
-          typename = std::enable_if_t<is_word_array_v<W> && is_integral_v<I> && is_unsigned_v<I>>>
-constexpr auto operator<<=(W& lhs, const I rhs) -> W
-{
-    const size_t shift = static_cast<size_t>(rhs);
-    lhs <<= shift;
-    return lhs;
-}
-
-/**
- * @brief Left-shift assignment operator
- * @tparam W The word_container type to work on
- * @param lhs The word_container to be shifted
- * @param rhs The number of bits to shift
- * @return The shifted word_container
- */
-template <typename W, typename I,
-          typename = std::enable_if_t<is_word_array_v<W> && is_integral_v<I> && is_unsigned_v<I>>>
-constexpr auto operator<<(const W& lhs, const I rhs) -> W
-{
-    W cpy{lhs};
-    return (cpy <<= rhs);
 }
 
 /**

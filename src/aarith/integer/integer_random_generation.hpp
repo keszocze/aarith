@@ -36,9 +36,9 @@ public:
         }
         // Modulo is slightly biased towards smaller numbers. Possible fix: e.g. use "Java's
         // algorithm.
-        using namespace aarith::integer_operators;
-//        std::cout << min << " + (" << uint << " % " << length << ") = " << min << " + "
-//                  << (uint % length) << "\n";
+        using namespace aarith::integer_operators; // NOLINT
+        //        std::cout << min << " + (" << uint << " % " << length << ") = " << min << " + "
+        //                  << (uint % length) << "\n";
         return width_cast<BitWidth>(min + (uint % length));
     }
 
@@ -57,7 +57,6 @@ private:
 
 /**
  * Implements random number generation interface similar to std::uniform_int_distribution.
- * @note the interval returned is
  */
 template <size_t BitWidth, typename WordType = uint64_t> class uniform_integer_distribution
 {
