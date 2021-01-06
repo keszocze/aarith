@@ -15,14 +15,15 @@ namespace aarith {
  * @param initial_carry True if there is an initial carry coming in
  * @return Sum of a and b with bit width max(I::width,T::width)+1
  */
-template <typename I, typename T,
-          typename = std::enable_if_t<is_integral_v<I> && is_integral_v<T>
-                                      >>
+template <typename I, typename T>
 [[nodiscard]] constexpr auto expanding_add(const I& a, const T& b, const bool initial_carry)
 {
 
-    static_assert(same_signedness<I, T>);
-    static_assert( same_word_type<I, T>);
+    static_assert(::aarith::is_integral_v<I>);
+    static_assert(::aarith::is_integral_v<T>);
+
+    // TODO do we need this assertion?
+    static_assert(::aarith::same_signedness<I, T>);
 
     constexpr size_t res_width = std::max(I::width(), T::width()) + 1U;
 
