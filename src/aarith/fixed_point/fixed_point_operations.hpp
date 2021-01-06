@@ -131,7 +131,8 @@ constexpr auto width_cast(const fixed<I, F, B, WordType>& a) -> fixed<TargetI, T
  */
 template <size_t I1, size_t F1, size_t I2, size_t F2, template <size_t, typename> typename B,
           typename WordType = uint64_t>
-auto constexpr expanding_add(const fixed<I1, F1, B, WordType>& a, const fixed<I2, F2, B, WordType>& b)
+auto constexpr expanding_add(const fixed<I1, F1, B, WordType>& a,
+                             const fixed<I2, F2, B, WordType>& b)
     -> fixed<std::max(I1, I2) + 1, std::max(F1, F2), B, WordType>
 {
     constexpr size_t I_expanded = std::max(I1, I2) + 1;
@@ -140,8 +141,7 @@ auto constexpr expanding_add(const fixed<I1, F1, B, WordType>& a, const fixed<I2
     const auto [expanded_a, expanded_b] = equalize_fraction_width(a, b);
 
     const auto tmp_result = expanding_add(expanded_a.bits(), expanded_b.bits());
-    const auto result =
-        fixed<I_expanded, F_expanded, B, WordType>::from_bitstring(tmp_result);
+    const auto result = fixed<I_expanded, F_expanded, B, WordType>::from_bitstring(tmp_result);
 
     return result;
 }
@@ -178,24 +178,26 @@ auto add(const fixed<I, F, B, WordType>& a, const fixed<I, F, B, WordType>& b)
  * @return The difference of both numbers using enough bits to correctly store the data
  */
 template <size_t I1, size_t F1, size_t I2, size_t F2, template <size_t, typename> typename B,
-    typename WordType = uint64_t>
+          typename WordType = uint64_t>
 auto expanding_sub(const fixed<I1, F1, B, WordType>& a, const fixed<I2, F2, B, WordType>& b)
--> fixed<std::max(I1, I2) + 1, std::max(F1, F2), B, WordType>
+    -> fixed<std::max(I1, I2) + 1, std::max(F1, F2), B, WordType>
 {
     constexpr size_t I_expanded = std::max(I1, I2) + 1;
 
     const auto [expanded_a, expanded_b] = equalize_fraction_width(a, b);
 
     const auto tmp_result = expanding_sub(expanded_a.bits(), expanded_b.bits());
+
+    constexpr size_t result_fraction_width = std::max(F1, F2);
     const auto result =
-        fixed<I_expanded, expanded_a.frac_width, B, WordType>::from_bitstring(tmp_result);
+        fixed<I_expanded, result_fraction_width, B, WordType>::from_bitstring(tmp_result);
 
     return result;
 }
 
-
 /**
- * @brief Subtracts two fixed point numbers with over/underflow semantics and truncation on the right
+ * @brief Subtracts two fixed point numbers with over/underflow semantics and truncation on the
+ * right
  * @tparam I Integer part width
  * @tparam F Fraction part width
  * @tparam B The integer type used to store the number (signed or unsigned)
@@ -206,7 +208,7 @@ auto expanding_sub(const fixed<I1, F1, B, WordType>& a, const fixed<I2, F2, B, W
  */
 template <size_t I, size_t F, template <size_t, typename> typename B, typename WordType = uint64_t>
 auto sub(const fixed<I, F, B, WordType>& a, const fixed<I, F, B, WordType>& b)
--> fixed<I, F, B, WordType>
+    -> fixed<I, F, B, WordType>
 {
     const auto result = expanding_sub(a, b);
     return width_cast<I, F>(result);
