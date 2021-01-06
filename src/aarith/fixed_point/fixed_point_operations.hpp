@@ -211,4 +211,16 @@ auto sub(const fixed<I, F, B, WordType>& a, const fixed<I, F, B, WordType>& b)
     return width_cast<I, F>(result);
 }
 
+template <size_t I, size_t F, template <size_t, typename> typename B, typename WordType = uint64_t>
+auto mul(const fixed<I, F, B, WordType>& a, const fixed<I, F, B, WordType>& b) -> fixed<I, F, B, WordType>
+{
+    throw std::logic_error("not implemented");
+}
+
+template <size_t I, size_t F, template <size_t, typename> typename B, typename WordType = uint64_t>
+auto div(const fixed<I, F, B, WordType>& a, const fixed<I, F, B, WordType>& b) -> fixed<I, F, B, WordType>
+{
+    throw std::logic_error("not implemented");
+}
+
 } // namespace aarith
