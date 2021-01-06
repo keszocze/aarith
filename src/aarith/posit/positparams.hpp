@@ -11,7 +11,7 @@ constexpr positparams<N, ES, WT>::positparams(const posit<N, ES, WT>& p)
     is_zero = p.is_zero();
     sign_bit = p.is_negative();
     scale = get_scale_value(p);
-    fraction = fractional(p);
+    fraction = posit_fraction(p);
 
     ensure_standard_form();
 }
@@ -47,7 +47,7 @@ constexpr positparams<N, ES, WT>::positparams(const integer<ValueWidth, ValueWor
     const auto intfraction = width_cast<fs>(abs_value);
 
     const auto leading_zeroes = count_leading_zeroes(intfraction);
-    fraction = fractional<N, ES, WT>(intfraction << leading_zeroes);
+    fraction = posit_fraction<N, ES, WT>(intfraction << leading_zeroes);
 
     //
     // set correct scale
@@ -606,8 +606,8 @@ void positparams<N, ES, WT>::sum_fractions(positparams<N, ES, WT>& dest,
 
 template <size_t N, size_t ES, typename WT>
 void positparams<N, ES, WT>::add_fractions(positparams<N, ES, WT>& dest,
-                                           const fractional<N, ES, WT>& lfrac,
-                                           const fractional<N, ES, WT>& rfrac)
+                                           const posit_fraction<N, ES, WT>& lfrac,
+                                           const posit_fraction<N, ES, WT>& rfrac)
 {
     dest.fraction = lfrac + rfrac;
 
@@ -622,8 +622,8 @@ void positparams<N, ES, WT>::add_fractions(positparams<N, ES, WT>& dest,
 
 template <size_t N, size_t ES, typename WT>
 void positparams<N, ES, WT>::sub_fractions(positparams<N, ES, WT>& dest,
-                                           const fractional<N, ES, WT>& lfrac,
-                                           const fractional<N, ES, WT>& rfrac)
+                                           const posit_fraction<N, ES, WT>& lfrac,
+                                           const posit_fraction<N, ES, WT>& rfrac)
 {
     dest.fraction = lfrac - rfrac;
 

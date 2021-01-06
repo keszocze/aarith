@@ -791,7 +791,7 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr uinteger<N, WT> get_exponent_value(const posit<N, ES, WT>& p);
 
 /**
- * Return the fraction of the given posit. The fraction is the fractional part
+ * Return the fraction of the given posit. The fraction is the posit_fraction part
  * of the posit interpreted as an unsigned integer.
  *
  * @return The fraction of the given posit.
@@ -963,11 +963,11 @@ public:
 //
 // Fractional Class
 //
-// For implementation, look at posit/fractional.hpp
+// For implementation, look at posit/posit_fraction.hpp
 //
 
 /**
- * @brief Class to handle fractional values.
+ * @brief Class to handle posit_fraction values.
  *
  * This represents an unsigned fixed point fraction as used by posits. Unlike
  * posits, this class uses an explicit hidden bit.
@@ -976,7 +976,7 @@ public:
  * @tparam ES The exponent size of associated posits
  * @tparam WT The word type of associated posits
  */
-template <size_t N, size_t ES, typename WT> class fractional
+template <size_t N, size_t ES, typename WT> class posit_fraction
 {
 public:
     /**
@@ -985,7 +985,7 @@ public:
     static constexpr size_t IntegerSize = N;
 
     /**
-     * @brief Size of the fractional part.
+     * @brief Size of the posit_fraction part.
      *
      * The biggest representable integer by a posit<N, ES> type
      * type is
@@ -1016,166 +1016,166 @@ public:
     /**
      * @return A fraction that represents the number zero.
      */
-    [[nodiscard]] static constexpr fractional zero();
+    [[nodiscard]] static constexpr posit_fraction zero();
 
     /**
      * @brief Construct a new zero fraction.
      *
      * The returned fraction has all bits set to zero. Meaning the
-     * constructed fractional represents zero.
+     * constructed posit_fraction represents zero.
      */
-    constexpr fractional();
+    constexpr posit_fraction();
 
     /**
      * @brief Copy constructor.
      */
-    constexpr fractional(const fractional& other);
+    constexpr posit_fraction(const posit_fraction& other);
 
     /**
-     * @brief Construct fractional from posit.
+     * @brief Construct posit_fraction from posit.
      *
-     * Extract the fractional part from p and construct this fractional to
+     * Extract the posit_fraction part from p and construct this posit_fraction to
      * represent that number.
      *
      * @param p The posit to import the fraction from.
      */
-    constexpr fractional(const posit<N, ES, WT>& p);
+    constexpr posit_fraction(const posit<N, ES, WT>& p);
 
     /**
-     * @brief Construct fractional from integer fraction.
+     * @brief Construct posit_fraction from integer fraction.
      *
-     * If argument frac is 00110010, then the fractional is constructed to
+     * If argument frac is 00110010, then the posit_fraction is constructed to
      * 0.00110010, that is the argument frac is taken as-is. The integer
-     * part of the fractional is initalized to zero.
+     * part of the posit_fraction is initalized to zero.
      *
      * @param frac The fraction to import.
      */
-    constexpr fractional(const uinteger<FractionSize, WT>& frac);
+    constexpr posit_fraction(const uinteger<FractionSize, WT>& frac);
 
     /**
      * @brief Assignment operator.
      */
-    fractional& operator=(const fractional<N, ES, WT>& other);
+    posit_fraction& operator=(const posit_fraction<N, ES, WT>& other);
 
     /**
      * @brief Check for equality.
      *
-     * Two fractional objects are equal if their integer and fractional part
+     * Two posit_fraction objects are equal if their integer and posit_fraction part
      * are identical. The truncated flag is not taken into account.
      *
      * @return Whether this and other are equal.
      */
-    [[nodiscard]] constexpr bool operator==(const fractional<N, ES, WT>& other) const;
+    [[nodiscard]] constexpr bool operator==(const posit_fraction<N, ES, WT>& other) const;
 
     /**
      * @brief Check for not equal.
      *
-     * Two fractional objects are equal if their integer and fractional part
+     * Two posit_fraction objects are equal if their integer and posit_fraction part
      * are identical. The truncated flag is not taken into account.
      *
      * @return Whether this and other are not equal.
      */
-    [[nodiscard]] constexpr bool operator!=(const fractional<N, ES, WT>& other) const;
+    [[nodiscard]] constexpr bool operator!=(const posit_fraction<N, ES, WT>& other) const;
 
     /**
      * @return Whether this is less than other. The truncated flag is not
      * taken into account.
      */
-    [[nodiscard]] constexpr bool operator<(const fractional<N, ES, WT>& other) const;
+    [[nodiscard]] constexpr bool operator<(const posit_fraction<N, ES, WT>& other) const;
 
     /**
      * @return Whether this is less than or equal to other. The truncated flag
      * is not taken into account.
      */
-    [[nodiscard]] constexpr bool operator<=(const fractional<N, ES, WT>& other) const;
+    [[nodiscard]] constexpr bool operator<=(const posit_fraction<N, ES, WT>& other) const;
 
     /**
      * @return Whether this is greater than other. The truncated flag is not
      * taken into account.
      */
-    [[nodiscard]] constexpr bool operator>(const fractional<N, ES, WT>& other) const;
+    [[nodiscard]] constexpr bool operator>(const posit_fraction<N, ES, WT>& other) const;
 
     /**
      * @return Whether this is greater than or equal to other. The truncated flag
      * is not taken into account.
      */
-    [[nodiscard]] constexpr bool operator>=(const fractional<N, ES, WT>& other) const;
+    [[nodiscard]] constexpr bool operator>=(const posit_fraction<N, ES, WT>& other) const;
 
     /**
-     * @brief Addition of two fractional values.
+     * @brief Addition of two posit_fraction values.
      *
      * If the result is too large or too small to fit in the underlying
      * storage, the overflowed/underflowed bits are discarded.
      *
-     * The returned fractional has the truncated flag set only if any of the
+     * The returned posit_fraction has the truncated flag set only if any of the
      * two operands also have the truncated flag set.
      *
      * @return The sum of this and other.
      */
-    [[nodiscard]] constexpr fractional operator+(const fractional<N, ES, WT>& other) const;
+    [[nodiscard]] constexpr posit_fraction operator+(const posit_fraction<N, ES, WT>& other) const;
 
     /**
-     * @brief Subtraction of two fractional values.
+     * @brief Subtraction of two posit_fraction values.
      *
      * If the result is too large or too small to fit in the underlying
      * storage, the overflowed/underflowed bits are discarded.
      *
-     * The returned fractional has the truncated flag set only if any of the
+     * The returned posit_fraction has the truncated flag set only if any of the
      * two operands also have the truncated flag set.
      *
      * @return other subtracted from this.
      */
-    [[nodiscard]] constexpr fractional operator-(const fractional<N, ES, WT>& other) const;
+    [[nodiscard]] constexpr posit_fraction operator-(const posit_fraction<N, ES, WT>& other) const;
 
     /**
-     * @brief Multiplication of two fractional values.
+     * @brief Multiplication of two posit_fraction values.
      *
      * If the result is too large or too small to fit in the underlying
      * storage, the overflowed/underflowed bits are discarded.
      *
      * @return this multiplied with other.
      */
-    [[nodiscard]] constexpr fractional operator*(const fractional<N, ES, WT>& other) const;
+    [[nodiscard]] constexpr posit_fraction operator*(const posit_fraction<N, ES, WT>& other) const;
 
     /**
-     * @brief Division of two fractional values.
+     * @brief Division of two posit_fraction values.
      *
      * If the result is too large or too small to fit in the underlying
      * storage, the overflowed/underflowed bits are discarded.
      *
      * @return this divided by other.
      */
-    [[nodiscard]] constexpr fractional operator/(const fractional<N, ES, WT>& other) const;
+    [[nodiscard]] constexpr posit_fraction operator/(const posit_fraction<N, ES, WT>& other) const;
 
     /**
      * @param shift The number of places to shift.
-     * @return This fractional shifted to the left.
+     * @return This posit_fraction shifted to the left.
      */
-    [[nodiscard]] constexpr fractional operator<<(const size_t shift) const;
+    [[nodiscard]] constexpr posit_fraction operator<<(const size_t shift) const;
 
     /**
      * @param shift The number of places to shift.
-     * @return This fractional shifted to the left.
+     * @return This posit_fraction shifted to the left.
      */
-    [[nodiscard]] constexpr fractional operator<<(const uinteger<N, WT>& shift) const;
+    [[nodiscard]] constexpr posit_fraction operator<<(const uinteger<N, WT>& shift) const;
 
     /**
      * @param shift The number of places to shift.
-     * @return This fractional shifted to the right.
+     * @return This posit_fraction shifted to the right.
      */
-    [[nodiscard]] constexpr fractional operator>>(const size_t shift) const;
+    [[nodiscard]] constexpr posit_fraction operator>>(const size_t shift) const;
 
     /**
      * @param shift The number of places to shift.
-     * @return This fractional shifted to the right.
+     * @return This posit_fraction shifted to the right.
      */
-    [[nodiscard]] constexpr fractional operator>>(const uinteger<N, WT>& shift) const;
+    [[nodiscard]] constexpr posit_fraction operator>>(const uinteger<N, WT>& shift) const;
 
     /**
-     * @brief Return whether this fractional has truncated precision.
+     * @brief Return whether this posit_fraction has truncated precision.
      *
      * During left or right shifts, bits set to one can be truncated.  If that
-     * happens, the internal truncated flag of the given fractional object is
+     * happens, the internal truncated flag of the given posit_fraction object is
      * set to true and remains true until destruction.
      *
      * @return Truncated flag.
@@ -1190,22 +1190,22 @@ public:
     [[nodiscard]] constexpr bool is_zero() const;
 
     /**
-     * @return A fractional with the underlying bits incremented by one.
+     * @return A posit_fraction with the underlying bits incremented by one.
      */
-    [[nodiscard]] constexpr fractional incremented() const;
+    [[nodiscard]] constexpr posit_fraction incremented() const;
 
     /**
-     * @brief Return the integer part of this fractional value.
+     * @brief Return the integer part of this posit_fraction value.
      *
-     * If this fractional represents 00001010.11110000, then this method
+     * If this posit_fraction represents 00001010.11110000, then this method
      * returns 00001010.
      */
     [[nodiscard]] constexpr uinteger<IntegerSize, WT> integer_bits() const;
 
     /**
-     * @brief Return the integer part of this fractional value.
+     * @brief Return the integer part of this posit_fraction value.
      *
-     * If this fractional represents 00001010.11110000, then this method
+     * If this posit_fraction represents 00001010.11110000, then this method
      * returns 11110000.
      */
     [[nodiscard]] constexpr uinteger<FractionSize, WT> fraction_bits() const;
@@ -1216,14 +1216,14 @@ public:
     [[nodiscard]] constexpr uinteger<ScratchSize, WT> scratch_bits() const;
 
     /**
-     * @brief Overload for writing fractional values to a stream.
+     * @brief Overload for writing posit_fraction values to a stream.
      */
     template <size_t SN, size_t SES, typename SWT>
-    friend std::ostream& operator<<(std::ostream& os, const fractional<SN, SES, SWT>& f);
+    friend std::ostream& operator<<(std::ostream& os, const posit_fraction<SN, SES, SWT>& f);
 
 private:
     /**
-     * The actual fractional value as an unsigned integer. We use an unsigned
+     * The actual posit_fraction value as an unsigned integer. We use an unsigned
      * integer (instead of, say, word array) to use the built-in arithmetic
      * operations.
      */
@@ -1360,7 +1360,7 @@ public:
     [[nodiscard]] constexpr positparams operator/(const positparams& rhs) const;
 
     /**
-     * @brief Overload for writing fractional values to a stream.
+     * @brief Overload for writing posit_fraction values to a stream.
      */
     template <size_t SN, size_t SES, typename SWT>
     friend std::ostream& operator<<(std::ostream& os, const positparams<SN, SES, SWT>& p);
@@ -1392,7 +1392,7 @@ private:
     /**
      * Fraction parameter.
      */
-    fractional<N, ES, WT> fraction;
+    posit_fraction<N, ES, WT> fraction;
 
     /**
      * @brief Private constructor for constructing empty parameter objects.
@@ -1450,8 +1450,8 @@ private:
      * @param lhs First operand of the addition.
      * @Param rhs Second operand of the addition.
      */
-    static void add_fractions(positparams& dst, const fractional<N, ES, WT>& lfrac,
-                              const fractional<N, ES, WT>& rfrac);
+    static void add_fractions(positparams& dst, const posit_fraction<N, ES, WT>& lfrac,
+                              const posit_fraction<N, ES, WT>& rfrac);
 
     /**
      * @brief Subtract one fraction from the other.
@@ -1462,8 +1462,8 @@ private:
      * @param lhs First operand of the addition.
      * @Param rhs Second operand of the addition. Will be subtracted from lhs.
      */
-    static void sub_fractions(positparams& dst, const fractional<N, ES, WT>& lfrac,
-                              const fractional<N, ES, WT>& rfrac);
+    static void sub_fractions(positparams& dst, const posit_fraction<N, ES, WT>& lfrac,
+                              const posit_fraction<N, ES, WT>& rfrac);
 
     void ensure_standard_form();
 };
@@ -1477,7 +1477,7 @@ private:
 //
 
 #include <aarith/posit/errors.hpp>
-#include <aarith/posit/fractional.hpp>
+#include <aarith/posit/posit_fraction.hpp>
 #include <aarith/posit/posit.hpp>
 #include <aarith/posit/posit_casts.hpp>
 #include <aarith/posit/posit_operations.hpp>
