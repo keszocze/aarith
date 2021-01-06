@@ -1,5 +1,7 @@
 #pragma once
 
+#include <aarith/integer.hpp>
+
 namespace aarith {
 
 template <size_t I, size_t F, template <size_t, typename> typename B, typename WordType = uint64_t>
@@ -199,6 +201,8 @@ public:
         one.data.set_bit(0,true);
         return one;
     }
+
+
 };
 
 template <size_t I, size_t F, typename WordType = uint64_t>

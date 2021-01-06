@@ -1,5 +1,6 @@
 #pragma once
 
+#include <aarith/integer.hpp>
 #include <utility>
 
 namespace aarith {
@@ -211,16 +212,34 @@ auto sub(const fixed<I, F, B, WordType>& a, const fixed<I, F, B, WordType>& b)
     return width_cast<I, F>(result);
 }
 
-template <size_t I, size_t F, template <size_t, typename> typename B, typename WordType = uint64_t>
-auto mul(const fixed<I, F, B, WordType>& a, const fixed<I, F, B, WordType>& b) -> fixed<I, F, B, WordType>
+template <size_t I, size_t F, template <size_t, typename> typename B, typename WT = uint64_t>
+auto mul(const fixed<I, F, B, WT>& a, const fixed<I, F, B, WT>& b) -> fixed<I, F, B, WT>
 {
-    throw std::logic_error("not implemented");
+    const size_t base_size = a.width;
+    const size_t scratch_size = 2 * base_size;
+
+    const auto a_extended = width_cast<scratch_size>(a.bits());
+    const auto b_extended = width_cast<scratch_size>(b.bits());
+
+    const auto result_bits_extended = (a_extended * b_extended) >> F;
+    const auto result_bits = width_cast<base_size>(result_bits_extended);
+
+    return fixed<I, F, B, WT>::from_bitstring(result_bits);
 }
 
-template <size_t I, size_t F, template <size_t, typename> typename B, typename WordType = uint64_t>
-auto div(const fixed<I, F, B, WordType>& a, const fixed<I, F, B, WordType>& b) -> fixed<I, F, B, WordType>
+template <size_t I, size_t F, template <size_t, typename> typename B, typename WT = uint64_t>
+auto div(const fixed<I, F, B, WT>& a, const fixed<I, F, B, WT>& b) -> fixed<I, F, B, WT>
 {
-    throw std::logic_error("not implemented");
+    const size_t base_size = a.width;
+    const size_t scratch_size = F + a.width;
+
+    const auto a_extended = width_cast<scratch_size>(a.bits());
+    const auto b_extended = width_cast<scratch_size>(b.bits());
+
+    const auto result_bits_extended = (a_extended << F) / b_extended;
+    const auto result_bits = width_cast<base_size>(result_bits_extended);
+
+    return fixed<I, F, B, WT>::from_bitstring(result_bits);
 }
 
 } // namespace aarith

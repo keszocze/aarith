@@ -1199,7 +1199,7 @@ auto constexpr operator-(const I& lhs, const I& rhs) -> I
     return sub(lhs, rhs);
 }
 
-template <typename I, typename = std::enable_if_t<is_integral_v<I>>>
+template <typename I, typename = std::enable_if_t<is_integral<I>::value>>
 auto constexpr operator*(const I& lhs, const I& rhs) -> I
 {
     return mul(lhs, rhs);
