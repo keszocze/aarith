@@ -59,7 +59,7 @@ template <size_t N, size_t ES, typename WT>
 template <size_t ValueWidth, typename ValueWordType>
 constexpr posit<N, ES, WT>::posit(const integer<ValueWidth, ValueWordType>& value)
 {
-    const positparams<N, ES, WT> parameters(value);
+    const posit_parameters<N, ES, WT> parameters(value);
     *this = posit(parameters);
 }
 
@@ -315,7 +315,7 @@ template <size_t N, size_t ES, typename WT>
 template <size_t TargetWidth, typename TargetWordType>
 [[nodiscard]] constexpr posit<N, ES, WT>::operator integer<TargetWidth, TargetWordType>() const
 {
-    const positparams<N, ES, WT> parameterized(*this);
+    const posit_parameters<N, ES, WT> parameterized(*this);
     return integer<TargetWidth, TargetWordType>(parameterized);
 }
 
@@ -510,8 +510,8 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT>
 posit<N, ES, WT>::operator+(const posit<N, ES, WT>& rhs) const
 {
-    const auto lparams = positparams<N, ES, WT>(*this);
-    const auto rparams = positparams<N, ES, WT>(rhs);
+    const auto lparams = posit_parameters<N, ES, WT>(*this);
+    const auto rparams = posit_parameters<N, ES, WT>(rhs);
 
     return posit(lparams + rparams);
 }
@@ -595,8 +595,8 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT>
 posit<N, ES, WT>::operator*(const posit<N, ES, WT>& rhs) const
 {
-    const auto lparams = positparams<N, ES, WT>(*this);
-    const auto rparams = positparams<N, ES, WT>(rhs);
+    const auto lparams = posit_parameters<N, ES, WT>(*this);
+    const auto rparams = posit_parameters<N, ES, WT>(rhs);
 
     return posit(lparams * rparams);
 }
@@ -613,8 +613,8 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT>
 posit<N, ES, WT>::operator/(const posit<N, ES, WT>& rhs) const
 {
-    const auto lparams = positparams<N, ES, WT>(*this);
-    const auto rparams = positparams<N, ES, WT>(rhs);
+    const auto lparams = posit_parameters<N, ES, WT>(*this);
+    const auto rparams = posit_parameters<N, ES, WT>(rhs);
 
     return posit(lparams / rparams);
 }

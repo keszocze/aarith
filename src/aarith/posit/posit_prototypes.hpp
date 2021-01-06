@@ -1250,7 +1250,7 @@ private:
 //
 // Positparam Class
 //
-// For implementation, look at posit/positparams.hpp
+// For implementation, look at posit/posit_parameters.hpp
 //
 
 /**
@@ -1265,19 +1265,19 @@ private:
  * @tparam ES The exponent size of associated posits
  * @tparam WT The word type of associated posits
  */
-template <size_t N, size_t ES, typename WT> class positparams
+template <size_t N, size_t ES, typename WT> class posit_parameters
 {
 public:
     /**
      * @brief Construct from posit.
      *
      * Construct this object to represent the value of p. Conversion from
-     * posit to positparams is referred to normalization in some posit
+     * posit to posit_parameters is referred to normalization in some posit
      * literature.
      *
      * @param p The posit to convert.
      */
-    constexpr positparams(const posit<N, ES, WT>& p);
+    constexpr posit_parameters(const posit<N, ES, WT>& p);
 
     /**
      * @brief Construct from signed integer.
@@ -1287,31 +1287,31 @@ public:
      * @param value The integer to convert.
      */
     template <size_t ValueWidth, typename ValueWordType>
-    constexpr positparams(const integer<ValueWidth, ValueWordType>& value);
+    constexpr posit_parameters(const integer<ValueWidth, ValueWordType>& value);
 
     /**
      * @brief Copy constructor.
      */
-    constexpr positparams(const positparams& other);
+    constexpr posit_parameters(const posit_parameters& other);
 
     /**
      * @brief Assignment operator.
      */
-    positparams& operator=(const positparams& other);
+    posit_parameters& operator=(const posit_parameters& other);
 
     /**
      * @brief Destructor.
      */
-    ~positparams();
+    ~posit_parameters();
 
     /**
      * @brief Convert back to posit.
      *
      * Convert the underlying parameters back to a posit. Conversion from
-     * positparams to posit is reference to as denormaliziation in some posit
+     * posit_parameters to posit is reference to as denormaliziation in some posit
      * literature.
      *
-     * If there exists not posit to represent this positparams exactly,
+     * If there exists not posit to represent this posit_parameters exactly,
      * rounding is applied.
      */
     [[nodiscard]] explicit constexpr operator posit<N, ES, WT>() const;
@@ -1329,41 +1329,41 @@ public:
      *
      * @return Whether this and other are equal.
      */
-    [[nodiscard]] constexpr bool operator==(const positparams& other) const;
+    [[nodiscard]] constexpr bool operator==(const posit_parameters& other) const;
 
     /**
      * @brief Check for not equal.
      *
      * @return Whether this and other are not equal.
      */
-    [[nodiscard]] constexpr bool operator!=(const positparams& other) const;
+    [[nodiscard]] constexpr bool operator!=(const posit_parameters& other) const;
 
     /**
      * @brief Addition of two posit in parameter representation.
      *
      * @return The sum of this and other.
      */
-    [[nodiscard]] constexpr positparams operator+(const positparams& rhs) const;
+    [[nodiscard]] constexpr posit_parameters operator+(const posit_parameters& rhs) const;
 
     /**
      * @brief Multiplication of two posit in parameter representation.
      *
      * @return The product of this and other.
      */
-    [[nodiscard]] constexpr positparams operator*(const positparams& rhs) const;
+    [[nodiscard]] constexpr posit_parameters operator*(const posit_parameters& rhs) const;
 
     /**
      * @brief Division of two posit in parameter representation.
      *
      * @return This divided by rhs.
      */
-    [[nodiscard]] constexpr positparams operator/(const positparams& rhs) const;
+    [[nodiscard]] constexpr posit_parameters operator/(const posit_parameters& rhs) const;
 
     /**
      * @brief Overload for writing posit_fraction values to a stream.
      */
     template <size_t SN, size_t SES, typename SWT>
-    friend std::ostream& operator<<(std::ostream& os, const positparams<SN, SES, SWT>& p);
+    friend std::ostream& operator<<(std::ostream& os, const posit_parameters<SN, SES, SWT>& p);
 
 private:
     /**
@@ -1399,28 +1399,29 @@ private:
      *
      * The constructed object has all flags set to false.
      */
-    constexpr positparams();
+    constexpr posit_parameters();
 
     /**
      * @return Parameter object that represents zero.
      */
-    [[nodiscard]] static constexpr positparams<N, ES, WT> zero();
+    [[nodiscard]] static constexpr posit_parameters<N, ES, WT> zero();
 
     /**
      * @return Parameter object that represents NaR.
      */
-    [[nodiscard]] static constexpr positparams<N, ES, WT> nar();
+    [[nodiscard]] static constexpr posit_parameters<N, ES, WT> nar();
 
     /**
      * @return Parameter object that represent the smallest positive value.
      */
-    [[nodiscard]] static constexpr positparams<N, ES, WT> minpos();
+    [[nodiscard]] static constexpr posit_parameters<N, ES, WT> minpos();
 
     /**
      * @brief Return p, q in order of scale.
      * @return A tuple that contains p, q ordered by scale.
      */
-    static std::tuple<positparams*, positparams*> ordered(positparams* p, positparams* q);
+    static std::tuple<posit_parameters*, posit_parameters*> ordered(posit_parameters* p,
+                                                                    posit_parameters* q);
 
     /**
      * @brief Match scale for addition.
@@ -1429,17 +1430,17 @@ private:
      * the object with smaller scale will have its fraction shifted to match
      * the new scale.
      */
-    static void match_scale_of(positparams& p, positparams& q);
+    static void match_scale_of(posit_parameters& p, posit_parameters& q);
 
     /**
-     * @brief Add up two positparams.
+     * @brief Add up two posit_parameters.
      *
      * @param dst Where to write the result to.
      * @param lhs First operand of the addition.
      * @Param rhs Second operand of the addition.
      */
-    static void sum_fractions(positparams& dst, const positparams<N, ES, WT>& lhs,
-                              const positparams<N, ES, WT>& rhs);
+    static void sum_fractions(posit_parameters& dst, const posit_parameters<N, ES, WT>& lhs,
+                              const posit_parameters<N, ES, WT>& rhs);
 
     /**
      * @brief Add up two fractions.
@@ -1450,7 +1451,7 @@ private:
      * @param lhs First operand of the addition.
      * @Param rhs Second operand of the addition.
      */
-    static void add_fractions(positparams& dst, const posit_fraction<N, ES, WT>& lfrac,
+    static void add_fractions(posit_parameters& dst, const posit_fraction<N, ES, WT>& lfrac,
                               const posit_fraction<N, ES, WT>& rfrac);
 
     /**
@@ -1462,7 +1463,7 @@ private:
      * @param lhs First operand of the addition.
      * @Param rhs Second operand of the addition. Will be subtracted from lhs.
      */
-    static void sub_fractions(positparams& dst, const posit_fraction<N, ES, WT>& lfrac,
+    static void sub_fractions(posit_parameters& dst, const posit_fraction<N, ES, WT>& lfrac,
                               const posit_fraction<N, ES, WT>& rfrac);
 
     void ensure_standard_form();
@@ -1477,11 +1478,11 @@ private:
 //
 
 #include <aarith/posit/errors.hpp>
-#include <aarith/posit/posit_fraction.hpp>
 #include <aarith/posit/posit.hpp>
 #include <aarith/posit/posit_casts.hpp>
+#include <aarith/posit/posit_fraction.hpp>
 #include <aarith/posit/posit_operations.hpp>
 #include <aarith/posit/posit_operators.hpp>
+#include <aarith/posit/posit_parameters.hpp>
 #include <aarith/posit/posit_types.hpp>
-#include <aarith/posit/positparams.hpp>
 #include <aarith/posit/string_utils.hpp>

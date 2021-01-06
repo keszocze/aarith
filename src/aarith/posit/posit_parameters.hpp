@@ -5,7 +5,7 @@
 namespace aarith {
 
 template <size_t N, size_t ES, typename WT>
-constexpr positparams<N, ES, WT>::positparams(const posit<N, ES, WT>& p)
+constexpr posit_parameters<N, ES, WT>::posit_parameters(const posit<N, ES, WT>& p)
 {
     is_nar = p.is_nar();
     is_zero = p.is_zero();
@@ -18,7 +18,8 @@ constexpr positparams<N, ES, WT>::positparams(const posit<N, ES, WT>& p)
 
 template <size_t N, size_t ES, typename WT>
 template <size_t ValueWidth, typename ValueWordType>
-constexpr positparams<N, ES, WT>::positparams(const integer<ValueWidth, ValueWordType>& value)
+constexpr posit_parameters<N, ES, WT>::posit_parameters(
+    const integer<ValueWidth, ValueWordType>& value)
 {
     //
     // initalize flags
@@ -63,7 +64,7 @@ constexpr positparams<N, ES, WT>::positparams(const integer<ValueWidth, ValueWor
 }
 
 template <size_t N, size_t ES, typename WT>
-constexpr positparams<N, ES, WT>::positparams(const positparams<N, ES, WT>& other)
+constexpr posit_parameters<N, ES, WT>::posit_parameters(const posit_parameters<N, ES, WT>& other)
     : is_nar(other.is_nar)
     , is_zero(other.is_zero)
     , sign_bit(other.sign_bit)
@@ -73,7 +74,8 @@ constexpr positparams<N, ES, WT>::positparams(const positparams<N, ES, WT>& othe
 }
 
 template <size_t N, size_t ES, typename WT>
-positparams<N, ES, WT>& positparams<N, ES, WT>::operator=(const positparams<N, ES, WT>& other)
+posit_parameters<N, ES, WT>&
+posit_parameters<N, ES, WT>::operator=(const posit_parameters<N, ES, WT>& other)
 {
     is_nar = other.is_nar;
     is_zero = other.is_zero;
@@ -84,12 +86,12 @@ positparams<N, ES, WT>& positparams<N, ES, WT>::operator=(const positparams<N, E
     return *this;
 }
 
-template <size_t N, size_t ES, typename WT> positparams<N, ES, WT>::~positparams()
+template <size_t N, size_t ES, typename WT> posit_parameters<N, ES, WT>::~posit_parameters()
 {
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr positparams<N, ES, WT>::operator posit<N, ES, WT>() const
+[[nodiscard]] constexpr posit_parameters<N, ES, WT>::operator posit<N, ES, WT>() const
 {
     using Posit = posit<N, ES, WT>;
     using Integer = integer<N, WT>;
@@ -257,7 +259,7 @@ template <size_t N, size_t ES, typename WT>
 
 template <size_t N, size_t ES, typename WT>
 template <size_t TargetWidth, typename TargetWordType>
-[[nodiscard]] constexpr positparams<N, ES, WT>::operator integer<TargetWidth, TargetWordType>()
+[[nodiscard]] constexpr posit_parameters<N, ES, WT>::operator integer<TargetWidth, TargetWordType>()
     const
 {
     // We need at least one sign bit and one "payload bit". Honestly for small
@@ -341,7 +343,7 @@ template <size_t TargetWidth, typename TargetWordType>
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool
-positparams<N, ES, WT>::operator==(const positparams<N, ES, WT>& other) const
+posit_parameters<N, ES, WT>::operator==(const posit_parameters<N, ES, WT>& other) const
 {
     return is_nar == other.is_nar && is_zero == other.is_zero && sign_bit == other.sign_bit &&
            scale == other.scale && fraction == other.fraction;
@@ -349,14 +351,14 @@ positparams<N, ES, WT>::operator==(const positparams<N, ES, WT>& other) const
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool
-positparams<N, ES, WT>::operator!=(const positparams<N, ES, WT>& other) const
+posit_parameters<N, ES, WT>::operator!=(const posit_parameters<N, ES, WT>& other) const
 {
     return !(*this == other);
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr positparams<N, ES, WT>
-positparams<N, ES, WT>::operator+(const positparams<N, ES, WT>& other) const
+[[nodiscard]] constexpr posit_parameters<N, ES, WT>
+posit_parameters<N, ES, WT>::operator+(const posit_parameters<N, ES, WT>& other) const
 {
     //
     // special arguments, that is either NaR or zero, both of which are weird
@@ -383,8 +385,8 @@ positparams<N, ES, WT>::operator+(const positparams<N, ES, WT>& other) const
     // that these objects are only as big as some integers
     //
 
-    positparams<N, ES, WT> lhs = *this;
-    positparams<N, ES, WT> rhs = other;
+    posit_parameters<N, ES, WT> lhs = *this;
+    posit_parameters<N, ES, WT> rhs = other;
 
     //
     // do addition
@@ -392,7 +394,7 @@ positparams<N, ES, WT>::operator+(const positparams<N, ES, WT>& other) const
 
     match_scale_of(lhs, rhs);
 
-    positparams<N, ES, WT> sum;
+    posit_parameters<N, ES, WT> sum;
     sum_fractions(sum, lhs, rhs);
 
     //
@@ -404,8 +406,8 @@ positparams<N, ES, WT>::operator+(const positparams<N, ES, WT>& other) const
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr positparams<N, ES, WT>
-positparams<N, ES, WT>::operator*(const positparams<N, ES, WT>& other) const
+[[nodiscard]] constexpr posit_parameters<N, ES, WT>
+posit_parameters<N, ES, WT>::operator*(const posit_parameters<N, ES, WT>& other) const
 {
     //
     // handle special cases NaR and zero
@@ -425,9 +427,9 @@ positparams<N, ES, WT>::operator*(const positparams<N, ES, WT>& other) const
     // do multiplication
     //
 
-    positparams<N, ES, WT> lhs = *this;
-    positparams<N, ES, WT> rhs = other;
-    positparams<N, ES, WT> prod;
+    posit_parameters<N, ES, WT> lhs = *this;
+    posit_parameters<N, ES, WT> rhs = other;
+    posit_parameters<N, ES, WT> prod;
 
     prod.sign_bit = lhs.sign_bit ^ rhs.sign_bit;
     prod.scale = lhs.scale + rhs.scale;
@@ -439,8 +441,8 @@ positparams<N, ES, WT>::operator*(const positparams<N, ES, WT>& other) const
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr positparams<N, ES, WT>
-positparams<N, ES, WT>::operator/(const positparams<N, ES, WT>& other) const
+[[nodiscard]] constexpr posit_parameters<N, ES, WT>
+posit_parameters<N, ES, WT>::operator/(const posit_parameters<N, ES, WT>& other) const
 {
     //
     // handle special cases NaR and zero
@@ -460,9 +462,9 @@ positparams<N, ES, WT>::operator/(const positparams<N, ES, WT>& other) const
     // do division
     //
 
-    positparams<N, ES, WT> lhs = *this;
-    positparams<N, ES, WT> rhs = other;
-    positparams<N, ES, WT> prod;
+    posit_parameters<N, ES, WT> lhs = *this;
+    posit_parameters<N, ES, WT> rhs = other;
+    posit_parameters<N, ES, WT> prod;
 
     prod.sign_bit = lhs.sign_bit ^ rhs.sign_bit;
     prod.scale = lhs.scale - rhs.scale;
@@ -474,7 +476,7 @@ positparams<N, ES, WT>::operator/(const positparams<N, ES, WT>& other) const
 }
 
 template <size_t N, size_t ES, typename WT>
-constexpr positparams<N, ES, WT>::positparams()
+constexpr posit_parameters<N, ES, WT>::posit_parameters()
     : is_nar(false)
     , is_zero(false)
     , sign_bit(false)
@@ -482,30 +484,30 @@ constexpr positparams<N, ES, WT>::positparams()
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr positparams<N, ES, WT> positparams<N, ES, WT>::zero()
+[[nodiscard]] constexpr posit_parameters<N, ES, WT> posit_parameters<N, ES, WT>::zero()
 {
-    positparams<N, ES, WT> result;
+    posit_parameters<N, ES, WT> result;
     result.is_zero = true;
     return result;
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr positparams<N, ES, WT> positparams<N, ES, WT>::nar()
+[[nodiscard]] constexpr posit_parameters<N, ES, WT> posit_parameters<N, ES, WT>::nar()
 {
-    positparams<N, ES, WT> result;
+    posit_parameters<N, ES, WT> result;
     result.is_nar = true;
     return result;
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr positparams<N, ES, WT> positparams<N, ES, WT>::minpos()
+[[nodiscard]] constexpr posit_parameters<N, ES, WT> posit_parameters<N, ES, WT>::minpos()
 {
-    return positparams(posit<N, ES, WT>::minpos());
+    return posit_parameters(posit<N, ES, WT>::minpos());
 }
 
 template <size_t N, size_t ES, typename WT>
-std::tuple<positparams<N, ES, WT>*, positparams<N, ES, WT>*>
-positparams<N, ES, WT>::ordered(positparams<N, ES, WT>* p, positparams<N, ES, WT>* q)
+std::tuple<posit_parameters<N, ES, WT>*, posit_parameters<N, ES, WT>*>
+posit_parameters<N, ES, WT>::ordered(posit_parameters<N, ES, WT>* p, posit_parameters<N, ES, WT>* q)
 {
     if (p->scale > q->scale)
     {
@@ -518,7 +520,8 @@ positparams<N, ES, WT>::ordered(positparams<N, ES, WT>* p, positparams<N, ES, WT
 }
 
 template <size_t N, size_t ES, typename WT>
-void positparams<N, ES, WT>::match_scale_of(positparams<N, ES, WT>& p, positparams<N, ES, WT>& q)
+void posit_parameters<N, ES, WT>::match_scale_of(posit_parameters<N, ES, WT>& p,
+                                                 posit_parameters<N, ES, WT>& q)
 {
     auto [bigger, smaller] = ordered(&p, &q);
 
@@ -529,9 +532,9 @@ void positparams<N, ES, WT>::match_scale_of(positparams<N, ES, WT>& p, positpara
 }
 
 template <size_t N, size_t ES, typename WT>
-void positparams<N, ES, WT>::sum_fractions(positparams<N, ES, WT>& dest,
-                                           const positparams<N, ES, WT>& lhs,
-                                           const positparams<N, ES, WT>& rhs)
+void posit_parameters<N, ES, WT>::sum_fractions(posit_parameters<N, ES, WT>& dest,
+                                                const posit_parameters<N, ES, WT>& lhs,
+                                                const posit_parameters<N, ES, WT>& rhs)
 {
     dest.is_nar = false;
     dest.is_zero = false;
@@ -605,9 +608,9 @@ void positparams<N, ES, WT>::sum_fractions(positparams<N, ES, WT>& dest,
 }
 
 template <size_t N, size_t ES, typename WT>
-void positparams<N, ES, WT>::add_fractions(positparams<N, ES, WT>& dest,
-                                           const posit_fraction<N, ES, WT>& lfrac,
-                                           const posit_fraction<N, ES, WT>& rfrac)
+void posit_parameters<N, ES, WT>::add_fractions(posit_parameters<N, ES, WT>& dest,
+                                                const posit_fraction<N, ES, WT>& lfrac,
+                                                const posit_fraction<N, ES, WT>& rfrac)
 {
     dest.fraction = lfrac + rfrac;
 
@@ -621,9 +624,9 @@ void positparams<N, ES, WT>::add_fractions(positparams<N, ES, WT>& dest,
 }
 
 template <size_t N, size_t ES, typename WT>
-void positparams<N, ES, WT>::sub_fractions(positparams<N, ES, WT>& dest,
-                                           const posit_fraction<N, ES, WT>& lfrac,
-                                           const posit_fraction<N, ES, WT>& rfrac)
+void posit_parameters<N, ES, WT>::sub_fractions(posit_parameters<N, ES, WT>& dest,
+                                                const posit_fraction<N, ES, WT>& lfrac,
+                                                const posit_fraction<N, ES, WT>& rfrac)
 {
     dest.fraction = lfrac - rfrac;
 
@@ -640,13 +643,13 @@ void positparams<N, ES, WT>::sub_fractions(positparams<N, ES, WT>& dest,
 }
 
 template <size_t SN, size_t SES, typename SWT>
-std::ostream& operator<<(std::ostream& os, const positparams<SN, SES, SWT>& p)
+std::ostream& operator<<(std::ostream& os, const posit_parameters<SN, SES, SWT>& p)
 {
     return os << "(nar=" << p.is_nar << " is_zero=" << p.is_zero << " sign=" << p.sign_bit
               << " scale=" << p.scale << " fraction=" << p.fraction << ")";
 }
 
-template <size_t N, size_t ES, typename WT> void positparams<N, ES, WT>::ensure_standard_form()
+template <size_t N, size_t ES, typename WT> void posit_parameters<N, ES, WT>::ensure_standard_form()
 {
     if (fraction.integer_bits())
     {

@@ -15,7 +15,7 @@ TEMPLATE_TEST_CASE_SIG("conversion to and from positparam preserves value", "[po
     {
         const Posit expected = Posit::from(bits);
 
-        const auto pp = positparams<N, ES, WT>(expected);
+        const auto pp = posit_parameters<N, ES, WT>(expected);
         const Posit actual = static_cast<Posit>(pp);
 
         REQUIRE(actual == expected);

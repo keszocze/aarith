@@ -107,7 +107,8 @@ posit_fraction<N, ES, WT>::scratch_bits() const
 }
 
 template <size_t N, size_t ES, typename WT>
-posit_fraction<N, ES, WT>& posit_fraction<N, ES, WT>::operator=(const posit_fraction<N, ES, WT>& other)
+posit_fraction<N, ES, WT>&
+posit_fraction<N, ES, WT>::operator=(const posit_fraction<N, ES, WT>& other)
 {
     bits = other.bits;
     truncated = other.truncated;
