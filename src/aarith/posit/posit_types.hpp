@@ -1,6 +1,6 @@
 #pragma once
 
-#include <aarith/posit/posit_prototypes.hpp>
+#include <aarith/posit.hpp>
 #include <cstdint>
 
 namespace aarith {
