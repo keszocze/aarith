@@ -1,6 +1,8 @@
 #pragma once
 
+#include <aarith/fixed_point.hpp>
 #include <aarith/integer.hpp>
+
 #include <cstdint>
 #include <stdexcept>
 #include <string>
@@ -1469,6 +1471,66 @@ private:
     void ensure_standard_form();
 };
 
+//
+// Quire Helpers for Calculating Sizes.
+//
+// They are separate from the quire class because to instantiate a quire we
+// need to run these functions.
+//
+// For implementation, look at posit/quire_sizes.hpp.
+//
+
+[[nodiscard]] constexpr size_t quire_integer_width(size_t posit_width, size_t posit_exponent_size);
+[[nodiscard]] constexpr size_t quire_fraction_width(size_t posit_width, size_t posit_exponent_size);
+[[nodiscard]] constexpr size_t quire_carry_width(size_t posit_width, size_t posit_exponent_size);
+[[nodiscard]] constexpr size_t quire_width(size_t posit_width, size_t posit_exponent_size);
+
+//
+// Quire Implementation.
+//
+// For implementation, look at posit/quire.hpp.
+//
+
+/**
+ * @brief Quire for use with posit arithmetic.
+ *
+ * A quire is a fixed point number that can be used to compute posit
+ * arithmetic without loss of precision up to a certain amount of operations.
+ *
+ * @tparam N The width of associated posits.
+ * @tparam ES The exponent size of associated posits.
+ * @tparam WT The word type of associated posits.
+ */
+template <size_t N, size_t ES, typename WT> class quire
+{
+public:
+    /**
+     * @brief Width of the integer part in the underlying fixed point number.
+     */
+    static constexpr size_t IntegerWidth = quire_integer_width(N, ES);
+
+    /**
+     * @brief Width of the fraction part in the underlying fixed point number.
+     */
+    static constexpr size_t FractionWidth = quire_fraction_width(N, ES);
+
+    /**
+     * @brief Width of the carry guard in the underlying fixed point number.
+     *
+     * The carry guard consists of at least 30 bits that are here to prevent
+     * rounding errors.
+     */
+    static constexpr size_t CarryWidth = quire_carry_width(N, ES);
+
+    /**
+     * @brief Total width of the underlying fixed point number, including the
+     * sign bit.
+     */
+    static constexpr size_t QuireSize = quire_width(N, ES);
+
+private:
+};
+
 } // namespace aarith
 
 //
@@ -1485,4 +1547,7 @@ private:
 #include <aarith/posit/posit_operators.hpp>
 #include <aarith/posit/posit_parameters.hpp>
 #include <aarith/posit/posit_types.hpp>
+#include <aarith/posit/quire.hpp>
+#include <aarith/posit/quire_sizes.hpp>
+#include <aarith/posit/quire_types.hpp>
 #include <aarith/posit/string_utils.hpp>
