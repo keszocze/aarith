@@ -115,13 +115,13 @@ TEMPLATE_TEST_CASE_SIG("Addition wraps around correctly for unsigned fixed point
             REQUIRE(sum == zero);
         }
     }
-        WHEN("Adding max to max")
+    WHEN("Adding max to max")
+    {
+        THEN("The result should be max - 1")
         {
-            THEN("The result should be max - 1")
-            {
-                REQUIRE(add(max_val, max_val) == sub(max_val, ulp));
-            }
+            REQUIRE(add(max_val, max_val) == sub(max_val, ulp));
         }
+    }
 }
 
 TEMPLATE_TEST_CASE_SIG("Addition wraps around correctly for signed fixed points",
@@ -142,6 +142,7 @@ TEMPLATE_TEST_CASE_SIG("Addition wraps around correctly for signed fixed points"
             REQUIRE(sum == min_val);
         }
     }
+
     WHEN("Adding min to min")
     {
         THEN("The result should be zero")
@@ -150,13 +151,6 @@ TEMPLATE_TEST_CASE_SIG("Addition wraps around correctly for signed fixed points"
             REQUIRE(sum == Fixed::zero());
         }
     }
-        WHEN("Adding max to max")
-        {
-            THEN("The result should be max - 1")
-            {
-                REQUIRE(add(max_val, max_val) == sub(max_val, ulp));
-            }
-        }
 }
 
 SCENARIO("Addition of fixed point numbers", "[fixed point][signed][arithmetic][addition]")

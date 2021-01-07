@@ -45,5 +45,4 @@ auto random_fixed_point() -> Catch::Generators::GeneratorWrapper<fixed<I, F, Bas
             new FixedPointGenerator<I, F, BaseInt, WordType>()));
 }
 
-
 } // namespace aarith

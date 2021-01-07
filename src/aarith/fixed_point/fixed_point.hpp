@@ -13,7 +13,7 @@ public:
     static constexpr size_t int_width = I;
     static constexpr size_t frac_width = F;
     using int_type = B<width, WordType>;
-    using fixed_type = fixed<I,F,B, WordType>;
+    using fixed_type = fixed<I, F, B, WordType>;
 
     static_assert(::aarith::is_integral_v<int_type>);
     static_assert(I + F > 0, "At least one bit is needed to construct a fixed point number");
@@ -75,12 +75,11 @@ public:
         else if constexpr (::aarith::is_integral_v<Integer>)
         {
             static_assert(I >= i.width);
-            static_assert(width>= i.width);
+            static_assert(width >= i.width);
             data = i;
             data = data << F;
         }
     }
-
 
     /**
      * @brief Constructs a fixed point number from a given "raw" string of bits.
@@ -93,7 +92,8 @@ public:
      * @param w The word array containing the raw data
      * @return A fixed point number constructed from the word array
      */
-    template <size_t W>[[nodiscard]] static constexpr fixed from_bitstring(const word_array<W, WordType>& w)
+    template <size_t W>
+    [[nodiscard]] static constexpr fixed from_bitstring(const word_array<W, WordType>& w)
     {
         static_assert(width >= W);
         fixed result;
@@ -107,7 +107,7 @@ public:
         static_assert(std::is_integral_v<Int>);
         static_assert(!std::is_signed_v<Int>);
 
-        return from_bitstring(uinteger<I+F,WordType>{n} << F);
+        return from_bitstring(uinteger<I + F, WordType>{n} << F);
     }
 
     /**
@@ -157,7 +157,8 @@ public:
      *
      * @return Max value
      */
-    [[nodiscard]] static constexpr fixed_type max() {
+    [[nodiscard]] static constexpr fixed_type max()
+    {
         fixed_type max;
         max.data = int_type::max();
         return max;
@@ -167,7 +168,8 @@ public:
      * @brief Minimal value that can be stored.
      * @return Min value
      */
-    [[nodiscard]] static constexpr fixed_type min() {
+    [[nodiscard]] static constexpr fixed_type min()
+    {
         fixed_type min;
         min.data = int_type::min();
         return min;
@@ -177,7 +179,8 @@ public:
      * @brief The number zero.
      * @return Zero
      */
-    [[nodiscard]] static constexpr fixed_type zero() {
+    [[nodiscard]] static constexpr fixed_type zero()
+    {
         fixed_type zero;
         return zero;
     }
@@ -186,9 +189,10 @@ public:
      * @brief The number one.
      * @return One
      */
-    [[nodiscard]] static constexpr fixed_type one() {
+    [[nodiscard]] static constexpr fixed_type one()
+    {
         fixed_type one;
-        one.data.set_bit(F,true);
+        one.data.set_bit(F, true);
         return one;
     }
 
@@ -196,13 +200,12 @@ public:
      * @brief The unit in the last place.
      * @return ULP
      */
-    [[nodiscard]] static constexpr fixed_type ulp() {
+    [[nodiscard]] static constexpr fixed_type ulp()
+    {
         fixed_type one;
-        one.data.set_bit(0,true);
+        one.data.set_bit(0, true);
         return one;
     }
-
-
 };
 
 template <size_t I, size_t F, typename WordType = uint64_t>
