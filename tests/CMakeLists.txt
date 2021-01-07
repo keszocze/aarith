@@ -59,7 +59,7 @@ add_aarith_test(posit-softposit-8-2-division FILES posit/posit-softposit-8-2-div
 add_aarith_test(posit-softposit-8-2-multiplication FILES posit/posit-softposit-8-2-multiplication-test.cpp)
 add_aarith_test(posit-softposit-8-2-subtraction FILES posit/posit-softposit-8-2-subtraction-test.cpp)
 add_aarith_test(posit-types FILES posit/posit_types-test.cpp)
-add_aarith_test(positparams FILES posit/positparams-test.cpp)
+add_aarith_test(posit_parameters FILES posit/posit_parameters-test.cpp)
 
 
 
