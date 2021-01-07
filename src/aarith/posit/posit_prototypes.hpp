@@ -883,7 +883,7 @@ width_cast(const posit<SourceWidth, SourceExponentSize, SourceWordType>& p);
 //
 // String Utilities for posit Class.
 //
-// For implementation, look at posit/string_utils.hpp
+// For implementation, look at posit/posit_string_utils.hpp
 //
 
 /**
@@ -1556,12 +1556,12 @@ public:
     /**
      * @brief Width of the integer part in the underlying fixed point number.
      */
-    static constexpr size_t IntegerWidth = quire_integer_width(N, ES);
+    static constexpr size_t IntegerSize = quire_integer_width(N, ES);
 
     /**
      * @brief Width of the fraction part in the underlying fixed point number.
      */
-    static constexpr size_t FractionWidth = quire_fraction_width(N, ES);
+    static constexpr size_t FractionSize = quire_fraction_width(N, ES);
 
     /**
      * @brief Width of the carry guard in the underlying fixed point number.
@@ -1569,7 +1569,7 @@ public:
      * The carry guard consists of at least 30 bits that are here to prevent
      * rounding errors.
      */
-    static constexpr size_t CarryWidth = quire_carry_width(N, ES);
+    static constexpr size_t CarrySize = quire_carry_width(N, ES);
 
     /**
      * @brief Total width of the underlying fixed point number, including the
@@ -1577,8 +1577,172 @@ public:
      */
     static constexpr size_t QuireSize = quire_width(N, ES);
 
+    /**
+     * @brief The underlying type used to store the current value of the
+     * quire.
+     */
+    using storage_type = fixed_point<1 + CarrySize + IntegerSize, FractionSize>;
+
+    /**
+     * @return A quire that represents the number zero.
+     */
+    [[nodiscard]] static constexpr quire zero();
+
+    /**
+     * @return A quire that represents NaR.
+     */
+    [[nodiscard]] static constexpr quire nar();
+
+    /**
+     * @brief Construct quire from fixed point value.
+     *
+     * @param bits The value to import as-is.
+     */
+    [[nodiscard]] static constexpr quire from(const storage_type& bits);
+
+    /**
+     * @brief Construct zero quire.
+     *
+     * Construct this quire to represent the number zero.
+     */
+    constexpr quire();
+
+    /**
+     * @brief Copy constructor.
+     *
+     * Construct object to be identical to other.
+     */
+    constexpr quire(const quire& other);
+
+    /**
+     * @brief Construct from posit.
+     *
+     * Construct a quire to match the value given by posit p.
+     */
+    constexpr quire(const posit<N, ES, WT>& p);
+
+    /**
+     * @brief Default destructor.
+     */
+    ~quire() = default;
+
+    /**
+     * @brief Assignment operator.
+     */
+    quire& operator=(const quire& other);
+
+    /**
+     * @return Whether this quire represents the number zero.
+     */
+    [[nodiscard]] constexpr bool is_zero() const;
+
+    /**
+     * @return Whether this quire represents NaR.
+     */
+    [[nodiscard]] constexpr bool is_nar() const;
+
+    /**
+     * @return The underlying fixed point storage.
+     */
+    [[nodiscard]] constexpr storage_type get_bits() const;
+
 private:
+    storage_type value;
 };
+
+//
+// Quire Operators.
+//
+// Outside the class for easy automatic conversion of arguments.
+//
+// For implementation, look at posit/quire_operators.hpp
+//
+
+/**
+ * @return Whether lhs and rhs are equal.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool operator==(const quire<N, ES, WT>& lhs, const quire<N, ES, WT>& rhs);
+
+/**
+ * @true Whether lhs and rhs are not equal.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool operator!=(const quire<N, ES, WT>& lhs, const quire<N, ES, WT>& rhs);
+
+/**
+ * @return Whether lhs is greater than rhs.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool operator>(const quire<N, ES, WT>& lhs, const quire<N, ES, WT>& rhs);
+
+/**
+ * @return Whether lhs is greater or equal to rhs.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool operator>=(const quire<N, ES, WT>& lhs, const quire<N, ES, WT>& rhs);
+
+/**
+ * @return Whether lhs is less than rhs.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool operator<(const quire<N, ES, WT>& lhs, const quire<N, ES, WT>& rhs);
+
+/**
+ * @return Whether lhs is less or equal to rhs.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool operator<=(const quire<N, ES, WT>& lhs, const quire<N, ES, WT>& rhs);
+
+/**
+ * @brief Quire Addition.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr quire<N, ES, WT> operator+(const quire<N, ES, WT>& lhs,
+                                                   const quire<N, ES, WT>& rhs);
+
+/**
+ * @brief Quire Subtraction.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr quire<N, ES, WT> operator-(const quire<N, ES, WT>& lhs,
+                                                   const quire<N, ES, WT>& rhs);
+
+/**
+ * @brief Quire Multiplication.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr quire<N, ES, WT> operator*(const quire<N, ES, WT>& lhs,
+                                                   const quire<N, ES, WT>& rhs);
+
+/**
+ * @brief Quire Division.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr quire<N, ES, WT> operator/(const quire<N, ES, WT>& lhs,
+                                                   const quire<N, ES, WT>& rhs);
+
+/**
+ * @brief Output a string representation of p to os.
+ */
+template <size_t N, size_t ES, typename WT>
+std::ostream& operator<<(std::ostream& os, const quire<N, ES, WT>& q);
+
+//
+// String utilities for the quire class.
+//
+// For implementation, look at posit/quire_string_utils.hpp
+//
+
+/**
+ * @brief Convert quire to printable bitstring.
+ *
+ * This function prints the underlying bitstring as a std::string of zeroes
+ * and ones.
+ *
+ * @param q The quire from which to print the bitstring.
+ */
+template <size_t N, size_t ES, typename WT> std::string to_binary(const quire<N, ES, WT>& q);
 
 } // namespace aarith
 
@@ -1595,8 +1759,10 @@ private:
 #include <aarith/posit/posit_operations.hpp>
 #include <aarith/posit/posit_operators.hpp>
 #include <aarith/posit/posit_parameters.hpp>
+#include <aarith/posit/posit_string_utils.hpp>
 #include <aarith/posit/posit_types.hpp>
 #include <aarith/posit/quire.hpp>
+#include <aarith/posit/quire_operators.hpp>
 #include <aarith/posit/quire_sizes.hpp>
+#include <aarith/posit/quire_string_utils.hpp>
 #include <aarith/posit/quire_types.hpp>
-#include <aarith/posit/string_utils.hpp>
