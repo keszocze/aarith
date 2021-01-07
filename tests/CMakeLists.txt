@@ -1,6 +1,5 @@
 set(CMAKE_CXX_CLANG_TIDY "")
 
-
 add_aarith_test(core-functional-style FILES core/functional-style-test.cpp)
 add_aarith_test(core-number-util FILES core/number_utils-test.cpp)
 add_aarith_test(word_array-random-generation FILES core/word_array-generation-test.cpp)
@@ -60,12 +59,9 @@ add_aarith_test(posit-softposit-8-2-multiplication FILES posit/posit-softposit-8
 add_aarith_test(posit-softposit-8-2-subtraction FILES posit/posit-softposit-8-2-subtraction-test.cpp)
 add_aarith_test(posit-types FILES posit/posit_types-test.cpp)
 add_aarith_test(posit_parameters FILES posit/posit_parameters-test.cpp)
-
-
+add_aarith_test(quire_sizes FILES posit/quire_sizes-test.cpp)
 
 add_aarith_test(fau-adder FILES uint-approx-test.cpp)
-
-
 
 if(MPIR_FOUND)
   add_aarith_test(uint-check-against-mpir FILES integer/uint-arithmetic-mpir-test.cpp LIBS ${MPIR_LIBRARIES} INCLUDES ${MPIR_INCLUDE_DIR})
@@ -78,7 +74,6 @@ endif()
 if (USE_FULL_RANGE_IN_TESTS)
   add_compile_definitions(AARITH_USE_FULL_RANGE)
 endif()
-
 
 ## coverage
 

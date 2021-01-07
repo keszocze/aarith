@@ -6,7 +6,7 @@ namespace aarith {
 
 [[nodiscard]] constexpr size_t quire_integer_width(size_t posit_width, size_t posit_exponent_size)
 {
-    return (1 << posit_exponent_size) * (posit_width - 2);
+    return 2 * (1 << posit_exponent_size) * (posit_width - 2);
 }
 
 [[nodiscard]] constexpr size_t quire_fraction_width(size_t posit_width, size_t posit_exponent_size)
@@ -51,7 +51,7 @@ namespace aarith {
             truncated_ones += 1;
         }
 
-        actual <<= 1;
+        actual >>= 1;
 
         width_power += 1;
     }
