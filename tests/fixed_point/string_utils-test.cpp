@@ -4,8 +4,8 @@
 
 using namespace aarith;
 
-
-SCENARIO("Testing the to_binary method") {
+SCENARIO("Testing the to_binary method")
+{
     GIVEN("The number zero in various bit widths")
     {
         THEN("To binary should give the correct bit string")

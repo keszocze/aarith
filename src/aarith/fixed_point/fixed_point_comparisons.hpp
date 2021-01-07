@@ -13,11 +13,14 @@ constexpr bool operator==(const FixedA& a, const FixedB& b)
     {
         return (a.bits() == b.bits());
     }
-    else {
-        if constexpr (fracA > fracB) {
+    else
+    {
+        if constexpr (fracA > fracB)
+        {
             return a.bits() == width_cast<FixedB::int_width, fracA>(b).bits();
         }
-        else {
+        else
+        {
             return width_cast<FixedA::int_width, fracB>(a).bits() == b.bits();
         }
     }
@@ -42,11 +45,14 @@ constexpr bool operator<(const FixedA& a, const FixedB& b)
     {
         return (a.bits() < b.bits());
     }
-    else {
-        if constexpr (fracA > fracB) {
+    else
+    {
+        if constexpr (fracA > fracB)
+        {
             return a.bits() < width_cast<FixedB::int_width, fracA>(b).bits();
         }
-        else {
+        else
+        {
             return width_cast<FixedA::int_width, fracB>(a).bits() == b.bits();
         }
     }

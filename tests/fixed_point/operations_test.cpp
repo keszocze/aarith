@@ -115,13 +115,13 @@ TEMPLATE_TEST_CASE_SIG("Addition wraps around correctly for unsigned fixed point
             REQUIRE(sum == zero);
         }
     }
-        WHEN("Adding max to max")
+    WHEN("Adding max to max")
+    {
+        THEN("The result should be max - 1")
         {
-            THEN("The result should be max - 1")
-            {
-                REQUIRE(add(max_val, max_val) == sub(max_val, ulp));
-            }
+            REQUIRE(add(max_val, max_val) == sub(max_val, ulp));
         }
+    }
 }
 
 TEMPLATE_TEST_CASE_SIG("Addition wraps around correctly for signed fixed points",
@@ -142,6 +142,7 @@ TEMPLATE_TEST_CASE_SIG("Addition wraps around correctly for signed fixed points"
             REQUIRE(sum == min_val);
         }
     }
+
     WHEN("Adding min to min")
     {
         THEN("The result should be zero")
@@ -150,13 +151,6 @@ TEMPLATE_TEST_CASE_SIG("Addition wraps around correctly for signed fixed points"
             REQUIRE(sum == Fixed::zero());
         }
     }
-        WHEN("Adding max to max")
-        {
-            THEN("The result should be max - 1")
-            {
-                REQUIRE(add(max_val, max_val) == sub(max_val, ulp));
-            }
-        }
 }
 
 SCENARIO("Addition of fixed point numbers", "[fixed point][signed][arithmetic][addition]")
@@ -179,6 +173,98 @@ SCENARIO("Addition of fixed point numbers", "[fixed point][signed][arithmetic][a
                     //
                     REQUIRE(result == expected);
                 }
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Multiplying one does not do anything",
+                       "[fixed_point][signed][unsigned][arithmetic][multiplication]",
+                       AARITH_FIXED_TEST_EXTENDED_SIGNATURE, AARITH_FIXED_TEST_EXTENDED_PARAM_RANGE)
+{
+    GIVEN("Two fixed point numbers")
+    {
+
+        using Fixed = fixed<I, F, BaseInt, WordType>;
+
+        Fixed a = GENERATE(take(20, random_fixed_point<I, F, BaseInt, WordType>()));
+
+        WHEN("Multiplying with one")
+        {
+            Fixed res = mul(a, Fixed::one());
+
+            THEN("The results should be identical")
+            {
+                REQUIRE(res == a);
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Multiplying zero returns zero",
+                       "[fixed_point][signed][unsigned][arithmetic][multiplication]",
+                       AARITH_FIXED_TEST_EXTENDED_SIGNATURE, AARITH_FIXED_TEST_EXTENDED_PARAM_RANGE)
+{
+    GIVEN("Two fixed point numbers")
+    {
+
+        using Fixed = fixed<I, F, BaseInt, WordType>;
+
+        Fixed a = GENERATE(take(20, random_fixed_point<I, F, BaseInt, WordType>()));
+
+        WHEN("Multiplying with zero")
+        {
+            auto res = mul(a, Fixed::zero());
+
+            THEN("The results should be zero")
+            {
+                REQUIRE(res == Fixed::zero());
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Dividing by one does not do anything",
+                       "[fixed_point][signed][unsigned][arithmetic][division]",
+                       AARITH_FIXED_TEST_EXTENDED_SIGNATURE, AARITH_FIXED_TEST_EXTENDED_PARAM_RANGE)
+{
+    GIVEN("Two fixed point numbers")
+    {
+
+        using Fixed = fixed<I, F, BaseInt, WordType>;
+
+        Fixed a = GENERATE(take(20, random_fixed_point<I, F, BaseInt, WordType>()));
+
+        WHEN("Dividing by one")
+        {
+            Fixed res = div(a, Fixed::one());
+
+            THEN("The results should be identical")
+            {
+                REQUIRE(res == a);
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Dividing a number x by x returns one",
+                       "[fixed_point][signed][unsigned][arithmetic][division]",
+                       AARITH_FIXED_TEST_EXTENDED_SIGNATURE, AARITH_FIXED_TEST_EXTENDED_PARAM_RANGE)
+{
+    GIVEN("A fixed point number")
+    {
+
+        using Fixed = fixed<I, F, BaseInt, WordType>;
+
+        Fixed a = GENERATE(take(20, random_fixed_point<I, F, BaseInt, WordType>()));
+
+        WHEN("Dividing by itself")
+        {
+            Fixed res = div(a, a);
+
+            THEN("The results should be one")
+            {
+                REQUIRE(res == Fixed::one());
             }
         }
     }

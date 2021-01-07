@@ -124,7 +124,7 @@ auto to_decimal(const integer<Width, WordType>& value) -> std::string
     return res;
 }
 
-template <typename Integer, typename = std::enable_if_t<::aarith::is_integral_v<Integer>>>
+template <typename Integer, typename = std::enable_if_t<is_integral_v<Integer>>>
 auto operator<<(std::ostream& out, const Integer& value) -> std::ostream&
 {
     if (out.flags() & std::ios::hex)

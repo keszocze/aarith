@@ -14,10 +14,10 @@ SCENARIO("Constructor and extraction functions work", "[fixed point]")
             20, random(std::numeric_limits<int64_t>::min(), std::numeric_limits<int64_t>::max())));
         int32_t n32 = GENERATE(take(
             20, random(std::numeric_limits<int32_t>::min(), std::numeric_limits<int32_t>::max())));
-        uint32_t un32 = GENERATE(take(N, random(std::numeric_limits<uint32_t>::min(),
-                                                 std::numeric_limits<uint32_t>::max())));
-        uint64_t un64 = GENERATE(take(N, random(std::numeric_limits<uint64_t>::min(),
-                                                 std::numeric_limits<uint64_t>::max())));
+        uint32_t un32 = GENERATE(take(
+            N, random(std::numeric_limits<uint32_t>::min(), std::numeric_limits<uint32_t>::max())));
+        uint64_t un64 = GENERATE(take(
+            N, random(std::numeric_limits<uint64_t>::min(), std::numeric_limits<uint64_t>::max())));
 
         WHEN("Using the constructor taking native data types")
         {
@@ -214,18 +214,18 @@ SCENARIO("Bit shifting fixed point numbers")
                 // entsprechenden Konstruktoren bauen
                 //                                constexpr auto shift1 = s << 5;
                 //                constexpr auto shift2 = u << 5;
-//                std::cout << to_binary(s) << "\t" << to_binary(s << 5) << "\n";
-//                std::cout << to_binary(u) << "\t" << to_binary(u << 5) << "\n";
+                //                std::cout << to_binary(s) << "\t" << to_binary(s << 5) << "\n";
+                //                std::cout << to_binary(u) << "\t" << to_binary(u << 5) << "\n";
             }
         }
         WHEN("Shifting right")
         {
             THEN("The result is a correctly shifted fixed point number")
             {
-//                std::cout << to_binary(u) << "\t" << to_binary(u >> 5) << "\n";
-//                std::cout << to_binary(u) << "\t" << to_binary(u >> 4) << "\n";
-//                std::cout << to_binary(s) << "\t" << to_binary(s >> 5) << "\n";
-//                std::cout << to_binary(s) << "\t" << to_binary(s >> 4) << "\n";
+                //                std::cout << to_binary(u) << "\t" << to_binary(u >> 5) << "\n";
+                //                std::cout << to_binary(u) << "\t" << to_binary(u >> 4) << "\n";
+                //                std::cout << to_binary(s) << "\t" << to_binary(s >> 5) << "\n";
+                //                std::cout << to_binary(s) << "\t" << to_binary(s >> 4) << "\n";
             }
         }
     }

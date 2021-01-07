@@ -34,10 +34,10 @@ constexpr bool operator==(const word_array<W, WordType>& a, const word_array<V, 
     }
 }
 
-template <typename W, typename V, typename WordType,
-          typename = std::enable_if_t<is_word_array_v<W> && is_word_array_v<V>>>
-constexpr bool operator!=(const W& a, const V& b)
+template <typename W, typename V> constexpr bool operator!=(const W& a, const V& b)
 {
+    static_assert(::aarith::is_word_array_v<W>);
+    static_assert(::aarith::is_word_array_v<V>);
 
     // we do not care about speed and simply call the equality function....
     return !(a == b);
