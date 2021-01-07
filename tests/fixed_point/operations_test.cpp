@@ -177,3 +177,95 @@ SCENARIO("Addition of fixed point numbers", "[fixed point][signed][arithmetic][a
         }
     }
 }
+
+TEMPLATE_TEST_CASE_SIG("Multiplying one does not do anything",
+                       "[fixed_point][signed][unsigned][arithmetic][multiplication]",
+                       AARITH_FIXED_TEST_EXTENDED_SIGNATURE, AARITH_FIXED_TEST_EXTENDED_PARAM_RANGE)
+{
+    GIVEN("Two fixed point numbers")
+    {
+
+        using Fixed = fixed<I, F, BaseInt, WordType>;
+
+        Fixed a = GENERATE(take(20, random_fixed_point<I, F, BaseInt, WordType>()));
+
+        WHEN("Multiplying with one")
+        {
+            Fixed res = mul(a, Fixed::one());
+
+            THEN("The results should be identical")
+            {
+                REQUIRE(res == a);
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Multiplying zero returns zero",
+                       "[fixed_point][signed][unsigned][arithmetic][multiplication]",
+                       AARITH_FIXED_TEST_EXTENDED_SIGNATURE, AARITH_FIXED_TEST_EXTENDED_PARAM_RANGE)
+{
+    GIVEN("Two fixed point numbers")
+    {
+
+        using Fixed = fixed<I, F, BaseInt, WordType>;
+
+        Fixed a = GENERATE(take(20, random_fixed_point<I, F, BaseInt, WordType>()));
+
+        WHEN("Multiplying with zero")
+        {
+            auto res = mul(a, Fixed::zero());
+
+            THEN("The results should be zero")
+            {
+                REQUIRE(res == Fixed::zero());
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Dividing by one does not do anything",
+                       "[fixed_point][signed][unsigned][arithmetic][division]",
+                       AARITH_FIXED_TEST_EXTENDED_SIGNATURE, AARITH_FIXED_TEST_EXTENDED_PARAM_RANGE)
+{
+    GIVEN("Two fixed point numbers")
+    {
+
+        using Fixed = fixed<I, F, BaseInt, WordType>;
+
+        Fixed a = GENERATE(take(20, random_fixed_point<I, F, BaseInt, WordType>()));
+
+        WHEN("Dividing by one")
+        {
+            Fixed res = div(a, Fixed::one());
+
+            THEN("The results should be identical")
+            {
+                REQUIRE(res == a);
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Dividing a number x by x returns one",
+                       "[fixed_point][signed][unsigned][arithmetic][division]",
+                       AARITH_FIXED_TEST_EXTENDED_SIGNATURE, AARITH_FIXED_TEST_EXTENDED_PARAM_RANGE)
+{
+    GIVEN("A fixed point number")
+    {
+
+        using Fixed = fixed<I, F, BaseInt, WordType>;
+
+        Fixed a = GENERATE(take(20, random_fixed_point<I, F, BaseInt, WordType>()));
+
+        WHEN("Dividing by itself")
+        {
+            Fixed res = div(a, a);
+
+            THEN("The results should be one")
+            {
+                REQUIRE(res == Fixed::one());
+            }
+        }
+    }
+}
