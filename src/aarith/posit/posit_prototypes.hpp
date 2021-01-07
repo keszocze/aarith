@@ -1367,6 +1367,16 @@ public:
     template <size_t SN, size_t SES, typename SWT>
     friend std::ostream& operator<<(std::ostream& os, const posit_parameters<SN, SES, SWT>& p);
 
+    /**
+     * @return The underlying scale value.
+     */
+    [[nodiscard]] constexpr integer<N, WT> get_scale() const;
+
+    /**
+     * @return The underlying fraction.
+     */
+    [[nodiscard]] constexpr posit_fraction<N, ES, WT> get_fraction() const;
+
 private:
     /**
      * Whether this posit represents NaR.

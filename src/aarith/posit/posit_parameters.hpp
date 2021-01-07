@@ -649,6 +649,18 @@ std::ostream& operator<<(std::ostream& os, const posit_parameters<SN, SES, SWT>&
               << " scale=" << p.scale << " fraction=" << p.fraction << ")";
 }
 
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr integer<N, WT> posit_parameters<N, ES, WT>::get_scale() const
+{
+    return scale;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit_fraction<N, ES, WT> posit_parameters<N, ES, WT>::get_fraction() const
+{
+    return fraction;
+}
+
 template <size_t N, size_t ES, typename WT> void posit_parameters<N, ES, WT>::ensure_standard_form()
 {
     if (fraction.integer_bits())
