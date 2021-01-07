@@ -5,20 +5,22 @@
 #include <iostream>
 #include <sstream>
 
-using namespace aarith;
+using namespace aarith; // NOLINT
 
 SCENARIO("Performing common functional operations", "[word_array][functional][utility]")
 {
+    static constexpr size_t full_width = 256;
+    static constexpr size_t half_width = 128;
     GIVEN("A word container w ")
     {
 
-        constexpr word_array<256> w{5, 1, 2, 3};
+        constexpr word_array<full_width> w{5, 1, 2, 3};
 
         WHEN("Mapping the values by adding one")
         {
             THEN("All individual words should be increased by one")
             {
-                constexpr auto fun = [](word_array<256>::word_type a) { return a + 1; };
+                constexpr auto fun = [](word_array<full_width>::word_type a) { return a + 1; };
                 constexpr auto result = map(w, fun);
 
                 CHECK(result.word(0) == 4);
@@ -32,7 +34,7 @@ SCENARIO("Performing common functional operations", "[word_array][functional][ut
         {
             THEN("All individual words should be increased by one")
             {
-                constexpr auto fun = [](word_array<256>::word_type a) { return a << 2; };
+                constexpr auto fun = [](word_array<full_width>::word_type a) { return a << 2U; };
                 constexpr auto result = map(w, fun);
 
                 CHECK(result.word(0) == 12);
@@ -56,15 +58,15 @@ SCENARIO("Performing common functional operations", "[word_array][functional][ut
 
         AND_GIVEN("Another word container v of same length")
         {
-            constexpr word_array<256> v{8, 16, 32, 64};
+            constexpr word_array<full_width> v{8, 16, 32, 64};
             WHEN("Performing the zip_with operation")
             {
 
                 THEN("Element-wise addition should work as intended")
                 {
 
-                    constexpr auto f = [](word_array<256>::word_type a,
-                                          word_array<256>::word_type b) { return a + b; };
+                    constexpr auto f = [](word_array<full_width>::word_type a,
+                                          word_array<full_width>::word_type b) { return a + b; };
 
                     constexpr auto result = zip_with(w, v, f);
 
@@ -75,8 +77,8 @@ SCENARIO("Performing common functional operations", "[word_array][functional][ut
                 }
                 THEN("It should be capable of modelling additions")
                 {
-                    constexpr word_array<128> a{0, std::numeric_limits<uint64_t>::max()};
-                    constexpr word_array<128> b{0, std::numeric_limits<uint64_t>::max()};
+                    constexpr word_array<half_width> a{0, std::numeric_limits<uint64_t>::max()};
+                    constexpr word_array<half_width> b{0, std::numeric_limits<uint64_t>::max()};
 
                     constexpr auto f = [carry = uint64_t(0)](uint64_t ain, uint64_t bin) mutable {
                         uint64_t partial_sum = ain + bin;
@@ -90,7 +92,8 @@ SCENARIO("Performing common functional operations", "[word_array][functional][ut
 
                     constexpr auto result = zip_with(a, b, f);
 
-                    constexpr auto uinteger_result = add(uinteger<128>(a), uinteger<128>(b));
+                    constexpr auto uinteger_result =
+                        add(uinteger<half_width>(a), uinteger<half_width>(b));
 
                     CHECK(uinteger<192>(result) == uinteger_result);
                 }
@@ -100,8 +103,8 @@ SCENARIO("Performing common functional operations", "[word_array][functional][ut
             {
                 THEN("It should be capable of modeling addition")
                 {
-                    constexpr word_array<128> a{0, std::numeric_limits<uint64_t>::max()};
-                    constexpr word_array<128> b{0, std::numeric_limits<uint64_t>::max()};
+                    constexpr word_array<half_width> a{0, std::numeric_limits<uint64_t>::max()};
+                    constexpr word_array<half_width> b{0, std::numeric_limits<uint64_t>::max()};
 
                     constexpr auto f = [](uint64_t ain, uint64_t bin, uint64_t cin) {
                         uint64_t partial_sum = ain + bin;
@@ -116,7 +119,8 @@ SCENARIO("Performing common functional operations", "[word_array][functional][ut
 
                     constexpr auto result = zip_with_state(a, b, f);
 
-                    constexpr auto uinteger_result = add(uinteger<128>(a), uinteger<128>(b));
+                    constexpr auto uinteger_result =
+                        add(uinteger<half_width>(a), uinteger<half_width>(b));
 
                     CHECK(uinteger<192>(result) == uinteger_result);
                 }
@@ -141,8 +145,8 @@ SCENARIO("Performing common functional operations", "[word_array][functional][ut
 
                     const std::vector<uint64_t> ns{8U, 15U, 5743U, 0U};
 
-                    constexpr auto f = [](word_array<256>::word_type a,
-                                          word_array<256>::word_type b,
+                    constexpr auto f = [](word_array<full_width>::word_type a,
+                                          word_array<full_width>::word_type b,
                                           uint64_t m) { return a + b + m; };
 
                     for (const auto n : ns)
@@ -157,9 +161,9 @@ SCENARIO("Performing common functional operations", "[word_array][functional][ut
             {
                 THEN("The result should work out well")
                 {
-                    constexpr uinteger<256> a{w};
-                    constexpr uinteger<256> b{v};
-                    const auto result = trivial_approx_add<256, 256>(a, b);
+                    constexpr uinteger<full_width> a{w};
+                    constexpr uinteger<full_width> b{v};
+                    const auto result = trivial_approx_add<full_width, full_width>(a, b);
 
                     for (size_t i = 0; i < w.word_count(); ++i)
                     {
@@ -198,7 +202,7 @@ SCENARIO("Performing common functional operations", "[word_array][functional][ut
             {
                 THEN("The result should work out well, filling additional slots with zeroes")
                 {
-                    constexpr uinteger<256> a{w};
+                    constexpr uinteger<full_width> a{w};
                     constexpr uinteger<192> b{v};
                     const auto result = trivial_approx_add<256, 192>(a, b);
 
@@ -217,7 +221,8 @@ SCENARIO("Performing common functional operations", "[word_array][functional][ut
 
                     const std::vector<uint64_t> ns{8U, 15U, 5743U, 0U};
 
-                    const auto f = [](word_array<256>::word_type a, word_array<256>::word_type b,
+                    const auto f = [](word_array<full_width>::word_type a,
+                                      word_array<full_width>::word_type b,
                                       uint64_t m) { return a + b + m; };
 
                     for (const auto n : ns)

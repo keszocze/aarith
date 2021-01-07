@@ -80,7 +80,7 @@ auto to_bcd(const uinteger<Width, WordType>& num)
     {
         uinteger<bcd_width, WordType> three(3U);
         uinteger<bcd_width, WordType> four(4U);
-        uinteger<bcd_width, WordType> mask(15U);
+        uinteger<bcd_width, WordType> mask(15U); // NOLINT
 
         for (auto c_bcd = 0U; c_bcd < bcd_digits; ++c_bcd)
         {

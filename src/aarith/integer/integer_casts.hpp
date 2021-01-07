@@ -6,7 +6,7 @@
 namespace aarith {
 
 /**
- * @brief Performs a runtime-checked conersion.
+ * @brief Performs a runtime-checked conversion.
  *
  * @warning The conversion will throw a runtime exception of the value does not fit into the desired
  * data type!

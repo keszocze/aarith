@@ -24,20 +24,20 @@ int main(int argc, char** argv)
 
     if (argc == 1)
     {
-        show_fau_adder_evaluation<8, 4, 1>();
+        show_fau_adder_evaluation<8, 4, 1>(); // NOLINT
         std::cout << "\n\n";
-        show_fau_adder_evaluation<8, 4, 3>();
+        show_fau_adder_evaluation<8, 4, 3>(); // NOLINT
         std::cout << "\n\n";
-        show_fau_adder_evaluation<16, 8, 1>();
+        show_fau_adder_evaluation<16, 8, 1>(); // NOLINT
         std::cout << "\n\n";
-        show_fau_adder_evaluation<16, 8, 3>();
+        show_fau_adder_evaluation<16, 8, 3>(); // NOLINT
         std::cout << "\n\n";
     }
     else
     {
-        show_fau_adder_evaluation<32, 16, 1>();
+        show_fau_adder_evaluation<32, 16, 1>(); // NOLINT
         std::cout << "\n\n";
-        show_fau_adder_evaluation<32, 16, 3>();
+        show_fau_adder_evaluation<32, 16, 3>(); // NOLINT
     }
 
     return 0;

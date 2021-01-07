@@ -326,7 +326,7 @@ public:
     }
 
     /**
-     * @brief Assigns the given value value to all elements in the container.
+     * @brief Assigns the specified value to all elements in the container.
      * @param value the value to assign to the elements
      */
     constexpr void fill(const word_type& value)
@@ -469,7 +469,9 @@ private:
     std::string gen_oob_msg(size_t index, bool accessed_bit = true)
     {
 
-        std::string msg, head, foot;
+        std::string msg;
+        std::string head;
+        std::string foot;
         if (accessed_bit)
         {
             head = "Trying to access bit with index ";
@@ -499,37 +501,5 @@ template <size_t Width, typename T> class is_word_array<word_array<Width, T>>
 public:
     static constexpr bool value = true;
 };
-
-template <size_t DestinationWidth, size_t SourceWidth, typename WordType>
-[[nodiscard]] auto constexpr width_cast(const word_array<SourceWidth, WordType>& source)
-    -> word_array<DestinationWidth, WordType>
-{
-
-    if constexpr (SourceWidth == DestinationWidth)
-    {
-        return source;
-    }
-    else
-    {
-
-        word_array<DestinationWidth, WordType> word_container;
-
-        if constexpr (DestinationWidth >= SourceWidth)
-        {
-            for (auto i = 0U; i < source.word_count(); ++i)
-            {
-                word_container.set_word(i, source.word(i));
-            }
-        }
-        else
-        {
-            for (auto i = 0U; i < word_container.word_count(); ++i)
-            {
-                word_container.set_word(i, source.word(i));
-            }
-        }
-        return word_container;
-    }
-}
 
 } // namespace aarith

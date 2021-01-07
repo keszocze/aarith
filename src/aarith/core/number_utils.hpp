@@ -87,7 +87,7 @@ constexpr size_t pow(const size_t base, const size_t exponent)
  * @param n The number to round
  * @return The largest number m=2^k for some k such that m <= n
  *
- * TODO remove this method when clang supports constexpr for std::log2 and std::floor
+ * TODO (keszocze) remove this method when clang supports constexpr for std::log2 and std::floor
  */
 [[nodiscard]] constexpr size_t floor_to_pow(const size_t n)
 {
