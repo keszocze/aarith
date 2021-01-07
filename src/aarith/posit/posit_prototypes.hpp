@@ -1474,15 +1474,54 @@ private:
 //
 // Quire Helpers for Calculating Sizes.
 //
-// They are separate from the quire class because to instantiate a quire we
-// need to run these functions.
+// They are separate from the quire class because to instantiate a quire class
+// we need to run these functions first.
 //
 // For implementation, look at posit/quire_sizes.hpp.
 //
 
+/**
+ * @brief Return width of integer part in quire.
+ *
+ * Computes the width of the integer part in a quire for posits with given
+ * width and exponent size.
+ *
+ * @param posit_width Width of the associated posit type.
+ * @param posit_exponent_size Exponent size of the associated posit type.
+ */
 [[nodiscard]] constexpr size_t quire_integer_width(size_t posit_width, size_t posit_exponent_size);
+
+/**
+ * @brief Return width of fraction part in quire.
+ *
+ * Computes the width of the fraction part in a quire for posits with given
+ * width and exponent size.
+ *
+ * @param posit_width Width of the associated posit type.
+ * @param posit_exponent_size Exponent size of the associated posit type.
+ */
 [[nodiscard]] constexpr size_t quire_fraction_width(size_t posit_width, size_t posit_exponent_size);
+
+/**
+ * @brief Return width of carry guard part in quire.
+ *
+ * Computes the width of the carry guard in a quire for posits with given
+ * width and exponent size.
+ *
+ * @param posit_width Width of the associated posit type.
+ * @param posit_exponent_size Exponent size of the associated posit type.
+ */
 [[nodiscard]] constexpr size_t quire_carry_width(size_t posit_width, size_t posit_exponent_size);
+
+/**
+ * @brief Return width of quire.
+ *
+ * Computes the width of the quire for posits with given width and exponent
+ * size. Includes sign bit, carry guard, integer and fractional parts.
+ *
+ * @param posit_width Width of the associated posit type.
+ * @param posit_exponent_size Exponent size of the associated posit type.
+ */
 [[nodiscard]] constexpr size_t quire_width(size_t posit_width, size_t posit_exponent_size);
 
 //
