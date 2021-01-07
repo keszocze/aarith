@@ -1,12 +1,14 @@
 add_library(aarith INTERFACE)
 target_sources(aarith INTERFACE
+	aarith/integer/approx_operations.hpp
         aarith/core.hpp
-        aarith/integer.hpp
-        aarith/integer_no_operators.hpp
+        aarith/fixed_point.hpp
         aarith/float.hpp
-        aarith/float_no_operators.hpp
         aarith/float/approx_operations.hpp
+        aarith/float_no_operators.hpp
+        aarith/integer.hpp
         aarith/integer/approx_operations.hpp
+        aarith/integer_no_operators.hpp
         aarith/posit.hpp
 )
 

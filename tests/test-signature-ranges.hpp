@@ -28,6 +28,18 @@
 #define AARITH_INT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE                                          \
     (8, uint64_t), (16, uint64_t), (32, uint64_t), (64, uint64_t)
 
+#define AARITH_FIXED_TEST_SIGNATURE ((size_t I, size_t F, typename WordType), I, F, WordType)
+#define AARITH_FIXED_TEST_PARAM_RANGE                                                              \
+    (8, 3, uint64_t), (10, 4, uint32_t), (3, 18, uint8_t), (35, 70, uint64_t)
+
+#define AARITH_FIXED_TEST_EXTENDED_SIGNATURE                                                       \
+    ((size_t I, size_t F, template <size_t, typename> class BaseInt, typename WordType), I, F,     \
+     BaseInt, WordType)
+#define AARITH_FIXED_TEST_EXTENDED_PARAM_RANGE                                                     \
+    (8, 3, integer, uint64_t), (10, 4, integer, uint32_t), (3, 18, integer, uint8_t),              \
+        (35, 70, integer, uint64_t), (8, 3, uinteger, uint64_t), (10, 4, uinteger, uint32_t),      \
+        (3, 18, uinteger, uint8_t), (35, 70, uinteger, uint64_t)
+
 #define AARITH_INT_EXTENDED_TEST_SIGNATURE                                                         \
     ((template <size_t, typename> class Type, size_t W, typename WordType), Type, W, WordType)
 #define AARITH_INT_EXTENDED_TEST_TEMPLATE_FULL_PARAM_RANGE                                         \

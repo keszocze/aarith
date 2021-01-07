@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iostream>
 
+
 int main()
 {
     using namespace aarith;
@@ -20,3 +21,4 @@ int main()
 
     return 0;
 }
+

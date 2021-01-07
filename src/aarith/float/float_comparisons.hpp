@@ -15,7 +15,6 @@ auto constexpr operator<(const floating_point<E, M> lhs, const floating_point<E,
     }
 
     // positive and negative zero are to be treated equally
-
     if (lhs.is_zero() && rhs.is_zero())
     {
         return false;
@@ -66,8 +65,6 @@ bool constexpr bitwise_equality(const floating_point<E, M> lhs, const floating_p
     const bool equal_sign = (lhs.get_sign() == rhs.get_sign());
     const bool equal_exponent = (lhs.get_exponent() == rhs.get_exponent());
     const bool equal_mantissa = (lhs.get_full_mantissa() == rhs.get_full_mantissa());
-    //    std::cout << "bitwise eq of\n";
-    //    std::cout << to_binary(lhs) << "\n" << to_binary(rhs) << "\n";
     //    std::cout << equal_sign << "\t" << equal_exponent << "\t" << equal_mantissa << "\n";
     return equal_sign && equal_exponent && equal_mantissa;
 }
@@ -75,6 +72,7 @@ bool constexpr bitwise_equality(const floating_point<E, M> lhs, const floating_p
 template <size_t E, size_t M>
 auto constexpr operator==(const floating_point<E, M> lhs, const floating_point<E, M> rhs) -> bool
 {
+
     if (lhs.is_nan() || rhs.is_nan())
     {
         return false;

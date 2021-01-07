@@ -628,7 +628,7 @@ public:
     void set_mantissa(const uinteger<M, WordType>& set_to)
     {
         mantissa = set_to;
-        if (exponent != IntegerExp::all_zeroes())
+        if (exponent != IntegerExp::zero())
         {
             mantissa.set_msb(true);
         }
