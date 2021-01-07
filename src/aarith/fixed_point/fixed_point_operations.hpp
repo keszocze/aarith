@@ -217,8 +217,8 @@ auto sub(const fixed<I, F, B, WordType>& a, const fixed<I, F, B, WordType>& b)
 template <size_t I, size_t F, template <size_t, typename> typename B, typename WT = uint64_t>
 auto mul(const fixed<I, F, B, WT>& a, const fixed<I, F, B, WT>& b) -> fixed<I, F, B, WT>
 {
-    const size_t base_size = a.width;
-    const size_t scratch_size = 2 * base_size;
+    constexpr size_t base_size = I + F;
+    constexpr size_t scratch_size = 2 * base_size;
 
     const auto a_extended = width_cast<scratch_size>(a.bits());
     const auto b_extended = width_cast<scratch_size>(b.bits());
@@ -232,8 +232,8 @@ auto mul(const fixed<I, F, B, WT>& a, const fixed<I, F, B, WT>& b) -> fixed<I, F
 template <size_t I, size_t F, template <size_t, typename> typename B, typename WT = uint64_t>
 auto div(const fixed<I, F, B, WT>& a, const fixed<I, F, B, WT>& b) -> fixed<I, F, B, WT>
 {
-    const size_t base_size = a.width;
-    const size_t scratch_size = F + a.width;
+    constexpr size_t base_size = I + F;
+    constexpr size_t scratch_size = F + base_size;
 
     const auto a_extended = width_cast<scratch_size>(a.bits());
     const auto b_extended = width_cast<scratch_size>(b.bits());
