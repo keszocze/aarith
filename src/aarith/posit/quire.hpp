@@ -31,13 +31,13 @@ template <size_t N, size_t ES, typename WT> constexpr quire<N, ES, WT>::quire()
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr quire<N, ES, WT>::quire(const quire<N, ES, WT>& other)
+constexpr quire<N, ES, WT>::quire(const quire<N, ES, WT>& other)
     : value(other.value)
 {
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr quire<N, ES, WT>::quire(const posit<N, ES, WT>& p)
+constexpr quire<N, ES, WT>::quire(const posit<N, ES, WT>& p)
 {
     //
     // Handle special cases.
