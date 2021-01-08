@@ -1282,6 +1282,15 @@ public:
     constexpr posit_parameters(const posit<N, ES, WT>& p);
 
     /**
+     * @brief Construct a new parameters object with given bits.
+     *
+     * Values are imported and then converted to standard form internally.
+     */
+    [[nodiscard]] static constexpr posit_parameters
+    from(bool is_nar_arg, bool is_zero_arg, bool sign_bit_arg, const integer<N, WT>& scale_arg,
+         const posit_fraction<N, ES, WT>& fraction_arg);
+
+    /**
      * @brief Construct from signed integer.
      *
      * Construct this object to represent the given value.

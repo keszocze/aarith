@@ -5,6 +5,25 @@
 namespace aarith {
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit_parameters<N, ES, WT>
+posit_parameters<N, ES, WT>::from(bool is_nar_arg, bool is_zero_arg, bool sign_bit_arg,
+                                  const integer<N, WT>& scale_arg,
+                                  const posit_fraction<N, ES, WT>& fraction_arg)
+{
+    posit_parameters<N, ES, WT> pp;
+
+    pp.is_nar = is_nar_arg;
+    pp.is_zero = is_zero_arg;
+    pp.sign_bit = sign_bit_arg;
+    pp.scale = scale_arg;
+    pp.fraction = fraction_arg;
+
+    pp.ensure_standard_form();
+
+    return pp;
+}
+
+template <size_t N, size_t ES, typename WT>
 constexpr posit_parameters<N, ES, WT>::posit_parameters(const posit<N, ES, WT>& p)
 {
     is_nar = p.is_nar();
