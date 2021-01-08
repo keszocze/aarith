@@ -685,7 +685,7 @@ public:
     /**
      * @return The underlying storage.
      */
-    [[nodiscard]] constexpr storage_type get_bits() const;
+    [[nodiscard]] constexpr const storage_type& get_bits() const;
 
 private:
     /**
@@ -1644,7 +1644,7 @@ public:
     /**
      * @return The underlying fixed point storage.
      */
-    [[nodiscard]] constexpr storage_type get_bits() const;
+    [[nodiscard]] constexpr const storage_type& get_bits() const;
 
 private:
     storage_type value;

@@ -131,7 +131,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr auto quire<N, ES, WT>::get_bits() const -> quire<N, ES, WT>::storage_type
+[[nodiscard]] constexpr const typename quire<N, ES, WT>::storage_type& quire<N, ES, WT>::get_bits() const
 {
     return value;
 }

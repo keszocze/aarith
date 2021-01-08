@@ -758,7 +758,7 @@ posit<N, ES, WT>::get_sign_bit() const
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr typename posit<N, ES, WT>::storage_type posit<N, ES, WT>::get_bits() const
+[[nodiscard]] constexpr const typename posit<N, ES, WT>::storage_type& posit<N, ES, WT>::get_bits() const
 {
     return bits;
 }
