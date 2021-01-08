@@ -951,7 +951,7 @@ auto normalize(const floating_point<E, M1, WordType>& nf) -> floating_point<E, M
 {
     if (nf.is_inf() || nf.is_nan())
     {
-        auto inf = normalized_float<E, M2, WordType>::pos_infinity();
+        auto inf = floating_point<E, M2, WordType>::pos_infinity();
         inf.set_sign(nf.get_sign());
         return inf;
     }
