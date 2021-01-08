@@ -7,16 +7,24 @@ int main()
 {
     using namespace aarith;
 
-    using I16 = integer<16>;
-    using U16 = uinteger<16>;
+    single_precision<uint64_t> test=single_precision<uint64_t>::neg_one();
 
-    I16 word;
-    U16 other_word, shift;
+    std::cout << test << "\n";
 
-    I16 shifted_size_t = word << size_t(45);
-    I16 shifted = word << shift;
-    U16 shifted_ = other_word << shift;
-    (void) shifted;
+    std::stringstream ss;
+    ss << test;
+
+    std::string s = ss.str();
+
+
+    std::cout << "\"" << to_sci_string(test).substr(0,1) << "\"\n";
+    std::cout << "\"" << to_sci_string(test).substr(1,1) << "\"\n";
+    std::cout << "\"" << to_sci_string(test).substr(2,1) << "\"\n";
+
+    std::cout << s << "\n";
+    std::cout << "\"" << s.substr(0,1) << "\"\n";
+    std::cout << "\"" << s.substr(1,1) << "\"\n";
+    std::cout << "\"" << s.substr(2,1) << "\"\n";
 
     return 0;
 }
