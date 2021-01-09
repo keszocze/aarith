@@ -71,7 +71,7 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 std::ostream& operator<<(std::ostream& os, const quire<N, ES, WT>& q)
 {
-    return os << q.value;
+    return os << q.get_bits();
 }
 
 } // namespace aarith

@@ -1270,6 +1270,9 @@ private:
 template <size_t N, size_t ES, typename WT> class posit_parameters
 {
 public:
+    using scale_type = integer<N, WT>;
+    using fraction_type = posit_fraction<N, ES, WT>;
+
     /**
      * @brief Construct from posit.
      *
@@ -1639,6 +1642,13 @@ public:
      * @brief Assignment operator.
      */
     quire& operator=(const quire& other);
+
+    /**
+     * @brief Conversion to posit.
+     *
+     * Converts the quire back to a posit value.
+     */
+    [[nodiscard]] constexpr operator posit<N, ES, WT>() const;
 
     /**
      * @return Whether this quire represents the number zero.

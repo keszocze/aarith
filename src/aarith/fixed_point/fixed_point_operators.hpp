@@ -11,6 +11,12 @@ auto operator+(const fixed<I, F, B, WT>& a, const fixed<I, F, B, WT>& b)
 }
 
 template <size_t I, size_t F, template <size_t, typename> typename B, typename WT>
+auto operator-(const fixed<I, F, B, WT>& q)
+{
+    return negate(q);
+}
+
+template <size_t I, size_t F, template <size_t, typename> typename B, typename WT>
 auto operator-(const fixed<I, F, B, WT>& a, const fixed<I, F, B, WT>& b)
 {
     return sub(a, b);

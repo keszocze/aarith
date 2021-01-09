@@ -168,6 +168,17 @@ public:
         data.set_bit(idx, value);
     }
 
+    /**
+     * @return Whether this fixed point value is negative.
+     *
+     * A fixed point number is negative if the most significant bit (sign bit)
+     * is set.
+     */
+    [[nodiscard]] constexpr bool is_negative() const
+    {
+        return data.msb();
+    }
+
     /*
      *
      * Constants
