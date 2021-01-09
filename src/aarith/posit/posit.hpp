@@ -240,7 +240,7 @@ template <size_t N, size_t ES, typename WT> constexpr posit<N, ES, WT>::posit(do
 
     if (x < 0.0)
     {
-        p = twos_complement(p);
+        p = negate(p);
     }
 
     // (6) Now that we have the bitstring, we can construct the underlying
@@ -462,8 +462,8 @@ constexpr bool posit<N, ES, WT>::operator<(const posit& other) const
 
     if (mybits.msb() && otherbits.msb())
     {
-        mybits = twos_complement(mybits);
-        otherbits = twos_complement(otherbits);
+        mybits = negate(mybits);
+        otherbits = negate(otherbits);
 
         return mybits > otherbits;
     }
@@ -555,7 +555,7 @@ template <size_t N, size_t ES, typename WT>
         return *this;
     }
 
-    const auto bits = twos_complement(this->get_bits());
+    const auto bits = negate(this->get_bits());
     return posit<N, ES, WT>::from(bits);
 }
 

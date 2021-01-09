@@ -352,7 +352,7 @@ template <size_t TargetWidth, typename TargetWordType>
 
     if (sign_bit)
     {
-        return twos_complement(abs_result);
+        return negate(abs_result);
     }
     else
     {

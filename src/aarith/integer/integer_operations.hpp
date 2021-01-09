@@ -907,15 +907,16 @@ template <size_t W, typename WordType>
 
 /**
  * @brief Negates the value
- * @tparam W The width of the signed integer
+ *
+ * Negating the value means applying the twos complement.
+ *
+ * @tparam Integer Argument and return type
  * @param n  The signed integer whose sign is to be changed
  * @return  The negative value of the signed integer
  */
-template <size_t W, typename WordType>
-constexpr auto negate(const integer<W, WordType>& n) -> integer<W, WordType>
+template <typename Integer> [[nodiscard]] constexpr auto negate(const Integer& n) -> Integer
 {
-    const integer<W, WordType> one(1U);
-    return add(~n, one);
+    return add(~n, Integer::one());
 }
 
 /**
@@ -1241,17 +1242,6 @@ template <typename Integer>
 [[nodiscard]] constexpr Integer distance(const Integer& a, const Integer& b)
 {
     return (a <= b) ? sub(b, a) : sub(a, b);
-}
-
-/**
- * @brief Compute the twos complement of a given integer.
- *
- * @param n The integer to compute the twos complement of.
- * @return The twos complement of n.
- */
-template <typename Integer> [[nodiscard]] constexpr Integer twos_complement(const Integer& n)
-{
-    return (~n) + n.one();
 }
 
 /**

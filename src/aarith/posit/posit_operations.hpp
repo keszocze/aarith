@@ -27,7 +27,7 @@ template <size_t N, size_t ES, typename WT>
 
     if (bits.msb())
     {
-        bits = twos_complement(bits);
+        bits = negate(bits);
     }
 
     // now count leading digits; regime is always >= 1
@@ -132,7 +132,7 @@ template <size_t N, size_t ES, typename WT>
 
     if (bits.msb())
     {
-        bits = twos_complement(bits);
+        bits = negate(bits);
     }
 
     const auto R0 = bits.bit(N - 2);
@@ -180,7 +180,7 @@ template <size_t N, size_t ES, typename WT>
 
     if (bits.msb())
     {
-        bits = twos_complement(bits);
+        bits = negate(bits);
     }
 
     // mask out the relevant exponent bits
@@ -206,7 +206,7 @@ template <size_t N, size_t ES, typename WT>
 
     if (bits.msb())
     {
-        bits = twos_complement(bits);
+        bits = negate(bits);
     }
 
     const auto mask = uinteger<N, WT>(get_low_mask<N, WT>(nfrac));
@@ -247,7 +247,7 @@ void dump_meta(std::ostream& os, const posit<N, ES, WT>& p)
     auto decoded = bits;
     if (p.is_negative())
     {
-        decoded = twos_complement(decoded);
+        decoded = negate(decoded);
     }
 
     const auto regime = get_regime_value(p);
