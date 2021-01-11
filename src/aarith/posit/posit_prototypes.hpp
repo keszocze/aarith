@@ -375,7 +375,7 @@ public:
      * In particular, NaR compares equal to itself.
      *
      * @return true if this and other represent the same value. Otherwise
-     * returns true.
+     * returns false.
      */
     [[nodiscard]] constexpr bool operator==(const posit& other) const;
 
@@ -1834,6 +1834,59 @@ public:
     valid_tile& operator=(const valid_tile& other);
 
     /**
+     * @brief Compare this and other for equality.
+     *
+     * Two tiles are equal if they share the same exact bit patterns.
+     * In particular, NaR compares equal to itself.
+     *
+     * @return true if this and other represent the same value and the
+     * uncertainty bits match. Otherwise returns false.
+     */
+    [[nodiscard]] constexpr bool operator==(const valid_tile& other) const;
+
+    /**
+     * @brief Compare this and other for inequality.
+     *
+     * Two tiles are not equal if they have different bit patterns.
+     *
+     * @return true if this and other represent different values. Otherwise
+     * returns false.
+     */
+    [[nodiscard]] constexpr bool operator!=(const valid_tile& other) const;
+
+    /**
+     * @brief Return whether this is less than other.
+     *
+     * If this or other represent NaR, this method returns false.
+     */
+    [[nodiscard]] constexpr bool operator<(const valid_tile& other) const;
+
+    /**
+     * @brief Return whether this is less than or equal to other.
+     *
+     * If either this or other represent NaR, this method returns
+     * false. If both this and other represent NaR, this method
+     * returns true.
+     */
+    [[nodiscard]] constexpr bool operator<=(const valid_tile& other) const;
+
+    /**
+     * @brief Return whether this is greater than other.
+     *
+     * If this or other represent NaR, this method returns false.
+     */
+    [[nodiscard]] constexpr bool operator>(const valid_tile& other) const;
+
+    /**
+     * @brief Return whether this is greater than or equal to other.
+     *
+     * If either this or other represent NaR, this method returns
+     * false. If both this and other represent NaR, this method
+     * returns true.
+     */
+    [[nodiscard]] constexpr bool operator>=(const valid_tile& other) const;
+
+    /**
      * @brief Set uncertainty bit.
      */
     void mark_as_uncertain();
@@ -1847,6 +1900,20 @@ public:
      * @return The uncertainty bit.
      */
     [[nodiscard]] constexpr bool is_uncertain() const;
+
+    /**
+     * @brief Access a reference to the underlying posit.
+     *
+     * Manipulating the returned reference will manipulate the tile posit.
+     *
+     * @return The underlying posit.
+     */
+    [[nodiscard]] posit<N, ES, WT>& value();
+
+    /**
+     * @return The underlying posit.
+     */
+    [[nodiscard]] const posit<N, ES, WT>& value() const;
 
 private:
     /**

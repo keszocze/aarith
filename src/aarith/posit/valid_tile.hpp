@@ -23,6 +23,46 @@ valid_tile<N, ES, WT>& valid_tile<N, ES, WT>::operator=(const valid_tile<N, ES, 
     return *this;
 }
 
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool valid_tile<N, ES, WT>::operator==(const valid_tile& other) const
+{
+    return (value() == other.value()) && (uncertain == other.uncertain);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool valid_tile<N, ES, WT>::operator!=(const valid_tile& other) const
+{
+    return !(*this == other);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool valid_tile<N, ES, WT>::operator<(const valid_tile& other) const
+{
+    throw std::logic_error("valid_tile::operator< not implemented");
+    return false;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool valid_tile<N, ES, WT>::operator<=(const valid_tile& other) const
+{
+    throw std::logic_error("valid_tile::operator<= not implemented");
+    return false;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool valid_tile<N, ES, WT>::operator>(const valid_tile& other) const
+{
+    throw std::logic_error("valid_tile::operator> not implemented");
+    return false;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool valid_tile<N, ES, WT>::operator>=(const valid_tile& other) const
+{
+    throw std::logic_error("valid_tile::operator>= not implemented");
+    return false;
+}
+
 template <size_t N, size_t ES, typename WT> void valid_tile<N, ES, WT>::mark_as_uncertain()
 {
     uncertain = true;
@@ -34,9 +74,15 @@ template <size_t N, size_t ES, typename WT> void valid_tile<N, ES, WT>::mark_as_
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool valid_tile<N, ES, WT>::is_uncertain() const
+[[nodiscard]] posit<N, ES, WT>& valid_tile<N, ES, WT>::value()
 {
-    return uncertain;
+    return *this;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] const posit<N, ES, WT>& valid_tile<N, ES, WT>::value() const
+{
+    return *this;
 }
 
 } // namespace aarith
