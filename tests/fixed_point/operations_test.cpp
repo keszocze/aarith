@@ -269,3 +269,42 @@ TEMPLATE_TEST_CASE_SIG("Dividing a number x by x returns one",
         }
     }
 }
+
+TEMPLATE_TEST_CASE_SIG("Negating a fixed number flips the sign",
+                       "[fixed_point][signed][arithmetic][division]",
+                       AARITH_FIXED_TEST_EXTENDED_SIGNATURE, AARITH_FIXED_TEST_EXTENDED_PARAM_RANGE)
+{
+    GIVEN("A fixed point number")
+    {
+        using Fixed = fixed<I, F, BaseInt, WordType>;
+
+        Fixed original = GENERATE(take(20, random_fixed_point<I, F, BaseInt, WordType>()));
+
+        WHEN("Negating the number flips the sign")
+        {
+            if (!original.is_zero())
+            {
+                Fixed negated = -original;
+                CHECK(bool(original.is_negative() ^ negated.is_negative()));
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Taking the absolute value of a fixed point always returns a non-negative value",
+                       "[fixed_point][signed][arithmetic][division]",
+                       AARITH_FIXED_TEST_EXTENDED_SIGNATURE, AARITH_FIXED_TEST_EXTENDED_PARAM_RANGE)
+{
+    GIVEN("A fixed point number")
+    {
+        using Fixed = fixed<I, F, BaseInt, WordType>;
+
+        Fixed value = GENERATE(take(20, random_fixed_point<I, F, BaseInt, WordType>()));
+
+        WHEN("Taking the absolute value returns something non-zero")
+        {
+            Fixed abs_value = abs(value);
+            CHECK_FALSE(abs_value.is_negative());
+        }
+    }
+}
