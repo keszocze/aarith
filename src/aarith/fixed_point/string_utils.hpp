@@ -16,7 +16,7 @@ uinteger<2 * F> fraction_as_integer(const fixed<I, F, B, WordType>& value)
     //     1/4 = 25/100   = 250/1000
     //   + 1/8 = 125/1000 = 125/1000
     //     -------------------------
-    //                      875/1000
+    //     0.875            875/1000
     //
     // and so on. Knowing this, we keep computing the numerator (example value
     // is 875) in variable "int_fraction".
