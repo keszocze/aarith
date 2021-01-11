@@ -8,6 +8,23 @@
 namespace aarith {
 
 /**
+ * @brief Return word array in reverse order.
+ */
+template <size_t W, typename WordType>
+[[nodiscard]] constexpr word_array<W, WordType> flip(const word_array<W, WordType>& w)
+{
+    word_array<W, WordType> copy;
+
+    for (size_t widx = 0; widx < W; ++widx)
+    {
+        const size_t copyidx = W - 1 - widx;
+        copy.set_bit(copyidx, w.bit(widx));
+    }
+
+    return copy;
+}
+
+/**
  * @brief  Counts the number of bits set to zero before the first one appears (from MSB to LSB)
  * @tparam Width Width of the word_array
  * @param value The word to count the leading zeroes in
