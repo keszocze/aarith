@@ -124,6 +124,28 @@ public:
     }
 
     /**
+     * @brief Return bit of the underlying bitstring.
+     *
+     * @param idx The index of the underlying bitstring.
+     * @returns The bit converted to bool.
+     */
+    [[nodiscard]] constexpr auto bit(size_t idx) const
+    {
+        return data.bit(idx);
+    }
+
+    /**
+     * @brief Set bit in the underlying bitstring.
+     *
+     * @param idx The index of the underlying bitstring to set.
+     * @param value The value of the bit, either true ('1') or false ('0').
+     */
+    void set_bit(size_t idx, bool value)
+    {
+        data.set_bit(idx, value);
+    }
+
+    /**
      * @brief Extracts the integer from the fixed point number
      *
      * @return Integer part of the fixed point number represented as an aarith integer
