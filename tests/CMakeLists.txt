@@ -59,7 +59,8 @@ add_aarith_test(posit-softposit-8-2-multiplication FILES posit/posit-softposit-8
 add_aarith_test(posit-softposit-8-2-subtraction FILES posit/posit-softposit-8-2-subtraction-test.cpp)
 add_aarith_test(posit-types FILES posit/posit_types-test.cpp)
 add_aarith_test(posit_parameters FILES posit/posit_parameters-test.cpp)
-add_aarith_test(quire_conversion FILES posit/quire_conversion-test.cpp)
+add_aarith_test(quire-arithmetic FILES posit/quire-arithmetic-test.cpp)
+add_aarith_test(quire-conversion FILES posit/quire-conversion-test.cpp)
 add_aarith_test(quire_sizes FILES posit/quire_sizes-test.cpp)
 
 add_aarith_test(fau-adder FILES uint-approx-test.cpp)

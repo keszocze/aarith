@@ -11,6 +11,12 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr quire<N, ES, WT> quire<N, ES, WT>::one()
+{
+    return quire(posit<N, ES, WT>::one());
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr quire<N, ES, WT> quire<N, ES, WT>::nar()
 {
     quire q;
@@ -130,28 +136,60 @@ quire<N, ES, WT>& quire<N, ES, WT>::operator=(const quire<N, ES, WT>& other)
 template <size_t N, size_t ES, typename WT>
 quire<N, ES, WT>& quire<N, ES, WT>::operator+=(const quire<N, ES, WT>& other)
 {
-    value += other.value;
+    if (is_nar() || other.is_nar())
+    {
+        *this = nar();
+    }
+    else
+    {
+        value = value + other.value;
+    }
+
     return *this;
 }
 
 template <size_t N, size_t ES, typename WT>
 quire<N, ES, WT>& quire<N, ES, WT>::operator-=(const quire<N, ES, WT>& other)
 {
-    value -= other.value;
+    if (is_nar() || other.is_nar())
+    {
+        *this = nar();
+    }
+    else
+    {
+        value = value - other.value;
+    }
+
     return *this;
 }
 
 template <size_t N, size_t ES, typename WT>
 quire<N, ES, WT>& quire<N, ES, WT>::operator*=(const quire<N, ES, WT>& other)
 {
-    value *= other.value;
+    if (is_nar() || other.is_nar())
+    {
+        *this = nar();
+    }
+    else
+    {
+        value = value * other.value;
+    }
+
     return *this;
 }
 
 template <size_t N, size_t ES, typename WT>
 quire<N, ES, WT>& quire<N, ES, WT>::operator/=(const quire<N, ES, WT>& other)
 {
-    value /= other.value;
+    if (is_nar() || other.is_nar() || other.is_zero())
+    {
+        *this = nar();
+    }
+    else
+    {
+        value = value / other.value;
+    }
+
     return *this;
 }
 
@@ -220,9 +258,8 @@ template <size_t N, size_t ES, typename WT>
     const bool param_is_zero = false;
     const bool param_sign_bit = value.is_negative();
 
-    auto params =
-        posit_parameters<N, ES, WT>::from(param_is_nar, param_is_zero, param_sign_bit,
-            param_scale, param_fraction);
+    auto params = posit_parameters<N, ES, WT>::from(param_is_nar, param_is_zero, param_sign_bit,
+                                                    param_scale, param_fraction);
 
     // return
 

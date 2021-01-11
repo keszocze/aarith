@@ -1601,6 +1601,11 @@ public:
     [[nodiscard]] static constexpr quire zero();
 
     /**
+     * @return A quire that represents the number one.
+     */
+    [[nodiscard]] static constexpr quire one();
+
+    /**
      * @return A quire that represents NaR.
      */
     [[nodiscard]] static constexpr quire nar();
@@ -1739,6 +1744,14 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr quire<N, ES, WT> operator+(const quire<N, ES, WT>& lhs,
                                                    const quire<N, ES, WT>& rhs);
+
+/**
+ * @brief Unary minus.
+ *
+ * If this quire represents NaR, the result is also NaR.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr quire<N, ES, WT> operator-(const quire<N, ES, WT>& q);
 
 /**
  * @brief Quire Subtraction.

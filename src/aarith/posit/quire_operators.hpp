@@ -50,6 +50,13 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr auto operator-(const quire<N, ES, WT>& q) -> quire<N, ES, WT>
+{
+    const auto value = q.get_bits();
+    return quire<N, ES, WT>::from(-value);
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr auto operator-(const quire<N, ES, WT>& lhs, const quire<N, ES, WT>& rhs)
     -> quire<N, ES, WT>
 {

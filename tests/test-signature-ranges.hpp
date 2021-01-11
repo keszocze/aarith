@@ -120,8 +120,11 @@
     (5, 0), (5, 1), (5, 2), (6, 0), (6, 1), (6, 2), (8, 0), (8, 1), (8, 2), (8, 3), (16, 0),       \
         (16, 1), (16, 2)
 
-#define AARITH_POSIT_TEST_TEMPLATE_SIGNED_INTEGERS                                                 \
-    (int8_t), (int16_t), (int32_t), (int64_t)
+#define AARITH_POSIT_TEST_TEMPLATE_FULL                                                            \
+    (5, 0), (5, 1), (5, 2), (6, 0), (6, 1), (6, 2), (8, 0), (8, 1), (8, 2), (8, 3), (16, 0),       \
+        (16, 1), (16, 2), (16, 3), (32, 0), (32, 1), (32, 2), (32, 3), (64, 0), (64, 1), (64, 2),  \
+        (64, 3), (128, 0), (128, 1), (128, 2), (128, 3)
 
-#define AARITH_POSIT_TEST_TEMPLATE_UNSIGNED_INTEGERS                                               \
-    (uint8_t), (uint16_t), (uint32_t), (uint64_t)
+#define AARITH_POSIT_TEST_TEMPLATE_SIGNED_INTEGERS (int8_t), (int16_t), (int32_t), (int64_t)
+
+#define AARITH_POSIT_TEST_TEMPLATE_UNSIGNED_INTEGERS (uint8_t), (uint16_t), (uint32_t), (uint64_t)
