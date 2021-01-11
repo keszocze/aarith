@@ -44,28 +44,36 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr auto operator+(const quire<N, ES, WT>& lhs, const quire<N, ES, WT>& rhs)
     -> quire<N, ES, WT>
 {
-    return quire(lhs.get_bits() + rhs.get_bits());
+    quire sum = lhs;
+    sum += rhs;
+    return sum;
 }
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr auto operator-(const quire<N, ES, WT>& lhs, const quire<N, ES, WT>& rhs)
     -> quire<N, ES, WT>
 {
-    return quire(lhs.get_bits() - rhs.get_bits());
+    quire diff = lhs;
+    diff -= rhs;
+    return diff;
 }
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr auto operator*(const quire<N, ES, WT>& lhs, const quire<N, ES, WT>& rhs)
     -> quire<N, ES, WT>
 {
-    return quire(lhs.get_bits() * rhs.get_bits());
+    quire prod = lhs;
+    prod *= rhs;
+    return prod;
 }
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr auto operator/(const quire<N, ES, WT>& lhs, const quire<N, ES, WT>& rhs)
     -> quire<N, ES, WT>
 {
-    return quire(lhs.get_bits() / rhs.get_bits());
+    quire quot = lhs;
+    quot /= rhs;
+    return quot;
 }
 
 template <size_t N, size_t ES, typename WT>

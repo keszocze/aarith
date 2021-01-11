@@ -128,6 +128,34 @@ quire<N, ES, WT>& quire<N, ES, WT>::operator=(const quire<N, ES, WT>& other)
 }
 
 template <size_t N, size_t ES, typename WT>
+quire<N, ES, WT>& quire<N, ES, WT>::operator+=(const quire<N, ES, WT>& other)
+{
+    value += other.value;
+    return *this;
+}
+
+template <size_t N, size_t ES, typename WT>
+quire<N, ES, WT>& quire<N, ES, WT>::operator-=(const quire<N, ES, WT>& other)
+{
+    value -= other.value;
+    return *this;
+}
+
+template <size_t N, size_t ES, typename WT>
+quire<N, ES, WT>& quire<N, ES, WT>::operator*=(const quire<N, ES, WT>& other)
+{
+    value *= other.value;
+    return *this;
+}
+
+template <size_t N, size_t ES, typename WT>
+quire<N, ES, WT>& quire<N, ES, WT>::operator/=(const quire<N, ES, WT>& other)
+{
+    value /= other.value;
+    return *this;
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr quire<N, ES, WT>::operator posit<N, ES, WT>() const
 {
     using Posit = posit<N, ES, WT>;

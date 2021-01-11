@@ -1644,6 +1644,26 @@ public:
     quire& operator=(const quire& other);
 
     /**
+     * @brief Add rhs to this.
+     */
+    quire& operator+=(const quire& rhs);
+
+    /**
+     * @brief Subtract rhs from this.
+     */
+    quire& operator-=(const quire& rhs);
+
+    /**
+     * @brief Set this to this multiplied with rhs.
+     */
+    quire& operator*=(const quire& rhs);
+
+    /**
+     * @brief Set this to this divided by other.
+     */
+    quire& operator/=(const quire& rhs);
+
+    /**
      * @brief Conversion to posit.
      *
      * Converts the quire back to a posit value.
