@@ -1,13 +1,18 @@
 #pragma once
 
 #include <aarith/fixed_point.hpp>
+#include <iomanip>
+#include <sstream>
+#include <string>
 
 namespace aarith {
 
 template <size_t I, size_t F, template <size_t, class> typename B, typename WordType>
-uinteger<2 * F> fraction_as_integer(const fixed<I, F, B, WordType>& value)
+auto fraction_as_integer(const fixed<I, F, B, WordType>& value)
 {
-    using Int = uinteger<F>;
+    // TODO (Schärtl): Find real bound for width of this buffer.
+
+    using Int = uinteger<2 * F>;
 
     // Understanding the conversion can be a bit tricky. It is important to
     // realize that
@@ -43,8 +48,14 @@ uinteger<2 * F> fraction_as_integer(const fixed<I, F, B, WordType>& value)
         q = q * ten;
     }
 
-    return int_fraction;
+    // Now change to string. Pad with leading zeroes if necessary.
 
+    const ssize_t decimal_places = fraction.width() - last_one_idx + 1;
+    const std::string int_fraction_str = to_decimal(int_fraction);
+
+    std::stringstream ss;
+    ss << std::setfill('0') << std::setw(decimal_places) << int_fraction_str;
+    return ss.str();
 }
 
 template <size_t I, size_t F, template <size_t, class> typename B, typename WordType>
@@ -66,7 +77,7 @@ auto operator<<(std::ostream& out, const fixed<I, F, B, WordType>& value) -> std
     {
         out << to_decimal(value.integer_part());
         out << ".";
-        out << to_decimal(fraction_as_integer(value));
+        out << fraction_as_integer(value);
     }
 
     return out;
