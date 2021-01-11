@@ -13,11 +13,11 @@ TEMPLATE_TEST_CASE_SIG("quire arithmetic with NaR", "[quire][template]",
 
     constexpr auto pnar = Posit::nar();
     constexpr auto pzero = Posit::zero();
-    constexpr auto preal = Posit::one();
+    constexpr auto pone = Posit::one();
 
     const auto qnar = quire(pnar);
     const auto qzero = quire(pzero);
-    const auto qone = quire(preal);
+    const auto qone = quire(pone);
 
     CHECK(qnar + qzero == qnar);
     CHECK(qnar + qone == qnar);
@@ -45,11 +45,11 @@ TEMPLATE_TEST_CASE_SIG("quire arithmetic with zero", "[quire][template]",
 
     constexpr auto pnar = Posit::nar();
     constexpr auto pzero = Posit::zero();
-    constexpr auto preal = Posit::one();
+    constexpr auto pone = Posit::one();
 
     const auto qnar = quire(pnar);
     const auto qzero = quire(pzero);
-    const auto qone = quire(preal);
+    const auto qone = quire(pone);
 
     CHECK(qzero + qzero == qzero);
     CHECK(qzero + qone == qone);
@@ -77,11 +77,11 @@ TEMPLATE_TEST_CASE_SIG("quire arithmetic with one", "[quire][template]",
 
     constexpr auto pnar = Posit::nar();
     constexpr auto pzero = Posit::zero();
-    constexpr auto preal = Posit::one();
+    constexpr auto pone = Posit::one();
 
     const auto qnar = quire(pnar);
     const auto qzero = quire(pzero);
-    const auto qone = quire(preal);
+    const auto qone = quire(pone);
 
     CHECK(qone + qzero == qone);
     CHECK(qone + qnar == qnar);
