@@ -3,7 +3,8 @@
 #include <aarith/posit.hpp>
 
 #include "../test-signature-ranges.hpp"
-#include "for-each-posit.hpp"
+#include "for_each_posit.hpp"
+#include "gen_posit.hpp"
 
 TEMPLATE_TEST_CASE_SIG("conversion to and from quire preserves value", "[posit][quire][template]",
                        ((size_t N, size_t ES), N, ES), AARITH_POSIT_TEST_TEMPLATE_EXHAUSTABLE)
@@ -21,6 +22,19 @@ TEMPLATE_TEST_CASE_SIG("conversion to and from quire preserves value", "[posit][
         INFO("ES=" << Posit::exponent_size());
         CHECK(actual == expected);
     });
+}
+
+TEMPLATE_TEST_CASE_SIG("conversion to and from random quire preserves value", "[posit][quire][template]",
+                       ((size_t N, size_t ES), N, ES), AARITH_POSIT_TEST_TEMPLATE_FULL)
+{
+    using namespace aarith;
+    using Posit = posit<N, ES>;
+
+    const Posit& expected = GENERATE(take(1000, random_posit<Posit>()));
+    const auto q = quire(expected);
+    const Posit actual = static_cast<Posit>(q);
+
+    REQUIRE(actual == expected);
 }
 
 TEMPLATE_TEST_CASE_SIG("conversion to and from special values", "[quire][template]",
