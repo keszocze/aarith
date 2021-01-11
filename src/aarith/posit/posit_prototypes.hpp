@@ -1796,6 +1796,71 @@ std::ostream& operator<<(std::ostream& os, const quire<N, ES, WT>& q);
  */
 template <size_t N, size_t ES, typename WT> std::string to_binary(const quire<N, ES, WT>& q);
 
+//
+// Valid Tile Class.
+//
+// For implementation, look at posit/valid_tile.hpp
+//
+
+/**
+ * @brief Single tile of a valid.
+ *
+ * A valid consists of two tiles, this is one of them. A tile is a posit
+ * combined with an uncertainty bit attached to it.
+ */
+template <size_t N, size_t ES, typename WT> class valid_tile : public posit<N, ES, WT>
+{
+public:
+    /**
+     * @brief Construct zero tile.
+     *
+     * The underlying uncertainty bit is initialized to zero.
+     */
+    valid_tile();
+
+    /**
+     * @brief Copy constructor.
+     */
+    valid_tile(const valid_tile& other);
+
+    /**
+     * @Default destructor.
+     */
+    ~valid_tile() = default;
+
+    /**
+     * @brief Assignment operator.
+     */
+    valid_tile& operator=(const valid_tile& other);
+
+    /**
+     * @brief Set uncertainty bit.
+     */
+    void mark_as_uncertain();
+
+    /**
+     * @brief Unset uncertainty bit.
+     */
+    void mark_as_certain();
+
+    /**
+     * @return The uncertainty bit.
+     */
+    [[nodiscard]] constexpr bool is_uncertain() const;
+
+private:
+    /**
+     * @brief Uncertainty flag.
+     *
+     * The original formulation of the valid format (Posit Arithmetic,
+     * Gustafson, October 2017, pp. 23) defines an uncertainty bit (i.e. just
+     * one bit) as part of the tile. This makes sense for hardware. For our
+     * software implementation we use a simple bool flag which is way easier
+     * and allows us to reuse functions that work on posits.
+     */
+    bool uncertain;
+};
+
 } // namespace aarith
 
 //
@@ -1818,3 +1883,4 @@ template <size_t N, size_t ES, typename WT> std::string to_binary(const quire<N,
 #include <aarith/posit/quire_sizes.hpp>
 #include <aarith/posit/quire_string_utils.hpp>
 #include <aarith/posit/quire_types.hpp>
+#include <aarith/posit/valid_tile.hpp>
