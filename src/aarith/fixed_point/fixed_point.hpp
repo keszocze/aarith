@@ -146,6 +146,32 @@ public:
         return bit_range<F - 1, 0>(data);
     }
 
+    /**
+     * @return Whether this fixed point value is negative.
+     *
+     * A fixed point number is negative if the most significant bit (sign bit)
+     * is set.
+     */
+    [[nodiscard]] constexpr bool is_negative() const
+    {
+        if constexpr (is_unsigned_int<int_type>)
+        {
+            return false;
+        }
+        else
+        {
+            return data.msb();
+        }
+    }
+
+    /**
+     * @return Whether this fixed point value is zero.
+     */
+    [[nodiscard]] constexpr bool is_zero() const
+    {
+        return data.is_zero();
+    }
+
     /*
      *
      * Constants

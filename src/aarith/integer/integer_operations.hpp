@@ -844,15 +844,17 @@ template <size_t W, typename WordType>
 
 /**
  * @brief Negates the value
- * @tparam W The width of the signed integer
- * @param n  The signed integer whose sign is to be changed
- * @return  The negative value of the signed integer
+ *
+ * Negating an integer means applying the twos complement.
+ *
+ * @tparam Integer The integer type to negate.
+ * @param n  The signed integer to negate.
+ * @return  The negative value of the integer to negate.
  */
-template <size_t W, typename WordType>
-constexpr auto negate(const integer<W, WordType>& n) -> integer<W, WordType>
+template <typename Integer>
+constexpr auto negate(const Integer& n) -> Integer
 {
-    const integer<W, WordType> one(1U);
-    return add(~n, one);
+    return add(~n, Integer::one());
 }
 
 /**
