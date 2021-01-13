@@ -1822,6 +1822,14 @@ class valid_tile : public posit<N, ES, WT>
 {
 public:
     /**
+     * @brief Construct tile from arguments as-is.
+     *
+     * @param p The posit to use as value.
+     * @param u The uncertainty bit.
+     */
+    [[nodiscard]] static constexpr valid_tile from(const posit<N, ES, WT>& p, bool u);
+
+    /**
      * @brief Construct zero tile.
      *
      * The underlying uncertainty bit is initialized to zero.

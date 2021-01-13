@@ -5,6 +5,18 @@
 namespace aarith {
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr valid_tile<N, ES, WT> valid_tile<N, ES, WT>::from(const posit<N, ES, WT>& p,
+                                                                          bool u)
+{
+    valid_tile v;
+
+    v.value() = p;
+    v.uncertain = u;
+
+    return v;
+}
+
+template <size_t N, size_t ES, typename WT>
 valid_tile<N, ES, WT>::valid_tile()
     : uncertain(false)
 {
