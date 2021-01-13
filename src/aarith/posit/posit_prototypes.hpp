@@ -1912,6 +1912,22 @@ public:
     [[nodiscard]] constexpr bool is_uncertain() const;
 
     /**
+     * @return Whether this tile represents the number zero exactly.
+     *
+     * A tile only represents zero if its value is zero and the u-bit is set
+     * to false.
+     */
+    [[nodiscard]] constexpr bool is_zero() const;
+
+    /**
+     * @return Whether this tile represents NaR.
+     *
+     * A tile only represents NaR if its value is NaR and the u-bit is set to
+     * false.
+     */
+    [[nodiscard]] constexpr bool is_nar() const;
+
+    /**
      * @brief Access a reference to the underlying posit.
      *
      * Manipulating the returned reference will manipulate the tile posit.
