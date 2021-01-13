@@ -19,6 +19,15 @@
 
 namespace aarith {
 
+/**
+ * @brief Fallback word type used as template parameters.
+ *
+ * Many of the types defines in this file use an aarith::uinteger or similar
+ * containers which require a word type paraemter. In most cases we just use the
+ * default type defined here.
+ */
+using DefaultWordType = uint64_t;
+
 //
 // Posit Class and Methods.
 //
@@ -36,7 +45,7 @@ namespace aarith {
  * @tparam ES The maximum width in bits of the exponent for a given posit.
  * @tparam WS The underlying word type used to store the posit.
  */
-template <size_t N, size_t ES, typename WT = uint64_t> class posit
+template <size_t N, size_t ES, typename WT = DefaultWordType> class posit
 {
 public:
     /**
@@ -978,7 +987,7 @@ public:
  * @tparam ES The exponent size of associated posits
  * @tparam WT The word type of associated posits
  */
-template <size_t N, size_t ES, typename WT> class posit_fraction
+template <size_t N, size_t ES, typename WT = DefaultWordType> class posit_fraction
 {
 public:
     /**
@@ -1267,7 +1276,7 @@ private:
  * @tparam ES The exponent size of associated posits
  * @tparam WT The word type of associated posits
  */
-template <size_t N, size_t ES, typename WT> class posit_parameters
+template <size_t N, size_t ES, typename WT = DefaultWordType> class posit_parameters
 {
 public:
     using scale_type = integer<N, WT>;
@@ -1562,7 +1571,7 @@ private:
  * @tparam ES The exponent size of associated posits.
  * @tparam WT The word type of associated posits.
  */
-template <size_t N, size_t ES, typename WT> class quire
+template <size_t N, size_t ES, typename WT = DefaultWordType> class quire
 {
 public:
     /**
@@ -1808,7 +1817,8 @@ template <size_t N, size_t ES, typename WT> std::string to_binary(const quire<N,
  * A valid consists of two tiles, this is one of them. A tile is a posit
  * combined with an uncertainty bit attached to it.
  */
-template <size_t N, size_t ES, typename WT> class valid_tile : public posit<N, ES, WT>
+template <size_t N, size_t ES, typename WT = DefaultWordType>
+class valid_tile : public posit<N, ES, WT>
 {
 public:
     /**
