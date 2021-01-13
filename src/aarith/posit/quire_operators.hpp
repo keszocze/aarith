@@ -86,7 +86,16 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 std::ostream& operator<<(std::ostream& os, const quire<N, ES, WT>& q)
 {
-    return os << q.get_bits();
+    if (q.is_nar())
+    {
+        os << "NaR";
+    }
+    else
+    {
+        os << q.get_bits();
+    }
+
+    return os;
 }
 
 } // namespace aarith

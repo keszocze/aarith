@@ -1928,6 +1928,21 @@ private:
     bool uncertain;
 };
 
+//
+// Additional valid tile operators.
+//
+// For implementation, look at posit/valid_tile_operators.hpp
+
+/**
+ * @brief Output a string representation of t to os.
+ *
+ * @param os The stream to write to.
+ * @param t The tile to write.
+ * @return A reference to os.
+ */
+template <size_t N, size_t ES, typename WT>
+std::ostream& operator<<(std::ostream& os, const valid_tile<N, ES, WT>& t);
+
 } // namespace aarith
 
 //
@@ -1951,3 +1966,4 @@ private:
 #include <aarith/posit/quire_string_utils.hpp>
 #include <aarith/posit/quire_types.hpp>
 #include <aarith/posit/valid_tile.hpp>
+#include <aarith/posit/valid_tile_operators.hpp>
