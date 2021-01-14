@@ -1848,6 +1848,8 @@ public:
      *
      * The maximum is the tile initialized with the maximum posit and the
      * u-bit set to true.
+     * Return the greatest possible tile that is not NaR. The maximum is the
+     * tile initialized with the maximum posit and the u-bit set to true.
      *
      * @return The biggest representable tile.
      */

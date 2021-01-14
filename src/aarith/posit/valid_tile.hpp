@@ -81,87 +81,55 @@ template <size_t N, size_t ES, typename WT>
     const valid_tile& lhs = *this;
     const valid_tile& rhs = other;
 
-    const bool ul = lhs.is_uncertain();
-    const bool ur = rhs.is_uncertain();
-
     //
     // Handle special cases related to NaR.
     //
 
-    if (lhs.value().is_nar() || rhs.value().is_nar())
+    if (lhs.is_nar() || rhs.is_nar())
     {
+        // NaR is never less than or greater anything. The result is always
+        // false.
+
         return false;
     }
 
-    //
-    // Handle the case of different signs.
-    //
-
-    if (lhs.is_negative() ^ rhs.is_negative())
+    if (lhs == min() && rhs != min())
     {
-        // Every negative posit p is less than any positive posit q, no matter
-        // the u-bit. So if the sign of lhs and rhs differs, we can just fall
-        // back to comparing the value.
-        return value() < other.value();
+        // Normal posit comparison returns false for any lt-comparison w/ NaR.
+        // Because the minimum possible tile has value NaR but u-bit set to
+        // '1', we have to handle lhs == min() as a special case.
+
+        return true;
     }
 
     //
-    // Handle the case of identical sign.
+    // Handle standard cases.
     //
 
-    // We now know that the sign of both lhs and rhs are identical. Depending
-    // on the u-bit, we have to do different comparisons.
+    // Comparing two tiles is equivalent to comparing two posits for most cases.
+    // Only when the u-bit differs do we have to run some special logic.
     //
-    // NOTE: The following code could be cut down quite a bit. However in its
-    // current formulation it better illustrates the different possible cases.
-    // So unless it proves to be a performance bottleneck, it is probably a
-    // good idea to keep it as-is.
+    // Given two tiles with identical values but different u-bits, the tile
+    // with u-bit set to '1' is always greater than the tile with u-bit set to
+    // '0'. This is because intervals, i.e. tiles with u-bit='1', drift to the
+    // right towards +∞, here illustrated on the number line:
+    //
+    // <----- -1 ----- 0 ---- 1 ---- 2 ---->
+    //   -2U      -1U     OU     1U     2U
 
-    assert(lhs.is_negative() == rhs.is_negative());
-    const bool sign_bit = lhs.is_negative();
+    const bool ul = lhs.is_uncertain();
+    const bool ur = rhs.is_uncertain();
 
-    if (ul && ur)
+    if ((ul != ur) && (lhs.value() == rhs.value()))
     {
-        // Both lhs and rhs represent intervals of the same sign. We only have
-        // to compare the underlying value.
-        return value() < other.value();
-    }
-    else if (!ul && !ur)
-    {
-        // Both lhs and rhs represent concrete real values. We only have to
-        // compare the underlying value.
-        return value() < other.value();
-    }
-    else if (ul && !ur)
-    {
-        // While lhs is an interval, rhs is a concrete real value.
+        // u-bits differ but value is identical. lhs is less than rhs iff
+        // rhs has u-bit set.
 
-        if (lhs.value() == other.value())
-        {
-            // While the value matches, rhs is an interval. That means that
-            // rhs is closer to NaR/infinity than lhs.
-
-            return sign_bit;
-        }
-        else
-        {
-            return value() < other.value();
-        }
+        return ur;
     }
     else
     {
-        assert(!ul && ur);
-
-        // Identical to the ul && !ur case, just with lhs and rhs flipped.
-
-        if (lhs.value() == other.value())
-        {
-            return !sign_bit;
-        }
-        else
-        {
-            return value() < other.value();
-        }
+        return lhs.value() < rhs.value();
     }
 }
 

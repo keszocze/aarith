@@ -299,7 +299,7 @@ SCENARIO("Valid Tile Comparisons")
             REQUIRE(tn1d16 < u1d4);
             REQUIRE(tn1d16 < u1d16);
             REQUIRE(tn1d16 < u0);
-            REQUIRE(tn1d16 > un1d16);
+            REQUIRE(tn1d16 < un1d16);
             REQUIRE(tn1d16 > un1d4);
             REQUIRE(tn1d16 > un1d2);
             REQUIRE(tn1d16 > un1);
@@ -321,7 +321,7 @@ SCENARIO("Valid Tile Comparisons")
             REQUIRE(tn1d4 < u1d16);
             REQUIRE(tn1d4 < u0);
             REQUIRE(tn1d4 < un1d16);
-            REQUIRE(tn1d4 > un1d4);
+            REQUIRE(tn1d4 < un1d4);
             REQUIRE(tn1d4 > un1d2);
             REQUIRE(tn1d4 > un1);
             REQUIRE(tn1d4 > un2);
@@ -342,7 +342,7 @@ SCENARIO("Valid Tile Comparisons")
             REQUIRE(tn1d2 < u0);
             REQUIRE(tn1d2 < un1d16);
             REQUIRE(tn1d2 < un1d4);
-            REQUIRE(tn1d2 > un1d2);
+            REQUIRE(tn1d2 < un1d2);
             REQUIRE(tn1d2 > un1);
             REQUIRE(tn1d2 > un2);
             REQUIRE(tn1d2 > un4);
@@ -362,7 +362,7 @@ SCENARIO("Valid Tile Comparisons")
             REQUIRE(tn1 < un1d16);
             REQUIRE(tn1 < un1d4);
             REQUIRE(tn1 < un1d2);
-            REQUIRE(tn1 > un1);
+            REQUIRE(tn1 < un1);
             REQUIRE(tn1 > un2);
             REQUIRE(tn1 > un4);
             REQUIRE(tn1 > un16);
@@ -381,7 +381,7 @@ SCENARIO("Valid Tile Comparisons")
             REQUIRE(tn2 < un1d4);
             REQUIRE(tn2 < un1d2);
             REQUIRE(tn2 < un1);
-            REQUIRE(tn2 > un2);
+            REQUIRE(tn2 < un2);
             REQUIRE(tn2 > un4);
             REQUIRE(tn2 > un16);
 
@@ -399,7 +399,7 @@ SCENARIO("Valid Tile Comparisons")
             REQUIRE(tn4 < un1d2);
             REQUIRE(tn4 < un1);
             REQUIRE(tn4 < un2);
-            REQUIRE(tn4 > un4);
+            REQUIRE(tn4 < un4);
             REQUIRE(tn4 > un16);
 
             REQUIRE(tn16 < u16);
@@ -416,7 +416,7 @@ SCENARIO("Valid Tile Comparisons")
             REQUIRE(tn16 < un1);
             REQUIRE(tn16 < un2);
             REQUIRE(tn16 < un4);
-            REQUIRE(tn16 > un16);
+            REQUIRE(tn16 < un16);
 
             REQUIRE(u16 > u2);
             REQUIRE(u16 > u1);
