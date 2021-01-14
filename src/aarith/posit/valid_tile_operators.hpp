@@ -1,26 +1,67 @@
 #pragma once
 
 #include <aarith/posit.hpp>
+#include <sstream>
 
 namespace aarith {
 
 template <size_t N, size_t ES, typename WT>
 std::ostream& operator<<(std::ostream& os, const valid_tile<N, ES, WT>& t)
 {
-    os << t.value();
-
-    // U-Bit Notation inspired by "The End Of Error", Gustafson, 2015.
+    std::stringstream ss;
 
     if (t.is_uncertain())
     {
-        os << "···";
+        // We are dealing with an uncertain tile, that is we are looking at
+        // some open interval. First find out the bounds.
+
+        posit<N, ES, WT> lower, upper;
+
+        if (t.is_negative())
+        {
+            lower = t.incremented();
+            upper = t;
+        }
+        else
+        {
+            lower = t;
+            upper = t.incremented();
+        }
+
+        // Print the left bound.
+
+        ss << "(";
+
+        if (lower.is_nar())
+        {
+            ss << "-∞";
+        }
+        else
+        {
+            ss << lower;
+        }
+
+        ss << ", ";
+
+        // Print the right bound.
+
+        if (t == t.max())
+        {
+            ss << "+∞";
+        }
+        else
+        {
+            ss << upper;
+        }
+
+        ss << ")";
     }
     else
     {
-        os << "↓";
+        ss << t.value() << "↓";
     }
 
-    return os;
+    return os << ss.str();
 }
 
 } // namespace aarith

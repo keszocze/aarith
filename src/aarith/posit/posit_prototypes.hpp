@@ -1999,9 +1999,10 @@ private:
 };
 
 //
-// Additional valid tile operators.
+// Additional Tile Operators.
 //
 // For implementation, look at posit/valid_tile_operators.hpp
+//
 
 /**
  * @brief Output a string representation of t to os.
