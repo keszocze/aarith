@@ -32,7 +32,7 @@ std::ostream& operator<<(std::ostream& os, const tile<N, ES, WT>& t)
 
         ss << "(";
 
-        if (lower.is_nar())
+        if (t == t.min())
         {
             ss << "-∞";
         }
