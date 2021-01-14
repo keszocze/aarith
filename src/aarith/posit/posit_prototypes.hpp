@@ -2035,3 +2035,4 @@ std::ostream& operator<<(std::ostream& os, const valid_tile<N, ES, WT>& t);
 #include <aarith/posit/quire_types.hpp>
 #include <aarith/posit/valid_tile.hpp>
 #include <aarith/posit/valid_tile_operators.hpp>
+#include <aarith/posit/valid_tile_types.hpp>
