@@ -5,10 +5,10 @@
 namespace aarith {
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr valid_tile<N, ES, WT> valid_tile<N, ES, WT>::from(const posit<N, ES, WT>& p,
+[[nodiscard]] constexpr tile<N, ES, WT> tile<N, ES, WT>::from(const posit<N, ES, WT>& p,
                                                                           bool u)
 {
-    valid_tile v;
+    tile v;
 
     v.value() = p;
     v.uncertain = u;
@@ -17,69 +17,69 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr valid_tile<N, ES, WT> valid_tile<N, ES, WT>::zero()
+[[nodiscard]] constexpr tile<N, ES, WT> tile<N, ES, WT>::zero()
 {
     constexpr auto p = posit<N, ES, WT>::zero();
     return from(p, false);
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr valid_tile<N, ES, WT> valid_tile<N, ES, WT>::nar()
+[[nodiscard]] constexpr tile<N, ES, WT> tile<N, ES, WT>::nar()
 {
     constexpr auto p = posit<N, ES, WT>::nar();
     return from(p, false);
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr valid_tile<N, ES, WT> valid_tile<N, ES, WT>::max()
+[[nodiscard]] constexpr tile<N, ES, WT> tile<N, ES, WT>::max()
 {
     constexpr auto p = posit<N, ES, WT>::max();
     return from(p, true);
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr valid_tile<N, ES, WT> valid_tile<N, ES, WT>::min()
+[[nodiscard]] constexpr tile<N, ES, WT> tile<N, ES, WT>::min()
 {
     constexpr auto p = posit<N, ES, WT>::nar();
     return from(p, true);
 }
 
 template <size_t N, size_t ES, typename WT>
-valid_tile<N, ES, WT>::valid_tile()
+tile<N, ES, WT>::tile()
     : uncertain(false)
 {
 }
 
 template <size_t N, size_t ES, typename WT>
-valid_tile<N, ES, WT>::valid_tile(const valid_tile<N, ES, WT>& other)
+tile<N, ES, WT>::tile(const tile<N, ES, WT>& other)
     : posit<N, ES, WT>(other)
     , uncertain(other.uncertain)
 {
 }
 
 template <size_t N, size_t ES, typename WT>
-valid_tile<N, ES, WT>& valid_tile<N, ES, WT>::operator=(const valid_tile<N, ES, WT>& other)
+tile<N, ES, WT>& tile<N, ES, WT>::operator=(const tile<N, ES, WT>& other)
 {
     return *this;
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool valid_tile<N, ES, WT>::operator==(const valid_tile& other) const
+[[nodiscard]] constexpr bool tile<N, ES, WT>::operator==(const tile& other) const
 {
     return (value() == other.value()) && (uncertain == other.uncertain);
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool valid_tile<N, ES, WT>::operator!=(const valid_tile& other) const
+[[nodiscard]] constexpr bool tile<N, ES, WT>::operator!=(const tile& other) const
 {
     return !(*this == other);
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool valid_tile<N, ES, WT>::operator<(const valid_tile& other) const
+[[nodiscard]] constexpr bool tile<N, ES, WT>::operator<(const tile& other) const
 {
-    const valid_tile& lhs = *this;
-    const valid_tile& rhs = other;
+    const tile& lhs = *this;
+    const tile& rhs = other;
 
     //
     // Handle special cases related to NaR.
@@ -134,59 +134,59 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool valid_tile<N, ES, WT>::operator<=(const valid_tile& other) const
+[[nodiscard]] constexpr bool tile<N, ES, WT>::operator<=(const tile& other) const
 {
     return (*this == other) || (*this < other);
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool valid_tile<N, ES, WT>::operator>(const valid_tile& other) const
+[[nodiscard]] constexpr bool tile<N, ES, WT>::operator>(const tile& other) const
 {
     return other < *this;
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool valid_tile<N, ES, WT>::operator>=(const valid_tile& other) const
+[[nodiscard]] constexpr bool tile<N, ES, WT>::operator>=(const tile& other) const
 {
     return (*this == other) || (*this > other);
 }
 
-template <size_t N, size_t ES, typename WT> void valid_tile<N, ES, WT>::mark_as_uncertain()
+template <size_t N, size_t ES, typename WT> void tile<N, ES, WT>::mark_as_uncertain()
 {
     uncertain = true;
 }
 
-template <size_t N, size_t ES, typename WT> void valid_tile<N, ES, WT>::mark_as_certain()
+template <size_t N, size_t ES, typename WT> void tile<N, ES, WT>::mark_as_certain()
 {
     uncertain = false;
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool valid_tile<N, ES, WT>::is_uncertain() const
+[[nodiscard]] constexpr bool tile<N, ES, WT>::is_uncertain() const
 {
     return uncertain;
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool valid_tile<N, ES, WT>::is_zero() const
+[[nodiscard]] constexpr bool tile<N, ES, WT>::is_zero() const
 {
     return *this == zero();
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool valid_tile<N, ES, WT>::is_nar() const
+[[nodiscard]] constexpr bool tile<N, ES, WT>::is_nar() const
 {
     return *this == nar();
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] posit<N, ES, WT>& valid_tile<N, ES, WT>::value()
+[[nodiscard]] posit<N, ES, WT>& tile<N, ES, WT>::value()
 {
     return *this;
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] const posit<N, ES, WT>& valid_tile<N, ES, WT>::value() const
+[[nodiscard]] const posit<N, ES, WT>& tile<N, ES, WT>::value() const
 {
     return *this;
 }

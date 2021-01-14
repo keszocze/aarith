@@ -1808,7 +1808,7 @@ template <size_t N, size_t ES, typename WT> std::string to_binary(const quire<N,
 //
 // Valid Tile Class.
 //
-// For implementation, look at posit/valid_tile.hpp
+// For implementation, look at posit/tile.hpp
 //
 
 /**
@@ -1818,7 +1818,7 @@ template <size_t N, size_t ES, typename WT> std::string to_binary(const quire<N,
  * combined with an uncertainty bit attached to it.
  */
 template <size_t N, size_t ES, typename WT = DefaultWordType>
-class valid_tile : public posit<N, ES, WT>
+class tile : public posit<N, ES, WT>
 {
 public:
     /**
@@ -1827,21 +1827,21 @@ public:
      * @param p The posit to use as value.
      * @param u The uncertainty bit.
      */
-    [[nodiscard]] static constexpr valid_tile from(const posit<N, ES, WT>& p, bool u);
+    [[nodiscard]] static constexpr tile from(const posit<N, ES, WT>& p, bool u);
 
     /**
      * @return Representation of zero.
      *
      * This is the concrete value zero. The u-bit is set to '0'.
      */
-    [[nodiscard]] static constexpr valid_tile zero();
+    [[nodiscard]] static constexpr tile zero();
 
     /**
      * @return Representation of NaR.
      *
      * This is the concrete value NaR. The u-bit is set to '0'.
      */
-    [[nodiscard]] static constexpr valid_tile nar();
+    [[nodiscard]] static constexpr tile nar();
 
     /**
      * @brief Return the greatest possible tile that is not NaR.
@@ -1853,7 +1853,7 @@ public:
      *
      * @return The biggest representable tile.
      */
-    [[nodiscard]] static constexpr valid_tile max();
+    [[nodiscard]] static constexpr tile max();
 
     /**
      * @brief Return the smallest possible tile that is not NaR.
@@ -1863,29 +1863,29 @@ public:
      *
      * @return The smallest representable tile.
      */
-    [[nodiscard]] static constexpr valid_tile min();
+    [[nodiscard]] static constexpr tile min();
 
     /**
      * @brief Construct zero tile.
      *
      * The underlying uncertainty bit is initialized to zero.
      */
-    valid_tile();
+    tile();
 
     /**
      * @brief Copy constructor.
      */
-    valid_tile(const valid_tile& other);
+    tile(const tile& other);
 
     /**
      * @Default destructor.
      */
-    ~valid_tile() = default;
+    ~tile() = default;
 
     /**
      * @brief Assignment operator.
      */
-    valid_tile& operator=(const valid_tile& other);
+    tile& operator=(const tile& other);
 
     /**
      * @brief Compare this and other for equality.
@@ -1896,7 +1896,7 @@ public:
      * @return true if this and other represent the same value and the
      * uncertainty bits match. Otherwise returns false.
      */
-    [[nodiscard]] constexpr bool operator==(const valid_tile& other) const;
+    [[nodiscard]] constexpr bool operator==(const tile& other) const;
 
     /**
      * @brief Compare this and other for inequality.
@@ -1906,14 +1906,14 @@ public:
      * @return true if this and other represent different values. Otherwise
      * returns false.
      */
-    [[nodiscard]] constexpr bool operator!=(const valid_tile& other) const;
+    [[nodiscard]] constexpr bool operator!=(const tile& other) const;
 
     /**
      * @brief Return whether this is less than other.
      *
      * If this or other represent NaR, this method returns false.
      */
-    [[nodiscard]] constexpr bool operator<(const valid_tile& other) const;
+    [[nodiscard]] constexpr bool operator<(const tile& other) const;
 
     /**
      * @brief Return whether this is less than or equal to other.
@@ -1922,14 +1922,14 @@ public:
      * false. If both this and other represent NaR, this method
      * returns true.
      */
-    [[nodiscard]] constexpr bool operator<=(const valid_tile& other) const;
+    [[nodiscard]] constexpr bool operator<=(const tile& other) const;
 
     /**
      * @brief Return whether this is greater than other.
      *
      * If this or other represent NaR, this method returns false.
      */
-    [[nodiscard]] constexpr bool operator>(const valid_tile& other) const;
+    [[nodiscard]] constexpr bool operator>(const tile& other) const;
 
     /**
      * @brief Return whether this is greater than or equal to other.
@@ -1938,7 +1938,7 @@ public:
      * false. If both this and other represent NaR, this method
      * returns true.
      */
-    [[nodiscard]] constexpr bool operator>=(const valid_tile& other) const;
+    [[nodiscard]] constexpr bool operator>=(const tile& other) const;
 
     /**
      * @brief Set uncertainty bit.
@@ -2001,7 +2001,7 @@ private:
 //
 // Additional Tile Operators.
 //
-// For implementation, look at posit/valid_tile_operators.hpp
+// For implementation, look at posit/tile_operators.hpp
 //
 
 /**
@@ -2012,7 +2012,7 @@ private:
  * @return A reference to os.
  */
 template <size_t N, size_t ES, typename WT>
-std::ostream& operator<<(std::ostream& os, const valid_tile<N, ES, WT>& t);
+std::ostream& operator<<(std::ostream& os, const tile<N, ES, WT>& t);
 
 } // namespace aarith
 
@@ -2036,6 +2036,6 @@ std::ostream& operator<<(std::ostream& os, const valid_tile<N, ES, WT>& t);
 #include <aarith/posit/quire_sizes.hpp>
 #include <aarith/posit/quire_string_utils.hpp>
 #include <aarith/posit/quire_types.hpp>
-#include <aarith/posit/valid_tile.hpp>
-#include <aarith/posit/valid_tile_operators.hpp>
-#include <aarith/posit/valid_tile_types.hpp>
+#include <aarith/posit/tile.hpp>
+#include <aarith/posit/tile_operators.hpp>
+#include <aarith/posit/tile_types.hpp>

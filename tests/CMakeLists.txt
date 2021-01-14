@@ -63,7 +63,7 @@ add_aarith_test(posit_parameters FILES posit/posit_parameters-test.cpp)
 add_aarith_test(quire-arithmetic FILES posit/quire-arithmetic-test.cpp)
 add_aarith_test(quire-conversion FILES posit/quire-conversion-test.cpp)
 add_aarith_test(quire_sizes FILES posit/quire_sizes-test.cpp)
-add_aarith_test(valid_tiles-comparisons FILES posit/valid_tiles-comparisons-test.cpp)
+add_aarith_test(tile-comparisons FILES posit/tile-comparisons-test.cpp)
 
 add_aarith_test(fau-adder FILES uint-approx-test.cpp)
 

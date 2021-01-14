@@ -9,7 +9,7 @@ SCENARIO("Valid Tile Comparisons")
     GIVEN("All valid tiles for <4, 1> posits")
     {
         using Posit = posit<4, 1>;
-        using Tile = valid_tile<4, 1>;
+        using Tile = tile<4, 1>;
 
         // Test cases based on Posit Arithmetic, Gustafson, October 2017,
         // pp. 19. While the following formulation feels a bit awkward, it is

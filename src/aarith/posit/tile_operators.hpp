@@ -6,7 +6,7 @@
 namespace aarith {
 
 template <size_t N, size_t ES, typename WT>
-std::ostream& operator<<(std::ostream& os, const valid_tile<N, ES, WT>& t)
+std::ostream& operator<<(std::ostream& os, const tile<N, ES, WT>& t)
 {
     std::stringstream ss;
 
