@@ -17,6 +17,34 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr valid_tile<N, ES, WT> valid_tile<N, ES, WT>::zero()
+{
+    constexpr auto p = posit<N, ES, WT>::zero();
+    return from(p, false);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr valid_tile<N, ES, WT> valid_tile<N, ES, WT>::nar()
+{
+    constexpr auto p = posit<N, ES, WT>::nar();
+    return from(p, false);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr valid_tile<N, ES, WT> valid_tile<N, ES, WT>::max()
+{
+    constexpr auto p = posit<N, ES, WT>::max();
+    return from(p, true);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr valid_tile<N, ES, WT> valid_tile<N, ES, WT>::min()
+{
+    constexpr auto p = posit<N, ES, WT>::nar();
+    return from(p, true);
+}
+
+template <size_t N, size_t ES, typename WT>
 valid_tile<N, ES, WT>::valid_tile()
     : uncertain(false)
 {
@@ -174,13 +202,13 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool valid_tile<N, ES, WT>::is_zero() const
 {
-    return !is_uncertain() && value().is_zero();
+    return *this == zero();
 }
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool valid_tile<N, ES, WT>::is_nar() const
 {
-    return !is_uncertain() && value().is_nar();
+    return *this == nar();
 }
 
 template <size_t N, size_t ES, typename WT>

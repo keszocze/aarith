@@ -1830,6 +1830,40 @@ public:
     [[nodiscard]] static constexpr valid_tile from(const posit<N, ES, WT>& p, bool u);
 
     /**
+     * @return Representation of zero.
+     *
+     * This is the concrete value zero. The u-bit is set to '0'.
+     */
+    [[nodiscard]] static constexpr valid_tile zero();
+
+    /**
+     * @return Representation of NaR.
+     *
+     * This is the concrete value NaR. The u-bit is set to '0'.
+     */
+    [[nodiscard]] static constexpr valid_tile nar();
+
+    /**
+     * @brief Return the greatest possible tile that is not NaR.
+     *
+     * The maximum is the tile initialized with the maximum posit and the
+     * u-bit set to true.
+     *
+     * @return The biggest representable tile.
+     */
+    [[nodiscard]] static constexpr valid_tile max();
+
+    /**
+     * @brief Return the smallest possible tile that is not NaR.
+     *
+     * The minimum is the tile initialized with NaR posit and u-bit set to
+     * true.
+     *
+     * @return The smallest representable tile.
+     */
+    [[nodiscard]] static constexpr valid_tile min();
+
+    /**
      * @brief Construct zero tile.
      *
      * The underlying uncertainty bit is initialized to zero.
