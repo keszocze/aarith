@@ -330,6 +330,8 @@ template <size_t E, size_t M, typename WordType>
         return result_is_negative ? floating_point<E, M>::neg_zero() : floating_point<E, M>::zero();
     }
 
+
+
     if (rhs.is_inf() || lhs.is_zero())
     {
         return result_is_negative ? floating_point<E, M>::neg_zero() : floating_point<E, M>::zero();
@@ -354,6 +356,7 @@ template <size_t E, size_t M, typename WordType>
             }
         }();
     }
+
     auto dividend = width_cast<2 * M + 1>(lhs.get_full_mantissa());
     auto divisor = width_cast<2 * M + 1>(rhs.get_full_mantissa());
     // shift to use integer division for producing 1,M

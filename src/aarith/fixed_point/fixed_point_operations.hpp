@@ -254,13 +254,13 @@ auto negate(const fixed<I, F, B, WT>& f) -> fixed<I, F, B, WT>
 template <size_t I, size_t F, template <size_t, typename> typename B, typename WT = uint64_t>
 auto abs(const fixed<I, F, B, WT>& f) -> fixed<I, F, B, WT>
 {
-    if (f >= f.zero())
+    if (f.is_negative())
     {
-        return f;
+        return negate(f);
     }
     else
     {
-        return negate(f);
+        return f;
     }
 }
 

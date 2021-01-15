@@ -628,7 +628,7 @@ public:
     void set_mantissa(const uinteger<M, WordType>& set_to)
     {
         mantissa = set_to;
-        if (exponent != IntegerExp::zero())
+        if (exponent != IntegerExp::all_zeroes())
         {
             mantissa.set_msb(true);
         }
@@ -949,6 +949,13 @@ auto rshift_and_round(const uinteger<M, WordType>& m, const size_t shift_by)
 template <size_t E, size_t M1, size_t M2 = M1, typename WordType = uint64_t>
 auto normalize(const floating_point<E, M1, WordType>& nf) -> floating_point<E, M2, WordType>
 {
+    if (nf.is_inf() || nf.is_nan())
+    {
+        auto inf = floating_point<E, M2, WordType>::pos_infinity();
+        inf.set_sign(nf.get_sign());
+        return inf;
+    }
+
     auto denormalized = nf;
 
     auto exponent = width_cast<E + 1>(denormalized.get_exponent());

@@ -39,6 +39,22 @@ SCENARIO("Check printing", "[integer][signed][utility][comparison]")
             }
         }
 
+        WHEN("Looking at negative powers of two")
+        {
+            THEN("Check that the results starts correctly")
+            {
+                const Fixed fp = -Fixed::one();
+
+                CAPTURE(fp, fp >> 1, fp >> 2, fp >> 3, fp >> 4, fp >> 5);
+                CHECK(starts_with("-1.0", fixed_to_string(fp)));
+                CHECK(starts_with("-0.5", fixed_to_string(fp >> 1)));
+                CHECK(starts_with("-0.25", fixed_to_string(fp >> 2)));
+                CHECK(starts_with("-0.125", fixed_to_string(fp >> 3)));
+                CHECK(starts_with("-0.0625", fixed_to_string(fp >> 4)));
+                CHECK(starts_with("-0.03125", fixed_to_string(fp >> 5)));
+            }
+        }
+
         WHEN("Looking at zero")
         {
             THEN("Check that the result is correct")

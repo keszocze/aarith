@@ -98,7 +98,7 @@ template <typename I> [[nodiscard]] constexpr auto sub(const I& a, const I& b) -
  */
 // template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(const I& a, const T&
 // b, const bool initial_borrow = false)
-template <typename I, typename T> [[nodiscard]] constexpr auto expanding_sub(const I& a, const T& b)
+template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(const I& a, const T& b)
 {
 
     static_assert(::aarith::same_signedness<I, T>);
@@ -908,13 +908,14 @@ template <size_t W, typename WordType>
 /**
  * @brief Negates the value
  *
- * Negating the value means applying the twos complement.
+ * Negating an integer means applying the twos complement.
  *
- * @tparam Integer Argument and return type
- * @param n  The signed integer whose sign is to be changed
- * @return  The negative value of the signed integer
+ * @tparam Integer The integer type to negate.
+ * @param n  The signed integer to negate.
+ * @return  The negative value of the integer to negate.
  */
-template <typename Integer> [[nodiscard]] constexpr auto negate(const Integer& n) -> Integer
+template <typename Integer>
+constexpr auto negate(const Integer& n) -> Integer
 {
     return add(~n, Integer::one());
 }

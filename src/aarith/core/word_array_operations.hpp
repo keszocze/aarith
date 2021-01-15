@@ -8,13 +8,24 @@
 namespace aarith {
 
 /**
- * @brief Counts the number of bits set to zero before the first one appears
- * (from MSB to LSB).
- *
- * Optional parameter offset makes it possible to skip the first offset-many
- * MSB. For example, calling count_leading_zeroes(0b100111, offset=1) would
- * return 2 as the first one is skipped.
- *
+ * @brief Return word array in reverse order.
+ */
+template <size_t W, typename WordType>
+[[nodiscard]] constexpr word_array<W, WordType> flip(const word_array<W, WordType>& w)
+{
+    word_array<W, WordType> copy;
+
+    for (size_t widx = 0; widx < W; ++widx)
+    {
+        const size_t copyidx = W - 1 - widx;
+        copy.set_bit(copyidx, w.bit(widx));
+    }
+
+    return copy;
+}
+
+/**
+ * @brief  Counts the number of bits set to zero before the first one appears (from MSB to LSB)
  * @tparam Width Width of the word_array
  * @param value The word to count the leading zeroes in
  * @param offset The number of MSB to skip before conuting.
@@ -203,20 +214,6 @@ dynamic_bit_range(const word_array<W, WordType>& w, size_t start_idx, size_t end
     }
 
     return result;
-}
-
-template <size_t W, typename WordType>
-[[nodiscard]] constexpr word_array<W, WordType> flip(const word_array<W, WordType>& w)
-{
-    word_array<W, WordType> copy;
-
-    for (size_t widx = 0; widx < W; ++widx)
-    {
-        const size_t copyidx = W - 1 - widx;
-        copy.set_bit(copyidx, w.bit(widx));
-    }
-
-    return copy;
 }
 
 /**
