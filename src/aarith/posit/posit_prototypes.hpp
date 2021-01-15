@@ -1817,8 +1817,7 @@ template <size_t N, size_t ES, typename WT> std::string to_binary(const quire<N,
  * A valid consists of two tiles, this is one of them. A tile is a posit
  * combined with an uncertainty bit attached to it.
  */
-template <size_t N, size_t ES, typename WT = DefaultWordType>
-class tile : public posit<N, ES, WT>
+template <size_t N, size_t ES, typename WT = DefaultWordType> class tile
 {
 public:
     /**
@@ -1987,7 +1986,14 @@ public:
 
 private:
     /**
-     * @brief Uncertainty flag.
+     * @brief Underlying value.
+     *
+     * The underlying posit without u-bit.
+     */
+    posit<N, ES, WT> concrete_value;
+
+    /**
+     * @brief Uncertainty bit.
      *
      * The original formulation of the valid format (Posit Arithmetic,
      * Gustafson, October 2017, pp. 23) defines an uncertainty bit (i.e. just

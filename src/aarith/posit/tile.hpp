@@ -5,12 +5,11 @@
 namespace aarith {
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr tile<N, ES, WT> tile<N, ES, WT>::from(const posit<N, ES, WT>& p,
-                                                                          bool u)
+[[nodiscard]] constexpr tile<N, ES, WT> tile<N, ES, WT>::from(const posit<N, ES, WT>& p, bool u)
 {
     tile v;
 
-    v.value() = p;
+    v.concrete_value = p;
     v.uncertain = u;
 
     return v;
@@ -52,7 +51,7 @@ tile<N, ES, WT>::tile()
 
 template <size_t N, size_t ES, typename WT>
 tile<N, ES, WT>::tile(const tile<N, ES, WT>& other)
-    : posit<N, ES, WT>(other)
+    : concrete_value(other.concrete_value)
     , uncertain(other.uncertain)
 {
 }
@@ -60,6 +59,9 @@ tile<N, ES, WT>::tile(const tile<N, ES, WT>& other)
 template <size_t N, size_t ES, typename WT>
 tile<N, ES, WT>& tile<N, ES, WT>::operator=(const tile<N, ES, WT>& other)
 {
+    concrete_value = other.concrete_value;
+    uncertain = other.uncertain;
+
     return *this;
 }
 
@@ -179,16 +181,15 @@ template <size_t N, size_t ES, typename WT>
     return *this == nar();
 }
 
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] posit<N, ES, WT>& tile<N, ES, WT>::value()
+template <size_t N, size_t ES, typename WT> [[nodiscard]] posit<N, ES, WT>& tile<N, ES, WT>::value()
 {
-    return *this;
+    return concrete_value;
 }
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] const posit<N, ES, WT>& tile<N, ES, WT>::value() const
 {
-    return *this;
+    return concrete_value;
 }
 
 } // namespace aarith
