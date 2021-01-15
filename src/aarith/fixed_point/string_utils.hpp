@@ -75,9 +75,14 @@ auto operator<<(std::ostream& out, const fixed<I, F, B, WordType>& value) -> std
     }
     else
     {
-        out << to_decimal(value.integer_part());
+        if (value.is_negative())
+        {
+            out << "-";
+        }
+
+        out << to_decimal(abs(value).integer_part());
         out << ".";
-        out << fraction_as_integer(value);
+        out << fraction_as_integer(abs(value));
     }
 
     return out;
