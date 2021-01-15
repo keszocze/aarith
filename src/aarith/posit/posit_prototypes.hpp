@@ -1811,7 +1811,7 @@ std::ostream& operator<<(std::ostream& os, const quire<N, ES, WT>& q);
 template <size_t N, size_t ES, typename WT> std::string to_binary(const quire<N, ES, WT>& q);
 
 //
-// Valid Tile Class.
+// Tile Class.
 //
 // For implementation, look at posit/tile.hpp
 //
@@ -2025,6 +2025,20 @@ private:
 template <size_t N, size_t ES, typename WT>
 std::ostream& operator<<(std::ostream& os, const tile<N, ES, WT>& t);
 
+//
+// Valid Class.
+//
+// For implementation, look at posit/valid.hpp
+//
+
+template <size_t N, size_t ES, typename WT> class valid
+{
+public:
+private:
+    tile<N, ES, WT> start;
+    tile<N, ES, WT> end;
+};
+
 } // namespace aarith
 
 //
@@ -2050,3 +2064,4 @@ std::ostream& operator<<(std::ostream& os, const tile<N, ES, WT>& t);
 #include <aarith/posit/tile.hpp>
 #include <aarith/posit/tile_operators.hpp>
 #include <aarith/posit/tile_types.hpp>
+#include <aarith/posit/valid.hpp>
