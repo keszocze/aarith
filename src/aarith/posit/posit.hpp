@@ -517,7 +517,7 @@ posit<N, ES, WT>::operator+(const posit<N, ES, WT>& rhs) const
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator+=(const posit<N, ES, WT>& rhs)
+posit<N, ES, WT>& posit<N, ES, WT>::operator+=(const posit<N, ES, WT>& rhs)
 {
 
     posit<N, ES, WT> sum = *this + rhs;
@@ -567,7 +567,7 @@ posit<N, ES, WT>::operator-(const posit<N, ES, WT>& rhs) const
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator-=(const posit<N, ES, WT>& rhs)
+posit<N, ES, WT>& posit<N, ES, WT>::operator-=(const posit<N, ES, WT>& rhs)
 {
     posit<N, ES, WT> sum = *this - rhs;
     this->bits = sum.get_bits();

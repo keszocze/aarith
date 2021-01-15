@@ -461,7 +461,7 @@ public:
      *
      * @param rhs The posit to add to this posit.
      */
-    [[nodiscard]] constexpr posit& operator+=(const posit& rhs);
+    posit& operator+=(const posit& rhs);
 
     /**
      * @brief Pre-Increment.
@@ -503,7 +503,7 @@ public:
      *
      * @param rhs The posit to subtract.
      */
-    [[nodiscard]] constexpr posit& operator-=(const posit& rhs);
+    posit& operator-=(const posit& rhs);
 
     /**
      * @brief Pre-Decrement
