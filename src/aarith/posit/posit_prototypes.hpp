@@ -480,18 +480,17 @@ public:
     /**
      * @brief Unary minus.
      *
-     * If this posit represents NaR, the result is also NaR.
+     * If this posit represents NaR, the result is also NaR. Also, as posits
+     * only have one unique representation of zero, calling this operator on a
+     * posit that represents zero again returns zero.
      */
     [[nodiscard]] constexpr posit operator-() const;
 
     /**
-     * @brief Sum of two posits.
+     * @brief Posit subtraction.
      *
      * If either operand is NaR, the result is also NaR. If neither operands
      * are NaR, the result is guaranteed not to be NaR.
-     *
-     * As posits only have one unique representation of zero, calling this
-     * operator on a posit that represents zero again returns zero.
      *
      * @param rhs The posit to add to this posit.
      * @return The sum of this and rhs.
@@ -521,6 +520,9 @@ public:
 
     /**
      * @brief Return the product of this multiplied with rhs.
+     *
+     * If either operand is NaR, the result is also NaR. If neither operands
+     * are NaR, the result is guaranteed not to be NaR.
      */
     [[nodiscard]] constexpr posit operator*(const posit& rhs) const;
 
@@ -531,6 +533,9 @@ public:
 
     /**
      * @brief Return this divided by other.
+     *
+     * If either operand is NaR, the result is also NaR. If neither operands
+     * are NaR, the result is guaranteed not to be NaR.
      */
     [[nodiscard]] constexpr posit operator/(const posit& rhs) const;
 
