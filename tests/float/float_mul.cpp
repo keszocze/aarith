@@ -67,6 +67,7 @@ TEMPLATE_TEST_CASE_SIG("Multiplication is commutative",
         {
             F res1{a * b};
             F res2{b * a};
+            CAPTURE(a, b, res1, res2);
             THEN("The result should not depend on operand order")
             {
                 REQUIRE(equal_except_rounding(res1, res2));

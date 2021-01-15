@@ -807,10 +807,30 @@ auto bit_equal(const floating_point<E, M1, WordType> lhs, const floating_point<E
            lhs.get_mantissa() == rhs.get_mantissa();
 }
 
+/**
+ * @brief Checks if two floating-point numbers are equal except for differences stemming from
+ * different rounding modes.
+ *
+ * @note Two NaNs are compared to be equal by this method!
+ *
+ * @tparam E
+ * @tparam M1
+ * @tparam M2
+ * @tparam WordType
+ * @param lhs
+ * @param rhs
+ * @return
+ */
 template <size_t E, size_t M1, size_t M2, typename WordType = uint64_t>
 auto equal_except_rounding(const floating_point<E, M1, WordType> lhs,
                            const floating_point<E, M2, WordType> rhs) -> bool
 {
+
+    if (lhs.is_nan() && rhs.is_nan())
+    {
+        return true;
+    }
+
     if (lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent())
     {
         if (lhs.get_full_mantissa() == rhs.get_full_mantissa())
@@ -884,7 +904,7 @@ auto equal_except_rounding(const floating_point<E, M1, WordType> lhs,
 }
 
 /**
- * @brief Computes the asbolute value of the floating point number
+ * @brief Computes the absolute value of the floating point number
  *
  * Quoting the standard: "copies a floating-point operand x to a destination in the same format,
  * setting the sign bit to 0 (positive)"
