@@ -1976,6 +1976,15 @@ public:
     [[nodiscard]] constexpr bool is_nar() const;
 
     /**
+     * @brief Check sign.
+     *
+     * @note If the tile represents NaR, this method returns false.
+     *
+     * @return Whether this tile represents some negative real or interval.
+     */
+    [[nodiscard]] constexpr bool is_negative() const;
+
+    /**
      * @brief Access a reference to the underlying posit.
      *
      * Manipulating the returned reference will manipulate the tile posit.
@@ -2042,6 +2051,7 @@ public:
     [[nodiscard]] static constexpr valid zero();
     [[nodiscard]] static constexpr valid one();
     [[nodiscard]] static constexpr valid empty();
+    [[nodiscard]] static constexpr valid nar();
 
     constexpr valid();
     constexpr valid(const valid& exact_value);
@@ -2053,6 +2063,11 @@ public:
     [[nodiscard]] constexpr bool operator==(const valid& other) const;
     [[nodiscard]] constexpr bool operator!=(const valid& other) const;
 
+    [[nodiscard]] constexpr bool operator<(const valid& other) const;
+    [[nodiscard]] constexpr bool operator<=(const valid& other) const;
+    [[nodiscard]] constexpr bool operator>(const valid& other) const;
+    [[nodiscard]] constexpr bool operator>=(const valid& other) const;
+
     [[nodiscard]] constexpr valid operator+(const valid& other) const;
     [[nodiscard]] constexpr valid operator-(const valid& other) const;
     [[nodiscard]] constexpr valid operator*(const valid& other) const;
@@ -2060,6 +2075,7 @@ public:
 
     [[nodiscard]] constexpr bool is_zero() const;
     [[nodiscard]] constexpr bool is_empty() const;
+    [[nodiscard]] constexpr bool is_nar() const;
 
 private:
     tile_type start;

@@ -34,8 +34,15 @@ template <size_t N, size_t ES, typename WT>
     // To represent the empty set, we can pick any posit p and return the
     // interval (p, p). We pick p = 0 here. This is arbitrary.
 
-    constexpr auto open_interval = tile<N, ES, WT>::from(posit_type::zero(), true);
+    constexpr auto open_interval = tile_type::from(posit_type::zero(), true);
     return from(open_interval, open_interval);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::nar()
+{
+    constexpr auto nar_tile = tile_type::nar();
+    return from(nar_tile, nar_tile);
 }
 
 template <size_t N, size_t ES, typename WT> constexpr valid<N, ES, WT>::valid()
@@ -84,31 +91,55 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool valid<N, ES, WT>::operator<(const valid& other) const
+{
+    throw std::logic_error("valid::operator< not implemented");
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool valid<N, ES, WT>::operator<=(const valid& other) const
+{
+    return (*this < other) || (*this == other);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool valid<N, ES, WT>::operator>(const valid& other) const
+{
+    return other < *this;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool valid<N, ES, WT>::operator>=(const valid& other) const
+{
+    return (*this > other) || (this == other);
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr valid<N, ES, WT>
 valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
 {
-    throw std::logic_error("valid::operator+ not implementated");
+    throw std::logic_error("valid::operator+ not implemented");
 }
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr valid<N, ES, WT>
 valid<N, ES, WT>::operator-(const valid<N, ES, WT>& other) const
 {
-    throw std::logic_error("valid::operator- not implementated");
+    throw std::logic_error("valid::operator- not implemented");
 }
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr valid<N, ES, WT>
 valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
 {
-    throw std::logic_error("valid::operator* not implementated");
+    throw std::logic_error("valid::operator* not implemented");
 }
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr valid<N, ES, WT>
 valid<N, ES, WT>::operator/(const valid<N, ES, WT>& other) const
 {
-    throw std::logic_error("valid::operator/ not implementated");
+    throw std::logic_error("valid::operator/ not implemented");
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -121,6 +152,12 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool valid<N, ES, WT>::is_empty() const
 {
     return start.is_uncertain() && end.is_uncertain() && start.value() == end.value();
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool valid<N, ES, WT>::is_nar() const
+{
+    return *this == nar();
 }
 
 template <size_t N, size_t ES, typename WT>

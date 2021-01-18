@@ -181,6 +181,12 @@ template <size_t N, size_t ES, typename WT>
     return *this == nar();
 }
 
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool tile<N, ES, WT>::is_negative() const
+{
+    return !is_nar() && value().is_nar();
+}
+
 template <size_t N, size_t ES, typename WT> [[nodiscard]] posit<N, ES, WT>& tile<N, ES, WT>::value()
 {
     return concrete_value;
