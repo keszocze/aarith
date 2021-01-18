@@ -2034,9 +2034,39 @@ std::ostream& operator<<(std::ostream& os, const tile<N, ES, WT>& t);
 template <size_t N, size_t ES, typename WT> class valid
 {
 public:
+    using posit_type = posit<N, ES, WT>;
+    using tile_type = tile<N, ES, WT>;
+
+    [[nodiscard]] static constexpr valid from(const tile_type& start, const tile_type& right);
+
+    [[nodiscard]] static constexpr valid zero();
+    [[nodiscard]] static constexpr valid one();
+    [[nodiscard]] static constexpr valid empty();
+
+    constexpr valid();
+    constexpr valid(const valid& exact_value);
+    constexpr valid(const posit<N, ES, WT>& other);
+    ~valid();
+
+    valid& operator=(const valid& other);
+
+    [[nodiscard]] constexpr bool operator==(const valid& other) const;
+    [[nodiscard]] constexpr bool operator!=(const valid& other) const;
+
+    [[nodiscard]] constexpr valid operator+(const valid& other) const;
+    [[nodiscard]] constexpr valid operator-(const valid& other) const;
+    [[nodiscard]] constexpr valid operator*(const valid& other) const;
+    [[nodiscard]] constexpr valid operator/(const valid& other) const;
+
+    [[nodiscard]] constexpr bool is_zero() const;
+    [[nodiscard]] constexpr bool is_empty() const;
+
 private:
-    tile<N, ES, WT> start;
-    tile<N, ES, WT> end;
+    tile_type start;
+    tile_type end;
+
+    [[nodiscard]] static constexpr valid canonical_empty();
+    void ensure_canonicalized();
 };
 
 } // namespace aarith
