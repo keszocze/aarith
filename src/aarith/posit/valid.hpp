@@ -93,7 +93,38 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool valid<N, ES, WT>::operator<(const valid& other) const
 {
-    throw std::logic_error("valid::operator< not implemented");
+    const valid& lhs = *this;
+    const valid& rhs = other;
+
+    if (lhs == rhs)
+    {
+        return false;
+    }
+
+    if (lhs.is_nar() || rhs.is_nar())
+    {
+        return false;
+    }
+
+    // Based on "The End of Error", Gustafson, 2015, pp. 105. The names might
+    // be a bit confusing, but "right" is the right (end) bound of "lhs" and
+    // "left" is the left (start) bound of "rhs". We keep names identical to
+    // the original formulation here.
+
+    const tile_type& right = lhs.end;
+    const tile_type& left = rhs.other.start;
+
+    if (right.is_negative() != left.is_negative())
+    {
+        return left.is_negative();
+    }
+
+    if (lhs == lhs.min() || rhs == rhs.min())
+    {
+        return lhs.min();
+    }
+
+    return false;
 }
 
 template <size_t N, size_t ES, typename WT>
