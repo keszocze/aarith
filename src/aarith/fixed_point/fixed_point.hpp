@@ -12,6 +12,7 @@ public:
     static constexpr size_t width = I + F;
     static constexpr size_t int_width = I;
     static constexpr size_t frac_width = F;
+    using word_type = WordType;
     using int_type = B<width, WordType>;
     using fixed_type = fixed<I, F, B, WordType>;
 
