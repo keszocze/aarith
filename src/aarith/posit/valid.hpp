@@ -34,14 +34,14 @@ template <size_t N, size_t ES, typename WT>
     // To represent the empty set, we can pick any posit p and return the
     // interval (p, p). We pick p = 0 here. This is arbitrary.
 
-    constexpr auto open_interval = tile_type::from(posit_type::zero(), true);
+    const auto open_interval = tile_type::from(posit_type::zero(), true);
     return from(open_interval, open_interval);
 }
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::nar()
 {
-    constexpr auto nar_tile = tile_type::nar();
+    const auto nar_tile = tile_type::nar();
     return from(nar_tile, nar_tile);
 }
 
@@ -183,6 +183,18 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool valid<N, ES, WT>::is_nar() const
 {
     return *this == nar();
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] const typename valid<N, ES, WT>::tile_type& valid<N, ES, WT>::get_start() const
+{
+    return start;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] const typename valid<N, ES, WT>::tile_type& valid<N, ES, WT>::get_end() const
+{
+    return end;
 }
 
 template <size_t N, size_t ES, typename WT>

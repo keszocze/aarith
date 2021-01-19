@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <string>
 #include <tuple>
+#include <vector>
 
 //
 // This file is for prototypes and forward declarations of the posit
@@ -1841,6 +1842,13 @@ public:
     [[nodiscard]] static constexpr tile zero();
 
     /**
+     * @return Representation of one.
+     *
+     * This is the concrete value one. The u-bit is set to '0'.
+     */
+    [[nodiscard]] static constexpr tile one();
+
+    /**
      * @return Representation of NaR.
      *
      * This is the concrete value NaR. The u-bit is set to '0'.
@@ -1998,6 +2006,8 @@ public:
      */
     [[nodiscard]] const posit<N, ES, WT>& value() const;
 
+    [[nodiscard]] const tile incremented() const;
+
 private:
     /**
      * @brief Underlying value.
@@ -2040,7 +2050,7 @@ std::ostream& operator<<(std::ostream& os, const tile<N, ES, WT>& t);
 // For implementation, look at posit/valid.hpp
 //
 
-template <size_t N, size_t ES, typename WT> class valid
+template <size_t N, size_t ES, typename WT = DefaultWordType> class valid
 {
 public:
     using posit_type = posit<N, ES, WT>;
@@ -2077,6 +2087,9 @@ public:
     [[nodiscard]] constexpr bool is_empty() const;
     [[nodiscard]] constexpr bool is_nar() const;
 
+    [[nodiscard]] const tile_type& get_start() const;
+    [[nodiscard]] const tile_type& get_end() const;
+
 private:
     tile_type start;
     tile_type end;
@@ -2084,6 +2097,15 @@ private:
     [[nodiscard]] static constexpr valid canonical_empty();
     void ensure_canonicalized();
 };
+
+//
+// Valid Operations
+//
+// For implementations, look at posit/valid_operations.hpp.
+//
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr std::vector<tile<N, ES, WT>> all_values_in(const valid<N, ES, WT>& v);
 
 } // namespace aarith
 
@@ -2111,3 +2133,5 @@ private:
 #include <aarith/posit/tile_operators.hpp>
 #include <aarith/posit/tile_types.hpp>
 #include <aarith/posit/valid.hpp>
+#include <aarith/posit/valid_operations.hpp>
+#include <aarith/posit/valid_types.hpp>

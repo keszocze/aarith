@@ -23,6 +23,13 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr tile<N, ES, WT> tile<N, ES, WT>::one()
+{
+    constexpr auto p = posit<N, ES, WT>::one();
+    return from(p, false);
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr tile<N, ES, WT> tile<N, ES, WT>::nar()
 {
     constexpr auto p = posit<N, ES, WT>::nar();
@@ -196,6 +203,22 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] const posit<N, ES, WT>& tile<N, ES, WT>::value() const
 {
     return concrete_value;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] const tile<N, ES, WT> tile<N, ES, WT>::incremented() const
+{
+    // emulate one bit addition where the last bit is the bool flag
+    // "uncertain"
+
+    if (uncertain)
+    {
+        return from(concrete_value.incremented(), false);
+    }
+    else
+    {
+        return from(concrete_value, true);
+    }
 }
 
 } // namespace aarith
