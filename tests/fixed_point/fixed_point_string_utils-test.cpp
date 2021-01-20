@@ -5,11 +5,12 @@
 #include "../test-signature-ranges.hpp"
 #include "gen_fixed_point.hpp"
 
-SCENARIO("Check printing", "[integer][signed][utility][comparison]")
+using namespace aarith;
+
+SCENARIO("Check printing", "[fixed_point][signed][utility][string]")
 {
     GIVEN("A fixed point number")
     {
-        using namespace aarith;
         using Fixed = fixed_point<32, 32>;
 
         const auto starts_with = [](const std::string& needle, const std::string& hay) -> bool {
@@ -63,5 +64,40 @@ SCENARIO("Check printing", "[integer][signed][utility][comparison]")
                 CHECK(starts_with("0.0", fixed_to_string(zero)));
             }
         }
+    }
+}
+
+SCENARIO("Testing the to_binary method")
+{
+    GIVEN("The number zero in various bit widths")
+    {
+        THEN("To binary should give the correct bit string")
+        {
+            fixed_point<3, 4> zero_3_4;
+            fixed_point<6, 4> zero_6_4;
+            fixed_point<3, 15> zero_3_15;
+
+            REQUIRE(to_binary(zero_3_4) == "000.0000");
+            REQUIRE(to_binary(zero_6_4) == "000000.0000");
+            REQUIRE(to_binary(zero_3_15) == "000.000000000000000");
+
+            ufixed_point<3, 4> uzero_3_4;
+            ufixed_point<6, 4> uzero_6_4;
+            ufixed_point<3, 15> uzero_3_15;
+
+            REQUIRE(to_binary(uzero_3_4) == "000.0000");
+            REQUIRE(to_binary(uzero_6_4) == "000000.0000");
+            REQUIRE(to_binary(uzero_3_15) == "000.000000000000000");
+        }
+    }
+}
+
+SCENARIO("Testing to string method for unsigned fixed points", "[utility][string][fixed_point]")
+{
+    GIVEN("A hand-picked value with MSB=1")
+    {
+        using F = ufixed_point<3, 5>;
+        F a = F::from_bitstring(aarith::word_array<8>{0b11111111});
+        std::cout << a << " " << to_binary(a) << "\n";
     }
 }
