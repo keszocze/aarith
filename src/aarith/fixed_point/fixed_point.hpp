@@ -177,7 +177,7 @@ public:
      */
     [[nodiscard]] constexpr bool is_negative() const
     {
-        if constexpr (is_unsigned_int<int_type>)
+        if constexpr (is_unsigned_v<int_type>)
         {
             return false;
         }
