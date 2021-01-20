@@ -1,7 +1,6 @@
 #pragma once
 
 #include <aarith/posit.hpp>
-#include <sstream>
 
 namespace aarith {
 
@@ -9,8 +8,6 @@ template <size_t N, size_t ES, typename WT>
 std::ostream& operator<<(std::ostream& os, const tile<N, ES, WT>& t)
 {
     const posit<N, ES, WT>& value = t.value();
-
-    std::stringstream ss;
 
     if (t.is_uncertain())
     {
@@ -32,38 +29,38 @@ std::ostream& operator<<(std::ostream& os, const tile<N, ES, WT>& t)
 
         // Print the left bound.
 
-        ss << "(";
+        os << "(";
 
         if (t == t.min())
         {
-            ss << "-∞";
+            os << "-∞";
         }
         else
         {
-            ss << lower;
+            os << lower;
         }
 
-        ss << ", ";
+        os << ", ";
 
         // Print the right bound.
 
         if (t == t.max())
         {
-            ss << "+∞";
+            os << "+∞";
         }
         else
         {
-            ss << upper;
+            os << upper;
         }
 
-        ss << ")";
+        os << ")";
     }
     else
     {
-        ss << value << "↓";
+        os << value << "↓";
     }
 
-    return os << ss.str();
+    return os;
 }
 
 } // namespace aarith
