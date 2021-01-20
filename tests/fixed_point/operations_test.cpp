@@ -282,12 +282,23 @@ TEMPLATE_TEST_CASE_SIG("Negating a fixed number flips the sign",
 
         Fixed original = GENERATE(take(20, random_fixed_point<Fixed>()));
 
-        WHEN("Negating the number flips the sign")
+        WHEN("Negating the number")
         {
-            if (!original.is_zero())
+
+            Fixed negated = -original;
+            CAPTURE(original, negated, to_binary(original), to_binary(negated));
+            THEN("either flips the sign (signed numbers) or doesn't change anything (zero/unsigned "
+                 "numbers")
             {
-                Fixed negated = -original;
-                CHECK(bool(original.is_negative() ^ negated.is_negative()));
+
+                if (!original.is_zero() && is_signed_v<Fixed>)
+                {
+
+                    CHECK(bool(original.is_negative() ^ negated.is_negative()));
+                }
+                else {
+                    CHECK(original == negated);
+                }
             }
         }
     }
