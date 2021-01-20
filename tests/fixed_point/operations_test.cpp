@@ -34,7 +34,6 @@ TEMPLATE_TEST_CASE_SIG("Fixed-point addition is commutative",
             {
                 Fixed res1 = add(a, b);
                 Fixed res2 = add(b, a);
-                //                std::cout << a << "\n" << b << "\n" << res1 << "\n\n";
                 THEN("The results should be identical")
                 {
                     REQUIRE(res1 == res2);
