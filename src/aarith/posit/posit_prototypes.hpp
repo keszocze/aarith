@@ -2099,7 +2099,16 @@ private:
 };
 
 //
-// Valid Operations
+// Additional Valid Operators.
+//
+// For implementations, look at posit/valid_operators.hpp.
+//
+
+template <size_t N, size_t ES, typename WT>
+std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v);
+
+//
+// Valid Operations.
 //
 // For implementations, look at posit/valid_operations.hpp.
 //
@@ -2134,4 +2143,5 @@ template <size_t N, size_t ES, typename WT>
 #include <aarith/posit/tile_types.hpp>
 #include <aarith/posit/valid.hpp>
 #include <aarith/posit/valid_operations.hpp>
+#include <aarith/posit/valid_operators.hpp>
 #include <aarith/posit/valid_types.hpp>
