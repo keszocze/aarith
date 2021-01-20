@@ -7,22 +7,23 @@
 
 using namespace aarith;
 
+const auto starts_with = [](const std::string& needle, const std::string& hay) -> bool {
+    // https://stackoverflow.com/questions/1878001/
+    return (hay.rfind(needle, 0) == 0);
+};
+
+template <typename F>
+const auto fixed_to_string = [](const F& q) -> std::string {
+    std::stringstream ss;
+    ss << q;
+    return ss.str();
+};
+
 SCENARIO("Check printing", "[fixed_point][signed][utility][string]")
 {
     GIVEN("A fixed point number")
     {
         using Fixed = fixed_point<32, 32>;
-
-        const auto starts_with = [](const std::string& needle, const std::string& hay) -> bool {
-            // https://stackoverflow.com/questions/1878001/
-            return (hay.rfind(needle, 0) == 0);
-        };
-
-        const auto fixed_to_string = [](const Fixed& q) -> std::string {
-            std::stringstream ss;
-            ss << q;
-            return ss.str();
-        };
 
         WHEN("Looking at powers of two")
         {
@@ -31,12 +32,12 @@ SCENARIO("Check printing", "[fixed_point][signed][utility][string]")
                 constexpr Fixed fp = Fixed::one();
 
                 CAPTURE(fp, fp >> 1, fp >> 2, fp >> 3, fp >> 4, fp >> 5);
-                CHECK(starts_with("1.0", fixed_to_string(fp)));
-                CHECK(starts_with("0.5", fixed_to_string(fp >> 1)));
-                CHECK(starts_with("0.25", fixed_to_string(fp >> 2)));
-                CHECK(starts_with("0.125", fixed_to_string(fp >> 3)));
-                CHECK(starts_with("0.0625", fixed_to_string(fp >> 4)));
-                CHECK(starts_with("0.03125", fixed_to_string(fp >> 5)));
+                CHECK(starts_with("1.0", fixed_to_string<Fixed>(fp)));
+                CHECK(starts_with("0.5", fixed_to_string<Fixed>(fp >> 1)));
+                CHECK(starts_with("0.25", fixed_to_string<Fixed>(fp >> 2)));
+                CHECK(starts_with("0.125", fixed_to_string<Fixed>(fp >> 3)));
+                CHECK(starts_with("0.0625", fixed_to_string<Fixed>(fp >> 4)));
+                CHECK(starts_with("0.03125", fixed_to_string<Fixed>(fp >> 5)));
             }
         }
 
@@ -47,12 +48,12 @@ SCENARIO("Check printing", "[fixed_point][signed][utility][string]")
                 const Fixed fp = -Fixed::one();
 
                 CAPTURE(fp, fp >> 1, fp >> 2, fp >> 3, fp >> 4, fp >> 5);
-                CHECK(starts_with("-1.0", fixed_to_string(fp)));
-                CHECK(starts_with("-0.5", fixed_to_string(fp >> 1)));
-                CHECK(starts_with("-0.25", fixed_to_string(fp >> 2)));
-                CHECK(starts_with("-0.125", fixed_to_string(fp >> 3)));
-                CHECK(starts_with("-0.0625", fixed_to_string(fp >> 4)));
-                CHECK(starts_with("-0.03125", fixed_to_string(fp >> 5)));
+                CHECK(starts_with("-1.0", fixed_to_string<Fixed>(fp)));
+                CHECK(starts_with("-0.5", fixed_to_string<Fixed>(fp >> 1)));
+                CHECK(starts_with("-0.25", fixed_to_string<Fixed>(fp >> 2)));
+                CHECK(starts_with("-0.125", fixed_to_string<Fixed>(fp >> 3)));
+                CHECK(starts_with("-0.0625", fixed_to_string<Fixed>(fp >> 4)));
+                CHECK(starts_with("-0.03125", fixed_to_string<Fixed>(fp >> 5)));
             }
         }
 
@@ -61,7 +62,7 @@ SCENARIO("Check printing", "[fixed_point][signed][utility][string]")
             THEN("Check that the result is correct")
             {
                 constexpr Fixed zero = Fixed::zero();
-                CHECK(starts_with("0.0", fixed_to_string(zero)));
+                CHECK(starts_with("0.0", fixed_to_string<Fixed>(zero)));
             }
         }
     }
@@ -92,12 +93,19 @@ SCENARIO("Testing the to_binary method")
     }
 }
 
-SCENARIO("Testing to string method for unsigned fixed points", "[utility][string][fixed_point]")
+SCENARIO("Testing to string method for unsigned fixed points",
+         "[utility][unsigned][string][fixed_point]")
 {
     GIVEN("A hand-picked value with MSB=1")
     {
         using F = ufixed_point<3, 5>;
         F a = F::from_bitstring(aarith::word_array<8>{0b11111111});
-        std::cout << a << " " << to_binary(a) << "\n";
+
+        CAPTURE(a, to_binary(a));
+
+        THEN("The number string must not start with a minus sign")
+        {
+            CHECK_FALSE(starts_with("-", fixed_to_string<F>(a)));
+        }
     }
 }
