@@ -247,20 +247,36 @@ auto div(const fixed<I, F, B, WT>& a, const fixed<I, F, B, WT>& b) -> fixed<I, F
 template <size_t I, size_t F, template <size_t, typename> typename B, typename WT = uint64_t>
 auto negate(const fixed<I, F, B, WT>& f) -> fixed<I, F, B, WT>
 {
-    const auto negated_bits = negate(f.bits());
-    return fixed<I, F, B, WT>::from_bitstring(negated_bits);
+
+    if constexpr (is_unsigned_v<fixed<I, F, B, WT>>)
+    {
+        return f;
+    }
+    else
+    {
+        const auto negated_bits = negate(f.bits());
+        return fixed<I, F, B, WT>::from_bitstring(negated_bits);
+    }
 }
 
 template <size_t I, size_t F, template <size_t, typename> typename B, typename WT = uint64_t>
 auto abs(const fixed<I, F, B, WT>& f) -> fixed<I, F, B, WT>
 {
-    if (f.is_negative())
+
+    if constexpr (is_unsigned_v<fixed<I, F, B, WT>>)
     {
-        return negate(f);
+        return f;
     }
     else
     {
-        return f;
+        if (f.is_negative())
+        {
+            return negate(f);
+        }
+        else
+        {
+            return f;
+        }
     }
 }
 
