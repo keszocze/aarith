@@ -639,7 +639,7 @@ public:
     /**
      * @return The sign bit. The returned integer is either set to 0 or 1.
      */
-    [[nodiscard]] constexpr storage_type get_sign_bit() const;
+    [[nodiscard]] constexpr storage_type msb() const;
 
     /**
      * @brief Compute the bitwise increment.
@@ -2074,7 +2074,7 @@ public:
     [[nodiscard]] constexpr bool operator==(const valid& other) const;
     [[nodiscard]] constexpr bool operator!=(const valid& other) const;
 
-    [[nodiscard]] constexpr bool operator<(const valid& other) const;
+    [[nodiscard]] /*constexpr*/ bool operator<(const valid& other) const;
     [[nodiscard]] constexpr bool operator<=(const valid& other) const;
     [[nodiscard]] constexpr bool operator>(const valid& other) const;
     [[nodiscard]] constexpr bool operator>=(const valid& other) const;

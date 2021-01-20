@@ -735,7 +735,7 @@ template <size_t N, size_t ES, typename WT>
         return false;
     }
 
-    return get_sign_bit() == storage_type(1);
+    return msb() == storage_type(1);
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -752,7 +752,7 @@ template <size_t N, size_t ES, typename WT>
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr typename posit<N, ES, WT>::storage_type
-posit<N, ES, WT>::get_sign_bit() const
+posit<N, ES, WT>::msb() const
 {
     return storage_type(bits.msb());
 }

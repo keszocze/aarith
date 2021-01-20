@@ -91,10 +91,8 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool valid<N, ES, WT>::operator<(const valid& other) const
+[[nodiscard]] /*constexpr*/ bool valid<N, ES, WT>::operator<(const valid& other) const
 {
-    // Based on "The End of Error", Gustafson, 2015, pp. 105.
-
     const valid& lhs = *this;
     const valid& rhs = other;
 
@@ -113,12 +111,15 @@ template <size_t N, size_t ES, typename WT>
         return false;
     }
 
-    // const tile_type& lbound = lhs.end;
-    // const tile_type& rbound = rhs.other.start;
+    if (lhs.crosses_infinity() || rhs.crosses_infinity())
+    {
+        return false;
+    }
 
-    // return lbound < rbound;
+    const tile_type& lbound = lhs.end;
+    const tile_type& rbound = rhs.start;
 
-    throw std::logic_error("valid::operator< not fully implemented");
+    return lbound < rbound;
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -228,7 +229,14 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] bool valid<N, ES, WT>::crosses_infinity() const
 {
-    return !start.is_negative() && end.is_negative();
+    // TODO (Schärtl): Fix!
+
+    if (!start.value().msb() && end.value().msb())
+    {
+        return true;
+    }
+
+    return false;
 }
 
 template <size_t N, size_t ES, typename WT> void valid<N, ES, WT>::ensure_canonicalized()
