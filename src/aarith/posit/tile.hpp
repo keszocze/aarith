@@ -191,7 +191,7 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool tile<N, ES, WT>::is_negative() const
 {
-    return !is_nar() && value().is_nar();
+    return !is_nar() && value().is_negative();
 }
 
 template <size_t N, size_t ES, typename WT> [[nodiscard]] posit<N, ES, WT>& tile<N, ES, WT>::value()
@@ -218,6 +218,22 @@ template <size_t N, size_t ES, typename WT>
     else
     {
         return from(concrete_value, true);
+    }
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] const tile<N, ES, WT> tile<N, ES, WT>::decremented() const
+{
+    // emulate one bit subtraction where the last bit is the bool flag
+    // "uncertain"
+
+    if (uncertain)
+    {
+        return from(concrete_value, false);
+    }
+    else
+    {
+        return from(concrete_value.decremented(), true);
     }
 }
 

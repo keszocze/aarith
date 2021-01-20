@@ -4,6 +4,8 @@
 #include <set>
 #include <vector>
 
+using namespace aarith;
+
 template <typename T>
 static void require_same(const std::vector<T>& actual, const std::vector<T>& expected)
 {
@@ -16,10 +18,19 @@ static void require_same(const std::vector<T>& actual, const std::vector<T>& exp
     REQUIRE(actual_set == expected_set);
 }
 
-SCENARIO("Valid Tile Comparisons")
+template <size_t N, size_t ES, typename WT>
+static void require_contains(const valid<N, ES, WT>& v,
+                             const std::vector<tile<N, ES, WT>>& expected)
 {
-    using namespace aarith;
+    for (const auto value : expected)
+    {
+        CAPTURE(v, value);
+        REQUIRE(v.contains(value));
+    }
+}
 
+SCENARIO("Valids contain the correct tiles")
+{
     static const size_t N = 3;
     static const size_t ES = 1;
 
@@ -30,16 +41,16 @@ SCENARIO("Valid Tile Comparisons")
     GIVEN("Special case valids")
     {
         const Valid zero = Valid::zero();
-        require_same(all_values_in(zero), { Tile::zero() });
+        require_same(all_values_in(zero), {Tile::zero()});
 
         const Valid one = Valid::one();
-        require_same(all_values_in(one), { Tile::one() });
+        require_same(all_values_in(one), {Tile::one()});
 
         const Valid empty = Valid::empty();
         require_same(all_values_in(empty), {});
 
         const Valid nar = Valid::nar();
-        require_same(all_values_in(nar), { Tile::nar() });
+        require_same(all_values_in(nar), {Tile::nar()});
     }
 
     GIVEN("Some arbitrary valid endpoints")
@@ -80,34 +91,46 @@ SCENARIO("Valid Tile Comparisons")
         const Tile u6 = Tile::from(p6, true);
         const Tile u7 = Tile::from(p7, true);
 
+        const std::vector<Tile> all_tiles = {t0, t1, t2, t3, t4, t5, t6, t7,
+                                             u0, u1, u2, u3, u4, u5, u6, u7};
+
         THEN("Assert that some arbitrary valids contain the correct entries")
         {
             const Valid v0 = Valid::from(t4, t6);
-            require_same(all_values_in(v0), { t4, u4, t5, u5, t6 });
+            require_same(all_values_in(v0), {t4, u4, t5, u5, t6});
+            require_contains(v0, {t4, u4, t5, u5, t6});
 
             const Valid v1 = Valid::from(t3, t4);
-            require_same(all_values_in(v1), { t3, u3, t4 });
+            require_same(all_values_in(v1), {t3, u3, t4});
+            require_contains(v1, {t3, u3, t4});
 
             const Valid v2 = Valid::from(t2, t6);
-            require_same(all_values_in(v2), { t2, u2, t3, u3, t4, u4, t5, u5, t6 });
+            require_same(all_values_in(v2), {t2, u2, t3, u3, t4, u4, t5, u5, t6});
+            require_contains(v2, {t2, u2, t3, u3, t4, u4, t5, u5, t6});
 
             const Valid v3 = Valid::from(t7, t1);
-            require_same(all_values_in(v3), { t7, u7, t0, u0, t1 });
+            require_same(all_values_in(v3), {t7, u7, t0, u0, t1});
+            require_contains(v3, {t7, u7, t0, u0, t1});
 
             const Valid v4 = Valid::from(t7, t1);
-            require_same(all_values_in(v4), { t7, u7, t0, u0, t1 });
+            require_same(all_values_in(v4), {t7, u7, t0, u0, t1});
+            require_contains(v4, {t7, u7, t0, u0, t1});
 
             const Valid v5 = Valid::from(u0, u1);
-            require_same(all_values_in(v5), { u0, t1, u1 });
+            require_same(all_values_in(v5), {u0, t1, u1});
+            require_contains(v5, {u0, t1, u1});
 
             const Valid v6 = Valid::from(u5, u6);
-            require_same(all_values_in(v6), { u5, t6, u6 });
+            require_same(all_values_in(v6), {u5, t6, u6});
+            require_contains(v6, {u5, t6, u6});
 
             const Valid v7 = Valid::from(t2, u4);
-            require_same(all_values_in(v7), { t2, u2, t3, u3, t4, u4 });
+            require_same(all_values_in(v7), {t2, u2, t3, u3, t4, u4});
+            require_contains(v7, {t2, u2, t3, u3, t4, u4});
 
             const Valid v8 = Valid::from(u3, t6);
-            require_same(all_values_in(v8), { u3, t4, u4, t5, u5, t6 });
+            require_same(all_values_in(v8), {u3, t4, u4, t5, u5, t6});
+            require_contains(v8, {u3, t4, u4, t5, u5, t6});
         }
     }
 }

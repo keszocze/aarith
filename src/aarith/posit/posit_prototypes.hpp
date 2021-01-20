@@ -2007,6 +2007,7 @@ public:
     [[nodiscard]] const posit<N, ES, WT>& value() const;
 
     [[nodiscard]] const tile incremented() const;
+    [[nodiscard]] const tile decremented() const;
 
 private:
     /**
@@ -2086,6 +2087,9 @@ public:
     [[nodiscard]] constexpr bool is_zero() const;
     [[nodiscard]] constexpr bool is_empty() const;
     [[nodiscard]] constexpr bool is_nar() const;
+    [[nodiscard]] constexpr valid inverse() const;
+
+    [[nodiscard]] constexpr bool contains(const tile_type& t) const;
 
     [[nodiscard]] const tile_type& get_start() const;
     [[nodiscard]] const tile_type& get_end() const;
@@ -2095,6 +2099,7 @@ private:
     tile_type end;
 
     [[nodiscard]] static constexpr valid canonical_empty();
+    [[nodiscard]] bool crosses_infinity() const;
     void ensure_canonicalized();
 };
 

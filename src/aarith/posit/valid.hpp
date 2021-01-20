@@ -186,6 +186,28 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::inverse() const
+{
+    const tile_type inverse_start = end.incremented();
+    const tile_type inverse_end = start.decremented();
+
+    return from(inverse_start, inverse_end);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool valid<N, ES, WT>::contains(const tile<N, ES, WT>& t) const
+{
+    if (crosses_infinity())
+    {
+        return !inverse().contains(t);
+    }
+    else
+    {
+        return t >= start && t <= end;
+    }
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] const typename valid<N, ES, WT>::tile_type& valid<N, ES, WT>::get_start() const
 {
     return start;
@@ -201,6 +223,12 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::canonical_empty()
 {
     return empty();
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] bool valid<N, ES, WT>::crosses_infinity() const
+{
+    return !start.is_negative() && end.is_negative();
 }
 
 template <size_t N, size_t ES, typename WT> void valid<N, ES, WT>::ensure_canonicalized()
