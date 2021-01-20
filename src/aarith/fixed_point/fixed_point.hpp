@@ -276,4 +276,10 @@ public:
     static constexpr bool value = true;
 };
 
+template <size_t I, size_t F, typename WordType> class is_signed<fixed<I, F, integer, WordType>>
+{
+public:
+    static constexpr bool value = true;
+};
+
 } // namespace aarith
