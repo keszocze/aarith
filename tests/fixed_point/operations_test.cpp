@@ -253,7 +253,7 @@ TEMPLATE_TEST_CASE_SIG("Dividing a number x by x returns one",
                        "[fixed_point][signed][unsigned][arithmetic][division]",
                        AARITH_FIXED_TEST_EXTENDED_SIGNATURE, AARITH_FIXED_TEST_EXTENDED_PARAM_RANGE)
 {
-    GIVEN("A fixed point number")
+    GIVEN("A fixed point number a")
     {
 
         using Fixed = fixed<I, F, BaseInt, WordType>;
@@ -262,11 +262,27 @@ TEMPLATE_TEST_CASE_SIG("Dividing a number x by x returns one",
 
         WHEN("Dividing by itself")
         {
-            Fixed res = div(a, a);
 
-            THEN("The results should be one")
+            if (!a.is_zero())
             {
-                REQUIRE(res == Fixed::one());
+                AND_WHEN("a is not zero")
+                {
+                    Fixed res = div(a, a);
+                    THEN("The results should be one")
+                    {
+                        REQUIRE(res == Fixed::one());
+                    }
+                }
+            }
+            else
+            {
+                AND_WHEN("a is zero")
+                {
+                    THEN("An exception should be thrown")
+                    {
+                        REQUIRE_THROWS(div(a, a));
+                    }
+                }
             }
         }
     }
@@ -287,7 +303,8 @@ TEMPLATE_TEST_CASE_SIG("Negating a fixed number flips the sign",
 
             Fixed negated = -original;
             CAPTURE(original, negated, to_binary(original), to_binary(negated));
-            THEN("either flips the sign (signed numbers) or doesn't change anything (zero/unsigned "
+            THEN("either flips the sign (signed numbers) or doesn't change anything "
+                 "(zero/unsigned "
                  "numbers")
             {
 
@@ -296,7 +313,8 @@ TEMPLATE_TEST_CASE_SIG("Negating a fixed number flips the sign",
 
                     CHECK(bool(original.is_negative() ^ negated.is_negative()));
                 }
-                else {
+                else
+                {
                     CHECK(original == negated);
                 }
             }
