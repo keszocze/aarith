@@ -91,7 +91,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] /*constexpr*/ bool valid<N, ES, WT>::operator<(const valid& other) const
+[[nodiscard]] constexpr bool valid<N, ES, WT>::operator<(const valid& other) const
 {
     const valid& lhs = *this;
     const valid& rhs = other;

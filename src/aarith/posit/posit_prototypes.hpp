@@ -24,7 +24,7 @@ namespace aarith {
  * @brief Fallback word type used as template parameters.
  *
  * Many of the types defines in this file use an aarith::uinteger or similar
- * containers which require a word type paraemter. In most cases we just use the
+ * containers which require a word type parameter. In most cases we just use the
  * default type defined here.
  */
 using DefaultWordType = uint64_t;
@@ -2051,55 +2051,224 @@ std::ostream& operator<<(std::ostream& os, const tile<N, ES, WT>& t);
 // For implementation, look at posit/valid.hpp
 //
 
+/**
+ * @brief Valid Intervals.
+ *
+ * Valids represent a similar concept to SORNs or Unum Type-II numbers.  A
+ * given valid consists of two posit endpoint with one uncertainty bit (u-bit)
+ * each.  If the u-bit is set, the given bound is open, if it is not set, the
+ * bound is closed.
+ */
 template <size_t N, size_t ES, typename WT = DefaultWordType> class valid
 {
 public:
+    /**
+     * @brief Underlying posit type.
+     */
     using posit_type = posit<N, ES, WT>;
+
+    /**
+     * @brief Underlying tile type.
+     */
     using tile_type = tile<N, ES, WT>;
 
+    /**
+     * @brief Construct a new valid with given endpoints.
+     *
+     * Arguments are imported as-is into a new valid.
+     */
     [[nodiscard]] static constexpr valid from(const tile_type& start, const tile_type& right);
 
+    /**
+     * @return Representation of the real number zero.
+     */
     [[nodiscard]] static constexpr valid zero();
+
+    /**
+     * @return Representation of the real number one.
+     */
     [[nodiscard]] static constexpr valid one();
+
+    /**
+     * @return Representation of the empty set.
+     */
     [[nodiscard]] static constexpr valid empty();
+
+    /**
+     * @return Representation of NaR.
+     */
     [[nodiscard]] static constexpr valid nar();
 
+    /**
+     * @brief Construct valid initialized to zero.
+     */
     constexpr valid();
-    constexpr valid(const valid& exact_value);
-    constexpr valid(const posit<N, ES, WT>& other);
+
+    /**
+     * @brief Copy constructor.
+     */
+    constexpr valid(const valid& other);
+
+    /**
+     * @brief Construct valid to represent given value exactly.
+     */
+    constexpr valid(const posit<N, ES, WT>& exact_value);
+
+    /**
+     * @brief Destructor
+     */
     ~valid();
 
+    /**
+     * @brief Assign this valid to hold the value of other.
+     *
+     * @param The value to change to.
+     */
     valid& operator=(const valid& other);
 
+    /**
+     * @brief Compare this and other for equality.
+     *
+     * Two valids are equal if they share the same exact bit patterns.
+     * In particular, NaR compares equal to itself.
+     */
     [[nodiscard]] constexpr bool operator==(const valid& other) const;
+
+    /**
+     * @brief Compare this and other for inequality.
+     *
+     * Two valid are not equal if they have different bit patterns.
+     */
     [[nodiscard]] constexpr bool operator!=(const valid& other) const;
 
-    [[nodiscard]] /*constexpr*/ bool operator<(const valid& other) const;
+    /**
+     * @brief Return whether this is less than other.
+     *
+     * Given two valids u, v, u < v means that every tile t in u is smaller
+     * than any other tile s in v.
+     */
+    [[nodiscard]] constexpr bool operator<(const valid& other) const;
+
+    /**
+     * @brief Return whether this is less than or equal to other.
+     */
     [[nodiscard]] constexpr bool operator<=(const valid& other) const;
+
+    /**
+     * @brief Return whether this is greater than other.
+     */
     [[nodiscard]] constexpr bool operator>(const valid& other) const;
+
+    /**
+     * @brief Return whether this is greater than or equal to other.
+     */
     [[nodiscard]] constexpr bool operator>=(const valid& other) const;
 
+    /**
+     * @brief Sum of two valids.
+     *
+     * @param rhs The valid to add to this valid.
+     * @return The sum of this and rhs.
+     */
     [[nodiscard]] constexpr valid operator+(const valid& other) const;
+
+    /**
+     * @brief Valid subtraction.
+     *
+     * @param rhs The valid to add to this valid.
+     * @return The sum of this and rhs.
+     */
     [[nodiscard]] constexpr valid operator-(const valid& other) const;
+
+    /**
+     * @brief Return the product of this multiplied with rhs.
+     */
     [[nodiscard]] constexpr valid operator*(const valid& other) const;
+
+    /**
+     * @brief Return this divided by other.
+     */
     [[nodiscard]] constexpr valid operator/(const valid& other) const;
 
+    /**
+     * @return Whether this valid represents the number zero.
+     */
     [[nodiscard]] constexpr bool is_zero() const;
+
+    /**
+     * @return Whether this valid represents the empty set.
+     */
     [[nodiscard]] constexpr bool is_empty() const;
+
+    /**
+     * @return Whether this valid represents NaR.
+     */
     [[nodiscard]] constexpr bool is_nar() const;
+
+    /**
+     * @brief Invert the valid.
+     *
+     * Inverting a valid v means returning a valid u that contains exactly
+     * those tiles that v does not contain.
+     *
+     * @return The reverse set.
+     */
     [[nodiscard]] constexpr valid inverse() const;
 
+    /**
+     * @return Whether t is part of the given valid.
+     */
     [[nodiscard]] constexpr bool contains(const tile_type& t) const;
 
+    /**
+     * @return The underlying start tile.
+     *
+     * @note Tiles need not be ordered. There is no guarantee that start is
+     * less than end.
+     */
     [[nodiscard]] const tile_type& get_start() const;
+
+    /**
+     * @return The underlying end tile.
+     *
+     * @note Tiles need not be ordered. There is no guarantee that start is
+     * less than end.
+     */
     [[nodiscard]] const tile_type& get_end() const;
 
 private:
+    /**
+     * @brief Start of the interval.
+     */
     tile_type start;
+
+    /**
+     * @brief End of the interval.
+     */
     tile_type end;
 
+    /**
+     * @return A normalized empty representation.
+     *
+     * There are multiple ways to represent the empty set as every tile t can
+     * be used to represent it, viz. interval (t, t).  This method returns a
+     * fixed representation of zero.
+     */
     [[nodiscard]] static constexpr valid canonical_empty();
+
+    /**
+     * @returns Whether this interval crosses the infinity/NaR border.
+     */
     [[nodiscard]] bool crosses_infinity() const;
+
+    /**
+     * @brief Ensure normalized representation.
+     *
+     * There are multiple ways to represent the empty set. This method ensures
+     * that if the given valid represents the empty set, the start and
+     * endpoints are set to a standardized value. While this is not necessary,
+     * it makes things easier to reason about.
+     */
     void ensure_canonicalized();
 };
 
@@ -2109,6 +2278,13 @@ private:
 // For implementations, look at posit/valid_operators.hpp.
 //
 
+/**
+ * @brief Output a string representation of v to os.
+ *
+ * @param os The stream to write to.
+ * @param v The valid to write.
+ * @return A reference to os.
+ */
 template <size_t N, size_t ES, typename WT>
 std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v);
 
@@ -2118,6 +2294,13 @@ std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v);
 // For implementations, look at posit/valid_operations.hpp.
 //
 
+/**
+ * @brief Return all tiles in a given valid.
+ *
+ * Returns a vector of all tiles in the given valid. While this function is
+ * useful for writing tests, for most cases you should use valid::contains and
+ * similar methods instead of iterating over each possibility.
+ */
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr std::vector<tile<N, ES, WT>> all_values_in(const valid<N, ES, WT>& v);
 
