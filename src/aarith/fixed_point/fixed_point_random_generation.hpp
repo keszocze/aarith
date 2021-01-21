@@ -7,17 +7,13 @@ namespace aarith {
 /**
  * Implements random number generation interface similar to std::uniform_int_distribution.
  */
-template <size_t I, size_t F, template <size_t, typename> typename BaseInt,
-          typename WordType = uint64_t>
-class uniform_fixed_point_distribution
+template <typename FixedPoint> class uniform_fixed_point_distribution
 {
 public:
-    using result_type = fixed<I, F, BaseInt, WordType>;
-
-    template <class Generator> auto operator()(Generator& g) -> result_type
+    template <class Generator> auto operator()(Generator& g) -> FixedPoint
     {
         auto data = random_array(g);
-        return result_type::from_bitstring(data);
+        return FixedPoint::from_bitstring(data);
     }
 
     virtual void reset()
@@ -26,7 +22,9 @@ public:
     }
 
 private:
-    uniform_word_array_distribution<I + F, WordType> random_array{};
+    static constexpr auto S = FixedPoint::width;
+    using word_type = typename FixedPoint::word_type;
+    uniform_word_array_distribution<S, word_type> random_array{};
 };
 
 } // namespace aarith

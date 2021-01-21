@@ -61,6 +61,12 @@ auto fraction_as_integer(const fixed<I, F, B, WordType>& value)
 template <size_t I, size_t F, template <size_t, class> typename B, typename WordType>
 auto operator<<(std::ostream& out, const fixed<I, F, B, WordType>& value) -> std::ostream&
 {
+
+    if (value.is_negative())
+    {
+        out << "-";
+    }
+
     if (out.flags() & std::ios::hex)
     {
         out << to_hex(value.integer_part());
@@ -75,11 +81,6 @@ auto operator<<(std::ostream& out, const fixed<I, F, B, WordType>& value) -> std
     }
     else
     {
-        if (value.is_negative())
-        {
-            out << "-";
-        }
-
         out << to_decimal(abs(value).integer_part());
         out << ".";
         out << fraction_as_integer(abs(value));

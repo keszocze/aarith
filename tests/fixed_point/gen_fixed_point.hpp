@@ -5,12 +5,11 @@
 
 namespace aarith {
 
-template <size_t I, size_t F, template <size_t, typename> class BaseInt,
-          typename WordType = uint64_t>
-class FixedPointGenerator : public Catch::Generators::IGenerator<fixed<I, F, BaseInt, WordType>>
+// TODO SFINAE it!
+template <typename FixedPoint>
+class FixedPointGenerator : public Catch::Generators::IGenerator<FixedPoint>
 {
 public:
-    using Fixed = fixed<I, F, BaseInt, WordType>;
 
     explicit FixedPointGenerator()
         : rng{std::random_device{}()}
@@ -19,7 +18,7 @@ public:
     {
     }
 
-    auto get() const -> const Fixed& override
+    auto get() const -> const FixedPoint& override
     {
         return current_number;
     }
@@ -32,17 +31,20 @@ public:
 
 private:
     std::minstd_rand rng;
-    uniform_fixed_point_distribution<I, F, BaseInt, WordType> random_number;
-    Fixed current_number;
+    uniform_fixed_point_distribution<FixedPoint> random_number;
+    FixedPoint current_number;
 };
 
-template <size_t I, size_t F, template <size_t, typename> class BaseInt,
-          typename WordType = uint64_t>
-auto random_fixed_point() -> Catch::Generators::GeneratorWrapper<fixed<I, F, BaseInt, WordType>>
+
+template <typename FixedPoint>
+auto random_fixed_point() -> Catch::Generators::GeneratorWrapper<FixedPoint>
 {
-    return Catch::Generators::GeneratorWrapper<fixed<I, F, BaseInt, WordType>>(
-        std::unique_ptr<Catch::Generators::IGenerator<fixed<I, F, BaseInt, WordType>>>(
-            new FixedPointGenerator<I, F, BaseInt, WordType>()));
+    return Catch::Generators::GeneratorWrapper<FixedPoint>(
+        std::unique_ptr<Catch::Generators::IGenerator<FixedPoint>>(
+            new FixedPointGenerator<FixedPoint>()));
 }
+
+
+
 
 } // namespace aarith

@@ -12,6 +12,7 @@ public:
     static constexpr size_t width = I + F;
     static constexpr size_t int_width = I;
     static constexpr size_t frac_width = F;
+    using word_type = WordType;
     using int_type = B<width, WordType>;
     using fixed_type = fixed<I, F, B, WordType>;
 
@@ -176,7 +177,7 @@ public:
      */
     [[nodiscard]] constexpr bool is_negative() const
     {
-        if constexpr (is_unsigned_int<int_type>)
+        if constexpr (is_unsigned_v<int_type>)
         {
             return false;
         }
@@ -270,6 +271,12 @@ public:
 };
 
 template <size_t I, size_t F, typename WordType> class is_unsigned<fixed<I, F, uinteger, WordType>>
+{
+public:
+    static constexpr bool value = true;
+};
+
+template <size_t I, size_t F, typename WordType> class is_signed<fixed<I, F, integer, WordType>>
 {
 public:
     static constexpr bool value = true;

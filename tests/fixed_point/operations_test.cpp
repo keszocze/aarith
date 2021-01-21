@@ -15,11 +15,11 @@ TEMPLATE_TEST_CASE_SIG("Fixed-point addition is commutative",
     {
         using Fixed = fixed<I, F, BaseInt, WordType>;
 
-        Fixed a = GENERATE(take(10, random_fixed_point<I, F, BaseInt, WordType>()));
+        Fixed a = GENERATE(take(10, random_fixed_point<Fixed>()));
 
         WHEN("Both numbers have the same widths")
         {
-            Fixed b = GENERATE(take(10, random_fixed_point<I, F, BaseInt, WordType>()));
+            Fixed b = GENERATE(take(10, random_fixed_point<Fixed>()));
 
             AND_WHEN("Adding the numbers with width expansion")
             {
@@ -34,7 +34,6 @@ TEMPLATE_TEST_CASE_SIG("Fixed-point addition is commutative",
             {
                 Fixed res1 = add(a, b);
                 Fixed res2 = add(b, a);
-                //                std::cout << a << "\n" << b << "\n" << res1 << "\n\n";
                 THEN("The results should be identical")
                 {
                     REQUIRE(res1 == res2);
@@ -47,11 +46,14 @@ TEMPLATE_TEST_CASE_SIG("Fixed-point addition is commutative",
             {
                 THEN("The addition should be commutative")
                 {
-                    auto b = GENERATE(take(5, random_fixed_point<I, F + 8, BaseInt, WordType>()));
-                    auto c =
-                        GENERATE(take(5, random_fixed_point<I + 2, F + 8, BaseInt, WordType>()));
-                    auto d =
-                        GENERATE(take(5, random_fixed_point<I + 2, F - 1, BaseInt, WordType>()));
+
+                    using bType = fixed<I, F + 8, BaseInt, WordType>;
+                    using cType = fixed<I + 2, F + 8, BaseInt, WordType>;
+                    using dType = fixed<I + 2, F - 1, BaseInt, WordType>;
+
+                    auto b = GENERATE(take(5, random_fixed_point<bType>()));
+                    auto c = GENERATE(take(5, random_fixed_point<cType>()));
+                    auto d = GENERATE(take(5, random_fixed_point<dType>()));
 
                     CHECK(expanding_add(a, b) == expanding_add(b, a));
                     CHECK(expanding_add(a, c) == expanding_add(c, a));
@@ -73,7 +75,7 @@ TEMPLATE_TEST_CASE_SIG("Adding zero does not do anything",
 
         using Fixed = fixed<I, F, BaseInt, WordType>;
 
-        Fixed a = GENERATE(take(20, random_fixed_point<I, F, BaseInt, WordType>()));
+        Fixed a = GENERATE(take(20, random_fixed_point<Fixed>()));
 
         WHEN("Adding the numbers with width expansion")
         {
@@ -187,7 +189,7 @@ TEMPLATE_TEST_CASE_SIG("Multiplying one does not do anything",
 
         using Fixed = fixed<I, F, BaseInt, WordType>;
 
-        Fixed a = GENERATE(take(20, random_fixed_point<I, F, BaseInt, WordType>()));
+        Fixed a = GENERATE(take(20, random_fixed_point<Fixed>()));
 
         WHEN("Multiplying with one")
         {
@@ -210,7 +212,7 @@ TEMPLATE_TEST_CASE_SIG("Multiplying zero returns zero",
 
         using Fixed = fixed<I, F, BaseInt, WordType>;
 
-        Fixed a = GENERATE(take(20, random_fixed_point<I, F, BaseInt, WordType>()));
+        Fixed a = GENERATE(take(20, random_fixed_point<Fixed>()));
 
         WHEN("Multiplying with zero")
         {
@@ -233,7 +235,7 @@ TEMPLATE_TEST_CASE_SIG("Dividing by one does not do anything",
 
         using Fixed = fixed<I, F, BaseInt, WordType>;
 
-        Fixed a = GENERATE(take(20, random_fixed_point<I, F, BaseInt, WordType>()));
+        Fixed a = GENERATE(take(20, random_fixed_point<Fixed>()));
 
         WHEN("Dividing by one")
         {
@@ -251,20 +253,36 @@ TEMPLATE_TEST_CASE_SIG("Dividing a number x by x returns one",
                        "[fixed_point][signed][unsigned][arithmetic][division]",
                        AARITH_FIXED_TEST_EXTENDED_SIGNATURE, AARITH_FIXED_TEST_EXTENDED_PARAM_RANGE)
 {
-    GIVEN("A fixed point number")
+    GIVEN("A fixed point number a")
     {
 
         using Fixed = fixed<I, F, BaseInt, WordType>;
 
-        Fixed a = GENERATE(take(20, random_fixed_point<I, F, BaseInt, WordType>()));
+        Fixed a = GENERATE(take(20, random_fixed_point<Fixed>()));
 
         WHEN("Dividing by itself")
         {
-            Fixed res = div(a, a);
 
-            THEN("The results should be one")
+            if (!a.is_zero())
             {
-                REQUIRE(res == Fixed::one());
+                AND_WHEN("a is not zero")
+                {
+                    Fixed res = div(a, a);
+                    THEN("The results should be one")
+                    {
+                        REQUIRE(res == Fixed::one());
+                    }
+                }
+            }
+            else
+            {
+                AND_WHEN("a is zero")
+                {
+                    THEN("An exception should be thrown")
+                    {
+                        REQUIRE_THROWS(div(a, a));
+                    }
+                }
             }
         }
     }
@@ -278,28 +296,42 @@ TEMPLATE_TEST_CASE_SIG("Negating a fixed number flips the sign",
     {
         using Fixed = fixed<I, F, BaseInt, WordType>;
 
-        Fixed original = GENERATE(take(20, random_fixed_point<I, F, BaseInt, WordType>()));
+        Fixed original = GENERATE(take(20, random_fixed_point<Fixed>()));
 
-        WHEN("Negating the number flips the sign")
+        WHEN("Negating the number")
         {
-            if (!original.is_zero())
+
+            Fixed negated = -original;
+            CAPTURE(original, negated, to_binary(original), to_binary(negated));
+            THEN("either flips the sign (signed numbers) or doesn't change anything "
+                 "(zero/unsigned "
+                 "numbers")
             {
-                Fixed negated = -original;
-                CHECK(bool(original.is_negative() ^ negated.is_negative()));
+
+                if (!original.is_zero() && is_signed_v<Fixed>)
+                {
+
+                    CHECK(bool(original.is_negative() ^ negated.is_negative()));
+                }
+                else
+                {
+                    CHECK(original == negated);
+                }
             }
         }
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("Taking the absolute value of a fixed point always returns a non-negative value",
-                       "[fixed_point][signed][arithmetic][division]",
-                       AARITH_FIXED_TEST_EXTENDED_SIGNATURE, AARITH_FIXED_TEST_EXTENDED_PARAM_RANGE)
+TEMPLATE_TEST_CASE_SIG(
+    "Taking the absolute value of a fixed point always returns a non-negative value",
+    "[fixed_point][signed][arithmetic][division]", AARITH_FIXED_TEST_EXTENDED_SIGNATURE,
+    AARITH_FIXED_TEST_EXTENDED_PARAM_RANGE)
 {
     GIVEN("A fixed point number")
     {
         using Fixed = fixed<I, F, BaseInt, WordType>;
 
-        Fixed value = GENERATE(take(20, random_fixed_point<I, F, BaseInt, WordType>()));
+        Fixed value = GENERATE(take(20, random_fixed_point<Fixed>()));
 
         WHEN("Taking the absolute value returns something non-zero")
         {
