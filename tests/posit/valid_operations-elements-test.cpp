@@ -181,6 +181,16 @@ SCENARIO("Valid Comparison")
     {
         THEN("Assert that they compare as expected")
         {
+            REQUIRE_FALSE(v0 < v0);
+            REQUIRE_FALSE(v0 < v1);
+            REQUIRE_FALSE(v0 < v2);
+            REQUIRE_FALSE(v0 < v3);
+            REQUIRE_FALSE(v0 < v4);
+            REQUIRE_FALSE(v0 < v5);
+            REQUIRE_FALSE(v0 < v6);
+            REQUIRE_FALSE(v0 < v7);
+            REQUIRE_FALSE(v0 < v8);
+
             REQUIRE_FALSE(v1 < v0);
             REQUIRE_FALSE(v1 < v1);
             REQUIRE_FALSE(v1 < v2);
@@ -190,6 +200,76 @@ SCENARIO("Valid Comparison")
             REQUIRE(v1 < v6);
             REQUIRE_FALSE(v1 < v7);
             REQUIRE_FALSE(v1 < v8);
+
+            REQUIRE_FALSE(v2 < v0);
+            REQUIRE_FALSE(v2 < v1);
+            REQUIRE_FALSE(v2 < v2);
+            REQUIRE_FALSE(v2 < v3);
+            REQUIRE_FALSE(v2 < v4);
+            REQUIRE_FALSE(v2 < v5);
+            REQUIRE_FALSE(v2 < v6);
+            REQUIRE_FALSE(v2 < v7);
+            REQUIRE_FALSE(v2 < v8);
+
+            REQUIRE_FALSE(v3 < v0);
+            REQUIRE_FALSE(v3 < v1);
+            REQUIRE_FALSE(v3 < v2);
+            REQUIRE_FALSE(v3 < v3);
+            REQUIRE_FALSE(v3 < v4);
+            REQUIRE_FALSE(v3 < v5);
+            REQUIRE_FALSE(v3 < v6);
+            REQUIRE_FALSE(v3 < v7);
+            REQUIRE_FALSE(v3 < v8);
+
+            REQUIRE_FALSE(v4 < v0);
+            REQUIRE_FALSE(v4 < v1);
+            REQUIRE_FALSE(v4 < v2);
+            REQUIRE_FALSE(v4 < v3);
+            REQUIRE_FALSE(v4 < v4);
+            REQUIRE_FALSE(v4 < v5);
+            REQUIRE_FALSE(v4 < v6);
+            REQUIRE_FALSE(v4 < v7);
+            REQUIRE_FALSE(v4 < v8);
+
+            REQUIRE(v5 < v0);
+            REQUIRE(v5 < v1);
+            REQUIRE(v5 < v2);
+            REQUIRE_FALSE(v5 < v3);
+            REQUIRE_FALSE(v5 < v4);
+            REQUIRE_FALSE(v5 < v5);
+            REQUIRE(v5 < v6);
+            REQUIRE(v5 < v7);
+            REQUIRE(v5 < v8);
+
+            REQUIRE_FALSE(v6 < v0);
+            REQUIRE_FALSE(v6 < v1);
+            REQUIRE_FALSE(v6 < v2);
+            REQUIRE_FALSE(v6 < v3);
+            REQUIRE_FALSE(v6 < v4);
+            REQUIRE_FALSE(v6 < v5);
+            REQUIRE_FALSE(v6 < v6);
+            REQUIRE_FALSE(v6 < v7);
+            REQUIRE_FALSE(v6 < v8);
+
+            REQUIRE_FALSE(v7 < v0);
+            REQUIRE_FALSE(v7 < v1);
+            REQUIRE_FALSE(v7 < v2);
+            REQUIRE_FALSE(v7 < v3);
+            REQUIRE_FALSE(v7 < v4);
+            REQUIRE_FALSE(v7 < v5);
+            REQUIRE(v7 < v6);
+            REQUIRE_FALSE(v7 < v7);
+            REQUIRE_FALSE(v7 < v8);
+
+            REQUIRE_FALSE(v8 < v0);
+            REQUIRE_FALSE(v8 < v1);
+            REQUIRE_FALSE(v8 < v2);
+            REQUIRE_FALSE(v8 < v3);
+            REQUIRE_FALSE(v8 < v4);
+            REQUIRE_FALSE(v8 < v5);
+            REQUIRE_FALSE(v8 < v6);
+            REQUIRE_FALSE(v8 < v7);
+            REQUIRE_FALSE(v8 < v8);
         }
     }
 }
