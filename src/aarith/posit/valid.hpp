@@ -144,7 +144,94 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr valid<N, ES, WT>
 valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
 {
-    throw std::logic_error("valid::operator+ not implemented");
+    // Compute the sum [a, b] + [c, d] = [l, r] where the endpoints can be
+    // open, closed or mixed.  Based on "The End of Error", John L. Gustafson,
+    // p. 113.
+
+    const tile_type& a = start;
+    const tile_type& b = end;
+
+    const tile_type& c = other.start;
+    const tile_type& d = other.end;
+
+    tile_type l, r;
+
+    // Handle special cases that throw exceptions. They are the NaR
+    // cases of the original formulation.
+
+    // TODO (Schärtl): Handle signaling NaR.
+
+    // Handle the cases that do not signal failure. First compute the left
+    // bound "l". If you are confused, this code makes a lot more sense if you
+    // look up the table from "The End of Error", p. 113.
+
+    if (a == closed_neg_inf())
+    {
+        l = closed_neg_inf();
+    }
+    else if (a == open_neg_inf())
+    {
+        if (c == closed_neg_inf())
+        {
+            l = closed_neg_inf();
+        }
+        else
+        {
+            l = open_neg_inf();
+        }
+    }
+    else if (c == closed_neg_inf())
+    {
+        l = closed_neg_inf();
+    }
+    else if (c == open_neg_inf())
+    {
+        l = open_neg_inf();
+    }
+    else
+    {
+        const posit_type lsum = a.value() + c.value();
+        const bool u = a.is_uncertain() || b.is_uncertain();
+
+        l = tile_type::from(lsum, u);
+    }
+
+    // Now compute the right bound "r".
+
+    if (b == open_pos_inf())
+    {
+        if (d == closed_pos_inf())
+        {
+            r = closed_pos_inf();
+        }
+        else
+        {
+            r = open_pos_inf();
+        }
+    }
+    else if (b == closed_pos_inf())
+    {
+        r = closed_pos_inf();
+    }
+    else if (d == open_pos_inf())
+    {
+        r = open_pos_inf();
+    }
+    else if (d == closed_pos_inf())
+    {
+        r = closed_pos_inf();
+    }
+    else
+    {
+        const posit_type lsum = b.value() + d.value();
+        const bool u = b.is_uncertain() || d.is_uncertain();
+
+        r = tile_type::from(lsum, u);
+    }
+
+    // Now that we have both bounds, we can construct the valid.
+
+    return from(l, r);
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -244,7 +331,7 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr typename valid<N, ES, WT>::tile_type valid<N, ES, WT>::open_pos_inf()
 {
-    constexpr auto bound = posit_type::maxpos();
+    constexpr auto bound = posit_type::max();
     return tile_type::from(bound, true);
 }
 
