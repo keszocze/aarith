@@ -2248,6 +2248,26 @@ private:
     tile_type end;
 
     /**
+     * @return A tile that represents [-inf when used with valids.
+     */
+    [[nodiscard]] static constexpr tile_type closed_neg_inf();
+
+    /**
+     * @return A tile that represents (-inf when used with valids.
+     */
+    [[nodiscard]] static constexpr tile_type open_neg_inf();
+
+    /**
+     * @return A tile that represents inf] when used with valids.
+     */
+    [[nodiscard]] static constexpr tile_type closed_pos_inf();
+
+    /**
+     * @return A tile that represents inf) when used with valids.
+     */
+    [[nodiscard]] static constexpr tile_type open_pos_inf();
+
+    /**
      * @return A normalized empty representation.
      *
      * There are multiple ways to represent the empty set as every tile t can

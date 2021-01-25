@@ -221,6 +221,34 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr typename valid<N, ES, WT>::tile_type valid<N, ES, WT>::closed_neg_inf()
+{
+    constexpr auto bound = posit_type::nar();
+    return tile_type::from(bound, false);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr typename valid<N, ES, WT>::tile_type valid<N, ES, WT>::open_neg_inf()
+{
+    constexpr auto bound = posit_type::nar();
+    return tile_type::from(bound, true);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr typename valid<N, ES, WT>::tile_type valid<N, ES, WT>::closed_pos_inf()
+{
+    constexpr auto bound = posit_type::nar();
+    return tile_type::from(bound, false);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr typename valid<N, ES, WT>::tile_type valid<N, ES, WT>::open_pos_inf()
+{
+    constexpr auto bound = posit_type::maxpos();
+    return tile_type::from(bound, true);
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::canonical_empty()
 {
     return empty();
