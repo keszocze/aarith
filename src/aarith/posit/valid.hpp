@@ -60,8 +60,8 @@ constexpr valid<N, ES, WT>::valid(const valid& other)
 
 template <size_t N, size_t ES, typename WT>
 constexpr valid<N, ES, WT>::valid(const posit<N, ES, WT>& exact_value)
-    : start(tile<N, ES, WT>::from(exact_value, true))
-    , end(tile<N, ES, WT>::from(exact_value, true))
+    : start(tile<N, ES, WT>::from(exact_value, false))
+    , end(tile<N, ES, WT>::from(exact_value, false))
 {
     ensure_canonicalized();
 }
