@@ -1827,6 +1827,11 @@ template <size_t N, size_t ES, typename WT = DefaultWordType> class tile
 {
 public:
     /**
+     * @brief Underlying posit type.
+     */
+    using posit_type = posit<N, ES, WT>;
+
+    /**
      * @brief Construct tile from arguments as-is.
      *
      * @param p The posit to use as value.

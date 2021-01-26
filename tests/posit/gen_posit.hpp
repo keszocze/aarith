@@ -1,7 +1,8 @@
 #pragma once
 
-#include <aarith/posit.hpp>
 #include <catch.hpp>
+
+#include <aarith/posit.hpp>
 
 namespace aarith {
 
@@ -13,10 +14,9 @@ public:
 
     explicit PositGenerator()
         : rng{std::random_device{}()}
-        , random_number(Storage::zero(), Storage::all_ones())
-        , current_number(random_number(rng))
+        , distribution(Storage::zero(), Storage::all_ones())
     {
-        current_posit = PositType::from(current_number);
+        next();
     }
 
     auto get() const -> const PositType& override
@@ -26,7 +26,7 @@ public:
 
     bool next() override
     {
-        current_number = random_number(rng);
+        current_number = distribution(rng);
         current_posit = PositType::from(current_number);
         return true;
     }
@@ -36,7 +36,7 @@ private:
     using WT = typename PositType::word_type;
 
     std::minstd_rand rng;
-    uniform_uinteger_distribution<N, WT> random_number;
+    uniform_uinteger_distribution<N, WT> distribution;
     Storage current_number;
     PositType current_posit;
 };
