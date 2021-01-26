@@ -223,10 +223,10 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
     }
     else
     {
-        const posit_type lsum = b.value() + d.value();
+        const posit_type rsum = b.value() + d.value();
         const bool u = b.is_uncertain() || d.is_uncertain();
 
-        r = tile_type::from(lsum, u);
+        r = tile_type::from(rsum, u);
     }
 
     // Now that we have both bounds, we can construct the valid.
@@ -238,7 +238,79 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr valid<N, ES, WT>
 valid<N, ES, WT>::operator-(const valid<N, ES, WT>& other) const
 {
-    throw std::logic_error("valid::operator- not implemented");
+    const tile_type& a = start;
+    const tile_type& b = end;
+
+    const tile_type& c = other.start;
+    const tile_type& d = other.end;
+
+    // TODO (Schärtl): Handle signaling NaR
+
+    tile_type l, r;
+
+    if (a == closed_neg_inf())
+    {
+        l = closed_neg_inf();
+    }
+    else if (a == open_neg_inf())
+    {
+        if (d == closed_pos_inf())
+        {
+            l = closed_neg_inf();
+        }
+        else
+        {
+            l = open_neg_inf();
+        }
+    }
+    else if (d == open_pos_inf())
+    {
+        l = open_neg_inf();
+    }
+    else if (d == closed_pos_inf())
+    {
+        l = closed_neg_inf();
+    }
+    else
+    {
+        const posit_type lsum = a.value() - d.value();
+        const bool u = a.is_uncertain() || d.is_uncertain();
+
+        l = tile_type::from(lsum, u);
+    }
+
+    if (b == closed_pos_inf())
+    {
+        r = closed_pos_inf();
+    }
+    else if (b == open_pos_inf())
+    {
+        if (c == closed_neg_inf())
+        {
+            r = closed_pos_inf();
+        }
+        else
+        {
+            r = open_pos_inf();
+        }
+    }
+    else if (c == closed_neg_inf())
+    {
+        r = closed_pos_inf();
+    }
+    else if (c == open_neg_inf())
+    {
+        r = open_neg_inf();
+    }
+    else
+    {
+        const posit_type rsum = a.value() - d.value();
+        const bool u = a.is_uncertain() || d.is_uncertain();
+
+        l = tile_type::from(rsum, u);
+    }
+
+    return from(l, r);
 }
 
 template <size_t N, size_t ES, typename WT>
