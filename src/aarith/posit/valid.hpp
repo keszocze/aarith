@@ -141,7 +141,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr valid<N, ES, WT>
+[[nodiscard]] /*constexpr*/ valid<N, ES, WT>
 valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
 {
     // Compute the sum [a, b] + [c, d] = [l, r] where the endpoints can be
@@ -190,7 +190,7 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
     }
     else
     {
-        const posit_type lsum = a.value() + c.value();
+        const posit_type lsum = a.value() + b.value();
         const bool u = a.is_uncertain() || b.is_uncertain();
 
         l = tile_type::from(lsum, u);
@@ -223,8 +223,8 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
     }
     else
     {
-        const posit_type rsum = b.value() + d.value();
-        const bool u = b.is_uncertain() || d.is_uncertain();
+        const posit_type rsum = c.value() + d.value();
+        const bool u = c.is_uncertain() || d.is_uncertain();
 
         r = tile_type::from(rsum, u);
     }

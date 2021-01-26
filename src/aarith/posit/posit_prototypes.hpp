@@ -702,7 +702,7 @@ public:
      */
     [[nodiscard]] constexpr const storage_type& get_bits() const;
 
-private:
+protected:
     /**
      * The underlying bitstring that makes up the posit.
      */
@@ -1238,7 +1238,7 @@ public:
     template <size_t SN, size_t SES, typename SWT>
     friend std::ostream& operator<<(std::ostream& os, const posit_fraction<SN, SES, SWT>& f);
 
-private:
+protected:
     /**
      * The actual posit_fraction value as an unsigned integer. We use an unsigned
      * integer (instead of, say, word array) to use the built-in arithmetic
@@ -1404,7 +1404,7 @@ public:
      */
     [[nodiscard]] constexpr posit_fraction<N, ES, WT> get_fraction() const;
 
-private:
+protected:
     /**
      * Whether this posit represents NaR.
      */
@@ -1434,7 +1434,7 @@ private:
     posit_fraction<N, ES, WT> fraction;
 
     /**
-     * @brief Private constructor for constructing empty parameter objects.
+     * @brief Protected constructor for constructing empty parameter objects.
      *
      * The constructed object has all flags set to false.
      */
@@ -1705,7 +1705,7 @@ public:
      */
     [[nodiscard]] constexpr const storage_type& get_bits() const;
 
-private:
+protected:
     storage_type value;
 };
 
@@ -2014,7 +2014,7 @@ public:
     [[nodiscard]] const tile incremented() const;
     [[nodiscard]] const tile decremented() const;
 
-private:
+protected:
     /**
      * @brief Underlying value.
      *
@@ -2175,7 +2175,7 @@ public:
      * @param rhs The valid to add to this valid.
      * @return The sum of this and rhs.
      */
-    [[nodiscard]] constexpr valid operator+(const valid& other) const;
+    [[nodiscard]] /*constexpr*/ valid operator+(const valid& other) const;
 
     /**
      * @brief Valid subtraction.
@@ -2241,7 +2241,7 @@ public:
      */
     [[nodiscard]] const tile_type& get_end() const;
 
-private:
+protected:
     /**
      * @brief Start of the interval.
      */
