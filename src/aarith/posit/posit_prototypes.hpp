@@ -2120,6 +2120,14 @@ public:
     constexpr valid(const posit<N, ES, WT>& exact_value);
 
     /**
+     * @brief Construct valid to represent given closed interval.
+     *
+     * @param start Start of the interval, inclusive.
+     * @param end End of the interval, inclusive.
+     */
+    constexpr valid(const posit<N, ES, WT>& start, const posit<N, ES, WT>& end);
+
+    /**
      * @brief Destructor
      */
     ~valid();
