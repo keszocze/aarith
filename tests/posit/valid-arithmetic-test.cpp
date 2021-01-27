@@ -84,8 +84,8 @@ TEMPLATE_TEST_CASE_SIG("addition and subtraction regular case", "[valid][posit][
         const Tile& x = sum.get_start();
         const Tile& y = sum.get_end();
 
-        REQUIRE(x.value() == (a.value() + b.value()));
-        REQUIRE(y.value() == (c.value() + d.value()));
+        REQUIRE(x.value() == (a.value() + c.value()));
+        REQUIRE(y.value() == (b.value() + d.value()));
     }
 
     {
