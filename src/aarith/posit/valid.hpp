@@ -304,10 +304,10 @@ valid<N, ES, WT>::operator-(const valid<N, ES, WT>& other) const
     }
     else
     {
-        const posit_type rsum = a.value() - d.value();
-        const bool u = a.is_uncertain() || d.is_uncertain();
+        const posit_type rsum = b.value() - c.value();
+        const bool u = b.is_uncertain() || c.is_uncertain();
 
-        l = tile_type::from(rsum, u);
+        r = tile_type::from(rsum, u);
     }
 
     return from(l, r);
