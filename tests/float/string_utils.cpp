@@ -1,8 +1,10 @@
 #include <aarith/float.hpp>
 #include <bitset>
 #include <catch.hpp>
+#include "gen_float.hpp"
 
 #include "../test-signature-ranges.hpp"
+
 using namespace aarith;
 
 TEMPLATE_TEST_CASE_SIG("String generation for the zeros",
@@ -49,7 +51,7 @@ TEMPLATE_TEST_CASE_SIG("String generation for the zeros",
             }
         }
 
-        WHEN("Creating the  scientific notation string")
+        WHEN("Creating the scientific notation string")
         {
             const std::string pos_scientific_string = to_sci_string(pos);
             const std::string neg_scientific_string = to_sci_string(neg);
@@ -62,6 +64,29 @@ TEMPLATE_TEST_CASE_SIG("String generation for the zeros",
                 REQUIRE(neg_scientific_string == expected_neg_zero_scientific_string);
                 //                std::cout << "pos: " << pos_compute_string << "\n";
                 //                std::cout << "neg: " << neg_compute_string << "\n";
+            }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("String generation for negative floating-points",
+                       "[floating_point][utility][string][invariant]",
+                       ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
+                       (11, 52, double))
+{
+    using F = floating_point<E, M>;
+    GIVEN("A negative floating-point number")
+    {
+        F a = GENERATE(take(100, random_float<E, M, FloatGenerationModes::NonSpecial>()));
+        a.set_sign(1);
+        WHEN("Creating the scientific notation string") {
+            std::string s = to_sci_string(a);
+
+            THEN("There should only be one minus sign") {
+                CAPTURE(a,s);
+                CHECK(s.substr(0,1) == "-");
+                CHECK(s.substr(0,2) != "--");
+                REQUIRE(s.substr(1,1) != "-");
             }
         }
     }
