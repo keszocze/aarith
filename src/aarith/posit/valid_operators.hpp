@@ -1,14 +1,14 @@
 #pragma once
 
 #include <aarith/posit.hpp>
-#include <algorithm>
 
 namespace aarith {
 
 template <size_t N, size_t ES, typename WT>
 std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v)
 {
-    const auto [start, end] = std::minmax(v.get_start(), v.get_end());
+    const auto& start = v.get_start();
+    const auto& end = v.get_end();
 
     if (start.is_uncertain())
     {
@@ -44,7 +44,7 @@ std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v)
         }
         else
         {
-            os << end.value() << ")";
+            os << end.value().incremented() << ")";
         }
     }
     else
