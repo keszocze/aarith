@@ -16,6 +16,12 @@ auto full_native_range()
                                         std::numeric_limits<N>::max() / 100.0f);
 }
 
+template <typename F>
+auto compare_float_test_results(const F& lhs, const F& rhs)
+{
+    return equal_except_rounding(lhs, rhs) || (lhs.is_nan() && rhs.is_nan());
+}
+
 TEMPLATE_TEST_CASE_SIG("One is the neutral element of the multiplication",
                        "[floating_point][arithmetic][multiplication][invariant]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
@@ -70,7 +76,7 @@ TEMPLATE_TEST_CASE_SIG("Multiplication is commutative",
             CAPTURE(a, b, res1, res2);
             THEN("The result should not depend on operand order")
             {
-                REQUIRE(equal_except_rounding(res1, res2));
+                REQUIRE(compare_float_test_results<F>(res1, res2));
             }
         }
     }
@@ -298,7 +304,7 @@ SCENARIO("Exact multiplication of two floating-point numbers (hand picked exampl
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
+                REQUIRE(compare_float_test_results<F>(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -312,7 +318,7 @@ SCENARIO("Exact multiplication of two floating-point numbers (hand picked exampl
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
+                REQUIRE(compare_float_test_results<F>(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -326,7 +332,7 @@ SCENARIO("Exact multiplication of two floating-point numbers (hand picked exampl
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
+                REQUIRE(compare_float_test_results<F>(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("The absolute of the first operand is higher than the absolute of the first operand, "
@@ -340,7 +346,7 @@ SCENARIO("Exact multiplication of two floating-point numbers (hand picked exampl
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
+                REQUIRE(compare_float_test_results<F>(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -354,7 +360,7 @@ SCENARIO("Exact multiplication of two floating-point numbers (hand picked exampl
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
+                REQUIRE(compare_float_test_results<F>(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -368,7 +374,7 @@ SCENARIO("Exact multiplication of two floating-point numbers (hand picked exampl
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
+                REQUIRE(compare_float_test_results<F>(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -382,7 +388,7 @@ SCENARIO("Exact multiplication of two floating-point numbers (hand picked exampl
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
+                REQUIRE(compare_float_test_results<F>(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("The absolute of the second operand is higher than the absolute of the first operand, "
@@ -396,7 +402,7 @@ SCENARIO("Exact multiplication of two floating-point numbers (hand picked exampl
 
             THEN("It should be the correct product.")
             {
-                REQUIRE(equal_except_rounding(result, floating_point<E, M>(number_a * number_b)));
+                REQUIRE(compare_float_test_results<F>(result, floating_point<E, M>(number_a * number_b)));
             }
         }
         WHEN("When one operand is a > 1 and the other is 0 < b < 1.")
@@ -410,7 +416,7 @@ SCENARIO("Exact multiplication of two floating-point numbers (hand picked exampl
             THEN("It should be the correct product.")
             {
                 const F res_ = floating_point<E, M>(number_a * number_b);
-                REQUIRE(equal_except_rounding(result, res_));
+                REQUIRE(compare_float_test_results<F>(result, res_));
             }
         }
     }
