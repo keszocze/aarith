@@ -826,9 +826,9 @@ auto equal_except_rounding(const floating_point<E, M1, WordType> lhs,
                            const floating_point<E, M2, WordType> rhs) -> bool
 {
 
-    if (lhs.is_nan() && rhs.is_nan())
+    if (lhs.is_nan() || rhs.is_nan())
     {
-        return true;
+        return false;
     }
 
     if (lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent())
