@@ -170,22 +170,6 @@ auto to_sci_string(const floating_point<E, M, WordType> nf) -> std::string
         return str.str();
     }
 
-    if (nf.is_negative())
-    {
-        str << "-";
-    }
-
-    if (nf.is_zero())
-    {
-        str << "0";
-        return str.str();
-    }
-    if (nf.is_inf())
-    {
-        str << "inf";
-        return str.str();
-    }
-
     if constexpr (E <= 8 && M <= 23)
     {
         auto f = static_cast<float>(nf);
@@ -200,6 +184,23 @@ auto to_sci_string(const floating_point<E, M, WordType> nf) -> std::string
     }
     else
     {
+
+        if (nf.is_negative())
+        {
+            str << "-";
+        }
+
+        if (nf.is_zero())
+        {
+            str << "0";
+            return str.str();
+        }
+        if (nf.is_inf())
+        {
+            str << "inf";
+            return str.str();
+        }
+
         auto fl_mantissa = nf.get_mantissa();
         uinteger<23, WordType> flc_mantissa;
         if constexpr (M >= 23)
