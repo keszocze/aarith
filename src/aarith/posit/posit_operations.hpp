@@ -188,7 +188,7 @@ template <size_t N, size_t ES, typename WT>
     const auto mask = uinteger<N, WT>(get_low_mask<N, WT>(nexp));
     const auto exponent_bits = (bits >> nfrac) & mask;
 
-    // the exponent value is *always* an ES-wide integer; if nexp=1 but ES=1,
+    // the exponent value is *always* an ES-wide integer; if nexp=1 but ES=2,
     // that one single exponent bit q needs to be understood as the msb of an
     // ES-wide integer, that is in this particular case, the exponent value is
     // 1- = 10 = 2 and not just 1; this cost me a lot of time

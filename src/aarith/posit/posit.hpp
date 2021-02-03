@@ -751,16 +751,114 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr typename posit<N, ES, WT>::storage_type
-posit<N, ES, WT>::msb() const
+[[nodiscard]] constexpr typename posit<N, ES, WT>::storage_type posit<N, ES, WT>::msb() const
 {
     return storage_type(bits.msb());
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr const typename posit<N, ES, WT>::storage_type& posit<N, ES, WT>::get_bits() const
+[[nodiscard]] const typename posit<N, ES, WT>::storage_type& posit<N, ES, WT>::get_bits() const
 {
     return bits;
+}
+
+template <size_t N, size_t ES, typename WT>
+template <size_t IN>
+[[nodiscard]] auto posit<N, ES, WT>::as_fraction() const -> std::tuple<integer<IN>, integer<IN>>
+{
+    using Int = integer<IN>;
+    using UInt = uinteger<IN>;
+
+    //
+    // Start by handling the two special cases, zero and NaR.
+    //
+
+    if (is_zero())
+    {
+        return {Int::zero(), Int::one()};
+    }
+
+    if (is_nar())
+    {
+        return {Int::zero(), Int::zero()};
+    }
+
+    //
+    // Parameterize the posit. This is similar to the double conversion
+    // operator code.
+    //
+
+    static constexpr UInt es = UInt(ES);
+
+    const Int sign = is_negative() ? -Int::one() : Int::one();
+    const Int useed = UInt::one() << (UInt::one() << es);
+    const Int k = get_regime_value(*this);
+    const Int e = get_exponent_value(*this);
+
+    const Int F = get_fraction_value(*this);
+    const Int nF = Int(get_num_fraction_bits(*this));
+
+    const Int scale = get_scale_value(*this);
+
+    //
+    // Set fraction parts p, q. This is quite tricky, so we split it up in
+    // four distinct cases.
+    //
+
+    Int p, q;
+
+    if (scale >= scale.zero())
+    {
+        if (F.is_zero())
+        {
+            // We are looking at an integer value greater than zero.
+
+            p = sign * Int(pow(useed, k)) * Int(UInt::one() << UInt(e));
+            q = Int::one();
+        }
+        else
+        {
+            // We are looking at a non-negative value that is not accurately
+            // representable by an integer.
+
+            q = UInt::one() << UInt(nF);
+            const Int p_base = sign * Int(pow(useed, k)) * Int(UInt::one() << UInt(e));
+            p = p_base * q + p_base * F;
+        }
+    }
+    else
+    {
+        if (F.is_zero())
+        {
+            // We are looking at a negative value that is perfectly representable by
+            // a fraction -1 / n where n is a positive integer.
+
+            p = sign * Int::one();
+            q = UInt::one() << UInt(abs(scale));
+        }
+        else
+        {
+            // We are looking at a negative value w/ an unrounded nominator
+            // greater than 1.
+
+            const Int m = Int::one() << expanding_abs(scale);
+            const Int n = Int::one() << expanding_abs(F);
+            const Int o = m * n;
+
+            p = sign * (n + n.one());
+            q = o;
+        }
+    }
+
+    //
+    // We have computed p, q. Now simplify the fraction and return it.
+    //
+
+    const Int divisor = gcd(p, q);
+    const Int pret = sign * abs(p / divisor);
+    const Int qret = abs(q / divisor);
+
+    return {pret, qret};
 }
 
 template <size_t N, size_t ES, typename WT>

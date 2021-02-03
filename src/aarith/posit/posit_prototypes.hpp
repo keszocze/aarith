@@ -700,7 +700,21 @@ public:
     /**
      * @return The underlying storage.
      */
-    [[nodiscard]] constexpr const storage_type& get_bits() const;
+    [[nodiscard]] const storage_type& get_bits() const;
+
+    /**
+     * @brief Return a rational representation.
+     *
+     * If the given posit represents NaR, this method returns the fraction
+     * 0 / 0. If the given posit is not NaR, the denominator will never
+     * be zero.
+     *
+     * @tparam IN The width of the returned fraction parts. If IN is chosen
+     * too small, overflow and underflow might corrupt the result.
+     *
+     * @return A tuple [p, q] to represent the fraction p / q.
+     */
+    template <size_t IN> [[nodiscard]] std::tuple<integer<IN>, integer<IN>> as_fraction() const;
 
 protected:
     /**

@@ -1103,3 +1103,65 @@ SCENARIO("Check conversion from double")
         }
     }
 }
+
+SCENARIO("Check conversion to integer fraction")
+{
+    constexpr size_t IW = 128;
+
+    using Posit = posit<5, 1>;
+    using Int = integer<IW>;
+
+    GIVEN("All posit<5, 1> values")
+    {
+        THEN("Assert that converting them to fractions works as expected")
+        {
+            const auto require_frac = [](const Posit& u, int32_t p, const int32_t q) {
+                const Int pexpected = Int(p);
+                const Int qexpected = Int(q);
+
+                const auto [pactual, qactual] = u.as_fraction<IW>();
+
+                CAPTURE(u, p, q, pactual, qactual);
+                REQUIRE(pexpected == pactual);
+                REQUIRE(qexpected == qactual);
+            };
+
+            std::cerr << std::endl;
+
+            require_frac(Posit::from(0b00000U), 0, 1);
+            require_frac(Posit::from(0b00001U), 1, 64);
+            require_frac(Posit::from(0b00010U), 1, 16);
+            require_frac(Posit::from(0b00011U), 1, 8);
+            require_frac(Posit::from(0b00100U), 1, 4);
+            require_frac(Posit::from(0b00101U), 3, 8);
+            require_frac(Posit::from(0b00110U), 1, 2);
+            require_frac(Posit::from(0b00111U), 3, 4);
+            require_frac(Posit::from(0b01000U), 1, 1);
+            require_frac(Posit::from(0b01001U), 3, 2);
+            require_frac(Posit::from(0b01010U), 2, 1);
+            require_frac(Posit::from(0b01011U), 3, 1);
+            require_frac(Posit::from(0b01100U), 4, 1);
+            require_frac(Posit::from(0b01101U), 8, 1);
+            require_frac(Posit::from(0b01110U), 16, 1);
+            require_frac(Posit::from(0b01111U), 64, 1);
+
+            require_frac(Posit::from(0b10000U), 0, 0);
+
+            require_frac(Posit::from(0b10001U), -64, 1);
+            require_frac(Posit::from(0b10010U), -16, 1);
+            require_frac(Posit::from(0b10011U), -8, 1);
+            require_frac(Posit::from(0b10100U), -4, 1);
+            require_frac(Posit::from(0b10101U), -3, 1);
+            require_frac(Posit::from(0b10110U), -2, 1);
+            require_frac(Posit::from(0b10111U), -3, 2);
+            require_frac(Posit::from(0b11000U), -1, 1);
+            require_frac(Posit::from(0b11001U), -3, 4);
+            require_frac(Posit::from(0b11010U), -1, 2);
+            require_frac(Posit::from(0b11011U), -3, 8);
+            require_frac(Posit::from(0b11100U), -1, 4);
+            require_frac(Posit::from(0b11101U), -1, 8);
+            require_frac(Posit::from(0b11110U), -1, 16);
+            require_frac(Posit::from(0b11111U), -1, 64);
+        }
+    }
+}

@@ -446,6 +446,27 @@ template <typename I>
 }
 
 /**
+ * @brief Compute the greatest common divisor.
+ */
+template <size_t Width, typename WordType>
+[[nodiscard]] constexpr auto gcd(const integer<Width, WordType>& x, const integer<Width, WordType>& y)
+{
+    using Int = integer<Width, WordType>;
+
+    Int a = x;
+    Int b = y;
+
+    while (!b.is_zero())
+    {
+        const Int t = b;
+        b = a % b;
+        a = t;
+    }
+
+    return a;
+}
+
+/**
  * @brief Computes the absolute value of a given signed integer.
  *
  * @warn There is a potential loss of precision as abs(integer::min) > integer::max

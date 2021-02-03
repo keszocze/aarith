@@ -1453,3 +1453,20 @@ SCENARIO("Computing the integer logarithm of integers", "[integer][signed][opera
         }
     }
 }
+
+SCENARIO("Computing the greatest common divisor of integers", "[integer][signed][operation]")
+{
+    GIVEN("Some integers")
+    {
+        THEN("Compute their GCD correctly")
+        {
+            using Integer = integer<32>;
+
+            CHECK(gcd(Integer(12), Integer(15)) == Integer(3));
+            CHECK(gcd(Integer(9), Integer(10)) == Integer(1));
+            CHECK(gcd(Integer(9), Integer(21)) == Integer(3));
+            CHECK(gcd(Integer(1701), Integer(3768)) == Integer(3));
+            CHECK(gcd(Integer(12345678), Integer(87654321)) == Integer(9));
+        }
+    }
+}
