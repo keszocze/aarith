@@ -149,7 +149,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] /*constexpr*/ valid<N, ES, WT>
+[[nodiscard]] constexpr valid<N, ES, WT>
 valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
 {
     // Compute the sum [a, b] + [c, d] = [l, r] where the endpoints can be

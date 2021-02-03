@@ -49,7 +49,8 @@ constexpr posit_fraction<N, ES, WT>::posit_fraction(const posit<N, ES, WT>& p)
 }
 
 template <size_t N, size_t ES, typename WT>
-constexpr posit_fraction<N, ES, WT>::posit_fraction(const uinteger<posit_fraction<N, ES, WT>::FractionSize, WT>& frac)
+constexpr posit_fraction<N, ES, WT>::posit_fraction(
+    const uinteger<posit_fraction<N, ES, WT>::FractionSize, WT>& frac)
     : truncated(false)
 {
     import_fraction_bits(frac);

@@ -2197,7 +2197,7 @@ public:
      * @param rhs The valid to add to this valid.
      * @return The sum of this and rhs.
      */
-    [[nodiscard]] /*constexpr*/ valid operator+(const valid& other) const;
+    [[nodiscard]] constexpr valid operator+(const valid& other) const;
 
     /**
      * @brief Valid subtraction.
