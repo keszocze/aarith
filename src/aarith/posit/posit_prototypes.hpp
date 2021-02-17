@@ -1279,6 +1279,35 @@ protected:
 };
 
 //
+// Rounding Mode Enum
+//
+
+/**
+ * Enum that encodes information how the result of a posit arithmetic
+ * operation was rounded.
+ */
+enum class rounding_mode
+{
+    /**
+     * @brief Indicates that the result was not rounded explicitly.
+     *
+     * Explicit rounding means that the absolute value of the resulting posit
+     * was incremented by one for the sake of rounding.  Note that a value
+     * that was not explicitly rounded might have been implicitly rounded down
+     * to fit with the next posit.
+     */
+    NOT_EXPLICITLY_ROUNDED,
+
+    /**
+     * @brief Indicates that the resulting magnitude was rounded explicitly.
+     *
+     * Explicit rounding means that the absolute value of the resulting posit
+     * was incremented by one for the sake of rounding.
+     */
+    ROUNDED_UP
+};
+
+//
 // Positparam Class
 //
 // For implementation, look at posit/posit_parameters.hpp
@@ -1417,6 +1446,12 @@ public:
      * @return The underlying fraction.
      */
     [[nodiscard]] constexpr posit_fraction<N, ES, WT> get_fraction() const;
+
+    /**
+     * @return The parameterized posit converted back to posit encoding and meta
+     * information about rounding that might have occurred.
+     */
+    [[nodiscard]] constexpr std::tuple<posit<N, ES, WT>, rounding_mode> to_posit() const;
 
 protected:
     /**

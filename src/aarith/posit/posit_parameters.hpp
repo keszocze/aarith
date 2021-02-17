@@ -112,168 +112,8 @@ template <size_t N, size_t ES, typename WT> posit_parameters<N, ES, WT>::~posit_
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit_parameters<N, ES, WT>::operator posit<N, ES, WT>() const
 {
-    using Posit = posit<N, ES, WT>;
-    using Integer = integer<N, WT>;
-
-    //
-    // If the result is nar or zero, things are easy.
-    //
-
-    if (is_nar)
-    {
-        return Posit::nar();
-    }
-
-    if (is_zero)
-    {
-        return Posit::zero();
-    }
-
-    //
-    // Compute parameters necessary to construct the posit.
-    //
-
-    constexpr Integer powes = Integer(1 << ES);
-    constexpr ssize_t es = static_cast<ssize_t>(ES);
-
-    const Integer regime = floordiv(scale, powes);
-    const Integer exponent = absmod(scale, powes);
-
-    //
-    // Set bits. Keep count of the currently bit being set with 'i'.
-    //
-
-    uinteger<N + ES + N> bits;
-    ssize_t i = bits.width() - 1;
-
-    //
-    // Set sign bit. As we are dealing with the absolute value and only set
-    // the sign bit at the end, there is actually nothing to do but increment
-    // the counter i.
-    //
-
-    i -= 1;
-
-    //
-    // Set regime bits.
-    //
-
-    Integer nregime;
-    bool first_regime_bit = false;
-
-    if (scale < scale.zero())
-    {
-        // north east
-
-        nregime = abs(regime) + regime.one();
-        first_regime_bit = false;
-    }
-    else
-    {
-        // south east
-
-        nregime = regime + regime.one() + regime.one();
-        first_regime_bit = true;
-    }
-
-    for (auto ridx = nregime.zero(); ridx < nregime && i >= 0; ++ridx, --i)
-    {
-        const bool last_regime_bit = (ridx == (nregime - nregime.one()));
-
-        if (last_regime_bit)
-        {
-            bits.set_bit(i, !first_regime_bit);
-        }
-        else
-        {
-            bits.set_bit(i, first_regime_bit);
-        }
-    }
-
-    //
-    // Set exponent bits.
-    //
-
-    for (ssize_t eprinted = 0; eprinted < es && i >= 0; ++eprinted, --i)
-    {
-        const ssize_t eidx = es - 1 - eprinted;
-        const auto exponent_bit = exponent.bit(eidx);
-        bits.set_bit(i, exponent_bit);
-    }
-
-    //
-    // Set fraction bits.
-    //
-
-    const auto fraction_bits = fraction.fraction_bits();
-
-    for (ssize_t fidx = fraction_bits.width() - 1; fidx >= 0 && i >= 0; --fidx, --i)
-    {
-        const auto fraction_bit = fraction_bits.bit(fidx);
-        bits.set_bit(i, fraction_bit);
-    }
-
-    //
-    // Split up bitstring into "posit_bits" which we use to construct the
-    // posit and "truncated" which we have to take a look at for rounding.
-    //
-
-    constexpr size_t posit_bits_width = N;
-    constexpr size_t truncated_width = bits.width() - posit_bits_width;
-    constexpr size_t tail_width = truncated_width - 1;
-
-    const uinteger<posit_bits_width, WT> posit_bits =
-        width_cast<posit_bits_width>(bits >> truncated_width);
-    const uinteger<truncated_width, WT> truncated = width_cast<truncated_width>(bits);
-    const uinteger<tail_width, WT> tail = width_cast<tail_width>(truncated);
-
-    //
-    // Construct the unrounded posit.
-    //
-
-    Posit x = Posit::from(posit_bits);
-
-    //
-    // Do rounding if necessary.
-    //
-
-    const bool last = posit_bits.bit(0);
-    const bool after = truncated.bit(truncated.width() - 1);
-    const bool tailbit = !tail.is_zero();
-
-    if ((last && after) || (after && tailbit))
-    {
-        x = x.incremented_real();
-    }
-
-    //
-    // Handle special case zero in return. Zero should only be returned when
-    // the result is actually zero (e.g. when multiplying with zero). When the
-    // result is very close to zero, but not quite zero, we have to return
-    // minpos instead to indicate that the result is something close but not
-    // quite zero.
-    //
-
-    if (x.is_zero())
-    {
-        assert(!is_zero); // already taken care of at the beginning
-        x = x.minpos();
-    }
-
-    //
-    // Apply twos complement for negative values.
-    //
-
-    if (sign_bit)
-    {
-        x = -x;
-    }
-
-    //
-    // return
-    //
-
-    return x;
+    const auto [p, r] = this->to_posit();
+    return p;
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -678,6 +518,179 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit_fraction<N, ES, WT> posit_parameters<N, ES, WT>::get_fraction() const
 {
     return fraction;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr std::tuple<posit<N, ES, WT>, rounding_mode>
+posit_parameters<N, ES, WT>::to_posit() const
+{
+    using Posit = posit<N, ES, WT>;
+    using Integer = integer<N, WT>;
+
+    constexpr auto not_rounded = rounding_mode::NOT_EXPLICITLY_ROUNDED;
+    constexpr auto rounded_up = rounding_mode::ROUNDED_UP;
+
+    //
+    // If the result is nar or zero, things are easy.
+    //
+
+    if (is_nar)
+    {
+        return {Posit::nar(), not_rounded};
+    }
+
+    if (is_zero)
+    {
+        return {Posit::zero(), not_rounded};
+    }
+
+    //
+    // Compute parameters necessary to construct the posit.
+    //
+
+    constexpr Integer powes = Integer(1 << ES);
+    constexpr ssize_t es = static_cast<ssize_t>(ES);
+
+    const Integer regime = floordiv(scale, powes);
+    const Integer exponent = absmod(scale, powes);
+
+    //
+    // Set bits. Keep count of the currently bit being set with 'i'.
+    //
+
+    uinteger<N + ES + N> bits;
+    ssize_t i = bits.width() - 1;
+
+    //
+    // Set sign bit. As we are dealing with the absolute value and only set
+    // the sign bit at the end, there is actually nothing to do but increment
+    // the counter i.
+    //
+
+    i -= 1;
+
+    //
+    // Set regime bits.
+    //
+
+    Integer nregime;
+    bool first_regime_bit = false;
+
+    if (scale < scale.zero())
+    {
+        // north east
+
+        nregime = abs(regime) + regime.one();
+        first_regime_bit = false;
+    }
+    else
+    {
+        // south east
+
+        nregime = regime + regime.one() + regime.one();
+        first_regime_bit = true;
+    }
+
+    for (auto ridx = nregime.zero(); ridx < nregime && i >= 0; ++ridx, --i)
+    {
+        const bool last_regime_bit = (ridx == (nregime - nregime.one()));
+
+        if (last_regime_bit)
+        {
+            bits.set_bit(i, !first_regime_bit);
+        }
+        else
+        {
+            bits.set_bit(i, first_regime_bit);
+        }
+    }
+
+    //
+    // Set exponent bits.
+    //
+
+    for (ssize_t eprinted = 0; eprinted < es && i >= 0; ++eprinted, --i)
+    {
+        const ssize_t eidx = es - 1 - eprinted;
+        const auto exponent_bit = exponent.bit(eidx);
+        bits.set_bit(i, exponent_bit);
+    }
+
+    //
+    // Set fraction bits.
+    //
+
+    const auto fraction_bits = fraction.fraction_bits();
+
+    for (ssize_t fidx = fraction_bits.width() - 1; fidx >= 0 && i >= 0; --fidx, --i)
+    {
+        const auto fraction_bit = fraction_bits.bit(fidx);
+        bits.set_bit(i, fraction_bit);
+    }
+
+    //
+    // Split up bitstring into "posit_bits" which we use to construct the
+    // posit and "truncated" which we have to take a look at for rounding.
+    //
+
+    constexpr size_t posit_bits_width = N;
+    constexpr size_t truncated_width = bits.width() - posit_bits_width;
+    constexpr size_t tail_width = truncated_width - 1;
+
+    const uinteger<posit_bits_width, WT> posit_bits =
+        width_cast<posit_bits_width>(bits >> truncated_width);
+    const uinteger<truncated_width, WT> truncated = width_cast<truncated_width>(bits);
+    const uinteger<tail_width, WT> tail = width_cast<tail_width>(truncated);
+
+    //
+    // Construct the unrounded posit.
+    //
+
+    Posit x = Posit::from(posit_bits);
+
+    //
+    // Do rounding if necessary.
+    //
+
+    const bool last = posit_bits.bit(0);
+    const bool after = truncated.bit(truncated.width() - 1);
+    const bool tailbit = !tail.is_zero();
+    rounding_mode rbit = not_rounded;
+
+    if ((last && after) || (after && tailbit))
+    {
+        x = x.incremented_real();
+        rbit = rounded_up;
+    }
+
+    //
+    // Handle special case zero in return. Zero should only be returned when
+    // the result is actually zero (e.g. when multiplying with zero). When the
+    // result is very close to zero, but not quite zero, we have to return
+    // minpos instead to indicate that the result is something close but not
+    // quite zero.
+    //
+
+    if (x.is_zero())
+    {
+        assert(!is_zero); // already taken care of at the beginning
+        x = x.minpos();
+    }
+
+    //
+    // Apply twos complement for negative values.
+    //
+
+    if (sign_bit)
+    {
+        x = -x;
+    }
+
+    //
+    // return
+    //
+
+    return {x, rbit};
 }
 
 template <size_t N, size_t ES, typename WT> void posit_parameters<N, ES, WT>::ensure_standard_form()
