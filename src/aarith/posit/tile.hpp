@@ -206,7 +206,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] const tile<N, ES, WT> tile<N, ES, WT>::incremented() const
+[[nodiscard]] constexpr tile<N, ES, WT> tile<N, ES, WT>::incremented() const
 {
     // emulate one bit addition where the last bit is the bool flag
     // "uncertain"
@@ -222,7 +222,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] const tile<N, ES, WT> tile<N, ES, WT>::decremented() const
+[[nodiscard]] constexpr tile<N, ES, WT> tile<N, ES, WT>::decremented() const
 {
     // emulate one bit subtraction where the last bit is the bool flag
     // "uncertain"
@@ -234,6 +234,25 @@ template <size_t N, size_t ES, typename WT>
     else
     {
         return from(concrete_value.decremented(), true);
+    }
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr typename tile<N, ES, WT>::posit_type tile<N, ES, WT>::as_start_value() const
+{
+    return value();
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr typename tile<N, ES, WT>::posit_type tile<N, ES, WT>::as_end_value() const
+{
+    if (is_uncertain())
+    {
+        return value().incremented();
+    }
+    else
+    {
+        return value();
     }
 }
 

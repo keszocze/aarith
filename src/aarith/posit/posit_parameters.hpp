@@ -521,14 +521,15 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr std::tuple<posit<N, ES, WT>, rounding_mode>
+[[nodiscard]] constexpr std::tuple<posit<N, ES, WT>, rounding_event>
 posit_parameters<N, ES, WT>::to_posit() const
 {
     using Posit = posit<N, ES, WT>;
     using Integer = integer<N, WT>;
 
-    constexpr auto not_rounded = rounding_mode::NOT_EXPLICITLY_ROUNDED;
-    constexpr auto rounded_up = rounding_mode::ROUNDED_UP;
+    constexpr auto not_rounded = rounding_event::NOT_ROUNDED;
+    constexpr auto rounded_down = rounding_event::ROUNDED_DOWN;
+    constexpr auto rounded_up = rounding_event::ROUNDED_UP;
 
     //
     // If the result is nar or zero, things are easy.
@@ -655,12 +656,17 @@ posit_parameters<N, ES, WT>::to_posit() const
     const bool last = posit_bits.bit(0);
     const bool after = truncated.bit(truncated.width() - 1);
     const bool tailbit = !tail.is_zero();
-    rounding_mode rbit = not_rounded;
+
+    rounding_event rbit = not_rounded;
 
     if ((last && after) || (after && tailbit))
     {
         x = x.incremented_real();
         rbit = rounded_up;
+    }
+    else if (after || tailbit)
+    {
+        rbit = rounded_down;
     }
 
     //

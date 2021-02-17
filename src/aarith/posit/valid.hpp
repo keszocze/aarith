@@ -149,7 +149,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr valid<N, ES, WT>
+[[nodiscard]] /*constexpr*/ valid<N, ES, WT>
 valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
 {
     // Compute the sum [a, b] + [c, d] = [l, r] where the endpoints can be
@@ -198,10 +198,22 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
     }
     else
     {
-        const posit_type lsum = a.value() + c.value();
-        const bool u = a.is_uncertain() || c.is_uncertain();
+        const auto [lsum, rbit] = add(a.as_start_value(), c.as_start_value());
+        // const bool u = a.is_uncertain() || c.is_uncertain();
+        const bool u = false;
+
+        std::cerr << "left: " << lsum << " " << rbit << std::endl;
 
         l = tile_type::from(lsum, u);
+
+        if (rbit == rounding_event::ROUNDED_UP)
+        {
+            l = l.decremented();
+        }
+        else if (rbit == rounding_event::ROUNDED_DOWN)
+        {
+            l = l.incremented();
+        }
     }
 
     // Now compute the right bound "r".
@@ -231,10 +243,22 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
     }
     else
     {
-        const posit_type rsum = b.value() + d.value();
-        const bool u = b.is_uncertain() || d.is_uncertain();
+        const auto [rsum, rbit] = add(b.as_end_value(), d.as_end_value());
+        // const bool u = b.is_uncertain() || d.is_uncertain();
+        const bool u = false;
+
+        std::cerr << "right: " << rsum << " " << rbit << std::endl;
 
         r = tile_type::from(rsum, u);
+
+        if (rbit == rounding_event::ROUNDED_UP)
+        {
+            r = r.decremented();
+        }
+        else if (rbit == rounding_event::ROUNDED_DOWN)
+        {
+            r = r.incremented();
+        }
     }
 
     // Now that we have both bounds, we can construct the valid.
@@ -385,6 +409,20 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] const typename valid<N, ES, WT>::tile_type& valid<N, ES, WT>::get_end() const
 {
     return end;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr typename valid<N, ES, WT>::posit_type
+valid<N, ES, WT>::get_start_value() const
+{
+    return start.as_start_value();
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr typename valid<N, ES, WT>::posit_type
+valid<N, ES, WT>::get_end_value() const
+{
+    return end.as_end_value();
 }
 
 template <size_t N, size_t ES, typename WT>

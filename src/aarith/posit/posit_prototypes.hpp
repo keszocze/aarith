@@ -30,6 +30,34 @@ namespace aarith {
 using DefaultWordType = uint64_t;
 
 //
+// Rounding Mode Enum
+//
+
+/**
+ * Enum that encodes information how the result of a posit arithmetic
+ * operation was rounded.
+ *
+ * @note Users might be tempted to misinterpret this enum as a boolean that
+ * represents "has been rounded" or similar. To discourage this misuse, values
+ * of the individual enum entries have been chosen such that each enum entry
+ * evaluates to true if implicitly converted to bool.
+ */
+enum class rounding_event
+{
+    NOT_ROUNDED = 1,
+    ROUNDED_DOWN = 2,
+    ROUNDED_UP = 3
+};
+
+//
+// Rounding Mode Operators
+//
+// For implementation, look at posit/rounding_event_operators.hpp
+//
+
+std::ostream& operator<<(std::ostream& os, const rounding_event& r);
+
+//
 // Posit Class and Methods.
 //
 // For implementations, look at posit/posit.hpp.
@@ -885,6 +913,21 @@ void dump_meta(std::ostream& os, const posit<N, ES, WT>& p);
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] std::string dump_string(const posit<N, ES, WT>& p);
 
+/**
+ * @brief Sum of two posits.
+ *
+ * If either operand is NaR, the result is also NaR. If neither operands are
+ * NaR, the result is guaranteed not to be NaR.
+ *
+ * @param lhs First posit to add.
+ * @param rhs Second posit to add.
+ * @return The sum of lhs and rhs. Also returns rounding information to
+ * indicates whether rounding occurred.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr std::tuple<posit<N, ES, WT>, rounding_event>
+add(const posit<N, ES, WT>& lhs, const posit<N, ES, WT>& rhs);
+
 //
 // Casts for posit Class.
 //
@@ -1279,35 +1322,6 @@ protected:
 };
 
 //
-// Rounding Mode Enum
-//
-
-/**
- * Enum that encodes information how the result of a posit arithmetic
- * operation was rounded.
- */
-enum class rounding_mode
-{
-    /**
-     * @brief Indicates that the result was not rounded explicitly.
-     *
-     * Explicit rounding means that the absolute value of the resulting posit
-     * was incremented by one for the sake of rounding.  Note that a value
-     * that was not explicitly rounded might have been implicitly rounded down
-     * to fit with the next posit.
-     */
-    NOT_EXPLICITLY_ROUNDED,
-
-    /**
-     * @brief Indicates that the resulting magnitude was rounded explicitly.
-     *
-     * Explicit rounding means that the absolute value of the resulting posit
-     * was incremented by one for the sake of rounding.
-     */
-    ROUNDED_UP
-};
-
-//
 // Positparam Class
 //
 // For implementation, look at posit/posit_parameters.hpp
@@ -1448,10 +1462,10 @@ public:
     [[nodiscard]] constexpr posit_fraction<N, ES, WT> get_fraction() const;
 
     /**
-     * @return The parameterized posit converted back to posit encoding and meta
-     * information about rounding that might have occurred.
+     * @return The parameterized posit converted back to posit encoding. Also
+     * returns rounding information to indicates whether rounding occurred.
      */
-    [[nodiscard]] constexpr std::tuple<posit<N, ES, WT>, rounding_mode> to_posit() const;
+    [[nodiscard]] constexpr std::tuple<posit<N, ES, WT>, rounding_event> to_posit() const;
 
 protected:
     /**
@@ -2060,8 +2074,18 @@ public:
      */
     [[nodiscard]] const posit<N, ES, WT>& value() const;
 
-    [[nodiscard]] const tile incremented() const;
-    [[nodiscard]] const tile decremented() const;
+    /**
+     * @return The tile bit-wise incremented by one.
+     */
+    [[nodiscard]] constexpr tile incremented() const;
+
+    /**
+     * @return The tile bit-wise decremented by one.
+     */
+    [[nodiscard]] constexpr tile decremented() const;
+
+    [[nodiscard]] constexpr posit_type as_start_value() const;
+    [[nodiscard]] constexpr posit_type as_end_value() const;
 
 protected:
     /**
@@ -2232,7 +2256,7 @@ public:
      * @param rhs The valid to add to this valid.
      * @return The sum of this and rhs.
      */
-    [[nodiscard]] constexpr valid operator+(const valid& other) const;
+    [[nodiscard]] /*constexpr*/ valid operator+(const valid& other) const;
 
     /**
      * @brief Valid subtraction.
@@ -2297,6 +2321,9 @@ public:
      * less than end.
      */
     [[nodiscard]] const tile_type& get_end() const;
+
+    [[nodiscard]] constexpr posit_type get_start_value() const;
+    [[nodiscard]] constexpr posit_type get_end_value() const;
 
 protected:
     /**
@@ -2408,6 +2435,7 @@ template <size_t N, size_t ES, typename WT>
 #include <aarith/posit/quire_sizes.hpp>
 #include <aarith/posit/quire_string_utils.hpp>
 #include <aarith/posit/quire_types.hpp>
+#include <aarith/posit/rounding_event_operators.hpp>
 #include <aarith/posit/tile.hpp>
 #include <aarith/posit/tile_operators.hpp>
 #include <aarith/posit/tile_types.hpp>
