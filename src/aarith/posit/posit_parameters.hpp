@@ -5,6 +5,34 @@
 namespace aarith {
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit_parameters<N, ES, WT> posit_parameters<N, ES, WT>::zero()
+{
+    posit_parameters<N, ES, WT> result;
+    result.is_zero = true;
+    return result;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit_parameters<N, ES, WT> posit_parameters<N, ES, WT>::nar()
+{
+    posit_parameters<N, ES, WT> result;
+    result.is_nar = true;
+    return result;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit_parameters<N, ES, WT> posit_parameters<N, ES, WT>::max()
+{
+    return posit_parameters(posit<N, ES, WT>::max());
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit_parameters<N, ES, WT> posit_parameters<N, ES, WT>::minpos()
+{
+    return posit_parameters(posit<N, ES, WT>::minpos());
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit_parameters<N, ES, WT>
 posit_parameters<N, ES, WT>::from(bool is_nar_arg, bool is_zero_arg, bool sign_bit_arg,
                                   const integer<N, WT>& scale_arg,
@@ -343,28 +371,6 @@ constexpr posit_parameters<N, ES, WT>::posit_parameters()
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr posit_parameters<N, ES, WT> posit_parameters<N, ES, WT>::zero()
-{
-    posit_parameters<N, ES, WT> result;
-    result.is_zero = true;
-    return result;
-}
-
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr posit_parameters<N, ES, WT> posit_parameters<N, ES, WT>::nar()
-{
-    posit_parameters<N, ES, WT> result;
-    result.is_nar = true;
-    return result;
-}
-
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr posit_parameters<N, ES, WT> posit_parameters<N, ES, WT>::minpos()
-{
-    return posit_parameters(posit<N, ES, WT>::minpos());
-}
-
-template <size_t N, size_t ES, typename WT>
 std::tuple<posit_parameters<N, ES, WT>*, posit_parameters<N, ES, WT>*>
 posit_parameters<N, ES, WT>::ordered(posit_parameters<N, ES, WT>* p, posit_parameters<N, ES, WT>* q)
 {
@@ -521,6 +527,13 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit_parameters<N, ES, WT>
+posit_parameters<N, ES, WT>::absolute_value() const
+{
+    return from(is_nar, is_zero, false, scale, fraction);
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr std::tuple<posit<N, ES, WT>, rounding_event>
 posit_parameters<N, ES, WT>::to_posit() const
 {
@@ -670,6 +683,30 @@ posit_parameters<N, ES, WT>::to_posit() const
     }
 
     //
+    // Rounding towards minpos/maxpos is awkward. We have to do
+    // some special checks to ensure that the returned rbit is correct.
+    //
+
+    if (rbit == not_rounded && x == x.max() && (abs(*this) != this->max()))
+    {
+        rbit = rounded_down;
+    }
+
+    if (sign_bit)
+    {
+        // Adapt rounding event for negative values.
+
+        if (rbit == rounded_down)
+        {
+            rbit = rounded_up;
+        }
+        else if (rbit == rounded_up)
+        {
+            rbit = rounded_down;
+        }
+    }
+
+    //
     // Handle special case zero in return. Zero should only be returned when
     // the result is actually zero (e.g. when multiplying with zero). When the
     // result is very close to zero, but not quite zero, we have to return
@@ -684,7 +721,8 @@ posit_parameters<N, ES, WT>::to_posit() const
     }
 
     //
-    // Apply twos complement for negative values.
+    // So far we worked with the absolute value. If the sign bit is set, we
+    // have to flip the sign and also update the rounding information.
     //
 
     if (sign_bit)

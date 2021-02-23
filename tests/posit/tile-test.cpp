@@ -4,9 +4,8 @@
 
 #include "../test-signature-ranges.hpp"
 #include "for_each_posit.hpp"
-#include "gen_posit.hpp"
 
-TEMPLATE_TEST_CASE_SIG("getting endpoints from tiles", "[posit][][template]",
+TEMPLATE_TEST_CASE_SIG("getting endpoints from tiles", "[posit][tile][template]",
                        ((size_t N, size_t ES), N, ES), AARITH_POSIT_TEST_TEMPLATE_EXHAUSTABLE)
 {
     using namespace aarith;

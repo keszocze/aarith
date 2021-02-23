@@ -873,8 +873,8 @@ template <size_t N, size_t ES, typename WT>
 /**
  * @brief Return absolute value of a given posit.
  *
- * If p is NaR, the result is also NaR. If p is
- * zero, the result is also zero as there is only one representation of zero.
+ * If p is NaR, the result is also NaR. If p is zero, the result is also zero
+ * as there is only one representation of zero.
  */
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> abs(const posit<N, ES, WT>& p);
@@ -1346,6 +1346,27 @@ public:
     using fraction_type = posit_fraction<N, ES, WT>;
 
     /**
+     * @return Parameter object that represents zero.
+     */
+    [[nodiscard]] static constexpr posit_parameters<N, ES, WT> zero();
+
+    /**
+     * @return Parameter object that represents NaR.
+     */
+    [[nodiscard]] static constexpr posit_parameters<N, ES, WT> nar();
+
+    /**
+     * @return Parameter object that represents the max posit for the given
+     * type.
+     */
+    [[nodiscard]] static constexpr posit_parameters<N, ES, WT> max();
+
+    /**
+     * @return Parameter object that represent the smallest positive value.
+     */
+    [[nodiscard]] static constexpr posit_parameters<N, ES, WT> minpos();
+
+    /**
      * @brief Construct from posit.
      *
      * Construct this object to represent the value of p. Conversion from
@@ -1462,6 +1483,14 @@ public:
     [[nodiscard]] constexpr posit_fraction<N, ES, WT> get_fraction() const;
 
     /**
+     * @brief Return absolute value of a given parameterized posit.
+     *
+     * If p is NaR, the result is also NaR. If p is zero, the result is also zero
+     * as there is only one representation of zero.
+     */
+    [[nodiscard]] constexpr posit_parameters absolute_value() const;
+
+    /**
      * @return The parameterized posit converted back to posit encoding. Also
      * returns rounding information to indicates whether rounding occurred.
      */
@@ -1502,21 +1531,6 @@ protected:
      * The constructed object has all flags set to false.
      */
     constexpr posit_parameters();
-
-    /**
-     * @return Parameter object that represents zero.
-     */
-    [[nodiscard]] static constexpr posit_parameters<N, ES, WT> zero();
-
-    /**
-     * @return Parameter object that represents NaR.
-     */
-    [[nodiscard]] static constexpr posit_parameters<N, ES, WT> nar();
-
-    /**
-     * @return Parameter object that represent the smallest positive value.
-     */
-    [[nodiscard]] static constexpr posit_parameters<N, ES, WT> minpos();
 
     /**
      * @brief Return p, q in order of scale.
@@ -1568,8 +1582,38 @@ protected:
     static void sub_fractions(posit_parameters& dst, const posit_fraction<N, ES, WT>& lfrac,
                               const posit_fraction<N, ES, WT>& rfrac);
 
+    /**
+     * @brief Normalize the parameterized posit.
+     *
+     * There are different parameter representations that are equivalent. For
+     * example, 1.0 × 2⁴ is the same as 0.1 × 2⁵. Calling ensure_standard_form
+     * changes this parameters object to a standard form.
+     *
+     * Converting to a single standardized form is not really necessary, but it
+     * allows us to ensure certain preconditions and that makes implementation
+     * easier.
+     */
     void ensure_standard_form();
 };
+
+//
+// Additional operators for posit_parameters class.
+//
+// For implementations, look at posit/posit_parameters_operations.hpp
+//
+
+/**
+ * @brief Return absolute value of a given parameterized posit.
+ *
+ * If p is NaR, the result is also NaR. If p is zero, the result is also zero
+ * as there is only one representation of zero.
+ *
+ * @note This function just calls the absolute_value method on argument p.
+ * We provide this function to match the interface of other types (e.g. integer,
+ * posit and so on).
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit_parameters<N, ES, WT> abs(const posit_parameters<N, ES, WT>& p);
 
 //
 // Quire Helpers for Calculating Sizes.
@@ -2428,6 +2472,7 @@ template <size_t N, size_t ES, typename WT>
 #include <aarith/posit/posit_operations.hpp>
 #include <aarith/posit/posit_operators.hpp>
 #include <aarith/posit/posit_parameters.hpp>
+#include <aarith/posit/posit_parameters_operations.hpp>
 #include <aarith/posit/posit_string_utils.hpp>
 #include <aarith/posit/posit_types.hpp>
 #include <aarith/posit/quire.hpp>
