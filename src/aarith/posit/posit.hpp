@@ -412,14 +412,14 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::incremented_real() const
 {
-    if (is_zero() || is_nar())
+    if (is_nar())
     {
         return *this;
     }
 
     const auto increment = incremented();
 
-    if (increment.is_zero() || increment.is_nar())
+    if (increment.is_nar())
     {
         return *this;
     }
@@ -430,14 +430,14 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::decremented_real() const
 {
-    if (is_zero() || is_nar())
+    if (is_nar())
     {
         return *this;
     }
 
     const auto decrement = decremented();
 
-    if (decrement.is_zero() || decrement.is_nar())
+    if (decrement.is_nar())
     {
         return *this;
     }
