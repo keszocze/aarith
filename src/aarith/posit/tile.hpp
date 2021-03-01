@@ -260,7 +260,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr std::string tile<N, ES, WT>::in_tile_notation() const
+[[nodiscard]] std::string tile<N, ES, WT>::in_tile_notation() const
 {
     std::stringstream ss;
 

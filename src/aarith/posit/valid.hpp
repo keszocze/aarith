@@ -429,7 +429,7 @@ valid<N, ES, WT>::get_end_value() const
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr std::string valid<N, ES, WT>::in_tile_notation() const
+[[nodiscard]] std::string valid<N, ES, WT>::in_tile_notation() const
 {
     std::stringstream ss;
 

@@ -2129,7 +2129,7 @@ public:
     [[nodiscard]] constexpr posit_type as_start_value() const;
     [[nodiscard]] constexpr posit_type as_end_value() const;
 
-    [[nodiscard]] constexpr std::string in_tile_notation() const;
+    [[nodiscard]] std::string in_tile_notation() const;
 
 protected:
     /**
@@ -2369,7 +2369,7 @@ public:
     [[nodiscard]] constexpr posit_type get_start_value() const;
     [[nodiscard]] constexpr posit_type get_end_value() const;
 
-    [[nodiscard]] constexpr std::string in_tile_notation() const;
+    [[nodiscard]] std::string in_tile_notation() const;
 
 protected:
     /**
