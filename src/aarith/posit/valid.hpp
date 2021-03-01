@@ -182,14 +182,53 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
 
     tile_type l, r;
 
-    // Handle special cases that throw exceptions. They are the NaR
-    // cases of the original formulation.
+    if (*this == max())
+    {
+        if (other == min())
+        {
+            return nar();
+        }
+        else
+        {
+            return *this;
+        }
+    }
 
-    // TODO (Schärtl): Handle signaling NaR.
+    if (*this == min())
+    {
+        if (other == max())
+        {
+            return nar();
+        }
+        else
+        {
+            return *this;
+        }
+    }
 
-    // Handle the cases that do not signal failure. First compute the left
-    // bound "l". If you are confused, this code makes a lot more sense if you
-    // look up the table from "The End of Error", p. 113.
+    if (other == max())
+    {
+        if (*this == min())
+        {
+            return nar();
+        }
+        else
+        {
+            return other;
+        }
+    }
+
+    if (other == min())
+    {
+        if (*this == max())
+        {
+            return nar();
+        }
+        else
+        {
+            return other;
+        }
+    }
 
     if (a == closed_neg_inf())
     {
@@ -217,17 +256,20 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
     else
     {
         const auto [lsum, rbit] = add(a.as_start_value(), c.as_start_value());
-        // const bool u = a.is_uncertain() || c.is_uncertain();
-        const bool u = false;
-
-        l = tile_type::from(lsum, u);
 
         if (rbit == rounding_event::ROUNDED_UP)
         {
+            l = tile_type::from(lsum, false);
             l = l.decremented();
+        }
+        else if (rbit == rounding_event::NOT_ROUNDED)
+        {
+            const bool u = a.is_uncertain() || c.is_uncertain();
+            l = tile_type::from(lsum, u);
         }
         else if (rbit == rounding_event::ROUNDED_DOWN)
         {
+            l = tile_type::from(lsum, false);
             l = l.incremented();
         }
     }
@@ -260,18 +302,29 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
     else
     {
         const auto [rsum, rbit] = add(b.as_end_value(), d.as_end_value());
-        // const bool u = b.is_uncertain() || d.is_uncertain();
-        const bool u = false;
-
-        r = tile_type::from(rsum, u);
 
         if (rbit == rounding_event::ROUNDED_UP)
         {
-            r = r.decremented();
+            r = tile_type::from(rsum, false);
+            r = r.decremented(); // -> u set to true
+        }
+        else if (rbit == rounding_event::NOT_ROUNDED)
+        {
+            const bool u = b.is_uncertain() || d.is_uncertain();
+
+            if (u)
+            {
+                r = tile_type::from(rsum.decremented_real(), u);
+            }
+            else
+            {
+                r = tile_type::from(rsum, u);
+            }
         }
         else if (rbit == rounding_event::ROUNDED_DOWN)
         {
-            r = r.incremented();
+            r = tile_type::from(rsum, false);
+            r = r.incremented(); // -> u set to true
         }
     }
 

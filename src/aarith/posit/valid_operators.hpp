@@ -13,7 +13,7 @@ std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v)
     const auto& start = v.get_start();
     const auto& end = v.get_end();
 
-    // Handle special cases close to \pm\infty.
+    // Handle special cases close to ±∞.
 
     if (v == v.max())
     {
@@ -41,9 +41,18 @@ std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v)
     // Handle intervals.
 
     {
+        // Handle left bound.
+
         if (start.is_uncertain())
         {
-            os << "(" << start.as_start_value();
+            if (start == start.min())
+            {
+                os << "(-∞";
+            }
+            else
+            {
+                os << "(" << start.as_start_value();
+            }
         }
         else
         {
@@ -52,11 +61,18 @@ std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v)
 
         os << ", ";
 
-        // Handle right bounds.
+        // Handle right bound.
 
         if (end.is_uncertain())
         {
-            os << end.as_end_value() << ")";
+            if (end == end.max())
+            {
+                os << "∞)";
+            }
+            else
+            {
+                os << end.as_end_value() << ")";
+            }
         }
         else
         {

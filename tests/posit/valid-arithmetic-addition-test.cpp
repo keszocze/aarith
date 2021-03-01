@@ -1,9 +1,11 @@
 #include <catch.hpp>
 
+#include <aarith/posit.hpp>
+
 #include "../test-signature-ranges.hpp"
 #include "any_irregular.hpp"
+#include "for_each_tile.hpp"
 #include "gen_tile.hpp"
-#include <aarith/posit.hpp>
 
 TEMPLATE_TEST_CASE_SIG("addition regular case", "[valid][posit][template]",
                        ((size_t N, size_t ES), N, ES), AARITH_POSIT_TEST_TEMPLATE_EXHAUSTABLE)
@@ -43,4 +45,38 @@ TEMPLATE_TEST_CASE_SIG("addition regular case", "[valid][posit][template]",
     REQUIRE(x.value() == (a.value() + c.value()));
     REQUIRE(y.value() == (b.value() + d.value()));
     */
+}
+
+TEMPLATE_TEST_CASE_SIG("adding zero does not change the result (exhaustive)",
+                       "[valid][posit][template]", ((size_t N, size_t ES), N, ES),
+                       AARITH_POSIT_TEST_TEMPLATE_SMALL)
+{
+    using namespace aarith;
+
+    using Tile = tile<N, ES>;
+    using Valid = valid<N, ES>;
+
+    for_each_tile<Tile>([](const Tile& t) {
+        const Valid zero = Valid::zero();
+        const Valid v = Valid::from(t, t);
+
+        REQUIRE((v + zero) == v);
+    });
+}
+
+TEMPLATE_TEST_CASE_SIG("adding zero does not change the result (random)",
+                       "[valid][posit][template]", ((size_t N, size_t ES), N, ES),
+                       AARITH_POSIT_TEST_TEMPLATE_FULL)
+{
+    using namespace aarith;
+
+    using Tile = tile<N, ES>;
+    using Valid = valid<N, ES>;
+
+    const Tile t = GENERATE(take(200, random_tile<Tile>()));
+
+    const Valid zero = Valid::zero();
+    const Valid v = Valid::from(t, t);
+
+    REQUIRE((v + zero) == v);
 }
