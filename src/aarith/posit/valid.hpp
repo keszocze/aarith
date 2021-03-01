@@ -1,5 +1,8 @@
 #pragma once
 
+#include <sstream>
+#include <string>
+
 #include <aarith/posit.hpp>
 
 namespace aarith {
@@ -423,6 +426,20 @@ template <size_t N, size_t ES, typename WT>
 valid<N, ES, WT>::get_end_value() const
 {
     return end.as_end_value();
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr std::string valid<N, ES, WT>::in_tile_notation() const
+{
+    std::stringstream ss;
+
+    ss << "{";
+    ss << get_start().in_tile_notation();
+    ss << "; ";
+    ss << get_end().in_tile_notation();
+    ss << "}";
+
+    return ss.str();
 }
 
 template <size_t N, size_t ES, typename WT>

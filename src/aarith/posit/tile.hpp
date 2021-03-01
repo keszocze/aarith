@@ -1,5 +1,8 @@
 #pragma once
 
+#include <sstream>
+#include <string>
+
 #include <aarith/posit.hpp>
 
 namespace aarith {
@@ -254,6 +257,23 @@ template <size_t N, size_t ES, typename WT>
     {
         return value();
     }
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr std::string tile<N, ES, WT>::in_tile_notation() const
+{
+    std::stringstream ss;
+
+    if (is_uncertain())
+    {
+        ss << value() << "ᵘ";
+    }
+    else
+    {
+        ss << value();
+    }
+
+    return ss.str();
 }
 
 } // namespace aarith

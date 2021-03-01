@@ -1972,8 +1972,6 @@ public:
      *
      * The maximum is the tile initialized with the maximum posit and the
      * u-bit set to true.
-     * Return the greatest possible tile that is not NaR. The maximum is the
-     * tile initialized with the maximum posit and the u-bit set to true.
      *
      * @return The biggest representable tile.
      */
@@ -2130,6 +2128,8 @@ public:
 
     [[nodiscard]] constexpr posit_type as_start_value() const;
     [[nodiscard]] constexpr posit_type as_end_value() const;
+
+    [[nodiscard]] constexpr std::string in_tile_notation() const;
 
 protected:
     /**
@@ -2368,6 +2368,8 @@ public:
 
     [[nodiscard]] constexpr posit_type get_start_value() const;
     [[nodiscard]] constexpr posit_type get_end_value() const;
+
+    [[nodiscard]] constexpr std::string in_tile_notation() const;
 
 protected:
     /**
