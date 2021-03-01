@@ -219,8 +219,6 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
         // const bool u = a.is_uncertain() || c.is_uncertain();
         const bool u = false;
 
-        std::cerr << "left: " << lsum << " " << rbit << std::endl;
-
         l = tile_type::from(lsum, u);
 
         if (rbit == rounding_event::ROUNDED_UP)
@@ -263,8 +261,6 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
         const auto [rsum, rbit] = add(b.as_end_value(), d.as_end_value());
         // const bool u = b.is_uncertain() || d.is_uncertain();
         const bool u = false;
-
-        std::cerr << "right: " << rsum << " " << rbit << std::endl;
 
         r = tile_type::from(rsum, u);
 
