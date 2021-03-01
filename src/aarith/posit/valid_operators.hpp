@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cassert>
+
 #include <aarith/posit.hpp>
 
 namespace aarith {
@@ -7,52 +9,62 @@ namespace aarith {
 template <size_t N, size_t ES, typename WT>
 std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v)
 {
+    using posit_type = typename valid<N, ES, WT>::posit_type;
     const auto& start = v.get_start();
     const auto& end = v.get_end();
 
-    if (start.is_uncertain())
+    // Handle special cases close to \pm\infty.
+
+    if (v == v.max())
     {
-        if (start == start.min())
+        return os << "(" << posit_type::max() << ", +∞)";
+    }
+
+    if (v == v.min())
+    {
+        return os << "(-∞, " << posit_type::min() << ")";
+    }
+
+    if (v == v.nar())
+    {
+        return os << "±∞";
+    }
+
+    // Handle exact values.
+
+    if (start == end && !start.is_uncertain())
+    {
+        assert(!end.is_uncertain());
+        return os << start.value();
+    }
+
+    // Handle intervals.
+
+    {
+        if (start.is_uncertain())
         {
-            os << "(-∞";
-        }
-        else if (start == start.max())
-        {
-            os << "(+∞";
+            os << "(" << start.as_start_value();
         }
         else
         {
-            os << "(" << start.value();
+            os << "[" << start.as_start_value();
         }
-    }
-    else
-    {
-        os << "[" << start.value();
-    }
 
-    os << ", ";
+        os << ", ";
 
-    if (end.is_uncertain())
-    {
-        if (end == end.min())
+        // Handle right bounds.
+
+        if (end.is_uncertain())
         {
-            os << "-∞)";
-        }
-        else if (end == end.max())
-        {
-            os << "+∞)";
+            os << end.as_end_value() << ")";
         }
         else
         {
-            os << end.value().incremented() << ")";
+            os << end.as_end_value() << "]";
         }
-    }
-    else
-    {
-        os << end.value() << "]";
-    }
 
-    return os;
+        return os;
+    }
 }
 
 } // namespace aarith

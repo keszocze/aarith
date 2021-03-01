@@ -2221,6 +2221,9 @@ public:
      */
     [[nodiscard]] static constexpr valid nar();
 
+    [[nodiscard]] static constexpr valid max();
+    [[nodiscard]] static constexpr valid min();
+
     /**
      * @brief Construct valid initialized to zero.
      */

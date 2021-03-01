@@ -42,6 +42,20 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::max()
+{
+    const auto max_tile = tile_type::max();
+    return from(max_tile, max_tile);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::min()
+{
+    const auto min_tile = tile_type::min();
+    return from(min_tile, min_tile);
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::nar()
 {
     const auto nar_tile = tile_type::nar();
