@@ -32,7 +32,7 @@ SCENARIO("Check printing", "[fixed_point][signed][utility][string]")
                 constexpr Fixed fp = Fixed::one();
 
                 CAPTURE(fp, fp >> 1, fp >> 2, fp >> 3, fp >> 4, fp >> 5);
-                CHECK(starts_with("1.0", fixed_to_string<Fixed>(fp)));
+                CHECK(starts_with("1", fixed_to_string<Fixed>(fp)));
                 CHECK(starts_with("0.5", fixed_to_string<Fixed>(fp >> 1)));
                 CHECK(starts_with("0.25", fixed_to_string<Fixed>(fp >> 2)));
                 CHECK(starts_with("0.125", fixed_to_string<Fixed>(fp >> 3)));
@@ -48,7 +48,7 @@ SCENARIO("Check printing", "[fixed_point][signed][utility][string]")
                 const Fixed fp = -Fixed::one();
 
                 CAPTURE(fp, fp >> 1, fp >> 2, fp >> 3, fp >> 4, fp >> 5);
-                CHECK(starts_with("-1.0", fixed_to_string<Fixed>(fp)));
+                CHECK(starts_with("-1", fixed_to_string<Fixed>(fp)));
                 CHECK(starts_with("-0.5", fixed_to_string<Fixed>(fp >> 1)));
                 CHECK(starts_with("-0.25", fixed_to_string<Fixed>(fp >> 2)));
                 CHECK(starts_with("-0.125", fixed_to_string<Fixed>(fp >> 3)));
@@ -62,7 +62,7 @@ SCENARIO("Check printing", "[fixed_point][signed][utility][string]")
             THEN("Check that the result is correct")
             {
                 constexpr Fixed zero = Fixed::zero();
-                CHECK(starts_with("0.0", fixed_to_string<Fixed>(zero)));
+                CHECK(starts_with("0", fixed_to_string<Fixed>(zero)));
             }
         }
     }

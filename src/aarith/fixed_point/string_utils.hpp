@@ -1,9 +1,11 @@
 #pragma once
 
-#include <aarith/fixed_point.hpp>
+#include <algorithm>
 #include <iomanip>
 #include <sstream>
 #include <string>
+
+#include <aarith/fixed_point.hpp>
 
 namespace aarith {
 
@@ -61,7 +63,6 @@ auto fraction_as_integer(const fixed<I, F, B, WordType>& value)
 template <size_t I, size_t F, template <size_t, class> typename B, typename WordType>
 auto operator<<(std::ostream& out, const fixed<I, F, B, WordType>& value) -> std::ostream&
 {
-
     if (value.is_negative())
     {
         out << "-";
@@ -81,9 +82,21 @@ auto operator<<(std::ostream& out, const fixed<I, F, B, WordType>& value) -> std
     }
     else
     {
+        // We always have to print the integer part.
         out << to_decimal(abs(value).integer_part());
-        out << ".";
-        out << fraction_as_integer(abs(value));
+
+        // We only output a fraction if it is non-zero. To check, we first
+        // render the fraction in a string and then, if it contains non-zero
+        // characters, write to to os.
+
+        const std::string fs = fraction_as_integer(abs(value));
+        const auto is_zero_char = [](const char c) -> bool { return c == '0'; };
+
+        if (!std::all_of(fs.begin(), fs.end(), is_zero_char))
+        {
+            out << ".";
+            out << fs;
+        }
     }
 
     return out;
