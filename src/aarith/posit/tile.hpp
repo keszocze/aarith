@@ -69,8 +69,8 @@ tile<N, ES, WT>::tile(const tile<N, ES, WT>& other)
 template <size_t N, size_t ES, typename WT>
 tile<N, ES, WT>& tile<N, ES, WT>::operator=(const tile<N, ES, WT>& other)
 {
-    concrete_value = other.concrete_value;
-    uncertain = other.uncertain;
+    this->concrete_value = other.concrete_value;
+    this->uncertain = other.uncertain;
 
     return *this;
 }

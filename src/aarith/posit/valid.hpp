@@ -98,15 +98,16 @@ template <size_t N, size_t ES, typename WT> valid<N, ES, WT>::~valid()
 template <size_t N, size_t ES, typename WT>
 valid<N, ES, WT>& valid<N, ES, WT>::operator=(const valid& other)
 {
-    start = other.start;
-    end = other.end;
+    this->start = other.start;
+    this->end = other.end;
+
     return *this;
 }
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool valid<N, ES, WT>::operator==(const valid& other) const
 {
-    return start == other.start && end == other.start;
+    return start == other.start && end == other.end;
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -501,10 +502,10 @@ template <size_t N, size_t ES, typename WT>
 
 template <size_t N, size_t ES, typename WT> void valid<N, ES, WT>::ensure_canonicalized()
 {
-    if (is_empty())
-    {
-        *this = canonical_empty();
-    }
+    // if (is_empty())
+    //{
+    //    *this = canonical_empty();
+    //}
 }
 
 } // namespace aarith
