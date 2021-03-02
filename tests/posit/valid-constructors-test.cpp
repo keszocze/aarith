@@ -115,3 +115,70 @@ TEMPLATE_TEST_CASE_SIG("valid concrete constructor contains correct values",
         REQUIRE_FALSE(v.contains(t));
     }
 }
+
+SCENARIO("canonical valid construction")
+{
+    using namespace aarith;
+
+    using Posit = posit<3, 1>;
+    using Valid = valid<3, 1>;
+
+    GIVEN("endpoints")
+    {
+        const Posit four = Posit(4.0);
+        const Posit one = Posit(1.0);
+        const Posit fourth = Posit(0.25);
+        const Posit zero = Posit(0.0);
+
+        constexpr bool open = true;
+        constexpr bool closed = false;
+
+        THEN("assert that valids are as expected")
+        {
+            {
+                const Valid v = Valid::from(one, closed, four, closed);
+                REQUIRE(v.in_interval_notation() == "[1, 4]");
+            }
+
+            {
+                const Valid v = Valid::from(fourth, closed, four, closed);
+                REQUIRE(v.in_interval_notation() == "[0.25, 4]");
+            }
+
+            {
+                const Valid v = Valid::from(zero, closed, four, closed);
+                REQUIRE(v.in_interval_notation() == "[0, 4]");
+            }
+
+            {
+                const Valid v = Valid::from(one, open, four, open);
+                REQUIRE(v.in_interval_notation() == "(1, 4)");
+            }
+
+            {
+                const Valid v = Valid::from(fourth, open, four, open);
+                REQUIRE(v.in_interval_notation() == "(0.25, 4)");
+            }
+
+            {
+                const Valid v = Valid::from(zero, open, four, open);
+                REQUIRE(v.in_interval_notation() == "(0, 4)");
+            }
+
+            {
+                const Valid v = Valid::from(one, closed, four, open);
+                REQUIRE(v.in_interval_notation() == "[1, 4)");
+            }
+
+            {
+                const Valid v = Valid::from(fourth, open, four, closed);
+                REQUIRE(v.in_interval_notation() == "(0.25, 4]");
+            }
+
+            {
+                const Valid v = Valid::from(zero, closed, four, open);
+                REQUIRE(v.in_interval_notation() == "[0, 4)");
+            }
+        }
+    }
+}

@@ -47,6 +47,137 @@ TEMPLATE_TEST_CASE_SIG("addition regular case", "[valid][posit][template]",
     */
 }
 
+SCENARIO("adding arbitrary posit-correct valids")
+{
+    using namespace aarith;
+
+    using Posit = posit<3, 1>;
+    using Valid = valid<3, 1>;
+
+    GIVEN("arbitrary valids")
+    {
+        const Valid four = Valid(Posit(4.0));
+        const Valid one = Valid(Posit(1.0));
+        const Valid fourth = Valid(Posit(0.25));
+        const Valid zero = Valid(Posit(0.0));
+
+        THEN("assert that their sum is as expected")
+        {
+            {
+                const Valid sum = one + one;
+                REQUIRE(sum.in_interval_notation() == "(1, 4)");
+            }
+
+            {
+                const Valid sum = one + fourth;
+                REQUIRE(sum.in_interval_notation() == "(1, 4)");
+            }
+
+            {
+                const Valid sum = fourth + one;
+                REQUIRE(sum.in_interval_notation() == "(1, 4)");
+            }
+
+            {
+                const Valid sum = fourth + zero;
+                REQUIRE(sum.in_interval_notation() == "0.25");
+            }
+
+            {
+                const Valid sum = four + four;
+                REQUIRE(sum.in_interval_notation() == "(4, ∞)");
+            }
+        }
+    }
+}
+
+SCENARIO("adding arbitrary interval valids")
+{
+    using namespace aarith;
+
+    using Posit = posit<3, 1>;
+    using Valid = valid<3, 1>;
+
+    GIVEN("arbitrary valids")
+    {
+        const Posit four = Posit(4.0);
+        const Posit one = Posit(1.0);
+        // const Posit fourth = Posit(0.25);
+        const Posit zero = Posit(0.0);
+
+        constexpr bool open = true;
+        constexpr bool closed = false;
+
+        THEN("assert that their sum is as expected")
+        {
+            {
+                const Valid ival = Valid::from(zero, open, one, open); // (0, 1)
+                const Valid sum = ival + ival;
+                REQUIRE(sum.in_interval_notation() == "(0, 4)");
+            }
+
+            {
+                const Valid ival = Valid::from(zero, closed, one, closed); // [0, 1]
+                const Valid sum = ival + ival;
+                REQUIRE(sum.in_interval_notation() == "[0, 4)");
+            }
+
+            {
+                const Valid ival = Valid::from(zero, open, one, closed); // (0, 1]
+                const Valid sum = ival + ival;
+                REQUIRE(sum.in_interval_notation() == "(0, 4)");
+            }
+
+            {
+                const Valid ival = Valid::from(zero, closed, one, open); // [0, 1)
+                const Valid sum = ival + ival;
+                REQUIRE(sum.in_interval_notation() == "[0, 4)");
+            }
+
+            {
+                const Valid ival = Valid::from(zero, open, one, open); // (0, 1)
+                const Valid sum = ival + ival;
+                REQUIRE(sum.in_interval_notation() == "(0, 4)");
+            }
+
+            {
+                const Valid v = Valid::from(zero, open, one, open); // (0, 1)
+                const Valid w = Valid::from(one, open, four, open); // (1, 4)
+                const Valid sum = v + w;
+                REQUIRE(sum.in_interval_notation() == "(1, ∞)");
+            }
+
+            {
+                const Valid v = Valid::from(zero, open, one, open);   // (0, 1)
+                const Valid w = Valid::from(one, open, four, closed); // (1, 4]
+                const Valid sum = v + w;
+                REQUIRE(sum.in_interval_notation() == "(1, ∞)");
+            }
+
+            {
+                const Valid v = Valid::from(zero, closed, one, open); // [0, 1)
+                const Valid w = Valid::from(one, open, four, closed); // (1, 4]
+                const Valid sum = v + w;
+                REQUIRE(sum.in_interval_notation() == "(1, ∞)");
+            }
+
+            {
+                const Valid v = Valid::from(zero, closed, one, closed); // [0, 1]
+                const Valid w = Valid::from(one, open, four, closed);   // (1, 4]
+                const Valid sum = v + w;
+                REQUIRE(sum.in_interval_notation() == "(1, ∞)");
+            }
+
+            {
+                const Valid v = Valid::from(zero, closed, one, closed); // [0, 1]
+                const Valid w = Valid::from(one, closed, four, closed); // [1, 4]
+                const Valid sum = v + w;
+                REQUIRE(sum.in_interval_notation() == "[1, ∞)");
+            }
+        }
+    }
+}
+
 TEMPLATE_TEST_CASE_SIG("adding zero does not change the result (exhaustive)",
                        "[valid][posit][template]", ((size_t N, size_t ES), N, ES),
                        AARITH_POSIT_TEST_TEMPLATE_SMALL)
