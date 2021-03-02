@@ -17,7 +17,7 @@ std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v)
 
     if (v == v.max())
     {
-        return os << "(" << posit_type::max() << ", +∞)";
+        return os << "(" << posit_type::max() << ", ∞)";
     }
 
     if (v == v.min())
