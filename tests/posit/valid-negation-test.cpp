@@ -2,6 +2,8 @@
 
 #include <aarith/posit.hpp>
 
+#include "../test-signature-ranges.hpp"
+
 SCENARIO("valid negation")
 {
     using namespace aarith;
@@ -62,18 +64,19 @@ SCENARIO("valid negation")
             }
         }
     }
+}
 
-    GIVEN("extreme values")
-    {
-        THEN("assert that negation works as expected")
-        {
-            const auto vmax = Valid::max();
-            const auto vmin = Valid::min();
-            const auto zero = Valid::zero();
+TEMPLATE_TEST_CASE_SIG("valid negation extreme values", "[valid][posit][template]",
+                       ((size_t N, size_t ES), N, ES), AARITH_POSIT_TEST_TEMPLATE_FULL)
+{
+    using namespace aarith;
+    using Valid = valid<N, ES>;
 
-            REQUIRE(-vmax == vmin);
-            REQUIRE(-vmin == vmax);
-            REQUIRE(-zero == zero);
-        }
-    }
+    const auto vmax = Valid::max();
+    const auto vmin = Valid::min();
+    const auto zero = Valid::zero();
+
+    REQUIRE(-vmax == vmin);
+    REQUIRE(-vmin == vmax);
+    REQUIRE(-zero == zero);
 }
