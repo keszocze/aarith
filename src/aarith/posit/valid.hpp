@@ -20,6 +20,32 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr valid<N, ES, WT>
+valid<N, ES, WT>::from(const posit<N, ES, WT>& start, bool start_open, const posit<N, ES, WT>& end,
+                       bool end_open)
+{
+    tile_type start_tile, end_tile;
+
+    // construct the tiles
+
+    start_tile = tile_type::from(start, start_open);
+
+    if (end_open)
+    {
+        const posit_type previous_step = end.decremented();
+        end_tile = tile_type::from(previous_step, true);
+    }
+    else
+    {
+        end_tile = tile_type::from(end, false);
+    }
+
+    // construct the valid
+
+    return from(start_tile, end_tile);
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::zero()
 {
     return from(tile_type::zero(), tile_type::zero());

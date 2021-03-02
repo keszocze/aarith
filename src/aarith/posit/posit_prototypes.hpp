@@ -2202,6 +2202,12 @@ public:
     [[nodiscard]] static constexpr valid from(const tile_type& start, const tile_type& right);
 
     /**
+     * @brief Construct a new valid from posit endpoints.
+     */
+    [[nodiscard]] static constexpr valid from(const posit_type& start, bool start_open,
+                                              const posit_type& end, bool end_open);
+
+    /**
      * @return Representation of the real number zero.
      */
     [[nodiscard]] static constexpr valid zero();
