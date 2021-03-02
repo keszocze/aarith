@@ -102,8 +102,12 @@ SCENARIO("adding arbitrary interval valids")
     {
         const Posit four = Posit(4.0);
         const Posit one = Posit(1.0);
-        // const Posit fourth = Posit(0.25);
+        const Posit fourth = Posit(0.25);
         const Posit zero = Posit(0.0);
+
+        const Posit nfour = Posit(-4.0);
+        const Posit none = Posit(-1.0);
+        const Posit nfourth = Posit(-0.25);
 
         constexpr bool open = true;
         constexpr bool closed = false;
@@ -173,6 +177,113 @@ SCENARIO("adding arbitrary interval valids")
                 const Valid w = Valid::from(one, closed, four, closed); // [1, 4]
                 const Valid sum = v + w;
                 REQUIRE(sum.in_interval_notation() == "[1, ∞)");
+            }
+
+            {
+                const Valid v = Valid::from(zero, closed, fourth, closed); // [0, 0.25]
+                const Valid w = Valid::from(fourth, closed, one, closed);  // [0.25, 1]
+                const Valid sum = v + w;
+                REQUIRE(sum.in_interval_notation() == "[0.25, 4)");
+            }
+
+            {
+                const Valid v = Valid::from(zero, open, fourth, open); // (0, 0.25)
+                const Valid w = Valid::from(fourth, open, one, open);  // (0.25, 1)
+                const Valid sum = v + w;
+                REQUIRE(sum.in_interval_notation() == "(0.25, 4)");
+            }
+
+            {
+                const Valid v = Valid::from(none, open, one, open); // (-1, 1)
+                const Valid sum = v + v;
+                REQUIRE(sum.in_interval_notation() == "(-4, 4)");
+            }
+
+            {
+                const Valid v = Valid::from(none, closed, one, closed); // [-1, 1]
+                const Valid sum = v + v;
+                REQUIRE(sum.in_interval_notation() == "(-4, 4)");
+            }
+
+            {
+                const Valid v = Valid::from(none, closed, one, open); // [-1, 1)
+                const Valid sum = v + v;
+                REQUIRE(sum.in_interval_notation() == "(-4, 4)");
+            }
+
+            {
+                const Valid v = Valid::from(none, open, one, closed); // (-1, 1]
+                const Valid sum = v + v;
+                REQUIRE(sum.in_interval_notation() == "(-4, 4)");
+            }
+
+            {
+                const Valid v = Valid::from(nfourth, open, zero, open); // (-0.25, 0)
+                const Valid sum = v + v;
+                REQUIRE(sum.in_interval_notation() == "(-1, 0)");
+            }
+
+            {
+                const Valid v = Valid::from(none, open, zero, open); // (-1, 0)
+                const Valid w = Valid::from(zero, open, one, open);  // (0, 1)
+                const Valid sum = v + w;
+                REQUIRE(sum.in_interval_notation() == "(-1, 1)");
+            }
+
+            {
+                const Valid v = Valid::from(none, closed, zero, closed); // [-1, 0]
+                const Valid w = Valid::from(zero, closed, one, closed);  // [0, 1]
+                const Valid sum = v + w;
+                REQUIRE(sum.in_interval_notation() == "[-1, 1]");
+            }
+
+            {
+                const Valid v = Valid::from(none, closed, zero, closed); // [-1, 0]
+                const Valid w = Valid::from(one, closed, four, closed);  // [1, 4]
+                const Valid sum = v + w;
+                REQUIRE(sum.in_interval_notation() == "[0, 4]");
+            }
+
+            {
+                const Valid v = Valid::from(none, closed, zero, open);  // [-1, 0)
+                const Valid w = Valid::from(one, closed, four, closed); // [1, 4]
+                const Valid sum = v + w;
+                REQUIRE(sum.in_interval_notation() == "[0, 4)");
+            }
+
+            {
+                const Valid v = Valid::from(none, closed, zero, open); // [-1, 0)
+                const Valid w = Valid::from(one, open, four, closed);  // (1, 4]
+                const Valid sum = v + w;
+                REQUIRE(sum.in_interval_notation() == "(0, 4)");
+            }
+
+            {
+                const Valid v = Valid::from(none, open, zero, open);  // (-1, 0)
+                const Valid w = Valid::from(one, open, four, closed); // (1, 4]
+                const Valid sum = v + w;
+                REQUIRE(sum.in_interval_notation() == "(0, 4)");
+            }
+
+            {
+                const Valid v = Valid::from(none, open, zero, open); // (-1, 0)
+                const Valid w = Valid::from(one, open, four, open);  // (1, 4)
+                const Valid sum = v + w;
+                REQUIRE(sum.in_interval_notation() == "(0, 4)");
+            }
+
+            {
+                const Valid v = Valid::from(nfour, open, zero, open); // (-4, 0)
+                const Valid w = Valid::from(zero, open, four, open);  // (0, 4)
+                const Valid sum = v + w;
+                REQUIRE(sum.in_interval_notation() == "(-4, 4)");
+            }
+
+            {
+                const Valid v = Valid::from(nfour, closed, zero, closed); // [-4, 0]
+                const Valid w = Valid::from(zero, closed, four, closed);  // [0, 4]
+                const Valid sum = v + w;
+                REQUIRE(sum.in_interval_notation() == "[-4, 4]");
             }
         }
     }
