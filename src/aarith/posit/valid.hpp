@@ -193,6 +193,12 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::operator+() const
+{
+    return *this;
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] /*constexpr*/ valid<N, ES, WT>
 valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
 {
@@ -388,6 +394,18 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
     //
 
     return from(l, r);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::operator-() const
+{
+    const posit_type new_start_value = -end.as_end_value();
+    const bool new_start_open = end.is_uncertain();
+
+    const posit_type new_end_value = -start.as_start_value();
+    const bool new_end_open = start.is_uncertain();
+
+    return from(new_start_value, new_start_open, new_end_value, new_end_open);
 }
 
 template <size_t N, size_t ES, typename WT>

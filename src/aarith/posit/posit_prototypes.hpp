@@ -2304,12 +2304,30 @@ public:
     [[nodiscard]] constexpr bool operator>=(const valid& other) const;
 
     /**
+     * @brief Unary addition.
+     *
+     * @return A copy of argument other.
+     */
+    [[nodiscard]] constexpr valid operator+() const;
+
+    /**
      * @brief Sum of two valids.
      *
      * @param rhs The valid to add to this valid.
      * @return The sum of this and rhs.
      */
     [[nodiscard]] /*constexpr*/ valid operator+(const valid& other) const;
+
+    /**
+     * @brief Unary minus.
+     *
+     * Negating a valid {p, q} means returning valid {-q, p}. Note that
+     * negation is not inversion! Negation is equivalent to multiplying the
+     * valid with (-1) while inversion is a set operation.
+     *
+     * @return The negation of this valid.
+     */
+    [[nodiscard]] constexpr valid operator-() const;
 
     /**
      * @brief Valid subtraction.
