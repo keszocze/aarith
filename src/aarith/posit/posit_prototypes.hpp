@@ -2378,6 +2378,7 @@ public:
     [[nodiscard]] constexpr posit_type get_start_value() const;
     [[nodiscard]] constexpr posit_type get_end_value() const;
 
+    [[nodiscard]] std::string in_interval_notation() const;
     [[nodiscard]] std::string in_tile_notation() const;
 
 protected:
