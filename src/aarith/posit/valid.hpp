@@ -196,9 +196,15 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] /*constexpr*/ valid<N, ES, WT>
 valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
 {
+    //
     // Compute the sum [a, b] + [c, d] = [l, r] where the endpoints can be
     // open, closed or mixed.  Based on "The End of Error", John L. Gustafson,
-    // p. 113.
+    // p. 113. Unfortunately this involves lots and lots of special cases.
+    //
+
+    //
+    // Start by aliasing the endpoints for easy access.
+    //
 
     const tile_type& a = start;
     const tile_type& b = end;
@@ -206,23 +212,21 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
     const tile_type& c = other.start;
     const tile_type& d = other.end;
 
+    //
+    // Tiles l, r will be the resulting start tile l and end tile r of the
+    // sum.
+    //
+
     tile_type l, r;
+
+    //
+    // Handle special case (maxpos, \infty) which is similar to floating point
+    // +\infty. Adding anything to infinity remains at infinity.
+    //
 
     if (*this == max())
     {
         if (other == min())
-        {
-            return nar();
-        }
-        else
-        {
-            return *this;
-        }
-    }
-
-    if (*this == min())
-    {
-        if (other == max())
         {
             return nar();
         }
@@ -244,6 +248,23 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
         }
     }
 
+    //
+    // Handle special case (-\infty, -maxpos) which is similar to floating
+    // point -\infty. Adding anything to infinity remains at infinity.
+    //
+
+    if (*this == min())
+    {
+        if (other == max())
+        {
+            return nar();
+        }
+        else
+        {
+            return *this;
+        }
+    }
+
     if (other == min())
     {
         if (*this == max())
@@ -255,6 +276,12 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
             return other;
         }
     }
+
+    //
+    // This takes care of the special cases that take the whole valid into
+    // account. We can now compute the regular case for start bound l of the
+    // sum.
+    //
 
     if (a == closed_neg_inf())
     {
@@ -300,7 +327,9 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
         }
     }
 
-    // Now compute the right bound "r".
+    //
+    // Now we compute the regular case for end bound r of the sum.
+    //
 
     if (b == open_pos_inf())
     {
@@ -354,7 +383,9 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
         }
     }
 
+    //
     // Now that we have both bounds, we can construct the valid.
+    //
 
     return from(l, r);
 }
