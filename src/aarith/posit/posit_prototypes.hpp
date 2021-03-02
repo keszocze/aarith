@@ -2126,9 +2126,35 @@ public:
      */
     [[nodiscard]] constexpr tile decremented() const;
 
+    /**
+     * @brief Return this tiles value used as a start value.
+     *
+     * Calling this method makes sense when this tile is used as a start bound
+     * in a valid v = {p, q}. In that case, this method returns value p as
+     * used in interval notation.
+     */
     [[nodiscard]] constexpr posit_type as_start_value() const;
+
+    /**
+     * @brief Return this tiles value used as an end value.
+     *
+     * Calling this method makes sense when this tile is used as an end bound
+     * in a valid v = {p, q}. In that case, this method returns value q as
+     * used in interval notation.
+     */
     [[nodiscard]] constexpr posit_type as_end_value() const;
 
+    /**
+     * @brief Return this tile represented in tile notation.
+     *
+     * Tile notation looks like {p; q} where p and q are the start or
+     * endpoints.
+     *
+     * If endpoints are printed as-is (e.g. "0"), that endpoint is a closed
+     * endpoint, that is the u-bit is not set. If endpoints are printed with a
+     * little ᵘ (e.g. "0ᵘ"), that endpoint is an open endpoint, that is the
+     * u-bit is set.
+     */
     [[nodiscard]] std::string in_tile_notation() const;
 
 protected:
@@ -2393,10 +2419,40 @@ public:
      */
     [[nodiscard]] const tile_type& get_end() const;
 
+    /**
+     * @brief Return the intervals start value.
+     *
+     * Given valid v = {p, q} in interval notation, this method returns p.
+     */
     [[nodiscard]] constexpr posit_type get_start_value() const;
+
+    /**
+     * @brief Return the intervals end value.
+     *
+     * Given valid v = {p, q} in interval notation, this method returns q.
+     */
     [[nodiscard]] constexpr posit_type get_end_value() const;
 
+    /**
+     * @brief Return this valid represented in interval notation.
+     *
+     * Tile notation looks like {p, q} where p and q are the start or end
+     * tiles and the curly braces are either replace with either closed "[]" or
+     * open "()" bounds.
+     */
     [[nodiscard]] std::string in_interval_notation() const;
+
+    /**
+     * @brief Return this valid represented in tile notation.
+     *
+     * Tile notation looks like {p; q} where p and q are the start or
+     * end tiles.
+     *
+     * If endpoints are printed as-is (e.g. "0"), that endpoint is a closed
+     * endpoint, that is the u-bit is not set. If endpoints are printed with a
+     * little ᵘ (e.g. "0ᵘ"), that endpoint is an open endpoint, that is the
+     * u-bit is set.
+     */
     [[nodiscard]] std::string in_tile_notation() const;
 
 protected:
