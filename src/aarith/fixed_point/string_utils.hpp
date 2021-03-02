@@ -10,7 +10,7 @@
 namespace aarith {
 
 template <size_t I, size_t F, template <size_t, class> typename B, typename WordType>
-auto fraction_as_integer(const fixed<I, F, B, WordType>& value)
+std::string fraction_as_integer(const fixed<I, F, B, WordType>& value)
 {
     // TODO (Schärtl): Find real bound for width of this buffer.
 
@@ -50,14 +50,42 @@ auto fraction_as_integer(const fixed<I, F, B, WordType>& value)
         q = q * ten;
     }
 
+    //
     // Now change to string. Pad with leading zeroes if necessary.
+    //
 
     const ssize_t decimal_places = fraction.width() - last_one_idx + 1;
     const std::string int_fraction_str = to_decimal(int_fraction);
 
     std::stringstream ss;
     ss << std::setfill('0') << std::setw(decimal_places) << int_fraction_str;
-    return ss.str();
+    const std::string dirty_result = ss.str();
+
+    //
+    // Finally we clean trailing zeroes as they tell us nothing.
+    //
+
+    ssize_t out_end;
+
+    for (out_end = dirty_result.size() - 1; out_end >= 0; --out_end)
+    {
+        const char& c = dirty_result.at(out_end);
+
+        if (c != '0')
+        {
+            break;
+        }
+    }
+
+    if (out_end < 0)
+    {
+        return "";
+    }
+    else
+    {
+        const size_t len = static_cast<size_t>(out_end) + 1;
+        return dirty_result.substr(0, len);
+    }
 }
 
 template <size_t I, size_t F, template <size_t, class> typename B, typename WordType>
