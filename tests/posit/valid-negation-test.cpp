@@ -75,8 +75,12 @@ TEMPLATE_TEST_CASE_SIG("valid negation extreme values", "[valid][posit][template
     const auto vmax = Valid::max();
     const auto vmin = Valid::min();
     const auto zero = Valid::zero();
+    const auto one = Valid::one();
+    const auto nar = Valid::nar();
 
     REQUIRE(-vmax == vmin);
     REQUIRE(-vmin == vmax);
     REQUIRE(-zero == zero);
+    REQUIRE(-(-one) == one);
+    REQUIRE(-nar == nar);
 }
