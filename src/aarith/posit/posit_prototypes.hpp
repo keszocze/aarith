@@ -2543,6 +2543,93 @@ std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v);
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr std::vector<tile<N, ES, WT>> all_values_in(const valid<N, ES, WT>& v);
 
+//
+// REWORK OF INTERVAL IMPLEMENTATION
+//
+
+enum class interval_bound
+{
+    OPEN = 1,
+    CLOSED = 2,
+};
+
+// For implementations, look at interval_bound_operators.hpp
+
+std::ostream& operator<<(std::ostream& os, const interval_bound& u);
+
+// For implementations, look at interval_bound_operations.hpp
+
+interval_bound negate(const interval_bound& u);
+
+//
+// I-Valid Class.
+//
+// For implementation, look at posit/ivalid.hpp
+//
+
+template <size_t N, size_t ES, typename WT = DefaultWordType> class ivalid
+{
+public:
+    using posit_type = posit<N, ES, WT>;
+    using tile_type = tile<N, ES, WT>;
+
+    [[nodiscard]] static constexpr ivalid from(const posit_type& start_value,
+                                               interval_bound start_bound,
+                                               const posit_type& end_value,
+                                               interval_bound end_bound);
+
+    [[nodiscard]] static constexpr ivalid zero();
+    [[nodiscard]] static constexpr ivalid one();
+    [[nodiscard]] static constexpr ivalid empty();
+    [[nodiscard]] static constexpr ivalid full();
+    [[nodiscard]] static constexpr ivalid nar();
+    [[nodiscard]] static constexpr ivalid max();
+    [[nodiscard]] static constexpr ivalid min();
+
+    constexpr ivalid();
+    constexpr ivalid(const ivalid& other);
+    constexpr ivalid(const posit<N, ES, WT>& exact_value);
+    constexpr ivalid(const posit<N, ES, WT>& start, const posit<N, ES, WT>& end);
+    ~ivalid();
+    ivalid& operator=(const ivalid& other);
+
+    [[nodiscard]] constexpr bool operator==(const ivalid& other) const;
+    [[nodiscard]] constexpr bool operator!=(const ivalid& other) const;
+    [[nodiscard]] constexpr bool operator<(const ivalid& other) const;
+    [[nodiscard]] constexpr bool operator<=(const ivalid& other) const;
+    [[nodiscard]] constexpr bool operator>(const ivalid& other) const;
+    [[nodiscard]] constexpr bool operator>=(const ivalid& other) const;
+
+    [[nodiscard]] constexpr ivalid operator+() const;
+    [[nodiscard]] constexpr ivalid operator+(const ivalid& other) const;
+    [[nodiscard]] constexpr ivalid operator-() const;
+    [[nodiscard]] constexpr ivalid operator-(const ivalid& other) const;
+    [[nodiscard]] constexpr ivalid operator*(const ivalid& other) const;
+    [[nodiscard]] constexpr ivalid operator/(const ivalid& other) const;
+
+    [[nodiscard]] constexpr bool is_zero() const;
+    [[nodiscard]] constexpr bool is_empty() const;
+    [[nodiscard]] constexpr bool is_full() const;
+    [[nodiscard]] constexpr bool is_nar() const;
+
+    [[nodiscard]] constexpr ivalid inverse() const;
+
+    [[nodiscard]] const posit_type& get_start_value() const;
+    [[nodiscard]] const posit_type& get_end_value() const;
+
+    [[nodiscard]] const interval_bound& get_start_bound() const;
+    [[nodiscard]] const interval_bound& get_end_bound() const;
+
+    [[nodiscard]] std::string in_interval_notation() const;
+    [[nodiscard]] std::string in_tile_notation() const;
+
+protected:
+    posit_type start_value;
+    interval_bound start_bound;
+    posit_type end_value;
+    interval_bound end_bound;
+};
+
 } // namespace aarith
 
 //
@@ -2552,6 +2639,9 @@ template <size_t N, size_t ES, typename WT>
 //
 
 #include <aarith/posit/errors.hpp>
+#include <aarith/posit/interval_bound_operations.hpp>
+#include <aarith/posit/interval_bound_operators.hpp>
+#include <aarith/posit/ivalid.hpp>
 #include <aarith/posit/posit.hpp>
 #include <aarith/posit/posit_casts.hpp>
 #include <aarith/posit/posit_fraction.hpp>
