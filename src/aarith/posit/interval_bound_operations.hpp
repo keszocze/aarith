@@ -4,7 +4,7 @@
 
 namespace aarith {
 
-interval_bound negate(const interval_bound& u)
+[[nodiscard]] constexpr interval_bound negate(interval_bound u)
 {
     switch (u)
     {

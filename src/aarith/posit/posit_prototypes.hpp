@@ -2559,7 +2559,7 @@ std::ostream& operator<<(std::ostream& os, const interval_bound& u);
 
 // For implementations, look at interval_bound_operations.hpp
 
-interval_bound negate(const interval_bound& u);
+[[nodiscard]] constexpr interval_bound negate(interval_bound u);
 
 //
 // I-Valid Class.
