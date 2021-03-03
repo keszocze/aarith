@@ -10,8 +10,8 @@ TEMPLATE_TEST_CASE_SIG("valid zero constructors and constants", "[posit][valid][
 {
     using namespace aarith;
 
-    using Tile = tile<N, ES>;
-    using Valid = valid<N, ES>;
+    using Posit = posit<N, ES>;
+    using Valid = ivalid<N, ES>;
 
     {
         const Valid v = Valid();
@@ -19,8 +19,8 @@ TEMPLATE_TEST_CASE_SIG("valid zero constructors and constants", "[posit][valid][
         REQUIRE(v.is_zero());
         REQUIRE_FALSE(v.is_nar());
         REQUIRE_FALSE(v.is_empty());
-        REQUIRE(v.contains(Tile::zero()));
-        REQUIRE_FALSE(v.contains(Tile::one()));
+        REQUIRE(v.contains(Posit::zero()));
+        REQUIRE_FALSE(v.contains(Posit::one()));
     }
 
     {
@@ -29,8 +29,8 @@ TEMPLATE_TEST_CASE_SIG("valid zero constructors and constants", "[posit][valid][
         REQUIRE(v.is_zero());
         REQUIRE_FALSE(v.is_nar());
         REQUIRE_FALSE(v.is_empty());
-        REQUIRE(v.contains(Tile::zero()));
-        REQUIRE_FALSE(v.contains(Tile::one()));
+        REQUIRE(v.contains(Posit::zero()));
+        REQUIRE_FALSE(v.contains(Posit::one()));
     }
 
     {
@@ -39,8 +39,8 @@ TEMPLATE_TEST_CASE_SIG("valid zero constructors and constants", "[posit][valid][
         REQUIRE_FALSE(v.is_zero());
         REQUIRE_FALSE(v.is_nar());
         REQUIRE_FALSE(v.is_empty());
-        REQUIRE_FALSE(v.contains(Tile::zero()));
-        REQUIRE(v.contains(Tile::one()));
+        REQUIRE_FALSE(v.contains(Posit::zero()));
+        REQUIRE(v.contains(Posit::one()));
     }
 
     {
@@ -49,8 +49,8 @@ TEMPLATE_TEST_CASE_SIG("valid zero constructors and constants", "[posit][valid][
         REQUIRE_FALSE(v.is_zero());
         REQUIRE(v.is_nar());
         REQUIRE_FALSE(v.is_empty());
-        REQUIRE_FALSE(v.contains(Tile::zero()));
-        REQUIRE_FALSE(v.contains(Tile::one()));
+        REQUIRE_FALSE(v.contains(Posit::zero()));
+        REQUIRE_FALSE(v.contains(Posit::one()));
     }
 
     {
@@ -59,8 +59,8 @@ TEMPLATE_TEST_CASE_SIG("valid zero constructors and constants", "[posit][valid][
         REQUIRE_FALSE(v.is_zero());
         REQUIRE_FALSE(v.is_nar());
         REQUIRE(v.is_empty());
-        REQUIRE_FALSE(v.contains(Tile::zero()));
-        REQUIRE_FALSE(v.contains(Tile::one()));
+        REQUIRE_FALSE(v.contains(Posit::zero()));
+        REQUIRE_FALSE(v.contains(Posit::one()));
     }
 }
 
@@ -70,16 +70,13 @@ TEMPLATE_TEST_CASE_SIG("valid concrete constructor", "[posit][valid][template]",
     using namespace aarith;
 
     using Posit = posit<N, ES>;
-    using Tile = tile<N, ES>;
-    using Valid = valid<N, ES>;
+    using Valid = ivalid<N, ES>;
 
-    const Posit& concrete = GENERATE(take(1000, random_posit<Posit>()));
-    const Tile t = Tile::from(concrete, false);
-    const Valid v(concrete);
+    const Posit& p = GENERATE(take(1000, random_posit<Posit>()));
+    const Valid v(p);
 
-    REQUIRE_FALSE(t.is_uncertain());
-    REQUIRE(v.contains(t));
-    REQUIRE(concrete.is_nar() == v.is_nar());
+    REQUIRE(v.contains(p));
+    REQUIRE(v.is_nar() == p.is_nar());
 }
 
 TEMPLATE_TEST_CASE_SIG("valid concrete constructor contains correct values",
@@ -89,8 +86,7 @@ TEMPLATE_TEST_CASE_SIG("valid concrete constructor contains correct values",
     using namespace aarith;
 
     using Posit = posit<N, ES>;
-    using Tile = tile<N, ES>;
-    using Valid = valid<N, ES>;
+    using Valid = ivalid<N, ES>;
 
     // First we throw the dice some concrete posit value. From this value we
     // create a valid.
@@ -104,15 +100,14 @@ TEMPLATE_TEST_CASE_SIG("valid concrete constructor contains correct values",
     // not be contained in "v".
 
     const Posit& other = GENERATE(take(100, random_posit<Posit>()));
-    const Tile t = Tile::from(other, false);
 
     if (concrete == other)
     {
-        REQUIRE(v.contains(t));
+        REQUIRE(v.contains(other));
     }
     else
     {
-        REQUIRE_FALSE(v.contains(t));
+        REQUIRE_FALSE(v.contains(other));
     }
 }
 
@@ -121,7 +116,7 @@ SCENARIO("canonical valid construction")
     using namespace aarith;
 
     using Posit = posit<3, 1>;
-    using Valid = valid<3, 1>;
+    using Valid = ivalid<3, 1>;
 
     GIVEN("endpoints")
     {
@@ -130,8 +125,8 @@ SCENARIO("canonical valid construction")
         const Posit fourth = Posit(0.25);
         const Posit zero = Posit(0.0);
 
-        constexpr bool open = true;
-        constexpr bool closed = false;
+        constexpr auto open = interval_bound::OPEN;
+        constexpr auto closed = interval_bound::CLOSED;
 
         THEN("assert that valids are as expected")
         {

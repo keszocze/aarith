@@ -269,7 +269,18 @@ ivalid<N, ES, WT>::operator+(const ivalid<N, ES, WT>& other) const
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr ivalid<N, ES, WT> ivalid<N, ES, WT>::operator-() const
 {
-    throw std::logic_error("not implemented");
+    if (this->is_full() || this->is_empty())
+    {
+        return *this;
+    }
+
+    const posit_type new_start_value = -this->end_value;
+    const interval_bound new_start_bound = this->end_bound;
+
+    const posit_type new_end_value = -this->start_value;
+    const interval_bound new_end_bound = this->start_bound;
+
+    return from(new_start_value, new_start_bound, new_end_value, new_end_bound);
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -369,7 +380,7 @@ template <size_t N, size_t ES, typename WT>
         return value.is_nar();
     }
 
-    if (!this->is_full())
+    if (this->is_full())
     {
         // If this valid represents any numbers on the number line, it
         // contains "value" as long as it represents an actual real.
@@ -380,30 +391,27 @@ template <size_t N, size_t ES, typename WT>
     // where for interval (p, q) we have to check whether p < value < q (and
     // all other variations of open/closed intervals).
 
-    const auto open = interval_bound::OPEN;
-    const auto closed = interval_bound::CLOSED;
-
     if (this->is_regular())
     {
         bool start_ok = false;
         bool end_ok = false;
 
-        if (this->start_bound == open)
+        if (this->start_bound == interval_bound::OPEN)
         {
-            start_ok = (this->start_bound < value);
+            start_ok = (this->start_value < value);
         }
         else
         {
-            start_ok = (this->start_bound <= value);
+            start_ok = (this->start_value <= value);
         }
 
-        if (this->end_bound == open)
+        if (this->end_bound == interval_bound::OPEN)
         {
-            end_ok = (value < this->end_bound);
+            end_ok = (value < this->end_value);
         }
         else
         {
-            end_ok = (value <= this->end_bound);
+            end_ok = (value <= this->end_value);
         }
 
         return start_ok && end_ok;
@@ -487,9 +495,9 @@ template <size_t N, size_t ES, typename WT>
     std::stringstream ss;
 
     ss << "{";
-    ss << in_tile_notation(start_value);
+    ss << in_tile_notation(start_value, start_bound);
     ss << "; ";
-    ss << in_tile_notation(end_value);
+    ss << in_tile_notation(end_value, end_bound);
     ss << "}";
 
     return ss.str();
