@@ -2528,22 +2528,6 @@ template <size_t N, size_t ES, typename WT>
 std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v);
 
 //
-// Valid Operations.
-//
-// For implementations, look at posit/valid_operations.hpp.
-//
-
-/**
- * @brief Return all tiles in a given valid.
- *
- * Returns a vector of all tiles in the given valid. While this function is
- * useful for writing tests, for most cases you should use valid::contains and
- * similar methods instead of iterating over each possibility.
- */
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr std::vector<tile<N, ES, WT>> all_values_in(const valid<N, ES, WT>& v);
-
-//
 // REWORK OF INTERVAL IMPLEMENTATION
 //
 
@@ -2562,80 +2546,332 @@ std::ostream& operator<<(std::ostream& os, const interval_bound& u);
 [[nodiscard]] constexpr interval_bound negate(interval_bound u);
 
 //
-// I-Valid Class.
+// Valid Class.
 //
-// For implementation, look at posit/ivalid.hpp
+// For implementation, look at posit/valid.hpp
 //
 
+/**
+ * @brief Valid Intervals.
+ *
+ * Valids represent a similar concept to SORNs or Unum Type-II numbers.  A
+ * given valid consists of two posit endpoint with one uncertainty bit (u-bit)
+ * each.  If the u-bit is set, the given bound is open, if it is not set, the
+ * bound is closed.
+ */
 template <size_t N, size_t ES, typename WT = DefaultWordType> class ivalid
 {
 public:
+    /**
+     * @brief Underlying posit type.
+     */
     using posit_type = posit<N, ES, WT>;
 
+    /**
+     * @brief Construct a new valid with given endpoints.
+     *
+     * Arguments are imported as-is into a new valid.
+     */
     [[nodiscard]] static constexpr ivalid from(const posit_type& start_value,
                                                interval_bound start_bound,
                                                const posit_type& end_value,
                                                interval_bound end_bound);
 
+    /**
+     * @return Representation of the real number zero.
+     */
     [[nodiscard]] static constexpr ivalid zero();
+
+    /**
+     * @return Representation of the real number one.
+     */
     [[nodiscard]] static constexpr ivalid one();
+
+    /**
+     * @return Representation of the empty set.
+     */
     [[nodiscard]] static constexpr ivalid empty();
+
+    /**
+     * @brief Return the full set.
+     *
+     * The full set is the valid that contains any real value, that is
+     * it represents the interval (-∞, ∞).
+     *
+     * @return Representation of the full set.
+     */
     [[nodiscard]] static constexpr ivalid full();
+
+    /**
+     * @return Representation of the NaR error state.
+     */
     [[nodiscard]] static constexpr ivalid nar();
+
+    /**
+     * @return Representation of (maxpos, ∞).
+     */
     [[nodiscard]] static constexpr ivalid max();
+
+    /**
+     * @return Representation of (-∞, -maxpos).
+     */
     [[nodiscard]] static constexpr ivalid min();
 
+    /**
+     * @brief Default constructor.
+     *
+     * Constructs this valid to represent the concrete value 0.
+     */
     constexpr ivalid();
+
+    /**
+     * @brief Copy constructor.
+     */
     constexpr ivalid(const ivalid& other);
+
+    /**
+     * @brief Construct valid to represent given value exactly.
+     */
     constexpr ivalid(const posit<N, ES, WT>& exact_value);
+
+    /**
+     * @brief Construct valid to represent given closed interval.
+     *
+     * @param start Start of the interval, inclusive.
+     * @param end End of the interval, inclusive.
+     */
     constexpr ivalid(const posit<N, ES, WT>& start, const posit<N, ES, WT>& end);
+
+    /**
+     * @brief Destructor.
+     *
+     * Here to fulfill the rule of three.
+     */
     ~ivalid();
+
+    /**
+     * @brief Assign this valid to hold the value of other.
+     *
+     * @param other rThe value to change to.
+     */
     ivalid& operator=(const ivalid& other);
 
+    /**
+     * @brief Compare this and other for equality.
+     *
+     * Two valids are equal if they represent the same set.
+     */
     [[nodiscard]] constexpr bool operator==(const ivalid& other) const;
+
+    /**
+     * @brief Compare this and other for inequality.
+     */
     [[nodiscard]] constexpr bool operator!=(const ivalid& other) const;
+
+    /**
+     * @brief Return whether this is less than other.
+     *
+     * Given two valids u, v, u < v means that every tile t in u is smaller
+     * than any other tile s in v.
+     */
     [[nodiscard]] constexpr bool operator<(const ivalid& other) const;
+
+    /**
+     * @brief Return whether this is less than or equal to other.
+     */
     [[nodiscard]] constexpr bool operator<=(const ivalid& other) const;
+
+    /**
+     * @brief Return whether this is greater than other.
+     */
     [[nodiscard]] constexpr bool operator>(const ivalid& other) const;
+
+    /**
+     * @brief Return whether this is greater than or equal to other.
+     */
     [[nodiscard]] constexpr bool operator>=(const ivalid& other) const;
 
+    /**
+     * @brief Unary addition.
+     *
+     * @return A copy of argument other.
+     */
     [[nodiscard]] constexpr ivalid operator+() const;
+
+    /**
+     * @brief Sum of two valids.
+     *
+     * @param rhs The valid to add to this valid.
+     * @return The sum of this and rhs.
+     */
     [[nodiscard]] constexpr ivalid operator+(const ivalid& other) const;
+
+    /**
+     * @brief Unary minus.
+     *
+     * Negating a valid {p, q} means returning valid {-q, p}. Note that
+     * negation is not inversion! Negation is equivalent to multiplying the
+     * valid with (-1) while inversion is a set operation.
+     *
+     * @return The negation of this valid.
+     */
     [[nodiscard]] constexpr ivalid operator-() const;
+
+    /**
+     * @brief Valid subtraction.
+     *
+     * @param rhs The valid to add to this valid.
+     * @return The sum of this and rhs.
+     */
     [[nodiscard]] constexpr ivalid operator-(const ivalid& other) const;
+
+    /**
+     * @brief Return the product of this multiplied with rhs.
+     */
     [[nodiscard]] constexpr ivalid operator*(const ivalid& other) const;
+
+    /**
+     * @brief Return this divided by other.
+     */
     [[nodiscard]] constexpr ivalid operator/(const ivalid& other) const;
 
+    /**
+     * @return Whether this valid represents the number zero.
+     */
     [[nodiscard]] constexpr bool is_zero() const;
+
+    /**
+     * @return Whether this valid represents the empty set.
+     */
     [[nodiscard]] constexpr bool is_empty() const;
+
+    /**
+     * @return Whether this valid represents the full set (-∞, ∞).
+     */
     [[nodiscard]] constexpr bool is_full() const;
+
+    /**
+     * @return Whether this valid represents NaR.
+     */
     [[nodiscard]] constexpr bool is_nar() const;
+
+    /**
+     * @return Whether this valid represents a posit exactly.
+     */
     [[nodiscard]] constexpr bool is_exact_real() const;
+
+    /**
+     * @return Whether "value" is part of the interval represented by this valid.
+     */
     [[nodiscard]] constexpr bool contains(const posit_type& value) const;
+
+    /**
+     * @brief Check if valid is regular.
+     *
+     * A valid is regular if it is a a proper interval on the reals with
+     * starting point is less than the end point.
+     *
+     * In particular, neithr NaR nor the empty set are regular.
+     */
     [[nodiscard]] constexpr bool is_regular() const;
+
+    /**
+     * @brief Check if valid is regular.
+     *
+     * A valid is irregular exactly if it is not regular.
+     */
     [[nodiscard]] constexpr bool is_irregular() const;
 
+    /**
+     * @brief Invert the valid.
+     *
+     * Inverting a valid v means returning a valid u that contains exactly
+     * those tiles that v does not contain.
+     *
+     * @return The reverse set.
+     */
     [[nodiscard]] constexpr ivalid inverse() const;
 
+    /**
+     * @brief Return the intervals start value.
+     *
+     * Given valid v = {p, q} in interval notation, this method returns p.
+     */
     [[nodiscard]] const posit_type& get_start_value() const;
+
+    /**
+     * @brief Return the intervals end value.
+     *
+     * Given valid v = {p, q} in interval notation, this method returns q.
+     */
     [[nodiscard]] const posit_type& get_end_value() const;
 
+    /**
+     * @brief Return the intervals start bound. Either open or closed.
+     */
     [[nodiscard]] const interval_bound& get_start_bound() const;
+
+    /**
+     * @brief Return the intervals end bound. Either open or closed.
+     */
     [[nodiscard]] const interval_bound& get_end_bound() const;
 
+    /**
+     * @brief Return this valid represented in interval notation.
+     *
+     * Tile notation looks like {p, q} where p and q are the start or end
+     * tiles and the curly braces are either replace with either closed "[]" or
+     * open "()" bounds.
+     */
     [[nodiscard]] std::string in_interval_notation() const;
+
+    /**
+     * @brief Return this valid represented in tile notation.
+     *
+     * Tile notation looks like {p; q} where p and q are the start or
+     * end tiles.
+     *
+     * If endpoints are printed as-is (e.g. "0"), that endpoint is a closed
+     * endpoint, that is the u-bit is not set. If endpoints are printed with a
+     * little ᵘ (e.g. "0ᵘ"), that endpoint is an open endpoint, that is the
+     * u-bit is set.
+     */
     [[nodiscard]] std::string in_tile_notation() const;
 
 protected:
+    /**
+     * @brief Start p of interval {p, q}.
+     */
     posit_type start_value;
+
+    /**
+     * @brief The kind of start bound, either open or closed.
+     */
     interval_bound start_bound;
+
+    /**
+     * @brief End q of interval {p, q}.
+     */
     posit_type end_value;
+
+    /**
+     * @brief The kind of end bound, either open or closed.
+     */
     interval_bound end_bound;
 
+    /**
+     * @brief Convert endpoint to tile notation.
+     *
+     * Helper used in valid::in_tile_notation() method.
+     */
     [[nodiscard]] static std::string in_tile_notation(const posit_type& p, const interval_bound& u);
 };
 
-// For implementations, look at posit/ivalid_operators.hpp.
+//
+// Additional Valid Operators.
+//
+// For implementations, look at posit/valid_operators.hpp.
+//
 
 template <size_t N, size_t ES, typename WT>
 std::ostream& operator<<(std::ostream& os, const ivalid<N, ES, WT>& v);
