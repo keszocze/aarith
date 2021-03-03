@@ -70,7 +70,6 @@ add_aarith_test(valid-arithmetic-addition FILES posit/valid-arithmetic-addition-
 add_aarith_test(valid-arithmetic-subtraction FILES posit/valid-arithmetic-subtraction-test.cpp)
 add_aarith_test(valid-constructors FILES posit/valid-constructors-test.cpp)
 add_aarith_test(valid-negation FILES posit/valid-negation-test.cpp)
-add_aarith_test(valid_operations-elements FILES posit/valid_operations-elements-test.cpp)
 
 add_aarith_test(fau-adder FILES uint-approx-test.cpp)
 
