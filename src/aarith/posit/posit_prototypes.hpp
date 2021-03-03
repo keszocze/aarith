@@ -2571,7 +2571,6 @@ template <size_t N, size_t ES, typename WT = DefaultWordType> class ivalid
 {
 public:
     using posit_type = posit<N, ES, WT>;
-    using tile_type = tile<N, ES, WT>;
 
     [[nodiscard]] static constexpr ivalid from(const posit_type& start_value,
                                                interval_bound start_bound,

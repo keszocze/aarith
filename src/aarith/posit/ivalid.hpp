@@ -263,7 +263,133 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr ivalid<N, ES, WT>
 ivalid<N, ES, WT>::operator+(const ivalid<N, ES, WT>& other) const
 {
-    throw std::logic_error("not implemented");
+    //
+    // Compute the sum [a, b] + [c, d] = [l, r] where the endpoints can be
+    // open, closed or mixed.  Based on "The End of Error", John L. Gustafson,
+    // p. 113. Unfortunately this involves lots and lots of special cases.
+    //
+
+    constexpr auto open = interval_bound::OPEN;
+    constexpr auto closed = interval_bound::CLOSED;
+
+    constexpr auto not_rounded = rounding_event::NOT_ROUNDED;
+    constexpr auto rounded_down = rounding_event::ROUNDED_DOWN;
+    constexpr auto rounded_up = rounding_event::ROUNDED_UP;
+
+    const posit_type& a = this->start_value;
+    const interval_bound& au = this->start_bound;
+
+    const posit_type& b = this->end_value;
+    const interval_bound& bu = this->end_bound;
+
+    const posit_type& c = other.start_value;
+    const interval_bound& cu = other.start_bound;
+
+    const posit_type& d = other.end_value;
+    const interval_bound& du = other.end_bound;
+
+    //
+    // Start by looking at special cases that are easy to handle.
+    //
+
+    if (this->is_nar() || other.is_nar())
+    {
+        return nar();
+    }
+
+    if (this->is_empty() || other.is_empty())
+    {
+        return empty();
+    }
+
+    if (this->is_full() || other.is_full())
+    {
+        return full();
+    }
+
+    //
+    // For now we do not support addition of irregular intervals.
+    // TODO(Schärtl): Define addition on irregular intervals.
+    //
+
+    if (this->is_irregular() || other.is_irregular())
+    {
+        throw std::logic_error("addition not defined on irregular arguments");
+    }
+
+    //
+    // Now we deal with regular intervals. We have to apply the traditional
+    // interval arithmetic rule {a, b} + {c, d} = {a + c, b + d} while taking
+    // bounds and special value infinity into account.
+    //
+
+    ivalid sum;
+
+    //
+    // Compute left side of sum.
+    //
+
+    if (a.is_nar() || c.is_nar())
+    {
+        sum.start_value = sum.start_value.nar();
+        sum.start_bound = open;
+    }
+    else
+    {
+        auto [ac_sum, ac_rbit] = add(a, c);
+        interval_bound ac_bound = open;
+
+        if (ac_rbit == rounded_up)
+        {
+            ac_sum = ac_sum.decremented();
+        }
+        else if (ac_rbit == not_rounded)
+        {
+            if (au == closed && cu == closed)
+            {
+                ac_bound = closed;
+            }
+        }
+
+        sum.start_value = ac_sum;
+        sum.start_bound = ac_bound;
+    }
+
+    //
+    // Compute right side of sum.
+    //
+
+    if (b.is_nar() || d.is_nar())
+    {
+        sum.end_value = sum.end_value.nar();
+        sum.end_bound = open;
+    }
+    else
+    {
+        auto [bd_sum, bd_rbit] = add(b, d);
+        interval_bound bd_bound = open;
+
+        if (bd_rbit == rounded_down)
+        {
+            bd_sum = bd_sum.incremented();
+        }
+        else if (bd_rbit == not_rounded)
+        {
+            if (bu == closed && du == closed)
+            {
+                bd_bound = closed;
+            }
+        }
+
+        sum.end_value = bd_sum;
+        sum.end_bound = bd_bound;
+    }
+
+    //
+    // We can now return the sum.
+    //
+
+    return sum;
 }
 
 template <size_t N, size_t ES, typename WT>
