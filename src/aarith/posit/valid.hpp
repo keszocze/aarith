@@ -9,11 +9,11 @@
 namespace aarith {
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr ivalid<N, ES, WT>
-ivalid<N, ES, WT>::from(const posit<N, ES, WT>& start_value, interval_bound start_bound,
+[[nodiscard]] constexpr valid<N, ES, WT>
+valid<N, ES, WT>::from(const posit<N, ES, WT>& start_value, interval_bound start_bound,
                         const posit<N, ES, WT>& end_value, interval_bound end_bound)
 {
-    ivalid v;
+    valid v;
 
     v.start_value = start_value;
     v.start_bound = start_bound;
@@ -25,7 +25,7 @@ ivalid<N, ES, WT>::from(const posit<N, ES, WT>& start_value, interval_bound star
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr ivalid<N, ES, WT> ivalid<N, ES, WT>::zero()
+[[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::zero()
 {
     const auto pzero = posit_type::zero();
     const auto closed = interval_bound::CLOSED;
@@ -34,7 +34,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr ivalid<N, ES, WT> ivalid<N, ES, WT>::one()
+[[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::one()
 {
     const auto pone = posit_type::one();
     const auto closed = interval_bound::CLOSED;
@@ -43,7 +43,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr ivalid<N, ES, WT> ivalid<N, ES, WT>::empty()
+[[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::empty()
 {
     const auto pzero = posit_type::zero();
     const auto open = interval_bound::OPEN;
@@ -52,7 +52,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr ivalid<N, ES, WT> ivalid<N, ES, WT>::full()
+[[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::full()
 {
     const auto infty = posit_type::nar();
     const auto open = interval_bound::OPEN;
@@ -61,7 +61,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr ivalid<N, ES, WT> ivalid<N, ES, WT>::max()
+[[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::max()
 {
     const auto pmax = posit_type::max();
     const auto infty = posit_type::nar();
@@ -71,7 +71,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr ivalid<N, ES, WT> ivalid<N, ES, WT>::min()
+[[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::min()
 {
     const auto pmin = posit_type::min();
     const auto infty = posit_type::nar();
@@ -81,7 +81,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr ivalid<N, ES, WT> ivalid<N, ES, WT>::nar()
+[[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::nar()
 {
     const auto infty = posit_type::nar();
     const auto closed = interval_bound::CLOSED;
@@ -90,7 +90,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-constexpr ivalid<N, ES, WT>::ivalid()
+constexpr valid<N, ES, WT>::valid()
     : start_value(posit_type::zero())
     , start_bound(interval_bound::CLOSED)
     , end_value(posit_type::zero())
@@ -99,7 +99,7 @@ constexpr ivalid<N, ES, WT>::ivalid()
 }
 
 template <size_t N, size_t ES, typename WT>
-constexpr ivalid<N, ES, WT>::ivalid(const ivalid& other)
+constexpr valid<N, ES, WT>::valid(const valid& other)
     : start_value(other.start_value)
     , start_bound(other.start_bound)
     , end_value(other.end_value)
@@ -108,7 +108,7 @@ constexpr ivalid<N, ES, WT>::ivalid(const ivalid& other)
 }
 
 template <size_t N, size_t ES, typename WT>
-constexpr ivalid<N, ES, WT>::ivalid(const posit<N, ES, WT>& exact_value)
+constexpr valid<N, ES, WT>::valid(const posit<N, ES, WT>& exact_value)
     : start_value(exact_value)
     , start_bound(interval_bound::CLOSED)
     , end_value(exact_value)
@@ -117,7 +117,7 @@ constexpr ivalid<N, ES, WT>::ivalid(const posit<N, ES, WT>& exact_value)
 }
 
 template <size_t N, size_t ES, typename WT>
-constexpr ivalid<N, ES, WT>::ivalid(const posit<N, ES, WT>& start, const posit<N, ES, WT>& end)
+constexpr valid<N, ES, WT>::valid(const posit<N, ES, WT>& start, const posit<N, ES, WT>& end)
     : start_value(start)
     , start_bound(interval_bound::CLOSED)
     , end_value(end)
@@ -125,12 +125,12 @@ constexpr ivalid<N, ES, WT>::ivalid(const posit<N, ES, WT>& start, const posit<N
 {
 }
 
-template <size_t N, size_t ES, typename WT> ivalid<N, ES, WT>::~ivalid()
+template <size_t N, size_t ES, typename WT> valid<N, ES, WT>::~valid()
 {
 }
 
 template <size_t N, size_t ES, typename WT>
-ivalid<N, ES, WT>& ivalid<N, ES, WT>::operator=(const ivalid& other)
+valid<N, ES, WT>& valid<N, ES, WT>::operator=(const valid& other)
 {
     this->start_value = other.start_value;
     this->start_bound = other.start_bound;
@@ -142,7 +142,7 @@ ivalid<N, ES, WT>& ivalid<N, ES, WT>::operator=(const ivalid& other)
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool ivalid<N, ES, WT>::operator==(const ivalid& other) const
+[[nodiscard]] constexpr bool valid<N, ES, WT>::operator==(const valid& other) const
 {
     // Handle special cases where two valid v, w can be equal even though
     // their bit patterns do not match.
@@ -177,16 +177,16 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool ivalid<N, ES, WT>::operator!=(const ivalid& other) const
+[[nodiscard]] constexpr bool valid<N, ES, WT>::operator!=(const valid& other) const
 {
     return !(*this == other);
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool ivalid<N, ES, WT>::operator<(const ivalid& other) const
+[[nodiscard]] constexpr bool valid<N, ES, WT>::operator<(const valid& other) const
 {
-    const ivalid& lhs = *this;
-    const ivalid& rhs = other;
+    const valid& lhs = *this;
+    const valid& rhs = other;
 
     if (lhs == rhs)
     {
@@ -236,32 +236,32 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool ivalid<N, ES, WT>::operator<=(const ivalid& other) const
+[[nodiscard]] constexpr bool valid<N, ES, WT>::operator<=(const valid& other) const
 {
     return (*this == other) || (*this < other);
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool ivalid<N, ES, WT>::operator>(const ivalid& other) const
+[[nodiscard]] constexpr bool valid<N, ES, WT>::operator>(const valid& other) const
 {
     return other < *this;
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool ivalid<N, ES, WT>::operator>=(const ivalid& other) const
+[[nodiscard]] constexpr bool valid<N, ES, WT>::operator>=(const valid& other) const
 {
     return (*this == other) || (*this > other);
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr ivalid<N, ES, WT> ivalid<N, ES, WT>::operator+() const
+[[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::operator+() const
 {
     return *this;
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr ivalid<N, ES, WT>
-ivalid<N, ES, WT>::operator+(const ivalid<N, ES, WT>& other) const
+[[nodiscard]] constexpr valid<N, ES, WT>
+valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
 {
     //
     // Compute the sum [a, b] + [c, d] = [l, r] where the endpoints can be
@@ -323,7 +323,7 @@ ivalid<N, ES, WT>::operator+(const ivalid<N, ES, WT>& other) const
     // bounds and special value infinity into account.
     //
 
-    ivalid sum;
+    valid sum;
 
     //
     // Compute left side of sum.
@@ -393,7 +393,7 @@ ivalid<N, ES, WT>::operator+(const ivalid<N, ES, WT>& other) const
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr ivalid<N, ES, WT> ivalid<N, ES, WT>::operator-() const
+[[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::operator-() const
 {
     if (this->is_full() || this->is_empty())
     {
@@ -410,34 +410,34 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr ivalid<N, ES, WT>
-ivalid<N, ES, WT>::operator-(const ivalid<N, ES, WT>& other) const
+[[nodiscard]] constexpr valid<N, ES, WT>
+valid<N, ES, WT>::operator-(const valid<N, ES, WT>& other) const
 {
     return *this + (-other);
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr ivalid<N, ES, WT>
-ivalid<N, ES, WT>::operator*(const ivalid<N, ES, WT>& other) const
+[[nodiscard]] constexpr valid<N, ES, WT>
+valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
 {
     throw std::logic_error("not implemented");
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr ivalid<N, ES, WT>
-ivalid<N, ES, WT>::operator/(const ivalid<N, ES, WT>& other) const
+[[nodiscard]] constexpr valid<N, ES, WT>
+valid<N, ES, WT>::operator/(const valid<N, ES, WT>& other) const
 {
     throw std::logic_error("not implemented");
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool ivalid<N, ES, WT>::is_zero() const
+[[nodiscard]] constexpr bool valid<N, ES, WT>::is_zero() const
 {
     return *this == zero();
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool ivalid<N, ES, WT>::is_empty() const
+[[nodiscard]] constexpr bool valid<N, ES, WT>::is_empty() const
 {
     // All intervals (p, p) are empty except when p = nar because interval
     // (nar, nar) is the full set.
@@ -459,7 +459,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool ivalid<N, ES, WT>::is_full() const
+[[nodiscard]] constexpr bool valid<N, ES, WT>::is_full() const
 {
     // Interval (nar, nar) is the full set, that is it is all the real numbers
     // as we interpret (nar, nar) as (-infty, infty).
@@ -471,7 +471,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool ivalid<N, ES, WT>::is_exact_real() const
+[[nodiscard]] constexpr bool valid<N, ES, WT>::is_exact_real() const
 {
     if (this->is_nar())
     {
@@ -484,13 +484,13 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool ivalid<N, ES, WT>::is_nar() const
+[[nodiscard]] constexpr bool valid<N, ES, WT>::is_nar() const
 {
     return *this == nar();
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool ivalid<N, ES, WT>::contains(const posit<N, ES, WT>& value) const
+[[nodiscard]] constexpr bool valid<N, ES, WT>::contains(const posit<N, ES, WT>& value) const
 {
     if (this->is_empty())
     {
@@ -549,7 +549,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool ivalid<N, ES, WT>::is_regular() const
+[[nodiscard]] constexpr bool valid<N, ES, WT>::is_regular() const
 {
     if (this->is_empty() || this->is_nar())
     {
@@ -565,13 +565,13 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bool ivalid<N, ES, WT>::is_irregular() const
+[[nodiscard]] constexpr bool valid<N, ES, WT>::is_irregular() const
 {
     return !this->is_regular();
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr ivalid<N, ES, WT> ivalid<N, ES, WT>::inverse() const
+[[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::inverse() const
 {
     const posit_type& new_start_value = this->end_value;
     const interval_bound new_start_bound = negate(this->end_bound);
@@ -583,32 +583,32 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] const typename ivalid<N, ES, WT>::posit_type&
-ivalid<N, ES, WT>::get_start_value() const
+[[nodiscard]] const typename valid<N, ES, WT>::posit_type&
+valid<N, ES, WT>::get_start_value() const
 {
     return start_value;
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] const typename ivalid<N, ES, WT>::posit_type& ivalid<N, ES, WT>::get_end_value() const
+[[nodiscard]] const typename valid<N, ES, WT>::posit_type& valid<N, ES, WT>::get_end_value() const
 {
     return end_value;
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] const interval_bound& ivalid<N, ES, WT>::get_start_bound() const
+[[nodiscard]] const interval_bound& valid<N, ES, WT>::get_start_bound() const
 {
     return start_bound;
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] const interval_bound& ivalid<N, ES, WT>::get_end_bound() const
+[[nodiscard]] const interval_bound& valid<N, ES, WT>::get_end_bound() const
 {
     return end_bound;
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] std::string ivalid<N, ES, WT>::in_interval_notation() const
+[[nodiscard]] std::string valid<N, ES, WT>::in_interval_notation() const
 {
     std::stringstream ss;
     ss << *this;
@@ -616,7 +616,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] std::string ivalid<N, ES, WT>::in_tile_notation() const
+[[nodiscard]] std::string valid<N, ES, WT>::in_tile_notation() const
 {
     std::stringstream ss;
 
@@ -630,7 +630,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] std::string ivalid<N, ES, WT>::in_tile_notation(const posit<N, ES, WT>& p,
+[[nodiscard]] std::string valid<N, ES, WT>::in_tile_notation(const posit<N, ES, WT>& p,
                                                               const interval_bound& u)
 {
     std::stringstream ss;

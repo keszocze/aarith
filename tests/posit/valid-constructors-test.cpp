@@ -11,7 +11,7 @@ TEMPLATE_TEST_CASE_SIG("valid zero constructors and constants", "[posit][valid][
     using namespace aarith;
 
     using Posit = posit<N, ES>;
-    using Valid = ivalid<N, ES>;
+    using Valid = valid<N, ES>;
 
     {
         const Valid v = Valid();
@@ -70,7 +70,7 @@ TEMPLATE_TEST_CASE_SIG("valid concrete constructor", "[posit][valid][template]",
     using namespace aarith;
 
     using Posit = posit<N, ES>;
-    using Valid = ivalid<N, ES>;
+    using Valid = valid<N, ES>;
 
     const Posit& p = GENERATE(take(1000, random_posit<Posit>()));
     const Valid v(p);
@@ -86,7 +86,7 @@ TEMPLATE_TEST_CASE_SIG("valid concrete constructor contains correct values",
     using namespace aarith;
 
     using Posit = posit<N, ES>;
-    using Valid = ivalid<N, ES>;
+    using Valid = valid<N, ES>;
 
     // First we throw the dice some concrete posit value. From this value we
     // create a valid.
@@ -116,7 +116,7 @@ SCENARIO("canonical valid construction")
     using namespace aarith;
 
     using Posit = posit<3, 1>;
-    using Valid = ivalid<3, 1>;
+    using Valid = valid<3, 1>;
 
     GIVEN("endpoints")
     {

@@ -9,7 +9,7 @@ SCENARIO("valid negation")
     using namespace aarith;
 
     using Posit = posit<3, 1>;
-    using Valid = ivalid<3, 1>;
+    using Valid = valid<3, 1>;
 
     GIVEN("arbitrary valids")
     {
@@ -70,7 +70,7 @@ TEMPLATE_TEST_CASE_SIG("valid negation extreme values", "[valid][posit][template
                        ((size_t N, size_t ES), N, ES), AARITH_POSIT_TEST_TEMPLATE_FULL)
 {
     using namespace aarith;
-    using Valid = ivalid<N, ES>;
+    using Valid = valid<N, ES>;
 
     const auto vmax = Valid::max();
     const auto vmin = Valid::min();

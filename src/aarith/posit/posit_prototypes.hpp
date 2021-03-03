@@ -1986,7 +1986,7 @@ std::ostream& operator<<(std::ostream& os, const interval_bound& u);
  * each.  If the u-bit is set, the given bound is open, if it is not set, the
  * bound is closed.
  */
-template <size_t N, size_t ES, typename WT = DefaultWordType> class ivalid
+template <size_t N, size_t ES, typename WT = DefaultWordType> class valid
 {
 public:
     /**
@@ -1999,7 +1999,7 @@ public:
      *
      * Arguments are imported as-is into a new valid.
      */
-    [[nodiscard]] static constexpr ivalid from(const posit_type& start_value,
+    [[nodiscard]] static constexpr valid from(const posit_type& start_value,
                                                interval_bound start_bound,
                                                const posit_type& end_value,
                                                interval_bound end_bound);
@@ -2007,17 +2007,17 @@ public:
     /**
      * @return Representation of the real number zero.
      */
-    [[nodiscard]] static constexpr ivalid zero();
+    [[nodiscard]] static constexpr valid zero();
 
     /**
      * @return Representation of the real number one.
      */
-    [[nodiscard]] static constexpr ivalid one();
+    [[nodiscard]] static constexpr valid one();
 
     /**
      * @return Representation of the empty set.
      */
-    [[nodiscard]] static constexpr ivalid empty();
+    [[nodiscard]] static constexpr valid empty();
 
     /**
      * @brief Return the full set.
@@ -2027,39 +2027,39 @@ public:
      *
      * @return Representation of the full set.
      */
-    [[nodiscard]] static constexpr ivalid full();
+    [[nodiscard]] static constexpr valid full();
 
     /**
      * @return Representation of the NaR error state.
      */
-    [[nodiscard]] static constexpr ivalid nar();
+    [[nodiscard]] static constexpr valid nar();
 
     /**
      * @return Representation of (maxpos, ∞).
      */
-    [[nodiscard]] static constexpr ivalid max();
+    [[nodiscard]] static constexpr valid max();
 
     /**
      * @return Representation of (-∞, -maxpos).
      */
-    [[nodiscard]] static constexpr ivalid min();
+    [[nodiscard]] static constexpr valid min();
 
     /**
      * @brief Default constructor.
      *
      * Constructs this valid to represent the concrete value 0.
      */
-    constexpr ivalid();
+    constexpr valid();
 
     /**
      * @brief Copy constructor.
      */
-    constexpr ivalid(const ivalid& other);
+    constexpr valid(const valid& other);
 
     /**
      * @brief Construct valid to represent given value exactly.
      */
-    constexpr ivalid(const posit<N, ES, WT>& exact_value);
+    constexpr valid(const posit<N, ES, WT>& exact_value);
 
     /**
      * @brief Construct valid to represent given closed interval.
@@ -2067,33 +2067,33 @@ public:
      * @param start Start of the interval, inclusive.
      * @param end End of the interval, inclusive.
      */
-    constexpr ivalid(const posit<N, ES, WT>& start, const posit<N, ES, WT>& end);
+    constexpr valid(const posit<N, ES, WT>& start, const posit<N, ES, WT>& end);
 
     /**
      * @brief Destructor.
      *
      * Here to fulfill the rule of three.
      */
-    ~ivalid();
+    ~valid();
 
     /**
      * @brief Assign this valid to hold the value of other.
      *
      * @param other rThe value to change to.
      */
-    ivalid& operator=(const ivalid& other);
+    valid& operator=(const valid& other);
 
     /**
      * @brief Compare this and other for equality.
      *
      * Two valids are equal if they represent the same set.
      */
-    [[nodiscard]] constexpr bool operator==(const ivalid& other) const;
+    [[nodiscard]] constexpr bool operator==(const valid& other) const;
 
     /**
      * @brief Compare this and other for inequality.
      */
-    [[nodiscard]] constexpr bool operator!=(const ivalid& other) const;
+    [[nodiscard]] constexpr bool operator!=(const valid& other) const;
 
     /**
      * @brief Return whether this is less than other.
@@ -2101,29 +2101,29 @@ public:
      * Given two valids u, v, u < v means that every tile t in u is smaller
      * than any other tile s in v.
      */
-    [[nodiscard]] constexpr bool operator<(const ivalid& other) const;
+    [[nodiscard]] constexpr bool operator<(const valid& other) const;
 
     /**
      * @brief Return whether this is less than or equal to other.
      */
-    [[nodiscard]] constexpr bool operator<=(const ivalid& other) const;
+    [[nodiscard]] constexpr bool operator<=(const valid& other) const;
 
     /**
      * @brief Return whether this is greater than other.
      */
-    [[nodiscard]] constexpr bool operator>(const ivalid& other) const;
+    [[nodiscard]] constexpr bool operator>(const valid& other) const;
 
     /**
      * @brief Return whether this is greater than or equal to other.
      */
-    [[nodiscard]] constexpr bool operator>=(const ivalid& other) const;
+    [[nodiscard]] constexpr bool operator>=(const valid& other) const;
 
     /**
      * @brief Unary addition.
      *
      * @return A copy of argument other.
      */
-    [[nodiscard]] constexpr ivalid operator+() const;
+    [[nodiscard]] constexpr valid operator+() const;
 
     /**
      * @brief Sum of two valids.
@@ -2131,7 +2131,7 @@ public:
      * @param rhs The valid to add to this valid.
      * @return The sum of this and rhs.
      */
-    [[nodiscard]] constexpr ivalid operator+(const ivalid& other) const;
+    [[nodiscard]] constexpr valid operator+(const valid& other) const;
 
     /**
      * @brief Unary minus.
@@ -2142,7 +2142,7 @@ public:
      *
      * @return The negation of this valid.
      */
-    [[nodiscard]] constexpr ivalid operator-() const;
+    [[nodiscard]] constexpr valid operator-() const;
 
     /**
      * @brief Valid subtraction.
@@ -2150,17 +2150,17 @@ public:
      * @param rhs The valid to add to this valid.
      * @return The sum of this and rhs.
      */
-    [[nodiscard]] constexpr ivalid operator-(const ivalid& other) const;
+    [[nodiscard]] constexpr valid operator-(const valid& other) const;
 
     /**
      * @brief Return the product of this multiplied with rhs.
      */
-    [[nodiscard]] constexpr ivalid operator*(const ivalid& other) const;
+    [[nodiscard]] constexpr valid operator*(const valid& other) const;
 
     /**
      * @brief Return this divided by other.
      */
-    [[nodiscard]] constexpr ivalid operator/(const ivalid& other) const;
+    [[nodiscard]] constexpr valid operator/(const valid& other) const;
 
     /**
      * @return Whether this valid represents the number zero.
@@ -2217,7 +2217,7 @@ public:
      *
      * @return The reverse set.
      */
-    [[nodiscard]] constexpr ivalid inverse() const;
+    [[nodiscard]] constexpr valid inverse() const;
 
     /**
      * @brief Return the intervals start value.
@@ -2301,7 +2301,7 @@ protected:
 //
 
 template <size_t N, size_t ES, typename WT>
-std::ostream& operator<<(std::ostream& os, const ivalid<N, ES, WT>& v);
+std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v);
 
 } // namespace aarith
 
@@ -2314,8 +2314,6 @@ std::ostream& operator<<(std::ostream& os, const ivalid<N, ES, WT>& v);
 #include <aarith/posit/errors.hpp>
 #include <aarith/posit/interval_bound_operations.hpp>
 #include <aarith/posit/interval_bound_operators.hpp>
-#include <aarith/posit/ivalid.hpp>
-#include <aarith/posit/ivalid_operators.hpp>
 #include <aarith/posit/posit.hpp>
 #include <aarith/posit/posit_casts.hpp>
 #include <aarith/posit/posit_fraction.hpp>
@@ -2331,4 +2329,6 @@ std::ostream& operator<<(std::ostream& os, const ivalid<N, ES, WT>& v);
 #include <aarith/posit/quire_string_utils.hpp>
 #include <aarith/posit/quire_types.hpp>
 #include <aarith/posit/rounding_event_operators.hpp>
+#include <aarith/posit/valid.hpp>
+#include <aarith/posit/valid_operators.hpp>
 #include <aarith/posit/valid_types.hpp>

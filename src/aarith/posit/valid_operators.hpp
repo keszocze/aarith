@@ -7,9 +7,9 @@
 namespace aarith {
 
 template <size_t N, size_t ES, typename WT>
-std::ostream& operator<<(std::ostream& os, const ivalid<N, ES, WT>& v)
+std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v)
 {
-    using posit_type = typename ivalid<N, ES, WT>::posit_type;
+    using posit_type = typename valid<N, ES, WT>::posit_type;
 
     const posit_type& start_value = v.get_start_value();
     const interval_bound& start_bound = v.get_start_bound();

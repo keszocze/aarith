@@ -52,7 +52,7 @@ SCENARIO("adding arbitrary posit-correct valids")
     using namespace aarith;
 
     using Posit = posit<3, 1>;
-    using Valid = ivalid<3, 1>;
+    using Valid = valid<3, 1>;
 
     GIVEN("arbitrary valids")
     {
@@ -96,7 +96,7 @@ SCENARIO("adding arbitrary interval valids")
     using namespace aarith;
 
     using Posit = posit<3, 1>;
-    using Valid = ivalid<3, 1>;
+    using Valid = valid<3, 1>;
 
     GIVEN("arbitrary valids")
     {
@@ -295,7 +295,7 @@ TEMPLATE_TEST_CASE_SIG("adding zero does not change the result (exhaustive)",
 {
     using namespace aarith;
 
-    using Valid = ivalid<N, ES>;
+    using Valid = valid<N, ES>;
     const Valid zero = Valid::zero();
 
     for_each_regular_valid<Valid>([&](const Valid& v) { REQUIRE((v + zero) == v); });
@@ -308,7 +308,7 @@ TEMPLATE_TEST_CASE_SIG("adding zero does not change the result (random)",
     using namespace aarith;
 
     using Posit = posit<N, ES>;
-    using Valid = ivalid<N, ES>;
+    using Valid = valid<N, ES>;
 
     constexpr auto open = interval_bound::OPEN;
     constexpr auto closed = interval_bound::CLOSED;
