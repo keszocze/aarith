@@ -334,6 +334,12 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool ivalid<N, ES, WT>::is_nar() const
+{
+    return *this == nar();
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr ivalid<N, ES, WT> ivalid<N, ES, WT>::inverse() const
 {
     const posit_type& new_start_value = this->end_value;
@@ -373,13 +379,41 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] std::string ivalid<N, ES, WT>::in_interval_notation() const
 {
-    throw std::logic_error("not implemented");
+    std::stringstream ss;
+    ss << *this;
+    return ss.str();
 }
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] std::string ivalid<N, ES, WT>::in_tile_notation() const
 {
-    throw std::logic_error("not implemented");
+    std::stringstream ss;
+
+    ss << "{";
+    ss << in_tile_notation(start_value);
+    ss << "; ";
+    ss << in_tile_notation(end_value);
+    ss << "}";
+
+    return ss.str();
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] std::string ivalid<N, ES, WT>::in_tile_notation(const posit<N, ES, WT>& p,
+                                                              const interval_bound& u)
+{
+    std::stringstream ss;
+
+    if (u == interval_bound::OPEN)
+    {
+        ss << p << "ᵘ";
+    }
+    else
+    {
+        ss << p;
+    }
+
+    return ss.str();
 }
 
 } // namespace aarith

@@ -2628,7 +2628,14 @@ protected:
     interval_bound start_bound;
     posit_type end_value;
     interval_bound end_bound;
+
+    [[nodiscard]] static std::string in_tile_notation(const posit_type& p, const interval_bound& u);
 };
+
+// For implementations, look at posit/ivalid_operators.hpp.
+
+template <size_t N, size_t ES, typename WT>
+std::ostream& operator<<(std::ostream& os, const ivalid<N, ES, WT>& v);
 
 } // namespace aarith
 
@@ -2642,6 +2649,7 @@ protected:
 #include <aarith/posit/interval_bound_operations.hpp>
 #include <aarith/posit/interval_bound_operators.hpp>
 #include <aarith/posit/ivalid.hpp>
+#include <aarith/posit/ivalid_operators.hpp>
 #include <aarith/posit/posit.hpp>
 #include <aarith/posit/posit_casts.hpp>
 #include <aarith/posit/posit_fraction.hpp>
