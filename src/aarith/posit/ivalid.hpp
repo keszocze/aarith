@@ -256,7 +256,7 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr ivalid<N, ES, WT> ivalid<N, ES, WT>::operator+() const
 {
-    throw std::logic_error("not implemented");
+    return *this;
 }
 
 template <size_t N, size_t ES, typename WT>
