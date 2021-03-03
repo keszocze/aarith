@@ -34,7 +34,7 @@ using DefaultWordType = uint64_t;
 //
 
 /**
- * Enum that encodes information how the result of a posit arithmetic
+ * @brief Enum that encodes information how the result of a posit arithmetic
  * operation was rounded.
  *
  * @note Users might be tempted to misinterpret this enum as a boolean that
@@ -55,6 +55,14 @@ enum class rounding_event
 // For implementation, look at posit/rounding_event_operators.hpp
 //
 
+/**
+ * @brief Output a string representation of r to os.
+ *
+ * @param os The stream to write to.
+ * @param r The enum to write.
+ * @return A reference to os.
+ */
+template <size_t N, size_t ES, typename WT>
 std::ostream& operator<<(std::ostream& os, const rounding_event& r);
 
 //
@@ -2194,355 +2202,49 @@ template <size_t N, size_t ES, typename WT>
 std::ostream& operator<<(std::ostream& os, const tile<N, ES, WT>& t);
 
 //
-// Valid Class.
-//
-// For implementation, look at posit/valid.hpp
+// Interval Bound Enum
 //
 
 /**
- * @brief Valid Intervals.
+ * @brief Enum that encodes the kind of bound, either open or closed.
  *
- * Valids represent a similar concept to SORNs or Unum Type-II numbers.  A
- * given valid consists of two posit endpoint with one uncertainty bit (u-bit)
- * each.  If the u-bit is set, the given bound is open, if it is not set, the
- * bound is closed.
+ * These bounds are used in our implementation of valids. Using an enum here
+ * makes for easier to understand code, but in a hardware iplementation,
+ * this enum would be encoded with the u-bit of the valid.
  */
-template <size_t N, size_t ES, typename WT = DefaultWordType> class valid
-{
-public:
-    /**
-     * @brief Underlying posit type.
-     */
-    using posit_type = posit<N, ES, WT>;
-
-    /**
-     * @brief Underlying tile type.
-     */
-    using tile_type = tile<N, ES, WT>;
-
-    /**
-     * @brief Construct a new valid with given endpoints.
-     *
-     * Arguments are imported as-is into a new valid.
-     */
-    [[nodiscard]] static constexpr valid from(const tile_type& start, const tile_type& right);
-
-    /**
-     * @brief Construct a new valid from posit endpoints.
-     */
-    [[nodiscard]] static constexpr valid from(const posit_type& start, bool start_open,
-                                              const posit_type& end, bool end_open);
-
-    /**
-     * @return Representation of the real number zero.
-     */
-    [[nodiscard]] static constexpr valid zero();
-
-    /**
-     * @return Representation of the real number one.
-     */
-    [[nodiscard]] static constexpr valid one();
-
-    /**
-     * @return Representation of the empty set.
-     */
-    [[nodiscard]] static constexpr valid empty();
-
-    /**
-     * @return Representation of NaR.
-     */
-    [[nodiscard]] static constexpr valid nar();
-
-    [[nodiscard]] static constexpr valid max();
-    [[nodiscard]] static constexpr valid min();
-
-    /**
-     * @brief Construct valid initialized to zero.
-     */
-    constexpr valid();
-
-    /**
-     * @brief Copy constructor.
-     */
-    constexpr valid(const valid& other);
-
-    /**
-     * @brief Construct valid to represent given value exactly.
-     */
-    constexpr valid(const posit<N, ES, WT>& exact_value);
-
-    /**
-     * @brief Construct valid to represent given closed interval.
-     *
-     * @param start Start of the interval, inclusive.
-     * @param end End of the interval, inclusive.
-     */
-    constexpr valid(const posit<N, ES, WT>& start, const posit<N, ES, WT>& end);
-
-    /**
-     * @brief Destructor
-     */
-    ~valid();
-
-    /**
-     * @brief Assign this valid to hold the value of other.
-     *
-     * @param The value to change to.
-     */
-    valid& operator=(const valid& other);
-
-    /**
-     * @brief Compare this and other for equality.
-     *
-     * Two valids are equal if they share the same exact bit patterns.
-     * In particular, NaR compares equal to itself.
-     */
-    [[nodiscard]] constexpr bool operator==(const valid& other) const;
-
-    /**
-     * @brief Compare this and other for inequality.
-     *
-     * Two valid are not equal if they have different bit patterns.
-     */
-    [[nodiscard]] constexpr bool operator!=(const valid& other) const;
-
-    /**
-     * @brief Return whether this is less than other.
-     *
-     * Given two valids u, v, u < v means that every tile t in u is smaller
-     * than any other tile s in v.
-     */
-    [[nodiscard]] constexpr bool operator<(const valid& other) const;
-
-    /**
-     * @brief Return whether this is less than or equal to other.
-     */
-    [[nodiscard]] constexpr bool operator<=(const valid& other) const;
-
-    /**
-     * @brief Return whether this is greater than other.
-     */
-    [[nodiscard]] constexpr bool operator>(const valid& other) const;
-
-    /**
-     * @brief Return whether this is greater than or equal to other.
-     */
-    [[nodiscard]] constexpr bool operator>=(const valid& other) const;
-
-    /**
-     * @brief Unary addition.
-     *
-     * @return A copy of argument other.
-     */
-    [[nodiscard]] constexpr valid operator+() const;
-
-    /**
-     * @brief Sum of two valids.
-     *
-     * @param rhs The valid to add to this valid.
-     * @return The sum of this and rhs.
-     */
-    [[nodiscard]] /*constexpr*/ valid operator+(const valid& other) const;
-
-    /**
-     * @brief Unary minus.
-     *
-     * Negating a valid {p, q} means returning valid {-q, p}. Note that
-     * negation is not inversion! Negation is equivalent to multiplying the
-     * valid with (-1) while inversion is a set operation.
-     *
-     * @return The negation of this valid.
-     */
-    [[nodiscard]] constexpr valid operator-() const;
-
-    /**
-     * @brief Valid subtraction.
-     *
-     * @param rhs The valid to add to this valid.
-     * @return The sum of this and rhs.
-     */
-    [[nodiscard]] constexpr valid operator-(const valid& other) const;
-
-    /**
-     * @brief Return the product of this multiplied with rhs.
-     */
-    [[nodiscard]] constexpr valid operator*(const valid& other) const;
-
-    /**
-     * @brief Return this divided by other.
-     */
-    [[nodiscard]] constexpr valid operator/(const valid& other) const;
-
-    /**
-     * @return Whether this valid represents the number zero.
-     */
-    [[nodiscard]] constexpr bool is_zero() const;
-
-    /**
-     * @return Whether this valid represents the empty set.
-     */
-    [[nodiscard]] constexpr bool is_empty() const;
-
-    /**
-     * @return Whether this valid represents NaR.
-     */
-    [[nodiscard]] constexpr bool is_nar() const;
-
-    /**
-     * @brief Invert the valid.
-     *
-     * Inverting a valid v means returning a valid u that contains exactly
-     * those tiles that v does not contain.
-     *
-     * @return The reverse set.
-     */
-    [[nodiscard]] constexpr valid inverse() const;
-
-    /**
-     * @return Whether t is part of the given valid.
-     */
-    [[nodiscard]] constexpr bool contains(const tile_type& t) const;
-
-    /**
-     * @return The underlying start tile.
-     *
-     * @note Tiles need not be ordered. There is no guarantee that start is
-     * less than end.
-     */
-    [[nodiscard]] const tile_type& get_start() const;
-
-    /**
-     * @return The underlying end tile.
-     *
-     * @note Tiles need not be ordered. There is no guarantee that start is
-     * less than end.
-     */
-    [[nodiscard]] const tile_type& get_end() const;
-
-    /**
-     * @brief Return the intervals start value.
-     *
-     * Given valid v = {p, q} in interval notation, this method returns p.
-     */
-    [[nodiscard]] constexpr posit_type get_start_value() const;
-
-    /**
-     * @brief Return the intervals end value.
-     *
-     * Given valid v = {p, q} in interval notation, this method returns q.
-     */
-    [[nodiscard]] constexpr posit_type get_end_value() const;
-
-    /**
-     * @brief Return this valid represented in interval notation.
-     *
-     * Tile notation looks like {p, q} where p and q are the start or end
-     * tiles and the curly braces are either replace with either closed "[]" or
-     * open "()" bounds.
-     */
-    [[nodiscard]] std::string in_interval_notation() const;
-
-    /**
-     * @brief Return this valid represented in tile notation.
-     *
-     * Tile notation looks like {p; q} where p and q are the start or
-     * end tiles.
-     *
-     * If endpoints are printed as-is (e.g. "0"), that endpoint is a closed
-     * endpoint, that is the u-bit is not set. If endpoints are printed with a
-     * little ᵘ (e.g. "0ᵘ"), that endpoint is an open endpoint, that is the
-     * u-bit is set.
-     */
-    [[nodiscard]] std::string in_tile_notation() const;
-
-protected:
-    /**
-     * @brief Start of the interval.
-     */
-    tile_type start;
-
-    /**
-     * @brief End of the interval.
-     */
-    tile_type end;
-
-    /**
-     * @return A tile that represents [-inf when used with valids.
-     */
-    [[nodiscard]] static constexpr tile_type closed_neg_inf();
-
-    /**
-     * @return A tile that represents (-inf when used with valids.
-     */
-    [[nodiscard]] static constexpr tile_type open_neg_inf();
-
-    /**
-     * @return A tile that represents inf] when used with valids.
-     */
-    [[nodiscard]] static constexpr tile_type closed_pos_inf();
-
-    /**
-     * @return A tile that represents inf) when used with valids.
-     */
-    [[nodiscard]] static constexpr tile_type open_pos_inf();
-
-    /**
-     * @return A normalized empty representation.
-     *
-     * There are multiple ways to represent the empty set as every tile t can
-     * be used to represent it, viz. interval (t, t).  This method returns a
-     * fixed representation of zero.
-     */
-    [[nodiscard]] static constexpr valid canonical_empty();
-
-    /**
-     * @returns Whether this interval crosses the infinity/NaR border.
-     */
-    [[nodiscard]] bool crosses_infinity() const;
-
-    /**
-     * @brief Ensure normalized representation.
-     *
-     * There are multiple ways to represent the empty set. This method ensures
-     * that if the given valid represents the empty set, the start and
-     * endpoints are set to a standardized value. While this is not necessary,
-     * it makes things easier to reason about.
-     */
-    void ensure_canonicalized();
-};
-
-//
-// Additional Valid Operators.
-//
-// For implementations, look at posit/valid_operators.hpp.
-//
-
-/**
- * @brief Output a string representation of v to os.
- *
- * @param os The stream to write to.
- * @param v The valid to write.
- * @return A reference to os.
- */
-template <size_t N, size_t ES, typename WT>
-std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v);
-
-//
-// REWORK OF INTERVAL IMPLEMENTATION
-//
-
 enum class interval_bound
 {
     OPEN = 1,
     CLOSED = 2,
 };
 
-// For implementations, look at interval_bound_operators.hpp
+//
+// Interval Bound Operators
+//
+// For implementation, look at posit/interval_bound_operators.hpp
+//
 
+/**
+ * @brief Output a string representation of u to os.
+ *
+ * @param os The stream to write to.
+ * @param u The enum to write.
+ * @return A reference to os.
+ */
 std::ostream& operator<<(std::ostream& os, const interval_bound& u);
 
-// For implementations, look at interval_bound_operations.hpp
+//
+// Additional Interval Bound Operations
+//
+// For implementation, look at posit/interval_bound_operations.hpp
+//
 
+/**
+ * @brief Negate the interval bound.
+ *
+ * Negating a closed bound returns an open bound and negating an open bound
+ * returns a closed bound.
+ */
 [[nodiscard]] constexpr interval_bound negate(interval_bound u);
 
 //
@@ -2907,7 +2609,4 @@ std::ostream& operator<<(std::ostream& os, const ivalid<N, ES, WT>& v);
 #include <aarith/posit/tile.hpp>
 #include <aarith/posit/tile_operators.hpp>
 #include <aarith/posit/tile_types.hpp>
-#include <aarith/posit/valid.hpp>
-#include <aarith/posit/valid_operations.hpp>
-#include <aarith/posit/valid_operators.hpp>
 #include <aarith/posit/valid_types.hpp>

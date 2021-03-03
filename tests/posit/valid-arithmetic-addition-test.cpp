@@ -3,7 +3,6 @@
 #include <aarith/posit.hpp>
 
 #include "../test-signature-ranges.hpp"
-#include "any_irregular.hpp"
 #include "for_each_tile.hpp"
 #include "for_each_valid.hpp"
 #include "gen_tile.hpp"

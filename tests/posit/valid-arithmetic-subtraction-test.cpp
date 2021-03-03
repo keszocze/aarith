@@ -1,7 +1,6 @@
 #include <catch.hpp>
 
 #include "../test-signature-ranges.hpp"
-#include "any_irregular.hpp"
 #include "gen_tile.hpp"
 #include <aarith/posit.hpp>
 
