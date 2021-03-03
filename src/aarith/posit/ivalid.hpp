@@ -152,7 +152,7 @@ template <size_t N, size_t ES, typename WT>
         return true;
     }
 
-    if (this->is_full() && other.is_ful())
+    if (this->is_full() && other.is_full())
     {
         return true;
     }
@@ -164,7 +164,7 @@ template <size_t N, size_t ES, typename WT>
         return false;
     }
 
-    // Compart end bound for bitwise match.
+    // Compare end bound for bitwise match.
 
     if (this->end_value != other.end_value || this->end_bound != other.end_bound)
     {
@@ -334,9 +334,106 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool ivalid<N, ES, WT>::is_exact_real() const
+{
+    if (this->is_nar())
+    {
+        return false;
+    }
+
+    const auto closed = interval_bound::CLOSED;
+
+    return start_bound == closed && end_bound == closed && start_value == end_value;
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool ivalid<N, ES, WT>::is_nar() const
 {
     return *this == nar();
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool ivalid<N, ES, WT>::contains(const posit<N, ES, WT>& value) const
+{
+    if (this->is_empty())
+    {
+        // If the valid is empty, it contains no elements and in particular it
+        // does not contain "value".
+        return false;
+    }
+
+    if (this->is_nar())
+    {
+        // If this valid represents special case NaR, it only contains posit
+        // NaR.
+        return value.is_nar();
+    }
+
+    if (!this->is_full())
+    {
+        // If this valid represents any numbers on the number line, it
+        // contains "value" as long as it represents an actual real.
+        return !value.is_nar();
+    }
+
+    // We handled all special cases. Now we take a look at the regular case
+    // where for interval (p, q) we have to check whether p < value < q (and
+    // all other variations of open/closed intervals).
+
+    const auto open = interval_bound::OPEN;
+    const auto closed = interval_bound::CLOSED;
+
+    if (this->is_regular())
+    {
+        bool start_ok = false;
+        bool end_ok = false;
+
+        if (this->start_bound == open)
+        {
+            start_ok = (this->start_bound < value);
+        }
+        else
+        {
+            start_ok = (this->start_bound <= value);
+        }
+
+        if (this->end_bound == open)
+        {
+            end_ok = (value < this->end_bound);
+        }
+        else
+        {
+            end_ok = (value <= this->end_bound);
+        }
+
+        return start_ok && end_ok;
+    }
+    else
+    {
+        return !this->inverse().contains(value);
+    }
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool ivalid<N, ES, WT>::is_regular() const
+{
+    if (this->is_empty() || this->is_nar())
+    {
+        return false;
+    }
+
+    if (this->is_full() || this->is_exact_real())
+    {
+        return true;
+    }
+
+    return start_value < end_value;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool ivalid<N, ES, WT>::is_irregular() const
+{
+    return !this->is_regular();
 }
 
 template <size_t N, size_t ES, typename WT>

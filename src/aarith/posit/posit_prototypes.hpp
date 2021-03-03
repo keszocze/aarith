@@ -2611,6 +2611,10 @@ public:
     [[nodiscard]] constexpr bool is_empty() const;
     [[nodiscard]] constexpr bool is_full() const;
     [[nodiscard]] constexpr bool is_nar() const;
+    [[nodiscard]] constexpr bool is_exact_real() const;
+    [[nodiscard]] constexpr bool contains(const posit_type& value) const;
+    [[nodiscard]] constexpr bool is_regular() const;
+    [[nodiscard]] constexpr bool is_irregular() const;
 
     [[nodiscard]] constexpr ivalid inverse() const;
 
