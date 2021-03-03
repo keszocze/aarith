@@ -5,6 +5,7 @@
 #include "../test-signature-ranges.hpp"
 #include "any_irregular.hpp"
 #include "for_each_tile.hpp"
+#include "for_each_valid.hpp"
 #include "gen_tile.hpp"
 
 TEMPLATE_TEST_CASE_SIG("addition regular case", "[valid][posit][template]",
@@ -52,7 +53,7 @@ SCENARIO("adding arbitrary posit-correct valids")
     using namespace aarith;
 
     using Posit = posit<3, 1>;
-    using Valid = valid<3, 1>;
+    using Valid = ivalid<3, 1>;
 
     GIVEN("arbitrary valids")
     {
@@ -96,7 +97,7 @@ SCENARIO("adding arbitrary interval valids")
     using namespace aarith;
 
     using Posit = posit<3, 1>;
-    using Valid = valid<3, 1>;
+    using Valid = ivalid<3, 1>;
 
     GIVEN("arbitrary valids")
     {
@@ -109,8 +110,8 @@ SCENARIO("adding arbitrary interval valids")
         const Posit none = Posit(-1.0);
         const Posit nfourth = Posit(-0.25);
 
-        constexpr bool open = true;
-        constexpr bool closed = false;
+        constexpr auto open = interval_bound::OPEN;
+        constexpr auto closed = interval_bound::CLOSED;
 
         THEN("assert that their sum is as expected")
         {
@@ -295,15 +296,10 @@ TEMPLATE_TEST_CASE_SIG("adding zero does not change the result (exhaustive)",
 {
     using namespace aarith;
 
-    using Tile = tile<N, ES>;
-    using Valid = valid<N, ES>;
+    using Valid = ivalid<N, ES>;
+    const Valid zero = Valid::zero();
 
-    for_each_tile<Tile>([](const Tile& t) {
-        const Valid zero = Valid::zero();
-        const Valid v = Valid::from(t, t);
-
-        REQUIRE((v + zero) == v);
-    });
+    for_each_regular_valid<Valid>([&](const Valid& v) { REQUIRE((v + zero) == v); });
 }
 
 TEMPLATE_TEST_CASE_SIG("adding zero does not change the result (random)",
@@ -312,13 +308,50 @@ TEMPLATE_TEST_CASE_SIG("adding zero does not change the result (random)",
 {
     using namespace aarith;
 
-    using Tile = tile<N, ES>;
-    using Valid = valid<N, ES>;
+    using Posit = posit<N, ES>;
+    using Valid = ivalid<N, ES>;
 
-    const Tile t = GENERATE(take(200, random_tile<Tile>()));
+    constexpr auto open = interval_bound::OPEN;
+    constexpr auto closed = interval_bound::CLOSED;
 
     const Valid zero = Valid::zero();
-    const Valid v = Valid::from(t, t);
 
-    REQUIRE((v + zero) == v);
+    const Posit start = GENERATE(take(10, random_posit<Posit>()));
+    const Posit end = GENERATE(take(10, random_posit<Posit>()));
+
+    {
+        const Valid v = Valid::from(start, open, end, open);
+
+        if (!v.is_irregular())
+        {
+            REQUIRE((v + zero) == v);
+        }
+    }
+
+    {
+        const Valid v = Valid::from(start, open, end, closed);
+
+        if (!v.is_irregular())
+        {
+            REQUIRE((v + zero) == v);
+        }
+    }
+
+    {
+        const Valid v = Valid::from(start, closed, end, open);
+
+        if (!v.is_irregular())
+        {
+            REQUIRE((v + zero) == v);
+        }
+    }
+
+    {
+        const Valid v = Valid::from(start, closed, end, closed);
+
+        if (!v.is_irregular())
+        {
+            REQUIRE((v + zero) == v);
+        }
+    }
 }
