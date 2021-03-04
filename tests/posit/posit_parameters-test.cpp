@@ -3,7 +3,6 @@
 #include <aarith/posit.hpp>
 
 #include "../test-signature-ranges.hpp"
-#include "for_each_posit.hpp"
 #include "gen_posit.hpp"
 
 TEMPLATE_TEST_CASE_SIG("conversion to and from positparam preserves value", "[posit][template]",
@@ -22,8 +21,9 @@ TEMPLATE_TEST_CASE_SIG("conversion to and from positparam preserves value", "[po
     });
 }
 
-TEMPLATE_TEST_CASE_SIG("conversion to and from random positparam preserves value", "[posit][template]",
-                       ((size_t N, size_t ES), N, ES), AARITH_POSIT_TEST_TEMPLATE_FULL)
+TEMPLATE_TEST_CASE_SIG("conversion to and from random positparam preserves value",
+                       "[posit][template]", ((size_t N, size_t ES), N, ES),
+                       AARITH_POSIT_TEST_TEMPLATE_FULL)
 {
     using namespace aarith;
     using Posit = posit<N, ES>;

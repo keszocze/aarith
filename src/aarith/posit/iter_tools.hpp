@@ -1,12 +1,24 @@
 #pragma once
 
 #include <aarith/posit.hpp>
-#include <functional>
 
-#include "for_each_posit.hpp"
+namespace aarith {
+
+template <typename PositType>
+inline void for_each_posit(const std::function<void(const PositType&)>& operation)
+{
+    using namespace aarith;
+    typename PositType::storage_type bits;
+
+    do
+    {
+        const auto p = PositType::from(bits);
+        operation(p);
+    } while (++bits);
+}
 
 template <typename ValidType>
-static void for_each_valid(const std::function<void(const ValidType&)>& operation)
+inline void for_each_valid(const std::function<void(const ValidType&)>& operation)
 {
     using namespace aarith;
 
@@ -41,7 +53,7 @@ static void for_each_valid(const std::function<void(const ValidType&)>& operatio
 }
 
 template <typename ValidType>
-static void for_each_regular_valid(const std::function<void(const ValidType&)>& operation)
+inline void for_each_regular_valid(const std::function<void(const ValidType&)>& operation)
 {
     for_each_valid<ValidType>([&](const ValidType& v) {
         if (v.is_regular())
@@ -50,3 +62,5 @@ static void for_each_regular_valid(const std::function<void(const ValidType&)>& 
         }
     });
 }
+
+} // namespace aarith

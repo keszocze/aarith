@@ -3,8 +3,6 @@
 #include <aarith/posit.hpp>
 
 #include "../test-signature-ranges.hpp"
-#include "for_each_tile.hpp"
-#include "for_each_valid.hpp"
 #include "gen_tile.hpp"
 
 TEMPLATE_TEST_CASE_SIG("addition regular case", "[valid][posit][template]",

@@ -3,7 +3,6 @@
 #include <aarith/posit.hpp>
 
 #include "../test-signature-ranges.hpp"
-#include "for_each_posit.hpp"
 
 SCENARIO("Check if the returned rounding modes seem correct")
 {

@@ -1,13 +1,14 @@
 #pragma once
 
-#include <aarith/fixed_point.hpp>
-#include <aarith/integer.hpp>
-
 #include <cstdint>
+#include <functional>
 #include <stdexcept>
 #include <string>
 #include <tuple>
 #include <vector>
+
+#include <aarith/fixed_point.hpp>
+#include <aarith/integer.hpp>
 
 //
 // This file is for prototypes and forward declarations of the posit
@@ -1934,7 +1935,7 @@ template <size_t N, size_t ES, typename WT> std::string to_binary(const quire<N,
  * @brief Enum that encodes the kind of bound, either open or closed.
  *
  * These bounds are used in our implementation of valids. Using an enum here
- * makes for easier to understand code, but in a hardware iplementation,
+ * makes for easier to understand code, but in a hardware implementation,
  * this enum would be encoded with the u-bit of the valid.
  */
 enum class interval_bound
@@ -2000,9 +2001,9 @@ public:
      * Arguments are imported as-is into a new valid.
      */
     [[nodiscard]] static constexpr valid from(const posit_type& start_value,
-                                               interval_bound start_bound,
-                                               const posit_type& end_value,
-                                               interval_bound end_bound);
+                                              interval_bound start_bound,
+                                              const posit_type& end_value,
+                                              interval_bound end_bound);
 
     /**
      * @return Representation of the real number zero.
@@ -2079,7 +2080,7 @@ public:
     /**
      * @brief Assign this valid to hold the value of other.
      *
-     * @param other rThe value to change to.
+     * @param other The value to change to.
      */
     valid& operator=(const valid& other);
 
@@ -2198,7 +2199,7 @@ public:
      * A valid is regular if it is a a proper interval on the reals with
      * starting point is less than the end point.
      *
-     * In particular, neithr NaR nor the empty set are regular.
+     * In particular, neither NaR nor the empty set are regular.
      */
     [[nodiscard]] constexpr bool is_regular() const;
 
@@ -2303,6 +2304,54 @@ protected:
 template <size_t N, size_t ES, typename WT>
 std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v);
 
+//
+// Functions for iterating over unum types. Useful for testing and
+// experiments.
+//
+// For implementations, look at posit/iter_tools.hpp
+//
+
+/**
+ * @brief Run function on each posit for a given type.
+ *
+ * Runs function operation on every posit of PositType in some unspecified
+ * order.
+ *
+ * @tparam PositType Instance of a posit type, e.g. posit<8, 2>.
+ * @param operation The function to call on each posit.
+ */
+template <typename PositType>
+inline void for_each_posit(const std::function<void(const PositType&)>& operation);
+
+/**
+ * @brief Run function on each valid for a given type.
+ *
+ * Runs function operation on every valid of ValidType in some unspecified
+ * order.
+ *
+ * @note This function is exponential in valid width N.
+ *
+ * @tparam ValidType Instance of a valid type, e.g. valid<8, 2>.
+ * @param operation The function to call on each valid.
+ */
+template <typename ValidType>
+inline void for_each_valid(const std::function<void(const ValidType&)>& operation);
+
+/**
+ * @brief Run function on each regular valid for a given type.
+ *
+ * Runs function operation on every regular valid of ValidType in some
+ * unspecified order. In particular, operation is never called on irregular
+ * valids.
+ *
+ * @note This function is exponential in valid width N.
+ *
+ * @tparam ValidType Instance of a valid type, e.g. valid<8, 2>.
+ * @param operation The function to call on each valid.
+ */
+template <typename ValidType>
+inline void for_each_regular_valid(const std::function<void(const ValidType&)>& operation);
+
 } // namespace aarith
 
 //
@@ -2314,6 +2363,7 @@ std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v);
 #include <aarith/posit/errors.hpp>
 #include <aarith/posit/interval_bound_operations.hpp>
 #include <aarith/posit/interval_bound_operators.hpp>
+#include <aarith/posit/iter_tools.hpp>
 #include <aarith/posit/posit.hpp>
 #include <aarith/posit/posit_casts.hpp>
 #include <aarith/posit/posit_fraction.hpp>
