@@ -7,7 +7,6 @@ namespace aarith {
 template <typename PositType>
 inline void for_each_posit(const std::function<void(const PositType&)>& operation)
 {
-    using namespace aarith;
     typename PositType::storage_type bits;
 
     do
@@ -20,8 +19,6 @@ inline void for_each_posit(const std::function<void(const PositType&)>& operatio
 template <typename ValidType>
 inline void for_each_valid(const std::function<void(const ValidType&)>& operation)
 {
-    using namespace aarith;
-
     using PositType = typename ValidType::posit_type;
 
     constexpr auto open = interval_bound::OPEN;
