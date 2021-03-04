@@ -21,27 +21,31 @@ std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v)
     constexpr interval_bound closed = interval_bound::CLOSED;
 
     //
-    // Handle special cases (1) empty set and (2) NaR. These need special
-    // treatment as we do not print them as regular values.
+    // Handle special cases that are not printed like intervals.
     //
-
-    if (v.is_empty())
-    {
-        return os << "∅";
-    }
 
     if (v.is_nar())
     {
         return os << "NaR";
     }
 
+    if (v.is_empty())
+    {
+        return os << "∅";
+    }
+
+    if (v.is_full())
+    {
+        return os << "◯";
+    }
+
     //
     // Handle exact values [p, p] = p.
     //
 
-    if (start_bound == closed && end_bound == closed && start_value == end_value)
+    if (v.is_exact_real())
     {
-        return os << start_value;
+        return os << v.as_exact_real();
     }
 
     //

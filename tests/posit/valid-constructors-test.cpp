@@ -64,6 +64,118 @@ TEMPLATE_TEST_CASE_SIG("valid zero constructors and constants", "[posit][valid][
     }
 }
 
+TEMPLATE_TEST_CASE_SIG("valid special cases", "[posit][valid][template]",
+                       ((size_t N, size_t ES), N, ES), AARITH_POSIT_TEST_TEMPLATE_FULL)
+{
+    using namespace aarith;
+
+    using Valid = valid<N, ES>;
+
+    {
+        const Valid v = Valid::nar();
+
+        REQUIRE_FALSE(v.is_zero());
+        REQUIRE_FALSE(v.is_empty());
+        REQUIRE_FALSE(v.is_all_reals());
+        REQUIRE_FALSE(v.is_full());
+        REQUIRE_FALSE(v.is_exact_real());
+        REQUIRE(v.is_nar());
+        REQUIRE_FALSE(v.is_regular());
+        REQUIRE(v.is_irregular());
+    }
+
+    {
+        const Valid v = Valid::empty();
+
+        REQUIRE_FALSE(v.is_zero());
+        REQUIRE(v.is_empty());
+        REQUIRE_FALSE(v.is_all_reals());
+        REQUIRE_FALSE(v.is_full());
+        REQUIRE_FALSE(v.is_exact_real());
+        REQUIRE_FALSE(v.is_nar());
+        REQUIRE(v.is_regular());
+        REQUIRE_FALSE(v.is_irregular());
+    }
+
+    {
+        const Valid v = Valid::full();
+
+        REQUIRE_FALSE(v.is_zero());
+        REQUIRE_FALSE(v.is_empty());
+        REQUIRE_FALSE(v.is_all_reals());
+        REQUIRE(v.is_full());
+        REQUIRE_FALSE(v.is_exact_real());
+        REQUIRE_FALSE(v.is_nar());
+        REQUIRE_FALSE(v.is_regular());
+        REQUIRE(v.is_irregular());
+    }
+
+    {
+        const Valid v = Valid::all_reals();
+
+        REQUIRE_FALSE(v.is_zero());
+        REQUIRE_FALSE(v.is_empty());
+        REQUIRE(v.is_all_reals());
+        REQUIRE_FALSE(v.is_full());
+        REQUIRE_FALSE(v.is_exact_real());
+        REQUIRE_FALSE(v.is_nar());
+        REQUIRE(v.is_regular());
+        REQUIRE_FALSE(v.is_irregular());
+    }
+
+    {
+        const Valid v = Valid::zero();
+
+        REQUIRE(v.is_zero());
+        REQUIRE_FALSE(v.is_empty());
+        REQUIRE_FALSE(v.is_all_reals());
+        REQUIRE_FALSE(v.is_full());
+        REQUIRE(v.is_exact_real());
+        REQUIRE_FALSE(v.is_nar());
+        REQUIRE(v.is_regular());
+        REQUIRE_FALSE(v.is_irregular());
+    }
+
+    {
+        const Valid v = Valid::one();
+
+        REQUIRE_FALSE(v.is_zero());
+        REQUIRE_FALSE(v.is_empty());
+        REQUIRE_FALSE(v.is_all_reals());
+        REQUIRE_FALSE(v.is_full());
+        REQUIRE(v.is_exact_real());
+        REQUIRE_FALSE(v.is_nar());
+        REQUIRE(v.is_regular());
+        REQUIRE_FALSE(v.is_irregular());
+    }
+
+    {
+        const Valid v = Valid::min();
+
+        REQUIRE_FALSE(v.is_zero());
+        REQUIRE_FALSE(v.is_empty());
+        REQUIRE_FALSE(v.is_all_reals());
+        REQUIRE_FALSE(v.is_full());
+        REQUIRE_FALSE(v.is_exact_real());
+        REQUIRE_FALSE(v.is_nar());
+        REQUIRE(v.is_regular());
+        REQUIRE_FALSE(v.is_irregular());
+    }
+
+    {
+        const Valid v = Valid::max();
+
+        REQUIRE_FALSE(v.is_zero());
+        REQUIRE_FALSE(v.is_empty());
+        REQUIRE_FALSE(v.is_all_reals());
+        REQUIRE_FALSE(v.is_full());
+        REQUIRE_FALSE(v.is_exact_real());
+        REQUIRE_FALSE(v.is_nar());
+        REQUIRE(v.is_regular());
+        REQUIRE_FALSE(v.is_irregular());
+    }
+}
+
 TEMPLATE_TEST_CASE_SIG("valid concrete constructor", "[posit][valid][template]",
                        ((size_t N, size_t ES), N, ES), AARITH_POSIT_TEST_TEMPLATE_FULL)
 {

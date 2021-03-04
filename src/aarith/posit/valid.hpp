@@ -52,12 +52,22 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::full()
+[[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::all_reals()
 {
     const auto infty = posit_type::nar();
     const auto open = interval_bound::OPEN;
 
     return from(infty, open, infty, open);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::full()
+{
+    const auto zero = posit_type::zero();
+    const auto open = interval_bound::OPEN;
+    const auto closed = interval_bound::CLOSED;
+
+    return from(zero, closed, zero, open);
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -203,6 +213,16 @@ template <size_t N, size_t ES, typename WT>
         return false;
     }
 
+    if (lhs.is_full() || rhs.is_full())
+    {
+        return false;
+    }
+
+    if (lhs.is_all_reals() || rhs.is_all_reals())
+    {
+        return false;
+    }
+
     if (lhs.is_irregular() || rhs.is_irregular())
     {
         return false;
@@ -310,6 +330,11 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
         return full();
     }
 
+    if (this->is_all_reals() || other.is_all_reals())
+    {
+        return all_reals();
+    }
+
     //
     // For now we do not support addition of irregular intervals.
     // TODO(Schärtl): Define addition on irregular intervals.
@@ -398,7 +423,7 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::operator-() const
 {
-    if (this->is_full() || this->is_empty())
+    if (this->is_nar() || this->is_empty() || this->is_full() || this->is_all_reals())
     {
         return *this;
     }
@@ -462,15 +487,22 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool valid<N, ES, WT>::is_all_reals() const
+{
+    return *this == all_reals();
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool valid<N, ES, WT>::is_full() const
 {
-    // Interval (nar, nar) is the full set, that is it is all the real numbers
-    // as we interpret (nar, nar) as (-infty, infty).
+    // Any interval [p, p) and (p, p] represents the full set if p is non-NaR.
 
-    const auto infty = posit_type::nar();
-    const auto open = interval_bound::OPEN;
+    if (start_value.is_nar() || end_value.is_nar())
+    {
+        return false;
+    }
 
-    return start_bound == open && end_bound == open && start_value == infty && end_value == infty;
+    return (start_value == end_value) && (start_bound != end_bound);
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -554,12 +586,49 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool valid<N, ES, WT>::is_regular() const
 {
-    if (this->is_empty() || this->is_nar())
+    // The full set and {NaR} both contain NaR, as such they are not regular.
+
+    if (this->is_full() || this->is_nar())
     {
         return false;
     }
 
-    if (this->is_full() || this->is_exact_real())
+    // Any interval [NaR, q} and {p, NaR] definitely contains NaR and as such
+    // is not regular.
+
+    constexpr interval_bound closed = interval_bound::CLOSED;
+
+    if (start_value.is_nar() && start_bound == closed)
+    {
+        return false;
+    }
+
+    if (end_value.is_nar() && end_bound == closed)
+    {
+        return false;
+    }
+
+    // Empty set, (-∞, ∞) and [p, p] for non-NaR posit p are all sets that do
+    // not contain NaR. As such they are regular valids.
+
+    if (this->is_empty() || this->is_all_reals() || this->is_exact_real())
+    {
+        return true;
+    }
+
+    // Interval (-∞, q} with non-NaR posit q is some real interval on the
+    // reals.  It does not contain valid NaR and as such is regular.
+
+    if (start_value.is_nar() && !end_value.is_nar())
+    {
+        return true;
+    }
+
+    // Just as above, {p, ∞) with non-NaR posit p represent some
+    // interval {p, ∞) which does not include valid NaR. Such valid are
+    // also regular.
+
+    if (!start_value.is_nar() && end_value.is_nar())
     {
         return true;
     }
@@ -607,6 +676,17 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] const interval_bound& valid<N, ES, WT>::get_end_bound() const
 {
     return end_bound;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> valid<N, ES, WT>::as_exact_real() const
+{
+    if (!this->is_exact_real())
+    {
+        throw std::logic_error("valid::exact_real called on valid that is not an exact real");
+    }
+
+    return start_value;
 }
 
 template <size_t N, size_t ES, typename WT>

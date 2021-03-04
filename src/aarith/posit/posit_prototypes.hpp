@@ -2021,10 +2021,20 @@ public:
     [[nodiscard]] static constexpr valid empty();
 
     /**
+     * @brief Return the real set.
+     *
+     * The real set is the valid that contains any real value, that is
+     * it represents the interval (-∞, ∞).
+     *
+     * @return Representation of the real set.
+     */
+    [[nodiscard]] static constexpr valid all_reals();
+
+    /**
      * @brief Return the full set.
      *
-     * The full set is the valid that contains any real value, that is
-     * it represents the interval (-∞, ∞).
+     * The full set is the valid that contains any possible tile on the number
+     * circle.
      *
      * @return Representation of the full set.
      */
@@ -2174,7 +2184,12 @@ public:
     [[nodiscard]] constexpr bool is_empty() const;
 
     /**
-     * @return Whether this valid represents the full set (-∞, ∞).
+     * @return Whether this valid represents the real set (-∞, ∞).
+     */
+    [[nodiscard]] constexpr bool is_all_reals() const;
+
+    /**
+     * @return Whether this valid represents the full set of all tiles.
      */
     [[nodiscard]] constexpr bool is_full() const;
 
@@ -2243,6 +2258,22 @@ public:
      * @brief Return the intervals end bound. Either open or closed.
      */
     [[nodiscard]] const interval_bound& get_end_bound() const;
+
+    /**
+     * @brief Return exact posit value.
+     *
+     * If this valid represents some real exactly, this method returns p.  If
+     * this valid does not represent a real exactly, this method throws an
+     * exception. You should probably use is_exact_real() before calling this
+     * method to ensure this is the case.
+     *
+     * Note that when this valid represents NaR exactly, this method still
+     * throws an exception as NaR is not a real.
+     *
+     * @return The posit real value this valid represents exactly.
+     * @throws std::logic_error If this valid does not represent a real exactly.
+     */
+    [[nodiscard]] constexpr posit_type as_exact_real() const;
 
     /**
      * @brief Return this valid represented in interval notation.
