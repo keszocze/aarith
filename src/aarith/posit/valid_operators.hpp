@@ -18,7 +18,7 @@ std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v)
     const interval_bound& end_bound = v.get_end_bound();
 
     constexpr interval_bound open = interval_bound::OPEN;
-    constexpr interval_bound closed = interval_bound::CLOSED;
+    [[maybe_unused]] constexpr interval_bound closed = interval_bound::CLOSED;
 
     //
     // Handle special cases that are not printed like intervals.
