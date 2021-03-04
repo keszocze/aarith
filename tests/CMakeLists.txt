@@ -66,6 +66,7 @@ add_aarith_test(quire-conversion FILES posit/quire-conversion-test.cpp)
 add_aarith_test(quire_sizes FILES posit/quire_sizes-test.cpp)
 add_aarith_test(valid-arithmetic-addition FILES posit/valid-arithmetic-addition-test.cpp)
 add_aarith_test(valid-arithmetic-subtraction FILES posit/valid-arithmetic-subtraction-test.cpp)
+add_aarith_test(valid-comparisons FILES posit/valid-comparisons-test.cpp)
 add_aarith_test(valid-constructors FILES posit/valid-constructors-test.cpp)
 add_aarith_test(valid-negation FILES posit/valid-negation-test.cpp)
 

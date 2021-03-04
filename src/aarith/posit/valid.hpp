@@ -11,7 +11,7 @@ namespace aarith {
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr valid<N, ES, WT>
 valid<N, ES, WT>::from(const posit<N, ES, WT>& start_value, interval_bound start_bound,
-                        const posit<N, ES, WT>& end_value, interval_bound end_bound)
+                       const posit<N, ES, WT>& end_value, interval_bound end_bound)
 {
     valid v;
 
@@ -203,7 +203,7 @@ template <size_t N, size_t ES, typename WT>
         return false;
     }
 
-    if (lhs.crosses_infinity() || rhs.crosses_infinity())
+    if (lhs.is_irregular() || rhs.is_irregular())
     {
         return false;
     }
@@ -211,28 +211,31 @@ template <size_t N, size_t ES, typename WT>
     // Here we are left comparing regular intervals {a, b} with {c, d}.
     // If b < c, we get {a, b} < {c, d}.
 
-    const posit_type& b = lhs.end_value();
-    const posit_type& c = rhs.start_value();
+    const posit_type& b = lhs.get_end_value();
+    const posit_type& c = rhs.get_start_value();
 
     if (b < c)
     {
         return true;
     }
-
-    // Finally, if b == c, the kind of bound is the deciding factor.
-    // We need to check the cases, where {a, b} < {c, d}.
-    //
-    // {a, b] < (b, c}  ==  {a, b]         < [b + eps, c}  -> ok
-    // {a, b) < [b, c}  ==  {a, b - eps]   < [b, c}        -> ok
-    // {a, b) < (b, c}  ==  {a, b - eps]   < [b + eps, c}  -> ok
-    // {a, b] < [b, c}  ==  {a, b         !< [b, c}        -> not ok
-
-    if (lhs.end_bound == interval_bound::CLOSED && rhs.start_bound == interval_bound::CLOSED)
+    else if (b == c)
     {
+        // If b == c, the kind of bound is the deciding factor.  We need to
+        // check the cases, where v = {a, b} < w = {c, d}.
+        //
+        // {a, b] < (b, c}  ==  {a, b]        <  [b + eps, c}  ->  v < w
+        // {a, b) < [b, c}  ==  {a, b - eps]  <  [b, c}        ->  v < w
+        // {a, b) < (b, c}  ==  {a, b - eps]  <  [b + eps, c}  ->  v < w
+        // {a, b] ≮ [b, c}  ==  {a, b         ≮  [b, c}        ->  v ≮ w
+
+        constexpr interval_bound closed = interval_bound::CLOSED;
+        return !(lhs.end_bound == closed && rhs.start_bound == closed);
+    }
+    else
+    {
+        // Either (1) b > c or (2) any of b or c are NaR.
         return false;
     }
-
-    return true;
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -583,8 +586,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] const typename valid<N, ES, WT>::posit_type&
-valid<N, ES, WT>::get_start_value() const
+[[nodiscard]] const typename valid<N, ES, WT>::posit_type& valid<N, ES, WT>::get_start_value() const
 {
     return start_value;
 }
@@ -631,7 +633,7 @@ template <size_t N, size_t ES, typename WT>
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] std::string valid<N, ES, WT>::in_tile_notation(const posit<N, ES, WT>& p,
-                                                              const interval_bound& u)
+                                                             const interval_bound& u)
 {
     std::stringstream ss;
 
