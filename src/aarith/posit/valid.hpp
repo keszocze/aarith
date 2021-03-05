@@ -483,7 +483,7 @@ valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
 
     if (this->is_all_reals() || other.is_all_reals())
     {
-        return nar();
+        return all_reals();
     }
 
     //
