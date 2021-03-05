@@ -2002,6 +2002,16 @@ std::ostream& operator<<(std::ostream& os, const interval_bound& u);
  */
 [[nodiscard]] constexpr interval_bound negate(interval_bound u);
 
+/**
+ * @brief Return whether this interval bound is open.
+ */
+[[nodiscard]] constexpr bool is_open(interval_bound u);
+
+/**
+ * @brief Return whether this interval bound is closed.
+ */
+[[nodiscard]] constexpr bool is_closed(interval_bound u);
+
 //
 // Valid Class.
 //

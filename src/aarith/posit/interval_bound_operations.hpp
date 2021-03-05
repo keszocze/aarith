@@ -14,4 +14,14 @@ namespace aarith {
     };
 }
 
+[[nodiscard]] constexpr bool is_open(interval_bound u)
+{
+    return u == interval_bound::OPEN;
+}
+
+[[nodiscard]] constexpr bool is_closed(interval_bound u)
+{
+    return u == interval_bound::CLOSED;
+}
+
 } // namespace aarith
