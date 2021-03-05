@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cassert>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -446,8 +447,26 @@ valid<N, ES, WT>::operator-(const valid<N, ES, WT>& other) const
     return *this + (-other);
 }
 
+template <typename T, size_t N> inline void print(const std::array<T, N>& array)
+{
+    std::cerr << "[";
+
+    for (size_t i = 0; i < array.size(); ++i)
+    {
+        const T& elem = array.at(i);
+        std::cerr << elem.product;
+
+        if (i != array.size() - 1)
+        {
+            std::cerr << ", ";
+        }
+    }
+
+    std::cerr << "]" << std::endl;
+}
+
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr valid<N, ES, WT>
+[[nodiscard]] /*constexpr*/ valid<N, ES, WT>
 valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
 {
     // We are multiplying v = {a, b} with w = {c, d}.
@@ -461,21 +480,51 @@ valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
     const tile_ref c = w.start();
     const tile_ref d = w.end();
 
-    group_result new_start, new_end;
+    //
+    // Start by looking at special cases that are easy to handle.
+    //
+
+    if (this->is_nar() || other.is_nar())
+    {
+        return nar();
+    }
+
+    if (this->is_empty() || other.is_empty())
+    {
+        return empty();
+    }
+
+    if (this->is_full() || other.is_full())
+    {
+        return full();
+    }
+
+    if (this->is_all_reals() || other.is_all_reals())
+    {
+        return nar();
+    }
+
+    //
+    // Valid multiplication requires us to consider all possible choices ac,
+    // ad, bc and bd.
+    //
+
+    valid product;
 
     {
         std::array<group_result, 4> choices = {tile_mul(a, c), tile_mul(a, d), tile_mul(b, c),
                                                tile_mul(b, d)};
 
         std::sort(choices.begin(), choices.end(), valid::lt_left);
-        new_start = choices.front();
+        product.start_value = choices.front().product;
+        product.start_bound = merge_bounds_from(choices.front());
 
         std::sort(choices.begin(), choices.end(), valid::lt_right);
-        new_end = choices.back();
+        product.end_value = choices.back().product;
+        product.end_bound = merge_bounds_from(choices.back());
     }
 
-    return valid::from(new_start.product, merge_bounds_from(new_start), new_end.product,
-                       merge_bounds_from(new_end));
+    return product;
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -796,13 +845,13 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] interval_bound
-valid<N, ES, WT>::merge_bounds_from(const valid<N, ES, WT>::group_result& group)
+[[nodiscard]] constexpr interval_bound valid<N, ES, WT>::merge_bounds_from(interval_bound u0,
+                                                                           interval_bound u1)
 {
     constexpr auto open = interval_bound::OPEN;
     constexpr auto closed = interval_bound::CLOSED;
 
-    if (is_open(group.lhs_bound) || is_open(group.rhs_bound))
+    if (is_open(u0) || is_open(u1))
     {
         return open;
     }
@@ -810,6 +859,13 @@ valid<N, ES, WT>::merge_bounds_from(const valid<N, ES, WT>::group_result& group)
     {
         return closed;
     }
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] interval_bound
+valid<N, ES, WT>::merge_bounds_from(const valid<N, ES, WT>::group_result& group)
+{
+    return valid::merge_bounds_from(group.lhs_bound, group.rhs_bound);
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -835,23 +891,27 @@ template <size_t N, size_t ES, typename WT>
         return false;
     }
 
-    if (lhs.product < rhs.product)
+    if (lhs.product != rhs.product)
     {
-        return true;
-    }
-
-    const interval_bound lhs_bound = valid::merge_bounds_from(lhs);
-    const interval_bound rhs_bound = valid::merge_bounds_from(rhs);
-
-    if (left)
-    {
-        // [x is less than (x.
-        return is_closed(lhs_bound) && is_open(rhs_bound);
+        return lhs.product < rhs.product;
     }
     else
     {
-        // x) is less than x].
-        return is_open(lhs_bound) && is_closed(rhs_bound);
+        assert(lhs.product == rhs.product);
+
+        const interval_bound lhs_bound = valid::merge_bounds_from(lhs);
+        const interval_bound rhs_bound = valid::merge_bounds_from(rhs);
+
+        if (left)
+        {
+            // [x is less than (x.
+            return is_closed(lhs_bound) && is_open(rhs_bound);
+        }
+        else
+        {
+            // x) is less than x].
+            return is_open(lhs_bound) && is_closed(rhs_bound);
+        }
     }
 }
 

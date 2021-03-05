@@ -2205,7 +2205,7 @@ public:
     /**
      * @brief Return the product of this multiplied with rhs.
      */
-    [[nodiscard]] constexpr valid operator*(const valid& other) const;
+    [[nodiscard]] /*constexpr*/ valid operator*(const valid& other) const;
 
     /**
      * @brief Return this divided by other.
@@ -2388,6 +2388,8 @@ protected:
     [[nodiscard]] const tile_ref start() const;
     [[nodiscard]] const tile_ref end() const;
 
+    [[nodiscard]] static constexpr interval_bound merge_bounds_from(interval_bound u0,
+                                                                    interval_bound u1);
     [[nodiscard]] static interval_bound merge_bounds_from(const group_result& group);
     [[nodiscard]] static bool lt_left(const group_result& lhs, const group_result& rhs);
     [[nodiscard]] static bool lt_right(const group_result& lhs, const group_result& rhs);
