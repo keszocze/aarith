@@ -923,6 +923,20 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] std::string dump_string(const posit<N, ES, WT>& p);
 
 /**
+ * @brief The result of an arithmetic operation.
+ *
+ * Operations such as add() and mul() return posit_result. It combines the
+ * actual numeric result with information about rounding that occurred. Keeping
+ * track of rounding can be useful when experimenting with posit arithmetic.
+ *
+ * @tparam N The total width in bits of the posit result.
+ * @tparam ES The maximum width in bits of the exponent of the posit result.
+ * @tparam WS The underlying word type used to store the posit result.
+ */
+template <size_t N, size_t ES, typename WT>
+using posit_result = std::tuple<posit<N, ES, WT>, rounding_event>;
+
+/**
  * @brief Sum of two posits.
  *
  * If either operand is NaR, the result is also NaR. If neither operands are
@@ -934,8 +948,23 @@ template <size_t N, size_t ES, typename WT>
  * indicates whether rounding occurred.
  */
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr std::tuple<posit<N, ES, WT>, rounding_event>
-add(const posit<N, ES, WT>& lhs, const posit<N, ES, WT>& rhs);
+[[nodiscard]] constexpr posit_result<N, ES, WT> add(const posit<N, ES, WT>& lhs,
+                                                    const posit<N, ES, WT>& rhs);
+
+/**
+ * @brief Product of two posits.
+ *
+ * If either operand is NaR, the result is also NaR. If neither operands are
+ * NaR, the result is guaranteed not to be NaR.
+ *
+ * @param lhs First posit to multiply.
+ * @param rhs Second posit to multiply.
+ * @return The product of lhs and rhs. Also returns rounding information to
+ * indicates whether rounding occurred.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit_result<N, ES, WT> mul(const posit<N, ES, WT>& lhs,
+                                                    const posit<N, ES, WT>& rhs);
 
 //
 // Casts for posit Class.

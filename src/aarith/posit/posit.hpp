@@ -593,10 +593,8 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT>
 posit<N, ES, WT>::operator*(const posit<N, ES, WT>& rhs) const
 {
-    const auto lparams = posit_parameters<N, ES, WT>(*this);
-    const auto rparams = posit_parameters<N, ES, WT>(rhs);
-
-    return posit(lparams * rparams);
+    const auto [product, rbit] = mul(*this, rhs);
+    return product;
 }
 
 template <size_t N, size_t ES, typename WT>

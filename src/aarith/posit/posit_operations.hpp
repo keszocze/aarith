@@ -269,14 +269,25 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr std::tuple<posit<N, ES, WT>, rounding_event> add(const posit<N, ES, WT>& lhs,
-                                                                        const posit<N, ES, WT>& rhs)
+[[nodiscard]] constexpr posit_result<N, ES, WT> add(const posit<N, ES, WT>& lhs,
+                                                    const posit<N, ES, WT>& rhs)
 {
     const auto lhs_params = posit_parameters<N, ES, WT>(lhs);
     const auto rhs_params = posit_parameters<N, ES, WT>(rhs);
     const auto sum_params = lhs_params + rhs_params;
 
     return sum_params.to_posit();
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit_result<N, ES, WT> mul(const posit<N, ES, WT>& lhs,
+                                                    const posit<N, ES, WT>& rhs)
+{
+    const auto lhs_params = posit_parameters<N, ES, WT>(lhs);
+    const auto rhs_params = posit_parameters<N, ES, WT>(rhs);
+    const auto prod_params = lhs_params * rhs_params;
+
+    return prod_params.to_posit();
 }
 
 } // namespace aarith
