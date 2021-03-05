@@ -2327,6 +2327,20 @@ public:
     [[nodiscard]] std::string in_tile_notation() const;
 
 protected:
+    struct tile_ref
+    {
+        const posit_type& value;
+        const interval_bound& bound;
+    };
+
+    struct group_result
+    {
+        posit_type product;
+        rounding_event rounding;
+        interval_bound lhs_bound;
+        interval_bound rhs_bound;
+    };
+
     /**
      * @brief Start p of interval {p, q}.
      */
@@ -2353,6 +2367,11 @@ protected:
      * Helper used in valid::in_tile_notation() method.
      */
     [[nodiscard]] static std::string in_tile_notation(const posit_type& p, const interval_bound& u);
+
+    [[nodiscard]] constexpr static group_result tile_mul(const tile_ref& lhs, const tile_ref& rhs);
+
+    [[nodiscard]] const tile_ref start() const;
+    [[nodiscard]] const tile_ref end() const;
 };
 
 //

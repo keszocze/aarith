@@ -729,4 +729,26 @@ template <size_t N, size_t ES, typename WT>
     return ss.str();
 }
 
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr typename valid<N, ES, WT>::group_result
+valid<N, ES, WT>::tile_mul(const valid<N, ES, WT>::tile_ref& lhs,
+                           const valid<N, ES, WT>::tile_ref& rhs)
+{
+    const auto [product, rounding] = mul(lhs.value, rhs.value);
+
+    return group_result{product, rounding, lhs.bound, rhs.bound};
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] const typename valid<N, ES, WT>::tile_ref valid<N, ES, WT>::start() const
+{
+    return {this->start_value, this->start_bound};
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] const typename valid<N, ES, WT>::tile_ref valid<N, ES, WT>::end() const
+{
+    return {this->end_value, this->end_bound};
+}
+
 } // namespace aarith
