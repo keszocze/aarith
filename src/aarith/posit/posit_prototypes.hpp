@@ -2343,12 +2343,17 @@ protected:
         const interval_bound& bound;
     };
 
-    struct group_result
+    class group_result
     {
+    public:
         posit_type product;
         rounding_event rounding;
         interval_bound lhs_bound;
         interval_bound rhs_bound;
+
+        constexpr group_result();
+        constexpr group_result(const posit_type& p, rounding_event r, interval_bound lu,
+                               interval_bound ru);
     };
 
     /**
@@ -2382,6 +2387,11 @@ protected:
 
     [[nodiscard]] const tile_ref start() const;
     [[nodiscard]] const tile_ref end() const;
+
+    [[nodiscard]] static interval_bound merge_bounds_from(const group_result& group);
+    [[nodiscard]] static bool lt_left(const group_result& lhs, const group_result& rhs);
+    [[nodiscard]] static bool lt_right(const group_result& lhs, const group_result& rhs);
+    [[nodiscard]] static bool lt(const group_result& lhs, const group_result& rhs, bool left);
 };
 
 //

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <algorithm>
+#include <array>
 #include <sstream>
 #include <stdexcept>
 #include <string>
@@ -448,7 +450,32 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr valid<N, ES, WT>
 valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
 {
-    throw std::logic_error("not implemented");
+    // We are multiplying v = {a, b} with w = {c, d}.
+
+    const valid& v = *this;
+    const valid& w = other;
+
+    const tile_ref a = v.start();
+    const tile_ref b = v.end();
+
+    const tile_ref c = w.start();
+    const tile_ref d = w.end();
+
+    group_result new_start, new_end;
+
+    {
+        std::array<group_result, 4> choices = {tile_mul(a, c), tile_mul(a, d), tile_mul(b, c),
+                                               tile_mul(b, d)};
+
+        std::sort(choices.begin(), choices.end(), valid::lt_left);
+        new_start = choices.front();
+
+        std::sort(choices.begin(), choices.end(), valid::lt_right);
+        new_end = choices.back();
+    }
+
+    return valid::from(new_start.product, merge_bounds_from(new_start), new_end.product,
+                       merge_bounds_from(new_end));
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -712,6 +739,24 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+constexpr valid<N, ES, WT>::group_result::group_result()
+    : rounding(rounding_event::NOT_ROUNDED)
+    , lhs_bound(interval_bound::OPEN)
+    , rhs_bound(interval_bound::OPEN)
+{
+}
+
+template <size_t N, size_t ES, typename WT>
+constexpr valid<N, ES, WT>::group_result::group_result(const posit<N, ES, WT>& p, rounding_event r,
+                                                       interval_bound lu, interval_bound ru)
+    : product(p)
+    , rounding(r)
+    , lhs_bound(lu)
+    , rhs_bound(ru)
+{
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] std::string valid<N, ES, WT>::in_tile_notation(const posit<N, ES, WT>& p,
                                                              const interval_bound& u)
 {
@@ -735,7 +780,6 @@ valid<N, ES, WT>::tile_mul(const valid<N, ES, WT>::tile_ref& lhs,
                            const valid<N, ES, WT>::tile_ref& rhs)
 {
     const auto [product, rounding] = mul(lhs.value, rhs.value);
-
     return group_result{product, rounding, lhs.bound, rhs.bound};
 }
 
@@ -749,6 +793,66 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] const typename valid<N, ES, WT>::tile_ref valid<N, ES, WT>::end() const
 {
     return {this->end_value, this->end_bound};
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] interval_bound
+valid<N, ES, WT>::merge_bounds_from(const valid<N, ES, WT>::group_result& group)
+{
+    constexpr auto open = interval_bound::OPEN;
+    constexpr auto closed = interval_bound::CLOSED;
+
+    if (is_open(group.lhs_bound) || is_open(group.rhs_bound))
+    {
+        return open;
+    }
+    else
+    {
+        return closed;
+    }
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] bool valid<N, ES, WT>::lt_left(const valid<N, ES, WT>::group_result& lhs,
+                                             const valid<N, ES, WT>::group_result& rhs)
+{
+    return valid::lt(lhs, rhs, true);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] bool valid<N, ES, WT>::lt_right(const valid<N, ES, WT>::group_result& lhs,
+                                              const valid<N, ES, WT>::group_result& rhs)
+{
+    return valid::lt(lhs, rhs, false);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] bool valid<N, ES, WT>::lt(const valid<N, ES, WT>::group_result& lhs,
+                                        const valid<N, ES, WT>::group_result& rhs, bool left)
+{
+    if (lhs.product.is_nar() || rhs.product.is_nar())
+    {
+        return false;
+    }
+
+    if (lhs.product < rhs.product)
+    {
+        return true;
+    }
+
+    const interval_bound lhs_bound = valid::merge_bounds_from(lhs);
+    const interval_bound rhs_bound = valid::merge_bounds_from(rhs);
+
+    if (left)
+    {
+        // [x is less than (x.
+        return is_closed(lhs_bound) && is_open(rhs_bound);
+    }
+    else
+    {
+        // x) is less than x].
+        return is_open(lhs_bound) && is_closed(rhs_bound);
+    }
 }
 
 } // namespace aarith
