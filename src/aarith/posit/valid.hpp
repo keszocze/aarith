@@ -447,24 +447,6 @@ valid<N, ES, WT>::operator-(const valid<N, ES, WT>& other) const
     return *this + (-other);
 }
 
-template <typename T, size_t N> inline void print(const std::array<T, N>& array)
-{
-    std::cerr << "[";
-
-    for (size_t i = 0; i < array.size(); ++i)
-    {
-        const T& elem = array.at(i);
-        std::cerr << elem.product;
-
-        if (i != array.size() - 1)
-        {
-            std::cerr << ", ";
-        }
-    }
-
-    std::cerr << "]" << std::endl;
-}
-
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] /*constexpr*/ valid<N, ES, WT>
 valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
