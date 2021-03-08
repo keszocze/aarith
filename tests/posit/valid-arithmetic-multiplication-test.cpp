@@ -113,6 +113,76 @@ SCENARIO("multiplying arbitrary interval valids")
 
                 REQUIRE(actual == expected);
             }
+
+            {
+                const Valid v = Valid::from(Posit(2), closed, Posit(4), closed);  // [2, 4]
+                const Valid w = Valid::from(Posit(0.25), closed, Posit(0.5), closed);  // [1/4, 1/2]
+
+                const Valid actual = v * w;
+                const Valid expected = Valid::from(Posit(0.5), closed, Posit(2), closed);  // [1/2, 2]
+
+                REQUIRE(actual == expected);
+            }
+
+            {
+                const Valid v = Valid::from(Posit(2), open, Posit(4), closed);  // (2, 4]
+                const Valid w = Valid::from(Posit(0.25), closed, Posit(0.5), closed);  // [1/4, 1/2]
+
+                const Valid actual = v * w;
+                const Valid expected = Valid::from(Posit(0.5), open, Posit(2), closed); // (1/2, 2]
+
+                REQUIRE(actual == expected);
+            }
+
+            {
+                const Valid v = Valid::from(Posit(2), closed, Posit(4), closed);  // [2, 4]
+                const Valid w = Valid::from(Posit(0.25), open, Posit(0.5), closed);  // (1/4, 1/2]
+
+                const Valid actual = v * w;
+                const Valid expected = Valid::from(Posit(0.5), open, Posit(2), closed); // (1/2, 2]
+
+                REQUIRE(actual == expected);
+            }
+
+            {
+                const Valid v = Valid::from(Posit(2), closed, Posit(4), open);  // [2, 4)
+                const Valid w = Valid::from(Posit(0.25), closed, Posit(0.5), closed);  // [1/4, 1/2]
+
+                const Valid actual = v * w;
+                const Valid expected = Valid::from(Posit(0.5), closed, Posit(2), open); // [1/2, 2)
+
+                REQUIRE(actual == expected);
+            }
+
+            {
+                const Valid v = Valid::from(Posit(2), closed, Posit(4), closed);  // [2, 4]
+                const Valid w = Valid::from(Posit(0.25), closed, Posit(0.5), open);  // [1/4, 1/2)
+
+                const Valid actual = v * w;
+                const Valid expected = Valid::from(Posit(0.5), closed, Posit(2), open); // [1/2, 2)
+
+                REQUIRE(actual == expected);
+            }
+
+            {
+                const Valid v = Valid::from(Posit(2), open, Posit(4), open);  // (2, 4)
+                const Valid w = Valid::from(Posit(0.25), closed, Posit(0.5), closed);  // [1/4, 1/2]
+
+                const Valid actual = v * w;
+                const Valid expected = Valid::from(Posit(0.5), open, Posit(2), open); // (1/2, 2)
+
+                REQUIRE(actual == expected);
+            }
+
+            {
+                const Valid v = Valid::from(Posit(2), open, Posit(4), open);  // (2, 4)
+                const Valid w = Valid::from(Posit(0.25), open, Posit(0.5), open);  // (1/4, 1/2)
+
+                const Valid actual = v * w;
+                const Valid expected = Valid::from(Posit(0.5), open, Posit(2), open); // (1/2, 2)
+
+                REQUIRE(actual == expected);
+            }
         }
     }
 
