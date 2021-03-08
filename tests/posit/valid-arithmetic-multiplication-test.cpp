@@ -1,3 +1,5 @@
+#include <algorithm>
+#include <set>
 #include <vector>
 
 #include <catch.hpp>
@@ -105,12 +107,51 @@ SCENARIO("multiplying arbitrary interval valids")
         {
             {
                 const Valid v = Valid::from(Posit(3), closed, Posit(3), closed);  // [3, 3] == 3
-                const Valid w = Valid::from(Posit(3), closed, Posit(3), closed);  // [3, 3] == 3
 
-                const Valid actual = v * w;
+                const Valid actual = v * v;
                 const Valid expected = Valid::from(Posit(8), open, Posit(16), open);  // (8, 16)
 
                 REQUIRE(actual == expected);
+            }
+        }
+    }
+
+    GIVEN("posit exact valids that can be multiplied w/o rounding")
+    {
+        THEN("assert that their product is as expected")
+        {
+            const std::set<double> values51 = {
+                64.0,      16.0,       8.0,       4.0,       3.0,       2.0,        3.0 / 2.0,  1.0,
+                3.0 / 4.0, 1.0 / 2.0,  3.0 / 8.0, 1.0 / 4.0, 1.0 / 8.0, 1.0 / 16.0, 1.0 / 64.0, 0.0,
+                -64.0,     16.0,       8.0,       4.0,       3.0,       2.0,        3.0 / 2.0,  1.0,
+                3.0 / 4.0, -1.0 / 2.0, 3.0 / 8.0, 1.0 / 4.0, 1.0 / 8.0, 1.0 / 16.0, 1.0 / -64.0};
+
+            const auto type51_has_value = [&](double x) -> bool {
+                return std::find(values51.begin(), values51.end(), x) != values51.end();
+            };
+
+            for (const double v_value : values51)
+            {
+                for (const double w_value : values51)
+                {
+                    const double expected = v_value * w_value;
+
+                    if (!type51_has_value(expected))
+                    {
+                        // We cannot represent the product of v and w exactly,
+                        // so don't even bother trying.
+                        continue;
+                    }
+
+                    const Valid v = Valid(Posit(v_value));
+                    const Valid w = Valid(Posit(w_value));
+                    const Valid product = v * w;
+
+                    REQUIRE(product.is_exact());
+
+                    const double actual = static_cast<double>(product.as_exact());
+                    REQUIRE(actual == expected);
+                }
             }
         }
     }
