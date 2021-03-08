@@ -451,12 +451,9 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] /*constexpr*/ valid<N, ES, WT>
 valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
 {
-    [[maybe_unused]] constexpr auto open = interval_bound::OPEN;
-    [[maybe_unused]] constexpr auto closed = interval_bound::CLOSED;
-
+    constexpr auto open = interval_bound::OPEN;
     constexpr auto not_rounded = rounding_event::NOT_ROUNDED;
     constexpr auto rounded_down = rounding_event::ROUNDED_DOWN;
-    constexpr auto rounded_up = rounding_event::ROUNDED_UP;
 
     // We are multiplying v = {a, b} with w = {c, d}.
 
