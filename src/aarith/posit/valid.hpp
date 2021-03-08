@@ -468,21 +468,48 @@ valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
 
     if (this->is_nar() || other.is_nar())
     {
+        // If any of the two operands indicates error, that is the sign to
+        // stop the computation as the algorithm is faulty.
+
         return nar();
     }
 
     if (this->is_empty() || other.is_empty())
     {
+        // Multiplying nothing with something is still nothing. I think.
+
         return empty();
     }
 
     if (this->is_full() || other.is_full())
     {
+        // The full set is weird because it's actually the union of all the
+        // reals with special error state NaR. The only reasonable answer we
+        // can make if any of the operators is the full set is again the full
+        // set.
+        //
+        // N.B.: We do know that if one operand is zero and the other operand
+        // is the full set, the result is only either 0 or NaR. But we cannot
+        // represent the set {NaR, 0}; the closest thing we have is the full
+        // set.
+
         return full();
+    }
+
+    if (this->is_zero() || other.is_zero())
+    {
+        // Multiplying any real with zero results in zero. The encoding of all
+        // reals requires this special case.
+
+        return zero();
     }
 
     if (this->is_all_reals() || other.is_all_reals())
     {
+        // Multiplying any arbitrary real with something could result in any
+        // real on the number line. The encoding of all reals requires this
+        // special case.
+
         return all_reals();
     }
 
