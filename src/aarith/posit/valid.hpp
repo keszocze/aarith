@@ -451,6 +451,13 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] /*constexpr*/ valid<N, ES, WT>
 valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
 {
+    [[maybe_unused]] constexpr auto open = interval_bound::OPEN;
+    [[maybe_unused]] constexpr auto closed = interval_bound::CLOSED;
+
+    constexpr auto not_rounded = rounding_event::NOT_ROUNDED;
+    constexpr auto rounded_down = rounding_event::ROUNDED_DOWN;
+    constexpr auto rounded_up = rounding_event::ROUNDED_UP;
+
     // We are multiplying v = {a, b} with w = {c, d}.
 
     const valid& v = *this;
@@ -520,17 +527,53 @@ valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
 
     valid product;
 
+    std::array<group_result, 4> choices = {tile_mul(a, c), tile_mul(a, d), tile_mul(b, c),
+                                           tile_mul(b, d)};
+
     {
-        std::array<group_result, 4> choices = {tile_mul(a, c), tile_mul(a, d), tile_mul(b, c),
-                                               tile_mul(b, d)};
-
         std::sort(choices.begin(), choices.end(), valid::lt_left);
-        product.start_value = choices.front().product;
-        product.start_bound = merge_bounds_from(choices.front());
+        const group_result& start = choices.front();
 
+        if (start.rounding == rounded_down)
+        {
+            product.start_value = start.product;
+            product.start_bound = open;
+        }
+        else if (start.rounding == not_rounded)
+        {
+            product.start_value = start.product;
+            product.start_bound = merge_bounds_from(start);
+        }
+        else
+        {
+            assert(start.rounding == rounded_up);
+
+            product.start_value = start.product.decremented();
+            product.start_bound = open;
+        }
+    }
+
+    {
         std::sort(choices.begin(), choices.end(), valid::lt_right);
-        product.end_value = choices.back().product;
-        product.end_bound = merge_bounds_from(choices.back());
+        const group_result& end = choices.back();
+
+        if (end.rounding == rounded_down)
+        {
+            product.end_value = end.product.incremented();
+            product.end_bound = open;
+        }
+        else if (end.rounding == not_rounded)
+        {
+            product.end_value = end.product;
+            product.end_bound = merge_bounds_from(end);
+        }
+        else
+        {
+            assert(end.rounding == rounded_up);
+
+            product.end_value = end.product;
+            product.end_bound = open;
+        }
     }
 
     return product;

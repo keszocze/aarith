@@ -88,3 +88,30 @@ TEMPLATE_TEST_CASE_SIG("multiplying zero works as expected (random)", "[valid][p
         }
     }
 }
+
+SCENARIO("multiplying arbitrary interval valids")
+{
+    using namespace aarith;
+
+    using Posit = posit<5, 1>;
+    using Valid = valid<5, 1>;
+
+    GIVEN("arbitrary valids")
+    {
+        constexpr auto open = interval_bound::OPEN;
+        constexpr auto closed = interval_bound::CLOSED;
+
+        THEN("assert that their product is as expected")
+        {
+            {
+                const Valid v = Valid::from(Posit(3), closed, Posit(3), closed);  // [3, 3] == 3
+                const Valid w = Valid::from(Posit(3), closed, Posit(3), closed);  // [3, 3] == 3
+
+                const Valid actual = v * w;
+                const Valid expected = Valid::from(Posit(8), open, Posit(16), open);  // (8, 16)
+
+                REQUIRE(actual == expected);
+            }
+        }
+    }
+}
