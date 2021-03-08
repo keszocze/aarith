@@ -247,10 +247,11 @@ public:
             }
             // the other special case is for zero and denormalized numbers: the exponent has to
             // remain zeroes only as well
-            else if (extracted_exp == E_::all_zeroes())
-            {
-                exponent = uinteger<E>::all_zeroes();
-            }
+            //else if (extracted_exp == E_::all_zeroes())
+            //{
+            //    //then F is denormalized, but may be normalized in a bigger format
+            //    exponent = sub(uinteger<E>::all_zeroes();
+            //}
             else
             {
                 // no special case left -> we can adjust the exponent
@@ -258,6 +259,24 @@ public:
                     uinteger<ext_exp_width - 1, WordType>::all_ones();
                 constexpr IntegerExp diff = sub(bias, smaller_bias);
                 exponent = add(IntegerExp{extracted_exp}, diff);
+                
+                if (extracted_exp == E_::all_zeroes())
+                {
+                    const auto one_at = first_set_bit(mantissa);
+                    auto shift_by = M - *one_at;
+                    if (exponent <= uinteger<sizeof(decltype(shift_by))*8>(shift_by))
+                    {
+                        // shift_by -= 1;
+                        mantissa = (mantissa << (exponent.word(0) - 1));
+                        exponent = exponent.all_zeroes();
+                    }
+                    else
+                    {
+                        mantissa = (mantissa << shift_by);
+                        exponent = sub(exponent, uinteger<E, WordType>(shift_by-1));
+                    }
+                
+                }
             }
         }
         else if (ext_exp_width > E)
