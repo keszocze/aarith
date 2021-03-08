@@ -634,16 +634,16 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool valid<N, ES, WT>::is_exact() const
+{
+    const auto closed = interval_bound::CLOSED;
+    return start_bound == closed && end_bound == closed && start_value == end_value;
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool valid<N, ES, WT>::is_exact_real() const
 {
-    if (this->is_nar())
-    {
-        return false;
-    }
-
-    const auto closed = interval_bound::CLOSED;
-
-    return start_bound == closed && end_bound == closed && start_value == end_value;
+    return !this->is_nar() && this->is_exact();
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -807,11 +807,22 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> valid<N, ES, WT>::as_exact() const
+{
+    if (!this->is_exact())
+    {
+        throw std::logic_error("valid::as_exact called on valid that is not an exact posit");
+    }
+
+    return start_value;
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> valid<N, ES, WT>::as_exact_real() const
 {
     if (!this->is_exact_real())
     {
-        throw std::logic_error("valid::exact_real called on valid that is not an exact real");
+        throw std::logic_error("valid::as_exact_real called on valid that is not an exact real");
     }
 
     return start_value;

@@ -2240,6 +2240,11 @@ public:
     /**
      * @return Whether this valid represents a posit exactly.
      */
+    [[nodiscard]] constexpr bool is_exact() const;
+
+    /**
+     * @return Whether this valid represents a real value exactly.
+     */
     [[nodiscard]] constexpr bool is_exact_real() const;
 
     /**
@@ -2301,8 +2306,21 @@ public:
     /**
      * @brief Return exact posit value.
      *
-     * If this valid represents some real exactly, this method returns p.  If
-     * this valid does not represent a real exactly, this method throws an
+     * If this valid represents some posit p exactly, this method returns p.
+     * If this valid does not represent a posit exactly, this method throws an
+     * exception. You should probably use is_exact() before calling this
+     * method to ensure this is the case.
+     *
+     * @return The posit real value this valid represents exactly.
+     * @throws std::logic_error If this valid does not represent a posit exactly.
+     */
+    [[nodiscard]] constexpr posit_type as_exact() const;
+
+    /**
+     * @brief Return exact real value.
+     *
+     * If this valid represents some real p exactly, this method returns p.
+     * If this valid does not represent a real exactly, this method throws an
      * exception. You should probably use is_exact_real() before calling this
      * method to ensure this is the case.
      *
