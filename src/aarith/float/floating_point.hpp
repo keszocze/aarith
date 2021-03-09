@@ -45,15 +45,15 @@ template <typename WordType = uint64_t> using tensorfloat32 = floating_point<8, 
  * @tparam MS The target width of the mantissa
  * @return The mantissa expended to a width of MS
  */
-template <size_t MS, size_t E, size_t M, typename WordType>
-[[nodiscard]] uinteger<MS, WordType> constexpr expand_full_mantissa(
-    const floating_point<E, M, WordType>& f)
-{
-    static_assert(MS >= M + 1, "Expanded mantissa must not be shorter than the original mantissa");
-    uinteger<MS, WordType> mantissa_{f.get_full_mantissa()};
-    mantissa_ <<= (size_t{MS} - size_t{M + 1});
-    return mantissa_;
-}
+//template <size_t MS, size_t E, size_t M, typename WordType>
+//[[nodiscard]] uinteger<MS, WordType> constexpr expand_full_mantissa(
+//    const floating_point<E, M, WordType>& f)
+//{
+//    static_assert(MS >= M + 1, "Expanded mantissa must not be shorter than the original mantissa");
+//    uinteger<MS, WordType> mantissa_{f.get_full_mantissa()};
+//    mantissa_ <<= (size_t{MS} - size_t{M + 1});
+//    return mantissa_;
+//}
 
 /**
  * @brief Expands the exponent respecting the bias of the target width
@@ -199,10 +199,7 @@ public:
 
     template <size_t E_, size_t M_>
     explicit floating_point(const floating_point<E_, M_, WordType> f)
-        : sign_neg(f.is_negative())
-        , exponent(expand_exponent<E>(f))
-        , mantissa(expand_full_mantissa<MW>(f))
-
+        : floating_point(as_word_array<E,M>(f))
     {
         static_assert(E_ <= E, "Exponent too long");
         static_assert(M_ <= M, "Mantissa too long");
