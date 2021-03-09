@@ -28,15 +28,15 @@ template <typename WordType = uint64_t> using tensorfloat32 = floating_point<8, 
  * @tparam MS The target width of the mantissa
  * @return The mantissa expended to a width of MS
  */
-template <size_t MS, size_t E, size_t M, typename WordType>
-[[nodiscard]] uinteger<MS, WordType> constexpr expand_mantissa(
-    const floating_point<E, M, WordType>& f)
-{
-    static_assert(MS >= M, "Expanded mantissa must not be shorter than the original mantissa");
-    uinteger<MS, WordType> mantissa_{f.get_mantissa()};
-    mantissa_ <<= (size_t{MS} - size_t{M});
-    return mantissa_;
-}
+// template <size_t MS, size_t E, size_t M, typename WordType>
+//[[nodiscard]] uinteger<MS, WordType> constexpr expand_mantissa(
+//    const floating_point<E, M, WordType>& f)
+//{
+//    static_assert(MS >= M, "Expanded mantissa must not be shorter than the original mantissa");
+//    uinteger<MS, WordType> mantissa_{f.get_mantissa()};
+//    mantissa_ <<= (size_t{MS} - size_t{M});
+//    return mantissa_;
+//}
 
 /**
  * @brief Expands the full mantissa (i.e. the significand) by correctly shifting the bits in the
