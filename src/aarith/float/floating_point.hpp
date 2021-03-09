@@ -85,7 +85,6 @@ width_cast(const floating_point<E, M, WordType>& f)
 
     if (f.is_denormalized())
     {
-        // TODO This is currently not working
         //############### Expand the mantissa
         auto new_mantissa = f.get_mantissa();
         size_t shift_amount = count_leading_zeroes(new_mantissa) + 1;
@@ -108,13 +107,13 @@ width_cast(const floating_point<E, M, WordType>& f)
         //############### Expand the mantissa
         if constexpr (M == MT)
         {
-            mantissa_ = f.get_full_mantissa();
+            mantissa_ = f.get_mantissa();
         }
         else
         {
 
-            mantissa_ = f.get_full_mantissa(); // TODO why include the hidden bit?
-            mantissa_ <<= (size_t{MT} - size_t{M + 1});
+            mantissa_ = f.get_mantissa();
+            mantissa_ <<= (size_t{MT} - size_t{M});
         }
 
         //############### Expand the exponent
