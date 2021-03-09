@@ -214,6 +214,7 @@ public:
         }
 
         using E_ = decltype(extracted_exp);
+        using M_ = decltype(extracted_mantissa);
 
         sign_neg = std::signbit(f);
 
@@ -258,24 +259,34 @@ public:
                 constexpr IntegerExp smaller_bias =
                     uinteger<ext_exp_width - 1, WordType>::all_ones();
                 constexpr IntegerExp diff = sub(bias, smaller_bias);
-                exponent = add(IntegerExp{extracted_exp}, diff);
                 
-                if (extracted_exp == E_::all_zeroes())
+                if (extracted_exp == E_::all_zeroes() && extracted_mantissa != M_::all_zeroes())
                 {
                     const auto one_at = first_set_bit(mantissa);
-                    auto shift_by = M - *one_at;
-                    if (exponent <= uinteger<sizeof(decltype(shift_by))*8>(shift_by))
+                    if(one_at)
                     {
-                        // shift_by -= 1;
-                        mantissa = (mantissa << (exponent.word(0) - 1));
-                        exponent = exponent.all_zeroes();
+                        exponent = add(IntegerExp{extracted_exp}, diff);
+                        auto shift_by = M - *one_at;
+                        if (exponent <= uinteger<sizeof(decltype(shift_by))*8>(shift_by))
+                        {
+                            // shift_by -= 1;
+                            mantissa = (mantissa << (exponent.word(0) - 1));
+                            exponent = exponent.all_zeroes();
+                        }
+                        else
+                        {
+                            mantissa = (mantissa << shift_by);
+                            exponent = sub(exponent, uinteger<E, WordType>(shift_by-1));
+                        }
                     }
                     else
                     {
-                        mantissa = (mantissa << shift_by);
-                        exponent = sub(exponent, uinteger<E, WordType>(shift_by-1));
+                        exponent = exponent.all_zeroes();
                     }
-                
+                }
+                else
+                {
+                    exponent = add(IntegerExp{extracted_exp}, diff);
                 }
             }
         }
