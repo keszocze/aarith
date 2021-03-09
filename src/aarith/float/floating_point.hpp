@@ -45,14 +45,13 @@ template <typename WordType = uint64_t> using tensorfloat32 = floating_point<8, 
  * @tparam MS The target width of the mantissa
  * @return The mantissa expended to a width of MS
  */
-//template <size_t MS, size_t E, size_t M, typename WordType>
+// template <size_t MS, size_t E, size_t M, typename WordType>
 //[[nodiscard]] uinteger<MS, WordType> constexpr expand_full_mantissa(
 //    const floating_point<E, M, WordType>& f)
 //{
-//    static_assert(MS >= M + 1, "Expanded mantissa must not be shorter than the original mantissa");
-//    uinteger<MS, WordType> mantissa_{f.get_full_mantissa()};
-//    mantissa_ <<= (size_t{MS} - size_t{M + 1});
-//    return mantissa_;
+//    static_assert(MS >= M + 1, "Expanded mantissa must not be shorter than the original
+//    mantissa"); uinteger<MS, WordType> mantissa_{f.get_full_mantissa()}; mantissa_ <<= (size_t{MS}
+//    - size_t{M + 1}); return mantissa_;
 //}
 
 /**
@@ -60,35 +59,35 @@ template <typename WordType = uint64_t> using tensorfloat32 = floating_point<8, 
  * @tparam ES The target width of the exponent
  * @return The exponent expanded to a width of ES
  */
-template <size_t ES, size_t E, size_t M, typename WordType>
-[[nodiscard]] uinteger<ES, WordType> expand_exponent(const floating_point<E, M, WordType>& f)
-{
-    static_assert(ES >= E, "Expanded exponent must not be shorter than the original exponent");
-
-    using exp_type = uinteger<ES, WordType>;
-
-    if (f.is_zero())
-    {
-        return exp_type::zero();
-    }
-
-    if (f.get_exponent() == uinteger<E, WordType>::all_ones())
-    {
-        return exp_type::all_ones();
-    }
-    else
-    {
-        using IntegerUnbiasedExp = integer<ES + 1, WordType>;
-        IntegerUnbiasedExp exp_f = f.unbiased_exponent();
-
-        const IntegerUnbiasedExp out_bias = floating_point<ES, M, WordType>::bias;
-
-        IntegerUnbiasedExp exponent_ = exp_f + out_bias;
-        exp_type resulting_exponent(width_cast<ES>(exponent_));
-
-        return resulting_exponent;
-    }
-}
+//template <size_t ES, size_t E, size_t M, typename WordType>
+//[[nodiscard]] uinteger<ES, WordType> expand_exponent(const floating_point<E, M, WordType>& f)
+//{
+//    static_assert(ES >= E, "Expanded exponent must not be shorter than the original exponent");
+//
+//    using exp_type = uinteger<ES, WordType>;
+//
+//    if (f.is_zero())
+//    {
+//        return exp_type::zero();
+//    }
+//
+//    if (f.get_exponent() == uinteger<E, WordType>::all_ones())
+//    {
+//        return exp_type::all_ones();
+//    }
+//    else
+//    {
+//        using IntegerUnbiasedExp = integer<ES + 1, WordType>;
+//        IntegerUnbiasedExp exp_f = f.unbiased_exponent();
+//
+//        const IntegerUnbiasedExp out_bias = floating_point<ES, M, WordType>::bias;
+//
+//        IntegerUnbiasedExp exponent_ = exp_f + out_bias;
+//        exp_type resulting_exponent(width_cast<ES>(exponent_));
+//
+//        return resulting_exponent;
+//    }
+//}
 
 /**
  * @brief Creates a bitstring representation of the floating point number.
@@ -109,18 +108,65 @@ as_word_array(const floating_point<E, M, WordType>& f)
     static_assert(ES >= E);
     static_assert(MS >= M);
 
+    using m_type = uinteger<MS, WordType>;
+    using e_type = uinteger<ES, WordType>;
+
     std::cout << ES << " " << E << " " << MS << " " << M << "\n";
 
-    auto mantissa_ = expand_mantissa<MS, E, M, WordType>(f);
-    std::cout << to_binary(mantissa_) << "\n";
-    auto exponent_ = expand_exponent<ES>(f);
-    std::cout << f.get_exponent() << " " << to_binary(exponent_) << " " << exponent_ << " "
-              << "\n";
+    if (f.is_denormalized())
+    {
+        //############### Expand the mantissa
+        // TODO FIX IT!
+        m_type mantissa_{f.get_full_mantissa()};
+        mantissa_ <<= (size_t{MS} - size_t{M + 1});
 
-    auto joined = concat(exponent_, mantissa_);
-    auto with_sign = concat(word_array<1, WordType>{f.get_sign()}, joined);
+        using IntegerUnbiasedExp = integer<ES + 1, WordType>;
+        IntegerUnbiasedExp exp_f = f.unbiased_exponent();
 
-    return with_sign;
+        const IntegerUnbiasedExp out_bias = floating_point<ES, M, WordType>::bias;
+        IntegerUnbiasedExp biased_exp = exp_f + out_bias;
+        e_type exponent_(width_cast<ES>(biased_exp));
+
+        // merge the rest
+        word_array<ES + MS> joined = concat(exponent_, mantissa_);
+        word_array<1 + ES + MS> with_sign = concat(word_array<1, WordType>{f.get_sign()}, joined);
+
+        return with_sign;
+    }
+    else
+    {
+
+        //############### Expand the mantissa
+        m_type mantissa_{f.get_full_mantissa()};
+        mantissa_ <<= (size_t{MS} - size_t{M + 1});
+
+        //############### Expand the exponent
+
+        e_type exponent_;
+
+        if (f.is_zero())
+        {
+            exponent_ = e_type::zero();
+        }
+
+        if (f.get_exponent() == uinteger<E, WordType>::all_ones())
+        {
+            exponent_ = e_type::all_ones();
+        }
+        else
+        {
+            const e_type in_bias{f.bias};
+            const auto out_bias = floating_point<ES, M, WordType>::bias;
+            auto bias_difference = sub(out_bias, in_bias);
+            exponent_ = add(e_type(f.get_exponent()), bias_difference);
+        }
+
+        // merge the rest
+        auto joined = concat(exponent_, mantissa_);
+        auto with_sign = concat(word_array<1, WordType>{f.get_sign()}, joined);
+
+        return with_sign;
+    }
 }
 
 template <size_t E, size_t M, typename WordType> class floating_point
@@ -199,7 +245,7 @@ public:
 
     template <size_t E_, size_t M_>
     explicit floating_point(const floating_point<E_, M_, WordType> f)
-        : floating_point(as_word_array<E,M>(f))
+        : floating_point(as_word_array<E, M>(f))
     {
         static_assert(E_ <= E, "Exponent too long");
         static_assert(M_ <= M, "Mantissa too long");
