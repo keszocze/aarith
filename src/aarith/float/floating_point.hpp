@@ -3,26 +3,56 @@
 #include <aarith/core.hpp>
 #include <aarith/float/float_utils.hpp>
 #include <aarith/integer_no_operators.hpp>
-#include <assert.h>
 #include <bitset>
+#include <cassert>
 #include <cstdint>
 #include <iostream>
 #include <string>
-#include <time.h>
 #include <type_traits>
 
 namespace aarith {
 
-template <size_t E, size_t M, typename WordType = uint64_t> class floating_point;
+template <size_t E, size_t M, typename WordType = uint64_t> class floating_point; // NOLINT
 
-template <typename WordType = uint64_t> using half_precision = floating_point<5, 10, WordType>;
-template <typename WordType = uint64_t> using single_precision = floating_point<8, 23, WordType>;
-template <typename WordType = uint64_t> using double_precison = floating_point<11, 52, WordType>;
 template <typename WordType = uint64_t>
-using quadruple_precision = floating_point<15, 112, WordType>;
-template <typename WordType = uint64_t> using bfloat16 = floating_point<8, 7, WordType>;
-template <typename WordType = uint64_t> using tensorfloat32 = floating_point<8, 10, WordType>;
+using half_precision = floating_point<5, 10, WordType>; // NOLINT
 
+template <typename WordType = uint64_t>
+using single_precision = floating_point<8, 23, WordType>; // NOLINT
+
+template <typename WordType = uint64_t>
+using double_precison = floating_point<11, 52, WordType>; // NOLINT
+
+template <typename WordType = uint64_t>
+using quadruple_precision = floating_point<15, 112, WordType>; // NOLINT
+
+template <typename WordType = uint64_t> using bfloat16 = floating_point<8, 7, WordType>; // NOLINT
+
+template <typename WordType = uint64_t>
+using tensorfloat32 = floating_point<8, 10, WordType>; // NOLINT
+
+/**
+ * @brief Creates a bitstring representation of the floating point number.
+ *
+ * You can use this method to create valid IEEE 754 bitstrings.
+ *
+ * @tparam E The bit-width of the input's exponent
+ * @tparam M The bit-width of the input's mantissa
+ * @tparam WordType The word type used to store the actual data
+ * @param f The floating-point numbers whose bitstring is to be created
+ * @return IEEE-754 bitstring representation of the floating point number
+ */
+template <size_t E, size_t M, typename WordType>
+[[nodiscard]] word_array<1 + E + M, WordType> as_word_array(const floating_point<E, M, WordType>& f)
+{
+    word_array<E + M> exp_mantissa = concat(f.get_exponent(), f.get_mantissa());
+    //    std::cout << "as_array: " << to_binary(f.get_exponent()) << "\t" <<
+    //    to_binary(f.get_mantissa())
+    //              << "\t" << to_binary(exp_mantissa) << "\n";
+    auto full_float = concat(word_array<1, WordType>{f.get_sign()}, exp_mantissa);
+    //    std::cout << "full_float " << to_binary(full_float) << "\n";
+    return full_float;
+}
 
 /**
  * @brief Creates a bitstring representation of the floating point number.
@@ -30,90 +60,92 @@ template <typename WordType = uint64_t> using tensorfloat32 = floating_point<8, 
  * The bitstring returned may use more bits for the exponent/mantissa than the floating point
  * number it was created from. You can use this method to create valid IEEE 754 bitstrings.
  *
- * @tparam ES The number of bits to use for the exponent
- * @tparam MS The number of bits to use for the mantissa
- * @return IEEE-754 bitstring representation of the floating point number
+ * @tparam ET The target bit-width for the exponent
+ * @tparam MT The target bit-width for the mantissa
+ * @tparam E The bit-width of the input's exponent
+ * @tparam M The bit-width of the input's mantissa
+ * @tparam WordType
+ * @param f
+ * @return
  */
-template <size_t ES, size_t MS, size_t E, size_t M, typename WordType>
-[[nodiscard]] word_array<1 + ES + MS, WordType>
-as_word_array(const floating_point<E, M, WordType>& f)
+template <size_t ET, size_t MT, size_t E, size_t M, typename WordType>
+[[nodiscard]] constexpr floating_point<ET, MT, WordType>
+width_cast(const floating_point<E, M, WordType>& f)
 {
-    using namespace aarith;
+    using R = floating_point<ET, MT, WordType>;
 
-    static_assert(ES >= E);
-    static_assert(MS >= M);
+    static_assert(ET >= E);
+    static_assert(MT >= M);
 
-    using m_type = uinteger<MS, WordType>;
-    using e_type = uinteger<ES, WordType>;
+    using m_type = uinteger<MT, WordType>;
+    using e_type = uinteger<ET, WordType>;
 
-    std::cout << ES << " " << E << " " << MS << " " << M << "\n";
+    m_type mantissa_;
+    e_type exponent_;
 
     if (f.is_denormalized())
     {
         // TODO This is currently not working
         //############### Expand the mantissa
+        auto new_mantissa = f.get_mantissa();
+        size_t shift_amount = count_leading_zeroes(new_mantissa) + 1;
+        new_mantissa = (new_mantissa << shift_amount);
 
-        auto mantissa_ = f.get_mantissa();
-        std::cout << "pre extend mantissa " << to_binary(mantissa_);
-        size_t shift_amount = count_leading_zeroes(mantissa_)+1;
-        mantissa_ = (mantissa_ << shift_amount);
-        std::cout << " shifted mantissa " << to_binary(mantissa_) << "(shift amount "<< shift_amount << ")\n";
+        mantissa_ = m_type{new_mantissa};
+        mantissa_ <<= (size_t{MT} - size_t{M + 1});
 
-        m_type new_mantissa{mantissa_};
-        new_mantissa <<= (size_t{MS} - size_t{M+1});
-
-
-        using IntegerUnbiasedExp = integer<ES + 1, WordType>;
+        using IntegerUnbiasedExp = integer<ET + 1, WordType>;
         IntegerUnbiasedExp exp_f = f.unbiased_exponent();
-        std::cout << "initial exp " << exp_f;
         exp_f = exp_f - IntegerUnbiasedExp{shift_amount};
-        std::cout << " new one " << exp_f << "\n";
 
-        const IntegerUnbiasedExp out_bias = floating_point<ES, M, WordType>::bias;
+        const IntegerUnbiasedExp out_bias = floating_point<ET, M, WordType>::bias;
         IntegerUnbiasedExp biased_exp = exp_f + out_bias;
-        e_type exponent_(width_cast<ES>(biased_exp));
-
-        // merge the rest
-        word_array<ES + MS> joined = concat(exponent_, new_mantissa);
-        std::cout << "joined " << to_binary(joined) << "\n";
-        word_array<1 + ES + MS> with_sign = concat(word_array<1, WordType>{f.get_sign()}, joined);
-
-        return with_sign;
+        exponent_ = width_cast<ET>(biased_exp);
     }
     else
     {
 
         //############### Expand the mantissa
-        m_type mantissa_{f.get_full_mantissa()}; // TODO why include the hidden bit?
-        mantissa_ <<= (size_t{MS} - size_t{M + 1});
-
-        //############### Expand the exponent
-
-        e_type exponent_;
-
-        if (f.is_zero())
+        if constexpr (M == MT)
         {
-            exponent_ = e_type::zero();
-        }
-
-        if (f.get_exponent() == uinteger<E, WordType>::all_ones())
-        {
-            exponent_ = e_type::all_ones();
+            mantissa_ = f.get_full_mantissa();
         }
         else
         {
-            const e_type in_bias{f.bias};
-            const auto out_bias = floating_point<ES, M, WordType>::bias;
-            auto bias_difference = sub(out_bias, in_bias);
-            exponent_ = add(e_type(f.get_exponent()), bias_difference);
+
+            mantissa_ = f.get_full_mantissa(); // TODO why include the hidden bit?
+            mantissa_ <<= (size_t{MT} - size_t{M + 1});
         }
 
-        // merge the rest
-        auto joined = concat(exponent_, mantissa_);
-        auto with_sign = concat(word_array<1, WordType>{f.get_sign()}, joined);
-
-        return with_sign;
+        //############### Expand the exponent
+        if constexpr (E == ET)
+        {
+            exponent_ = f.get_exponent();
+        }
+        else
+        {
+            if (f.is_zero())
+            {
+                exponent_ = e_type::zero();
+            }
+            else if (f.get_exponent() == uinteger<E, WordType>::all_ones())
+            {
+                exponent_ = e_type::all_ones();
+            }
+            else
+            {
+                const e_type in_bias{f.bias};
+                const auto out_bias = floating_point<ET, M, WordType>::bias;
+                auto bias_difference = sub(out_bias, in_bias);
+                exponent_ = add(e_type(f.get_exponent()), bias_difference);
+            }
+        }
     }
+    auto exp_mantissa = concat(exponent_, mantissa_);
+    auto full_bitstring = concat(uinteger<1, WordType>{f.is_negative()}, exp_mantissa);
+
+    R res(full_bitstring);
+    return res;
 }
 
 template <size_t E, size_t M, typename WordType> class floating_point
@@ -192,8 +224,17 @@ public:
 
     template <size_t E_, size_t M_>
     explicit floating_point(const floating_point<E_, M_, WordType> f)
-        : floating_point(as_word_array<E, M>(f))
     {
+        auto tmp = width_cast<E, M, E_, M_, WordType>(f);
+        sign_neg = tmp.is_negative();
+        exponent = tmp.get_exponent();
+        mantissa = tmp.get_full_mantissa();
+
+        std::cout << "creating new float (" << sign_neg << ", " << to_binary(exponent) << ", "
+                  << to_binary(mantissa) << ")\n";
+        std::cout << "from float (" << tmp.is_negative() << ", " << to_binary(f.get_exponent())
+                  << ", " << to_binary(f.get_full_mantissa()) << ")\n";
+
         static_assert(E_ <= E, "Exponent too long");
         static_assert(M_ <= M, "Mantissa too long");
     }
@@ -702,7 +743,8 @@ public:
     {
         const bool denormalized = (exponent == IntegerExp::all_zeroes());
         const bool exception = (exponent == IntegerExp::all_ones());
-        const bool result = denormalized && !exception;
+        const bool rest_is_null = (mantissa == IntegerMant::all_zeroes());
+        const bool result = denormalized && !exception && !rest_is_null;
         return result;
     }
 
@@ -793,8 +835,9 @@ private:
         static_assert(E <= exp_width, "Exponent width too large");
         static_assert(M <= mant_width, "Mantissa width too large");
 
-        uinteger<1 + exp_width + mant_width, WordType> array{
-            as_word_array<exp_width, mant_width>(*this)};
+        auto resized = width_cast<exp_width, mant_width, E, M, WordType>(*this);
+        auto as_array = as_word_array(resized);
+        uinteger<1 + exp_width + mant_width, WordType> array{as_array};
 
         uint_storage bitstring = static_cast<uint_storage>(array);
         To result = bit_cast<To>(bitstring);

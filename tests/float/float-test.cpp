@@ -15,7 +15,7 @@ auto full_native_range()
 }
 
 TEMPLATE_TEST_CASE_SIG("Constructing larger normalized floats from smaller ones",
-                       "[floating_point][casting][constructor]",
+                       "[floating_point][casting][constructor][foo]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, float), (11, 52, double))
 {
@@ -41,6 +41,7 @@ TEMPLATE_TEST_CASE_SIG("Constructing larger normalized floats from smaller ones"
 
                 THEN("The value should not have changed")
                 {
+                    CAPTURE(f,to_binary(f), g, to_binary(g), h, to_binary(h),j, to_binary(j));
                     CHECK(f == g);
                     CHECK(f == h);
                     CHECK(g == f);
@@ -81,7 +82,7 @@ TEMPLATE_TEST_CASE_SIG("Creating constant values is a constexpr",
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("Width-casting special values into larger normalized floats",
+TEMPLATE_TEST_CASE_SIG("Width-casting special values into larger floats",
                        "[floating_point][casting][constructor]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, float), (11, 52, double))
@@ -140,6 +141,9 @@ TEMPLATE_TEST_CASE_SIG("Width-casting special values into larger normalized floa
 
                 THEN("It should still be NaN")
                 {
+
+                    CAPTURE(nan, g, h, j);
+
                     CHECK(nan.is_nan());
                     CHECK(g.is_nan());
                     CHECK(h.is_nan());

@@ -94,7 +94,7 @@ template <size_t E, size_t M, size_t E_, size_t M_,
 bool constexpr logical_equality(const floating_point<E, M> lhs, const floating_point<E_, M_> rhs)
 {
 
-    bool equal_mantissa = false;
+    bool equal_mantissa = false; // NO-LINT
 
     if constexpr (M > M_)
     {
@@ -108,13 +108,17 @@ bool constexpr logical_equality(const floating_point<E, M> lhs, const floating_p
     {
         const auto val = bit_range<M_, M_ - M>(rhs.get_full_mantissa());
         const auto zero = bit_range<(M_ - M) - 1, 0>(rhs.get_full_mantissa());
+        std::cout << to_binary(val) << "\tzero: " << to_binary(zero) << "\n";
+        std::cout << to_binary(lhs.get_full_mantissa()) << "\n";
+        std::cout << to_binary(rhs.get_full_mantissa()) << "\n";
+        std::cout << to_binary(val) << to_binary(zero) <<"\n";
         equal_mantissa = (zero == zero.all_zeroes()) && (val == lhs.get_full_mantissa());
     }
 
     const bool equal_sign = (lhs.get_sign() == rhs.get_sign());
 
     const bool equal_exponent = (lhs.unbiased_exponent() == rhs.unbiased_exponent());
-    //    std::cout << equal_sign << "\t" << equal_exponent << "\t" << equal_mantissa << "\n";
+    std::cout << equal_sign << "\t" << equal_exponent << "\t" << equal_mantissa << "\n";
     return equal_sign && equal_exponent && equal_mantissa;
 }
 
