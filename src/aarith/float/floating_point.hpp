@@ -119,20 +119,28 @@ as_word_array(const floating_point<E, M, WordType>& f)
         //############### Expand the mantissa
 
         auto mantissa_ = f.get_mantissa();
+        std::cout << "pre extend mantissa " << to_binary(mantissa_);
         size_t shift_amount = count_leading_zeroes(mantissa_)+1;
-        mantissa_ <<= shift_amount;
+        mantissa_ = (mantissa_ << shift_amount);
+        std::cout << " shifted mantissa " << to_binary(mantissa_) << "(shift amount "<< shift_amount << ")\n";
+
+        m_type new_mantissa{mantissa_};
+        new_mantissa <<= (size_t{MS} - size_t{M+1});
 
 
         using IntegerUnbiasedExp = integer<ES + 1, WordType>;
         IntegerUnbiasedExp exp_f = f.unbiased_exponent();
-        exp_f = exp_f + IntegerUnbiasedExp{shift_amount};
+        std::cout << "initial exp " << exp_f;
+        exp_f = exp_f - IntegerUnbiasedExp{shift_amount};
+        std::cout << " new one " << exp_f << "\n";
 
         const IntegerUnbiasedExp out_bias = floating_point<ES, M, WordType>::bias;
         IntegerUnbiasedExp biased_exp = exp_f + out_bias;
         e_type exponent_(width_cast<ES>(biased_exp));
 
         // merge the rest
-        word_array<ES + MS> joined = concat(exponent_, mantissa_);
+        word_array<ES + MS> joined = concat(exponent_, new_mantissa);
+        std::cout << "joined " << to_binary(joined) << "\n";
         word_array<1 + ES + MS> with_sign = concat(word_array<1, WordType>{f.get_sign()}, joined);
 
         return with_sign;
@@ -530,15 +538,6 @@ public:
     static constexpr auto mantissa_width() -> size_t
     {
         return M;
-    }
-
-    [[nodiscard]] static constexpr integer<E + 1, WordType> denorm_exponent()
-    {
-
-        const integer<E + 1, WordType> b{bias};
-        const integer<E + 1, WordType> neg_bias = sub(integer<E + 1, WordType>::zero(), b);
-
-        return add(neg_bias, integer<E + 1, WordType>::one());
     }
 
     constexpr auto get_sign() const -> unsigned int
