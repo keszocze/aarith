@@ -251,8 +251,7 @@ template <size_t N, size_t ES, typename WT>
         // {a, b) < (b, c}  ==  {a, b - eps]  <  [b + eps, c}  ->  v < w
         // {a, b] ≮ [b, c}  ==  {a, b         ≮  [b, c}        ->  v ≮ w
 
-        constexpr interval_bound closed = interval_bound::CLOSED;
-        return !(lhs.end_bound == closed && rhs.start_bound == closed);
+        return is_open(lhs.end_bound) || is_open(rhs.start_bound);
     }
     else
     {
@@ -376,7 +375,7 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
         }
         else if (ac_rbit == not_rounded)
         {
-            if (au == closed && cu == closed)
+            if (is_closed(au) && is_closed(cu))
             {
                 ac_bound = closed;
             }
@@ -406,7 +405,7 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
         }
         else if (bd_rbit == not_rounded)
         {
-            if (bu == closed && du == closed)
+            if (is_closed(bu) && is_closed(du))
             {
                 bd_bound = closed;
             }
@@ -635,8 +634,7 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool valid<N, ES, WT>::is_exact() const
 {
-    const auto closed = interval_bound::CLOSED;
-    return start_bound == closed && end_bound == closed && start_value == end_value;
+    return is_closed(start_bound) && is_closed(end_bound) && start_value == end_value;
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -684,7 +682,7 @@ template <size_t N, size_t ES, typename WT>
         bool start_ok = false;
         bool end_ok = false;
 
-        if (this->start_bound == interval_bound::OPEN)
+        if (is_open(this->start_bound))
         {
             start_ok = (this->start_value < value);
         }
@@ -693,7 +691,7 @@ template <size_t N, size_t ES, typename WT>
             start_ok = (this->start_value <= value);
         }
 
-        if (this->end_bound == interval_bound::OPEN)
+        if (is_open(this->end_bound))
         {
             end_ok = (value < this->end_value);
         }
@@ -723,14 +721,12 @@ template <size_t N, size_t ES, typename WT>
     // Any interval [NaR, q} and {p, NaR] definitely contains NaR and as such
     // is not regular.
 
-    constexpr interval_bound closed = interval_bound::CLOSED;
-
-    if (start_value.is_nar() && start_bound == closed)
+    if (start_value.is_nar() && is_closed(start_bound))
     {
         return false;
     }
 
-    if (end_value.is_nar() && end_bound == closed)
+    if (end_value.is_nar() && is_closed(end_bound))
     {
         return false;
     }
@@ -873,7 +869,7 @@ template <size_t N, size_t ES, typename WT>
 {
     std::stringstream ss;
 
-    if (u == interval_bound::OPEN)
+    if (is_open(u))
     {
         ss << p << "ᵘ";
     }

@@ -17,9 +17,6 @@ std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v)
     const posit_type& end_value = v.get_end_value();
     const interval_bound& end_bound = v.get_end_bound();
 
-    constexpr interval_bound open = interval_bound::OPEN;
-    [[maybe_unused]] constexpr interval_bound closed = interval_bound::CLOSED;
-
     //
     // Handle special cases that are not printed like intervals.
     //
@@ -57,13 +54,13 @@ std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v)
         // Handle left bound.
         //
 
-        if (start_bound == open)
+        if (is_open(start_bound))
         {
             os << "(";
         }
         else
         {
-            assert(start_bound == closed);
+            assert(is_closed(start_bound));
             os << "[";
         }
 
@@ -95,13 +92,13 @@ std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v)
             os << end_value;
         }
 
-        if (end_bound == open)
+        if (is_open(end_bound))
         {
             os << ")";
         }
         else
         {
-            assert(end_bound == closed);
+            assert(is_closed(end_bound));
             os << "]";
         }
 
