@@ -115,13 +115,17 @@ as_word_array(const floating_point<E, M, WordType>& f)
 
     if (f.is_denormalized())
     {
+        // TODO This is currently not working
         //############### Expand the mantissa
-        // TODO FIX IT!
-        m_type mantissa_{f.get_full_mantissa()};
-        mantissa_ <<= (size_t{MS} - size_t{M + 1});
+
+        auto mantissa_ = f.get_mantissa();
+        size_t shift_amount = count_leading_zeroes(mantissa_)+1;
+        mantissa_ <<= shift_amount;
+
 
         using IntegerUnbiasedExp = integer<ES + 1, WordType>;
         IntegerUnbiasedExp exp_f = f.unbiased_exponent();
+        exp_f = exp_f + IntegerUnbiasedExp{shift_amount};
 
         const IntegerUnbiasedExp out_bias = floating_point<ES, M, WordType>::bias;
         IntegerUnbiasedExp biased_exp = exp_f + out_bias;
@@ -137,7 +141,7 @@ as_word_array(const floating_point<E, M, WordType>& f)
     {
 
         //############### Expand the mantissa
-        m_type mantissa_{f.get_full_mantissa()};
+        m_type mantissa_{f.get_full_mantissa()}; // TODO why include the hidden bit?
         mantissa_ <<= (size_t{MS} - size_t{M + 1});
 
         //############### Expand the exponent

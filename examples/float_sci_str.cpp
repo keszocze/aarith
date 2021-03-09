@@ -13,9 +13,12 @@ void print_nums(const FP value)
     using int_storage = typename float_extraction_helper::bit_cast_to_type_trait<F>::type;
     constexpr size_t int_width = float_extraction_helper::bit_cast_to_type_trait<F>::width;
 
-
+    auto large_val = floating_point<11,52>(as_word_array<11,52>(value));
 
     cout << to_binary(value) << "\n";
+    cout << to_compute_string(value) << "\n";
+    cout << to_binary(large_val) << "\n";
+    cout << to_compute_string(large_val) << "\n";
     cout << static_cast<F>(value) << "\n";
     auto tmp = bit_cast<int_storage>(static_cast<F>(value));
     std::bitset<int_width> as_bitset(tmp);
@@ -60,12 +63,22 @@ int main()
     using nddouble = floating_point<22, 104>;
     const float base = 3.1415f;
 
-    nbetweensd foo(false, uinteger<10>::zero(), uinteger<42>::all_ones());
+    auto single_bit = uinteger<42>::all_zeroes();
+    single_bit.set_bit(0,true);
+
+    nbetweensd foo(false, uinteger<10>::zero(), single_bit);
 
 
-    print_nums<double>(foo);
+//    print_nums<double>(foo);
 
 
+
+    auto large_val = floating_point<11,52>(as_word_array<11,52>(foo));
+
+    cout << to_binary(foo) << "\n";
+    cout << to_compute_string(foo) << "\n";
+    cout << to_binary(large_val) << "\n";
+    cout << to_compute_string(large_val) << "\n";
 
     // compare_to_float<float, nsingle>(base);
     // compare_to_float<float, nbetweensd>(base);
