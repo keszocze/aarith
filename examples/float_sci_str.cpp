@@ -4,22 +4,20 @@
 
 using namespace aarith;
 
-int main()
+template <class F, class FP> 
+void compare_to_float(F base)
 {
-    using nsingle = floating_point<8, 23>;
-    using ndouble = floating_point<11, 52>;
-    using nddouble = floating_point<22, 104>;
-    const float base = 3.1415f;
-    float ref = base;
-    double dref = base;
-    nsingle sgl(ref);
-    ndouble dbl(ref);
-    nddouble ddbl(ref);
-
+    F ref = base;
+    FP sgl;
     do{
-        sgl = nsingle(ref);
-        std::cout << "float:\n" << ref << "\n"
-                  << "nfloat - single precision:\n" << to_sci_string(sgl) << "\n\n";
+        sgl = FP(ref);
+        std::cout 
+            << "float:\n" 
+            << ref << "\n"
+            << to_binary(FP(ref)) << "\n"
+            << "nfloat - single precision:\n" 
+            << to_sci_string(sgl) 
+            << "\n\n";
         
         ref *= base;
     }
@@ -27,54 +25,34 @@ int main()
     
     ref = base;
     do{
-        sgl = nsingle(ref);
-        std::cout << "float:\n" << ref << "\n"
-                  << "nfloat - single precision:\n" << to_sci_string(sgl) << "\n\n";
+        sgl = FP(ref);
+        std::cout 
+            << "float:\n" 
+            << ref << "\n"
+            << to_binary(FP(ref)) << "\n"
+            << "nfloat - single precision:\n" 
+            << to_sci_string(sgl) 
+            << "\n\n";
         
         ref /= base;
     }
     while(!sgl.is_zero());
     
-    dref = base;
-    do{
-        dbl = ndouble(dref);
-        std::cout << "float:\n" << dref << "\n"
-                  << "nfloat - double precision:\n" << to_sci_string(dbl) << "\n\n";
-        
-        dref *= base;
-    }
-    while(!dbl.is_inf());
     
-    dref = base;
-    do{
-        dbl = ndouble(dref);
-        std::cout << "float:\n" << dref << "\n"
-                  << "nfloat - double precision:\n" << to_sci_string(dbl) << "\n\n";
-        
-        dref /= base;
-    }
-    while(!dbl.is_zero());
-    
-    dref = base;
-    do{
-        ddbl = nddouble(dref);
-        std::cout << "float:\n" << dref << "\n"
-                  << "nfloat - twice double precision:\n" << to_sci_string(ddbl) << "\n\n";
-        
-        dref *= base;
-    }
-    while(!ddbl.is_inf());
-    
-    dref = base;
-    do{
-        ddbl = nddouble(dref);
-        std::cout << "float:\n" << dref << "\n"
-                  << "nfloat - twice double precision:\n" << to_sci_string(ddbl) << "\n"
-                  << "nfloat - twice double precision:\n" << to_binary(ddbl) << "\n\n";
-        
-        dref /= base;
-    }
-    while(!ddbl.is_zero());
+}
+
+int main()
+{
+    using nsingle = floating_point<8, 23>;
+    using nbetweensd = floating_point<10, 42>;
+    using ndouble = floating_point<11, 52>;
+    using nddouble = floating_point<22, 104>;
+    const float base = 3.1415f;
+
+    //compare_to_float<float, nsingle>(base);
+    compare_to_float<float, nbetweensd>(base);
+    //compare_to_float<double, ndouble>(static_cast<double>(base));
+    //compare_to_float<double, nddouble>(static_cast<double>(base));
     
 
     return 0;
