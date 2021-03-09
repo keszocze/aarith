@@ -4,6 +4,7 @@
 #include <aarith/float/float_utils.hpp>
 #include <aarith/integer_no_operators.hpp>
 #include <assert.h>
+#include <bitset>
 #include <cstdint>
 #include <iostream>
 #include <string>
@@ -60,28 +61,32 @@ template <size_t MS, size_t E, size_t M, typename WordType>
  * @return The exponent expanded to a width of ES
  */
 template <size_t ES, size_t E, size_t M, typename WordType>
-[[nodiscard]] uinteger<ES, WordType> constexpr expand_exponent(
-    const floating_point<E, M, WordType>& f)
+[[nodiscard]] uinteger<ES, WordType> expand_exponent(const floating_point<E, M, WordType>& f)
 {
     static_assert(ES >= E, "Expanded exponent must not be shorter than the original exponent");
 
     using exp_type = uinteger<ES, WordType>;
 
-    uinteger<E, WordType> exp_f = f.get_exponent();
+    if (f.is_zero())
+    {
+        return exp_type::zero();
+    }
 
-    if (exp_f == uinteger<E, WordType>::all_ones())
+    if (f.get_exponent() == uinteger<E, WordType>::all_ones())
     {
         return exp_type::all_ones();
     }
     else
     {
-        const exp_type in_bias{f.bias};
-        const auto out_bias = floating_point<ES, M, WordType>::bias;
-        auto bias_difference = sub(out_bias, in_bias);
+        using IntegerUnbiasedExp = integer<ES + 1, WordType>;
+        IntegerUnbiasedExp exp_f = f.unbiased_exponent();
 
-        exp_type exponent_ = exp_type{exp_f};
-        exponent_ = add(exponent_, bias_difference);
-        return exponent_;
+        const IntegerUnbiasedExp out_bias = floating_point<ES, M, WordType>::bias;
+
+        IntegerUnbiasedExp exponent_ = exp_f + out_bias;
+        exp_type resulting_exponent(width_cast<ES>(exponent_));
+
+        return resulting_exponent;
     }
 }
 
@@ -96,16 +101,23 @@ template <size_t ES, size_t E, size_t M, typename WordType>
  * @return IEEE-754 bitstring representation of the floating point number
  */
 template <size_t ES, size_t MS, size_t E, size_t M, typename WordType>
-[[nodiscard]] word_array<1 + ES + MS, WordType> constexpr as_word_array(
-    const floating_point<E, M, WordType>& f)
+[[nodiscard]] word_array<1 + ES + MS, WordType>
+as_word_array(const floating_point<E, M, WordType>& f)
 {
     using namespace aarith;
 
     static_assert(ES >= E);
     static_assert(MS >= M);
 
+    std::cout << ES << " " << E << " " << MS << " " << M << "\n";
+
     auto mantissa_ = expand_mantissa<MS, E, M, WordType>(f);
-    auto joined = concat(expand_exponent<ES>(f), mantissa_);
+    std::cout << to_binary(mantissa_) << "\n";
+    auto exponent_ = expand_exponent<ES>(f);
+    std::cout << f.get_exponent() << " " << to_binary(exponent_) << " " << exponent_ << " "
+              << "\n";
+
+    auto joined = concat(exponent_, mantissa_);
     auto with_sign = concat(word_array<1, WordType>{f.get_sign()}, joined);
 
     return with_sign;
@@ -118,6 +130,7 @@ public:
     static_assert(E > 1, "Exponent width has to be greater one.");
 
     static constexpr size_t MW = M + 1;
+    static constexpr size_t Width = M + E + 1;
 
     using IntegerExp = uinteger<E, WordType>;
     using IntegerUnbiasedExp = integer<E + 1, WordType>;
@@ -198,6 +211,7 @@ public:
     template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
     explicit floating_point(const F f)
     {
+        // TODO dieses disassemblen in eine Methode packen?
         const float_disassembly value_disassembled = disassemble_float<F>(f);
         constexpr size_t ext_exp_width = get_exponent_width<F>();
         constexpr size_t ext_mant_width = get_mantissa_width<F>();
@@ -230,10 +244,10 @@ public:
         else
         {
             // the extracted mantissa does *not* necessarily fit in the stored mantissa. we perform
-            // a width cast that potentially loses quite some precision
-            // we first move the bits to the right in order not to lose them
+            // a width cast that potentially loses quite some accuracy
+            // we first move the bits to the right in order not to lose too many bits
             extracted_mantissa >>= (ext_mant_width - M);
-            mantissa = width_cast<M>(extracted_mantissa);
+            mantissa = width_cast<M>(extracted_mantissa); // cuts off from the left
         }
 
         if constexpr (ext_exp_width < E)
@@ -248,7 +262,7 @@ public:
             }
             // the other special case is for zero and denormalized numbers: the exponent has to
             // remain zeroes only as well
-            //else if (extracted_exp == E_::all_zeroes())
+            // else if (extracted_exp == E_::all_zeroes())
             //{
             //    //then F is denormalized, but may be normalized in a bigger format
             //    exponent = sub(uinteger<E>::all_zeroes();
@@ -259,15 +273,15 @@ public:
                 constexpr IntegerExp smaller_bias =
                     uinteger<ext_exp_width - 1, WordType>::all_ones();
                 constexpr IntegerExp diff = sub(bias, smaller_bias);
-                
+
                 if (extracted_exp == E_::all_zeroes() && extracted_mantissa != M_::all_zeroes())
                 {
                     const auto one_at = first_set_bit(mantissa);
-                    if(one_at)
+                    if (one_at)
                     {
                         exponent = add(IntegerExp{extracted_exp}, diff);
                         auto shift_by = M - *one_at;
-                        if (exponent <= uinteger<sizeof(decltype(shift_by))*8>(shift_by))
+                        if (exponent <= uinteger<sizeof(decltype(shift_by)) * 8>(shift_by))
                         {
                             // shift_by -= 1;
                             mantissa = (mantissa << (exponent.word(0) - 1));
@@ -276,7 +290,7 @@ public:
                         else
                         {
                             mantissa = (mantissa << shift_by);
-                            exponent = sub(exponent, uinteger<E, WordType>(shift_by-1));
+                            exponent = sub(exponent, uinteger<E, WordType>(shift_by - 1));
                         }
                     }
                     else
@@ -597,8 +611,8 @@ public:
         const IntegerUnbiasedExp signed_bias{bias};
         const IntegerUnbiasedExp signed_exponent{get_exponent()};
 
-        const IntegerUnbiasedExp real_exponent = sub(signed_exponent, signed_bias);
-        return real_exponent;
+        const IntegerUnbiasedExp unbiased_exp = sub(signed_exponent, signed_bias);
+        return unbiased_exp;
     }
 
     /**
@@ -784,7 +798,7 @@ private:
      * @tparam To Either float or double
      * @return Float/Double representation of the number
      */
-    template <typename To> [[nodiscard]] constexpr To generic_cast() const
+    template <typename To> [[nodiscard]] To generic_cast() const
     {
 
         static_assert(std::is_floating_point<To>(), "Can only convert to float or double.");

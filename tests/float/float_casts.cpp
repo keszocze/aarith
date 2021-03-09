@@ -373,3 +373,27 @@ TEMPLATE_TEST_CASE_SIG("Infinity and NaNs are created correctly",
     REQUIRE(nan.is_nan());
     REQUIRE(nan_from_native.is_nan());
 }
+
+SCENARIO("Expa nding the exponent of a de-normalized floating point", "[foo]")
+{
+    GIVEN("A denormalized floating-point")
+    {
+        using F = floating_point<8, 23>;
+        using T = floating_point<10,23>;
+
+        constexpr F val(true, word_array<8>::all_zeroes(), word_array<23>::all_ones());
+
+        WHEN("Expanding the exponent")
+        {
+
+            const uinteger<10> exponent_ = expand_exponent<10>(val);
+            const integer<11> unbiased = integer<11>(exponent_) - integer<11>(T::bias);
+
+            THEN("It should work (needs to be defined)")
+            {
+
+                REQUIRE(unbiased == val.unbiased_exponent());
+            }
+        }
+    }
+}
