@@ -46,11 +46,7 @@ template <size_t E, size_t M, typename WordType>
 [[nodiscard]] word_array<1 + E + M, WordType> as_word_array(const floating_point<E, M, WordType>& f)
 {
     word_array<E + M> exp_mantissa = concat(f.get_exponent(), f.get_mantissa());
-    //    std::cout << "as_array: " << to_binary(f.get_exponent()) << "\t" <<
-    //    to_binary(f.get_mantissa())
-    //              << "\t" << to_binary(exp_mantissa) << "\n";
     auto full_float = concat(word_array<1, WordType>{f.get_sign()}, exp_mantissa);
-    //    std::cout << "full_float " << to_binary(full_float) << "\n";
     return full_float;
 }
 
@@ -237,7 +233,6 @@ public:
     template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
     explicit floating_point(const F f)
     {
-        // TODO dieses disassemblen in eine Methode packen?
         const float_disassembly value_disassembled = disassemble_float<F>(f);
         constexpr size_t ext_exp_width = get_exponent_width<F>();
         constexpr size_t ext_mant_width = get_mantissa_width<F>();
@@ -828,8 +823,6 @@ private:
 
         static_assert(std::is_floating_point<To>(), "Can only convert to float or double.");
 
-        using namespace aarith;
-
         using uint_storage = typename float_extraction_helper::bit_cast_to_type_trait<To>::type;
         constexpr auto exp_width = get_exponent_width<To>();
         constexpr auto mant_width = get_mantissa_width<To>();
@@ -896,81 +889,76 @@ auto equal_except_rounding(const floating_point<E, M1, WordType> lhs,
                            const floating_point<E, M2, WordType> rhs) -> bool
 {
 
-    if (lhs.is_nan() || rhs.is_nan())
+    if (lhs.is_nan() || rhs.is_nan() || (lhs.get_sign() != rhs.get_sign()) ||
+        (lhs.get_exponent() != rhs.get_exponent()))
     {
         return false;
     }
 
-    if (lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent())
+    if (lhs.get_full_mantissa() == rhs.get_full_mantissa())
     {
-        if (lhs.get_full_mantissa() == rhs.get_full_mantissa())
+        return true;
+    }
+
+    constexpr auto Min = std::min(M1, M2);
+    constexpr auto offset_M1 = M1 - Min;
+    constexpr auto offset_M2 = M2 - Min;
+
+    const auto m1 = lhs.get_full_mantissa();
+    const auto m2 = rhs.get_full_mantissa();
+
+    auto bit1 = m1.bit(offset_M1);
+    auto bit2 = m2.bit(offset_M2);
+
+    bool rounding_error = true;
+    bool has_to_be_equal = false; // bit1 == bit2;
+    bool initial_zeroes = true;
+    for (auto i = 0U; i < Min; ++i)
+    {
+        if (has_to_be_equal)
         {
-            return true;
+            if (m1.bit(i + offset_M1) != m2.bit(i + offset_M2))
+            {
+                rounding_error = false;
+                break;
+            }
         }
         else
         {
-            constexpr auto Min = std::min(M1, M2);
-            constexpr auto offset_M1 = M1 - Min;
-            constexpr auto offset_M2 = M2 - Min;
-
-            const auto m1 = lhs.get_full_mantissa();
-            const auto m2 = rhs.get_full_mantissa();
-
-            auto bit1 = m1.bit(offset_M1);
-            auto bit2 = m2.bit(offset_M2);
-
-            bool rounding_error = true;
-            bool has_to_be_equal = false; // bit1 == bit2;
-            bool initial_zeroes = true;
-            for (auto i = 0U; i < Min; ++i)
+            if (initial_zeroes && m1.bit(i + offset_M1) == 0 && m2.bit(i + offset_M2) == 0)
             {
-                if (has_to_be_equal)
+                continue;
+            }
+            else if (m1.bit(i + offset_M1) != m2.bit(i + offset_M2))
+            {
+                if (initial_zeroes)
                 {
-                    if (m1.bit(i + offset_M1) != m2.bit(i + offset_M2))
-                    {
-                        rounding_error = false;
-                        break;
-                    }
+                    bit1 = m1.bit(i + offset_M1);
+                    bit2 = m2.bit(i + offset_M2);
+                    initial_zeroes = false;
+                }
+                if (m1.bit(i + offset_M1) == bit1 && m2.bit(i + offset_M2) == bit2)
+                {
+                    continue;
                 }
                 else
                 {
-                    if (initial_zeroes && m1.bit(i + offset_M1) == 0 && m2.bit(i + offset_M2) == 0)
-                    {
-                        continue;
-                    }
-                    else if (m1.bit(i + offset_M1) != m2.bit(i + offset_M2))
-                    {
-                        if (initial_zeroes)
-                        {
-                            bit1 = m1.bit(i + offset_M1);
-                            bit2 = m2.bit(i + offset_M2);
-                            initial_zeroes = false;
-                        }
-                        if (m1.bit(i + offset_M1) == bit1 && m2.bit(i + offset_M2) == bit2)
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            has_to_be_equal = true;
-                        }
-                    }
-                    else if (i > 0)
-                    {
-                        has_to_be_equal = true;
-                    }
-                    else
-                    {
-                        rounding_error = false;
-                        break;
-                    }
+                    has_to_be_equal = true;
                 }
             }
-
-            return rounding_error;
+            else if (i > 0)
+            {
+                has_to_be_equal = true;
+            }
+            else
+            {
+                rounding_error = false;
+                break;
+            }
         }
     }
-    return false;
+
+    return rounding_error;
 }
 
 /**

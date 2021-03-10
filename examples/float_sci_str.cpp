@@ -81,17 +81,8 @@ int main()
     //
     //
 
-    ndouble test(
-        word_array<64>{0b0111111101100010001101001001001011100010000111111101001011001000});
-    std::cout << as_word_array(test) << "\n";
-    floating_point<11 + 80, 52> test_{test};
-    std::cout << "(" << test_.is_negative() << ", " << to_binary(test.get_exponent()) << ", "
-              << to_binary(test_.get_full_mantissa()) << ")"
-              << "\n";
-    // compare_to_float<float, nsingle>(base);
-    // compare_to_float<float, nbetweensd>(base);
-    // compare_to_float<double, ndouble>(static_cast<double>(base));
-    // compare_to_float<double, nddouble>(static_cast<double>(base));
-
+    single_precision<uint64_t> val(word_array<32>{0b10000111110100100001011111010000});
+    float val_f = static_cast<float>(val);
+    cout << val << "\t" << val_f << "\n";
     return 0;
 }
