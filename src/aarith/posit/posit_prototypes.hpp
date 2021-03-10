@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <functional>
 #include <stdexcept>
@@ -65,6 +66,27 @@ enum class rounding_event
  */
 template <size_t N, size_t ES, typename WT>
 std::ostream& operator<<(std::ostream& os, const rounding_event& r);
+
+//
+// Additional Rounding Event Operations
+//
+// For implementation, look at posit/rounding_event_operations.hpp
+//
+
+/**
+ * @brief Return whether rounding event r is equal to NOT_ROUNDED.
+ */
+[[nodiscard]] constexpr bool is_not_rounded(rounding_event r);
+
+/**
+ * @brief Return whether rounding event r is equal to ROUNDED_DOWN.
+ */
+[[nodiscard]] constexpr bool is_rounded_down(rounding_event r);
+
+/**
+ * @brief Return whether rounding event r is equal to ROUNDED_UP.
+ */
+[[nodiscard]] constexpr bool is_rounded_up(rounding_event r);
 
 //
 // Posit Class and Methods.
@@ -2012,6 +2034,8 @@ std::ostream& operator<<(std::ostream& os, const interval_bound& u);
  */
 [[nodiscard]] constexpr bool is_closed(interval_bound u);
 
+[[nodiscard]] constexpr interval_bound merge(interval_bound u0, interval_bound u1);
+
 //
 // Valid Class.
 //
@@ -2205,7 +2229,7 @@ public:
     /**
      * @brief Return the product of this multiplied with rhs.
      */
-    [[nodiscard]] /*constexpr*/ valid operator*(const valid& other) const;
+    [[nodiscard]] constexpr valid operator*(const valid& other) const;
 
     /**
      * @brief Return this divided by other.
@@ -2361,6 +2385,12 @@ protected:
         const interval_bound& bound;
     };
 
+    struct tile
+    {
+        posit_type p;
+        interval_bound u;
+    };
+
     class group_result
     {
     public:
@@ -2370,8 +2400,7 @@ protected:
         interval_bound rhs_bound;
 
         constexpr group_result();
-        constexpr group_result(const posit_type& p, rounding_event r, interval_bound lu,
-                               interval_bound ru);
+        constexpr group_result(const posit_type& p, rounding_event r, interval_bound lu, interval_bound ru);
     };
 
     /**
@@ -2401,17 +2430,20 @@ protected:
      */
     [[nodiscard]] static std::string in_tile_notation(const posit_type& p, const interval_bound& u);
 
-    [[nodiscard]] constexpr static group_result tile_mul(const tile_ref& lhs, const tile_ref& rhs);
+    [[nodiscard]] static bool lt(const tile& lhs, const tile& rhs);
 
-    [[nodiscard]] const tile_ref start() const;
-    [[nodiscard]] const tile_ref end() const;
+    [[nodiscard]] static constexpr std::array<tile, 4> get_mul_candidates(const valid& lhs, const valid& rhs, bool left);
 
-    [[nodiscard]] static constexpr interval_bound merge_bounds_from(interval_bound u0,
-                                                                    interval_bound u1);
-    [[nodiscard]] static interval_bound merge_bounds_from(const group_result& group);
-    [[nodiscard]] static bool lt_left(const group_result& lhs, const group_result& rhs);
-    [[nodiscard]] static bool lt_right(const group_result& lhs, const group_result& rhs);
-    [[nodiscard]] static bool lt(const group_result& lhs, const group_result& rhs, bool left);
+    [[nodiscard]] static constexpr tile get_mul_first_candidate(const tile& lhs, const tile& rhs, bool left);
+    [[nodiscard]] static constexpr tile get_mul_middle_candidate(const tile& lhs, const tile& rhs, bool left);
+    [[nodiscard]] static constexpr tile get_mul_last_candidate(const tile& lhs, const tile& rhs, bool left);
+
+    [[nodiscard]] static constexpr tile adapt(const posit_type& value, const rounding_event rvalue, const interval_bound desired, bool left);
+    [[nodiscard]] static constexpr tile adapt_left(const posit_type& value, const rounding_event rvalue, const interval_bound desired);
+    [[nodiscard]] static constexpr tile adapt_right(const posit_type& value, const rounding_event rvalue, const interval_bound desired);
+
+    [[nodiscard]] const tile start() const;
+    [[nodiscard]] const tile end() const;
 };
 
 //
@@ -2497,6 +2529,7 @@ inline void for_each_regular_valid(const std::function<void(const ValidType&)>& 
 #include <aarith/posit/quire_sizes.hpp>
 #include <aarith/posit/quire_string_utils.hpp>
 #include <aarith/posit/quire_types.hpp>
+#include <aarith/posit/rounding_event_operations.hpp>
 #include <aarith/posit/rounding_event_operators.hpp>
 #include <aarith/posit/valid.hpp>
 #include <aarith/posit/valid_operators.hpp>

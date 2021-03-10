@@ -26,7 +26,7 @@ static std::vector<aarith::valid<N, ES, WT>> all_valids(const aarith::posit<N, E
 
 TEMPLATE_TEST_CASE_SIG("multiplying one does not change the result (random)",
                        "[valid][posit][template]", ((size_t N, size_t ES), N, ES),
-                       AARITH_POSIT_TEST_TEMPLATE_FULL)
+                       AARITH_POSIT_TEST_TEMPLATE_BIG)
 {
     using namespace aarith;
 
@@ -106,37 +106,28 @@ SCENARIO("multiplying arbitrary interval valids")
         THEN("assert that their product is as expected")
         {
             {
-                const Valid v = Valid::from(Posit(3), closed, Posit(3), closed);  // [3, 3] == 3
+                const Valid v = Valid::from(Posit(3), closed, Posit(3), closed); // [3, 3] == 3
 
                 const Valid actual = v * v;
-                const Valid expected = Valid::from(Posit(8), open, Posit(16), open);  // (8, 16)
+                const Valid expected = Valid::from(Posit(8), open, Posit(16), open); // (8, 16)
 
                 REQUIRE(actual == expected);
             }
 
             {
-                const Valid v = Valid::from(Posit(2), closed, Posit(4), closed);  // [2, 4]
-                const Valid w = Valid::from(Posit(0.25), closed, Posit(0.5), closed);  // [1/4, 1/2]
+                const Valid v = Valid::from(Posit(2), closed, Posit(4), closed);      // [2, 4]
+                const Valid w = Valid::from(Posit(0.25), closed, Posit(0.5), closed); // [1/4, 1/2]
 
                 const Valid actual = v * w;
-                const Valid expected = Valid::from(Posit(0.5), closed, Posit(2), closed);  // [1/2, 2]
+                const Valid expected =
+                    Valid::from(Posit(0.5), closed, Posit(2), closed); // [1/2, 2]
 
                 REQUIRE(actual == expected);
             }
 
             {
-                const Valid v = Valid::from(Posit(2), open, Posit(4), closed);  // (2, 4]
-                const Valid w = Valid::from(Posit(0.25), closed, Posit(0.5), closed);  // [1/4, 1/2]
-
-                const Valid actual = v * w;
-                const Valid expected = Valid::from(Posit(0.5), open, Posit(2), closed); // (1/2, 2]
-
-                REQUIRE(actual == expected);
-            }
-
-            {
-                const Valid v = Valid::from(Posit(2), closed, Posit(4), closed);  // [2, 4]
-                const Valid w = Valid::from(Posit(0.25), open, Posit(0.5), closed);  // (1/4, 1/2]
+                const Valid v = Valid::from(Posit(2), open, Posit(4), closed);        // (2, 4]
+                const Valid w = Valid::from(Posit(0.25), closed, Posit(0.5), closed); // [1/4, 1/2]
 
                 const Valid actual = v * w;
                 const Valid expected = Valid::from(Posit(0.5), open, Posit(2), closed); // (1/2, 2]
@@ -145,8 +136,18 @@ SCENARIO("multiplying arbitrary interval valids")
             }
 
             {
-                const Valid v = Valid::from(Posit(2), closed, Posit(4), open);  // [2, 4)
-                const Valid w = Valid::from(Posit(0.25), closed, Posit(0.5), closed);  // [1/4, 1/2]
+                const Valid v = Valid::from(Posit(2), closed, Posit(4), closed);    // [2, 4]
+                const Valid w = Valid::from(Posit(0.25), open, Posit(0.5), closed); // (1/4, 1/2]
+
+                const Valid actual = v * w;
+                const Valid expected = Valid::from(Posit(0.5), open, Posit(2), closed); // (1/2, 2]
+
+                REQUIRE(actual == expected);
+            }
+
+            {
+                const Valid v = Valid::from(Posit(2), closed, Posit(4), open);        // [2, 4)
+                const Valid w = Valid::from(Posit(0.25), closed, Posit(0.5), closed); // [1/4, 1/2]
 
                 const Valid actual = v * w;
                 const Valid expected = Valid::from(Posit(0.5), closed, Posit(2), open); // [1/2, 2)
@@ -155,8 +156,8 @@ SCENARIO("multiplying arbitrary interval valids")
             }
 
             {
-                const Valid v = Valid::from(Posit(2), closed, Posit(4), closed);  // [2, 4]
-                const Valid w = Valid::from(Posit(0.25), closed, Posit(0.5), open);  // [1/4, 1/2)
+                const Valid v = Valid::from(Posit(2), closed, Posit(4), closed);    // [2, 4]
+                const Valid w = Valid::from(Posit(0.25), closed, Posit(0.5), open); // [1/4, 1/2)
 
                 const Valid actual = v * w;
                 const Valid expected = Valid::from(Posit(0.5), closed, Posit(2), open); // [1/2, 2)
@@ -165,8 +166,8 @@ SCENARIO("multiplying arbitrary interval valids")
             }
 
             {
-                const Valid v = Valid::from(Posit(2), open, Posit(4), open);  // (2, 4)
-                const Valid w = Valid::from(Posit(0.25), closed, Posit(0.5), closed);  // [1/4, 1/2]
+                const Valid v = Valid::from(Posit(2), open, Posit(4), open);          // (2, 4)
+                const Valid w = Valid::from(Posit(0.25), closed, Posit(0.5), closed); // [1/4, 1/2]
 
                 const Valid actual = v * w;
                 const Valid expected = Valid::from(Posit(0.5), open, Posit(2), open); // (1/2, 2)
@@ -175,13 +176,65 @@ SCENARIO("multiplying arbitrary interval valids")
             }
 
             {
-                const Valid v = Valid::from(Posit(2), open, Posit(4), open);  // (2, 4)
-                const Valid w = Valid::from(Posit(0.25), open, Posit(0.5), open);  // (1/4, 1/2)
+                const Valid v = Valid::from(Posit(2), open, Posit(4), open);      // (2, 4)
+                const Valid w = Valid::from(Posit(0.25), open, Posit(0.5), open); // (1/4, 1/2)
 
                 const Valid actual = v * w;
                 const Valid expected = Valid::from(Posit(0.5), open, Posit(2), open); // (1/2, 2)
 
                 REQUIRE(actual == expected);
+            }
+
+            {
+                const Valid v = Valid::from(Posit(-2), closed, Posit(4), closed); // [-2, 4]
+                const Valid w =
+                    Valid::from(Posit(-0.25), closed, Posit(0.5), closed); // [-1/4, 1/2]
+
+                const Valid actual = v * w;
+                const Valid expected = Valid::from(Posit(-1), closed, Posit(2), closed); // [-1, 2]
+
+                REQUIRE(actual == expected);
+            }
+
+            {
+                const Valid v = Valid::from(Posit(-2), closed, Posit(4), closed); // (-2, 4)
+                const Valid w =
+                    Valid::from(Posit(-0.25), closed, Posit(0.5), closed); // [-1/4, 1/2]
+
+                const Valid actual = v * w;
+                const Valid expected = Valid::from(Posit(-1), closed, Posit(2), closed); // (-1, 2)
+
+                REQUIRE(actual == expected);
+            }
+
+            {
+                // Taken from "The End of Error", p. 128.
+                //
+                // This is a tricky one. Multiplying v = [-1, 2) with w = (-1/2, 1] means
+                // we have the following choices:
+                //
+                //   (-1)    * (-1/2 + ε) = 1/2 - ε,                 (I)
+                //   (-1)    * (-1)       = -1,                      (II)
+                //   (2 - ε) * (-1/2 + η) = -1 + 2η + ε/2 - εη,      (III)
+                //   (2 - ε) * (1)        = 2 - ε                    (IV)
+                //
+                // Finding the maximum is obvious, it is (IV). But what about
+                // the lower bound?  Both (II) and (III) have end point (-1),
+                // but (III) has awkward infinitesimals which we are not at
+                // all sure about whether they are positive or negative. So we
+                // have to make a conservative guess an return the result
+                //
+                //   v * w = {(III); (IV)} = (Pred(-1), 2)
+                //
+                // which is the best thing we could possibly return.
+
+                const Valid v = Valid::from(Posit(-1), closed, Posit(2), open);   // [-1, 2)
+                const Valid w = Valid::from(Posit(-0.5), open, Posit(1), closed); // (-1/2, 1]
+
+                const Valid actu = v * w;
+                const Valid expec = Valid::from(Posit(-1).decremented_real(), open, Posit(2), open);
+
+                REQUIRE(actu == expec);
             }
         }
     }

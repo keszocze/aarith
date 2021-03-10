@@ -294,12 +294,12 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
     // p. 113. Unfortunately this involves lots and lots of special cases.
     //
 
-    constexpr auto open = interval_bound::OPEN;
-    constexpr auto closed = interval_bound::CLOSED;
+    [[maybe_unused]] constexpr auto open = interval_bound::OPEN;
+    [[maybe_unused]] constexpr auto closed = interval_bound::CLOSED;
 
-    constexpr auto not_rounded = rounding_event::NOT_ROUNDED;
-    constexpr auto rounded_down = rounding_event::ROUNDED_DOWN;
-    constexpr auto rounded_up = rounding_event::ROUNDED_UP;
+    [[maybe_unused]] constexpr auto not_rounded = rounding_event::NOT_ROUNDED;
+    [[maybe_unused]] constexpr auto rounded_down = rounding_event::ROUNDED_DOWN;
+    [[maybe_unused]] constexpr auto rounded_up = rounding_event::ROUNDED_UP;
 
     const posit_type& a = this->start_value;
     const interval_bound& au = this->start_bound;
@@ -366,23 +366,11 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
     }
     else
     {
-        auto [ac_sum, ac_rbit] = add(a, c);
-        interval_bound ac_bound = open;
+        const auto [ac_sum, ac_rbit] = add(a, c);
+        const tile left = adapt_left(ac_sum, ac_rbit, merge(au, cu));
 
-        if (ac_rbit == rounded_up)
-        {
-            ac_sum = ac_sum.decremented();
-        }
-        else if (ac_rbit == not_rounded)
-        {
-            if (is_closed(au) && is_closed(cu))
-            {
-                ac_bound = closed;
-            }
-        }
-
-        sum.start_value = ac_sum;
-        sum.start_bound = ac_bound;
+        sum.start_value = left.p;
+        sum.start_bound = left.u;
     }
 
     //
@@ -396,23 +384,11 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
     }
     else
     {
-        auto [bd_sum, bd_rbit] = add(b, d);
-        interval_bound bd_bound = open;
+        const auto [bd_sum, bd_rbit] = add(b, d);
+        const tile right = adapt_right(bd_sum, bd_rbit, merge(bu, du));
 
-        if (bd_rbit == rounded_down)
-        {
-            bd_sum = bd_sum.incremented();
-        }
-        else if (bd_rbit == not_rounded)
-        {
-            if (is_closed(bu) && is_closed(du))
-            {
-                bd_bound = closed;
-            }
-        }
-
-        sum.end_value = bd_sum;
-        sum.end_bound = bd_bound;
+        sum.end_value = right.p;
+        sum.end_bound = right.u;
     }
 
     //
@@ -447,26 +423,9 @@ valid<N, ES, WT>::operator-(const valid<N, ES, WT>& other) const
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] /*constexpr*/ valid<N, ES, WT>
+[[nodiscard]] constexpr valid<N, ES, WT>
 valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
 {
-    constexpr auto open = interval_bound::OPEN;
-
-    constexpr auto not_rounded = rounding_event::NOT_ROUNDED;
-    constexpr auto rounded_down = rounding_event::ROUNDED_DOWN;
-    [[maybe_unused]] constexpr auto rounded_up = rounding_event::ROUNDED_UP;
-
-    // We are multiplying v = {a, b} with w = {c, d}.
-
-    const valid& v = *this;
-    const valid& w = other;
-
-    const tile_ref a = v.start();
-    const tile_ref b = v.end();
-
-    const tile_ref c = w.start();
-    const tile_ref d = w.end();
-
     //
     // Start by looking at special cases that are easy to handle.
     //
@@ -525,53 +484,20 @@ valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
 
     valid product;
 
-    std::array<group_result, 4> choices = {tile_mul(a, c), tile_mul(a, d), tile_mul(b, c),
-                                           tile_mul(b, d)};
-
     {
-        std::sort(choices.begin(), choices.end(), valid::lt_left);
-        const group_result& start = choices.front();
+        std::array<tile, 4> choices = get_mul_candidates(*this, other, true);
+        std::sort(choices.begin(), choices.end(), valid::lt);
 
-        if (start.rounding == rounded_down)
-        {
-            product.start_value = start.product;
-            product.start_bound = open;
-        }
-        else if (start.rounding == not_rounded)
-        {
-            product.start_value = start.product;
-            product.start_bound = merge_bounds_from(start);
-        }
-        else
-        {
-            assert(start.rounding == rounded_up);
-
-            product.start_value = start.product.decremented();
-            product.start_bound = open;
-        }
+        product.start_value = choices.front().p;
+        product.start_bound = choices.front().u;
     }
 
     {
-        std::sort(choices.begin(), choices.end(), valid::lt_right);
-        const group_result& end = choices.back();
+        std::array<tile, 4> choices = get_mul_candidates(*this, other, false);
+        std::sort(choices.begin(), choices.end(), valid::lt);
 
-        if (end.rounding == rounded_down)
-        {
-            product.end_value = end.product.incremented();
-            product.end_bound = open;
-        }
-        else if (end.rounding == not_rounded)
-        {
-            product.end_value = end.product;
-            product.end_bound = merge_bounds_from(end);
-        }
-        else
-        {
-            assert(end.rounding == rounded_up);
-
-            product.end_value = end.product;
-            product.end_bound = open;
-        }
+        product.end_value = choices.back().p;
+        product.end_bound = choices.back().u;
     }
 
     return product;
@@ -846,6 +772,25 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] bool valid<N, ES, WT>::lt(const typename valid<N, ES, WT>::tile& lhs,
+                                        const typename valid<N, ES, WT>::tile& rhs)
+{
+    if (lhs.p.is_nar() || rhs.p.is_nar())
+    {
+        return false;
+    }
+
+    if (lhs.p == rhs.p)
+    {
+        return is_closed(lhs.u) && is_open(rhs.u);
+    }
+    else
+    {
+        return lhs.p < rhs.p;
+    }
+}
+
+template <size_t N, size_t ES, typename WT>
 constexpr valid<N, ES, WT>::group_result::group_result()
     : rounding(rounding_event::NOT_ROUNDED)
     , lhs_bound(interval_bound::OPEN)
@@ -882,95 +827,217 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr typename valid<N, ES, WT>::group_result
-valid<N, ES, WT>::tile_mul(const valid<N, ES, WT>::tile_ref& lhs,
-                           const valid<N, ES, WT>::tile_ref& rhs)
+[[nodiscard]] constexpr std::array<typename valid<N, ES, WT>::tile, 4>
+valid<N, ES, WT>::get_mul_candidates(const valid& lhs, const valid& rhs, bool left)
 {
-    const auto [product, rounding] = mul(lhs.value, rhs.value);
-    return group_result{product, rounding, lhs.bound, rhs.bound};
+    const tile a = lhs.start();
+    const tile b = lhs.end();
+    const tile c = rhs.start();
+    const tile d = rhs.end();
+
+    std::array<tile, 4> results = {
+        get_mul_first_candidate(a, c, left), get_mul_middle_candidate(a, d, left),
+        get_mul_middle_candidate(c, b, left), get_mul_last_candidate(b, d, left)};
+
+    return results;
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] const typename valid<N, ES, WT>::tile_ref valid<N, ES, WT>::start() const
+[[nodiscard]] constexpr typename valid<N, ES, WT>::tile
+valid<N, ES, WT>::get_mul_first_candidate(const typename valid<N, ES, WT>::tile& lhs,
+                                          const typename valid<N, ES, WT>::tile& rhs, bool left)
 {
-    return {this->start_value, this->start_bound};
+
+    const auto [ac, r] = mul(lhs.p, rhs.p);
+    return adapt(ac, r, merge(lhs.u, rhs.u), left);
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] const typename valid<N, ES, WT>::tile_ref valid<N, ES, WT>::end() const
+[[nodiscard]] constexpr typename valid<N, ES, WT>::tile
+valid<N, ES, WT>::get_mul_middle_candidate(const typename valid<N, ES, WT>::tile& lhs,
+                                           const typename valid<N, ES, WT>::tile& rhs, bool left)
 {
-    return {this->end_value, this->end_bound};
-}
+    const auto& a = lhs.p;
+    const auto& au = lhs.u;
 
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr interval_bound valid<N, ES, WT>::merge_bounds_from(interval_bound u0,
-                                                                           interval_bound u1)
-{
-    constexpr auto open = interval_bound::OPEN;
-    constexpr auto closed = interval_bound::CLOSED;
+    const auto& d = rhs.p;
+    const auto& du = rhs.u;
 
-    if (is_open(u0) || is_open(u1))
+    const auto [ad, r] = mul(a, d);
+
+    posit_type p;
+    interval_bound u = interval_bound::OPEN;
+
+    if (is_closed(au) && is_closed(du))
     {
-        return open;
+        // a * d = a * d. We really want "ad" exactly.
+
+        p = ad;
+        u = interval_bound::CLOSED;
     }
-    else
+    else if (is_closed(au) && is_open(du))
     {
-        return closed;
-    }
-}
-
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] interval_bound
-valid<N, ES, WT>::merge_bounds_from(const valid<N, ES, WT>::group_result& group)
-{
-    return valid::merge_bounds_from(group.lhs_bound, group.rhs_bound);
-}
-
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] bool valid<N, ES, WT>::lt_left(const valid<N, ES, WT>::group_result& lhs,
-                                             const valid<N, ES, WT>::group_result& rhs)
-{
-    return valid::lt(lhs, rhs, true);
-}
-
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] bool valid<N, ES, WT>::lt_right(const valid<N, ES, WT>::group_result& lhs,
-                                              const valid<N, ES, WT>::group_result& rhs)
-{
-    return valid::lt(lhs, rhs, false);
-}
-
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] bool valid<N, ES, WT>::lt(const valid<N, ES, WT>::group_result& lhs,
-                                        const valid<N, ES, WT>::group_result& rhs, bool left)
-{
-    if (lhs.product.is_nar() || rhs.product.is_nar())
-    {
-        return false;
-    }
-
-    if (lhs.product != rhs.product)
-    {
-        return lhs.product < rhs.product;
-    }
-    else
-    {
-        assert(lhs.product == rhs.product);
-
-        const interval_bound lhs_bound = valid::merge_bounds_from(lhs);
-        const interval_bound rhs_bound = valid::merge_bounds_from(rhs);
+        // a * (d - ε) = ad - aε. We move to the left of product "ad".
 
         if (left)
         {
-            // [x is less than (x.
-            return is_closed(lhs_bound) && is_open(rhs_bound);
+            p = ad.decremented();
+            u = interval_bound::OPEN;
         }
         else
         {
-            // x) is less than x].
-            return is_open(lhs_bound) && is_closed(rhs_bound);
+            p = ad;
+            u = interval_bound::OPEN;
         }
     }
+    else if (is_open(au) && is_closed(du))
+    {
+        // (a + ε) * d = ad + dε. We move to the right of product "ad".
+
+        if (left)
+        {
+            p = ad;
+            u = interval_bound::OPEN;
+        }
+        else
+        {
+            p = ad.incremented();
+            u = interval_bound::OPEN;
+        }
+    }
+    else
+    {
+        assert(is_open(au) && is_open(du));
+
+        // (a + ε) * (d - η) = ad + aη + dε - ηε. We really have no idea
+        // whether we should be left or right of product "ad". As such we have
+        // to make the conservative choices and pick the predecessor of
+        // product ac.
+
+        if (left)
+        {
+            p = ad.decremented();
+            u = interval_bound::OPEN;
+        }
+        else
+        {
+            p = ad;
+            u = interval_bound::OPEN;
+        }
+    }
+
+    return adapt(p, r, u, left);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr typename valid<N, ES, WT>::tile
+valid<N, ES, WT>::get_mul_last_candidate(const typename valid<N, ES, WT>::tile& lhs,
+                                         const typename valid<N, ES, WT>::tile& rhs, bool left)
+{
+    const auto& b = lhs.p;
+    const auto& bu = lhs.u;
+
+    const auto& d = rhs.p;
+    const auto& du = rhs.u;
+
+    const auto [bd, r] = mul(b, d);
+
+    posit_type p;
+    interval_bound u = interval_bound::OPEN;
+
+    if (is_closed(bu) && is_closed(du))
+    {
+        p = bd;
+        u = interval_bound::CLOSED;
+    }
+    else
+    {
+        if (left)
+        {
+            p = bd.decremented();
+            u = interval_bound::OPEN;
+        }
+        else
+        {
+            p = bd;
+            u = interval_bound::OPEN;
+        }
+    }
+
+    return adapt(p, r, u, left);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr typename valid<N, ES, WT>::tile
+valid<N, ES, WT>::adapt(const posit_type& value, const rounding_event rvalue,
+                        const interval_bound desired, bool left)
+{
+    if (left)
+    {
+        return adapt_left(value, rvalue, desired);
+    }
+    else
+    {
+        return adapt_right(value, rvalue, desired);
+    }
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr typename valid<N, ES, WT>::tile
+valid<N, ES, WT>::adapt_left(const posit_type& value, const rounding_event rvalue,
+                             const interval_bound desired)
+{
+    posit_type result_value = value;
+    interval_bound result_bound = interval_bound::OPEN;
+
+    if (is_rounded_up(rvalue))
+    {
+        result_value = value.decremented();
+        result_bound = interval_bound::OPEN;
+    }
+    else if (is_not_rounded(rvalue))
+    {
+        // We are only assured to get "desired" when posit arithmetic did not
+        // round.
+        result_bound = desired;
+    }
+
+    return {result_value, result_bound};
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr typename valid<N, ES, WT>::tile
+valid<N, ES, WT>::adapt_right(const posit_type& value, const rounding_event rvalue,
+                              const interval_bound desired)
+{
+    posit_type result_value = value;
+    interval_bound result_bound = interval_bound::OPEN;
+
+    if (is_rounded_down(rvalue))
+    {
+        result_value = value.incremented();
+        result_bound = interval_bound::OPEN;
+    }
+    else if (is_not_rounded(rvalue))
+    {
+        // We are only assured to get "desired" when posit arithmetic did not
+        // round.
+        result_bound = desired;
+    }
+
+    return {result_value, result_bound};
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] const typename valid<N, ES, WT>::tile valid<N, ES, WT>::start() const
+{
+    return {this->get_start_value(), this->get_start_bound()};
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] const typename valid<N, ES, WT>::tile valid<N, ES, WT>::end() const
+{
+    return {this->get_end_value(), this->get_end_bound()};
 }
 
 } // namespace aarith

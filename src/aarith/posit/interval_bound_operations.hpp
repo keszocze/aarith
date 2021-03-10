@@ -24,4 +24,16 @@ namespace aarith {
     return u == interval_bound::CLOSED;
 }
 
+[[nodiscard]] constexpr interval_bound merge(interval_bound u0, interval_bound u1)
+{
+    if (is_closed(u0) && is_closed(u1))
+    {
+        return interval_bound::CLOSED;
+    }
+    else
+    {
+        return interval_bound::OPEN;
+    }
+}
+
 } // namespace aarith
