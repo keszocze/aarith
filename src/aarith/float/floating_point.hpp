@@ -213,29 +213,25 @@ public:
     {
     }
 
-    explicit constexpr floating_point(const unsigned int is_neg, IntegerExp exp,
-                                      word_array<MW, WordType> mant)
+    explicit constexpr floating_point(const unsigned int is_neg, const IntegerExp& exp,
+                                      const word_array<MW, WordType>& mant)
         : sign_neg(is_neg)
         , exponent(exp)
         , mantissa(mant)
     {
     }
 
-    template <size_t E_, size_t M_>
-    explicit floating_point(const floating_point<E_, M_, WordType> f)
+    constexpr floating_point(const floating_point<E, M, WordType>& f)
+        : sign_neg(f.sign_neg)
+        , exponent(f.exponent)
+        , mantissa(f.mantissa)
     {
-        auto tmp = width_cast<E, M, E_, M_, WordType>(f);
-        sign_neg = tmp.is_negative();
-        exponent = tmp.get_exponent();
-        mantissa = tmp.get_full_mantissa();
+    }
 
-        std::cout << "creating new float (" << sign_neg << ", " << to_binary(exponent) << ", "
-                  << to_binary(mantissa) << ")\n";
-        std::cout << "from float (" << tmp.is_negative() << ", " << to_binary(f.get_exponent())
-                  << ", " << to_binary(f.get_full_mantissa()) << ")\n";
-
-        static_assert(E_ <= E, "Exponent too long");
-        static_assert(M_ <= M, "Mantissa too long");
+    template <size_t E_, size_t M_, typename = std::enable_if_t<(M > M_) && (E > E_)>>
+    constexpr explicit floating_point(const floating_point<E_, M_, WordType>& f)
+        : floating_point(width_cast<E, M, E_, M_, WordType>(f))
+    {
     }
 
     template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
@@ -798,8 +794,15 @@ public:
     template <size_t ETarget, size_t MTarget>
     [[nodiscard]] explicit constexpr operator floating_point<ETarget, MTarget, WordType>() const
     {
-        const auto tmp{as_word_array<ETarget, MTarget>(*this)};
-        return floating_point<ETarget, MTarget, WordType>{tmp};
+        return width_cast<ETarget, MTarget>(*this);
+    }
+
+    floating_point<E, M, WordType>& operator=(const floating_point<E, M, WordType>& f)
+    {
+        this->sign_neg = f.sign_neg;
+        this->exponent = f.exponent;
+        this->mantissa = f.mantissa;
+        return *this;
     }
 
     [[nodiscard]] floating_point<E, M> make_quiet_nan() const
