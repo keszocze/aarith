@@ -68,6 +68,12 @@ template <size_t ET, size_t MT, size_t E, size_t M, typename WordType>
 [[nodiscard]] constexpr floating_point<ET, MT, WordType>
 width_cast(const floating_point<E, M, WordType>& f)
 {
+
+    if constexpr (ET == E && MT == M)
+    {
+        return f;
+    }
+
     using R = floating_point<ET, MT, WordType>;
 
     static_assert(ET >= E);
@@ -82,20 +88,34 @@ width_cast(const floating_point<E, M, WordType>& f)
     if (f.is_denormalized())
     {
         //############### Expand the mantissa
-        auto new_mantissa = f.get_mantissa();
-        size_t shift_amount = count_leading_zeroes(new_mantissa) + 1;
-        new_mantissa = (new_mantissa << shift_amount);
+        size_t shift_amount = 0;
+        if constexpr (MT == M)
+        {
+            mantissa_ = f.get_mantissa();
+        }
+        else
+        {
+            auto new_mantissa = f.get_mantissa();
+            shift_amount = count_leading_zeroes(new_mantissa) + 1;
+            new_mantissa = (new_mantissa << shift_amount);
+            mantissa_ = m_type{new_mantissa};
+            mantissa_ <<= (size_t{MT} - size_t{M + 1});
+        }
 
-        mantissa_ = m_type{new_mantissa};
-        mantissa_ <<= (size_t{MT} - size_t{M + 1});
+        if constexpr (ET == E)
+        {
+            exponent_ = f.get_exponent();
+        }
+        else
+        {
+            using IntegerUnbiasedExp = integer<ET + 1, WordType>;
+            IntegerUnbiasedExp exp_f = f.unbiased_exponent();
+            exp_f = exp_f - IntegerUnbiasedExp{shift_amount};
 
-        using IntegerUnbiasedExp = integer<ET + 1, WordType>;
-        IntegerUnbiasedExp exp_f = f.unbiased_exponent();
-        exp_f = exp_f - IntegerUnbiasedExp{shift_amount};
-
-        const IntegerUnbiasedExp out_bias = floating_point<ET, M, WordType>::bias;
-        IntegerUnbiasedExp biased_exp = exp_f + out_bias;
-        exponent_ = width_cast<ET>(biased_exp);
+            const IntegerUnbiasedExp out_bias = floating_point<ET, M, WordType>::bias;
+            IntegerUnbiasedExp biased_exp = exp_f + out_bias;
+            exponent_ = width_cast<ET>(biased_exp);
+        }
     }
     else
     {
@@ -818,7 +838,7 @@ private:
      * @tparam To Either float or double
      * @return Float/Double representation of the number
      */
-    template <typename To> [[nodiscard]] To generic_cast() const
+    template <typename To> [[nodiscard]] constexpr To generic_cast() const
     {
 
         static_assert(std::is_floating_point<To>(), "Can only convert to float or double.");

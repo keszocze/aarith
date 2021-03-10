@@ -81,8 +81,11 @@ int main()
     //
     //
 
-    single_precision<uint64_t> val(word_array<32>{0b10000111110100100001011111010000});
-    float val_f = static_cast<float>(val);
-    cout << val << "\t" << val_f << "\n";
+    single_precision<uint64_t> a(word_array<32>{0b11110111100110110011101101010111});
+    single_precision<uint64_t> b(word_array<32>{0b00000000001101010101101111001000});
+    float a_ = static_cast<float>(a);
+    float b_ = static_cast<float>(b);
+    cout << a << "\t" << a_ << "\n";
+    cout << b << "\t" << b_ << "\n";
     return 0;
 }

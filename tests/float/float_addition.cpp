@@ -165,8 +165,8 @@ TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts"
     }
     else
     {
-        CAPTURE(a, to_binary(a), a_native, b, to_binary(b), b_native, a.is_nan(), b.is_nan(), res,
-                res_native, res_);
+        CAPTURE(a, to_binary(a), a_native, b, to_binary(b), b_native, a.is_nan(), b.is_nan(),
+                a.is_inf(), b.is_inf(), res, res_native, res_);
         CHECK(equal_except_rounding(res_native_, res));
         REQUIRE(equal_except_rounding(F{res_}, F{res_native}));
     }
