@@ -810,7 +810,7 @@ template <size_t N, size_t ES, typename WT>
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr std::array<typename valid<N, ES, WT>::tile, 4>
-valid<N, ES, WT>::get_mul_candidates(const valid& lhs, const valid& rhs, bool left)
+valid<N, ES, WT>::get_mul_candidates(const valid& lhs, const valid& rhs, bool is_left)
 {
     const tile a = lhs.start();
     const tile b = lhs.end();
@@ -818,8 +818,8 @@ valid<N, ES, WT>::get_mul_candidates(const valid& lhs, const valid& rhs, bool le
     const tile d = rhs.end();
 
     std::array<tile, 4> results = {
-        get_mul_first_candidate(a, c, left), get_mul_middle_candidate(a, d, left),
-        get_mul_middle_candidate(c, b, left), get_mul_last_candidate(b, d, left)};
+        get_mul_first_candidate(a, c, is_left), get_mul_middle_candidate(a, d, is_left),
+        get_mul_middle_candidate(c, b, is_left), get_mul_last_candidate(b, d, is_left)};
 
     return results;
 }
@@ -827,17 +827,17 @@ valid<N, ES, WT>::get_mul_candidates(const valid& lhs, const valid& rhs, bool le
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr typename valid<N, ES, WT>::tile
 valid<N, ES, WT>::get_mul_first_candidate(const typename valid<N, ES, WT>::tile& lhs,
-                                          const typename valid<N, ES, WT>::tile& rhs, bool left)
+                                          const typename valid<N, ES, WT>::tile& rhs, bool is_left)
 {
 
     const auto [ac, r] = mul(lhs.p, rhs.p);
-    return adapt(ac, r, merge(lhs.u, rhs.u), left);
+    return adapt(ac, r, merge(lhs.u, rhs.u), is_left);
 }
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr typename valid<N, ES, WT>::tile
 valid<N, ES, WT>::get_mul_middle_candidate(const typename valid<N, ES, WT>::tile& lhs,
-                                           const typename valid<N, ES, WT>::tile& rhs, bool left)
+                                           const typename valid<N, ES, WT>::tile& rhs, bool is_left)
 {
     const auto& a = lhs.p;
     const auto& au = lhs.u;
@@ -859,10 +859,10 @@ valid<N, ES, WT>::get_mul_middle_candidate(const typename valid<N, ES, WT>::tile
     }
     else if (is_closed(au) && is_open(du))
     {
-        // a * (d - ε) = ad - aε. We move to the left of product "ad".
-
-        if (left)
+        if (is_left)
         {
+            // a * (d - ε) = ad - aε. We move to the left of product "ad".
+
             p = ad.decremented();
             u = interval_bound::OPEN;
         }
@@ -874,10 +874,10 @@ valid<N, ES, WT>::get_mul_middle_candidate(const typename valid<N, ES, WT>::tile
     }
     else if (is_open(au) && is_closed(du))
     {
-        // (a + ε) * d = ad + dε. We move to the right of product "ad".
-
-        if (left)
+        if (is_left)
         {
+            // (a + ε) * d = ad + dε. We move to the right of product "ad".
+
             p = ad;
             u = interval_bound::OPEN;
         }
@@ -891,13 +891,13 @@ valid<N, ES, WT>::get_mul_middle_candidate(const typename valid<N, ES, WT>::tile
     {
         assert(is_open(au) && is_open(du));
 
-        // (a + ε) * (d - η) = ad + aη + dε - ηε. We really have no idea
-        // whether we should be left or right of product "ad". As such we have
-        // to make the conservative choices and pick the predecessor of
-        // product ac.
-
-        if (left)
+        if (is_left)
         {
+            // (a + ε) * (d - η) = ad + aη + dε - ηε. We really have no idea
+            // whether we should be left or right of product "ad". As such we have
+            // to make the conservative choices and pick the predecessor of
+            // product ac.
+
             p = ad.decremented();
             u = interval_bound::OPEN;
         }
@@ -908,13 +908,13 @@ valid<N, ES, WT>::get_mul_middle_candidate(const typename valid<N, ES, WT>::tile
         }
     }
 
-    return adapt(p, r, u, left);
+    return adapt(p, r, u, is_left);
 }
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr typename valid<N, ES, WT>::tile
 valid<N, ES, WT>::get_mul_last_candidate(const typename valid<N, ES, WT>::tile& lhs,
-                                         const typename valid<N, ES, WT>::tile& rhs, bool left)
+                                         const typename valid<N, ES, WT>::tile& rhs, bool is_left)
 {
     const auto& b = lhs.p;
     const auto& bu = lhs.u;
@@ -934,7 +934,7 @@ valid<N, ES, WT>::get_mul_last_candidate(const typename valid<N, ES, WT>::tile& 
     }
     else
     {
-        if (left)
+        if (is_left)
         {
             p = bd.decremented();
             u = interval_bound::OPEN;
@@ -946,15 +946,15 @@ valid<N, ES, WT>::get_mul_last_candidate(const typename valid<N, ES, WT>::tile& 
         }
     }
 
-    return adapt(p, r, u, left);
+    return adapt(p, r, u, is_left);
 }
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr typename valid<N, ES, WT>::tile
 valid<N, ES, WT>::adapt(const posit_type& value, const rounding_event rvalue,
-                        const interval_bound desired, bool left)
+                        const interval_bound desired, bool is_left)
 {
-    if (left)
+    if (is_left)
     {
         return adapt_left(value, rvalue, desired);
     }
@@ -1011,13 +1011,13 @@ valid<N, ES, WT>::adapt_right(const posit_type& value, const rounding_event rval
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] const typename valid<N, ES, WT>::tile valid<N, ES, WT>::start() const
+[[nodiscard]] constexpr typename valid<N, ES, WT>::tile valid<N, ES, WT>::start() const
 {
     return {this->get_start_value(), this->get_start_bound()};
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] const typename valid<N, ES, WT>::tile valid<N, ES, WT>::end() const
+[[nodiscard]] constexpr typename valid<N, ES, WT>::tile valid<N, ES, WT>::end() const
 {
     return {this->get_end_value(), this->get_end_bound()};
 }
