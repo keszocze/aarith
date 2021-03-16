@@ -2379,28 +2379,10 @@ public:
     [[nodiscard]] std::string in_tile_notation() const;
 
 protected:
-    struct tile_ref
-    {
-        const posit_type& value;
-        const interval_bound& bound;
-    };
-
     struct tile
     {
         posit_type p;
         interval_bound u;
-    };
-
-    class group_result
-    {
-    public:
-        posit_type product;
-        rounding_event rounding;
-        interval_bound lhs_bound;
-        interval_bound rhs_bound;
-
-        constexpr group_result();
-        constexpr group_result(const posit_type& p, rounding_event r, interval_bound lu, interval_bound ru);
     };
 
     /**

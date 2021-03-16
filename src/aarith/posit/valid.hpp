@@ -791,24 +791,6 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-constexpr valid<N, ES, WT>::group_result::group_result()
-    : rounding(rounding_event::NOT_ROUNDED)
-    , lhs_bound(interval_bound::OPEN)
-    , rhs_bound(interval_bound::OPEN)
-{
-}
-
-template <size_t N, size_t ES, typename WT>
-constexpr valid<N, ES, WT>::group_result::group_result(const posit<N, ES, WT>& p, rounding_event r,
-                                                       interval_bound lu, interval_bound ru)
-    : product(p)
-    , rounding(r)
-    , lhs_bound(lu)
-    , rhs_bound(ru)
-{
-}
-
-template <size_t N, size_t ES, typename WT>
 [[nodiscard]] std::string valid<N, ES, WT>::in_tile_notation(const posit<N, ES, WT>& p,
                                                              const interval_bound& u)
 {
