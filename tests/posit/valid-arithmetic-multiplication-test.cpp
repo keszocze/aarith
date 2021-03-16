@@ -280,3 +280,30 @@ SCENARIO("multiplying arbitrary interval valids")
         }
     }
 }
+
+SCENARIO("multiplying arbitrary low res valids")
+{
+    using namespace aarith;
+
+    using Posit = posit<3, 1>;
+    using Valid = valid<3, 1>;
+
+    GIVEN("arbitrary valids")
+    {
+        constexpr auto open = interval_bound::OPEN;
+        constexpr auto closed = interval_bound::CLOSED;
+
+        THEN("assert that their product is as expected")
+        {
+            {
+                const Valid v = Valid::from(Posit(-1), closed, Posit(0), closed);   // [-1, 0]
+                const Valid w = Valid::from(Posit(-4), closed, Posit(-0.25), open); // [-4, -1/4)
+
+                const Valid actual = v * w;
+                const Valid expected = Valid::from(Posit(0), closed, Posit(4), closed); // [0, 4]
+
+                REQUIRE(actual == expected);
+            }
+        }
+    }
+}

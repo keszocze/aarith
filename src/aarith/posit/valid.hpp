@@ -839,9 +839,29 @@ template <size_t N, size_t ES, typename WT>
 valid<N, ES, WT>::get_mul_first_candidate(const typename valid<N, ES, WT>::tile& lhs,
                                           const typename valid<N, ES, WT>::tile& rhs, bool is_left)
 {
+    const auto& a = lhs.p;
+    const auto& au = lhs.u;
 
-    const auto [ac, r] = mul(lhs.p, rhs.p);
-    return adapt(ac, r, merge(lhs.u, rhs.u), is_left);
+    const auto& c = rhs.p;
+    const auto& cu = rhs.u;
+
+    const auto [ac, r] = mul(a, c);
+
+    posit_type p;
+    interval_bound u = interval_bound::OPEN;
+
+    if ((is_closed(au) && a.is_zero()) || (is_closed(cu) && c.is_zero()))
+    {
+        p = p.zero();
+        u = interval_bound::CLOSED;
+    }
+    else
+    {
+        p = ac;
+        u = merge(au, cu);
+    }
+
+    return adapt(p, r, u, is_left);
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -865,6 +885,11 @@ valid<N, ES, WT>::get_mul_middle_candidate(const typename valid<N, ES, WT>::tile
         // a * d = a * d. We really want "ad" exactly.
 
         p = ad;
+        u = interval_bound::CLOSED;
+    }
+    else if ((is_closed(au) && a.is_zero()) || (is_closed(du) && d.is_zero()))
+    {
+        p = p.zero();
         u = interval_bound::CLOSED;
     }
     else if (is_closed(au) && is_open(du))
@@ -940,6 +965,11 @@ valid<N, ES, WT>::get_mul_last_candidate(const typename valid<N, ES, WT>::tile& 
     if (is_closed(bu) && is_closed(du))
     {
         p = bd;
+        u = interval_bound::CLOSED;
+    }
+    else if ((is_closed(bu) && b.is_zero()) || (is_closed(du) && d.is_zero()))
+    {
+        p = p.zero();
         u = interval_bound::CLOSED;
     }
     else
