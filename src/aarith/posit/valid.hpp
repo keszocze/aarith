@@ -478,6 +478,16 @@ valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
     }
 
     //
+    // For now we do not support multiplication of irregular intervals.
+    // TODO(Schärtl): Define multiplication on irregular intervals.
+    //
+
+    if (this->is_irregular() || other.is_irregular())
+    {
+        throw std::logic_error("multiplication not defined on irregular arguments");
+    }
+
+    //
     // Valid multiplication requires us to consider all possible choices ac,
     // ad, bc and bd.
     //
