@@ -304,6 +304,26 @@ SCENARIO("multiplying arbitrary low res valids")
 
                 REQUIRE(actual == expected);
             }
+
+            {
+                const Valid v = Valid::from(Posit(0), closed, Posit(4), closed); // [0, 4]
+                const Valid w = Valid(Posit(4));                                 // [4, 4]
+
+                const Valid actual = v * w;
+                const Valid expected = Valid::from(Posit(0), closed, Posit::nar(), open); // [0, ∞)
+
+                REQUIRE(actual == expected);
+            }
+
+            {
+                const Valid v = Valid::from(Posit(0), closed, Posit(4), open); // [0, 4)
+                const Valid w = Valid(Posit(4));                               // [4, 4]
+
+                const Valid actual = v * w;
+                const Valid expected = Valid::from(Posit(0), closed, Posit::nar(), open); // [0, ∞)
+
+                REQUIRE(actual == expected);
+            }
         }
     }
 }
