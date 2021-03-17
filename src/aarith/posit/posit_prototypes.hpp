@@ -1578,7 +1578,7 @@ protected:
      * Scale parameter. Can be both positive (for big numbers) and negative
      * (for numbers close to zero).
      */
-    integer<N, WT> scale;
+    scale_type scale;
 
     /**
      * Fraction parameter.

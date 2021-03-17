@@ -538,7 +538,7 @@ template <size_t N, size_t ES, typename WT>
 posit_parameters<N, ES, WT>::to_posit() const
 {
     using Posit = posit<N, ES, WT>;
-    using Integer = integer<N, WT>;
+    using Integer = scale_type;
 
     constexpr auto not_rounded = rounding_event::NOT_ROUNDED;
     constexpr auto rounded_down = rounding_event::ROUNDED_DOWN;
