@@ -1402,7 +1402,18 @@ protected:
 template <size_t N, size_t ES, typename WT = DefaultWordType> class posit_parameters
 {
 public:
-    using scale_type = integer<N, WT>;
+    /**
+     * @brief Integer type of the underlying scale value.
+     *
+     * The scale integer is always at least eight bits wide as for
+     * smaller N (e.g. N=3), a scale of just width N is not enough to
+     * compute all results correctly.
+     */
+    using scale_type = integer<((N > 8) ? N : 8), WT>;
+
+    /**
+     * @brief Type of the underlying fraction value.
+     *
     using fraction_type = posit_fraction<N, ES, WT>;
 
     /**
