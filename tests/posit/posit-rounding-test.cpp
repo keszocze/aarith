@@ -130,3 +130,24 @@ TEMPLATE_TEST_CASE_SIG("adding zero means no rounding", "[posit][template]",
         REQUIRE(rbit == not_rounded);
     });
 }
+
+TEMPLATE_TEST_CASE_SIG("rounding behavior when multiplying with max", "[posit][template]",
+                       ((size_t N, size_t ES), N, ES), AARITH_POSIT_TEST_TEMPLATE_EXHAUSTABLE)
+{
+    using namespace aarith;
+    using Posit = posit<N, ES>;
+
+    const Posit p = Posit::max();
+
+    {
+        const Posit q = Posit::max();
+        const auto [pq, r] = mul(p, q);
+        REQUIRE(is_rounded_down(r));
+    }
+
+    {
+        const Posit q = Posit::one();
+        const auto [pq, r] = mul(p, q);
+        REQUIRE(is_not_rounded(r));
+    }
+}

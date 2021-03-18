@@ -691,20 +691,16 @@ posit_parameters<N, ES, WT>::to_posit() const
     // some special checks to ensure that the returned rbit is correct.
     //
 
-    if (rbit == not_rounded && x == x.max() && (abs(*this) != this->max()))
+    if (x == x.max())
     {
-        rbit = rounded_down;
-    }
+        const posit_parameters maxparam = posit_parameters::max();
+        const posit_parameters absparam = abs(*this);
 
-    if (sign_bit)
-    {
-        // Adapt rounding event for negative values.
-
-        if (rbit == rounded_down)
+        if (rbit == not_rounded && absparam != maxparam)
         {
-            rbit = rounded_up;
+            rbit = rounded_down;
         }
-        else if (rbit == rounded_up)
+        else if (absparam.scale.is_negative() || absparam.scale > maxparam.scale)
         {
             rbit = rounded_down;
         }
@@ -720,18 +716,40 @@ posit_parameters<N, ES, WT>::to_posit() const
 
     if (x.is_zero())
     {
-        assert(!is_zero); // already taken care of at the beginning
+        // Flag is_zero should not be set. Should be checked during pre-flight
+        // checks.
+        assert(!is_zero);
+
+        // Even though this parameterized posit does not represent zero, the
+        // posit value we computed came out as zero. Weirdly enough, posits do
+        // not round to zero in this particular case, rather they round to the
+        // smallest positive value to indicate that the value is close to zero
+        // but not quite zero.
         x = x.minpos();
+        rbit = rounded_up;
     }
 
     //
     // So far we worked with the absolute value. If the sign bit is set, we
-    // have to flip the sign and also update the rounding information.
+    // have to adapt the result to represent a negative value instead.
     //
 
     if (sign_bit)
     {
+        // Adapt posit magnitude.
+
         x = -x;
+
+        // Adapt rounding event for negative values.
+
+        if (rbit == rounded_down)
+        {
+            rbit = rounded_up;
+        }
+        else if (rbit == rounded_up)
+        {
+            rbit = rounded_down;
+        }
     }
 
     //
