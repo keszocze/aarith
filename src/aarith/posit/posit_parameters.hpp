@@ -69,7 +69,7 @@ constexpr posit_parameters<N, ES, WT>::posit_parameters(
     const integer<ValueWidth, ValueWordType>& value)
 {
     //
-    // initalize flags
+    // initialize flags
     //
 
     is_nar = false;
@@ -168,7 +168,7 @@ template <size_t TargetWidth, typename TargetWordType>
     if (is_nar)
     {
         // NaR cannot be represented by an integer; unlike floating points
-        // there is no NaN or smiliar to return
+        // there is no NaN or similar to return
         throw nar_error("tried to convert NaR to integer");
     }
 
@@ -182,7 +182,7 @@ template <size_t TargetWidth, typename TargetWordType>
     //   1.01010010 ✕ 2³.
     //
     // We first set variable "intfrac" to represent that number without a
-    // seperation dot, e.g.
+    // separation dot, e.g.
     //
     //   101010010 ✕ 2³⁻⁸,
     //
@@ -511,7 +511,10 @@ void posit_parameters<N, ES, WT>::sub_fractions(posit_parameters<N, ES, WT>& des
 template <size_t SN, size_t SES, typename SWT>
 std::ostream& operator<<(std::ostream& os, const posit_parameters<SN, SES, SWT>& p)
 {
-    return os << "(nar=" << p.is_nar << " is_zero=" << p.is_zero << " sign=" << p.sign_bit
+    // We defined the operator<< as a friend of posit_parameters. We can
+    // access the members directly.
+
+    return os << "(is_nar=" << p.is_nar << " is_zero=" << p.is_zero << " sign_bit=" << p.sign_bit
               << " scale=" << p.scale << " fraction=" << p.fraction << ")";
 }
 
