@@ -2,6 +2,7 @@
 #include <aarith/float/string_utils.hpp>
 #include <bitset>
 #include <cmath>
+#include <sstream>
 
 using namespace aarith;
 using namespace std;
@@ -28,30 +29,63 @@ template <class F, class FP> void compare_to_float(F base)
 {
     F ref = base;
     FP sgl;
+    using ss = std::stringstream;
+    auto comparisons_inc = 0UL;
+    auto errors_inc = 0UL;
+    auto comparisons_dec = 0UL;
+    auto errors_dec = 0UL;
+
     do
     {
+        comparisons_inc++;
+        std::cout << "\r" << comparisons_inc << "        ";
         sgl = FP(ref);
-        std::cout << "float:\n"
-                  << ref << "\n"
-                  << to_binary(FP(ref)) << "\n"
-                  << "nfloat - single precision:\n"
-                  << to_sci_string(sgl) << "\n\n";
 
+        ss reference, afloat;
+        reference << scientific << ref;
+        afloat << to_sci_string(sgl);
+
+        if(reference.str() != afloat.str())
+        {
+            std::cout << "float:\n"
+                      << reference.str() << "\n"
+                      << to_binary(FP(ref)) << "\n"
+                      << "aarith float:\n"
+                      << afloat.str() << "\n\n";
+            errors_inc++;
+        }
         ref *= base;
     } while (!sgl.is_inf());
+    std::cout << "\n";
 
     ref = base;
     do
     {
+        comparisons_dec++;
+        std::cout << "\r" << comparisons_dec << "        ";
         sgl = FP(ref);
-        std::cout << "float:\n"
-                  << ref << "\n"
-                  << to_binary(FP(ref)) << "\n"
-                  << "nfloat - single precision:\n"
-                  << to_sci_string(sgl) << "\n\n";
+
+        ss reference, afloat;
+        reference << scientific << ref;
+        afloat << to_sci_string(sgl);
+
+        if(reference.str() != afloat.str())
+        {
+            std::cout << "float:\n"
+                      << reference.str() << "\n"
+                      << to_binary(FP(ref)) << "\n"
+                      << "aarith float:\n"
+                      << afloat.str() << "\n\n";
+            errors_dec++;
+        }
 
         ref /= base;
     } while (!sgl.is_zero());
+    std::cout << "\n";
+
+    std::cout << "Base: " << base << "\n"
+              << "Errors (inc): " << errors_inc << "/" << comparisons_inc << "\n"
+              << "Errors (dec): " << errors_dec << "/" << comparisons_dec << "\n";
 }
 
 int main()
@@ -87,5 +121,19 @@ int main()
     float b_ = static_cast<float>(b);
     cout << a << "\t" << a_ << "\n";
     cout << b << "\t" << b_ << "\n";
+
+    cout << "float, nsingle:\n";
+    compare_to_float<float, nsingle>(3.14);
+    cout << "float, nbetweensd:\n";
+    compare_to_float<float, nbetweensd>(3.14);
+    cout << "float, ndouble:\n";
+    compare_to_float<float, ndouble>(3.14);
+    cout << "float, nddouble:\n";
+    compare_to_float<float, nddouble>(3.14);
+    cout << "double, ndouble:\n";
+    compare_to_float<double, ndouble>(3.14);
+    cout << "double, nddouble:\n";
+    compare_to_float<double, nddouble>(3.14);
+
     return 0;
 }
