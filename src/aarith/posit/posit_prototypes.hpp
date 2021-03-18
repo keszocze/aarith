@@ -1413,7 +1413,7 @@ public:
 
     /**
      * @brief Type of the underlying fraction value.
-     *
+     */
     using fraction_type = posit_fraction<N, ES, WT>;
 
     /**

@@ -390,7 +390,8 @@ void posit_parameters<N, ES, WT>::match_scale_of(posit_parameters<N, ES, WT>& p,
 {
     auto [bigger, smaller] = ordered(&p, &q);
 
-    const auto scale_diff = uinteger<N, WT>(bigger->scale - smaller->scale);
+    constexpr size_t scale_width = scale_type::width();
+    const auto scale_diff = uinteger<scale_width, WT>(bigger->scale - smaller->scale);
 
     smaller->scale = bigger->scale;
     smaller->fraction = smaller->fraction >> scale_diff;
