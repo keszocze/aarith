@@ -7,7 +7,7 @@ int main()
 {
     using namespace aarith;
 
-    single_precision<uint64_t> test=single_precision<uint64_t>::neg_one();
+    single_precision test=single_precision::neg_one();
 
     std::cout << test << "\n";
 
