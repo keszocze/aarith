@@ -64,7 +64,6 @@ enum class rounding_event
  * @param r The enum to write.
  * @return A reference to os.
  */
-template <size_t N, size_t ES, typename WT>
 std::ostream& operator<<(std::ostream& os, const rounding_event& r);
 
 //
