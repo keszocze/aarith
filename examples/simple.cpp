@@ -11,6 +11,6 @@ int main()
 
     float x=3.0F, y=2.5F;
     floating_point<8,23> x_{3.0F}, y_{2.5F};
-    std::cout << "x + y = " << (x * y) << "\n";
-    std::cout << "x_+ y_ = " << (x_ * y_) << "\n";
+    std::cout << "x * y = " << (x * y) << "\n";
+    std::cout << "x_ * y_ = " << (x_ * y_) << "\n";
 }
