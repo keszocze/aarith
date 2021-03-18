@@ -1,7 +1,9 @@
-`uinteger`
-===============
+``uinteger``
+============
 
-The template class `uinteger` represents an unsigned integer of arbitrary, but compile-time static length.
+The template class ``uinteger`` represents an unsigned integer of arbitrary, but compile-time static length.
+
+It exhibits the usual overflow/underflow behaviir which is `not` undefined behavior!
 
 Class documentation
 -------------------

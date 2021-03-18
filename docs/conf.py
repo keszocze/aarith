@@ -152,4 +152,5 @@ man_pages = [
 
 
 # Breathe Configuration
-breathe_default_project = "Aarith"
+breathe_default_project = "aarith"
+breathe_projects = { 'aarith' : 'doxygen/xml/'}
