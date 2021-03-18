@@ -1,21 +1,15 @@
 add_library(aarith INTERFACE)
 target_sources(aarith INTERFACE
-  aarith/types/uinteger.hpp
-  aarith/types/sinteger.hpp
-  aarith/types/word_container.hpp
-  aarith/types/normfloat.hpp
-  aarith/types/traits.hpp
-  aarith/types/random.hpp
-  aarith/operations/uinteger_operations.hpp
-  aarith/operations/float_operations.hpp
-  aarith/operations/approx_operations.hpp
-  aarith/operations/sinteger_operations.hpp
-  aarith/operations/uinteger_comparisons.hpp
-  aarith/operations/float_comparisons.hpp
-  aarith/utilities/bit_operations.hpp
-  aarith/utilities/string_utils.hpp
-  aarith/utilities/float_utils.hpp
+        aarith/core.hpp
+        aarith/integer.hpp
+        aarith/integer_no_operators.hpp
+        aarith/float.hpp
+        aarith/float_no_operators.hpp
+        aarith/float/approx_operations.hpp
+        aarith/integer/approx_operations.hpp
 )
+
 target_include_directories(aarith INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_compile_features(aarith INTERFACE cxx_std_17)
 add_library(aarith::Library ALIAS aarith)
+

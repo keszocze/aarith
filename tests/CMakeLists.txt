@@ -1,61 +1,59 @@
-add_executable(uint-test
-  uint-test.cpp
-)
-target_link_libraries(uint-test Catch2::WithMain aarith::Library)
-add_test(NAME uint-test COMMAND uint-test)
-
-add_executable(exact_operations-test
-  exact_operations-test.cpp
-)
-target_link_libraries(exact_operations-test Catch2::WithMain aarith::Library)
-add_test(NAME exact_operations-test COMMAND exact_operations-test)
-
-add_executable(exact_operations-float-test
-  exact_operations-float-test.cpp
-)
-target_link_libraries(exact_operations-float-test Catch2::WithMain aarith::Library)
-add_test(NAME exact_operations-float-test COMMAND exact_operations-float-test)
-
-add_executable(comparisons-test
-  comparisons-test.cpp
-)
-target_link_libraries(comparisons-test Catch2::WithMain aarith::Library)
-add_test(NAME comparisons-test COMMAND comparisons-test)
-
-add_executable(string_utils-test
-  string_utils-test.cpp
-)
-target_link_libraries(string_utils-test Catch2::WithMain aarith::Library)
-add_test(NAME string_utils-test COMMAND string_utils-test)
-
-add_executable(uint-anytime-test uint-anytime-test.cpp)
-target_link_libraries(uint-anytime-test Catch2::WithMain aarith::Library)
-add_test(NAME uint-anytime-test COMMAND uint-anytime-test)
+set(CMAKE_CXX_CLANG_TIDY "")
 
 
-add_executable(util-test string_utils-test.cpp)
-target_link_libraries(util-test Catch2::WithMain aarith::Library)
-add_test(NAME util-test COMMAND util-test)
+add_aarith_test(core-functional-style FILES core/functional-style-test.cpp)
+add_aarith_test(core-number-util FILES core/number_utils-test.cpp)
+add_aarith_test(word_array-random-generation FILES core/word_array-generation-test.cpp)
+add_aarith_test(word_array-bit-operations FILES core/bit_operations-test.cpp)
+add_aarith_test(word_array-extraction FILES core/word_array-extraction-test.cpp)
+add_aarith_test(word_array-utility FILES core/word_array-utility-test.cpp)
 
 
-add_executable(bit-operations-test bit_operations-test.cpp)
-target_link_libraries(bit-operations-test Catch2::WithMain aarith::Library)
-add_test(NAME bit-operations-test COMMAND bit-operations-test)
+add_aarith_test(uint-general FILES integer/uint-test.cpp)
+add_aarith_test(uint-random-generation FILES integer/uint-random-generation-test.cpp)
+add_aarith_test(uint-operations FILES integer/uint-operations-test.cpp)
+add_aarith_test(uint-anytime FILES integer/uint-anytime-test.cpp)
+add_aarith_test(uint-comparisons FILES integer/uint-comparisons-test.cpp)
+add_aarith_test(uint-extraction FILES integer/uint-extraction-test.cpp)
+
+add_aarith_test(string_utils FILES integer/string_utils-test.cpp)
+add_aarith_test(integer-general FILES integer/integer-test.cpp)
+add_aarith_test(integer-operations FILES integer/integer-operations-test.cpp)
+add_aarith_test(integer-shift-operations FILES integer/integer-shift-operations-test.cpp)
+add_aarith_test(integer-comparisons FILES integer/integer-comparisons-test.cpp)
+add_aarith_test(integer-ranges FILES integer/ranges_test.cpp)
+add_aarith_test(integer-random-generation FILES integer/integer-random-generation-test.cpp)
+add_aarith_test(integer-cast FILES integer/integer-casts.cpp)
+
+add_aarith_test(float-anytime-operations FILES float/anytime_operations-float-test.cpp)
+add_aarith_test(float FILES float/float-test.cpp  float/float_general_operations.cpp)
+add_aarith_test(float-casts FILES float/float_casts.cpp)
+add_aarith_test(float-string_utils FILES float/string_utils.cpp)
+add_aarith_test(float-comparison FILES float/float_comparisons.cpp)
+add_aarith_test(float-total_ordering FILES float/total_ordering.cpp)
+add_aarith_test(float-sign_bit_operations FILES float/sign_bit_operations.cpp)
+add_aarith_test(float-NaN-payloads FILES float/nan_payload.cpp)
+add_aarith_test(float-random-generation FILES float/float-random-generation-test.cpp)
+add_aarith_test(float-division FILES float/float_division.cpp)
+add_aarith_test(float-multiplication FILES float/float_mul.cpp)
+add_aarith_test(float-addition FILES float/float_addition.cpp)
+add_aarith_test(float-subtraction FILES float/float_subtraction.cpp)
+add_aarith_test(float-classify-methods FILES float/classify-methods.cpp)
+
+add_aarith_test(fau-adder FILES uint-approx-test.cpp)
 
 
-add_executable(sint-test sint-test.cpp sint-operations-test.cpp sint-comparisons-test.cpp)
-target_link_libraries(sint-test Catch2::WithMain aarith::Library)
-add_test(NAME sint-test COMMAND sint-test)
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/")
-find_package(MPIR)
 if(MPIR_FOUND)
-  add_executable(uint-random-test uint-random-test.cpp)
-  target_link_libraries(uint-random-test PRIVATE aarith::Library Catch2::WithMain ${MPIR_LIBRARIES})
-  target_include_directories(uint-random-test PRIVATE ${MPIR_INCLUDE_DIR})
-  add_test(NAME uint-random-test COMMAND uint-random-test)
+  add_aarith_test(uint-check-against-mpir FILES integer/uint-arithmetic-mpir-test.cpp LIBS ${MPIR_LIBRARIES} INCLUDES ${MPIR_INCLUDE_DIR})
+  message(STATUS "MPIR found: Building MPIR tests")
 else()
-  message(WARNING "Could not find MPIR; not building coverage test")
+  message(STATUS "Could not find MPIR: not building MPIR tests")
+endif()
+
+
+if (USE_FULL_RANGE_IN_TESTS)
+  add_compile_definitions(AARITH_USE_FULL_RANGE)
 endif()
 
 
@@ -73,6 +71,8 @@ else()
 endif()
 
 if(BUILD_COVERAGE_DATA)
-  target_compile_options(uint-test PRIVATE --coverage)
-  target_link_options(uint-test PRIVATE --coverage)
+  target_compile_options(uint-general-test PRIVATE --coverage)
+  target_link_options(uint-general-test PRIVATE --coverage)
 endif()
+
+## integration tests
