@@ -373,3 +373,4 @@ TEMPLATE_TEST_CASE_SIG("Infinity and NaNs are created correctly",
     REQUIRE(nan.is_nan());
     REQUIRE(nan_from_native.is_nan());
 }
+

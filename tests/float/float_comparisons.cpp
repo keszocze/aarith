@@ -125,7 +125,7 @@ TEMPLATE_TEST_CASE_SIG("Comparisons should match the native counterparts",
 }
 
 TEMPLATE_TEST_CASE_SIG("Constants should be stored correctly",
-                       "[floating_point][comparison][utility]",
+                       "[floating_point][comparison][utility][foo]",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, double))
 {
