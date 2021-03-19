@@ -174,13 +174,21 @@ auto to_sci_string(const floating_point<E, M, WordType> nf) -> std::string
     if constexpr (E <= 8 && M <= 23)
     {
         auto f = static_cast<float>(nf);
-        str << std::scientific << f;
+        if(f != 0)
+        {
+            str << std::scientific;
+        }
+        str << f;
         return str.str();
     }
     else if constexpr (E <= 11 && M <= 52)
     {
         auto f = static_cast<double>(nf);
-        str << std::scientific << f;
+        if(f != 0)
+        {
+            str << std::scientific;
+        }
+        str << f;
         return str.str();
     }
     else
