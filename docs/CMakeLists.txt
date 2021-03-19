@@ -26,15 +26,12 @@ add_custom_target(Doxygen ALL DEPENDS ${DOXYGEN_INDEX_FILE})
 set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR})
 set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/sphinx)
 set(SPHINX_INDEX_FILE ${SPHINX_BUILD}/index.html)
-set(SPHINX_CONFIG_IN ${SPHINX_SOURCE}/conf.py.in)
 set(SPHINX_CONFIG_OUT ${SPHINX_SOURCE}/conf.py)
-
-configure_file(${SPHINX_CONFIG_IN} ${SPHINX_CONFIG_OUT} @ONLY)
 
 add_custom_command(OUTPUT ${SPHINX_INDEX_FILE}
                    COMMAND
                      ${SPHINX_EXECUTABLE} -b html
-                     -Dbreathe_projects.ABO=${DOXYGEN_OUTPUT_DIR}/xml
+                     -Dbreathe_projects.aarith=${DOXYGEN_OUTPUT_DIR}/xml
                    ${SPHINX_SOURCE} ${SPHINX_BUILD}
                    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                    DEPENDS
