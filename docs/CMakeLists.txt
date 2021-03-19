@@ -39,5 +39,5 @@ add_custom_command(OUTPUT ${SPHINX_INDEX_FILE}
                    MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py
                    COMMENT "Generating documentation with Sphinx")
 
-add_custom_target(Sphinx ALL DEPENDS ${SPHINX_INDEX_FILE})
+add_custom_target(Sphinx DEPENDS ${SPHINX_INDEX_FILE})
 
