@@ -1,5 +1,3 @@
-
-
 cmake_minimum_required(VERSION 3.13)
 project(aarith)
 option(BUILD_BENCHMARKS "build benchmarks" OFF)
@@ -8,11 +6,6 @@ option(BUILD_CORRECTNESS_EXPERIMENTS "build correctness experiments" OFF)
 option(BUILD_TESTS "build tests" ON)
 option(BUILD_EXAMPLES "build examples" ON)
 option(BUILD_DOCUMENTATION "Build documentation" ON)
-
-#set(CMAKE_CXX_CLANG_TIDY
-#        clang-tidy;)
-
-
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/lib")
 find_package(MPIR)
@@ -53,7 +46,6 @@ add_custom_target(clangformat
 #        COMMAND echo ${ALL_SOURCE_FILES}
         COMMAND clang-format -style=file -i ${ALL_SOURCE_FILES}
         )
-
 
 if(BUILD_BENCHMARKS)
     add_subdirectory(lib/benchmark)

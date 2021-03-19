@@ -26,6 +26,10 @@ add_custom_target(Doxygen ALL DEPENDS ${DOXYGEN_INDEX_FILE})
 set(SPHINX_SOURCE ${CMAKE_CURRENT_SOURCE_DIR})
 set(SPHINX_BUILD ${CMAKE_CURRENT_BINARY_DIR}/sphinx)
 set(SPHINX_INDEX_FILE ${SPHINX_BUILD}/index.html)
+set(SPHINX_CONFIG_IN ${SPHINX_SOURCE}/conf.py.in)
+set(SPHINX_CONFIG_OUT ${SPHINX_SOURCE}/conf.py)
+
+configure_file(${SPHINX_CONFIG_IN} ${SPHINX_CONFIG_OUT} @ONLY)
 
 add_custom_command(OUTPUT ${SPHINX_INDEX_FILE}
                    COMMAND
@@ -36,8 +40,7 @@ add_custom_command(OUTPUT ${SPHINX_INDEX_FILE}
                    DEPENDS
                    ${CMAKE_CURRENT_SOURCE_DIR}/index.rst
                    ${DOXYGEN_INDEX_FILE}
-                   MAIN_DEPENDENCY ${SPHINX_SOURCE}/conf.py
+                   MAIN_DEPENDENCY ${SPHINX_CONF_OUT}
                    COMMENT "Generating documentation with Sphinx")
 
 add_custom_target(Sphinx DEPENDS ${SPHINX_INDEX_FILE})
-

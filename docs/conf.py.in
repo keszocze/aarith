@@ -48,7 +48,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Aarith'
-copyright = u'2020, Marcel Brand, Oliver Keszocze, Michael Witterauf'
+copyright = u'2020, 2021, Marcel Brand, Oliver Keszocze, Michael Witterauf'
 author = u'Marcel Brand, Oliver Keszcoze, Michael Witterauf'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -137,8 +137,6 @@ latex_elements = {
     # 'figure_align': 'htbp',
 }
 
-
-
 # -- Options for manual page output ---------------------------------------
 
 # One entry per manual page. List of tuples
@@ -150,7 +148,8 @@ man_pages = [
 
 
 
+import os
 
 # Breathe Configuration
 breathe_default_project = "aarith"
-breathe_projects = { 'aarith' : 'doxygen/xml/'}
+breathe_projects = { 'aarith' : '@DOXYGEN_OUTPUT_DIR@/xml/'}
