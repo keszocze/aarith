@@ -88,7 +88,7 @@ width_cast(const floating_point<E, M, WordType>& f)
     if (f.is_denormalized())
     {
         //############### Expand the mantissa
-        size_t shift_amount = 0;
+        size_t [[maybe_unused]] shift_amount = 0;
         if constexpr (MT == M)
         {
             mantissa_ = f.get_mantissa();
