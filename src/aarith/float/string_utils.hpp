@@ -72,36 +72,36 @@ auto to_compute_string(const floating_point<E, M, WordType> nf) -> std::string
         return stream.str();
     }
 
-    stream << (neg ? "(" : ""); // might need to add enclosing paranthesis
+    stream << (neg ? "(" : "");
 
     // print exponent
-    if (nf.is_normalized())
-    {
-        stream << "2^(" << nf.unbiased_exponent() << ")";
-    }
-    else
-    {
-        stream << "2^(" << nf.denorm_exponent() << ")";
-    }
+    stream << "2^(" << nf.unbiased_exponent() << ")";
 
     // print the mantissa part, here, actual computations are necessary
-    stream << " * (" << (nf.is_normalized() ? "1" : "0");
+    stream << " * (";
 
+    bool is_first_summand = true;
     const auto mantissa = nf.get_mantissa();
 
-    integer<65> iM{M};
+    if (nf.is_normalized())
+    {
+        stream << "1";
+        is_first_summand = false;
+    }
+
+    int64_t M_ = M; // we need it to behave correctly for negative numbers
     for (int64_t i = M; i > 0; --i)
     {
-        auto curr_bit = mantissa.bit(i);
+        auto curr_bit = mantissa.bit(i - 1);
         if (curr_bit == 1)
         {
-            integer<65> I{i};
-            stream << " + 2^(" << sub(I, iM) << ")";
+            stream << (is_first_summand ? "" : " + ") << "2^(" << ((i - M_) - 1) << ")";
+            is_first_summand = false;
         }
     }
     stream << ")";
 
-    stream << (neg ? ")" : ""); // might need to add enclosing paranthesis
+    stream << (neg ? ")" : "");
     return stream.str();
 }
 
@@ -163,6 +163,7 @@ template <size_t E, size_t M, typename WordType>
 auto to_sci_string(const floating_point<E, M, WordType> nf) -> std::string
 {
     std::stringstream str;
+    str.precision(std::cout.precision());
 
     if (nf.is_nan())
     {
@@ -173,12 +174,20 @@ auto to_sci_string(const floating_point<E, M, WordType> nf) -> std::string
     if constexpr (E <= 8 && M <= 23)
     {
         auto f = static_cast<float>(nf);
+        if(f != 0)
+        {
+            str << std::scientific;
+        }
         str << f;
         return str.str();
     }
     else if constexpr (E <= 11 && M <= 52)
     {
         auto f = static_cast<double>(nf);
+        if(f != 0)
+        {
+            str << std::scientific;
+        }
         str << f;
         return str.str();
     }
@@ -241,7 +250,7 @@ auto to_sci_string(const floating_point<E, M, WordType> nf) -> std::string
                 conv.dec_exponent -= 1;
             }
         }
-        str << *mantissa;
+        str << std::fixed << *mantissa;
         if (conv.dec_exponent != 0)
         {
             str << "e" << (conv.neg_exponent ? "-" : "+") << conv.dec_exponent;

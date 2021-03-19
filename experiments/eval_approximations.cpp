@@ -101,19 +101,19 @@ template <size_t A, typename WordType = uint64_t> void test_a()
             const F any_sub = anytime_sub(f, g, A + 1);
             const F any_mul = anytime_mul(f, g, A + 1);
 
-            std::cout << A << ";" << f_float << ";" << g_float << ";" << as_word_array<8, A>(f)
-                      << ";" << as_word_array<8, A>(g) << ";";
-            std::cout << as_word_array<8, 23>(f) << ";" << as_word_array<8, 23>(g) << ";";
+            std::cout << A << ";" << f_float << ";" << g_float << ";" << as_word_array(f)
+                      << ";" << as_word_array(g) << ";";
+            std::cout << as_word_array(f) << ";" << as_word_array(g) << ";";
             std::cout << add_float << ";" << sub_float << ";" << mul_float << ";";
-            std::cout << as_word_array<8, 23>(add_float_F) << ";"
-                      << as_word_array<8, 23>(sub_float_F) << ";"
-                      << as_word_array<8, 23>(mul_float_F) << ";";
-            std::cout << as_word_array<8, A>(add) << ";" << as_word_array<8, A>(sub) << ";"
-                      << as_word_array<8, A>(mul) << ";" << as_word_array<8, 23>(add) << ";"
-                      << as_word_array<8, 23>(sub) << ";" << as_word_array<8, 23>(mul) << ";";
-            std::cout << as_word_array<8, A>(any_add) << ";" << as_word_array<8, A>(any_sub) << ";"
-                      << as_word_array<8, A>(any_mul) << ";" << as_word_array<8, 23>(any_add) << ";"
-                      << as_word_array<8, 23>(any_sub) << ";" << as_word_array<8, 23>(any_mul)
+            std::cout << as_word_array(add_float_F) << ";"
+                      << as_word_array(sub_float_F) << ";"
+                      << as_word_array(mul_float_F) << ";";
+            std::cout << as_word_array(add) << ";" << as_word_array(sub) << ";"
+                      << as_word_array(mul) << ";" << as_word_array(add) << ";"
+                      << as_word_array(sub) << ";" << as_word_array(mul) << ";";
+            std::cout << as_word_array(any_add) << ";" << as_word_array(any_sub) << ";"
+                      << as_word_array(any_mul) << ";" << as_word_array(any_add) << ";"
+                      << as_word_array(any_sub) << ";" << as_word_array(any_mul)
                       << ";";
 
             std::cout << "\n";

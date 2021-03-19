@@ -262,7 +262,7 @@ template <size_t E, size_t M, typename WordType>
         {
             ext_esum = ~ext_esum;
             ext_esum = add(ext_esum, uinteger<ext_esum.width()>(2));
-            if (ext_esum < uinteger<64>(M + 1))
+            if (ext_esum < uinteger<64>(M + 1)) // TODO remove this number? it should bit bit-width of size_t?
             {
                 mproduct = mproduct >> ext_esum.word(0);
                 product.set_full_mantissa(width_cast<M + 1>(mproduct));
@@ -396,7 +396,7 @@ template <size_t E, size_t M, typename WordType>
             // in case some part of the mantissa can be expressed as subnormal number
             exponent_tmp = ~exponent_tmp;
             exponent_tmp = add(exponent_tmp, uinteger<exponent_tmp.width()>(2));
-            if (exponent_tmp < uinteger<sizeof(M) * 8>(M + 1))
+            if (exponent_tmp < uinteger<sizeof(M) * 8>(M + 1)) // TODO where does the 8 come from?
             {
                 mquotient = rshift_and_round(mquotient, exponent_tmp.word(0));
                 quotient.set_full_mantissa(width_cast<M + 1>(mquotient));

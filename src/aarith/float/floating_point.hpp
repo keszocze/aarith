@@ -3,86 +3,51 @@
 #include <aarith/core.hpp>
 #include <aarith/float/float_utils.hpp>
 #include <aarith/integer_no_operators.hpp>
-#include <assert.h>
+#include <bitset>
+#include <cassert>
 #include <cstdint>
 #include <iostream>
 #include <string>
-#include <time.h>
 #include <type_traits>
 
 namespace aarith {
 
-template <size_t E, size_t M, typename WordType = uint64_t> class floating_point;
+template <size_t E, size_t M, typename WordType = uint64_t> class floating_point; // NOLINT
 
-template <typename WordType = uint64_t> using half_precision = floating_point<5, 10, WordType>;
-template <typename WordType = uint64_t> using single_precision = floating_point<8, 23, WordType>;
-template <typename WordType = uint64_t> using double_precison = floating_point<11, 52, WordType>;
 template <typename WordType = uint64_t>
-using quadruple_precision = floating_point<15, 112, WordType>;
-template <typename WordType = uint64_t> using bfloat16 = floating_point<8, 7, WordType>;
-template <typename WordType = uint64_t> using tensorfloat32 = floating_point<8, 10, WordType>;
+using half_precision = floating_point<5, 10, WordType>; // NOLINT
+
+template <typename WordType = uint64_t>
+using single_precision = floating_point<8, 23, WordType>; // NOLINT
+
+template <typename WordType = uint64_t>
+using double_precison = floating_point<11, 52, WordType>; // NOLINT
+
+template <typename WordType = uint64_t>
+using quadruple_precision = floating_point<15, 112, WordType>; // NOLINT
+
+template <typename WordType = uint64_t> using bfloat16 = floating_point<8, 7, WordType>; // NOLINT
+
+template <typename WordType = uint64_t>
+using tensorfloat32 = floating_point<8, 10, WordType>; // NOLINT
 
 /**
- * @brief Expands the mantissa by correctly shifting the bits in the larger uinteger
- * @tparam MS The target width of the mantissa
- * @return The mantissa expended to a width of MS
- */
-template <size_t MS, size_t E, size_t M, typename WordType>
-[[nodiscard]] uinteger<MS, WordType> constexpr expand_mantissa(
-    const floating_point<E, M, WordType>& f)
-{
-    static_assert(MS >= M, "Expanded mantissa must not be shorter than the original mantissa");
-    uinteger<MS, WordType> mantissa_{f.get_mantissa()};
-    mantissa_ <<= (size_t{MS} - size_t{M});
-    return mantissa_;
-}
-
-/**
- * @brief Expands the full mantissa (i.e. the significand) by correctly shifting the bits in the
- * larger uinteger.
+ * @brief Creates a bitstring representation of the floating point number.
  *
- * @tparam MS The target width of the mantissa
- * @return The mantissa expended to a width of MS
+ * You can use this method to create valid IEEE 754 bitstrings.
+ *
+ * @tparam E The bit-width of the input's exponent
+ * @tparam M The bit-width of the input's mantissa
+ * @tparam WordType The word type used to store the actual data
+ * @param f The floating-point numbers whose bitstring is to be created
+ * @return IEEE-754 bitstring representation of the floating point number
  */
-template <size_t MS, size_t E, size_t M, typename WordType>
-[[nodiscard]] uinteger<MS, WordType> constexpr expand_full_mantissa(
-    const floating_point<E, M, WordType>& f)
+template <size_t E, size_t M, typename WordType>
+[[nodiscard]] word_array<1 + E + M, WordType> as_word_array(const floating_point<E, M, WordType>& f)
 {
-    static_assert(MS >= M + 1, "Expanded mantissa must not be shorter than the original mantissa");
-    uinteger<MS, WordType> mantissa_{f.get_full_mantissa()};
-    mantissa_ <<= (size_t{MS} - size_t{M + 1});
-    return mantissa_;
-}
-
-/**
- * @brief Expands the exponent respecting the bias of the target width
- * @tparam ES The target width of the exponent
- * @return The exponent expanded to a width of ES
- */
-template <size_t ES, size_t E, size_t M, typename WordType>
-[[nodiscard]] uinteger<ES, WordType> constexpr expand_exponent(
-    const floating_point<E, M, WordType>& f)
-{
-    static_assert(ES >= E, "Expanded exponent must not be shorter than the original exponent");
-
-    using exp_type = uinteger<ES, WordType>;
-
-    uinteger<E, WordType> exp_f = f.get_exponent();
-
-    if (exp_f == uinteger<E, WordType>::all_ones())
-    {
-        return exp_type::all_ones();
-    }
-    else
-    {
-        const exp_type in_bias{f.bias};
-        const auto out_bias = floating_point<ES, M, WordType>::bias;
-        auto bias_difference = sub(out_bias, in_bias);
-
-        exp_type exponent_ = exp_type{exp_f};
-        exponent_ = add(exponent_, bias_difference);
-        return exponent_;
-    }
+    word_array<E + M> exp_mantissa = concat(f.get_exponent(), f.get_mantissa());
+    auto full_float = concat(word_array<1, WordType>{f.get_sign()}, exp_mantissa);
+    return full_float;
 }
 
 /**
@@ -91,24 +56,111 @@ template <size_t ES, size_t E, size_t M, typename WordType>
  * The bitstring returned may use more bits for the exponent/mantissa than the floating point
  * number it was created from. You can use this method to create valid IEEE 754 bitstrings.
  *
- * @tparam ES The number of bits to use for the exponent
- * @tparam MS The number of bits to use for the mantissa
- * @return IEEE-754 bitstring representation of the floating point number
+ * @tparam ET The target bit-width for the exponent
+ * @tparam MT The target bit-width for the mantissa
+ * @tparam E The bit-width of the input's exponent
+ * @tparam M The bit-width of the input's mantissa
+ * @tparam WordType
+ * @param f
+ * @return
  */
-template <size_t ES, size_t MS, size_t E, size_t M, typename WordType>
-[[nodiscard]] word_array<1 + ES + MS, WordType> constexpr as_word_array(
-    const floating_point<E, M, WordType>& f)
+template <size_t ET, size_t MT, size_t E, size_t M, typename WordType>
+[[nodiscard]] constexpr floating_point<ET, MT, WordType>
+width_cast(const floating_point<E, M, WordType>& f)
 {
-    using namespace aarith;
 
-    static_assert(ES >= E);
-    static_assert(MS >= M);
+    if constexpr (ET == E && MT == M)
+    {
+        return f;
+    }
 
-    auto mantissa_ = expand_mantissa<MS, E, M, WordType>(f);
-    auto joined = concat(expand_exponent<ES>(f), mantissa_);
-    auto with_sign = concat(word_array<1, WordType>{f.get_sign()}, joined);
+    using R = floating_point<ET, MT, WordType>;
 
-    return with_sign;
+    static_assert(ET >= E);
+    static_assert(MT >= M);
+
+    using m_type = uinteger<MT, WordType>;
+    using e_type = uinteger<ET, WordType>;
+
+    m_type mantissa_;
+    e_type exponent_;
+
+    if (f.is_denormalized())
+    {
+        //############### Expand the mantissa
+        [[maybe_unused]] size_t shift_amount = 0;
+        if constexpr (MT == M)
+        {
+            mantissa_ = f.get_mantissa();
+        }
+        else
+        {
+            auto new_mantissa = f.get_mantissa();
+            shift_amount = count_leading_zeroes(new_mantissa) + 1;
+            new_mantissa = (new_mantissa << shift_amount);
+            mantissa_ = m_type{new_mantissa};
+            mantissa_ <<= (size_t{MT} - size_t{M + 1});
+        }
+
+        if constexpr (ET == E)
+        {
+            exponent_ = f.get_exponent();
+        }
+        else
+        {
+            using IntegerUnbiasedExp = integer<ET + 1, WordType>;
+            IntegerUnbiasedExp exp_f = f.unbiased_exponent();
+            exp_f = exp_f - IntegerUnbiasedExp{shift_amount};
+
+            const IntegerUnbiasedExp out_bias = floating_point<ET, M, WordType>::bias;
+            IntegerUnbiasedExp biased_exp = exp_f + out_bias;
+            exponent_ = width_cast<ET>(biased_exp);
+        }
+    }
+    else
+    {
+
+        //############### Expand the mantissa
+        if constexpr (M == MT)
+        {
+            mantissa_ = f.get_mantissa();
+        }
+        else
+        {
+
+            mantissa_ = f.get_mantissa();
+            mantissa_ <<= (size_t{MT} - size_t{M});
+        }
+
+        //############### Expand the exponent
+        if constexpr (E == ET)
+        {
+            exponent_ = f.get_exponent();
+        }
+        else
+        {
+            if (f.is_zero())
+            {
+                exponent_ = e_type::zero();
+            }
+            else if (f.get_exponent() == uinteger<E, WordType>::all_ones())
+            {
+                exponent_ = e_type::all_ones();
+            }
+            else
+            {
+                const e_type in_bias{f.bias};
+                const auto out_bias = floating_point<ET, M, WordType>::bias;
+                auto bias_difference = sub(out_bias, in_bias);
+                exponent_ = add(e_type(f.get_exponent()), bias_difference);
+            }
+        }
+    }
+    auto exp_mantissa = concat(exponent_, mantissa_);
+    auto full_bitstring = concat(uinteger<1, WordType>{f.is_negative()}, exp_mantissa);
+
+    R res(full_bitstring);
+    return res;
 }
 
 template <size_t E, size_t M, typename WordType> class floating_point
@@ -118,6 +170,7 @@ public:
     static_assert(E > 1, "Exponent width has to be greater one.");
 
     static constexpr size_t MW = M + 1;
+    static constexpr size_t Width = M + E + 1;
 
     using IntegerExp = uinteger<E, WordType>;
     using IntegerUnbiasedExp = integer<E + 1, WordType>;
@@ -176,23 +229,25 @@ public:
     {
     }
 
-    explicit constexpr floating_point(const unsigned int is_neg, IntegerExp exp,
-                                      word_array<MW, WordType> mant)
+    explicit constexpr floating_point(const unsigned int is_neg, const IntegerExp& exp,
+                                      const word_array<MW, WordType>& mant)
         : sign_neg(is_neg)
         , exponent(exp)
         , mantissa(mant)
     {
     }
 
-    template <size_t E_, size_t M_>
-    explicit floating_point(const floating_point<E_, M_, WordType> f)
-        : sign_neg(f.is_negative())
-        , exponent(expand_exponent<E>(f))
-        , mantissa(expand_full_mantissa<MW>(f))
-
+    constexpr floating_point(const floating_point<E, M, WordType>& f)
+        : sign_neg(f.sign_neg)
+        , exponent(f.exponent)
+        , mantissa(f.mantissa)
     {
-        static_assert(E_ <= E, "Exponent too long");
-        static_assert(M_ <= M, "Mantissa too long");
+    }
+
+    template <size_t E_, size_t M_, typename = std::enable_if_t<(M > M_) && (E > E_)>>
+    constexpr explicit floating_point(const floating_point<E_, M_, WordType>& f)
+        : floating_point(width_cast<E, M, E_, M_, WordType>(f))
+    {
     }
 
     template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
@@ -214,6 +269,7 @@ public:
         }
 
         using E_ = decltype(extracted_exp);
+        using M_ = decltype(extracted_mantissa);
 
         sign_neg = std::signbit(f);
 
@@ -229,10 +285,10 @@ public:
         else
         {
             // the extracted mantissa does *not* necessarily fit in the stored mantissa. we perform
-            // a width cast that potentially loses quite some precision
-            // we first move the bits to the right in order not to lose them
+            // a width cast that potentially loses quite some accuracy
+            // we first move the bits to the right in order not to lose too many bits
             extracted_mantissa >>= (ext_mant_width - M);
-            mantissa = width_cast<M>(extracted_mantissa);
+            mantissa = width_cast<M>(extracted_mantissa); // cuts off from the left
         }
 
         if constexpr (ext_exp_width < E)
@@ -247,17 +303,46 @@ public:
             }
             // the other special case is for zero and denormalized numbers: the exponent has to
             // remain zeroes only as well
-            else if (extracted_exp == E_::all_zeroes())
-            {
-                exponent = uinteger<E>::all_zeroes();
-            }
+            // else if (extracted_exp == E_::all_zeroes())
+            //{
+            //    //then F is denormalized, but may be normalized in a bigger format
+            //    exponent = sub(uinteger<E>::all_zeroes();
+            //}
             else
             {
                 // no special case left -> we can adjust the exponent
                 constexpr IntegerExp smaller_bias =
                     uinteger<ext_exp_width - 1, WordType>::all_ones();
                 constexpr IntegerExp diff = sub(bias, smaller_bias);
-                exponent = add(IntegerExp{extracted_exp}, diff);
+
+                if (extracted_exp == E_::all_zeroes() && extracted_mantissa != M_::all_zeroes())
+                {
+                    const auto one_at = first_set_bit(mantissa);
+                    if (one_at)
+                    {
+                        exponent = add(IntegerExp{extracted_exp}, diff);
+                        auto shift_by = M - *one_at;
+                        if (exponent <= uinteger<sizeof(decltype(shift_by)) * 8>(shift_by))
+                        {
+                            // shift_by -= 1;
+                            mantissa = (mantissa << (exponent.word(0) - 1));
+                            exponent = exponent.all_zeroes();
+                        }
+                        else
+                        {
+                            mantissa = (mantissa << shift_by);
+                            exponent = sub(exponent, uinteger<E, WordType>(shift_by - 1));
+                        }
+                    }
+                    else
+                    {
+                        exponent = exponent.all_zeroes();
+                    }
+                }
+                else
+                {
+                    exponent = add(IntegerExp{extracted_exp}, diff);
+                }
             }
         }
         else if (ext_exp_width > E)
@@ -441,15 +526,6 @@ public:
         return M;
     }
 
-    [[nodiscard]] static constexpr integer<E + 1, WordType> denorm_exponent()
-    {
-
-        const integer<E + 1, WordType> b{bias};
-        const integer<E + 1, WordType> neg_bias = sub(integer<E + 1, WordType>::zero(), b);
-
-        return add(neg_bias, integer<E + 1, WordType>::one());
-    }
-
     constexpr auto get_sign() const -> unsigned int
     {
         return (sign_neg) ? 1U : 0U;
@@ -567,8 +643,8 @@ public:
         const IntegerUnbiasedExp signed_bias{bias};
         const IntegerUnbiasedExp signed_exponent{get_exponent()};
 
-        const IntegerUnbiasedExp real_exponent = sub(signed_exponent, signed_bias);
-        return real_exponent;
+        const IntegerUnbiasedExp unbiased_exp = sub(signed_exponent, signed_bias);
+        return unbiased_exp;
     }
 
     /**
@@ -677,7 +753,8 @@ public:
     {
         const bool denormalized = (exponent == IntegerExp::all_zeroes());
         const bool exception = (exponent == IntegerExp::all_ones());
-        const bool result = denormalized && !exception;
+        const bool rest_is_null = (mantissa == IntegerMant::all_zeroes());
+        const bool result = denormalized && !exception && !rest_is_null;
         return result;
     }
 
@@ -732,8 +809,15 @@ public:
     template <size_t ETarget, size_t MTarget>
     [[nodiscard]] explicit constexpr operator floating_point<ETarget, MTarget, WordType>() const
     {
-        const auto tmp{as_word_array<ETarget, MTarget>(*this)};
-        return floating_point<ETarget, MTarget, WordType>{tmp};
+        return width_cast<ETarget, MTarget>(*this);
+    }
+
+    floating_point<E, M, WordType>& operator=(const floating_point<E, M, WordType>& f)
+    {
+        this->sign_neg = f.sign_neg;
+        this->exponent = f.exponent;
+        this->mantissa = f.mantissa;
+        return *this;
     }
 
     [[nodiscard]] floating_point<E, M> make_quiet_nan() const
@@ -759,8 +843,6 @@ private:
 
         static_assert(std::is_floating_point<To>(), "Can only convert to float or double.");
 
-        using namespace aarith;
-
         using uint_storage = typename float_extraction_helper::bit_cast_to_type_trait<To>::type;
         constexpr auto exp_width = get_exponent_width<To>();
         constexpr auto mant_width = get_mantissa_width<To>();
@@ -768,8 +850,9 @@ private:
         static_assert(E <= exp_width, "Exponent width too large");
         static_assert(M <= mant_width, "Mantissa width too large");
 
-        uinteger<1 + exp_width + mant_width, WordType> array{
-            as_word_array<exp_width, mant_width>(*this)};
+        auto resized = width_cast<exp_width, mant_width, E, M, WordType>(*this);
+        auto as_array = as_word_array(resized);
+        uinteger<1 + exp_width + mant_width, WordType> array{as_array};
 
         uint_storage bitstring = static_cast<uint_storage>(array);
         To result = bit_cast<To>(bitstring);
@@ -826,81 +909,76 @@ auto equal_except_rounding(const floating_point<E, M1, WordType> lhs,
                            const floating_point<E, M2, WordType> rhs) -> bool
 {
 
-    if (lhs.is_nan() || rhs.is_nan())
+    if (lhs.is_nan() || rhs.is_nan() || (lhs.get_sign() != rhs.get_sign()) ||
+        (lhs.get_exponent() != rhs.get_exponent()))
     {
         return false;
     }
 
-    if (lhs.get_sign() == rhs.get_sign() && lhs.get_exponent() == rhs.get_exponent())
+    if (lhs.get_full_mantissa() == rhs.get_full_mantissa())
     {
-        if (lhs.get_full_mantissa() == rhs.get_full_mantissa())
+        return true;
+    }
+
+    constexpr auto Min = std::min(M1, M2);
+    constexpr auto offset_M1 = M1 - Min;
+    constexpr auto offset_M2 = M2 - Min;
+
+    const auto m1 = lhs.get_full_mantissa();
+    const auto m2 = rhs.get_full_mantissa();
+
+    auto bit1 = m1.bit(offset_M1);
+    auto bit2 = m2.bit(offset_M2);
+
+    bool rounding_error = true;
+    bool has_to_be_equal = false; // bit1 == bit2;
+    bool initial_zeroes = true;
+    for (auto i = 0U; i < Min; ++i)
+    {
+        if (has_to_be_equal)
         {
-            return true;
+            if (m1.bit(i + offset_M1) != m2.bit(i + offset_M2))
+            {
+                rounding_error = false;
+                break;
+            }
         }
         else
         {
-            constexpr auto Min = std::min(M1, M2);
-            constexpr auto offset_M1 = M1 - Min;
-            constexpr auto offset_M2 = M2 - Min;
-
-            const auto m1 = lhs.get_full_mantissa();
-            const auto m2 = rhs.get_full_mantissa();
-
-            auto bit1 = m1.bit(offset_M1);
-            auto bit2 = m2.bit(offset_M2);
-
-            bool rounding_error = true;
-            bool has_to_be_equal = false; // bit1 == bit2;
-            bool initial_zeroes = true;
-            for (auto i = 0U; i < Min; ++i)
+            if (initial_zeroes && m1.bit(i + offset_M1) == 0 && m2.bit(i + offset_M2) == 0)
             {
-                if (has_to_be_equal)
+                continue;
+            }
+            else if (m1.bit(i + offset_M1) != m2.bit(i + offset_M2))
+            {
+                if (initial_zeroes)
                 {
-                    if (m1.bit(i + offset_M1) != m2.bit(i + offset_M2))
-                    {
-                        rounding_error = false;
-                        break;
-                    }
+                    bit1 = m1.bit(i + offset_M1);
+                    bit2 = m2.bit(i + offset_M2);
+                    initial_zeroes = false;
+                }
+                if (m1.bit(i + offset_M1) == bit1 && m2.bit(i + offset_M2) == bit2)
+                {
+                    continue;
                 }
                 else
                 {
-                    if (initial_zeroes && m1.bit(i + offset_M1) == 0 && m2.bit(i + offset_M2) == 0)
-                    {
-                        continue;
-                    }
-                    else if (m1.bit(i + offset_M1) != m2.bit(i + offset_M2))
-                    {
-                        if (initial_zeroes)
-                        {
-                            bit1 = m1.bit(i + offset_M1);
-                            bit2 = m2.bit(i + offset_M2);
-                            initial_zeroes = false;
-                        }
-                        if (m1.bit(i + offset_M1) == bit1 && m2.bit(i + offset_M2) == bit2)
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            has_to_be_equal = true;
-                        }
-                    }
-                    else if (i > 0)
-                    {
-                        has_to_be_equal = true;
-                    }
-                    else
-                    {
-                        rounding_error = false;
-                        break;
-                    }
+                    has_to_be_equal = true;
                 }
             }
-
-            return rounding_error;
+            else if (i > 0)
+            {
+                has_to_be_equal = true;
+            }
+            else
+            {
+                rounding_error = false;
+                break;
+            }
         }
     }
-    return false;
+
+    return rounding_error;
 }
 
 /**

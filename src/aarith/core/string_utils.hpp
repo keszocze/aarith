@@ -8,7 +8,7 @@ inline constexpr auto number_of_decimal_digits(size_t bits) -> size_t
 {
     // When converted to decimal, an n-bit binary numeral will have at most k*n decimal digits,
     // rounded up, where k = log_10 2 ~ 0.301.
-    return (bits * 301) / 1000 + ((bits * 301) % 1000 == 0 ? 0 : 1);
+    return (bits * 301) / 1000 + ((bits * 301) % 1000 == 0 ? 0 : 1); // NOLINT
 }
 
 template <class T, class U>

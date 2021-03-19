@@ -12,3 +12,6 @@ target_link_libraries(invert_gti aarith::Library)
 
 add_executable(float_example float_sci_str.cpp)
 target_link_libraries(float_example aarith::Library)
+
+add_executable(simple simple.cpp)
+target_link_libraries(simple aarith::Library)
