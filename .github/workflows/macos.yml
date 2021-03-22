@@ -22,7 +22,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: []
+        os: [macos-10.15]
         compiler: [clang++, gcc-8, gcc-9, gcc-10]
 
     steps:
