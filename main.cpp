@@ -1,7 +1,7 @@
 #include <aarith/float.hpp>
 #include <aarith/integer.hpp>
 #include <aarith/core/number_utils.hpp>
-#include <cmath>
+#include <aarith/float/numeric_limits.hpp>
 #include <iostream>
 
 int main()
@@ -30,6 +30,11 @@ int main()
 
     std::cout << static_cast<int>(-3.5f) << " " <<  ::aarith::floor<int>(-3.5f) << "\n";
     std::cout << static_cast<int>(3.5f) << " " <<  ::aarith::floor<int>(3.5f) << "\n";
+
+    std::cout << single_precision<uint64_t>::min_exp << "\n";
+
+    std::cout << std::numeric_limits<single_precision<uint64_t>>::min_exponent << "\n";
+    std::cout << min_exponent<single_precision<uint64_t>>() << "\n";
 
     return 0;
 }
