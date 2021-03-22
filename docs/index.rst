@@ -9,7 +9,7 @@ Aarith currently supports
 * IEEE 754 like floating-point numbers of arbitrary bit-width for both, the exponent and the mantissa
 * Two's complement integers of arbitrary bit-width (signed and unsigned)
 
-See
+
 
 .. toctree::
    :maxdepth: 2

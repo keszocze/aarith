@@ -1,8 +1,15 @@
-# Aarith: Approximate Arithmetic
+# Aarith: An Arbitrary Precision Number Library
 
-Aarith is a library for performing arbitrary-width and approximate arithmetic.
 
-Enjoy responsibly!
+Aarith is a header-only, arbitrary precision number library for C++. It is intended to be used as a drop-in replacement
+of the native data types.
+
+Aarith currently supports
+
+* IEEE 754 like floating-point numbers of arbitrary bit-width for both, the exponent and the mantissa
+* Two's complement integers of arbitrary bit-width (signed and unsigned)
+
+[Read the full documentation](there will be a link)
 
 ## Installation
 
@@ -63,7 +70,7 @@ using tensorfloat32 = floating_point<8, 10, uint64_t>;
 Further examples for how to use aarith can be found in the `examples` and `experiments` folders
 (the tests can also give a good idea of how to use aarith).
 
-We also refer the interested user to [Keszocze2021]_.
+We also refer the interested user to the publication listed below.
 
 ## License
 
