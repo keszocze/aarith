@@ -1,6 +1,13 @@
-name: CMake
+name: Linux CI
 
-on: [push]
+on:
+  push:
+    branches:
+    - master
+    - sphinx
+  pull_request:
+    branches:
+    - master
 
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
@@ -12,7 +19,16 @@ jobs:
     # well on Windows or Mac.  You can convert this to a matrix build if you need
     # cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04]
+        compiler: [clang++-8, clang++-9, clang++-10, clang++-11, g++-8, g++-9, g++-10]
+        exclude:
+          - os: ubuntu-18.04
+            compiler: clang++-10
+          - os: ubuntu-18.04
+            compiler: clang++-11
 
     steps:
     - uses: actions/checkout@v2
@@ -30,7 +46,8 @@ jobs:
       # Note the current convention is to use the -S and -B options here to specify source 
       # and build directories, but this is only available with CMake 3.13 and higher.  
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+      run: |
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
 
     - name: Build
       working-directory: ${{github.workspace}}/build
