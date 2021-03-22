@@ -829,6 +829,20 @@ public:
         return nan;
     }
 
+    [[nodiscard]] static constexpr int digits10()
+    {
+        return ::aarith::floor<int>(
+            (std::numeric_limits<floating_point<E, M, WordType>>::digits - 1U) *
+            ::aarith::log<10, 2>()); // NOLINT
+    }
+
+    [[nodiscard]] static constexpr int max_digits10()
+    {
+        return ::aarith::ceil<int>(std::numeric_limits<floating_point<E, M, WordType>>::digits *
+                                       ::aarith::log<10, 2>() + // NOLINT
+                                   1);
+    }
+
 private:
     /**
      * @brief Casts the number to float or double.
@@ -1138,3 +1152,86 @@ constexpr bool is754version2019()
 }
 
 } // namespace aarith
+
+// We are only allowed to extend std with specializations
+// https://en.cppreference.com/w/cpp/language/extending_std
+template <size_t E, size_t M, typename WordType>
+class std::numeric_limits<::aarith::floating_point<E, M, WordType>>
+{
+public:
+    static constexpr bool is_specialized = true;
+    static constexpr bool is_signed = true;
+    static constexpr bool is_integer = false;
+    static constexpr bool is_exact = false;
+    static constexpr bool has_infinity = true;
+    static constexpr bool has_quiet_NaN = true;
+    static constexpr bool has_signaling_NaN = true;
+    static constexpr bool is_bounded = true;
+    static constexpr std::float_denorm_style has_denorm = std::denorm_present;
+    static constexpr bool has_denorm_loss = false;
+    static constexpr std::float_round_style round_style = std::round_toward_zero;
+    static constexpr bool is_iec559 = false;
+    static constexpr bool is_modulo = false;
+    static constexpr int radix = 2;
+    static constexpr int digits = M + 1;
+    static constexpr int digits10 = ::aarith::floating_point<E, M, WordType>::digits10();
+
+    static constexpr int max_digits10 = ::aarith::floating_point<E, M, WordType>::max_digits10();
+
+    static constexpr int min_exponent = 0;
+    static constexpr int min_exponent10 = 0;
+    static constexpr int max_exponent = 0;
+    static constexpr int max_exponent10 = 0;
+
+    static constexpr bool traps = false;
+
+    static constexpr bool tinyness_before = false;
+
+    static constexpr ::aarith::floating_point<E, M, WordType> min() noexcept
+    {
+        // TODO
+        return ::aarith::floating_point<E, M, WordType>::zero();
+    }
+
+    static constexpr ::aarith::floating_point<E, M, WordType> lowest() noexcept
+    {
+        // TODO
+        return ::aarith::floating_point<E, M, WordType>::zero();
+    }
+
+    static constexpr ::aarith::floating_point<E, M, WordType> max() noexcept
+    {
+        //
+        return ::aarith::floating_point<E, M, WordType>::max();
+    }
+
+    static constexpr ::aarith::floating_point<E, M, WordType> epsilon() noexcept
+    {
+        return ::aarith::floating_point<E, M, WordType>::zero();
+    }
+
+    static constexpr ::aarith::floating_point<E, M, WordType> round_error() noexcept
+    {
+        return ::aarith::floating_point<E, M, WordType>::zero();
+    }
+
+    static constexpr ::aarith::floating_point<E, M, WordType> infinity() noexcept
+    {
+        return ::aarith::floating_point<E, M, WordType>::zero();
+    }
+
+    static constexpr ::aarith::floating_point<E, M, WordType> quiet_NaN() noexcept
+    {
+        return ::aarith::floating_point<E, M, WordType>::zero();
+    }
+
+    static constexpr ::aarith::floating_point<E, M, WordType> signaling_NaN() noexcept
+    {
+        return ::aarith::floating_point<E, M, WordType>::zero();
+    }
+
+    static constexpr ::aarith::floating_point<E, M, WordType> denorm_min() noexcept
+    {
+        return ::aarith::floating_point<E, M, WordType>::min();
+    }
+};

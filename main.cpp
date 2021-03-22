@@ -1,11 +1,12 @@
 #include <aarith/float.hpp>
 #include <aarith/integer.hpp>
+#include <aarith/core/number_utils.hpp>
 #include <cmath>
 #include <iostream>
 
 int main()
 {
-    using namespace aarith;
+    using namespace aarith; // NOLINT
 
     single_precision<uint64_t> test=single_precision<uint64_t>::neg_one();
 
@@ -25,6 +26,10 @@ int main()
     std::cout << "\"" << s.substr(0,1) << "\"\n";
     std::cout << "\"" << s.substr(1,1) << "\"\n";
     std::cout << "\"" << s.substr(2,1) << "\"\n";
+
+
+    std::cout << static_cast<int>(-3.5f) << " " <<  ::aarith::floor<int>(-3.5f) << "\n";
+    std::cout << static_cast<int>(3.5f) << " " <<  ::aarith::floor<int>(3.5f) << "\n";
 
     return 0;
 }
