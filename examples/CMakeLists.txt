@@ -1,4 +1,6 @@
-set(CMAKE_CXX_CLANG_TIDY "clang-tidy")
+if (USE_CLANGTIDY)
+    set(CMAKE_CXX_CLANG_TIDY "clang-tidy")
+endif()
 
 cmake_minimum_required(VERSION 3.13)
 
