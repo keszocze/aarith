@@ -4,21 +4,44 @@ namespace aarith {
 
 template <unsigned Radix, unsigned Value> constexpr double log();
 
+/*
+ * This method is necessary as not all compilers support constexpr
+ * in the math library
+ */
 template <> constexpr double log<2, 10>()
 {
     return 3.32192809489;
 }
 
+/*
+ * This method is necessary as not all compilers support constexpr
+ * in the math library
+ */
 template <> constexpr double log<10, 2>()
 {
     return 0.30102999566;
 }
 
+/*
+ * This method is necessary as not all compilers support constexpr
+ * in the math library
+ */
 template <class Result> constexpr Result ceil(double num)
 {
     return (static_cast<double>(static_cast<Result>(num)) == num)
                ? static_cast<Result>(num)
                : static_cast<Result>(num) + ((num > 0) ? 1 : 0);
+}
+
+/*
+ * This method is necessary as not all compilers support constexpr
+ * in the math library
+ */
+template <class Result> constexpr Result floor(double num)
+{
+    return (static_cast<double>(static_cast<Result>(num)) == num)
+           ? static_cast<Result>(num)
+           : static_cast<Result>(num) - ((num < 0) ? 1 : 0);
 }
 
 /**
