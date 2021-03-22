@@ -1,12 +1,30 @@
+#include <aarith/float.hpp>
+#include <aarith/integer.hpp>
+#include <cmath>
 #include <iostream>
-#include <bitset>
-#include <aarith/types/integer.hpp>
-#include <aarith/operations/exact_operations.hpp>
-#include <aarith/utilities/string_utils.hpp>
 
-//#include <integer.hpp>
+int main()
+{
+    using namespace aarith;
 
-int main() {
+    single_precision test=single_precision::neg_one();
+
+    std::cout << test << "\n";
+
+    std::stringstream ss;
+    ss << test;
+
+    std::string s = ss.str();
+
+
+    std::cout << "\"" << to_sci_string(test).substr(0,1) << "\"\n";
+    std::cout << "\"" << to_sci_string(test).substr(1,1) << "\"\n";
+    std::cout << "\"" << to_sci_string(test).substr(2,1) << "\"\n";
+
+    std::cout << s << "\n";
+    std::cout << "\"" << s.substr(0,1) << "\"\n";
+    std::cout << "\"" << s.substr(1,1) << "\"\n";
+    std::cout << "\"" << s.substr(2,1) << "\"\n";
 
     return 0;
 }
