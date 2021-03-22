@@ -5,24 +5,27 @@
 namespace aarith {
 
 /**
- * @brief
- * @param bits
- * @return
+ * @brief Computes an approximation of the decimal deigits an n_bits number will use
+ * @param n_bits The number of bits in the number
+ * @return The approximation of the number of decimal digits the n_bits number will have
  */
-inline constexpr auto number_of_decimal_digits(size_t bits) -> size_t
+inline constexpr auto number_of_decimal_digits(size_t n_bits) -> size_t
 {
     // When converted to decimal, an n-bit binary numeral will have at most k*n decimal digits,
     // rounded up, where k = log_10 2 ~ 0.301.
-    return (bits * 301) / 1000 + ((bits * 301) % 1000 == 0 ? 0 : 1); // NOLINT
+    return (n_bits * 301) / 1000 + ((n_bits * 301) % 1000 == 0 ? 0 : 1); // NOLINT
 }
 
 /**
- * @brief
- * @tparam T
- * @tparam U
- * @param dividend
- * @param divisor
- * @return
+ * @brief Division with subsequent ceil oberation
+ *
+ * Computes ceil(dividend/divisor)
+ *
+ * @tparam T Type of the dividend
+ * @tparam U Type of the divisor
+ * @param dividend The actual dividend
+ * @param divisor The actual divisor
+ * @return Returns ceil(dividend/divisor)
  */
 template <class T, class U>
 constexpr auto rounded_integer_division(T dividend, U divisor) -> decltype(T{} / U{})
