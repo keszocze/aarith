@@ -680,6 +680,23 @@ public:
     //
 
     /**
+     * @brief Check whether posit is a non-negative real.
+     *
+     * This method returns true exactly if the underlying posit represents a
+     * real value greater or equal to zero. In particular, it returns false
+     * for all negative values and for special value NaR.
+     *
+     * @return Whether this posit represents a non-negative real number.
+     */
+    [[nodiscard]] constexpr bool is_non_negative() const;
+
+    /**
+     * @brief Check whether posit is a negative real.
+     *
+     * This method returns true exactly if the underlying posit represents a
+     * real value less than zero. In particular, it returns false for all
+     * non-negative values and for special value NaR.
+     *
      * @return Whether this posit represents a negative real number.
      */
     [[nodiscard]] constexpr bool is_negative() const;
@@ -2047,6 +2064,98 @@ std::ostream& operator<<(std::ostream& os, const interval_bound& u);
 [[nodiscard]] constexpr interval_bound merge(interval_bound u0, interval_bound u1);
 
 //
+// Bound Sign Enum
+//
+
+enum class bound_sign
+{
+    EXACT,
+    PLUS_EPS,
+    MINUS_EPS,
+    UNSURE,
+};
+
+//
+// Bound Sign Operator
+//
+// For implementation, look at posit/bound_sign_operators.hpp
+//
+
+std::ostream& operator<<(std::ostream& os, const bound_sign& bs);
+
+//
+// Additional Bound Sign Operations
+//
+// For implementation, look at posit/bound_sign_operations.hpp
+//
+
+/**
+ * @return Whether bs is equal to EXACT.
+ */
+[[nodiscard]] constexpr bool is_exact(bound_sign bs);
+
+/**
+ * @return Whether bs is equal to PLUS_EPS.
+ */
+[[nodiscard]] constexpr bool is_plus_eps(bound_sign bs);
+
+/**
+ * @return Whether bs is equal to MINUS_EPS.
+ */
+[[nodiscard]] constexpr bool is_minus_eps(bound_sign bs);
+
+/**
+ * @return Whether bs is equal to UNSURE.
+ */
+[[nodiscard]] constexpr bool is_unsure(bound_sign bs);
+
+//
+// Bound Class
+//
+// For implementation, look at posit/bound.hpp
+//
+
+template <size_t N, size_t ES, typename WT = DefaultWordType> class bound
+{
+public:
+    using posit_type = posit<N, ES, WT>;
+
+    bound();
+    bound(const posit_type& new_value, bound_sign sign = bound_sign::EXACT);
+    bound(const bound& other);
+    ~bound();
+
+    bound& operator=(const bound& other);
+
+    [[nodiscard]] constexpr bool operator==(const bound& other) const;
+    [[nodiscard]] constexpr bool operator!=(const bound& other) const;
+
+    [[nodiscard]] constexpr bound operator*(const bound& other) const;
+
+    [[nodiscard]] const posit_type& get_value() const;
+    [[nodiscard]] const bound_sign& get_sign() const;
+
+    [[nodiscard]] constexpr bool is_exact() const;
+    [[nodiscard]] constexpr bool is_plus_eps() const;
+    [[nodiscard]] constexpr bool is_minus_eps() const;
+    [[nodiscard]] constexpr bool is_unsure() const;
+
+    [[nodiscard]] constexpr bool is_zero() const;
+    [[nodiscard]] constexpr bool is_negative() const;
+    [[nodiscard]] constexpr bool is_non_negative() const;
+
+private:
+    posit_type value;
+    bound_sign sign;
+};
+
+//
+// Additional Bound Operators
+//
+// For implementation, look at posit/bound_operators.hpp
+//
+
+//
 // Valid Class.
 //
 // For implementation, look at posit/valid.hpp
@@ -2613,6 +2722,10 @@ inline void for_each_regular_valid(const std::function<void(const ValidType&)>& 
 // they wish.
 //
 
+#include <aarith/posit/bound.hpp>
+#include <aarith/posit/bound_operators.hpp>
+#include <aarith/posit/bound_sign_operations.hpp>
+#include <aarith/posit/bound_sign_operators.hpp>
 #include <aarith/posit/errors.hpp>
 #include <aarith/posit/interval_bound_operations.hpp>
 #include <aarith/posit/interval_bound_operators.hpp>

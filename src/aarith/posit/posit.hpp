@@ -724,14 +724,15 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool posit<N, ES, WT>::is_non_negative() const
+{
+    return !is_nar() && !msb();
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool posit<N, ES, WT>::is_negative() const
 {
-    if (is_nar())
-    {
-        return false;
-    }
-
-    return msb() == storage_type(1);
+    return !is_nar() && msb();
 }
 
 template <size_t N, size_t ES, typename WT>

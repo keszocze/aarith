@@ -43,6 +43,7 @@ add_aarith_test(float-addition FILES float/float_addition.cpp)
 add_aarith_test(float-subtraction FILES float/float_subtraction.cpp)
 add_aarith_test(float-classify-methods FILES float/classify-methods.cpp)
 
+add_aarith_test(bound-multiplication FILES posit/bound-multiplication-test.cpp)
 add_aarith_test(posit FILES posit/posit-test.cpp)
 add_aarith_test(posit-casts FILES posit/posit_casts-test.cpp)
 add_aarith_test(posit-operations FILES posit/posit_operations-test.cpp)
