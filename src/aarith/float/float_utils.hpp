@@ -231,7 +231,7 @@ template <typename F> constexpr IEEEClass fp_class(const F& f)
 enum class Radix
 {
     Two,
-    Ten
+    Ten // NOLINT
 };
 
 /**
@@ -270,12 +270,12 @@ constexpr size_t get_mantissa_width()
 
 template <> constexpr size_t get_mantissa_width<float>()
 {
-    return 23U;
+    return 23U; // NOLINT
 }
 
 template <> constexpr size_t get_mantissa_width<double>()
 {
-    return 52U;
+    return 52U; // NOLINT
 }
 
 template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
@@ -286,12 +286,12 @@ constexpr size_t get_exponent_width()
 
 template <> constexpr size_t get_exponent_width<float>()
 {
-    return 8U;
+    return 8U; // NOLINT
 }
 
 template <> constexpr size_t get_exponent_width<double>()
 {
-    return 11U;
+    return 11U; // NOLINT
 }
 
 /**

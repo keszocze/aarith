@@ -1,3 +1,6 @@
+[![Linux CI](https://github.com/keszocze/aarith/actions/workflows/linux.yml/badge.svg?branch=master)](https://github.com/keszocze/aarith/actions/workflows/linux.yml)
+[![Documentation Status](https://readthedocs.org/projects/aarith/badge/?version=latest)](https://aarith.readthedocs.io/en/latest/?badge=latest)
+
 # Aarith: An Arbitrary Precision Number Library
 
 

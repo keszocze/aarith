@@ -59,7 +59,7 @@ constexpr bool operator<(const uinteger<W, WordType>& a, const uinteger<V, WordT
         // do not care too much about speed
 
         const size_t max_width =
-            std::max(W, V); // TODO make constexpr the moment clang supports this
+            std::max(W, V); // TODO (keszocze) make constexpr the moment clang supports this
 
         integer<max_width, WordType> a_ = width_cast<max_width>(a);
         integer<max_width, WordType> b_ = width_cast<max_width>(b);

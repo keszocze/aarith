@@ -23,33 +23,77 @@ public:
 };
 
 /**
+ * @brief Test for a type being an word array
  *
- * @tparam Type
+ * Helper for the `is_word_array` type trait
+ *
+ * @tparam Type Type to check for being an aarith word array
  */
 template <class Type> inline constexpr bool is_word_array_v = is_word_array<Type>::value;
 
+
+/**
+ * @brief Type trait to check if a type is an aarith integer
+ * @tparam Type The Type to check
+ */
 template <class Type> class is_integral
 {
 public:
+    /**
+     * By default, mo type is an aarith integer
+     */
     static constexpr bool value = false;
 };
 
+/**
+ * @brief Test for a type being an aarith integer
+ *
+ * Helper for the `is_integral` type trait
+ * @tparam Type The type to check
+ *
+ */
 template <class Type> inline constexpr bool is_integral_v = is_integral<Type>::value;
 
+
+/**
+ * @brief Type trait to check if a type is an unsigned aarith type
+ *
+ * @tparam Type The type to check
+ */
 template <class Type> class is_unsigned
 {
 public:
+    /**
+     * By default, no type is an unsigned type
+     */
     static constexpr bool value = false;
 };
 
+/**
+ * @brief Test for an aarith type to be unsigned
+ *
+ * @tparam Type The type to check
+ */
 template <class Type> inline constexpr bool is_unsigned_v = is_unsigned<Type>::value;
 
+
+/**
+ * @brief Type trait to check if a type is a signed aarith type
+ * @tparam Type The type to check
+ */
 template <class Type> class is_signed
 {
 public:
+    /**
+     * By default, no type is an signed aarith type
+     */
     static constexpr bool value = false;
 };
 
+/**
+ * @brief Test for an aarith type to be signed
+ * @tparam Type The type to check
+ */
 template <class Type> inline constexpr bool is_signed_v = is_signed<Type>::value;
 
 /**

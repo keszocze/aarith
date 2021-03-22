@@ -114,8 +114,7 @@ template <size_t E, size_t M>
         return rhs.make_quiet_nan();
     }
 
-    if ((lhs.is_nan() || rhs.is_nan()) || (lhs.is_zero() && rhs.is_inf()) ||
-        (lhs.is_inf() && rhs.is_zero()))
+    if ((lhs.is_zero() && rhs.is_inf()) || (lhs.is_inf() && rhs.is_zero()))
     {
         return floating_point<E, M>::NaN();
     }
@@ -152,7 +151,7 @@ template <size_t E, size_t M>
         {
             ext_esum = ~ext_esum;
             ext_esum = add(ext_esum, uinteger<ext_esum.width()>(2));
-            if (ext_esum < uinteger<64>(M + 1))
+            if (ext_esum < uinteger<64>(M + 1)) // TODO (keszocze) where does the 64 come from?
             {
                 mproduct = mproduct >> ext_esum.word(0);
                 product.set_full_mantissa(width_cast<M + 1>(mproduct));

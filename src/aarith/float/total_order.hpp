@@ -107,7 +107,7 @@ bool constexpr totalOrder(const floating_point<E, M, WordType>& x,
         // 2) totalOrder(+0, −0) is false.
         if (x.is_pos_zero() && y.is_neg_zero())
         {
-            return false;
+            return false; // NOLINT
         }
 
         // I totally fail to understand the following clause (see below) as the equality check above

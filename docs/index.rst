@@ -1,6 +1,14 @@
 Aarith: An Arbitrary Precision Number Library
 =============================================
 
+.. image:: https://github.com/keszocze/aarith/actions/workflows/linux.yml/badge.svg?branch=master
+:target:https://github.com/keszocze/aarith/actions/workflows/linux.yml
+:alt: Linux Build Status
+
+.. image:: https://readthedocs.org/projects/aarith/badge/?version=latest
+:target: https://aarith.readthedocs.io/en/latest/?badge=latest
+:alt: Documentation Status
+
 Aarith is a header-only, arbitrary precision number library for C++. It is intended to be used as a drop-in replacement
 of the native data types.
 
