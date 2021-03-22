@@ -26,7 +26,9 @@ jobs:
         compiler: [clang++-8, clang++-9, clang++-10, clang++-11, g++-8, g++-9, g++-10]
         exclude:
           - os: ubuntu-18.04
-            compiler: clang++-10, clang++-11
+            compiler: clang++-10
+          - os: ubuntu-18.04
+            compiler: clang++-11
 
     steps:
     - uses: actions/checkout@v2
