@@ -32,7 +32,3 @@ Casts
 
 .. doxygenfile:: integer_casts.hpp
 
-#Ranges
-#------
-
-#.. doxygenfile:: integer_ranges.hpp

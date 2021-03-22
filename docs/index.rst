@@ -12,17 +12,36 @@ Aarith currently supports
 See
 
 .. toctree::
-   :maxdepth: 3
-   :caption: Contents
+   :maxdepth: 2
 
    installation
    tutorial
    usecases
    philosophy
-   reference
    literature
 
 
+.. toctree::
+    :maxdepth: 2
+    :caption: Integers
+
+    api/integer
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Floating-Point Numbers
+
+    api/float/class
+    api/float/operations
+    api/float/comparisons
+    api/float/utilities
+
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Utilities
+
+    api/word_array
 
 Publication
 -----------

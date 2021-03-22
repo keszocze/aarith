@@ -1,6 +1,8 @@
 Flaoting-Point Numbers
 ======================
 
+**Header** ``aarith/float/floating_point.hpp``
+
 The template class ``floating_point`` represents a floating-point number of arbitrary, but compile-time static precision.
 
 

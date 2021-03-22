@@ -1,5 +1,6 @@
 Use Cases
 =========
+.. _use_cases:
 
 In the following, use cases for Aarith will be shown. (So far, we only present one)
 
@@ -42,6 +43,7 @@ be accessed when designing hardware units.
         constexpr size_t msp_width = width - lsp_width;
         const uinteger<msp_width> a_msp = a_split.first;
         const uinteger<msp_width> b_msp = b_split.first;
+        //***********************
 
         // sum up LSP including the computation of the carry
         uinteger<lsp_width + 1> lsp_sum = expanding_add(a_lsp, b_lsp);

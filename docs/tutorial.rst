@@ -48,8 +48,8 @@ This gives the expected output of
         using tensorfloat32 = floating_point<8, 10, uint64_t>;
 
 
-Further examples for how to use aarith can be found in the `examples` and `experiments` folders
-(the tests can also give a good idea of how to use aarith).
+Further examples for how to use aarith can be found at the :ref:`Uses Cases <use_cases>` and in the `examples` and
+`experiments` source code folders (the tests can also give a good idea of how to use aarith).
 
 We also refer the interested user to [Keszocze2021]_.
 
