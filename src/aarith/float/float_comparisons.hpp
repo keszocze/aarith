@@ -94,7 +94,7 @@ template <size_t E, size_t M, size_t E_, size_t M_,
 bool constexpr logical_equality(const floating_point<E, M> lhs, const floating_point<E_, M_> rhs)
 {
 
-    bool equal_mantissa = false; // NO-LINT
+    bool equal_mantissa = false; // NOLINT
 
     if constexpr (M > M_)
     {

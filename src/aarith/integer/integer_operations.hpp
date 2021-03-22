@@ -21,8 +21,6 @@ template <typename I, typename T>
 
     static_assert(::aarith::is_integral_v<I>);
     static_assert(::aarith::is_integral_v<T>);
-
-    // TODO do we need this assertion?
     static_assert(::aarith::same_signedness<I, T>);
 
     constexpr size_t res_width = std::max(I::width(), T::width()) + 1U;
@@ -248,7 +246,7 @@ template <std::size_t W, std::size_t V, typename WordType>
         constexpr size_t floor_pow_two = floor_to_pow(W);
 
         constexpr size_t karazuba_width =
-            (floor_pow_two == W) ? (floor_pow_two >> 1) : (floor_pow_two);
+            (floor_pow_two == W) ? (floor_pow_two >> 1U) : (floor_pow_two);
 
         const auto a_split = split<karazuba_width - 1>(a);
         const auto b_split = split<karazuba_width - 1>(b);
@@ -430,8 +428,8 @@ template <size_t Width, typename WordType>
 [[nodiscard]] constexpr auto expanding_abs(const integer<Width, WordType>& n)
     -> uinteger<Width, WordType>
 {
-    uinteger<Width, WordType> abs = n.is_negative() ? negate(n) : n;
-    return abs;
+    uinteger<Width, WordType> abs_ = n.is_negative() ? negate(n) : n;
+    return abs_;
 }
 
 /**
@@ -599,7 +597,7 @@ template <size_t W, size_t V, typename WordType>
 
     const integer<W + V, WordType> result = schoolbook_expanding_mul(m_, r_);
 
-    return m_neg ^ r_neg ? -result : result;
+    return (m_neg ^ r_neg) ? -result : result;
 }
 
 /**

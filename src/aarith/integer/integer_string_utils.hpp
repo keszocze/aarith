@@ -9,7 +9,7 @@ template <size_t N, size_t Width, typename WordType>
 auto to_base_2n(const uinteger<Width, WordType>& value)
 {
     static_assert(N <= 4);
-    static constexpr char digits[16] = {'0', '1', '2', '3', '4', '5', '6', '7',
+    static constexpr std::array<char,16> digits{'0', '1', '2', '3', '4', '5', '6', '7',
                                         '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
     static constexpr auto digit_count = rounded_integer_division(Width, N);
 
