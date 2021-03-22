@@ -2,18 +2,47 @@
 
 namespace aarith {
 
-template <unsigned Radix, unsigned Value> constexpr double log();
+/**
+ * @brief Constexpr version of log
+ *
+ * This method is necessary as not all compilers already come with a constexpr ready math library.
+ *
+ * @note Only two values needed by aarith are epxlictly stored!
+ *
+ * @tparam Base The base of the loarithm
+ * @tparam Value The value whose logarithm is to be computed
+ * @return The logarithm of Value base Base
+ */
+template <unsigned Base, unsigned Value> constexpr double log();
 
-template <> constexpr double log<2, 10>()
+
+/**
+ * @brief The constexpr value of log_2(10)
+ * @return log_2(10)
+ */
+template <> constexpr double log<2, 10>() // NOLINT
 {
-    return 3.32192809489;
+    return 3.32192809489; // NOLINT
 }
 
-template <> constexpr double log<10, 2>()
+/**
+ * @brief The constexpr value of log_10(2)
+ * @return log_10(2)
+ */
+template <> constexpr double log<10, 2>() // NOLINT
 {
-    return 0.30102999566;
+    return 0.30102999566; // NOLINT
 }
 
+/**
+ * @brief Constexpr version of the ceil operation
+ *
+ * This method is only necessary as not all compilers already have an constexpr ready math library.
+ *
+ * @tparam Result Type for the result
+ * @param num The number to round down
+ * @return num rounded down
+ */
 template <class Result> constexpr Result ceil(double num)
 {
     return (static_cast<double>(static_cast<Result>(num)) == num)
@@ -74,10 +103,10 @@ constexpr size_t pow(const size_t base, const size_t exponent)
 {
     size_t first_bit = 0UL;
     size_t tmp = n;
-    while (tmp)
+    while (tmp > 0)
     {
         ++first_bit;
-        tmp = tmp >> 1;
+        tmp = tmp >> 1U;
     }
     return first_bit;
 }

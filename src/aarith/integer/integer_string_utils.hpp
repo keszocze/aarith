@@ -1,6 +1,6 @@
 #pragma once
 
-#include <aarith/core/string_utils.hpp>
+#include <aarith/core/core_string_utils.hpp>
 
 namespace aarith {
 

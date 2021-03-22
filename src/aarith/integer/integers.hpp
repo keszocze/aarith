@@ -341,7 +341,7 @@ public:
 
 } // namespace aarith
 
-#include <aarith/core/number_utils.hpp>
+#include <aarith/core/core_number_utils.hpp>
 
 // We are only allowed to extend std with specializations
 // https://en.cppreference.com/w/cpp/language/extending_std

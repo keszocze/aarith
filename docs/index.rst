@@ -12,7 +12,8 @@ Aarith currently supports
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
+   :caption: General
 
    installation
    tutorial
@@ -22,13 +23,13 @@ Aarith currently supports
 
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
     :caption: Integers
 
     api/integer
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
     :caption: Floating-Point Numbers
 
     api/float/class
@@ -37,11 +38,6 @@ Aarith currently supports
     api/float/utilities
 
 
-.. toctree::
-    :maxdepth: 2
-    :caption: Utilities
-
-    api/word_array
 
 Publication
 -----------
@@ -66,6 +62,16 @@ Bibtex:
     }
 
 
+
+
+.. toctree::
+    :maxdepth: 1
+    :caption: Core & Utilities
+
+    api/core/word_array
+    api/core/stringnum
+    api/core/traits
+    api/core/bitcast
 
 Indices and tables
 ==================
