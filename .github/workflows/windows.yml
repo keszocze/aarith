@@ -1,4 +1,4 @@
-name: macOS CI
+name: Windows CI
 
 on:
   push:
@@ -19,11 +19,7 @@ jobs:
     # well on Windows or Mac.  You can convert this to a matrix build if you need
     # cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: []
-        compiler: [clang++, gcc-8, gcc-9, gcc-10]
+    runs-on: windows-2019
 
     steps:
     - uses: actions/checkout@v2
@@ -42,7 +38,7 @@ jobs:
       # and build directories, but this is only available with CMake 3.13 and higher.  
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
       run: |
-        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
+        cmake $GITHUB_WORKSPACE -G "Visual Studio 16 2019" -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DCMAKE_CXX_COMPILER=${{ matrix.compiler }}
 
     - name: Build
       working-directory: ${{github.workspace}}/build
