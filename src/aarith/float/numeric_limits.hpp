@@ -13,7 +13,7 @@ namespace aarith {
  *
  * @return The min exponent
  */
-template <typename F> [[nodiscard]]  int min_exponent()
+template <typename F> [[nodiscard]]  constexpr int min_exponent()
 {
     auto ftype_min_exp = F::min_exp;
     int min_exponent_ = static_cast<int>(ftype_min_exp) + 1;

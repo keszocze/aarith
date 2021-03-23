@@ -187,7 +187,7 @@ public:
     static constexpr IntegerExp bias = uinteger<E - 1, WordType>::all_ones();
     static constexpr IntegerUnbiasedExp max_exp = uinteger<E - 1, WordType>::all_ones();
     static constexpr IntegerUnbiasedExp min_exp = []() {
-        const IntegerExp bias_ = uinteger<E - 1, WordType>::all_ones();
+        const IntegerExp bias_ = IntegerExp{uinteger<E - 1, WordType>::all_ones()};
         IntegerUnbiasedExp min_exp_{bias_};
         IntegerUnbiasedExp one = IntegerUnbiasedExp::one();
         min_exp_ = negate(sub(min_exp_, one));

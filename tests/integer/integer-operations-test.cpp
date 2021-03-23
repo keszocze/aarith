@@ -6,7 +6,7 @@
 
 #include "../test-signature-ranges.hpp"
 
-using namespace aarith;
+using namespace aarith; // NOLINT
 
 TEMPLATE_TEST_CASE_SIG("Pre/postfix operator++", "[integer][arithmetic][foo]",
                        AARITH_INT_EXTENDED_TEST_SIGNATURE,

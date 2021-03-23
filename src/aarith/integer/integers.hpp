@@ -19,7 +19,7 @@ namespace aarith {
 namespace implementation {
 
 template <typename T, size_t W, typename WordType, template <size_t, typename> typename I>
-[[nodiscard]] T generic_cast(const I<W, WordType>& num)
+[[nodiscard]] constexpr T generic_cast(const I<W, WordType>& num)
 {
 
     constexpr size_t target_size = sizeof(T) * CHAR_BIT;
@@ -29,15 +29,10 @@ template <typename T, size_t W, typename WordType, template <size_t, typename> t
 
     constexpr size_t word_width = I<W, WordType>::word_width();
 
-    std::cout << num << " " << extended_num << "\n";
-    std::cout << to_binary(num) << " " << to_binary(extended_num) << "\n";
-
     T result{0};
 
-    std::cout << "result |= extendend_num.word(i) << (i * " << word_width  <<")\n";
     for (size_t i = 0; i < use_words; ++i)
     {
-        std::cout << result << " |= " << (extended_num.word(i) << (i * word_width)) << " (i=" << i<<")\n";
         result |= extended_num.word(i) << (i * word_width);
     }
 
@@ -237,10 +232,9 @@ public:
             && std::is_signed_v<T>
             && (sizeof(WordType) >= sizeof(T))
                               > >
-    explicit  integer(T t) // NOLINT
+    explicit constexpr integer(T t) // NOLINT
         : word_array<Width, WordType>(static_cast<WordType>(t))
     {
-        std::cout << "yup\n";
         if (t < 0)
         {
             auto const ones = static_cast<WordType>(-1);
@@ -257,14 +251,13 @@ public:
                       && (sizeof(WordType) >= sizeof(T))
                   >
               >
-    explicit integer(T t, Args... args)
+    explicit constexpr integer(T t, Args... args)
         : word_array<Width, WordType>(static_cast<WordType>(t), args...)
     {
-        std::cout << "hier\n";
     }
 
     template <class... Args>
-    constexpr explicit integer(WordType fst, Args... args)
+    constexpr  explicit integer(WordType fst, Args... args)
         : word_array<Width, WordType>(fst, args...)
     {
     }
