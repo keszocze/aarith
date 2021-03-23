@@ -70,9 +70,7 @@ public:
     using IntExp = typename F::IntegerExp;
     using IntFrac = typename F::IntegerFrac;
 
-    explicit floating_point_distribution()
-    {
-    }
+    explicit floating_point_distribution() = default;
 
     template <typename Generator> auto operator()(Generator& g) -> F
     {

@@ -1,7 +1,7 @@
 #include <catch.hpp>
 
 #include <aarith/core.hpp>
-#include <aarith/core/string_utils.hpp>
+#include <aarith/core/core_string_utils.hpp>
 
 #include "../test-signature-ranges.hpp"
 #include "gen_word_array.hpp"

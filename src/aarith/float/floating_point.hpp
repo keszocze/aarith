@@ -2,11 +2,12 @@
 
 #include <aarith/core.hpp>
 #include <aarith/float/float_utils.hpp>
-
 #include <aarith/integer_no_operators.hpp>
+
 #include <bitset>
 #include <cassert>
 #include <cstdint>
+#include <ctime>
 #include <iostream>
 #include <string>
 #include <type_traits>
@@ -15,24 +16,27 @@ namespace aarith {
 
 template <size_t E, size_t M, typename WordType = uint64_t> class floating_point; // NOLINT
 
+using half_precision = floating_point<5, 10, uint64_t>; // NOLINT
+using single_precision = floating_point<8, 23, uint64_t>; // NOLINT
+using double_precison = floating_point<11, 52, uint64_t>; // NOLINT
+using quadruple_precision = floating_point<15, 112, uint64_t>; // NOLINT
+using bfloat16 = floating_point<8, 7, uint64_t>; // NOLINT
+using tensorfloat32 = floating_point<8, 10, uint64_t>; // NOLINT
 
-
-template <typename WordType = uint64_t>
-using half_precision = floating_point<5, 10, WordType>; // NOLINT
-
-template <typename WordType = uint64_t>
-using single_precision = floating_point<8, 23, WordType>; // NOLINT
-
-template <typename WordType = uint64_t>
-using double_precison = floating_point<11, 52, WordType>; // NOLINT
-
-template <typename WordType = uint64_t>
-using quadruple_precision = floating_point<15, 112, WordType>; // NOLINT
-
-template <typename WordType = uint64_t> using bfloat16 = floating_point<8, 7, WordType>; // NOLINT
-
-template <typename WordType = uint64_t>
-using tensorfloat32 = floating_point<8, 10, WordType>; // NOLINT
+/**
+ * @brief Expands the mantissa by correctly shifting the bits in the larger uinteger
+ * @tparam MS The target width of the mantissa
+ * @return The mantissa expended to a width of MS
+ */
+template <size_t MS, size_t E, size_t M, typename WordType>
+[[nodiscard]] uinteger<MS, WordType> constexpr expand_mantissa(
+    const floating_point<E, M, WordType>& f)
+{
+    static_assert(MS >= M, "Expanded mantissa must not be shorter than the original mantissa");
+    uinteger<MS, WordType> mantissa_{f.get_mantissa()};
+    mantissa_ <<= (size_t{MS} - size_t{M});
+    return mantissa_;
+}
 
 /**
  * @brief Creates a bitstring representation of the floating point number.
@@ -225,7 +229,7 @@ public:
 
     explicit constexpr floating_point(const unsigned int is_neg, IntegerExp exp,
                                       word_array<M, WordType> frac)
-        : sign_neg(is_neg)
+        : sign_neg(is_neg) // NOLINT
         , exponent(exp)
         , mantissa((exponent == IntegerExp::zero()) ? IntegerMant{frac}
                                                     : msb_one(IntegerMant{frac}))
@@ -234,7 +238,7 @@ public:
 
     explicit constexpr floating_point(const unsigned int is_neg, const IntegerExp& exp,
                                       const word_array<MW, WordType>& mant)
-        : sign_neg(is_neg)
+        : sign_neg(is_neg) // NOLINT
         , exponent(exp)
         , mantissa(mant)
     {
@@ -264,7 +268,7 @@ public:
 
         // does not correctly insert -0
         // sign_neg = (f < 0);
-        sign_neg = value_disassembled.is_neg;
+        sign_neg = value_disassembled.is_neg; // NOLINT
 
         if (f == static_cast<F>(0.))
         {
@@ -529,7 +533,7 @@ public:
         return M;
     }
 
-    constexpr auto get_sign() const -> unsigned int
+    [[nodiscard]] constexpr auto get_sign() const -> unsigned int
     {
         return (sign_neg) ? 1U : 0U;
     }
@@ -539,7 +543,7 @@ public:
         sign_neg = (sign & 1U) > 0;
     }
 
-    auto get_exponent() const -> uinteger<E, WordType>
+    [[nodiscard]]  auto get_exponent() const -> uinteger<E, WordType>
     {
         return exponent;
     }
@@ -616,7 +620,7 @@ public:
      * @brief Checks if the number is a quiet NaN
      * @return True iff the number is a quiet NaN
      */
-    constexpr bool is_qNaN() const
+    [[nodiscard]]  constexpr bool is_qNaN() const
     {
         const bool exp_all_ones = exponent == IntegerExp ::all_ones();
         const bool first_bit_set = width_cast<M>(mantissa).msb();
@@ -627,7 +631,7 @@ public:
      * @brief Checks if the number is a signalling NaN
      * @return True iff the number is a signalling NaN
      */
-    constexpr bool is_sNaN() const
+    [[nodiscard]]  constexpr bool is_sNaN() const
     {
         const bool exp_all_ones = exponent == IntegerExp ::all_ones();
         const auto fraction = width_cast<M>(mantissa);
@@ -649,8 +653,6 @@ public:
         const IntegerUnbiasedExp unbiased_exp = sub(signed_exponent, signed_bias);
         return unbiased_exp;
     }
-
-
 
     /**
      * @brief Checks whether the floating point number is zero
@@ -691,12 +693,12 @@ public:
         exponent = set_to;
     }
 
-    auto constexpr get_full_mantissa() const -> uinteger<MW, WordType>
+    [[nodiscard]] auto constexpr get_full_mantissa() const -> uinteger<MW, WordType>
     {
         return mantissa;
     }
 
-    auto constexpr get_mantissa() const -> uinteger<M, WordType>
+    [[nodiscard]] auto constexpr get_mantissa() const -> uinteger<M, WordType>
     {
         return width_cast<M>(mantissa);
     }
@@ -715,7 +717,7 @@ public:
         }
     }
 
-    auto bit(size_t index) const -> typename uinteger<M, WordType>::bit_type
+    [[nodiscard]] auto bit(size_t index) const -> typename uinteger<M, WordType>::bit_type
     {
         if (index < MW)
         {
@@ -819,6 +821,9 @@ public:
 
     floating_point<E, M, WordType>& operator=(const floating_point<E, M, WordType>& f)
     {
+        if (this == &f) {
+            return *this;
+        }
         this->sign_neg = f.sign_neg;
         this->exponent = f.exponent;
         this->mantissa = f.mantissa;
@@ -833,8 +838,6 @@ public:
         floating_point<E, M> nan{sign_neg, nan_exponent, nan_mantissa};
         return nan;
     }
-
-
 
 private:
     /**
@@ -866,7 +869,7 @@ private:
         return result;
     }
 
-    bool sign_neg;
+    bool sign_neg{false};
     uinteger<E, WordType> exponent;
     uinteger<MW, WordType> mantissa;
 };
@@ -1052,12 +1055,10 @@ auto rshift_and_round(const uinteger<M, WordType>& m, const size_t shift_by)
 }
 
 template <size_t E, size_t M1, size_t M2 = M1, typename WordType = uint64_t>
-auto normalize(const floating_point<E, M1, WordType>& nf) -> floating_point<E, M2, WordType>
+auto normalize(const floating_point<E, M1, WordType>& num) -> floating_point<E, M2, WordType>
 {
-    auto denormalized = nf;
-
-    auto exponent = width_cast<E + 1>(denormalized.get_exponent());
-    auto mantissa = denormalized.get_full_mantissa();
+    auto exponent = width_cast<E + 1>(num.get_exponent());
+    auto mantissa = num.get_full_mantissa();
 
     const auto one_at = first_set_bit(mantissa);
 
@@ -1099,7 +1100,7 @@ auto normalize(const floating_point<E, M1, WordType>& nf) -> floating_point<E, M
         }
     }
 
-    floating_point<E, M2, WordType> normalized(denormalized.get_sign(), width_cast<E>(exponent),
+    floating_point<E, M2, WordType> normalized(num.get_sign(), width_cast<E>(exponent),
                                                width_cast<M2 + 1>(mantissa));
 
     if (normalized.is_nan() || exponent.bit(E) == 1)

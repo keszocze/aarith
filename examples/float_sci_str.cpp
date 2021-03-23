@@ -1,5 +1,5 @@
 #include <aarith/float.hpp>
-#include <aarith/float/string_utils.hpp>
+#include <aarith/float/float_string_utils.hpp>
 #include <bitset>
 #include <cmath>
 #include <sstream>
@@ -115,8 +115,8 @@ int main()
     //
     //
 
-    single_precision<uint64_t> a(word_array<32>{0b11110111100110110011101101010111});
-    single_precision<uint64_t> b(word_array<32>{0b00000000001101010101101111001000});
+    single_precision a(word_array<32>{0b11110111100110110011101101010111});
+    single_precision b(word_array<32>{0b00000000001101010101101111001000});
     float a_ = static_cast<float>(a);
     float b_ = static_cast<float>(b);
     cout << a << "\t" << a_ << "\n";
