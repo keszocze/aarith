@@ -1,6 +1,6 @@
 #pragma once
 
-#include <aarith/core/string_utils.hpp>
+#include <aarith/core/core_string_utils.hpp>
 
 #include <sstream>
 
@@ -72,36 +72,36 @@ auto to_compute_string(const floating_point<E, M, WordType> nf) -> std::string
         return stream.str();
     }
 
-    stream << (neg ? "(" : ""); // might need to add enclosing paranthesis
+    stream << (neg ? "(" : "");
 
     // print exponent
-    if (nf.is_normalized())
-    {
-        stream << "2^(" << nf.unbiased_exponent() << ")";
-    }
-    else
-    {
-        stream << "2^(" << nf.denorm_exponent() << ")";
-    }
+    stream << "2^(" << nf.unbiased_exponent() << ")";
 
     // print the mantissa part, here, actual computations are necessary
-    stream << " * (" << (nf.is_normalized() ? "1" : "0");
+    stream << " * (";
 
+    bool is_first_summand = true;
     const auto mantissa = nf.get_mantissa();
 
-    integer<65> iM{M};
+    if (nf.is_normalized())
+    {
+        stream << "1";
+        is_first_summand = false;
+    }
+
+    int64_t M_ = M; // we need it to behave correctly for negative numbers
     for (int64_t i = M; i > 0; --i)
     {
-        auto curr_bit = mantissa.bit(i);
+        auto curr_bit = mantissa.bit(i - 1);
         if (curr_bit == 1)
         {
-            integer<65> I{i};
-            stream << " + 2^(" << sub(I, iM) << ")";
+            stream << (is_first_summand ? "" : " + ") << "2^(" << ((i - M_) - 1) << ")";
+            is_first_summand = false;
         }
     }
     stream << ")";
 
-    stream << (neg ? ")" : ""); // might need to add enclosing paranthesis
+    stream << (neg ? ")" : "");
     return stream.str();
 }
 
@@ -116,7 +116,7 @@ struct decimal_conversion
 template <size_t E, size_t M, typename WordType>
 auto compute_nearest_exponent10(const floating_point<E, M, WordType>& nf) -> decimal_conversion
 {
-    // TODO float pow and log functions
+    // TODO (keszocze) float pow and log functions
     if constexpr (E > sizeof(size_t) * 8)
     {
         decimal_conversion conv{0U, 0., false, true};
@@ -141,7 +141,7 @@ auto compute_nearest_exponent10(const floating_point<E, M, WordType>& nf) -> dec
     decimal_exponent *= convert_2exp;
 
     double rounded_exponent = std::floor(decimal_exponent);
-    if ((decimal_exponent - rounded_exponent) > 0.5)
+    if ((decimal_exponent - rounded_exponent) > 0.5) // NOLINT
     {
         rounded_exponent = std::ceil(decimal_exponent);
     }
@@ -151,7 +151,7 @@ auto compute_nearest_exponent10(const floating_point<E, M, WordType>& nf) -> dec
         diff = rounded_exponent - decimal_exponent;
     }
 
-    auto conversion10 = std::pow(10., diff);
+    auto conversion10 = std::pow(10., diff); // NOLINT
 
     decimal_conversion conv_struct{static_cast<size_t>(rounded_exponent), conversion10, is_neg};
 
@@ -163,6 +163,7 @@ template <size_t E, size_t M, typename WordType>
 auto to_sci_string(const floating_point<E, M, WordType> nf) -> std::string
 {
     std::stringstream str;
+    str.precision(std::cout.precision());
 
     if (nf.is_nan())
     {
@@ -170,15 +171,28 @@ auto to_sci_string(const floating_point<E, M, WordType> nf) -> std::string
         return str.str();
     }
 
-    if constexpr (E <= 8 && M <= 23)
+    static constexpr size_t floatM = 23U;
+    static constexpr size_t floatE = 8U;
+    static constexpr size_t doubleM = 52;
+    static constexpr size_t doubleE = 11;
+
+    if constexpr (E <= floatE && M <= floatM)
     {
         auto f = static_cast<float>(nf);
+        if(f != 0)
+        {
+            str << std::scientific;
+        }
         str << f;
         return str.str();
     }
-    else if constexpr (E <= 11 && M <= 52)
+    else if constexpr (E <= doubleE && M <= doubleM)
     {
         auto f = static_cast<double>(nf);
+        if(f != 0)
+        {
+            str << std::scientific;
+        }
         str << f;
         return str.str();
     }
@@ -202,24 +216,24 @@ auto to_sci_string(const floating_point<E, M, WordType> nf) -> std::string
         }
 
         auto fl_mantissa = nf.get_mantissa();
-        uinteger<23, WordType> flc_mantissa;
-        if constexpr (M >= 23)
+        uinteger<floatM, WordType> flc_mantissa;
+        if constexpr (M >= floatM)
         {
-            auto shift_mantissa = M - 23;
+            auto shift_mantissa = M - floatM;
             fl_mantissa = fl_mantissa >> shift_mantissa;
-            flc_mantissa = width_cast<23>(fl_mantissa);
+            flc_mantissa = width_cast<floatM>(fl_mantissa);
         }
         else
         {
-            auto shift_mantissa = 23 - M;
-            flc_mantissa = width_cast<23>(fl_mantissa);
+            auto shift_mantissa = floatM - M;
+            flc_mantissa = width_cast<floatM>(fl_mantissa);
             flc_mantissa = (flc_mantissa << shift_mantissa);
         }
         // construct a float with the given mantissa and an exponent of 0
         // to leech on float's inherent decimal output
         uint32_t ui_mantissa =
-            (static_cast<uint32_t>(flc_mantissa.word(0)) & 0x7fffff) | 0x3f800000;
-        float* mantissa = reinterpret_cast<float*>(&ui_mantissa);
+            (static_cast<uint32_t>(flc_mantissa.word(0)) & 0x7fffff) | 0x3f800000; // TODO (brand) please explain these binary numbers
+        float* mantissa = reinterpret_cast<float*>(&ui_mantissa); // NOLINT
         auto conv = compute_nearest_exponent10(nf);
         *mantissa = *mantissa * conv.conversion;
 
@@ -231,7 +245,7 @@ auto to_sci_string(const floating_point<E, M, WordType> nf) -> std::string
 
         if (*mantissa <= 1.F && conv.dec_exponent != 0)
         {
-            *mantissa *= 10.f;
+            *mantissa *= 10.f; // NOLINT
             if (conv.neg_exponent)
             {
                 conv.dec_exponent += 1;
@@ -241,7 +255,7 @@ auto to_sci_string(const floating_point<E, M, WordType> nf) -> std::string
                 conv.dec_exponent -= 1;
             }
         }
-        str << *mantissa;
+        str << std::fixed << *mantissa;
         if (conv.dec_exponent != 0)
         {
             str << "e" << (conv.neg_exponent ? "-" : "+") << conv.dec_exponent;

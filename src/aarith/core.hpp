@@ -10,7 +10,7 @@
 
 #include <aarith/core/traits.hpp>
 
-#include <aarith/core/number_utils.hpp>
-#include <aarith/core/string_utils.hpp>
+#include <aarith/core/core_number_utils.hpp>
+#include <aarith/core/core_string_utils.hpp>
 
 #include <aarith/core/word_array_random_generation.hpp>

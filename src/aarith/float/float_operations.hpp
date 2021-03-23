@@ -6,16 +6,23 @@
 namespace aarith {
 
 /**
- * @brief Addition of two floating_points using the FAU adder: lhs+rhs
+ * @brief Generic addition of two `floating_point` values
  *
- * @param lhs The first number that is to be summed up
- * @param rhs The second number that is to be summed up
- * @param bits The number of most-significant bits that are calculated of the mantissa addition
- * @tparam E Width of exponent
- * @tparam M Width of mantissa
+ * This method computes the sum of two floating-point values using the provided functions `fun_add`
+ * and `fun_sub` to compute the new mantissa. This generic function allows to easily implement
+ * own adders, e.g. to develop new hardware implementations.
  *
- * @return The sum
+ * @note As an end-user of aarith, you will, most likely, never need to call this function.
  *
+ * @tparam E Exponent width
+ * @tparam M Mantissa width
+ * @tparam Function_add Function object type for  performing an addition
+ * @tparam Function_sub Function object fype for performing a subtraction
+ * @param lhs Left-hand side argument of the usm
+ * @param rhs Right-hand side argument of the sum
+ * @param fun_add Function performing the addition of the mantissae
+ * @param fun_sub Function performing the subtraction of the mantissae
+ * @return The sum of lhs + rhs using the provided functions
  */
 template <size_t E, size_t M, class Function_add, class Function_sub>
 [[nodiscard]] auto add_(const floating_point<E, M> lhs, const floating_point<E, M> rhs,
@@ -54,16 +61,23 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
 }
 
 /**
- * @brief Subtraction with floating_points using the FAU adder: lhs-rhs.
+ * @brief Generic subtraction of two `floating_point` values
  *
- * @param lhs The minuend
- * @param rhs The subtrahend
- * @param bits The number of most-significant bits that are calculated of the mantissa subtraction
- * @tparam E Width of exponent
- * @tparam M Width of mantissa including the leading 1
+ * This method computes the difference of two floating-point values using the provided functions `fun_add`
+ * and `fun_sub` to compute the new mantissa. This generic function allows to easily implement
+ * own adders, e.g. to develop new hardware implementations.*
  *
- * @return The difference lhs-rhs
+ * @note As an end-user of aarith, you will, most likely, never need to call this function.
  *
+ * @tparam E Exponent width
+ * @tparam M Mantissa width
+ * @tparam Function_add Function object type for  performing an addition
+ * @tparam Function_sub Function object fype for performing a subtraction
+ * @param lhs Left-hand side argument of the usm
+ * @param rhs Right-hand side argument of the sum
+ * @param fun_add Function performing the addition of the mantissae
+ * @param fun_sub Function performing the subtraction of the mantissae
+ * @return The sum of lhs + rhs using the provided functions
  */
 template <size_t E, size_t M, class Function_add, class Function_sub>
 [[nodiscard]] auto sub_(const floating_point<E, M> lhs, const floating_point<E, M> rhs,
@@ -100,7 +114,7 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
 }
 
 /**
- * @brief Adds to floating_points.
+ * @brief Adds two `floating_point` values
  *
  * @param lhs The first number that is to be summed up
  * @param rhs The second number that is to be summed up
@@ -139,9 +153,7 @@ template <size_t E, size_t M>
         return rhs;
     }
 
-    // return add_<E, M, class aarith::uinteger<M+1, long unsigned int> (*)(const class
-    // aarith::uinteger<M+1>&, const class aarith::uinteger<M+1>&, const bool)>(lhs, rhs,
-    // expanding_add<M+1, M+1>, expanding_sub<M+1, M+1>);
+
     return add_<
         E, M,
         class aarith::uinteger<M + 2, uint64_t> (*)(const aarith::uinteger<M + 1, uint64_t>&,
@@ -150,13 +162,10 @@ template <size_t E, size_t M>
                                                     const aarith::uinteger<M + 1, uint64_t>&)>(
         lhs, rhs, expanding_add<uinteger<M + 1>, uinteger<M + 1>>,
         expanding_sub<uinteger<M + 1>, uinteger<M + 1>>);
-
-    // return add_<E, M>(lhs, rhs, expanding_add<uinteger<M+1>, uinteger<M+1>>,
-    // expanding_sub<uinteger<M+1>, uinteger<M+1>>);
 }
 
 /**
- * @brief Subtraction with floating_points: lhs-rhs.
+ * @brief Subtract two `floating_point` values
  *
  * @param lhs The minuend
  * @param rhs The subtrahend
@@ -170,9 +179,6 @@ template <size_t E, size_t M>
 [[nodiscard]] auto sub(const floating_point<E, M> lhs, const floating_point<E, M> rhs)
     -> floating_point<E, M>
 {
-    // return sub_<E, M>(lhs, rhs, expanding_add<uinteger<M+1>, uinteger<M+1>>,
-    // expanding_sub<uinteger<M+1>, uinteger<M+1>>);
-
     if (lhs.is_nan())
     {
         return lhs.make_quiet_nan();
@@ -200,7 +206,7 @@ template <size_t E, size_t M>
 }
 
 /**
- * @brief Multiplication with floating_points: lhs*rhs.
+ * @brief Multiplies two `floating_point` numbers
  *
  * @param lhs The multiplicand
  * @param rhs The multiplicator
@@ -262,7 +268,7 @@ template <size_t E, size_t M, typename WordType>
         {
             ext_esum = ~ext_esum;
             ext_esum = add(ext_esum, uinteger<ext_esum.width()>(2));
-            if (ext_esum < uinteger<64>(M + 1))
+            if (ext_esum < uinteger<64>(M + 1)) // TODO remove this number? it should bit bit-width of size_t?
             {
                 mproduct = mproduct >> ext_esum.word(0);
                 product.set_full_mantissa(width_cast<M + 1>(mproduct));
@@ -399,7 +405,7 @@ template <size_t E, size_t M, typename WordType>
             // in case some part of the mantissa can be expressed as subnormal number
             exponent_tmp = ~exponent_tmp;
             exponent_tmp = add(exponent_tmp, uinteger<exponent_tmp.width()>(2));
-            if (exponent_tmp < uinteger<sizeof(M) * 8>(M + 1))
+            if (exponent_tmp < uinteger<sizeof(M) * 8>(M + 1)) // TODO where does the 8 come from?
             {
                 mquotient = rshift_and_round(mquotient, exponent_tmp.word(0));
                 quotient.set_full_mantissa(width_cast<M + 1>(mquotient));
@@ -422,8 +428,8 @@ template <size_t E, size_t M, typename WordType>
 /**
  * @brief Computes the negative value of the floating-point number
  *
- * Quoting the standard: "copies a floating-point operand x to a destination in the same format,
- * reversing the sign bit. negate(x) is not the same as subtraction(0, x)"
+ * Quoting the standard: copies a floating-point operand x to a destination in the same format,
+ * reversing the sign bit. negate(x) is not the same as subtraction(0, x)
  *
  * @note This method ignores NaN values in the sense that they are also copied and the sign bit
  * flipped.
@@ -447,8 +453,8 @@ negate(const floating_point<E, M, WordType>& x)
 /**
  * @brief Copies the floating-point number
  *
- * Quoting the standard: "copies a floating-point operand x to a destination in the same format,
- * with no change to the sign bit."
+ * Quoting the standard: copies a floating-point operand x to a destination in the same format,
+ * with no change to the sign bit.
  *
  * @note This method ignores NaN values in the sense that they are also copied not signalling any
  * error.
@@ -472,8 +478,8 @@ template <size_t E, size_t M, typename WordType = uint64_t>
 /**
  * @brief Copies a floating-point number using the sign of another number
  *
- * Quoting the standard: "copies a floating-point operand x to a destination in the same format as
- * x, but with the sign bit of y."
+ * Quoting the standard: copies a floating-point operand x to a destination in the same format as
+ * x, but with the sign bit of y.
  *
  * @note This method ignores NaN values in the sense that they are also copied not signalling any
  * error.
@@ -515,6 +521,16 @@ bit_range(const floating_point<E, M, WordType>& f)
     return bit_range<Start, End>(f.as_word_array());
 }
 
+
+/**
+ * This additional nesting of a namespace allows to include aarith without having the usual
+ * operator names imported as well.
+ *
+ * The use case for this is to allow explicitly replace the conventional arithmetic operations
+ * with sepcialized ones. This can, e.g., be used when evaluating approximate operations in the
+ * context of neural networks. The name lookup of C++ makes it necessary not to see the operators
+ * earlier.
+ */
 namespace float_operators {
 
 template <size_t E, size_t M, typename WordType>

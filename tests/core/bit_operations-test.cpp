@@ -1,7 +1,7 @@
 #include <catch.hpp>
 
 #include <aarith/core.hpp>
-#include <aarith/core/string_utils.hpp>
+#include <aarith/core/core_string_utils.hpp>
 
 #include "../test-signature-ranges.hpp"
 #include "gen_word_array.hpp"
@@ -835,6 +835,21 @@ TEMPLATE_TEST_CASE_SIG("Counting leading ones/zeroes", "[word_array][utility][bi
             THEN("The result should be W")
             {
                 REQUIRE(count_leading_ones(ones) == W);
+            }
+        }
+    }
+
+    GIVEN("<00...01> of length W") {
+        A a = A::all_zeroes();
+        a.set_bit(0, true);
+
+        WHEN("Counting the leading zeroes")
+        {
+            const size_t count = count_leading_zeroes(a);
+            THEN("The result should be W-1")
+            {
+                constexpr size_t expected = W-1;
+                REQUIRE(count == expected);
             }
         }
     }

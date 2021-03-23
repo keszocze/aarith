@@ -257,11 +257,10 @@ uinteger<width + 1> FAUadder(const uinteger<width>& a, const uinteger<width>& b)
     const auto a_split = split<lsp_index>(a);
     const auto b_split = split<lsp_index>(b);
 
-    constexpr size_t msp_width = width - lsp_width;
-
     const uinteger<lsp_width> a_lsp = a_split.second;
     const uinteger<lsp_width> b_lsp = b_split.second;
 
+    constexpr size_t msp_width = width - lsp_width;
     const uinteger<msp_width> a_msp = a_split.first;
     const uinteger<msp_width> b_msp = b_split.first;
 

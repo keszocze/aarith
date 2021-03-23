@@ -140,7 +140,7 @@ TEMPLATE_TEST_CASE_SIG("Floating point addition works for special values",
 }
 
 TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts",
-                       "[floating_point][arithmetic][addition]",
+                       "[floating_point][arithmetic][addition][foo]",
                        AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE,
                        AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE)
 {
@@ -161,27 +161,14 @@ TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts"
 
     if (a.is_nan() || b.is_nan())
     {
-        REQUIRE(bit_equal(F{res_}, F{res_native}));
+        CAPTURE(res_, res_native, F{res_}, F{res_native}, res.is_nan(), res_native_.is_nan());
+        CHECK(res.is_nan());
+        REQUIRE(res_native_.is_nan());
     }
     else
     {
-        if (!equal_except_rounding(res_native_, res))
-        {
-            // F res__ = a + b;
-            // std::cout << a << " + " << b << " = " << res__ << "\n";
-            std::cout << to_binary(a) << " + \n"
-                      << to_binary(b) << " = \n"
-                      << to_binary(res) << "\n";
-            // std::cout << to_compute_string(a) << "\t+\t" << to_compute_string(b) << " = "
-            //          << to_compute_string(res) << "\n";
-
-            // std::cout << a_native << " + " << b_native << " = " << res_native << "\n";
-            std::cout << "res:        " << to_binary(res) << "\n"
-                      << "res_native: " << to_binary(res_native_) << "\n";
-            auto dbg = a + b;
-            std::cout << "dbg: " << to_binary(dbg) << "\n";
-        }
-
+        CAPTURE(a, to_binary(a), a_native, b, to_binary(b), b_native, a.is_nan(), b.is_nan(),
+                a.is_inf(), b.is_inf(), res, res_native, res_);
         CHECK(equal_except_rounding(res_native_, res));
         REQUIRE(equal_except_rounding(F{res_}, F{res_native}));
     }

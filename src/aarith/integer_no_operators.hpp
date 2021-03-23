@@ -8,6 +8,6 @@
 #include <aarith/integer/integer_ranges.hpp>
 #include <aarith/integer/integers.hpp>
 
-#include <aarith/integer/string_utils.hpp>
+#include <aarith/integer/integer_string_utils.hpp>
 
 #include <aarith/integer/integer_random_generation.hpp>

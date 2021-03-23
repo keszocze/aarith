@@ -4,13 +4,29 @@
 
 namespace aarith {
 
-inline constexpr auto number_of_decimal_digits(size_t bits) -> size_t
+/**
+ * @brief Computes an approximation of the decimal deigits an n_bits number will use
+ * @param n_bits The number of bits in the number
+ * @return The approximation of the number of decimal digits the n_bits number will have
+ */
+inline constexpr auto number_of_decimal_digits(size_t n_bits) -> size_t
 {
     // When converted to decimal, an n-bit binary numeral will have at most k*n decimal digits,
     // rounded up, where k = log_10 2 ~ 0.301.
-    return (bits * 301) / 1000 + ((bits * 301) % 1000 == 0 ? 0 : 1);
+    return (n_bits * 301) / 1000 + ((n_bits * 301) % 1000 == 0 ? 0 : 1); // NOLINT
 }
 
+/**
+ * @brief Division with subsequent ceil oberation
+ *
+ * Computes ceil(dividend/divisor)
+ *
+ * @tparam T Type of the dividend
+ * @tparam U Type of the divisor
+ * @param dividend The actual dividend
+ * @param divisor The actual divisor
+ * @return Returns ceil(dividend/divisor)
+ */
 template <class T, class U>
 constexpr auto rounded_integer_division(T dividend, U divisor) -> decltype(T{} / U{})
 {
@@ -94,6 +110,12 @@ auto to_binary(const word_array<Width, WordType>& value) -> std::string
     return result;
 }
 
+/**
+ * @brief Outputs a `word_array` to an output stream using the convenient << operator form
+ * @tparam W Width of the word array
+ * @tparam WordType The type used to store the actual data
+ * @tparam WA Generic word array type
+ */
 template <size_t W, typename WordType, template <size_t, typename> class WA,
           typename =
               std::enable_if_t<is_word_array_v<WA<W, WordType>> && !is_integral_v<WA<W, WordType>>>>

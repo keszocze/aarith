@@ -5,7 +5,6 @@
 #include "../test-signature-ranges.hpp"
 #include "gen_word_array.hpp"
 #include <aarith/core.hpp>
-#include <aarith/core/string_utils.hpp>
 
 using namespace aarith;
 

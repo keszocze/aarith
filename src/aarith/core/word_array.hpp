@@ -29,12 +29,12 @@ public:
 
     constexpr word_array() = default;
 
-    constexpr word_array(WordType w)
+    explicit constexpr word_array(WordType w)
     {
         this->words[0] = w & word_mask(0);
     }
 
-    template <class... Args> constexpr word_array(WordType w, Args... args)
+    template <class... Args> explicit constexpr word_array(WordType w, Args... args)
     {
         set_words(w, args...);
     }
@@ -46,7 +46,7 @@ public:
         return wc;
     }
 
-    template <size_t V, typename T> constexpr word_array(const word_array<V, T>& other)
+    template <size_t V, typename T> constexpr word_array(const word_array<V, T>& other) // NOLINT
     {
         static_assert(V <= Width, "Can not create a word_array from larger container");
         for (auto i = 0U; i < other.word_count(); ++i)
@@ -56,7 +56,7 @@ public:
     }
 
     template <size_t V, typename T>
-    constexpr word_array<Width, T> operator=(const word_array<V, T>& other)
+    constexpr word_array<Width, T>& operator=(const word_array<V, T>& other)
     {
 
         static_assert(V <= Width, "Can not create a word_array from larger container");
@@ -137,7 +137,7 @@ public:
     [[nodiscard]] static constexpr auto word_count() noexcept -> size_t
     {
         const auto word_size = sizeof(word_type) * 8;
-        return (Width / word_size) + (Width % word_size ? 1 : 0);
+        return (Width / word_size) + ((Width % word_size) ? 1 : 0);
     }
 
     [[nodiscard]] static constexpr word_type word_mask(size_t index) noexcept
@@ -200,14 +200,14 @@ public:
      * @param index The index for which the bit is to be returned
      * @return  The bit at the indexed position
      */
-    auto constexpr bit(size_t index) const -> bit_type
+    [[nodiscard]] auto constexpr bit(size_t index) const -> bit_type
     {
         auto const the_word = word(index / word_width());
         auto const masked_bit = the_word & (static_cast<word_type>(1) << (index % word_width()));
         return static_cast<bit_type>(masked_bit > 0 ? 1 : 0);
     }
 
-    template <size_t Count> constexpr auto bits(size_t index) const -> word_array<Count, WordType>
+    template <size_t Count> [[nodiscard]] constexpr auto bits(size_t index) const -> word_array<Count, WordType>
     {
         word_array<Count, WordType> result;
         for (auto i = 0U; i < Count; ++i)
@@ -229,17 +229,17 @@ public:
         //            std::string msg = gen_oob_msg(index, true);
         //            throw std::out_of_range(msg);
         //        }
-        const size_t word_index = index / word_width();
+        const size_t word_index_ = index / word_width();
         const size_t inner_word_index = index % word_width();
         word_type mask = (1ULL << inner_word_index);
 
         if (value)
         {
-            words[word_index] |= mask;
+            words[word_index_] |= mask;
         }
         else
         {
-            words[word_index] &= ~mask;
+            words[word_index_] &= ~mask;
         }
     }
 
@@ -253,7 +253,7 @@ public:
         auto const the_word = word(word_index(index));
         auto const masked_word = the_word & ~(static_cast<word_type>(1) << (index % word_width()));
         set_word(word_index(index),
-                 masked_word | (static_cast<word_type>(value & 1) << (index % word_width())));
+                 masked_word | (static_cast<word_type>(value & 1U) << (index % word_width())));
     }
 
     void constexpr set_word(const size_t index, const word_type value)
@@ -278,7 +278,7 @@ public:
 
      * @return Const reference to the requested element.
      */
-    auto at(size_t pos) const
+    [[nodiscard]] auto at(size_t pos) const
     {
         return words.at(pos);
     }
@@ -289,7 +289,7 @@ public:
      * @param pos position of the element to return
      * @return Const reference to the requested element.
      */
-    auto operator[](size_t pos) const
+    [[nodiscard]] auto operator[](size_t pos) const
     {
         return words[pos];
     }
@@ -308,7 +308,7 @@ public:
      * @brief Returns a const reference to the first element in the container.
      * @return Const reference to the first element
      */
-    auto front() const
+    [[nodiscard]] auto front() const
     {
         return words.front();
     }
@@ -318,7 +318,7 @@ public:
      * @return Const reference to the last element.
      *
      **/
-    auto back() const
+    [[nodiscard]] auto back() const
     {
         return words.back();
     }
@@ -420,42 +420,42 @@ public:
         return !is_zero();
     }
 
-    constexpr auto begin() const noexcept
+    [[nodiscard]] constexpr auto begin() const noexcept
     {
         return words.begin();
     }
 
-    constexpr auto end() const noexcept
+    [[nodiscard]] constexpr auto end() const noexcept
     {
         return words.end();
     }
 
-    constexpr auto cbegin() const noexcept
+    [[nodiscard]] constexpr auto cbegin() const noexcept
     {
         return words.cbegin();
     }
 
-    constexpr auto cend() const noexcept
+    [[nodiscard]] constexpr auto cend() const noexcept
     {
         return words.cend();
     }
 
-    constexpr auto rbegin() const noexcept
+    [[nodiscard]] constexpr auto rbegin() const noexcept
     {
         return words.rbegin();
     }
 
-    constexpr auto rend() const noexcept
+    [[nodiscard]] constexpr auto rend() const noexcept
     {
         return words.rend();
     }
 
-    constexpr auto crbegin() const noexcept
+    [[nodiscard]] constexpr auto crbegin() const noexcept
     {
         return words.crbegin();
     }
 
-    constexpr auto crend() const noexcept
+    [[nodiscard]] constexpr auto crend() const noexcept
     {
         return words.crend();
     }
@@ -475,33 +475,6 @@ private:
         static_assert(index < word_count(), "too many initializer words");
         words[0] = value & word_mask(0);
         return index;
-    }
-
-    std::string gen_oob_msg(size_t index, bool accessed_bit = true)
-    {
-
-        std::string msg;
-        std::string head;
-        std::string foot;
-        if (accessed_bit)
-        {
-            head = "Trying to access bit with index ";
-            foot = std::to_string(width() - 1);
-        }
-        else
-        {
-            head = "Trying to access word with index ";
-            foot = std::to_string(word_count() - 1);
-        }
-
-        msg += head;
-        msg += std::to_string(index);
-        msg += " for word_array<";
-        msg += std::to_string(width());
-        msg += "> with max index ";
-        msg += foot;
-
-        return msg;
     }
 
     std::array<word_type, word_count()> words{{0}};

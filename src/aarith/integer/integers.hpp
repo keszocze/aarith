@@ -123,7 +123,7 @@ public:
      */
 
 private:
-    template <typename T> constexpr T generic_cast() const
+    template <typename T> [[nodiscard]]  constexpr T generic_cast() const
     {
         if constexpr (sizeof(T) <= sizeof(WordType))
         {
@@ -355,7 +355,7 @@ public:
 
 } // namespace aarith
 
-#include <aarith/core/number_utils.hpp>
+#include <aarith/core/core_number_utils.hpp>
 
 // We are only allowed to extend std with specializations
 // https://en.cppreference.com/w/cpp/language/extending_std
@@ -373,12 +373,12 @@ public:
     static constexpr std::float_denorm_style has_denorm = std::denorm_absent;
     static constexpr bool has_denorm_loss = false;
 
-    // TODO do we need to take that into account somewhere?
+    // TODO (keszocze) do we need to take that into account somewhere?
     static constexpr std::float_round_style round_style = std::round_toward_zero;
     static constexpr bool is_iec559 = false;
     static constexpr bool is_modulo = true;
     static constexpr int radix = 2;
-    static constexpr int digits = W; // TODO what happens if W > max_int?
+    static constexpr int digits = W; // TODO (keszocze) what happens if W > max_int?
     static constexpr int digits10 =
         ::aarith::ceil<int>(std::numeric_limits<::aarith::uinteger<W>>::digits *
                             ::aarith::log<10, 2>()) - // NOLINT

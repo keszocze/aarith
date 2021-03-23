@@ -31,9 +31,9 @@ template <typename Integer> class integer_range
         {
         }
 
-        integer_iter<I, IsForwardIterator>(const integer_range<I> range)
+        explicit integer_iter<I, IsForwardIterator>(const integer_range<I> rg)
             : current(std::nullopt)
-            , range(range)
+            , range(rg)
         {
         }
 
@@ -113,7 +113,7 @@ template <typename Integer> class integer_range
     };
 
 public:
-    integer_range(const Integer start = Integer::min(), const Integer end = Integer::max(),
+    explicit integer_range(const Integer start = Integer::min(), const Integer end = Integer::max(),
                   const Integer stride = Integer::one())
         : start_(start)
         , end_(end)
