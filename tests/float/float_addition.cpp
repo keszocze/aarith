@@ -161,6 +161,9 @@ TEMPLATE_TEST_CASE_SIG("Floating point addition matches its native counterparts"
 
     if (a.is_nan() || b.is_nan())
     {
+        CAPTURE(res_, res_native, F{res_}, F{res_native}, res.is_nan(), res_native_.is_nan());
+        CHECK(res.is_nan());
+        CHECK(res_native_.is_nan());
         REQUIRE(bit_equal(F{res_}, F{res_native}));
     }
     else
