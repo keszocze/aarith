@@ -423,7 +423,7 @@ valid<N, ES, WT>::operator-(const valid<N, ES, WT>& other) const
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] /*constexpr*/ valid<N, ES, WT>
+[[nodiscard]] constexpr valid<N, ES, WT>
 valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
 {
     //

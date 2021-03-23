@@ -2067,6 +2067,9 @@ std::ostream& operator<<(std::ostream& os, const interval_bound& u);
 // Bound Sign Enum
 //
 
+/**
+ * @brief Infinitesimal difference for the bound class.
+ */
 enum class bound_sign
 {
     EXACT,
@@ -2081,6 +2084,13 @@ enum class bound_sign
 // For implementation, look at posit/bound_sign_operators.hpp
 //
 
+/**
+ * @brief Output a string representation of bs to os.
+ *
+ * @param os The stream to write to.
+ * @param bs The enum to write.
+ * @return A reference to os.
+ */
 std::ostream& operator<<(std::ostream& os, const bound_sign& bs);
 
 //
@@ -2115,58 +2125,154 @@ std::ostream& operator<<(std::ostream& os, const bound_sign& bs);
 // For implementation, look at posit/bound.hpp
 //
 
+/**
+ * @brief A left or right endpoint of a valid.
+ */
 template <size_t N, size_t ES, typename WT = DefaultWordType> class bound
 {
 public:
+    /**
+     * @brief Underlying posit type.
+     */
     using posit_type = posit<N, ES, WT>;
 
+    /**
+     * @brief Create bound object from the start of a valid.
+     */
     [[nodiscard]] static constexpr bound from_left(const posit_type& value,
                                                    const interval_bound& u);
+
+    /**
+     * @brief Create bound object from the end of a valid.
+     */
     [[nodiscard]] static constexpr bound from_right(const posit_type& value,
                                                     const interval_bound& u);
 
+    /**
+     * @brief Construct bound to represent the number zero exactly.
+     */
     bound();
+
+    /**
+     * @brief Construct bound to represent given value and sign.
+     */
     bound(const posit_type& new_value, bound_sign sign = bound_sign::EXACT);
+
+    /**
+     * @brief Copy constructor.
+     */
     bound(const bound& other);
+
+    /**
+     * @brief Destructor.
+     *
+     * Here to fulfill the rule of three.
+     */
     ~bound();
 
+    /**
+     * @brief Assign this bound to hold the value of other.
+     *
+     * @param other The value to change to.
+     */
     bound& operator=(const bound& other);
 
+    /**
+     * @brief Compare this and other for equality.
+     */
     [[nodiscard]] constexpr bool operator==(const bound& other) const;
+
+    /**
+     * @brief Compare this and other for inequality.
+     */
     [[nodiscard]] constexpr bool operator!=(const bound& other) const;
 
-    [[nodiscard]] /*constexpr*/ bound operator*(const bound& other) const;
+    /**
+     * @brief Return the product of this multiplied with rhs.
+     */
+    [[nodiscard]] constexpr bound operator*(const bound& other) const;
 
+    /**
+     * @return Reference to the underlying value.
+     */
     [[nodiscard]] const posit_type& get_value() const;
+
+    /**
+     * @return Reference to the underlying sign.
+     */
     [[nodiscard]] const bound_sign& get_sign() const;
 
+    /**
+     * @return Whether the underlying sign is exact.
+     */
     [[nodiscard]] constexpr bool is_exact() const;
+
+    /**
+     * @return Whether the underlying sign is plus eps.
+     */
     [[nodiscard]] constexpr bool is_plus_eps() const;
+
+    /**
+     * @return Whether the underlying sign is minus eps.
+     */
     [[nodiscard]] constexpr bool is_minus_eps() const;
+
+    /**
+     * @return Whether the underlying sign is unsure.
+     */
     [[nodiscard]] constexpr bool is_unsure() const;
 
+    /**
+     * @return Whether the underlying value is zero.
+     */
     [[nodiscard]] constexpr bool is_zero() const;
+
+    /**
+     * @return Whether the underlying value is a negative real.
+     */
     [[nodiscard]] constexpr bool is_negative() const;
+
+    /**
+     * @return Whether the underlying value is a non-negative real.
+     */
     [[nodiscard]] constexpr bool is_non_negative() const;
 
+    /**
+     * @return This bound as a start valid endpoint.
+     */
     [[nodiscard]] constexpr std::tuple<posit_type, interval_bound> to_left() const;
+
+    /**
+     * @return This bound as an ending valid endpoint.
+     */
     [[nodiscard]] constexpr std::tuple<posit_type, interval_bound> to_right() const;
 
+    /**
+     * @return Whether lhs is less than rhs when computing a left valid bound.
+     */
     [[nodiscard]] static constexpr bool lt_left(const bound& lhs, const bound& rhs);
+
+    /**
+     * @return Whether lhs is less than rhs when computing a right valid bound.
+     */
     [[nodiscard]] static constexpr bool lt_right(const bound& lhs, const bound& rhs);
 
 private:
+    /**
+     * @brief Underlying posit endpoint.
+     */
     posit_type value;
+
+    /**
+     * @brief Underlying sign of the posit endpoint.
+     */
     bound_sign sign;
 
+    /**
+     * @return Whether lhs is less than rhs.
+     */
     [[nodiscard]] static constexpr bool lt(const bound& lhs, const bound& rhs, bool is_left);
 };
-
-//
-// Additional Bound Operators
-//
-// For implementation, look at posit/bound_operators.hpp
-//
 
 //
 // Valid Class.
@@ -2366,7 +2472,7 @@ public:
     /**
      * @brief Return the product of this multiplied with rhs.
      */
-    [[nodiscard]] /*constexpr*/ valid operator*(const valid& other) const;
+    [[nodiscard]] constexpr valid operator*(const valid& other) const;
 
     /**
      * @brief Return this divided by other.

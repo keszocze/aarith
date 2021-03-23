@@ -77,7 +77,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] /*constexpr*/ bound<N, ES, WT>
+[[nodiscard]] constexpr bound<N, ES, WT>
 bound<N, ES, WT>::operator*(const bound<N, ES, WT>& other) const
 {
     // This implements the table defined in valid-bound-multiplication.ods.
