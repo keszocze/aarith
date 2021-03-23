@@ -331,6 +331,59 @@ public:
         return implementation::generic_cast<int64_t>(*this);
     }
 
+    /**
+     * @brief Converts to an uint8_t
+     *
+     * Note that there will be a possible loss of precision as this method simply cuts
+     * of the "overflowing" bits.
+     *
+     * @return An uint8_t storing the value of this integer
+     */
+    explicit constexpr operator uint8_t() const
+    {
+        // we can safely return this as the smallest WordType is uint8_t
+        return static_cast<uint8_t>(this->word(0));
+    }
+
+    /**
+     * @brief Converts to an uint16_t
+     *
+     * Note that there will be a possible loss of precision as this method simply cuts
+     * of the "overflowing" bits.
+     *
+     * @return An uint16_t storing the value of this integer
+     */
+    explicit constexpr operator uint16_t() const
+    {
+        return implementation::generic_cast<uint16_t>(*this);
+    }
+
+    /**
+     * @brief Converts to an uint32_t
+     *
+     * Note that there will be a possible loss of precision as this method simply cuts
+     * of the "overflowing" bits.
+     *
+     * @return An uint32_t storing the value of this integer
+     */
+    explicit constexpr operator uint32_t() const
+    {
+        return implementation::generic_cast<uint32_t>(*this);
+    }
+
+    /**
+     * @brief Converts to an uint64_t
+     *
+     * Note that there will be a possible loss of precision as this method simply cuts
+     * of the "overflowing" bits.
+     *
+     * @return An uint64_t storing the value of this integer
+     */
+    explicit constexpr operator uint64_t() const
+    {
+        return implementation::generic_cast<uint64_t>(*this);
+    }
+
     [[nodiscard]] static constexpr integer min()
     {
         integer min;
