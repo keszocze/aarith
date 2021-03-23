@@ -28,8 +28,11 @@
 #define AARITH_UINT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE                                         \
     (8, uint8_t), (16, uint16_t), (32, uint32_t), (64, uint64_t)
 
-#define AARITH_INT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE                                          \
+#define AARITH_SINT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE                                          \
     (8, int8_t), (16, int16_t), (32, int32_t), (64, int64_t)
+
+#define AARITH_INT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE                                          \
+    (8, uint8_t), (16, uint16_t), (32, uint32_t), (64, uint64_t), (8, int8_t), (16, int16_t), (32, int32_t), (64, int64_t)
 
 #define AARITH_INT_EXTENDED_TEST_SIGNATURE                                                         \
     ((template <size_t, typename> class Type, size_t W, typename WordType), Type, W, WordType)

@@ -19,31 +19,29 @@ namespace aarith {
 namespace implementation {
 
 template <typename T, size_t W, typename WordType, template <size_t, typename> typename I>
-[[nodiscard]] constexpr T generic_cast(const I<W, WordType>& num)
+[[nodiscard]] T generic_cast(const I<W, WordType>& num)
 {
-    if constexpr (sizeof(T) <= sizeof(WordType))
+
+    constexpr size_t target_size = sizeof(T) * CHAR_BIT;
+    constexpr size_t use_words = I<target_size, WordType>::word_count();
+    const I<target_size, WordType> extended_num = width_cast<target_size>(num);
+
+
+    constexpr size_t word_width = I<W, WordType>::word_width();
+
+    std::cout << num << " " << extended_num << "\n";
+    std::cout << to_binary(num) << " " << to_binary(extended_num) << "\n";
+
+    T result{0};
+
+    std::cout << "result |= extendend_num.word(i) << (i * " << word_width  <<")\n";
+    for (size_t i = 0; i < use_words; ++i)
     {
-        // the last word is sufficient to fill the desired target type, so we can simply
-        // make a call to the static_cast operation
-        return static_cast<T>(num.word(0));
+        std::cout << result << " |= " << (extended_num.word(i) << (i * word_width)) << " (i=" << i<<")\n";
+        result |= extended_num.word(i) << (i * word_width);
     }
-    else
-    {
-        constexpr size_t words_per_type = (sizeof(T)) / sizeof(WordType);
 
-        constexpr size_t use_words = std::min(words_per_type, I<W, WordType>::word_count());
-
-        constexpr size_t word_width = I<W, WordType>::word_width();
-
-        T result{0};
-
-        for (size_t i = 0; i < use_words; ++i)
-        {
-            result |= num.word(i) << (i * word_width);
-        }
-
-        return result;
-    }
+    return result;
 }
 } // namespace implementation
 
@@ -159,8 +157,7 @@ public:
      */
     explicit constexpr operator uint8_t() const
     {
-        // we can safely return this as the smallest WordType is uint8_t
-        return static_cast<uint8_t>(this->word(0));
+        return implementation::generic_cast<uint8_t>(*this);
     }
 
     /**
@@ -235,10 +232,15 @@ public:
     {
     }
 
-    template <typename T, typename = std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>>>
-    explicit constexpr integer(T t) // NOLINT
+    template <typename T, typename = std::enable_if_t<
+        std::is_integral_v<T>
+            && std::is_signed_v<T>
+            && (sizeof(WordType) >= sizeof(T))
+                              > >
+    explicit  integer(T t) // NOLINT
         : word_array<Width, WordType>(static_cast<WordType>(t))
     {
+        std::cout << "yup\n";
         if (t < 0)
         {
             auto const ones = static_cast<WordType>(-1);
@@ -250,10 +252,15 @@ public:
     }
 
     template <typename T, class... Args,
-              typename = std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>>>
-    explicit constexpr integer(T t, Args... args)
+              typename = std::enable_if_t<
+                  std::is_integral_v<T> && std::is_signed_v<T>
+                      && (sizeof(WordType) >= sizeof(T))
+                  >
+              >
+    explicit integer(T t, Args... args)
         : word_array<Width, WordType>(static_cast<WordType>(t), args...)
     {
+        std::cout << "hier\n";
     }
 
     template <class... Args>
@@ -288,8 +295,7 @@ public:
      */
     explicit constexpr operator int8_t() const
     {
-        // we can safely return this as the smallest WordType is int8_t
-        return static_cast<uint8_t>(this->word(0));
+        return implementation::generic_cast<int8_t>(*this);
     }
 
     /**
@@ -341,8 +347,7 @@ public:
      */
     explicit constexpr operator uint8_t() const
     {
-        // we can safely return this as the smallest WordType is uint8_t
-        return static_cast<uint8_t>(this->word(0));
+        return implementation::generic_cast<uint8_t>(*this);
     }
 
     /**

@@ -13,12 +13,11 @@ namespace aarith {
  *
  * @return The min exponent
  */
-template <typename F> [[nodiscard]] constexpr int min_exponent()
+template <typename F> [[nodiscard]]  int min_exponent()
 {
-//    constexpr auto ftype_min_exp = F::min_exp;
-//    constexpr int min_exponent_ = static_cast<int64_t>(ftype_min_exp) + 1;
-//    return min_exponent_;
-    return 0;
+    auto ftype_min_exp = F::min_exp;
+    int min_exponent_ = static_cast<int>(ftype_min_exp) + 1;
+    return min_exponent_;
 }
 
 /**
@@ -32,10 +31,9 @@ template <typename F> [[nodiscard]] constexpr int min_exponent()
  */
 template <typename F> [[nodiscard]] constexpr int max_exponent()
 {
-//    constexpr auto ftype_min_exp = F::max_exp;
-//    constexpr int max_exponent_ = static_cast<int64_t>(ftype_min_exp) + 1;
-//    return max_exponent_;
-    return 0;
+    constexpr auto ftype_min_exp = F::max_exp;
+    constexpr int max_exponent_ = static_cast<int64_t>(ftype_min_exp) + 1;
+    return max_exponent_;
 }
 
 } // namespace aarith
