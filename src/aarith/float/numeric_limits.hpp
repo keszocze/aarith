@@ -31,8 +31,8 @@ template <typename F> [[nodiscard]]  constexpr int min_exponent()
  */
 template <typename F> [[nodiscard]] constexpr int max_exponent()
 {
-    constexpr auto ftype_min_exp = F::max_exp;
-    constexpr int max_exponent_ = static_cast<int64_t>(ftype_min_exp) + 1;
+    constexpr auto ftype_max_exp = F::max_exp;
+    constexpr int max_exponent_ = static_cast<int64_t>(ftype_max_exp) + 1;
     return max_exponent_;
 }
 
@@ -54,7 +54,7 @@ public:
     static constexpr bool is_bounded = true;
     static constexpr std::float_denorm_style has_denorm = std::denorm_present;
     static constexpr bool has_denorm_loss = false;
-    static constexpr std::float_round_style round_style = std::round_toward_zero;
+    static constexpr std::float_round_style round_style = std::round_to_nearest;
     static constexpr bool is_iec559 = false;
     static constexpr bool is_modulo = false;
     static constexpr int radix = 2;
@@ -70,13 +70,12 @@ public:
 
     static constexpr int min_exponent =
         ::aarith::min_exponent<::aarith::floating_point<E, M, WordType>>();
-
-    // TODO (keszocze) compute the values for min/max_exponent10 correctly
-     static constexpr int min_exponent10 = 0;
-     static constexpr int max_exponent10 = 0;
-
     static constexpr int max_exponent =
-        ::aarith::min_exponent<::aarith::floating_point<E, M, WordType>>();
+        ::aarith::max_exponent<::aarith::floating_point<E, M, WordType>>();
+
+     static constexpr int min_exponent10 = ::aarith::ceil<int>(double(std::numeric_limits<::aarith::floating_point<E, M, WordType>>::min_exponent) / ::aarith::log<2,10>());
+     static constexpr int max_exponent10 = ::aarith::floor<int>(double(std::numeric_limits<::aarith::floating_point<E, M, WordType>>::max_exponent) / ::aarith::log<2,10>());
+
 
     static constexpr bool traps = false;
 
@@ -98,16 +97,18 @@ public:
 
     static constexpr ::aarith::floating_point<E, M, WordType> lowest() noexcept
     {
-        // TODO
-        return ::aarith::floating_point<E, M, WordType>::zero();
+        return ::aarith::floating_point<E, M, WordType>::min();
     }
 
-    static constexpr ::aarith::floating_point<E, M, WordType> max() noexcept
+    static constexpr::aarith::floating_point<E, M, WordType> max() noexcept
     {
-        //
         return ::aarith::floating_point<E, M, WordType>::max();
     }
 
+    /**
+     * @warning This is **not** the correct value!
+     * @return
+     */
     static constexpr ::aarith::floating_point<E, M, WordType> epsilon() noexcept
     {
         return ::aarith::floating_point<E, M, WordType>::zero();
@@ -115,7 +116,7 @@ public:
 
     static constexpr ::aarith::floating_point<E, M, WordType> round_error() noexcept
     {
-        return ::aarith::floating_point<E, M, WordType>::zero();
+        return ::aarith::floating_point<E, M, WordType>::round_error();
     }
 
     static constexpr ::aarith::floating_point<E, M, WordType> infinity() noexcept

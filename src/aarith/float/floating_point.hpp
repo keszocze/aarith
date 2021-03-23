@@ -467,6 +467,28 @@ public:
 
     /**
      *
+     * @return The smallest finite value
+     */
+    [[nodiscard]] static constexpr floating_point min()
+    {
+        word_array<E, WordType> exp = word_array<E, WordType>::all_ones();
+        exp.set_bit(0, false);
+        return floating_point(true, exp, IntegerMant::all_ones());
+    }
+
+    /**
+     *
+     * @return The largest finite value
+     */
+    [[nodiscard]] static constexpr floating_point max()
+    {
+        word_array<E, WordType> exp = word_array<E, WordType>::all_ones();
+        exp.set_bit(0, false);
+        return floating_point(false, exp, IntegerMant::all_ones());
+    }
+
+    /**
+     *
      * @return Smallest positive normalized value
      */
     [[nodiscard]] static constexpr floating_point smallest_normalized()
@@ -484,6 +506,23 @@ public:
     {
         constexpr floating_point small_denorm(false, IntegerExp::all_zeroes(), IntegerMant::one());
         return small_denorm;
+    }
+
+    /**
+     *
+     * @return The maximal rounding error (assuming round-to-nearest)
+     */
+    [[nodiscard]] static constexpr floating_point round_error()
+    {
+        IntegerMant m = IntegerMant::all_zeroes();
+        m.set_msb(true);
+
+        IntegerExp  e = IntegerExp::all_ones();
+        e.set_bit(0,false);
+        e.set_msb(false);
+
+        const floating_point rounding_error(false, e, m);
+        return rounding_error;
     }
 
     /**
@@ -543,7 +582,7 @@ public:
         sign_neg = (sign & 1U) > 0;
     }
 
-    [[nodiscard]]  auto get_exponent() const -> uinteger<E, WordType>
+    [[nodiscard]] auto get_exponent() const -> uinteger<E, WordType>
     {
         return exponent;
     }
@@ -620,7 +659,7 @@ public:
      * @brief Checks if the number is a quiet NaN
      * @return True iff the number is a quiet NaN
      */
-    [[nodiscard]]  constexpr bool is_qNaN() const
+    [[nodiscard]] constexpr bool is_qNaN() const
     {
         const bool exp_all_ones = exponent == IntegerExp ::all_ones();
         const bool first_bit_set = width_cast<M>(mantissa).msb();
@@ -631,7 +670,7 @@ public:
      * @brief Checks if the number is a signalling NaN
      * @return True iff the number is a signalling NaN
      */
-    [[nodiscard]]  constexpr bool is_sNaN() const
+    [[nodiscard]] constexpr bool is_sNaN() const
     {
         const bool exp_all_ones = exponent == IntegerExp ::all_ones();
         const auto fraction = width_cast<M>(mantissa);
@@ -821,7 +860,8 @@ public:
 
     floating_point<E, M, WordType>& operator=(const floating_point<E, M, WordType>& f)
     {
-        if (this == &f) {
+        if (this == &f)
+        {
             return *this;
         }
         this->sign_neg = f.sign_neg;
