@@ -422,18 +422,6 @@ valid<N, ES, WT>::operator-(const valid<N, ES, WT>& other) const
     return *this + (-other);
 }
 
-template <typename Container> inline void print(const Container& array)
-{
-    std::cerr << "[ ";
-
-    for (const auto& elem : array)
-    {
-        std::cerr << elem << ", ";
-    }
-
-    std::cerr << "]\n";
-}
-
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] /*constexpr*/ valid<N, ES, WT>
 valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
@@ -510,13 +498,7 @@ valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
     const bound_type c = bound_type::from_left(other.start_value, other.start_bound);
     const bound_type d = bound_type::from_right(other.end_value, other.end_bound);
 
-    // std::cerr << "a=" << a <<std::endl;
-    // std::cerr << "b=" << b <<std::endl;
-    // std::cerr << "c=" << c <<std::endl;
-    // std::cerr << "d=" << d <<std::endl;
-
     std::array<bound_type, 4> choices = {a * c, a * d, b * c, b * d};
-    // print(choices);
 
     //
     // Now we pick out the biggest and smallest value and the convert them
@@ -811,25 +793,6 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] bool valid<N, ES, WT>::lt(const typename valid<N, ES, WT>::tile& lhs,
-                                        const typename valid<N, ES, WT>::tile& rhs)
-{
-    if (lhs.p.is_nar() || rhs.p.is_nar())
-    {
-        return false;
-    }
-
-    if (lhs.p == rhs.p)
-    {
-        return is_closed(lhs.u) && is_open(rhs.u);
-    }
-    else
-    {
-        return lhs.p < rhs.p;
-    }
-}
-
-template <size_t N, size_t ES, typename WT>
 [[nodiscard]] std::string valid<N, ES, WT>::in_tile_notation(const posit<N, ES, WT>& p,
                                                              const interval_bound& u)
 {
@@ -845,177 +808,6 @@ template <size_t N, size_t ES, typename WT>
     }
 
     return ss.str();
-}
-
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr std::array<typename valid<N, ES, WT>::tile, 4>
-valid<N, ES, WT>::get_mul_candidates(const valid& lhs, const valid& rhs, bool is_left)
-{
-    const tile a = lhs.start();
-    const tile b = lhs.end();
-    const tile c = rhs.start();
-    const tile d = rhs.end();
-
-    std::array<tile, 4> results = {
-        get_mul_first_candidate(a, c, is_left), get_mul_middle_candidate(a, d, is_left),
-        get_mul_middle_candidate(c, b, is_left), get_mul_last_candidate(b, d, is_left)};
-
-    return results;
-}
-
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr typename valid<N, ES, WT>::tile
-valid<N, ES, WT>::get_mul_first_candidate(const typename valid<N, ES, WT>::tile& lhs,
-                                          const typename valid<N, ES, WT>::tile& rhs, bool is_left)
-{
-    const auto& a = lhs.p;
-    const auto& au = lhs.u;
-
-    const auto& c = rhs.p;
-    const auto& cu = rhs.u;
-
-    const auto [ac, r] = mul(a, c);
-
-    posit_type p;
-    interval_bound u = interval_bound::OPEN;
-
-    if ((is_closed(au) && a.is_zero()) || (is_closed(cu) && c.is_zero()))
-    {
-        p = p.zero();
-        u = interval_bound::CLOSED;
-    }
-    else
-    {
-        p = ac;
-        u = merge(au, cu);
-    }
-
-    return adapt(p, r, u, is_left);
-}
-
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr typename valid<N, ES, WT>::tile
-valid<N, ES, WT>::get_mul_middle_candidate(const typename valid<N, ES, WT>::tile& lhs,
-                                           const typename valid<N, ES, WT>::tile& rhs, bool is_left)
-{
-    const auto& a = lhs.p;
-    const auto& au = lhs.u;
-
-    const auto& d = rhs.p;
-    const auto& du = rhs.u;
-
-    const auto [ad, r] = mul(a, d);
-
-    posit_type p;
-    interval_bound u = interval_bound::OPEN;
-
-    if (is_closed(au) && is_closed(du))
-    {
-        // a * d = a * d. We really want "ad" exactly.
-
-        p = ad;
-        u = interval_bound::CLOSED;
-    }
-    else if ((is_closed(au) && a.is_zero()) || (is_closed(du) && d.is_zero()))
-    {
-        p = p.zero();
-        u = interval_bound::CLOSED;
-    }
-    else if (is_closed(au) && is_open(du))
-    {
-        if (is_left)
-        {
-            // a * (d - ε) = ad - aε. We move to the left of product "ad".
-
-            p = ad.decremented();
-            u = interval_bound::OPEN;
-        }
-        else
-        {
-            p = ad;
-            u = interval_bound::OPEN;
-        }
-    }
-    else if (is_open(au) && is_closed(du))
-    {
-        if (is_left)
-        {
-            // (a + ε) * d = ad + dε. We move to the right of product "ad".
-
-            p = ad;
-            u = interval_bound::OPEN;
-        }
-        else
-        {
-            p = ad.incremented();
-            u = interval_bound::OPEN;
-        }
-    }
-    else
-    {
-        assert(is_open(au) && is_open(du));
-
-        if (is_left)
-        {
-            // (a + ε) * (d - η) = ad + aη + dε - ηε. We really have no idea
-            // whether we should be left or right of product "ad". As such we have
-            // to make the conservative choices and pick the predecessor of
-            // product ac.
-
-            p = ad.decremented();
-            u = interval_bound::OPEN;
-        }
-        else
-        {
-            p = ad;
-            u = interval_bound::OPEN;
-        }
-    }
-
-    return adapt(p, r, u, is_left);
-}
-
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr typename valid<N, ES, WT>::tile
-valid<N, ES, WT>::get_mul_last_candidate(const typename valid<N, ES, WT>::tile& lhs,
-                                         const typename valid<N, ES, WT>::tile& rhs, bool is_left)
-{
-    const auto& b = lhs.p;
-    const auto& bu = lhs.u;
-
-    const auto& d = rhs.p;
-    const auto& du = rhs.u;
-
-    const auto [bd, r] = mul(b, d);
-
-    posit_type p;
-    interval_bound u = interval_bound::OPEN;
-
-    if (is_closed(bu) && is_closed(du))
-    {
-        p = bd;
-        u = interval_bound::CLOSED;
-    }
-    else if ((is_closed(bu) && b.is_zero()) || (is_closed(du) && d.is_zero()))
-    {
-        p = p.zero();
-        u = interval_bound::CLOSED;
-    }
-    else
-    {
-        if (is_left)
-        {
-            p = bd.decremented();
-            u = interval_bound::OPEN;
-        }
-        else
-        {
-            p = bd;
-            u = interval_bound::OPEN;
-        }
-    }
-
-    return adapt(p, r, u, is_left);
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -1077,18 +869,6 @@ valid<N, ES, WT>::adapt_right(const posit_type& value, const rounding_event rval
     }
 
     return {result_value, result_bound};
-}
-
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr typename valid<N, ES, WT>::tile valid<N, ES, WT>::start() const
-{
-    return {this->get_start_value(), this->get_start_bound()};
-}
-
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr typename valid<N, ES, WT>::tile valid<N, ES, WT>::end() const
-{
-    return {this->get_end_value(), this->get_end_bound()};
 }
 
 } // namespace aarith

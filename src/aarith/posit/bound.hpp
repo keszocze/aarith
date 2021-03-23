@@ -85,15 +85,11 @@ bound<N, ES, WT>::operator*(const bound<N, ES, WT>& other) const
     const bound& x = *this;
     const bound& y = other;
 
-    //std::cerr << "---- operator* ----" << std::endl;
-
     const auto [xy, r] = mul(x.value, y.value);
 
     if (x.is_exact() && y.is_exact())
     {
         // x * y
-
-        //std::cerr << "here it is" << std::endl;
 
         if (x.is_zero() || y.is_zero())
         {

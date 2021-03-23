@@ -2555,74 +2555,6 @@ protected:
     [[nodiscard]] static std::string in_tile_notation(const posit_type& p, const interval_bound& u);
 
     /**
-     * @return Whether tile lhs is less than tile rhs.
-     */
-    [[nodiscard]] static bool lt(const tile& lhs, const tile& rhs);
-
-    /**
-     * @brief Return the four choices of multiplication endpoints.
-     *
-     * When multiplying posits lhs = {a, b} with rhs = {c, d}, we have the
-     * choice of products {ac, ad, bc, bd}. This function returns each of
-     * these choices.
-     *
-     * When computing product lhs * rhs = {x, y}, the rules for computing x
-     * and y have slight differences. This is why argument left indicates whether
-     * we are computing left bound x (left = true) or right bound y (left = false).
-     *
-     * @param lhs The first valid to multiply.
-     * @param rhs The second valid to multiply.
-     * @param left Whether we are computing a left bound.
-     */
-    [[nodiscard]] static constexpr std::array<tile, 4>
-    get_mul_candidates(const valid& lhs, const valid& rhs, bool left);
-
-    /**
-     * @brief Compute first multiplication candidate.
-     *
-     * When multiplying posits lhs = {a, b} with rhs = {c, d}, we have the
-     * choice of products {ac, ad, bc, bd}. Given tiles a and c, this method
-     * returns ac.
-     *
-     * @param a The first tile to multiply.
-     * @param c The second tile to multiply.
-     * @param is_left Whether we are computing a left bound.
-     */
-    [[nodiscard]] static constexpr tile get_mul_first_candidate(const tile& a, const tile& c,
-                                                                bool is_left);
-
-    /**
-     * @brief Compute second multiplication candidate.
-     *
-     * When multiplying posits lhs = {a, b} with rhs = {c, d}, we have the
-     * choice of products {ac, ad, bc, bd}. Given tiles a and d, this method
-     * returns ad.
-     *
-     * @note This function can also be used to compute product bc if c is passed
-     * as argument a and b is passed as argument d.
-     *
-     * @param a The first tile to multiply.
-     * @param d The second tile to multiply.
-     * @param is_left Whether we are computing a left bound.
-     */
-    [[nodiscard]] static constexpr tile get_mul_middle_candidate(const tile& a, const tile& d,
-                                                                 bool is_left);
-
-    /**
-     * @brief Compute last multiplication candidate.
-     *
-     * When multiplying posits lhs = {a, b} with rhs = {c, d}, we have the
-     * choice of products {ac, ad, bc, bd}. Given tiles b and d, this method
-     * returns bd.
-     *
-     * @param b The first tile to multiply.
-     * @param d The second tile to multiply.
-     * @param is_left Whether we are computing a left bound.
-     */
-    [[nodiscard]] static constexpr tile get_mul_last_candidate(const tile& b, const tile& d,
-                                                               bool is_left);
-
-    /**
      * @brief Fix rounding of endpoint in arithmetic result.
      *
      * When computing arithmetic operations on valids (e.g. addition,
@@ -2661,18 +2593,6 @@ protected:
      */
     [[nodiscard]] static constexpr tile
     adapt_right(const posit_type& value, const rounding_event rvalue, const interval_bound desired);
-
-    /**
-     * @return Start tile of this valid.
-     *
-     * @note See documentation for valid::adapt for more details.
-     */
-    [[nodiscard]] constexpr tile start() const;
-
-    /**
-     * @return End tile of this valid.
-     */
-    [[nodiscard]] constexpr tile end() const;
 };
 
 //
