@@ -180,7 +180,7 @@ SCENARIO("multiplying arbitrary interval valids")
                 const Valid w = Valid::from(Posit(0.25), open, Posit(0.5), open); // (1/4, 1/2)
 
                 const Valid actual = v * w;
-                const Valid expected = Valid::from(Posit(0.5), open, Posit(2), open); // (1/2, 2)
+                const Valid expected = Valid::from(Posit(0.5), open, Posit(3), open); // (1/2, 2)
 
                 REQUIRE(actual == expected);
             }
@@ -332,8 +332,7 @@ SCENARIO("multiplying arbitrary low res valids")
                 const Valid actual = v * w;
                 const Valid expected = Valid::from(Posit(-4), open, Posit(0), open); // (-4, 0)
 
-                // TODO(Schärtl): fix multiplication logic
-                //REQUIRE(actual == expected);
+                REQUIRE(actual == expected);
             }
         }
     }

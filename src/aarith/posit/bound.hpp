@@ -5,6 +5,34 @@
 namespace aarith {
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bound<N, ES, WT> bound<N, ES, WT>::from_left(const posit<N, ES, WT>& value,
+                                                                     const interval_bound& u)
+{
+    if (is_open(u))
+    {
+        return bound(value, bound_sign::PLUS_EPS);
+    }
+    else
+    {
+        return bound(value, bound_sign::EXACT);
+    }
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bound<N, ES, WT> bound<N, ES, WT>::from_right(const posit<N, ES, WT>& value,
+                                                                      const interval_bound& u)
+{
+    if (is_open(u))
+    {
+        return bound(value, bound_sign::MINUS_EPS);
+    }
+    else
+    {
+        return bound(value, bound_sign::EXACT);
+    }
+}
+
+template <size_t N, size_t ES, typename WT>
 bound<N, ES, WT>::bound()
     : sign(bound_sign::EXACT)
 {
@@ -49,7 +77,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr bound<N, ES, WT>
+[[nodiscard]] /*constexpr*/ bound<N, ES, WT>
 bound<N, ES, WT>::operator*(const bound<N, ES, WT>& other) const
 {
     // This implements the table defined in valid-bound-multiplication.ods.
@@ -57,11 +85,15 @@ bound<N, ES, WT>::operator*(const bound<N, ES, WT>& other) const
     const bound& x = *this;
     const bound& y = other;
 
+    //std::cerr << "---- operator* ----" << std::endl;
+
     const auto [xy, r] = mul(x.value, y.value);
 
     if (x.is_exact() && y.is_exact())
     {
         // x * y
+
+        //std::cerr << "here it is" << std::endl;
 
         if (x.is_zero() || y.is_zero())
         {
@@ -396,6 +428,118 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool bound<N, ES, WT>::is_non_negative() const
 {
     return this->value.is_non_negative();
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr std::tuple<posit<N, ES, WT>, interval_bound>
+bound<N, ES, WT>::to_left() const
+{
+    posit_type left_value;
+    interval_bound left_bound = interval_bound::CLOSED;
+
+    switch (this->sign)
+    {
+    case bound_sign::EXACT:
+        left_value = this->value;
+        left_bound = interval_bound::CLOSED;
+        break;
+    case bound_sign::PLUS_EPS:
+        left_value = this->value;
+        left_bound = interval_bound::OPEN;
+        break;
+    case bound_sign::MINUS_EPS:
+    case bound_sign::UNSURE:
+        // TODO(Schärtl): handle infty
+        left_value = this->value.decremented();
+        left_bound = interval_bound::OPEN;
+        break;
+        break;
+    };
+
+    return std::make_tuple(left_value, left_bound);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr std::tuple<posit<N, ES, WT>, interval_bound>
+bound<N, ES, WT>::to_right() const
+{
+    posit_type right_value;
+    interval_bound right_bound = interval_bound::CLOSED;
+
+    switch (this->sign)
+    {
+    case bound_sign::EXACT:
+        right_value = this->value;
+        right_bound = interval_bound::CLOSED;
+        break;
+    case bound_sign::MINUS_EPS:
+        right_value = this->value;
+        right_bound = interval_bound::OPEN;
+        break;
+    case bound_sign::PLUS_EPS:
+    case bound_sign::UNSURE:
+        // TODO(Schärtl): handle infty
+        right_value = this->value.incremented();
+        right_bound = interval_bound::OPEN;
+        break;
+        break;
+    };
+
+    return std::make_tuple(right_value, right_bound);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool bound<N, ES, WT>::lt_left(const bound<N, ES, WT>& lhs,
+                                                       const bound<N, ES, WT>& rhs)
+{
+    return bound::lt(lhs, rhs, true);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool bound<N, ES, WT>::lt_right(const bound<N, ES, WT>& lhs,
+                                                        const bound<N, ES, WT>& rhs)
+{
+    return bound::lt(lhs, rhs, false);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bool bound<N, ES, WT>::lt(const bound<N, ES, WT>& lhs,
+                                                  const bound<N, ES, WT>& rhs, bool is_left)
+{
+    if (lhs.value.is_nar() || rhs.value.is_nar())
+    {
+        return false;
+    }
+
+    if (lhs.value == rhs.value)
+    {
+        //
+        //   ----------|----------|----------|----------
+        //                        p
+        //                 -eps       +eps
+        //
+
+        if (lhs.is_unsure())
+        {
+            return is_left;
+        }
+        if (lhs.is_minus_eps())
+        {
+            return rhs.is_exact() || rhs.is_plus_eps();
+        }
+        else if (lhs.is_exact())
+        {
+            return rhs.is_plus_eps();
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        return lhs.value < rhs.value;
+    }
 }
 
 } // namespace aarith

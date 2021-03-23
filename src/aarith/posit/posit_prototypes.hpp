@@ -2120,6 +2120,11 @@ template <size_t N, size_t ES, typename WT = DefaultWordType> class bound
 public:
     using posit_type = posit<N, ES, WT>;
 
+    [[nodiscard]] static constexpr bound from_left(const posit_type& value,
+                                                   const interval_bound& u);
+    [[nodiscard]] static constexpr bound from_right(const posit_type& value,
+                                                    const interval_bound& u);
+
     bound();
     bound(const posit_type& new_value, bound_sign sign = bound_sign::EXACT);
     bound(const bound& other);
@@ -2130,7 +2135,7 @@ public:
     [[nodiscard]] constexpr bool operator==(const bound& other) const;
     [[nodiscard]] constexpr bool operator!=(const bound& other) const;
 
-    [[nodiscard]] constexpr bound operator*(const bound& other) const;
+    [[nodiscard]] /*constexpr*/ bound operator*(const bound& other) const;
 
     [[nodiscard]] const posit_type& get_value() const;
     [[nodiscard]] const bound_sign& get_sign() const;
@@ -2144,9 +2149,17 @@ public:
     [[nodiscard]] constexpr bool is_negative() const;
     [[nodiscard]] constexpr bool is_non_negative() const;
 
+    [[nodiscard]] constexpr std::tuple<posit_type, interval_bound> to_left() const;
+    [[nodiscard]] constexpr std::tuple<posit_type, interval_bound> to_right() const;
+
+    [[nodiscard]] static constexpr bool lt_left(const bound& lhs, const bound& rhs);
+    [[nodiscard]] static constexpr bool lt_right(const bound& lhs, const bound& rhs);
+
 private:
     posit_type value;
     bound_sign sign;
+
+    [[nodiscard]] static constexpr bool lt(const bound& lhs, const bound& rhs, bool is_left);
 };
 
 //
@@ -2176,6 +2189,11 @@ public:
      * @brief Underlying posit type.
      */
     using posit_type = posit<N, ES, WT>;
+
+    /**
+     * @brief Type that can be used to represent the underlying bounds.
+     */
+    using bound_type = bound<N, ES, WT>;
 
     /**
      * @brief Construct a new valid with given endpoints.
@@ -2348,7 +2366,7 @@ public:
     /**
      * @brief Return the product of this multiplied with rhs.
      */
-    [[nodiscard]] constexpr valid operator*(const valid& other) const;
+    [[nodiscard]] /*constexpr*/ valid operator*(const valid& other) const;
 
     /**
      * @brief Return this divided by other.

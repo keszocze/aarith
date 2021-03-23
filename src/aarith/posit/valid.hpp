@@ -422,8 +422,20 @@ valid<N, ES, WT>::operator-(const valid<N, ES, WT>& other) const
     return *this + (-other);
 }
 
+template <typename Container> inline void print(const Container& array)
+{
+    std::cerr << "[ ";
+
+    for (const auto& elem : array)
+    {
+        std::cerr << elem << ", ";
+    }
+
+    std::cerr << "]\n";
+}
+
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr valid<N, ES, WT>
+[[nodiscard]] /*constexpr*/ valid<N, ES, WT>
 valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
 {
     //
@@ -492,22 +504,39 @@ valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
     // ad, bc and bd.
     //
 
+    const bound_type a = bound_type::from_left(this->start_value, this->start_bound);
+    const bound_type b = bound_type::from_right(this->end_value, this->end_bound);
+
+    const bound_type c = bound_type::from_left(other.start_value, other.start_bound);
+    const bound_type d = bound_type::from_right(other.end_value, other.end_bound);
+
+    // std::cerr << "a=" << a <<std::endl;
+    // std::cerr << "b=" << b <<std::endl;
+    // std::cerr << "c=" << c <<std::endl;
+    // std::cerr << "d=" << d <<std::endl;
+
+    std::array<bound_type, 4> choices = {a * c, a * d, b * c, b * d};
+    // print(choices);
+
+    //
+    // Now we pick out the biggest and smallest value and the convert them
+    // back to valid bounds.
+    //
+
     valid product;
 
     {
-        std::array<tile, 4> choices = get_mul_candidates(*this, other, true);
-        std::sort(choices.begin(), choices.end(), valid::lt);
-
-        product.start_value = choices.front().p;
-        product.start_bound = choices.front().u;
+        std::sort(choices.begin(), choices.end(), bound_type::lt_left);
+        const auto [lvalue, lbound] = choices.front().to_left();
+        product.start_value = lvalue;
+        product.start_bound = lbound;
     }
 
     {
-        std::array<tile, 4> choices = get_mul_candidates(*this, other, false);
-        std::sort(choices.begin(), choices.end(), valid::lt);
-
-        product.end_value = choices.back().p;
-        product.end_bound = choices.back().u;
+        std::sort(choices.begin(), choices.end(), bound_type::lt_right);
+        const auto [rvalue, rbound] = choices.back().to_right();
+        product.end_value = rvalue;
+        product.end_bound = rbound;
     }
 
     return product;
