@@ -7,7 +7,7 @@
 
 using namespace aarith;
 
-TEMPLATE_TEST_CASE_SIG("Expanding integers", "[integer][signed][unsigned][casting][foo]",
+TEMPLATE_TEST_CASE_SIG("Expanding integers", "[integer][signed][unsigned][casting]",
                        AARITH_INT_TEST_SIGNATURE,
                        //                       (8, uint64_t)
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
@@ -100,7 +100,7 @@ TEMPLATE_TEST_CASE_SIG("Expanding integers", "[integer][signed][unsigned][castin
 
 SCENARIO("Up-casting to the next larger native integer type", "[integer][unsigned][casting]")
 {
-    GIVEN("An unsigned integer with 13 bidth")
+    GIVEN("An unsigned integer with 13 bits")
     {
         WHEN("Casting to an uint16_t")
         {
@@ -602,6 +602,56 @@ SCENARIO("Width casting of signed integers", "[integer][signed][utility][casting
                 CHECK(i32r == i32);
                 CHECK(i150r == integer<2>{2});
             }
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Casting unsigned integers", "[integer][unsigned][casting]",
+                       AARITH_INT_TEST_SIGNATURE,
+                       //                       (8, uint64_t)
+                       AARITH_UINT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE)
+{
+    using I = aarith::uinteger<W>;
+    using N = WordType;
+
+    GIVEN("A random native integer")
+    {
+        const N val =
+            GENERATE(take(20, random(std::numeric_limits<N>::min(), std::numeric_limits<N>::max())));
+
+        const I aarith_val{val};
+
+        WHEN("Casting the value back")
+        {
+            const N cast = static_cast<N>(aarith_val);
+            CAPTURE(val, aarith_val, cast);
+            REQUIRE(cast == val);
+
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Casting unsigned integers", "[integer][unsigned][casting]",
+                       AARITH_INT_TEST_SIGNATURE,
+//                       (8, uint64_t)
+                       AARITH_INT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE)
+{
+    using I = aarith::integer<W>;
+    using N = WordType;
+
+    GIVEN("A random native integer")
+    {
+        const N val =
+            GENERATE(take(20, random(std::numeric_limits<N>::min(), std::numeric_limits<N>::max())));
+
+        const I aarith_val{val};
+
+        WHEN("Casting the value back")
+        {
+            const N cast = static_cast<N>(aarith_val);
+            CAPTURE(val, aarith_val, cast);
+            REQUIRE(cast == val);
+
         }
     }
 }
