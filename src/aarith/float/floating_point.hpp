@@ -16,12 +16,12 @@ namespace aarith {
 
 template <size_t E, size_t M, typename WordType = uint64_t> class floating_point; // NOLINT
 
-using half_precision = floating_point<5, 10, uint64_t>; // NOLINT
-using single_precision = floating_point<8, 23, uint64_t>; // NOLINT
-using double_precison = floating_point<11, 52, uint64_t>; // NOLINT
+using half_precision = floating_point<5, 10, uint64_t>;        // NOLINT
+using single_precision = floating_point<8, 23, uint64_t>;      // NOLINT
+using double_precision = floating_point<11, 52, uint64_t>;      // NOLINT
 using quadruple_precision = floating_point<15, 112, uint64_t>; // NOLINT
-using bfloat16 = floating_point<8, 7, uint64_t>; // NOLINT
-using tensorfloat32 = floating_point<8, 10, uint64_t>; // NOLINT
+using bfloat16 = floating_point<8, 7, uint64_t>;               // NOLINT
+using tensorfloat32 = floating_point<8, 10, uint64_t>;         // NOLINT
 
 /**
  * @brief Expands the mantissa by correctly shifting the bits in the larger uinteger
