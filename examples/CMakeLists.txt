@@ -1,11 +1,3 @@
-if (USE_CLANGTIDY)
-    set(CMAKE_CXX_CLANG_TIDY "clang-tidy")
-endif()
-
-cmake_minimum_required(VERSION 3.13)
-
-
-
 add_executable(sqrt_example sqrt.cpp)
 target_link_libraries(sqrt_example aarith::Library)
 
