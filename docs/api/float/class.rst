@@ -1,5 +1,7 @@
-Flaoting-Point Numbers
+Floating-Point Numbers
 ======================
+
+.. _floating_point:
 
 **Header** ``aarith/float/floating_point.hpp``
 

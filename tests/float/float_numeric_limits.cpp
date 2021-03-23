@@ -6,9 +6,18 @@
 
 using namespace aarith; // NOLINT
 
-TEMPLATE_TEST_CASE_SIG("Dinge", "Tags", ((typename F, typename AF, size_t N), F, AF, N ),
+
+
+
+TEMPLATE_TEST_CASE_SIG("Testing numeric_limits for aarith floating_points",
+                       "[utility][floating_point]", ((typename F, typename AF, size_t N), F, AF, N),
                        (float, single_precision, 3), (double, double_precision, 3))
 {
+    /*
+     * Note that the tmeplate paramter N (set to 3 in both cases) is necessary as otherwise Catch2
+     * complains (and failts to compile) that some wrapper call is ambiguous. Simply ignore it.
+     */
+
 
     using fbase = std::numeric_limits<F>;
     using abase = std::numeric_limits<AF>;
