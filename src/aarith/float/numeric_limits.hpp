@@ -8,13 +8,16 @@ namespace aarith {
  * @brief Returns the min exponent as defined by std::numeric_limits
  *
  * See https://en.cppreference.com/w/cpp/types/numeric_limits/min_exponent
+ *
+ * @warning This only works for expnont width up to 64 bits
+ *
  * @return The min exponent
  */
 template <typename F> [[nodiscard]] constexpr int min_exponent()
 {
-    constexpr auto ftype_min_exp = F::min_exp;
-    // TODO implement this...
-    // constexpr int min_exponent = static_cast<int>(ftype_min_exp) +1;
+//    constexpr auto ftype_min_exp = F::min_exp;
+//    constexpr int min_exponent_ = static_cast<int64_t>(ftype_min_exp) + 1;
+//    return min_exponent_;
     return 0;
 }
 
@@ -22,13 +25,16 @@ template <typename F> [[nodiscard]] constexpr int min_exponent()
  * @brief Returns the min exponent as defined by std::numeric_limits
  *
  * See https://en.cppreference.com/w/cpp/types/numeric_limits/max_exponent
+ *
+ * @warning This only works for expnont width up to 64 bits
+ *
  * @return The min exponent
  */
 template <typename F> [[nodiscard]] constexpr int max_exponent()
 {
-    constexpr auto ftype_min_exp = F::max_exp;
-    // TODO implement this...
-    // constexpr int min_exponent = static_cast<int>(ftype_min_exp) +1;
+//    constexpr auto ftype_min_exp = F::max_exp;
+//    constexpr int max_exponent_ = static_cast<int64_t>(ftype_min_exp) + 1;
+//    return max_exponent_;
     return 0;
 }
 
@@ -67,11 +73,12 @@ public:
     static constexpr int min_exponent =
         ::aarith::min_exponent<::aarith::floating_point<E, M, WordType>>();
 
-    // TODO compute reasonable values
-    // static constexpr int min_exponent10 = 0;
+    // TODO (keszocze) compute the values for min/max_exponent10 correctly
+     static constexpr int min_exponent10 = 0;
+     static constexpr int max_exponent10 = 0;
+
     static constexpr int max_exponent =
         ::aarith::min_exponent<::aarith::floating_point<E, M, WordType>>();
-    // static constexpr int max_exponent10 = 0;
 
     static constexpr bool traps = false;
 
@@ -115,17 +122,17 @@ public:
 
     static constexpr ::aarith::floating_point<E, M, WordType> infinity() noexcept
     {
-        return ::aarith::floating_point<E, M, WordType>::zero();
+        return ::aarith::floating_point<E, M, WordType>::pos_infinity();
     }
 
     static constexpr ::aarith::floating_point<E, M, WordType> quiet_NaN() noexcept
     {
-        return ::aarith::floating_point<E, M, WordType>::zero();
+        return ::aarith::floating_point<E, M, WordType>::qNaN();
     }
 
     static constexpr ::aarith::floating_point<E, M, WordType> signaling_NaN() noexcept
     {
-        return ::aarith::floating_point<E, M, WordType>::zero();
+        return ::aarith::floating_point<E, M, WordType>::sNaN();
     }
 
     static constexpr ::aarith::floating_point<E, M, WordType> denorm_min() noexcept

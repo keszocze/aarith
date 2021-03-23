@@ -76,6 +76,7 @@ public:
         return n;
     }
 
+
     /*
      * Constants
      */
@@ -114,6 +115,7 @@ public:
     /*
      * Conversion operators
      */
+
 
 private:
     template <typename T> [[nodiscard]]  constexpr T generic_cast() const
