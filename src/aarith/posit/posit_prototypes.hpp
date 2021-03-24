@@ -2119,6 +2119,15 @@ std::ostream& operator<<(std::ostream& os, const bound_sign& bs);
  */
 [[nodiscard]] constexpr bool is_unsure(bound_sign bs);
 
+/**
+ * @brief Negate sign.
+ *
+ * Negating a sign means that PLUS_EPS gets turned to MINUS_EPS, MINUS_EPS
+ * similarly gets flipped around to PLUS_EPS and both EXACT and UNSURE stay the
+ * same.
+ */
+[[nodiscard]] constexpr bound_sign negate(bound_sign bs);
+
 //
 // Bound Class
 //
@@ -2273,6 +2282,18 @@ private:
      */
     [[nodiscard]] static constexpr bool lt(const bound& lhs, const bound& rhs, bool is_left);
 };
+
+//
+// Additional Bound Operations
+//
+// For implementation, look at posit/bound_operations.hpp
+//
+
+/**
+ * @return Absolute value of bound b.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr bound<N, ES, WT> abs(const bound<N, ES, WT>& b);
 
 //
 // Valid Class.
@@ -2699,6 +2720,12 @@ protected:
      */
     [[nodiscard]] static constexpr tile
     adapt_right(const posit_type& value, const rounding_event rvalue, const interval_bound desired);
+
+    /**
+     * @brief Return the four candidates for multiplication.
+     */
+    [[nodiscard]] static constexpr std::array<bound_type, 4> get_mult_choices(const valid& lhs,
+                                                                              const valid& rhs);
 };
 
 //
@@ -2767,6 +2794,7 @@ inline void for_each_regular_valid(const std::function<void(const ValidType&)>& 
 //
 
 #include <aarith/posit/bound.hpp>
+#include <aarith/posit/bound_operations.hpp>
 #include <aarith/posit/bound_operators.hpp>
 #include <aarith/posit/bound_sign_operations.hpp>
 #include <aarith/posit/bound_sign_operators.hpp>

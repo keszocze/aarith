@@ -422,6 +422,18 @@ valid<N, ES, WT>::operator-(const valid<N, ES, WT>& other) const
     return *this + (-other);
 }
 
+namespace Impl {
+
+template <typename T, size_t N, typename FilterFunc>
+[[nodiscard]] constexpr std::vector<T> filter(const std::array<T, N>& a, FilterFunc f)
+{
+    std::vector<T> ret;
+    std::copy_if(a.begin(), a.end(), std::back_inserter(ret), f);
+    return ret;
+}
+
+} // namespace Impl
+
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr valid<N, ES, WT>
 valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
@@ -478,47 +490,75 @@ valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
     }
 
     //
-    // For now we do not support multiplication of irregular intervals.
-    // TODO(Schärtl): Define multiplication on irregular intervals.
-    //
-
-    if (this->is_irregular() || other.is_irregular())
-    {
-        throw std::logic_error("multiplication not defined on irregular arguments");
-    }
-
-    //
     // Valid multiplication requires us to consider all possible choices ac,
-    // ad, bc and bd.
-    //
-
-    const bound_type a = bound_type::from_left(this->start_value, this->start_bound);
-    const bound_type b = bound_type::from_right(this->end_value, this->end_bound);
-
-    const bound_type c = bound_type::from_left(other.start_value, other.start_bound);
-    const bound_type d = bound_type::from_right(other.end_value, other.end_bound);
-
-    std::array<bound_type, 4> choices = {a * c, a * d, b * c, b * d};
-
-    //
-    // Now we pick out the biggest and smallest value and the convert them
-    // back to valid bounds.
+    // ad, bc and bd.  Pick out the biggest and smallest value and the convert
+    // them back to valid bounds.
     //
 
     valid product;
+    std::array<bound_type, 4> choices = valid::get_mult_choices(*this, other);
 
+    if (this->is_irregular() || other.is_irregular())
     {
-        std::sort(choices.begin(), choices.end(), bound_type::lt_left);
-        const auto [lvalue, lbound] = choices.front().to_left();
-        product.start_value = lvalue;
-        product.start_bound = lbound;
+        // For [irregular valids], we use a pessimistic bound that wraps
+        // around from the top.
+
+        {
+            auto left_choices = Impl::filter(choices, [](const bound_type& elem) -> bool {
+                return elem.get_value().is_non_negative();
+            });
+
+            if (left_choices.empty())
+            {
+                product.end_value = posit_type::nar();
+                product.end_bound = interval_bound::CLOSED;
+            }
+            else
+            {
+                std::sort(left_choices.begin(), left_choices.end(), bound_type::lt_left);
+                const auto [lvalue, lbound] = left_choices.front().to_left();
+                product.start_value = lvalue;
+                product.start_bound = lbound;
+            }
+        }
+
+        {
+            auto right_choices = Impl::filter(choices, [](const bound_type& elem) -> bool {
+                return elem.get_value().is_negative();
+            });
+
+            if (right_choices.empty())
+            {
+                product.start_value = posit_type::nar();
+                product.start_bound = interval_bound::CLOSED;
+            }
+            else
+            {
+                std::sort(right_choices.begin(), right_choices.end(), bound_type::lt_right);
+                const auto [rvalue, rbound] = right_choices.back().to_right();
+                product.end_value = rvalue;
+                product.end_bound = rbound;
+            }
+        }
     }
-
+    else
     {
-        std::sort(choices.begin(), choices.end(), bound_type::lt_right);
-        const auto [rvalue, rbound] = choices.back().to_right();
-        product.end_value = rvalue;
-        product.end_bound = rbound;
+        // For [regular valids], we can use traditional interval arithmetic
+        // rules.
+
+        {
+            std::sort(choices.begin(), choices.end(), bound_type::lt_left);
+            const auto [lvalue, lbound] = choices.front().to_left();
+            product.start_value = lvalue;
+            product.start_bound = lbound;
+        }
+
+        {
+            std::sort(choices.begin(), choices.end(), bound_type::lt_right);
+            const auto [rvalue, rbound] = choices.back().to_right();
+            product.end_value = rvalue;
+            product.end_bound = rbound;
+        }
     }
 
     return product;
@@ -869,6 +909,19 @@ valid<N, ES, WT>::adapt_right(const posit_type& value, const rounding_event rval
     }
 
     return {result_value, result_bound};
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr std::array<typename valid<N, ES, WT>::bound_type, 4>
+valid<N, ES, WT>::get_mult_choices(const valid<N, ES, WT>& lhs, const valid<N, ES, WT>& rhs)
+{
+    const bound_type a = bound_type::from_left(lhs.start_value, lhs.start_bound);
+    const bound_type b = bound_type::from_right(lhs.end_value, lhs.end_bound);
+
+    const bound_type c = bound_type::from_left(rhs.start_value, rhs.start_bound);
+    const bound_type d = bound_type::from_right(rhs.end_value, rhs.end_bound);
+
+    return {a * c, a * d, b * c, b * d};
 }
 
 } // namespace aarith

@@ -24,4 +24,14 @@ namespace aarith {
     return bs == bound_sign::UNSURE;
 }
 
+[[nodiscard]] constexpr bound_sign negate(bound_sign bs)
+{
+    switch (bs)
+    {
+    case bound_sign::PLUS_EPS: return bound_sign::MINUS_EPS; break;
+    case bound_sign::MINUS_EPS: return bound_sign::PLUS_EPS; break;
+    default: return bs;
+    };
+}
+
 } // namespace aarith
