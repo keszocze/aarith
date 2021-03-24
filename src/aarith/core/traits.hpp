@@ -31,7 +31,6 @@ public:
  */
 template <class Type> inline constexpr bool is_word_array_v = is_word_array<Type>::value;
 
-
 /**
  * @brief Type trait to check if a type is an aarith integer
  * @tparam Type The Type to check
@@ -54,7 +53,6 @@ public:
  */
 template <class Type> inline constexpr bool is_integral_v = is_integral<Type>::value;
 
-
 /**
  * @brief Type trait to check if a type is an unsigned aarith type
  *
@@ -76,7 +74,6 @@ public:
  */
 template <class Type> inline constexpr bool is_unsigned_v = is_unsigned<Type>::value;
 
-
 /**
  * @brief Type trait to check if a type is a signed aarith type
  * @tparam Type The type to check
@@ -96,6 +93,25 @@ public:
  */
 template <class Type> inline constexpr bool is_signed_v = is_signed<Type>::value;
 
+
+/**
+ * @brief Type trait for an aarith type being an arithmetic type
+ * @tparam T The type to check
+ */
+template <class T> struct is_arithmetic
+{
+    /**
+     * By default, no type is an arithmetic type
+     */
+    static constexpr bool value = false;
+};
+
+/**
+ * @brief Test for an aarith type being an arithmetic type
+ * @tparam T The type to check
+ */
+template <class T> inline constexpr bool is_arithmetic_v = is_arithmetic<T>::value;
+
 /**
  * @brief Type trait to check if a type is an aarith floating_point number
  *
@@ -106,7 +122,6 @@ template <class Type> inline constexpr bool is_signed_v = is_signed<Type>::value
 template <class Type> class is_float
 {
 public:
-
     /**
      * By default, a type is not of type aarith floating_point
      */
