@@ -8,3 +8,4 @@
 #include <aarith/float/floating_point.hpp>
 #include <aarith/float/nan_payload.hpp>
 #include <aarith/float/total_order.hpp>
+#include <aarith/float/numeric_limits.hpp>
