@@ -10,11 +10,11 @@ template <size_t N, size_t ES, typename WT>
 {
     if (is_open(u))
     {
-        return bound(value, bound_sign::PLUS_EPS);
+        return bound(value, bound_sign::PLUS_EPS, true);
     }
     else
     {
-        return bound(value, bound_sign::EXACT);
+        return bound(value, bound_sign::EXACT, true);
     }
 }
 
@@ -24,24 +24,26 @@ template <size_t N, size_t ES, typename WT>
 {
     if (is_open(u))
     {
-        return bound(value, bound_sign::MINUS_EPS);
+        return bound(value, bound_sign::MINUS_EPS, false);
     }
     else
     {
-        return bound(value, bound_sign::EXACT);
+        return bound(value, bound_sign::EXACT, false);
     }
 }
 
 template <size_t N, size_t ES, typename WT>
 bound<N, ES, WT>::bound()
     : sign(bound_sign::EXACT)
+    , is_left(true)
 {
 }
 
 template <size_t N, size_t ES, typename WT>
-bound<N, ES, WT>::bound(const posit<N, ES, WT>& new_value, bound_sign new_sign)
+bound<N, ES, WT>::bound(const posit<N, ES, WT>& new_value, bound_sign new_sign, bool new_is_left)
     : value(new_value)
     , sign(new_sign)
+    , is_left(new_is_left)
 {
 }
 
@@ -49,6 +51,7 @@ template <size_t N, size_t ES, typename WT>
 bound<N, ES, WT>::bound(const bound<N, ES, WT>& other)
     : value(other.value)
     , sign(other.sign)
+    , is_left(other.is_left)
 {
 }
 
@@ -61,13 +64,22 @@ bound<N, ES, WT>& bound<N, ES, WT>::operator=(const bound<N, ES, WT>& other)
 {
     this->value = other.value;
     this->sign = other.sign;
+    this->is_left = other.is_left;
     return *this;
 }
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool bound<N, ES, WT>::operator==(const bound<N, ES, WT>& other) const
 {
-    return this->value == other.value && this->sign == other.sign;
+    if (this->value.is_nar() || other.value.is_nar())
+    {
+        return this->value == other.value && this->sign == other.sign && this->is_left &&
+               other.is_left;
+    }
+    else
+    {
+        return this->value == other.value && this->sign == other.sign;
+    }
 }
 
 template <size_t N, size_t ES, typename WT>
@@ -84,6 +96,47 @@ bound<N, ES, WT>::operator*(const bound<N, ES, WT>& other) const
 
     const bound& x = *this;
     const bound& y = other;
+
+    //
+    // Handle Infty Cases
+    //
+
+    if (x.value.is_nar() && y.value.is_nar())
+    {
+        if (x.is_left == y.is_left)
+        {
+            const bool both_left = x.is_left;
+
+            if (both_left)
+            {
+                return bound(posit_type::nar(), bound_sign::MINUS_EPS, true);
+            }
+            else
+            {
+                return bound(posit_type::nar(), bound_sign::PLUS_EPS, false);
+            }
+        }
+        else
+        {
+            return bound(posit_type::nar(), bound_sign::EXACT);
+        }
+    }
+
+    if (x.value.is_nar() && !y.is_zero())
+    {
+        assert(!y.value.is_nar());
+        return x;
+    }
+
+    if (!x.is_zero() && y.value.is_nar())
+    {
+        assert(!x.value.is_nar());
+        return y;
+    }
+
+    //
+    // Handle Regular Cases
+    //
 
     const auto [xy, r] = mul(x.value, y.value);
 
@@ -385,6 +438,12 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] const bool& bound<N, ES, WT>::get_is_left() const
+{
+    return this->is_left;
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool bound<N, ES, WT>::is_exact() const
 {
     return this->sign == bound_sign::EXACT;
@@ -433,24 +492,38 @@ bound<N, ES, WT>::to_left() const
     posit_type left_value;
     interval_bound left_bound = interval_bound::CLOSED;
 
-    switch (this->sign)
+    if (this->value.is_nar())
     {
-    case bound_sign::EXACT:
-        left_value = this->value;
-        left_bound = interval_bound::CLOSED;
-        break;
-    case bound_sign::PLUS_EPS:
-        left_value = this->value;
-        left_bound = interval_bound::OPEN;
-        break;
-    case bound_sign::MINUS_EPS:
-    case bound_sign::UNSURE:
-        // TODO(Schärtl): handle infty
-        left_value = this->value.decremented();
-        left_bound = interval_bound::OPEN;
-        break;
-        break;
-    };
+        if (this->is_left)
+        {
+            left_value = posit_type::nar();
+            left_bound = interval_bound::OPEN;
+        }
+        else
+        {
+            left_value = posit_type::nar();
+            left_bound = interval_bound::CLOSED;
+        }
+    }
+    else
+    {
+        switch (this->sign)
+        {
+        case bound_sign::EXACT:
+            left_value = this->value;
+            left_bound = interval_bound::CLOSED;
+            break;
+        case bound_sign::PLUS_EPS:
+            left_value = this->value;
+            left_bound = interval_bound::OPEN;
+            break;
+        case bound_sign::MINUS_EPS:
+        case bound_sign::UNSURE:
+            left_value = this->value.decremented();
+            left_bound = interval_bound::OPEN;
+            break;
+        };
+    }
 
     return std::make_tuple(left_value, left_bound);
 }
@@ -462,24 +535,38 @@ bound<N, ES, WT>::to_right() const
     posit_type right_value;
     interval_bound right_bound = interval_bound::CLOSED;
 
-    switch (this->sign)
+    if (this->value.is_nar())
     {
-    case bound_sign::EXACT:
-        right_value = this->value;
-        right_bound = interval_bound::CLOSED;
-        break;
-    case bound_sign::MINUS_EPS:
-        right_value = this->value;
-        right_bound = interval_bound::OPEN;
-        break;
-    case bound_sign::PLUS_EPS:
-    case bound_sign::UNSURE:
-        // TODO(Schärtl): handle infty
-        right_value = this->value.incremented();
-        right_bound = interval_bound::OPEN;
-        break;
-        break;
-    };
+        if (this->is_left)
+        {
+            right_value = posit_type::nar();
+            right_bound = interval_bound::CLOSED;
+        }
+        else
+        {
+            right_value = posit_type::nar();
+            right_bound = interval_bound::OPEN;
+        }
+    }
+    else
+    {
+        switch (this->sign)
+        {
+        case bound_sign::EXACT:
+            right_value = this->value;
+            right_bound = interval_bound::CLOSED;
+            break;
+        case bound_sign::MINUS_EPS:
+            right_value = this->value;
+            right_bound = interval_bound::OPEN;
+            break;
+        case bound_sign::PLUS_EPS:
+        case bound_sign::UNSURE:
+            right_value = this->value.incremented();
+            right_bound = interval_bound::OPEN;
+            break;
+        };
+    }
 
     return std::make_tuple(right_value, right_bound);
 }
@@ -502,9 +589,20 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool bound<N, ES, WT>::lt(const bound<N, ES, WT>& lhs,
                                                   const bound<N, ES, WT>& rhs, bool is_left)
 {
-    if (lhs.value.is_nar() || rhs.value.is_nar())
+    if (lhs.value.is_nar() && rhs.value.is_nar())
     {
         return false;
+    }
+
+    if (lhs.value.is_nar())
+    {
+        assert(!rhs.value.is_nar());
+        return lhs.is_left;
+    }
+
+    if (rhs.value.is_nar())
+    {
+        return !rhs.is_left;
     }
 
     if (lhs.value == rhs.value)

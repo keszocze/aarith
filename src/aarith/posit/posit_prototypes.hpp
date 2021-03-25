@@ -2165,7 +2165,7 @@ public:
     /**
      * @brief Construct bound to represent given value and sign.
      */
-    bound(const posit_type& new_value, bound_sign sign = bound_sign::EXACT);
+    bound(const posit_type& new_value, bound_sign sign = bound_sign::EXACT, bool is_left = true);
 
     /**
      * @brief Copy constructor.
@@ -2210,6 +2210,11 @@ public:
      * @return Reference to the underlying sign.
      */
     [[nodiscard]] const bound_sign& get_sign() const;
+
+    /**
+     * @return Reference to the underlying sign.
+     */
+    [[nodiscard]] const bool& get_is_left() const;
 
     /**
      * @return Whether the underlying sign is exact.
@@ -2266,7 +2271,7 @@ public:
      */
     [[nodiscard]] static constexpr bool lt_right(const bound& lhs, const bound& rhs);
 
-private:
+protected:
     /**
      * @brief Underlying posit endpoint.
      */
@@ -2276,6 +2281,11 @@ private:
      * @brief Underlying sign of the posit endpoint.
      */
     bound_sign sign;
+
+    /**
+     * @brief Whether this is left bound. If false, it is a right bound.
+     */
+    bool is_left;
 
     /**
      * @return Whether lhs is less than rhs.
