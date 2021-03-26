@@ -69,6 +69,7 @@ add_aarith_test(valid-arithmetic-addition FILES posit/valid-arithmetic-addition-
 add_aarith_test(valid-arithmetic-multiplication FILES posit/valid-arithmetic-multiplication-test.cpp)
 add_aarith_test(valid-comparisons FILES posit/valid-comparisons-test.cpp)
 add_aarith_test(valid-constructors FILES posit/valid-constructors-test.cpp)
+add_aarith_test(valid-merge-with FILES posit/valid-merge-with-test.cpp)
 add_aarith_test(valid-negation FILES posit/valid-negation-test.cpp)
 
 add_aarith_test(fau-adder FILES uint-approx-test.cpp)

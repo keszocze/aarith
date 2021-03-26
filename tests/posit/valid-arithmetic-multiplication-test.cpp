@@ -7,22 +7,8 @@
 #include <aarith/posit.hpp>
 
 #include "../test-signature-ranges.hpp"
+#include "all_valids.hpp"
 #include "gen_posit.hpp"
-
-template <size_t N, size_t ES, typename WT>
-static std::vector<aarith::valid<N, ES, WT>> all_valids(const aarith::posit<N, ES, WT>& start,
-                                                        const aarith::posit<N, ES, WT>& end)
-{
-    using namespace aarith;
-
-    using Valid = valid<N, ES, WT>;
-
-    constexpr auto open = interval_bound::OPEN;
-    constexpr auto closed = interval_bound::CLOSED;
-
-    return {Valid::from(start, open, end, open), Valid::from(start, open, end, closed),
-            Valid::from(start, closed, end, open), Valid::from(start, closed, end, closed)};
-}
 
 TEMPLATE_TEST_CASE_SIG("multiplying one does not change the result (random)",
                        "[valid][posit][template]", ((size_t N, size_t ES), N, ES),

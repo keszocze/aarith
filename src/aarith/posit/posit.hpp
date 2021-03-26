@@ -760,6 +760,13 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] const integer<N, WT> posit<N, ES, WT>::get_signed_bits() const
+{
+    const integer<N, WT> signed_bits = this->bits;
+    return signed_bits;
+}
+
+template <size_t N, size_t ES, typename WT>
 template <size_t IN>
 [[nodiscard]] auto posit<N, ES, WT>::as_fraction() const -> std::tuple<integer<IN>, integer<IN>>
 {

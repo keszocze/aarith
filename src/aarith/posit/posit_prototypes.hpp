@@ -778,6 +778,19 @@ public:
     [[nodiscard]] const storage_type& get_bits() const;
 
     /**
+     * @brief Convert to signed binary representation.
+     *
+     * Internally, posits are stored as unsigned integers. This method returns
+     * that underlying storage casted to a signed integer. The bits stay the same,
+     * they are now merely interpreted as a signed integer with sign bit.
+     *
+     * Getting the signed bits can be useful when running operations on the
+     * number circle because the bigger the signed bits are, the further on
+     * the right we are on the number circle.
+     */
+    [[nodiscard]] const integer<N, WT> get_signed_bits() const;
+
+    /**
      * @brief Return a rational representation.
      *
      * If the given posit represents NaR, this method returns the fraction
@@ -2629,6 +2642,17 @@ public:
      * @throws std::logic_error If this valid does not represent a real exactly.
      */
     [[nodiscard]] constexpr posit_type as_exact_real() const;
+
+    /**
+     * @brief Merge two valids.
+     *
+     * @note The returned valid is only guaranteed to be a superset of the
+     * union of this and other.
+     *
+     * @return Valid that contains all tiles form this valid as well as all
+     * tiles from the other valid.
+     */
+    [[nodiscard]] constexpr valid merge_with(const valid& other) const;
 
     /**
      * @brief Return this valid represented in interval notation.

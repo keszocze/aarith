@@ -811,6 +811,150 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr valid<N, ES, WT>
+valid<N, ES, WT>::merge_with(const valid<N, ES, WT>& other) const
+{
+    const valid& lhs = *this;
+    const valid& rhs = other;
+
+    const posit_type infty = posit_type::nar();
+
+    //
+    // If any of the valids is empty, simply return the other one.
+    //
+
+    if (lhs.is_empty())
+    {
+        return rhs;
+    }
+
+    if (rhs.is_empty())
+    {
+        return lhs;
+    }
+
+    //
+    // If any of the sets are full, the return value will also be the full
+    // set.
+    //
+
+    if (lhs.is_full() || rhs.is_full())
+    {
+        return full();
+    }
+
+    //
+    // If any of the valids is the full real set, we can probably return that
+    // too.
+    //
+
+    if (lhs.is_all_reals())
+    {
+        if (rhs.contains(infty))
+        {
+            return full();
+        }
+        else
+        {
+            return all_reals();
+        }
+    }
+
+    if (rhs.is_all_reals())
+    {
+        if (lhs.contains(infty))
+        {
+            return full();
+        }
+        else
+        {
+            return all_reals();
+        }
+    }
+
+    //
+    // Handle the case of two regular valids.
+    //
+
+    if (lhs.is_regular() && rhs.is_regular())
+    {
+        const auto& m_end_value = lhs.get_start_value();
+        const auto& m_end_bound = lhs.get_start_bound();
+
+        const auto& m_start_value = rhs.get_end_value();
+        const auto& m_start_bound = rhs.get_end_bound();
+
+        return valid::from(m_end_value, m_end_bound, m_start_value, m_start_bound);
+    }
+
+    //
+    // We are dealing with irregular valids, yikes.
+    //
+
+    const auto lhs_start_bits = lhs.get_start_value().get_signed_bits();
+    const auto lhs_end_bits = lhs.get_end_value().get_signed_bits();
+    const auto rhs_start_bits = rhs.get_start_value().get_signed_bits();
+    const auto rhs_end_bits = rhs.get_end_value().get_signed_bits();
+
+    posit_type m_end_value, m_start_value;
+    interval_bound m_end_bound, m_start_bound;
+
+    if (lhs_start_bits > rhs_start_bits)
+    {
+        m_start_value = rhs.get_start_value();
+        m_start_bound = rhs.get_start_bound();
+    }
+    else if (lhs_start_bits == rhs_start_bits)
+    {
+        m_start_value = rhs.get_start_value();
+        m_start_bound = merge(rhs.get_start_bound(), lhs.get_start_bound());
+    }
+    else
+    {
+        assert(lhs_start_bits < rhs_start_bits);
+
+        m_start_value = lhs.get_start_value();
+        m_start_bound = rhs.get_start_bound();
+    }
+
+    if (lhs_end_bits < rhs_end_bits)
+    {
+        m_end_value = lhs.get_end_value();
+        m_end_bound = lhs.get_end_bound();
+    }
+    else if (lhs_end_bits == rhs_end_bits)
+    {
+        m_end_value = lhs.get_end_value();
+        m_end_bound = merge(rhs.get_end_bound(), lhs.get_end_bound());
+    }
+    else
+    {
+        assert(lhs_end_bits > rhs_end_bits);
+
+        m_end_value = rhs.get_end_value();
+        m_end_bound = rhs.get_end_bound();
+    }
+
+    //
+    // Evaluate the generated endpoints. If they overlap, that is when
+    // they result in a regular result, that is an error as merging
+    // irregular valids must again result into an irregular valid. In
+    // those cases, we can only be pessimistic and return the full set.
+    //
+
+    const auto ret = valid::from(m_start_value, m_start_bound, m_end_value, m_end_bound);
+
+    if (ret.is_irregular())
+    {
+        return ret;
+    }
+    else
+    {
+        return full();
+    }
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] std::string valid<N, ES, WT>::in_interval_notation() const
 {
     std::stringstream ss;
