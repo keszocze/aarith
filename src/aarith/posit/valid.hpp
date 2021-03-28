@@ -608,13 +608,7 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool valid<N, ES, WT>::is_full() const
 {
-    // Any interval [p, p) and (p, p] represents the full set if p is non-NaR.
-
-    if (start_value.is_nar() || end_value.is_nar())
-    {
-        return false;
-    }
-
+    // Any interval [p, p) and (p, p] represents the full set.
     return (start_value == end_value) && (start_bound != end_bound);
 }
 
