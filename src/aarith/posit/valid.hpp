@@ -1068,4 +1068,27 @@ valid<N, ES, WT>::get_mult_choices(const valid<N, ES, WT>& lhs, const valid<N, E
     return {a * c, a * d, b * c, b * d};
 }
 
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr std::tuple<valid<N, ES, WT>, valid<N, ES, WT>>
+valid<N, ES, WT>::split_irregular(const valid& v)
+{
+    if (!v.is_irregular())
+    {
+        throw std::logic_error("called valid::split_irregular on regular valid");
+    }
+
+    if (v.is_nar())
+    {
+        return std::make_tuple(nar(), empty());
+    }
+
+    constexpr auto infty = posit_type::nar();
+    constexpr auto open = interval_bound::OPEN;
+
+    const auto right = valid::from(v.get_start_value(), v.get_start_bound(), infty, open);
+    const auto left = valid::from(infty, open, v.get_end_value(), v.get_end_bound());
+
+    return std::make_tuple(left, right);
+}
+
 } // namespace aarith
