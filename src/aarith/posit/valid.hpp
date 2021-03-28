@@ -498,9 +498,9 @@ valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
     valid product;
     std::array<bound_type, 4> choices = valid::get_mult_choices(*this, other);
 
-    if (this->is_irregular() || other.is_irregular())
+    if (this->is_irregular() && other.is_irregular())
     {
-        // For [irregular valids], we use a pessimistic bound that wraps
+        // For [irregular valids], we use a pessimistic bound that wrap
         // around from the top.
 
         {
@@ -541,10 +541,20 @@ valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
             }
         }
     }
+    else if (this->is_regular() != other.is_regular())
+    {
+        const auto& regular = this->is_regular() ? *this : other;
+        const auto& irregular = this->is_irregular() ? *this : other;
+
+        const auto [i0, i1] = split_irregular(irregular);
+        return nar().merge_with(regular * i0).merge_with(regular * i1);
+    }
     else
     {
         // For [regular valids], we can use traditional interval arithmetic
         // rules.
+
+        assert(this->is_regular() && other.is_regular());
 
         {
             std::sort(choices.begin(), choices.end(), bound_type::lt_left);
