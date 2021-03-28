@@ -900,8 +900,10 @@ valid<N, ES, WT>::merge_with(const valid<N, ES, WT>& other) const
     const auto rhs_start_bits = rhs.get_start_value().get_signed_bits();
     const auto rhs_end_bits = rhs.get_end_value().get_signed_bits();
 
-    posit_type m_end_value, m_start_value;
-    interval_bound m_end_bound, m_start_bound;
+    posit_type m_end_value;
+    posit_type m_start_value;
+    interval_bound m_end_bound = interval_bound::CLOSED;
+    interval_bound m_start_bound = interval_bound::CLOSED;
 
     if (lhs_start_bits > rhs_start_bits)
     {
