@@ -33,7 +33,7 @@ template <size_t DestinationWidth, template <size_t, typename> typename Containe
     }
     else
     {
-        word_array<DestinationWidth, WordType> word_container;
+        Container<DestinationWidth, WordType> word_container;
 
         if constexpr (DestinationWidth >= SourceWidth)
         {

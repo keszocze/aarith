@@ -89,7 +89,7 @@ public:
     template <size_t V, typename T> void set_bits(const word_array<V, T>& other)
     {
 
-        static_assert(V <= Width, "Can not create a word_array from larger container");
+        static_assert(V <= Width, "Can not create a word_array from a larger container");
 
         for (size_t i = 0U; i < other.word_count(); ++i)
         {

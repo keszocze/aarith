@@ -16,12 +16,12 @@ namespace aarith {
 
 template <size_t E, size_t M, typename WordType = uint64_t> class floating_point; // NOLINT
 
-using half_precision = floating_point<5, 10, uint64_t>; // NOLINT
-using single_precision = floating_point<8, 23, uint64_t>; // NOLINT
-using double_precison = floating_point<11, 52, uint64_t>; // NOLINT
+using half_precision = floating_point<5, 10, uint64_t>;        // NOLINT
+using single_precision = floating_point<8, 23, uint64_t>;      // NOLINT
+using double_precision = floating_point<11, 52, uint64_t>;      // NOLINT
 using quadruple_precision = floating_point<15, 112, uint64_t>; // NOLINT
-using bfloat16 = floating_point<8, 7, uint64_t>; // NOLINT
-using tensorfloat32 = floating_point<8, 10, uint64_t>; // NOLINT
+using bfloat16 = floating_point<8, 7, uint64_t>;               // NOLINT
+using tensorfloat32 = floating_point<8, 10, uint64_t>;         // NOLINT
 
 /**
  * @brief Expands the mantissa by correctly shifting the bits in the larger uinteger
@@ -37,7 +37,6 @@ template <size_t MS, size_t E, size_t M, typename WordType>
     mantissa_ <<= (size_t{MS} - size_t{M});
     return mantissa_;
 }
-
 
 /**
  * @brief Creates a bitstring representation of the floating point number.
@@ -188,7 +187,7 @@ public:
     static constexpr IntegerExp bias = uinteger<E - 1, WordType>::all_ones();
     static constexpr IntegerUnbiasedExp max_exp = uinteger<E - 1, WordType>::all_ones();
     static constexpr IntegerUnbiasedExp min_exp = []() {
-        const IntegerExp bias_ = uinteger<E - 1, WordType>::all_ones();
+        const IntegerExp bias_ = IntegerExp{uinteger<E - 1, WordType>::all_ones()};
         IntegerUnbiasedExp min_exp_{bias_};
         IntegerUnbiasedExp one = IntegerUnbiasedExp::one();
         min_exp_ = negate(sub(min_exp_, one));
@@ -468,6 +467,28 @@ public:
 
     /**
      *
+     * @return The smallest finite value
+     */
+    [[nodiscard]] static constexpr floating_point min()
+    {
+        word_array<E, WordType> exp = word_array<E, WordType>::all_ones();
+        exp.set_bit(0, false);
+        return floating_point(true, exp, IntegerMant::all_ones());
+    }
+
+    /**
+     *
+     * @return The largest finite value
+     */
+    [[nodiscard]] static constexpr floating_point max()
+    {
+        word_array<E, WordType> exp = word_array<E, WordType>::all_ones();
+        exp.set_bit(0, false);
+        return floating_point(false, exp, IntegerMant::all_ones());
+    }
+
+    /**
+     *
      * @return Smallest positive normalized value
      */
     [[nodiscard]] static constexpr floating_point smallest_normalized()
@@ -485,6 +506,23 @@ public:
     {
         constexpr floating_point small_denorm(false, IntegerExp::all_zeroes(), IntegerMant::one());
         return small_denorm;
+    }
+
+    /**
+     *
+     * @return The maximal rounding error (assuming round-to-nearest)
+     */
+    [[nodiscard]] static constexpr floating_point round_error()
+    {
+        IntegerMant m = IntegerMant::all_zeroes();
+        m.set_msb(true);
+
+        IntegerExp  e = IntegerExp::all_ones();
+        e.set_bit(0,false);
+        e.set_msb(false);
+
+        const floating_point rounding_error(false, e, m);
+        return rounding_error;
     }
 
     /**
@@ -544,7 +582,7 @@ public:
         sign_neg = (sign & 1U) > 0;
     }
 
-    [[nodiscard]]  auto get_exponent() const -> uinteger<E, WordType>
+    [[nodiscard]] auto get_exponent() const -> uinteger<E, WordType>
     {
         return exponent;
     }
@@ -621,7 +659,7 @@ public:
      * @brief Checks if the number is a quiet NaN
      * @return True iff the number is a quiet NaN
      */
-    [[nodiscard]]  constexpr bool is_qNaN() const
+    [[nodiscard]] constexpr bool is_qNaN() const
     {
         const bool exp_all_ones = exponent == IntegerExp ::all_ones();
         const bool first_bit_set = width_cast<M>(mantissa).msb();
@@ -632,7 +670,7 @@ public:
      * @brief Checks if the number is a signalling NaN
      * @return True iff the number is a signalling NaN
      */
-    [[nodiscard]]  constexpr bool is_sNaN() const
+    [[nodiscard]] constexpr bool is_sNaN() const
     {
         const bool exp_all_ones = exponent == IntegerExp ::all_ones();
         const auto fraction = width_cast<M>(mantissa);
@@ -822,7 +860,8 @@ public:
 
     floating_point<E, M, WordType>& operator=(const floating_point<E, M, WordType>& f)
     {
-        if (this == &f) {
+        if (this == &f)
+        {
             return *this;
         }
         this->sign_neg = f.sign_neg;
@@ -1058,7 +1097,6 @@ auto rshift_and_round(const uinteger<M, WordType>& m, const size_t shift_by)
 template <size_t E, size_t M1, size_t M2 = M1, typename WordType = uint64_t>
 auto normalize(const floating_point<E, M1, WordType>& num) -> floating_point<E, M2, WordType>
 {
-
     auto exponent = width_cast<E + 1>(num.get_exponent());
     auto mantissa = num.get_full_mantissa();
 

@@ -50,6 +50,17 @@ template <class Result> constexpr Result ceil(double num)
                : static_cast<Result>(num) + ((num > 0) ? 1 : 0);
 }
 
+/*
+ * This method is necessary as not all compilers support constexpr
+ * in the math library
+ */
+template <class Result> constexpr Result floor(double num)
+{
+    return (static_cast<double>(static_cast<Result>(num)) == num)
+           ? static_cast<Result>(num)
+           : static_cast<Result>(num) - ((num < 0) ? 1 : 0);
+}
+
 /**
  * @brief Exponentiation function
  *
