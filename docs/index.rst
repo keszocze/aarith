@@ -28,6 +28,7 @@ Aarith currently supports
    usecases
    philosophy
    literature
+   changelog
 
 
 .. toctree::
