@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 project(aarith)
 option(BUILD_BENCHMARKS "build benchmarks" OFF)
-option(BUILD_EXPERIMENTS "build experiments" OFF)
+option(BUILD_EXPERIMENTS "build experiments" ON)
 option(BUILD_CORRECTNESS_EXPERIMENTS "build correctness experiments" OFF)
 option(BUILD_TESTS "build tests" ON)
 option(BUILD_EXAMPLES "build examples" ON)
