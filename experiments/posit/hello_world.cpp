@@ -1,13 +1,12 @@
-/*
+/**
  * Hello World
  *
  * Count up from -maxpos to maxpos. Not very interesting, but enough for trying
  * out the build.
  */
 
-#include <iostream>
-
 #include <aarith/posit.hpp>
+#include <iostream>
 
 using namespace aarith;
 

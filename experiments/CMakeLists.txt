@@ -6,3 +6,4 @@ add_aarith_experiment("eval_approximations" FILES eval_approximations.cpp)
 # Posit Experiments
 
 add_aarith_experiment("posit_hello_world" FILES posit/hello_world.cpp)
+add_aarith_experiment("posit_iteration" FILES posit/iteration.cpp)
