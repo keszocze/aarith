@@ -956,6 +956,18 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> sqrt(const posit<N, ES, WT>& x);
 
 /**
+ * @brief Compute the k-th power.
+ *
+ * That is, compute x^k.
+ *
+ * @param base Base x to rise.
+ * @param exponent Exponent k.
+ */
+template <size_t N, size_t ES, typename WT, size_t IN, typename IWT>
+[[nodiscard]] constexpr posit<N, ES, WT> pow(const posit<N, ES, WT>& base,
+                                             integer<IN, IWT> exponent);
+
+/**
  * @brief Dump posit information to stream.
  *
  * This function dumps various interesting parameters to a stream. It is

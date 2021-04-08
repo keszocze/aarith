@@ -133,6 +133,9 @@
         (64, 2), (64, 3), (128, 0), (128, 1), (128, 2), (128, 3), (256, 0), (256, 1), (256, 2),    \
         (256, 3), (512, 0), (512, 1), (512, 3)
 
+#define AARITH_POSIT_TEST_TEMPLATE_SINGLE                                                          \
+    (32, 2)
+
 #define AARITH_POSIT_TEST_TEMPLATE_SIGNED_INTEGERS (int8_t), (int16_t), (int32_t), (int64_t)
 
 #define AARITH_POSIT_TEST_TEMPLATE_UNSIGNED_INTEGERS (uint8_t), (uint16_t), (uint32_t), (uint64_t)

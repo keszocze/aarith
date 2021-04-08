@@ -269,6 +269,52 @@ template <size_t N, size_t ES, typename WT>
     return rcur;
 }
 
+template <size_t N, size_t ES, typename WT, size_t IN, typename IWT>
+[[nodiscard]] constexpr posit<N, ES, WT> pow(const posit<N, ES, WT>& base,
+                                             integer<IN, IWT> exponent)
+{
+    using Posit = posit<N, ES, WT>;
+
+    // Handle special cases.
+
+    if (base.is_nar())
+    {
+        return Posit::nar();
+    }
+
+    if (base.is_zero() && exponent.is_zero())
+    {
+        return Posit::nar();
+    }
+
+    if (exponent.is_zero())
+    {
+        return Posit::one();
+    }
+
+    // Do the iteration. If we have a positive exponent, we multiply by
+    // base. If on the other hand, exponent is negative, we divide instead.
+
+    const auto total_steps = expanding_abs(exponent);
+    const bool exponent_negative = exponent.is_negative();
+
+    Posit power = Posit::one();
+
+    for (auto i = total_steps.zero(); i < total_steps; ++i)
+    {
+        if (exponent_negative)
+        {
+            power = power / base;
+        }
+        else
+        {
+            power = power * base;
+        }
+    }
+
+    return power;
+}
+
 template <size_t N, size_t ES, typename WT>
 void dump_meta(std::ostream& os, const posit<N, ES, WT>& p)
 {
