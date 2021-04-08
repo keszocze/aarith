@@ -251,11 +251,6 @@ template <size_t N, size_t ES, typename WT>
         return Posit::nar();
     }
 
-    if (x.is_zero())
-    {
-        return Posit::zero();
-    }
-
     // Naive Newton-Raphson Method. We iterate until convergence.
 
     const Posit two = Posit(2);
