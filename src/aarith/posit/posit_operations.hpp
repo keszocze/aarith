@@ -242,7 +242,36 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> sqrt(const posit<N, ES, WT>& x)
 {
-    return x;
+    using Posit = posit<N, ES, WT>;
+
+    // Handle special cases.
+
+    if (!x.is_non_negative())
+    {
+        return Posit::nar();
+    }
+
+    if (x.is_zero())
+    {
+        return Posit::zero();
+    }
+
+    // Naive Newton-Raphson Method. We iterate until convergence.
+
+    const Posit two = Posit(2);
+
+    Posit rprev;
+    Posit rcur = x;
+
+    while (rprev != rcur)
+    {
+        const Posit rnext = (rcur + x / rcur) / two;
+
+        rprev = rcur;
+        rcur = rnext;
+    }
+
+    return rcur;
 }
 
 template <size_t N, size_t ES, typename WT>
