@@ -950,6 +950,12 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr integer<N> get_scale_value(const posit<N, ES, WT>& p);
 
 /**
+ * @brief Compute the square root.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> sqrt(const posit<N, ES, WT>& x);
+
+/**
  * @brief Dump posit information to stream.
  *
  * This function dumps various interesting parameters to a stream. It is

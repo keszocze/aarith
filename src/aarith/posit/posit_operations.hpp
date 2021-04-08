@@ -240,6 +240,12 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> sqrt(const posit<N, ES, WT>& x)
+{
+	return x;
+}
+
+template <size_t N, size_t ES, typename WT>
 void dump_meta(std::ostream& os, const posit<N, ES, WT>& p)
 {
     const auto bits = p.get_bits();
