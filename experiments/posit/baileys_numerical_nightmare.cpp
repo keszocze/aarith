@@ -12,41 +12,39 @@
 #include <aarith/posit.hpp>
 #include <iostream>
 
-template <typename Number>
-static void report(const Number& x, const Number& y)
+template <typename Number> static void report(const Number& x, const Number& y)
 {
-	std::cout << std::endl;
-	std::cout << "  x=" << x << std::endl;
-	std::cout << "  y=" << y << std::endl;
-	std::cout << std::endl;
+    std::cout << std::endl;
+    std::cout << "  x=" << x << std::endl;
+    std::cout << "  y=" << y << std::endl;
+    std::cout << std::endl;
 }
 
-template <typename Number>
-static void solve()
+template <typename Number> static void solve()
 {
-	// Given system of linear equations
-	//
-	//   ax + by = u
-	//   cx + dy = v
-	//
-	// we solve with Cramer's rule, viz.
-	//
-	//   det := ad - bc
-	//   x := (ud - bv) / det
-	//   y := (av - uc) / det
+    // Given system of linear equations
+    //
+    //   ax + by = u
+    //   cx + dy = v
+    //
+    // we solve with Cramer's rule, viz.
+    //
+    //   det := ad - bc
+    //   x := (ud - bv) / det
+    //   y := (av - uc) / det
 
-	const Number a = static_cast<Number>(0.25510582);
-	const Number b = static_cast<Number>(0.527461970);
-	const Number u = static_cast<Number>(0.79981812);
-	const Number c = static_cast<Number>(0.80143857);
-	const Number d = static_cast<Number>(1.65707065);
-	const Number v = static_cast<Number>(2.51270273);
+    const Number a = static_cast<Number>(0.25510582);
+    const Number b = static_cast<Number>(0.527461970);
+    const Number u = static_cast<Number>(0.79981812);
+    const Number c = static_cast<Number>(0.80143857);
+    const Number d = static_cast<Number>(1.65707065);
+    const Number v = static_cast<Number>(2.51270273);
 
-	const Number det = a * d - b * c;
-	const Number x = (u * d - b * v) / det;
-	const Number y = (a * v - u * c) / det;
+    const Number det = a * d - b * c;
+    const Number x = (u * d - b * v) / det;
+    const Number y = (a * v - u * c) / det;
 
-	report(x, y);
+    report(x, y);
 }
 
 int main()

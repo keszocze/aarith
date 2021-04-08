@@ -2767,7 +2767,8 @@ protected:
     [[nodiscard]] static constexpr std::array<bound_type, 4> get_mult_choices(const valid& lhs,
                                                                               const valid& rhs);
 
-    [[nodiscard]] static constexpr std::tuple<valid, valid> split_irregular(const valid& irrregular);
+    [[nodiscard]] static constexpr std::tuple<valid, valid>
+    split_irregular(const valid& irrregular);
 };
 
 //

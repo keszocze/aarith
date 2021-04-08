@@ -18,39 +18,38 @@
 #include <iostream>
 
 template <typename Number>
-static void report(const Number& a, const Number&b, const Number&c, const Number& x1, const Number& x2)
+static void report(const Number& a, const Number& b, const Number& c, const Number& x1,
+                   const Number& x2)
 {
-	std::cout << std::endl;
-	std::cout << "  a=" << a << std::endl;
-	std::cout << "  b=" << b << std::endl;
-	std::cout << "  c=" << c << std::endl;
-	std::cout << "  x1=" << x1 << std::endl;
-	std::cout << "  x2=" << x2 << std::endl;
-	std::cout << std::endl;
+    std::cout << std::endl;
+    std::cout << "  a=" << a << std::endl;
+    std::cout << "  b=" << b << std::endl;
+    std::cout << "  c=" << c << std::endl;
+    std::cout << "  x1=" << x1 << std::endl;
+    std::cout << "  x2=" << x2 << std::endl;
+    std::cout << std::endl;
 }
 
-template <typename Number>
-static void solve(const Number& a, const Number& b, const Number& c)
+template <typename Number> static void solve(const Number& a, const Number& b, const Number& c)
 {
-	const Number two = static_cast<Number>(2.0);
-	const Number four = static_cast<Number>(4.0);
+    const Number two = static_cast<Number>(2.0);
+    const Number four = static_cast<Number>(4.0);
 
-	const Number det = sqrt(b * b - four * a * c);
+    const Number det = sqrt(b * b - four * a * c);
 
-	const Number x1 = (-b + det) / (two * a);
-	const Number x2 = (-b - det) / (two * a);
+    const Number x1 = (-b + det) / (two * a);
+    const Number x2 = (-b - det) / (two * a);
 
-	report(a, b, c, x1, x2);
+    report(a, b, c, x1, x2);
 }
 
-template <typename Number>
-static void solve()
+template <typename Number> static void solve()
 {
-	const Number a = static_cast<Number>(3.0);
-	const Number b = static_cast<Number>(100.0);
-	const Number c = static_cast<Number>(2.0);
+    const Number a = static_cast<Number>(3.0);
+    const Number b = static_cast<Number>(100.0);
+    const Number c = static_cast<Number>(2.0);
 
-	solve(a, b, c);
+    solve(a, b, c);
 }
 
 int main()
