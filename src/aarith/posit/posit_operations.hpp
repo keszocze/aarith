@@ -43,7 +43,7 @@ template <size_t N, size_t ES, typename WT>
         nregime = count_leading_zeroes(bits, 1);
     }
 
-    // regime is never more than N - 1 as the sign bit is always seperate
+    // regime is never more than N - 1 as the sign bit is always separate
 
     return std::min(N - 1, nregime + 1);
 }
@@ -137,7 +137,7 @@ template <size_t N, size_t ES, typename WT>
 
     const auto R0 = bits.bit(N - 2);
 
-    // general case where we have to subtract the seperator bit from the
+    // general case where we have to subtract the separator bit from the
     // number of regime bit; what we understand as the number of regime bits
     // is called "r + 1" in the draft
 
