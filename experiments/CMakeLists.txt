@@ -9,3 +9,4 @@ add_aarith_experiment("posit_baileys_numerical_nightmare" FILES posit/baileys_nu
 add_aarith_experiment("posit_hello_world" FILES posit/hello_world.cpp)
 add_aarith_experiment("posit_iteration" FILES posit/iteration.cpp)
 add_aarith_experiment("posit_quadratic" FILES posit/quadratic.cpp)
+add_aarith_experiment("posit_thin_triangle" FILES posit/thin_triangle.cpp)
