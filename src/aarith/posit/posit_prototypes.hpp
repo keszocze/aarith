@@ -1035,6 +1035,22 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit_result<N, ES, WT> mul(const posit<N, ES, WT>& lhs,
                                                     const posit<N, ES, WT>& rhs);
 
+/**
+ * @brief Divide posit.
+ *
+ * If either operand is NaR, the result is also NaR. If rhs is zero, the
+ * result is also NaR (division by zero). In all other cases, the result is
+ * guaranteed to be a non-NaR posit.
+ *
+ * @param lhs Numerator.
+ * @param rhs Denominator.
+ * @return Numerator divided by denominator. Also returns rounding information
+ * to indicates whether rounding occurred.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit_result<N, ES, WT> div(const posit<N, ES, WT>& lhs,
+                                                    const posit<N, ES, WT>& rhs);
+
 //
 // Casts for posit Class.
 //
