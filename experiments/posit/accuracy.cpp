@@ -16,27 +16,6 @@
 
 using namespace aarith;
 
-template <typename X, typename Y> static double decimal_accuracy(const X& x, const Y& y)
-{
-    const double xd = static_cast<double>(x);
-    const double yd = static_cast<double>(y);
-
-    const double err = fabs(log10(xd / yd));
-
-    if (std::isnan(err) || std::isinf(err))
-    {
-        return 0.0;
-    }
-
-    return err;
-}
-
-/**
- * Run the reciprocal test for posits.
- *
- * That is, given posit p, compute 1 / p and check whether the result had to
- * be rounded.
- */
 template <typename Posit> static void reciprocal_posit_for()
 {
     constexpr size_t N = Posit::width();
@@ -86,10 +65,65 @@ template <typename Posit> static void reciprocal_posit_for()
     const double bad_percent = static_cast<double>(bad) / total;
     const double mean_error = total_error / total;
 
-    std::cout << "=== Summary ===" << std::endl;
     std::cout << "ok=" << ok << " p=" << ok_percent << std::endl;
     std::cout << "bad=" << bad << " p=" << bad_percent << std::endl;
     std::cout << "mean_error=" << mean_error << std::endl;
+    std::cout << std::endl;
+}
+
+template <typename Posit> static void square_posit_for()
+{
+    constexpr size_t N = Posit::width();
+    constexpr size_t ES = Posit::exponent_size();
+
+    std::cout << "====== Square (Posit) ======" << std::endl;
+    std::cout << "N=" << N << std::endl;
+    std::cout << "ES=" << ES << std::endl;
+
+    uint64_t ok = 0;
+    uint64_t bad = 0;
+    double total_error = 0.0;
+
+    for_each_posit<Posit>([&](const Posit& p) {
+        // When evaluating p * p, there is no point in looking at the case
+        // where p is NaR as the result will again be NaR.
+
+        if (p.is_nar())
+        {
+            return;
+        }
+
+        // Check if the result was rounded.
+
+        const auto [square, r] = mul(p, p);
+
+        if (is_not_rounded(r))
+        {
+            ok += 1;
+        }
+        else
+        {
+            bad += 1;
+        }
+
+        // Compute achived decimal accuracy. We use a high precision float
+        // enviornment as comparison.
+
+        const double x = static_cast<double>(p);
+        const double expected = x * x;
+        const double error = decimal_accuracy(square, expected);
+        total_error += error;
+    });
+
+    const auto total = ok + bad;
+    const double ok_percent = static_cast<double>(ok) / total;
+    const double bad_percent = static_cast<double>(bad) / total;
+    const double mean_error = total_error / total;
+
+    std::cout << "ok=" << ok << " p=" << ok_percent << std::endl;
+    std::cout << "bad=" << bad << " p=" << bad_percent << std::endl;
+    std::cout << "mean_error=" << mean_error << std::endl;
+    std::cout << std::endl;
 }
 
 template <typename Float> static void reciprocal_float_for()
@@ -141,17 +175,82 @@ template <typename Float> static void reciprocal_float_for()
     const double bad_percent = static_cast<double>(bad) / total;
     const double mean_error = total_error / total;
 
-    std::cout << "=== Summary ===" << std::endl;
     std::cout << "ok=" << ok << " p=" << ok_percent << std::endl;
     std::cout << "bad=" << bad << " p=" << bad_percent << std::endl;
     std::cout << "mean_error=" << mean_error << std::endl;
+    std::cout << std::endl;
+}
+
+template <typename Float> static void square_float_for()
+{
+    constexpr size_t E = Float::exponent_width();
+    constexpr size_t M = Float::mantissa_width();
+    constexpr size_t N = 1 + E + M;
+
+    std::cout << "====== Square (Float) ======" << std::endl;
+    std::cout << "N=" << N << std::endl;
+    std::cout << "E=" << E << std::endl;
+    std::cout << "M=" << M << std::endl;
+
+    uint64_t ok = 0;
+    uint64_t bad = 0;
+    double total_error = 0.0;
+
+    for_each_float<Float>([&](const Float& f) {
+        // When evaluating x * x, there is no point in looking at the cases
+        // where x is NaN or Infty.
+
+        if (f.is_nan() || f.is_inf())
+        {
+            return;
+        }
+
+        const Float square = f * f;
+
+        // Compute achived decimal accuracy. We use a high precision float
+        // enviornment as comparison.
+
+        const double x = static_cast<double>(f);
+        const double expected =  x * x;
+        const double error = decimal_accuracy(square, expected);
+        total_error += error;
+
+        if (error == 0)
+        {
+            ok += 1;
+        }
+        else
+        {
+            bad += 1;
+        }
+    });
+
+    const auto total = ok + bad;
+    const double ok_percent = static_cast<double>(ok) / total;
+    const double bad_percent = static_cast<double>(bad) / total;
+    const double mean_error = total_error / total;
+
+    std::cout << "ok=" << ok << " p=" << ok_percent << std::endl;
+    std::cout << "bad=" << bad << " p=" << bad_percent << std::endl;
+    std::cout << "mean_error=" << mean_error << std::endl;
+    std::cout << std::endl;
 }
 
 int main()
 {
-    reciprocal_posit_for<posit<8, 1>>();
-    reciprocal_posit_for<posit16>();
+    using P8 = posit<8, 1>;
+    using P16 = posit16;
 
-    reciprocal_float_for<floating_point<4, 3>>();
-    reciprocal_float_for<half_precision>();
+    using F8 = floating_point<4, 3>;
+    using F16 = half_precision;
+
+    reciprocal_posit_for<P8>();
+    reciprocal_posit_for<P16>();
+    reciprocal_float_for<F8>();
+    reciprocal_float_for<F16>();
+
+    square_posit_for<P8>();
+    square_posit_for<P16>();
+    square_float_for<F8>();
+    square_float_for<F16>();
 }
