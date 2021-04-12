@@ -16,14 +16,25 @@
 
 using namespace aarith;
 
+/**
+ * @brief Configuration
+ *
+ * Set this to true to only print human-readable overviews. Set it to false to
+ * generate CSV for use in other tools.
+ */
+static constexpr bool PRINT_STATS = false;
+
 template <typename Posit> static void reciprocal_posit_for()
 {
     constexpr size_t N = Posit::width();
     constexpr size_t ES = Posit::exponent_size();
 
-    std::cout << "====== Reciprocal (Posit) ======" << std::endl;
-    std::cout << "N=" << N << std::endl;
-    std::cout << "ES=" << ES << std::endl;
+    if constexpr (PRINT_STATS)
+    {
+        std::cout << "====== Reciprocal (Posit) ======" << std::endl;
+        std::cout << "N=" << N << std::endl;
+        std::cout << "ES=" << ES << std::endl;
+    }
 
     uint64_t ok = 0;
     uint64_t bad = 0;
@@ -58,6 +69,11 @@ template <typename Posit> static void reciprocal_posit_for()
         const double expected = 1.0 / x;
         const double error = decimal_accuracy(quot, expected);
         total_error += error;
+
+        if (!PRINT_STATS)
+        {
+            std::cout << error << "\n";
+        }
     });
 
     const auto total = ok + bad;
@@ -65,10 +81,13 @@ template <typename Posit> static void reciprocal_posit_for()
     const double bad_percent = static_cast<double>(bad) / total;
     const double mean_error = total_error / total;
 
-    std::cout << "ok=" << ok << " p=" << ok_percent << std::endl;
-    std::cout << "bad=" << bad << " p=" << bad_percent << std::endl;
-    std::cout << "mean_error=" << mean_error << std::endl;
-    std::cout << std::endl;
+    if constexpr (PRINT_STATS)
+    {
+        std::cout << "ok=" << ok << " p=" << ok_percent << std::endl;
+        std::cout << "bad=" << bad << " p=" << bad_percent << std::endl;
+        std::cout << "mean_error=" << mean_error << std::endl;
+        std::cout << std::endl;
+    }
 }
 
 template <typename Posit> static void square_posit_for()
@@ -76,9 +95,12 @@ template <typename Posit> static void square_posit_for()
     constexpr size_t N = Posit::width();
     constexpr size_t ES = Posit::exponent_size();
 
-    std::cout << "====== Square (Posit) ======" << std::endl;
-    std::cout << "N=" << N << std::endl;
-    std::cout << "ES=" << ES << std::endl;
+    if constexpr (PRINT_STATS)
+    {
+        std::cout << "====== Square (Posit) ======" << std::endl;
+        std::cout << "N=" << N << std::endl;
+        std::cout << "ES=" << ES << std::endl;
+    }
 
     uint64_t ok = 0;
     uint64_t bad = 0;
@@ -113,6 +135,11 @@ template <typename Posit> static void square_posit_for()
         const double expected = x * x;
         const double error = decimal_accuracy(square, expected);
         total_error += error;
+
+        if (!PRINT_STATS)
+        {
+            std::cout << error << "\n";
+        }
     });
 
     const auto total = ok + bad;
@@ -120,10 +147,13 @@ template <typename Posit> static void square_posit_for()
     const double bad_percent = static_cast<double>(bad) / total;
     const double mean_error = total_error / total;
 
-    std::cout << "ok=" << ok << " p=" << ok_percent << std::endl;
-    std::cout << "bad=" << bad << " p=" << bad_percent << std::endl;
-    std::cout << "mean_error=" << mean_error << std::endl;
-    std::cout << std::endl;
+    if constexpr (PRINT_STATS)
+    {
+        std::cout << "ok=" << ok << " p=" << ok_percent << std::endl;
+        std::cout << "bad=" << bad << " p=" << bad_percent << std::endl;
+        std::cout << "mean_error=" << mean_error << std::endl;
+        std::cout << std::endl;
+    }
 }
 
 template <typename Float> static void reciprocal_float_for()
@@ -132,10 +162,13 @@ template <typename Float> static void reciprocal_float_for()
     constexpr size_t M = Float::mantissa_width();
     constexpr size_t N = 1 + E + M;
 
-    std::cout << "====== Reciprocal (Float) ======" << std::endl;
-    std::cout << "N=" << N << std::endl;
-    std::cout << "E=" << E << std::endl;
-    std::cout << "M=" << M << std::endl;
+    if constexpr (PRINT_STATS)
+    {
+        std::cout << "====== Reciprocal (Float) ======" << std::endl;
+        std::cout << "N=" << N << std::endl;
+        std::cout << "E=" << E << std::endl;
+        std::cout << "M=" << M << std::endl;
+    }
 
     uint64_t ok = 0;
     uint64_t bad = 0;
@@ -168,6 +201,11 @@ template <typename Float> static void reciprocal_float_for()
         {
             bad += 1;
         }
+
+        if (!PRINT_STATS)
+        {
+            std::cout << error << "\n";
+        }
     });
 
     const auto total = ok + bad;
@@ -175,10 +213,13 @@ template <typename Float> static void reciprocal_float_for()
     const double bad_percent = static_cast<double>(bad) / total;
     const double mean_error = total_error / total;
 
-    std::cout << "ok=" << ok << " p=" << ok_percent << std::endl;
-    std::cout << "bad=" << bad << " p=" << bad_percent << std::endl;
-    std::cout << "mean_error=" << mean_error << std::endl;
-    std::cout << std::endl;
+    if constexpr (PRINT_STATS)
+    {
+        std::cout << "ok=" << ok << " p=" << ok_percent << std::endl;
+        std::cout << "bad=" << bad << " p=" << bad_percent << std::endl;
+        std::cout << "mean_error=" << mean_error << std::endl;
+        std::cout << std::endl;
+    }
 }
 
 template <typename Float> static void square_float_for()
@@ -187,10 +228,13 @@ template <typename Float> static void square_float_for()
     constexpr size_t M = Float::mantissa_width();
     constexpr size_t N = 1 + E + M;
 
-    std::cout << "====== Square (Float) ======" << std::endl;
-    std::cout << "N=" << N << std::endl;
-    std::cout << "E=" << E << std::endl;
-    std::cout << "M=" << M << std::endl;
+    if constexpr (PRINT_STATS)
+    {
+        std::cout << "====== Square (Float) ======" << std::endl;
+        std::cout << "N=" << N << std::endl;
+        std::cout << "E=" << E << std::endl;
+        std::cout << "M=" << M << std::endl;
+    }
 
     uint64_t ok = 0;
     uint64_t bad = 0;
@@ -211,7 +255,7 @@ template <typename Float> static void square_float_for()
         // enviornment as comparison.
 
         const double x = static_cast<double>(f);
-        const double expected =  x * x;
+        const double expected = x * x;
         const double error = decimal_accuracy(square, expected);
         total_error += error;
 
@@ -223,6 +267,11 @@ template <typename Float> static void square_float_for()
         {
             bad += 1;
         }
+
+        if (!PRINT_STATS)
+        {
+            std::cout << error << "\n";
+        }
     });
 
     const auto total = ok + bad;
@@ -230,10 +279,13 @@ template <typename Float> static void square_float_for()
     const double bad_percent = static_cast<double>(bad) / total;
     const double mean_error = total_error / total;
 
-    std::cout << "ok=" << ok << " p=" << ok_percent << std::endl;
-    std::cout << "bad=" << bad << " p=" << bad_percent << std::endl;
-    std::cout << "mean_error=" << mean_error << std::endl;
-    std::cout << std::endl;
+    if constexpr (PRINT_STATS)
+    {
+        std::cout << "ok=" << ok << " p=" << ok_percent << std::endl;
+        std::cout << "bad=" << bad << " p=" << bad_percent << std::endl;
+        std::cout << "mean_error=" << mean_error << std::endl;
+        std::cout << std::endl;
+    }
 }
 
 int main()
@@ -244,13 +296,12 @@ int main()
     using F8 = floating_point<4, 3>;
     using F16 = half_precision;
 
-    reciprocal_posit_for<P8>();
-    reciprocal_posit_for<P16>();
-    reciprocal_float_for<F8>();
-    reciprocal_float_for<F16>();
-
-    square_posit_for<P8>();
-    square_posit_for<P16>();
-    square_float_for<F8>();
-    square_float_for<F16>();
+    // reciprocal_posit_for<P8>();
+    // reciprocal_posit_for<P16>();
+    // reciprocal_float_for<F8>();
+    // reciprocal_float_for<F16>();
+    // square_posit_for<P8>();
+    // square_posit_for<P16>();
+    // square_float_for<F8>();
+    // square_float_for<F16>();
 }

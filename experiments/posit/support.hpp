@@ -48,12 +48,5 @@ template <typename X, typename Y> inline double decimal_accuracy(const X& x, con
     const double xd = static_cast<double>(x);
     const double yd = static_cast<double>(y);
 
-    const double err = fabs(log10(xd / yd));
-
-    if (std::isnan(err) || std::isinf(err))
-    {
-        return 0.0;
-    }
-
-    return err;
+    return fabs(log10(xd / yd));
 }
