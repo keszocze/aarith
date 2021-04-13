@@ -31,6 +31,11 @@ std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v)
         return os << "∅";
     }
 
+    if (v.is_all_reals())
+    {
+        return os << "ℝ";
+    }
+
     if (v.is_full())
     {
         return os << "◯";
