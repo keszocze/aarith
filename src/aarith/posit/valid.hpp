@@ -578,7 +578,67 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr valid<N, ES, WT>
 valid<N, ES, WT>::operator/(const valid<N, ES, WT>& other) const
 {
-    throw std::logic_error("not implemented");
+    //
+    // Handle Special Cases
+    //
+
+    if (this->is_irregular() || other.is_irregular())
+    {
+        throw std::logic_error("division not defined on irregular arguments");
+    }
+
+    if (other.contains(posit_type::zero()))
+    {
+        throw std::logic_error("division not defined on denominator containing zero");
+    }
+
+    if (other.is_all_reals())
+    {
+        return *this * all_reals();
+    }
+
+    //
+    // Handle Regular Case
+    //
+    // To compute v / u, we find the reciprocal u',
+    //
+    //   u' := 1 / u,
+    //
+    // and then return
+    //
+    //   v / u = v * u'
+    //
+    // as the result.
+    //
+
+    valid reciprocal;
+
+    if (other.end_value.is_nar())
+    {
+        reciprocal.start_value = posit_type::nar();
+        reciprocal.start_bound = interval_bound::OPEN;
+    }
+    else
+    {
+        // TODO (Schärtl): Find a tighter bound.
+        reciprocal.start_value = (posit_type::one() / other.end_value).decremented();
+        reciprocal.start_bound = interval_bound::OPEN;
+    }
+
+    if (other.start_value.is_nar())
+    {
+        reciprocal.end_value = posit_type::nar();
+        reciprocal.end_bound = interval_bound::OPEN;
+    }
+    else
+    {
+        reciprocal.end_value = (posit_type::one() / other.start_value).incremented();
+        reciprocal.end_bound = interval_bound::OPEN;
+    }
+
+    std::cerr << "recip=" << reciprocal << std::endl;
+
+    return *this * reciprocal;
 }
 
 template <size_t N, size_t ES, typename WT>
