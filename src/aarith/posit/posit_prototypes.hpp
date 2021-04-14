@@ -956,6 +956,12 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> sqrt(const posit<N, ES, WT>& x);
 
 /**
+ * @brief Compute the natural logarithm.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> log(const posit<N, ES, WT>& x);
+
+/**
  * @brief Compute the k-th power.
  *
  * That is, compute x^k.

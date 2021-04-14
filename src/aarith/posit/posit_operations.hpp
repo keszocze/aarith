@@ -269,6 +269,50 @@ template <size_t N, size_t ES, typename WT>
     return rcur;
 }
 
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> log(const posit<N, ES, WT>& x)
+{
+    using Posit = posit<N, ES, WT>;
+
+    //
+    // Handle special cases.
+    //
+
+    if (x.is_nar() || x <= Posit::zero())
+    {
+        return Posit::nar();
+    }
+
+    //
+    // Approximate log x with algorithm from
+    //
+    //   https://doi.org/10.1090/S0025-5718-1972-0307438-2
+    //
+    // summarized on Stackoverflow,
+    //
+    //   https://math.stackexchange.com/a/75398
+    //
+
+    const Posit one = Posit(1);
+    const Posit two = Posit(2);
+
+    Posit a = (one + x) / two;
+    Posit b = sqrt(x);
+
+    const int niterations = 50;
+
+    for (int i = 0; i < niterations; ++i)
+    {
+        const Posit anext = (a + b) / two;
+        const Posit bnext = sqrt(anext * b);
+
+        a = anext;
+        b = bnext;
+    }
+
+    return two * ((x - one) / (a + b));
+}
+
 template <size_t N, size_t ES, typename WT, size_t IN, typename IWT>
 [[nodiscard]] constexpr posit<N, ES, WT> pow(const posit<N, ES, WT>& base,
                                              integer<IN, IWT> exponent)
