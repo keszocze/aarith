@@ -294,7 +294,7 @@ posit_fraction<N, ES, WT>::operator>>(const uinteger<N, WT>& shift) const
 }
 
 template <size_t SN, size_t SES, typename SWT>
-std::ostream& operator<<(std::ostream& os, const posit_fraction<SN, SES, SWT>& f)
+inline std::ostream& operator<<(std::ostream& os, const posit_fraction<SN, SES, SWT>& f)
 {
     os << to_binary(f.integer_bits());
     os << ".";

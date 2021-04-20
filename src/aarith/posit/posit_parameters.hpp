@@ -509,7 +509,7 @@ void posit_parameters<N, ES, WT>::sub_fractions(posit_parameters<N, ES, WT>& des
 }
 
 template <size_t SN, size_t SES, typename SWT>
-std::ostream& operator<<(std::ostream& os, const posit_parameters<SN, SES, SWT>& p)
+inline std::ostream& operator<<(std::ostream& os, const posit_parameters<SN, SES, SWT>& p)
 {
     // We defined the operator<< as a friend of posit_parameters. We can
     // access the members directly.

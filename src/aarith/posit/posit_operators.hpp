@@ -6,7 +6,7 @@
 namespace aarith {
 
 template <size_t N, size_t ES, typename WT>
-std::ostream& operator<<(std::ostream& os, const posit<N, ES, WT>& p)
+inline std::ostream& operator<<(std::ostream& os, const posit<N, ES, WT>& p)
 {
     return os << quire(p);
 }

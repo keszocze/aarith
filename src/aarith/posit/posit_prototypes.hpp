@@ -64,7 +64,7 @@ enum class rounding_event
  * @param r The enum to write.
  * @return A reference to os.
  */
-std::ostream& operator<<(std::ostream& os, const rounding_event& r);
+inline std::ostream& operator<<(std::ostream& os, const rounding_event& r);
 
 //
 // Additional Rounding Event Operations
@@ -850,7 +850,7 @@ protected:
  * @return A reference to os.
  */
 template <size_t N, size_t ES, typename WT>
-std::ostream& operator<<(std::ostream& os, const posit<N, ES, WT>& p);
+inline std::ostream& operator<<(std::ostream& os, const posit<N, ES, WT>& p);
 
 //
 // Additional operations for posit Class.
@@ -1422,7 +1422,7 @@ public:
      * @brief Overload for writing posit_fraction values to a stream.
      */
     template <size_t SN, size_t SES, typename SWT>
-    friend std::ostream& operator<<(std::ostream& os, const posit_fraction<SN, SES, SWT>& f);
+    friend inline std::ostream& operator<<(std::ostream& os, const posit_fraction<SN, SES, SWT>& f);
 
 protected:
     /**
@@ -1610,7 +1610,7 @@ public:
      * @brief Overload for writing posit_fraction values to a stream.
      */
     template <size_t SN, size_t SES, typename SWT>
-    friend std::ostream& operator<<(std::ostream& os, const posit_parameters<SN, SES, SWT>& p);
+    friend inline std::ostream& operator<<(std::ostream& os, const posit_parameters<SN, SES, SWT>& p);
 
     /**
      * @return The underlying scale value.
@@ -2040,7 +2040,7 @@ template <size_t N, size_t ES, typename WT>
  * @brief Output a string representation of p to os.
  */
 template <size_t N, size_t ES, typename WT>
-std::ostream& operator<<(std::ostream& os, const quire<N, ES, WT>& q);
+inline std::ostream& operator<<(std::ostream& os, const quire<N, ES, WT>& q);
 
 //
 // String utilities for the quire class.
@@ -2088,7 +2088,7 @@ enum class interval_bound
  * @param u The enum to write.
  * @return A reference to os.
  */
-std::ostream& operator<<(std::ostream& os, const interval_bound& u);
+inline std::ostream& operator<<(std::ostream& os, const interval_bound& u);
 
 //
 // Additional Interval Bound Operations
@@ -2144,7 +2144,7 @@ enum class bound_sign
  * @param bs The enum to write.
  * @return A reference to os.
  */
-std::ostream& operator<<(std::ostream& os, const bound_sign& bs);
+inline std::ostream& operator<<(std::ostream& os, const bound_sign& bs);
 
 //
 // Additional Bound Sign Operations
@@ -2812,7 +2812,7 @@ protected:
 //
 
 template <size_t N, size_t ES, typename WT>
-std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v);
+inline std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v);
 
 //
 // Functions for iterating over unum types. Useful for testing and

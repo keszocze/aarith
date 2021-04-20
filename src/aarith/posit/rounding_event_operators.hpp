@@ -2,7 +2,7 @@
 
 namespace aarith {
 
-std::ostream& operator<<(std::ostream& os, const rounding_event& r)
+inline std::ostream& operator<<(std::ostream& os, const rounding_event& r)
 {
     switch (r)
     {

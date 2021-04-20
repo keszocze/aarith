@@ -4,7 +4,7 @@
 
 namespace aarith {
 
-std::ostream& operator<<(std::ostream& os, const interval_bound& u)
+inline std::ostream& operator<<(std::ostream& os, const interval_bound& u)
 {
     switch (u)
     {

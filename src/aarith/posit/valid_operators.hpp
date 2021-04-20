@@ -7,7 +7,7 @@
 namespace aarith {
 
 template <size_t N, size_t ES, typename WT>
-std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v)
+inline std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v)
 {
     using posit_type = typename valid<N, ES, WT>::posit_type;
 

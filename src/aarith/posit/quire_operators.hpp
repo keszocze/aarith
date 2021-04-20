@@ -84,7 +84,7 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
-std::ostream& operator<<(std::ostream& os, const quire<N, ES, WT>& q)
+inline std::ostream& operator<<(std::ostream& os, const quire<N, ES, WT>& q)
 {
     if (q.is_nar())
     {
