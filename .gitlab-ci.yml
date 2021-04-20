@@ -18,7 +18,7 @@ compile_gcc:
     stage: compile
     artifacts:
         paths:
-            - build/gcc
+            - build/gcc/tests
         expire_in: 30 minutes
 
     script:
@@ -34,7 +34,7 @@ compile_clang:
     stage: compile
     artifacts:
         paths:
-            - build/clang
+            - build/clang/tests
         expire_in: 30 minutes
     script:
         - mkdir -p build/clang
