@@ -1115,7 +1115,7 @@ constexpr IntegerType pow(const IntegerType& base, const size_t exponent)
 
     for (size_t i = 0U; i <= exponent; ++i)
     {
-        result = mul(result, base);
+        result = result * base;
     }
     return result;
 }
