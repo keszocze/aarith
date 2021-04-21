@@ -96,7 +96,7 @@ template <typename I> [[nodiscard]] constexpr auto sub(const I& a, const I& b) -
  */
 // template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(const I& a, const T&
 // b, const bool initial_borrow = false)
-template <typename I, typename T>[[nodiscard]] constexpr auto expanding_sub(const I& a, const T& b)
+template <typename I, typename T> [[nodiscard]] constexpr auto expanding_sub(const I& a, const T& b)
 {
 
     static_assert(::aarith::same_signedness<I, T>);
@@ -447,7 +447,8 @@ template <typename I>
  * @brief Compute the greatest common divisor.
  */
 template <size_t Width, typename WordType>
-[[nodiscard]] constexpr auto gcd(const integer<Width, WordType>& x, const integer<Width, WordType>& y)
+[[nodiscard]] constexpr auto gcd(const integer<Width, WordType>& x,
+                                 const integer<Width, WordType>& y)
 {
     using Int = integer<Width, WordType>;
 
@@ -933,8 +934,7 @@ template <size_t W, typename WordType>
  * @param n  The signed integer to negate.
  * @return  The negative value of the integer to negate.
  */
-template <typename Integer>
-constexpr auto negate(const Integer& n) -> Integer
+template <typename Integer> constexpr auto negate(const Integer& n) -> Integer
 {
     return add(~n, Integer::one());
 }
@@ -1094,9 +1094,10 @@ auto constexpr expanding_mul(const I& a, const I& b)
  * @param exponent
  * @return The base to the power of the exponent
  */
-template <typename IntegerType>
-constexpr IntegerType pow(const IntegerType& base, const size_t exponent)
+template <size_t N, typename WT>
+constexpr integer<N, WT> pow(const integer<N, WT>& base, const size_t exponent)
 {
+    using IntegerType = integer<N, WT>;
 
     if (exponent == std::numeric_limits<size_t>::max())
     {
@@ -1113,10 +1114,51 @@ constexpr IntegerType pow(const IntegerType& base, const size_t exponent)
 
     IntegerType result = IntegerType::one();
 
-    for (size_t i = 0U; i <= exponent; ++i)
+    for (size_t i = 0U; i < exponent; ++i)
     {
         result = result * base;
     }
+
+    return result;
+}
+
+/**
+ * @brief Exponentiation function
+ *
+ * @note This function does not make any attempts to be fast or to prevent overflows!
+ *
+ * @note If exponent equals std::numeric_limits<size_t>::max(), this method throws an exception,
+ * unless base equals zero
+ * @tparam W Bit width of the integer
+ * @param base
+ * @param exponent
+ * @return The base to the power of the exponent
+ */
+template <size_t N, typename WT>
+constexpr integer<N, WT> pow(const uinteger<N, WT>& base, const size_t exponent)
+{
+    using IntegerType = uinteger<N, WT>;
+
+    if (exponent == std::numeric_limits<size_t>::max())
+    {
+        if (base.is_zero())
+        {
+            return IntegerType::zero();
+        }
+        else
+        {
+            throw std::runtime_error(
+                "Attempted exponentiation by std::numeric_limits<size_t>::max()");
+        }
+    }
+
+    IntegerType result = IntegerType::one();
+
+    for (size_t i = 0U; i < exponent; ++i)
+    {
+        result = result * base;
+    }
+
     return result;
 }
 
