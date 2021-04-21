@@ -527,14 +527,14 @@ public:
      *
      * @return A reference to the incremented value.
      */
-    [[nodiscard]] constexpr posit& operator++();
+    constexpr posit& operator++();
 
     /**
      * @brief Post-Increment.
      *
      * @return A copy of the value before it was incremented.
      */
-    [[nodiscard]] constexpr posit operator++(int);
+    constexpr posit operator++(int);
 
     /**
      * @brief Unary minus.
@@ -588,7 +588,7 @@ public:
     /**
      * @brief Set this to this multiplied with rhs.
      */
-    [[nodiscard]] constexpr posit& operator*=(const posit& rhs);
+    constexpr posit& operator*=(const posit& rhs);
 
     /**
      * @brief Return this divided by other.
@@ -601,7 +601,7 @@ public:
     /**
      * @brief Set this to this divided by other.
      */
-    [[nodiscard]] constexpr posit& operator/=(const posit& rhs);
+    constexpr posit& operator/=(const posit& rhs);
 
     //
     // Constants
