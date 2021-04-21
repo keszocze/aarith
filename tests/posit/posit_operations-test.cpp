@@ -1165,3 +1165,108 @@ SCENARIO("Check conversion to integer fraction")
         }
     }
 }
+
+SCENARIO("max and min functions for posits")
+{
+    using Posit = posit32;
+
+    GIVEN("Arbitrary posit values")
+    {
+        const Posit p0 = Posit(-10);
+        const Posit p1 = Posit(0);
+        const Posit p2 = Posit(10);
+        const Posit p3 = Posit::nar();
+
+        THEN("Assert that max works as expected")
+        {
+            REQUIRE(max(p0, p0) == p0);
+            REQUIRE(max(p0, p1) == p1);
+            REQUIRE(max(p0, p2) == p2);
+            REQUIRE(max(p0, p3) == p0);
+
+            REQUIRE(max(p1, p0) == p1);
+            REQUIRE(max(p1, p1) == p1);
+            REQUIRE(max(p1, p2) == p2);
+            REQUIRE(max(p1, p3) == p1);
+
+            REQUIRE(max(p2, p0) == p2);
+            REQUIRE(max(p2, p1) == p2);
+            REQUIRE(max(p2, p2) == p2);
+            REQUIRE(max(p2, p3) == p2);
+
+            REQUIRE(max(p3, p0) == p0);
+            REQUIRE(max(p3, p1) == p1);
+            REQUIRE(max(p3, p2) == p2);
+            REQUIRE(max(p3, p3) == p3);
+        }
+
+        THEN("Assert that min works as expected")
+        {
+            REQUIRE(min(p0, p0) == p0);
+            REQUIRE(min(p0, p1) == p0);
+            REQUIRE(min(p0, p2) == p0);
+            REQUIRE(min(p0, p3) == p0);
+
+            REQUIRE(min(p1, p0) == p0);
+            REQUIRE(min(p1, p1) == p1);
+            REQUIRE(min(p1, p2) == p1);
+            REQUIRE(min(p1, p3) == p1);
+
+            REQUIRE(min(p2, p0) == p0);
+            REQUIRE(min(p2, p1) == p1);
+            REQUIRE(min(p2, p2) == p2);
+            REQUIRE(min(p2, p3) == p2);
+
+            REQUIRE(min(p3, p0) == p0);
+            REQUIRE(min(p3, p1) == p1);
+            REQUIRE(min(p3, p2) == p2);
+            REQUIRE(min(p3, p3) == p3);
+        }
+
+        THEN("Assert that max and fmax are identical")
+        {
+            REQUIRE(max(p0, p0) == fmax(p0, p0));
+            REQUIRE(max(p0, p1) == fmax(p0, p1));
+            REQUIRE(max(p0, p2) == fmax(p0, p2));
+            REQUIRE(max(p0, p3) == fmax(p0, p3));
+
+            REQUIRE(max(p1, p0) == fmax(p1, p0));
+            REQUIRE(max(p1, p1) == fmax(p1, p1));
+            REQUIRE(max(p1, p2) == fmax(p1, p2));
+            REQUIRE(max(p1, p3) == fmax(p1, p3));
+
+            REQUIRE(max(p2, p0) == fmax(p2, p0));
+            REQUIRE(max(p2, p1) == fmax(p2, p1));
+            REQUIRE(max(p2, p2) == fmax(p2, p2));
+            REQUIRE(max(p2, p3) == fmax(p2, p3));
+
+            REQUIRE(max(p3, p0) == fmax(p3, p0));
+            REQUIRE(max(p3, p1) == fmax(p3, p1));
+            REQUIRE(max(p3, p2) == fmax(p3, p2));
+            REQUIRE(max(p3, p3) == fmax(p3, p3));
+        }
+
+        THEN("Assert that min and fmin are identical")
+        {
+            REQUIRE(min(p0, p0) == fmin(p0, p0));
+            REQUIRE(min(p0, p1) == fmin(p0, p1));
+            REQUIRE(min(p0, p2) == fmin(p0, p2));
+            REQUIRE(min(p0, p3) == fmin(p0, p3));
+
+            REQUIRE(min(p1, p0) == fmin(p1, p0));
+            REQUIRE(min(p1, p1) == fmin(p1, p1));
+            REQUIRE(min(p1, p2) == fmin(p1, p2));
+            REQUIRE(min(p1, p3) == fmin(p1, p3));
+
+            REQUIRE(min(p2, p0) == fmin(p2, p0));
+            REQUIRE(min(p2, p1) == fmin(p2, p1));
+            REQUIRE(min(p2, p2) == fmin(p2, p2));
+            REQUIRE(min(p2, p3) == fmin(p2, p3));
+
+            REQUIRE(min(p3, p0) == fmin(p3, p0));
+            REQUIRE(min(p3, p1) == fmin(p3, p1));
+            REQUIRE(min(p3, p2) == fmin(p3, p2));
+            REQUIRE(min(p3, p3) == fmin(p3, p3));
+        }
+    }
+}

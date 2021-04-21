@@ -974,6 +974,48 @@ template <size_t N, size_t ES, typename WT, size_t IN, typename IWT>
                                              integer<IN, IWT> exponent);
 
 /**
+ * @brief Return maximum of two posits.
+ *
+ * If either argument is NaR, the other argument is returned. If both
+ * arguments are NaR, NaR is returned.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> max(const posit<N, ES, WT>& p, const posit<N, ES, WT>& q);
+
+/**
+ * @brief Return maximum of two posits.
+ *
+ * If either argument is NaR, the other argument is returned. If both
+ * arguments are NaR, NaR is returned.
+ *
+ * Identical to function max. fmax is provided for compatibility with floating
+ * point code bases that are being ported to use posit arithmetic instead.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> fmax(const posit<N, ES, WT>& p, const posit<N, ES, WT>& q);
+
+/**
+ * @brief Return minimum of two posits.
+ *
+ * If either argument is NaR, the other argument is returned. If both
+ * arguments are NaR, NaR is returned.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> min(const posit<N, ES, WT>& p, const posit<N, ES, WT>& q);
+
+/**
+ * @brief Return minimum of two posits.
+ *
+ * If either argument is NaR, the other argument is returned. If both
+ * arguments are NaR, NaR is returned.
+ *
+ * Identical to function min. fmin is provided for compatibility with floating
+ * point code bases that are being ported to use posit arithmetic instead.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> fmin(const posit<N, ES, WT>& p, const posit<N, ES, WT>& q);
+
+/**
  * @brief Dump posit information to stream.
  *
  * This function dumps various interesting parameters to a stream. It is
@@ -1610,7 +1652,8 @@ public:
      * @brief Overload for writing posit_fraction values to a stream.
      */
     template <size_t SN, size_t SES, typename SWT>
-    friend inline std::ostream& operator<<(std::ostream& os, const posit_parameters<SN, SES, SWT>& p);
+    friend inline std::ostream& operator<<(std::ostream& os,
+                                           const posit_parameters<SN, SES, SWT>& p);
 
     /**
      * @return The underlying scale value.

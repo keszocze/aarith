@@ -360,6 +360,64 @@ template <size_t N, size_t ES, typename WT, size_t IN, typename IWT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> max(const posit<N, ES, WT>& p, const posit<N, ES, WT>& q)
+{
+    if (p.is_nar())
+    {
+        return q;
+    }
+
+    if (q.is_nar())
+    {
+        return p;
+    }
+
+    if (p > q)
+    {
+        return p;
+    }
+    else
+    {
+        return q;
+    }
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> fmax(const posit<N, ES, WT>& p, const posit<N, ES, WT>& q)
+{
+    return max(p, q);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> min(const posit<N, ES, WT>& p, const posit<N, ES, WT>& q)
+{
+    if (p.is_nar())
+    {
+        return q;
+    }
+
+    if (q.is_nar())
+    {
+        return p;
+    }
+
+    if (p < q)
+    {
+        return p;
+    }
+    else
+    {
+        return q;
+    }
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> fmin(const posit<N, ES, WT>& p, const posit<N, ES, WT>& q)
+{
+    return min(p, q);
+}
+
+template <size_t N, size_t ES, typename WT>
 void dump_meta(std::ostream& os, const posit<N, ES, WT>& p)
 {
     const auto bits = p.get_bits();
