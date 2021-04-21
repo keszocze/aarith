@@ -703,6 +703,14 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::pi()
+{
+    // This sucks because for big posit types (N >> 32), we will get
+    // increasingly inaccurate results.
+    return posit(M_PI);
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr uinteger<N + 1, WT> posit<N, ES, WT>::npat()
 {
     // to support arbitrary template parameters, we need to be able to

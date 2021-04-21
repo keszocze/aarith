@@ -655,6 +655,11 @@ public:
      */
     [[nodiscard]] static constexpr posit nar();
 
+    /**
+     * @return An approximation of π.
+     */
+    [[nodiscard]] static constexpr posit pi();
+
     //
     // Posit-Specific Constants
     //
