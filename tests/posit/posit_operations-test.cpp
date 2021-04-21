@@ -17,7 +17,7 @@ static void check_bitstring(const aarith::posit<N, ES, WT>& p, const char* expec
     REQUIRE(std::string(expected) == actual);
 }
 
-SCENARIO("Print the bitstrings with seperator")
+SCENARIO("Print the bitstrings with separator")
 {
     GIVEN("All posit<8, 2> values")
     {
@@ -1267,6 +1267,31 @@ SCENARIO("max and min functions for posits")
             REQUIRE(min(p3, p1) == fmin(p3, p1));
             REQUIRE(min(p3, p2) == fmin(p3, p2));
             REQUIRE(min(p3, p3) == fmin(p3, p3));
+        }
+    }
+}
+
+SCENARIO("factorial for posits")
+{
+    using Posit = posit32;
+
+    GIVEN("The first few reasonable arguments")
+    {
+        THEN("Assert that factorial returns a reasonable result")
+        {
+            REQUIRE(factorial(Posit::nar()) == Posit::nar());
+            REQUIRE(factorial(Posit(-1)) == Posit::nar());
+            REQUIRE(factorial(Posit(0)) == Posit(1));
+            REQUIRE(factorial(Posit(1)) == Posit(1));
+            REQUIRE(factorial(Posit(2)) == Posit(2));
+            REQUIRE(factorial(Posit(3)) == Posit(6));
+            REQUIRE(factorial(Posit(4)) == Posit(24));
+            REQUIRE(factorial(Posit(5)) == Posit(120));
+            REQUIRE(factorial(Posit(6)) == Posit(720));
+            REQUIRE(factorial(Posit(7)) == Posit(5040));
+            REQUIRE(factorial(Posit(8)) == Posit(40320));
+            REQUIRE(factorial(Posit(9)) == Posit(362880));
+            REQUIRE(factorial(Posit(10)) == Posit(3628800));
         }
     }
 }

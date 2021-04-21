@@ -967,6 +967,17 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> log(const posit<N, ES, WT>& x);
 
 /**
+ * @brief Compute factorial of x.
+ *
+ * If x is negative, NaR is returned. If x is non an integer (but rather, a
+ * real), the result will be weird. If rounding happens during computation,
+ * the result will also be weird. Essentially you need to be very careful
+ * when using this function. You probably should not use it at all.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> factorial(const posit<N, ES, WT>& x);
+
+/**
  * @brief Compute the k-th power.
  *
  * That is, compute x^k.

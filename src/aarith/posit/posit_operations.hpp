@@ -313,6 +313,31 @@ template <size_t N, size_t ES, typename WT>
     return two * ((x - one) / (a + b));
 }
 
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> factorial(const posit<N, ES, WT>& x)
+{
+    using Posit = posit<N, ES, WT>;
+
+    if (x.is_negative() || x.is_nar())
+    {
+        return Posit::nar();
+    }
+
+    if (x.is_zero())
+    {
+        return Posit::one();
+    }
+
+    Posit accu = Posit::one();
+
+    for (Posit i = Posit::one(); i <= x; ++i)
+    {
+        accu *= i;
+    }
+
+    return accu;
+}
+
 template <size_t N, size_t ES, typename WT, size_t IN, typename IWT>
 [[nodiscard]] constexpr posit<N, ES, WT> pow(const posit<N, ES, WT>& base,
                                              integer<IN, IWT> exponent)
