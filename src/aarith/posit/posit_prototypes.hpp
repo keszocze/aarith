@@ -660,6 +660,11 @@ public:
      */
     [[nodiscard]] static constexpr posit pi();
 
+    /**
+     * @return An approximation of τ.
+     */
+    [[nodiscard]] static constexpr posit tau();
+
     //
     // Posit-Specific Constants
     //
@@ -965,6 +970,24 @@ template <size_t N, size_t ES, typename WT>
  */
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> log(const posit<N, ES, WT>& x);
+
+/**
+ * @brief Compute sine to some accuracy.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> sin(const posit<N, ES, WT>& x);
+
+/**
+ * @brief Compute cosine to some accuracy.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> cos(const posit<N, ES, WT>& x);
+
+/**
+ * @brief Compute tangent.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> tan(const posit<N, ES, WT>& x);
 
 /**
  * @brief Compute factorial of x.

@@ -314,6 +314,81 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> sin(const posit<N, ES, WT>& x)
+{
+    // Poor approximation of sin with https://math.stackexchange.com/a/812699
+
+    using Posit = posit<N, ES, WT>;
+    using Int = integer<2 * N>;
+
+    const Int two = Int(2);
+
+    // Remove full rotations.
+
+    Posit arg = x;
+
+    while (arg > Posit::tau())
+    {
+        arg -= Posit::tau();
+    }
+
+    // Iterate.
+
+    Posit sinx = arg;
+    Int power = Int(3);
+    bool minus = true;
+
+    while (true)
+    {
+        // Compute factorial for the denominator q of summand p/q.
+
+        const Posit q = factorial(Posit(power));
+
+        if (q == Posit::max())
+        {
+            break;
+        }
+
+        // Compute smmand and add to series.
+
+        const Posit summand = pow(arg, power) / q;
+
+        if (minus)
+        {
+            sinx = sinx - summand;
+        }
+        else
+        {
+            sinx = sinx + summand;
+        }
+
+        // Move to next step.
+
+        power = power + two;
+        minus = !minus;
+    }
+
+    return sinx;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> cos(const posit<N, ES, WT>& x)
+{
+    using Posit = posit<N, ES, WT>;
+
+    const Posit pi = Posit::pi();
+    const Posit two = Posit(2);
+
+    return sin(pi / two - x);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> tan(const posit<N, ES, WT>& x)
+{
+    return sin(x) / cos(x);
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> factorial(const posit<N, ES, WT>& x)
 {
     using Posit = posit<N, ES, WT>;

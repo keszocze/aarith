@@ -711,6 +711,12 @@ template <size_t N, size_t ES, typename WT>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::tau()
+{
+    return posit(2) * posit::pi();
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr uinteger<N + 1, WT> posit<N, ES, WT>::npat()
 {
     // to support arbitrary template parameters, we need to be able to
