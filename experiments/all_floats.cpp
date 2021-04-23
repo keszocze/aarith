@@ -35,8 +35,23 @@ int main()
 {
     using Float = half_precision;
 
-    for_each_float<Float>([](const Float& x) {
-        const double ieee = static_cast<double>(x);
-        std::cout << ieee << std::endl;
+    Float maxval, minval;
+
+    for_each_float<Float>([&](const Float& x)
+    {
+        if (!x.is_inf() && x > maxval)
+        {
+            maxval = x;
+        }
+
+        if (!x.is_inf() && x < minval)
+        {
+            minval = x;
+        }
+
+        std::cout << x << std::endl;
     });
+
+    std::cout << "maxval=" << maxval << std::endl;
+    std::cout << "minval=" << minval << std::endl;
 }
