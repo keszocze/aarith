@@ -130,6 +130,12 @@ constexpr valid<N, ES, WT>::valid(const posit<N, ES, WT>& exact_value)
 }
 
 template <size_t N, size_t ES, typename WT>
+constexpr valid<N, ES, WT>::valid(double x)
+{
+    *this = valid(posit_type(x));
+}
+
+template <size_t N, size_t ES, typename WT>
 constexpr valid<N, ES, WT>::valid(const posit<N, ES, WT>& start, const posit<N, ES, WT>& end)
     : start_value(start)
     , start_bound(interval_bound::CLOSED)

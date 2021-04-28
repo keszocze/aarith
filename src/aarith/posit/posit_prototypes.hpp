@@ -2545,6 +2545,17 @@ public:
     constexpr valid(const posit<N, ES, WT>& exact_value);
 
     /**
+     * @brief Construct valid to represent given value converted to posit
+     * exactly.
+     *
+     * Conversion to posit happens first, which might introduce rounding
+     * error. This rounding error is not taken account of here, i.e.  calling
+     * this constructor is identical to calling valid(posit<N, ES, WT>(x)) for
+     * some double x.
+     */
+    constexpr valid(double x);
+
+    /**
      * @brief Construct valid to represent given closed interval.
      *
      * @param start Start of the interval, inclusive.
