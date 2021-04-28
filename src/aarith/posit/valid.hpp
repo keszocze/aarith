@@ -642,8 +642,6 @@ valid<N, ES, WT>::operator/(const valid<N, ES, WT>& other) const
         reciprocal.end_bound = interval_bound::OPEN;
     }
 
-    std::cerr << "recip=" << reciprocal << std::endl;
-
     return *this * reciprocal;
 }
 
