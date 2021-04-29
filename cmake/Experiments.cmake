@@ -2,6 +2,7 @@ function(add_aarith_experiment testname)
 
     SET(targetname "${testname}-experiment")
 
+    find_package(Threads)
 
     set (multiValueArgs FILES)
     cmake_parse_arguments(
@@ -14,7 +15,7 @@ function(add_aarith_experiment testname)
 
 
     add_executable(${targetname} ${AARITH_EXP_FILES})
-    target_link_libraries(${targetname} PRIVATE aarith::Library ${AARITH_EXP_LIBS})
+    target_link_libraries(${targetname} PRIVATE aarith::Library ${AARITH_EXP_LIBS} ${CMAKE_THREAD_LIBS_INIT})
 
 
     if (DEFINED AARITH_EXP_INCLUDES)

@@ -6,10 +6,14 @@
  * Inline helpers for use in posit experiments.
  */
 
+#include <cmath>
+#include <fstream>
+#include <functional>
+#include <ostream>
+#include <string>
+
 #include <aarith/float.hpp>
 #include <aarith/integer.hpp>
-#include <cmath>
-#include <functional>
 
 /**
  * @brief Run function on each float.
@@ -50,3 +54,94 @@ template <typename X, typename Y> inline double decimal_accuracy(const X& x, con
 
     return fabs(log10(xd / yd));
 }
+
+struct color
+{
+    uint8_t red;
+    uint8_t green;
+    uint8_t blue;
+
+    color()
+        : red(0)
+        , green(0)
+        , blue(0)
+    {
+    }
+
+    color(uint8_t ared, uint8_t agreen, uint8_t ablue)
+        : red(ared)
+        , green(agreen)
+        , blue(ablue)
+    {
+    }
+
+    static color black()
+    {
+        return color(0, 0, 0);
+    }
+
+    static color white()
+    {
+        return color(255, 255, 255);
+    }
+};
+
+template <size_t Width, size_t Height> class bitmap
+{
+public:
+    bitmap()
+    {
+        const size_t npixels = Width * Height;
+
+        for (size_t i = 0; i < npixels; ++i)
+        {
+            this->pixels.emplace_back(0, 0, 0);
+        }
+    }
+
+    color& at(const size_t x, const size_t y)
+    {
+        return this->pixels.at(index_for(x, y));
+    }
+
+    const color& at(const size_t x, const size_t y) const
+    {
+        return this->pixels.at(index_for(x, y));
+    }
+
+    void to_ppm(std::ostream& os) const
+    {
+        os << "P3"
+           << "\n";
+        os << Width << " " << Height << "\n";
+        os << "255"
+           << "\n";
+
+        for (size_t y = 0; y < Height; ++y)
+        {
+            for (size_t x = 0; x < Width; ++x)
+            {
+                const color& mypixel = this->at(x, y);
+
+                os << static_cast<int>(mypixel.red) << " ";
+                os << static_cast<int>(mypixel.green) << " ";
+                os << static_cast<int>(mypixel.blue) << "\n";
+            }
+        }
+    }
+
+    void to_ppm_file(const std::string& filename) const
+    {
+        std::ofstream out(filename);
+        out.exceptions(std::ios_base::failbit);
+        this->to_ppm(out);
+    }
+
+private:
+    std::vector<color> pixels;
+
+    size_t index_for(const size_t x, const size_t y) const
+    {
+        return x + y * Width;
+    }
+};
