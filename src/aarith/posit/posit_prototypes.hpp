@@ -2908,6 +2908,18 @@ template <size_t N, size_t ES, typename WT>
 inline std::ostream& operator<<(std::ostream& os, const valid<N, ES, WT>& v);
 
 //
+// Additional operations for valid class.
+//
+// For implementations, look at posit/valid_operations.hpp.
+//
+
+/**
+ * @brief Compute the square root.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr valid<N, ES, WT> sqrt(const valid<N, ES, WT>& v);
+
+//
 // Functions for iterating over unum types. Useful for testing and
 // experiments.
 //
@@ -2989,5 +3001,6 @@ inline void for_each_regular_valid(const std::function<void(const ValidType&)>& 
 #include <aarith/posit/rounding_event_operations.hpp>
 #include <aarith/posit/rounding_event_operators.hpp>
 #include <aarith/posit/valid.hpp>
+#include <aarith/posit/valid_operations.hpp>
 #include <aarith/posit/valid_operators.hpp>
 #include <aarith/posit/valid_types.hpp>

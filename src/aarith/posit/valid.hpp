@@ -129,8 +129,7 @@ constexpr valid<N, ES, WT>::valid(const posit<N, ES, WT>& exact_value)
 {
 }
 
-template <size_t N, size_t ES, typename WT>
-constexpr valid<N, ES, WT>::valid(double x)
+template <size_t N, size_t ES, typename WT> constexpr valid<N, ES, WT>::valid(double x)
 {
     *this = valid(posit_type(x));
 }
