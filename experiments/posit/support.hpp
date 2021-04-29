@@ -55,6 +55,10 @@ template <typename X, typename Y> inline double decimal_accuracy(const X& x, con
     return fabs(log10(xd / yd));
 }
 
+/**
+ * Represents a single color with 8 bit for each channel.
+ * Used together with class bitmap for drawing images.
+ */
 struct color
 {
     uint8_t red;
@@ -86,6 +90,10 @@ struct color
     }
 };
 
+/**
+ * A bitmap in memory. Can be exported in PPM format.  This class is
+ * useful for drawing pretty pictures and visualizations.
+ */
 template <size_t Width, size_t Height> class bitmap
 {
 public:
@@ -146,4 +154,20 @@ private:
     }
 };
 
+/**
+ * Define an eight bit float type. It is honestly kind of useless.
+ */
 using quarter_precision = aarith::floating_point<4, 3>;
+
+/**
+ * Implement sqrt for aarith floating points. Converts to double
+ * and then does math with the libc sqrt implementation. Because
+ * it does math in 64 bit, calling sqrt w/ floating points of greater
+ * width will introduce error that is hard to track.
+ */
+template <size_t E, size_t M, typename WT>
+inline aarith::floating_point<E, M, WT> sqrt(const aarith::floating_point<E, M, WT>& x)
+{
+    using Float = aarith::floating_point<E, M, WT>;
+    return Float(sqrt(double(x)));
+}

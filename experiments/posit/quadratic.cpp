@@ -12,10 +12,13 @@
  * From "The End of Error", pp. 98.
  */
 
-#include <aarith/float.hpp>
-#include <aarith/posit.hpp>
 #include <cmath>
 #include <iostream>
+
+#include <aarith/float.hpp>
+#include <aarith/posit.hpp>
+
+#include "support.hpp"
 
 template <typename Number>
 static void report(const Number& a, const Number& b, const Number& c, const Number& x1,
@@ -54,6 +57,18 @@ template <typename Number> static void solve()
 
 int main()
 {
+    std::cout << "[support::quarter_precision]" << std::endl;
+    solve<quarter_precision>();
+
+    std::cout << "[aarith::half_precision]" << std::endl;
+    solve<aarith::half_precision>();
+
+    std::cout << "[aarith::single_precision]" << std::endl;
+    solve<aarith::single_precision>();
+
+    std::cout << "[aarith::double_precision]" << std::endl;
+    solve<aarith::double_precision>();
+
     std::cout << "[float]" << std::endl;
     solve<float>();
 
@@ -72,7 +87,15 @@ int main()
     std::cout << "[aarith::posit64]" << std::endl;
     solve<aarith::posit64>();
 
-    using posit128 = aarith::posit<128, 2>;
-    std::cout << "[aarith::posit<128, 2>]" << std::endl;
-    solve<posit128>();
+    std::cout << "[aarith::valid8]" << std::endl;
+    solve<aarith::valid8>();
+
+    std::cout << "[aarith::valid16]" << std::endl;
+    solve<aarith::valid16>();
+
+    std::cout << "[aarith::valid32]" << std::endl;
+    solve<aarith::valid32>();
+
+    std::cout << "[aarith::valid64]" << std::endl;
+    solve<aarith::valid64>();
 }
