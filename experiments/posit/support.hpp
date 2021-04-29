@@ -145,3 +145,5 @@ private:
         return x + y * Width;
     }
 };
+
+using quarter_precision = aarith::floating_point<4, 3>;

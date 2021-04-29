@@ -12,6 +12,8 @@
 #include <aarith/posit.hpp>
 #include <iostream>
 
+#include "support.hpp"
+
 template <typename Number> static void report(const Number& x, const Number& y)
 {
     std::cout << std::endl;
@@ -51,6 +53,9 @@ int main()
 {
     std::cout << "[expected]" << std::endl;
     report(-1, 2);
+
+    std::cout << "[support::quarter_precision]" << std::endl;
+    solve<quarter_precision>();
 
     std::cout << "[aarith::half_precision]" << std::endl;
     solve<aarith::half_precision>();
