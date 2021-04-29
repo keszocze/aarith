@@ -14,11 +14,14 @@
 
 #include "support.hpp"
 
-template <typename Number> static void report(const Number& x, const Number& y)
+template <typename Number, typename Result>
+static void report(const Number& x, const Number& y, const Result& u, const Result& v)
 {
     std::cout << std::endl;
     std::cout << "  x=" << x << std::endl;
     std::cout << "  y=" << y << std::endl;
+    std::cout << "  u=" << u << std::endl;
+    std::cout << "  v=" << v << std::endl;
     std::cout << std::endl;
 }
 
@@ -46,13 +49,16 @@ template <typename Number> static void solve()
     const Number x = (u * d - b * v) / det;
     const Number y = (a * v - u * c) / det;
 
-    report(x, y);
+    const Number usanity = a * x + b * y;
+    const Number vsanity = c * x + d * y;
+
+    report(x, y, usanity, vsanity);
 }
 
 int main()
 {
     std::cout << "[expected]" << std::endl;
-    report(-1, 2);
+    report(-1, 2, 0.79981812, 2.51270273);
 
     std::cout << "[support::quarter_precision]" << std::endl;
     solve<quarter_precision>();
@@ -65,9 +71,6 @@ int main()
 
     std::cout << "[aarith::double_precision]" << std::endl;
     solve<aarith::double_precision>();
-
-    std::cout << "[aarith::quadruple_precision]" << std::endl;
-    solve<aarith::quadruple_precision>();
 
     std::cout << "[float]" << std::endl;
     solve<float>();
@@ -87,7 +90,15 @@ int main()
     std::cout << "[aarith::posit64]" << std::endl;
     solve<aarith::posit64>();
 
-    using posit128 = aarith::posit<128, 2>;
-    std::cout << "[aarith::posit<128, 2>]" << std::endl;
-    solve<posit128>();
+    std::cout << "[aarith::valid8]" << std::endl;
+    solve<aarith::valid8>();
+
+    std::cout << "[aarith::valid16]" << std::endl;
+    solve<aarith::valid16>();
+
+    std::cout << "[aarith::valid32]" << std::endl;
+    solve<aarith::valid32>();
+
+    std::cout << "[aarith::valid64]" << std::endl;
+    solve<aarith::valid64>();
 }
