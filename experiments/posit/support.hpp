@@ -171,3 +171,29 @@ inline aarith::floating_point<E, M, WT> sqrt(const aarith::floating_point<E, M, 
     using Float = aarith::floating_point<E, M, WT>;
     return Float(sqrt(double(x)));
 }
+
+template <size_t E, size_t M, typename WT, size_t IN, typename IWT>
+inline aarith::floating_point<E, M, WT> pow(const aarith::floating_point<E, M, WT>& x,
+                                            const aarith::integer<IN, IWT>& k)
+{
+    using Int = aarith::integer<IN, IWT>;
+    using Float = aarith::floating_point<E, M, WT>;
+
+    Float power = Float::one();
+
+    const auto niterations = expanding_abs(k);
+
+    for (auto i = niterations.zero(); i < niterations; ++i)
+    {
+        if (k.is_negative())
+        {
+            power = power / x;
+        }
+        else
+        {
+            power = power * x;
+        }
+    }
+
+    return power;
+}

@@ -6,11 +6,14 @@
  * From "Posit Arithmetic", 2017, pp. 75.
  */
 
+#include <cmath>
+#include <iostream>
+
 #include <aarith/float.hpp>
 #include <aarith/integer.hpp>
 #include <aarith/posit.hpp>
-#include <cmath>
-#include <iostream>
+
+#include "support.hpp"
 
 using namespace aarith;
 
@@ -56,27 +59,12 @@ template <typename Number> static void compute_area()
 
 int main()
 {
-    /*
-    std::cout << "[float]" << std::endl;
-    compute_area<float>();
+    std::cout << "[aarith::quadruple_precision]" << std::endl;
+    compute_area<aarith::quadruple_precision>();
 
-    std::cout << "[double]" << std::endl;
-    compute_area<double>();
-    */
-
-    std::cout << "[aarith::posit8]" << std::endl;
-    compute_area<aarith::posit8>();
-
-    std::cout << "[aarith::posit16]" << std::endl;
-    compute_area<aarith::posit16>();
-
-    std::cout << "[aarith::posit32]" << std::endl;
-    compute_area<aarith::posit32>();
-
-    std::cout << "[aarith::posit64]" << std::endl;
-    compute_area<aarith::posit64>();
-
-    using posit128 = aarith::posit<128, 2>;
     std::cout << "[aarith::posit<128, 2>]" << std::endl;
-    compute_area<posit128>();
+    compute_area <aarith::posit<128, 2>>();
+
+    // std::cout << "[aarith::posit<128, 7>]" << std::endl;
+    // compute_area<aarith::posit<128, 7>>();
 }
