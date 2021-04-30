@@ -950,6 +950,18 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> abs(const posit<N, ES, WT>& p);
 
 /**
+ * @brief Return absolute value of a given posit.
+ *
+ * If p is NaR, the result is also NaR. If p is zero, the result is also zero
+ * as there is only one representation of zero.
+ *
+ * Identical to function abs. fabs is provided for compatibility with floating
+ * point code bases that are being ported to use posit arithmetic instead.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> fabs(const posit<N, ES, WT>& p);
+
+/**
  * @brief Return the global exponent that unifies regime and exponent.
  *
  * Posit values are a fraction m raised to some power 2^k where k is made up
