@@ -2951,6 +2951,19 @@ template <typename PositType>
 inline void for_each_posit(const std::function<void(const PositType&)>& operation);
 
 /**
+ * @brief Run function on each regular posit for a given type.
+ *
+ * Runs function operation on every regular posit of PositType,
+ * starting from smallest up to biggest. All posits except for NaR are
+ * regular, i.e. this functions runs operation on every non-NaR value.
+ *
+ * @tparam PositType Instance of a posit type, e.g. posit<8, 2>.
+ * @param operation The function to call on each posit.
+ */
+template <typename PositType>
+inline void for_each_regular_posit(const std::function<void(const PositType&)>& operation);
+
+/**
  * @brief Run function on each valid for a given type.
  *
  * Runs function operation on every valid of ValidType in some unspecified

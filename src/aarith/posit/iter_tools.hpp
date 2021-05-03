@@ -7,13 +7,25 @@ namespace aarith {
 template <typename PositType>
 inline void for_each_posit(const std::function<void(const PositType&)>& operation)
 {
-    typename PositType::storage_type bits;
+    const auto min_bits = PositType::min().get_bits();
+    auto bits = min_bits;
 
     do
     {
         const auto p = PositType::from(bits);
         operation(p);
-    } while (++bits);
+    } while (++bits != min_bits);
+}
+
+template <typename PositType>
+inline void for_each_regular_posit(const std::function<void(const PositType&)>& operation)
+{
+    for_each_posit<PositType>([&](const PositType& p) {
+        if (!p.is_nar())
+        {
+            operation(p);
+        }
+    });
 }
 
 template <typename ValidType>
