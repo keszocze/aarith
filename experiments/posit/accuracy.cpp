@@ -1,7 +1,7 @@
 /**
  * Evaluating Posit Accuracy
  *
- * Based on previous work "Beating FLatoing Point at its Own Game: Posit
+ * Based on previous work "Beating Floating Point at its Own Game: Posit
  * Arithmetic", 2017, pp. 79.
  */
 
@@ -62,8 +62,8 @@ template <typename Posit> static void reciprocal_posit_for()
             bad += 1;
         }
 
-        // Compute achived decimal accuracy. We use a high precision float
-        // enviornment as comparison.
+        // Compute achieved decimal accuracy. We use a high precision float
+        // environment as comparison.
 
         const double x = static_cast<double>(p);
         const double expected = 1.0 / x;
@@ -128,8 +128,8 @@ template <typename Posit> static void square_posit_for()
             bad += 1;
         }
 
-        // Compute achived decimal accuracy. We use a high precision float
-        // enviornment as comparison.
+        // Compute achieved decimal accuracy. We use a high precision float
+        // environment as comparison.
 
         const double x = static_cast<double>(p);
         const double expected = x * x;
@@ -185,8 +185,8 @@ template <typename Float> static void reciprocal_float_for()
 
         const Float quot = Float::one() / f;
 
-        // Compute achived decimal accuracy. We use a high precision float
-        // enviornment as comparison.
+        // Compute achieved decimal accuracy. We use a high precision float
+        // environment as comparison.
 
         const double x = static_cast<double>(f);
         const double expected = 1.0 / x;
@@ -251,8 +251,8 @@ template <typename Float> static void square_float_for()
 
         const Float square = f * f;
 
-        // Compute achived decimal accuracy. We use a high precision float
-        // enviornment as comparison.
+        // Compute achieved decimal accuracy. We use a high precision float
+        // environment as comparison.
 
         const double x = static_cast<double>(f);
         const double expected = x * x;
