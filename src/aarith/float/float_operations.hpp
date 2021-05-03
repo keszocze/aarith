@@ -523,7 +523,7 @@ nextafter(const floating_point<E, M, WordType>& x, const floating_point<E, M, Wo
         return y;
     }
 
-    const Int mask = Int::all_ones() / Int(2);
+    const Int mask = Int(Int::all_ones()) / Int(2);
     Int ax = ux & mask;
     Int ay = uy & mask;
 

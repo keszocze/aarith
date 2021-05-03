@@ -32,7 +32,10 @@ inline void for_each_float(const std::function<void(const FloatType&)>& operatio
 }
 
 /*
- * @brief Run function on each regular float in some arbitrary order.
+ * @brief Run function on each regular float.
+ *
+ * This function starts with the smallest representable value and then
+ * calls operation with increasingly bigger values.
  *
  * Regular floats are all those floats which are neither NaN nor some
  * kind of infinity.
@@ -43,12 +46,16 @@ inline void for_each_float(const std::function<void(const FloatType&)>& operatio
 template <typename FloatType>
 inline void for_each_regular_float(const std::function<void(const FloatType&)>& operation)
 {
-    for_each_float<FloatType>([&](const FloatType& x) {
-        if (!x.is_nan() && !x.is_inf())
-        {
-            operation(x);
-        }
-    });
+    const FloatType start = FloatType::min();
+    const FloatType limit = FloatType::pos_infinity();
+
+    FloatType current = start;
+
+    do
+    {
+        operation(current);
+        current = nextafter(current, limit);
+    } while (current != start && current != limit);
 }
 
 } // namespace aarith
