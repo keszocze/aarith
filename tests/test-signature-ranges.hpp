@@ -4,6 +4,7 @@
 #define AARITH_FLOAT_TEST_SIGNATURE_WITH_NATIVE_TYPE                                               \
     ((size_t E, size_t M, typename Native), E, M, Native)
 
+#define AARITH_FLOAT_TEMPLATE_RANGE_EXHAUSTABLE (5, 2), (6, 9), (8, 7)
 #define AARITH_FLOAT_TEMPLATE_RANGE (5, 2), (6, 9), (8, 7), (8, 23), (11, 52), (15, 112)
 #define AARITH_FLOAT_TEMPLATE_NATIVE_RANGE (8, 23), (11, 52)
 #define AARITH_FLOAT_TEMPLATE_NATIVE_RANGE_WITH_TYPE (8, 23, float), (11, 52, double)
@@ -28,11 +29,12 @@
 #define AARITH_UINT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE                                         \
     (8, uint8_t), (16, uint16_t), (32, uint32_t), (64, uint64_t)
 
-#define AARITH_SINT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE                                          \
+#define AARITH_SINT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE                                         \
     (8, int8_t), (16, int16_t), (32, int32_t), (64, int64_t)
 
 #define AARITH_INT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE                                          \
-    (8, uint8_t), (16, uint16_t), (32, uint32_t), (64, uint64_t), (8, int8_t), (16, int16_t), (32, int32_t), (64, int64_t)
+    (8, uint8_t), (16, uint16_t), (32, uint32_t), (64, uint64_t), (8, int8_t), (16, int16_t),      \
+        (32, int32_t), (64, int64_t)
 
 #define AARITH_FIXED_TEST_SIGNATURE ((size_t I, size_t F, typename WordType), I, F, WordType)
 #define AARITH_FIXED_TEST_PARAM_RANGE                                                              \
@@ -139,8 +141,7 @@
         (64, 2), (64, 3), (128, 0), (128, 1), (128, 2), (128, 3), (256, 0), (256, 1), (256, 2),    \
         (256, 3), (512, 0), (512, 1), (512, 3)
 
-#define AARITH_POSIT_TEST_TEMPLATE_SINGLE                                                          \
-    (32, 2)
+#define AARITH_POSIT_TEST_TEMPLATE_SINGLE (32, 2)
 
 #define AARITH_POSIT_TEST_TEMPLATE_SIGNED_INTEGERS (int8_t), (int16_t), (int32_t), (int64_t)
 
