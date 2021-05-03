@@ -13,6 +13,33 @@
 
 namespace aarith {
 
+/**
+ * Namespace to prevent accidental usage. With C++20 modules, this function can easily be hidden
+ */
+namespace implementation {
+
+template <typename T, size_t W, typename WordType, template <size_t, typename> typename I>
+[[nodiscard]] constexpr T generic_cast(const I<W, WordType>& num)
+{
+
+    constexpr size_t target_size = sizeof(T) * CHAR_BIT;
+    constexpr size_t use_words = I<target_size, WordType>::word_count();
+    const I<target_size, WordType> extended_num = width_cast<target_size>(num);
+
+
+    constexpr size_t word_width = I<W, WordType>::word_width();
+
+    T result{0};
+
+    for (size_t i = 0; i < use_words; ++i)
+    {
+        result |= extended_num.word(i) << (i * word_width);
+    }
+
+    return result;
+}
+} // namespace implementation
+
 template <size_t Width, class WordType = uint64_t>
 class uinteger : public word_array<Width, WordType>
 {
@@ -122,34 +149,6 @@ public:
      * Conversion operators
      */
 
-private:
-    template <typename T> [[nodiscard]]  constexpr T generic_cast() const
-    {
-        if constexpr (sizeof(T) <= sizeof(WordType))
-        {
-            // the last word is sufficient to fill the desired target type, so we can simply
-            // make a call to the static_cast operation
-            return static_cast<T>(this->word(0));
-        }
-        else
-        {
-            constexpr size_t words_per_type = (sizeof(T)) / sizeof(WordType);
-
-            constexpr size_t use_words =
-                std::min(words_per_type, uinteger<Width, WordType>::word_count());
-
-            uint16_t result = 0;
-
-            for (size_t i = 0; i < use_words; ++i)
-            {
-                result += this->word(i) << (i * uinteger<Width, WordType>::word_width());
-            }
-
-            return result;
-        }
-    }
-
-public:
     /**
      * @brief Converts to an uint8_t
      *
@@ -160,8 +159,7 @@ public:
      */
     explicit constexpr operator uint8_t() const
     {
-        // we can safely return this as the smallest WordType is uint8_t
-        return static_cast<uint8_t>(this->word(0));
+        return implementation::generic_cast<uint8_t>(*this);
     }
 
     /**
@@ -174,7 +172,7 @@ public:
      */
     explicit constexpr operator uint16_t() const
     {
-        return generic_cast<uint16_t>();
+        return implementation::generic_cast<uint16_t>(*this);
     }
 
     /**
@@ -187,7 +185,7 @@ public:
      */
     explicit constexpr operator uint32_t() const
     {
-        return generic_cast<uint32_t>();
+        return implementation::generic_cast<uint32_t>(*this);
     }
 
     /**
@@ -200,7 +198,7 @@ public:
      */
     explicit constexpr operator uint64_t() const
     {
-        return generic_cast<uint64_t>();
+        return implementation::generic_cast<uint64_t>(*this);
     }
 };
 
@@ -238,7 +236,11 @@ public:
     {
     }
 
-    template <typename T, typename = std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>>>
+    template <typename T, typename = std::enable_if_t<
+        std::is_integral_v<T>
+            && std::is_signed_v<T>
+            && (sizeof(WordType) >= sizeof(T))
+                              > >
     explicit constexpr integer(T t) // NOLINT
         : word_array<Width, WordType>(static_cast<WordType>(t))
     {
@@ -253,14 +255,18 @@ public:
     }
 
     template <typename T, class... Args,
-              typename = std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>>>
+              typename = std::enable_if_t<
+                  std::is_integral_v<T> && std::is_signed_v<T>
+                      && (sizeof(WordType) >= sizeof(T))
+                  >
+              >
     explicit constexpr integer(T t, Args... args)
         : word_array<Width, WordType>(static_cast<WordType>(t), args...)
     {
     }
 
     template <class... Args>
-    constexpr explicit integer(WordType fst, Args... args)
+    constexpr  explicit integer(WordType fst, Args... args)
         : word_array<Width, WordType>(fst, args...)
     {
     }
@@ -280,6 +286,114 @@ public:
     [[nodiscard]] static constexpr size_t width()
     {
         return Width;
+    }
+
+    /*
+     * Conversion operations
+     */
+
+    /**
+     * @brief Converts to an int8_t
+     *
+     * Note that there will be a possible loss of precision as this method simply cuts
+     * of the "overflowing" bits.
+     *
+     * @return An int8_t storing the value of this integer
+     */
+    explicit constexpr operator int8_t() const
+    {
+        return implementation::generic_cast<int8_t>(*this);
+    }
+
+    /**
+     * @brief Converts to an int16_t
+     *
+     * Note that there will be a possible loss of precision as this method simply cuts
+     * of the "overflowing" bits.
+     *
+     * @return An int16_t storing the value of this integer
+     */
+    explicit constexpr operator int16_t() const
+    {
+        return implementation::generic_cast<int16_t>(*this);
+    }
+
+    /**
+     * @brief Converts to an int32_t
+     *
+     * Note that there will be a possible loss of precision as this method simply cuts
+     * of the "overflowing" bits.
+     *
+     * @return An int32_t storing the value of this integer
+     */
+    explicit constexpr operator int32_t() const
+    {
+        return implementation::generic_cast<int32_t>(*this);
+    }
+
+    /**
+     * @brief Converts to an int64_t
+     *
+     * Note that there will be a possible loss of precision as this method simply cuts
+     * of the "overflowing" bits.
+     *
+     * @return An int64_t storing the value of this integer
+     */
+    explicit constexpr operator int64_t() const
+    {
+        return implementation::generic_cast<int64_t>(*this);
+    }
+
+    /**
+     * @brief Converts to an uint8_t
+     *
+     * Note that there will be a possible loss of precision as this method simply cuts
+     * of the "overflowing" bits.
+     *
+     * @return An uint8_t storing the value of this integer
+     */
+    explicit constexpr operator uint8_t() const
+    {
+        return implementation::generic_cast<uint8_t>(*this);
+    }
+
+    /**
+     * @brief Converts to an uint16_t
+     *
+     * Note that there will be a possible loss of precision as this method simply cuts
+     * of the "overflowing" bits.
+     *
+     * @return An uint16_t storing the value of this integer
+     */
+    explicit constexpr operator uint16_t() const
+    {
+        return implementation::generic_cast<uint16_t>(*this);
+    }
+
+    /**
+     * @brief Converts to an uint32_t
+     *
+     * Note that there will be a possible loss of precision as this method simply cuts
+     * of the "overflowing" bits.
+     *
+     * @return An uint32_t storing the value of this integer
+     */
+    explicit constexpr operator uint32_t() const
+    {
+        return implementation::generic_cast<uint32_t>(*this);
+    }
+
+    /**
+     * @brief Converts to an uint64_t
+     *
+     * Note that there will be a possible loss of precision as this method simply cuts
+     * of the "overflowing" bits.
+     *
+     * @return An uint64_t storing the value of this integer
+     */
+    explicit constexpr operator uint64_t() const
+    {
+        return implementation::generic_cast<uint64_t>(*this);
     }
 
     [[nodiscard]] static constexpr integer min()

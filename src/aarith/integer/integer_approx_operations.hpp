@@ -307,7 +307,7 @@ uinteger<width + 1> FAUadder(const uinteger<width>& a, const uinteger<width>& b)
  * @tparam V Bit width of the second summand
  * @param a First summand
  * @param b Second summand
- * @return Aproximated addition of a and b
+ * @return Approximated addition of a and b
  */
 template <size_t W, size_t V, typename WordType>
 [[nodiscard]] uinteger<std::max(W, V), WordType> trivial_approx_add(const uinteger<W, WordType> a,
@@ -323,7 +323,7 @@ template <size_t W, size_t V, typename WordType>
 }
 
 template <size_t width, size_t lsp_width, size_t shared_bits = 0>
-uinteger<width + 1> FAU_sub(const uinteger<width>& a, [[maybe_unused]] const uinteger<width>& b)
+uinteger<width + 1> FAUsubtractor(const uinteger<width>& a, const uinteger<width>& b)
 {
     auto b_inv = ~width_cast<width + 1>(b);
     const auto one = uinteger<width + 1>(1U);

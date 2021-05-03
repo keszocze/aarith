@@ -1,7 +1,7 @@
 #pragma once
 
 #include <aarith/integer.hpp>
-#include <aarith/integer/approx_operations.hpp>
+#include <aarith/integer/integer_approx_operations.hpp>
 #include <tuple>
 
 namespace aarith {

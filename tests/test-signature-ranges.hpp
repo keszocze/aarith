@@ -25,8 +25,14 @@
         (1025, uint16_t), (1025, uint32_t), (1025, uint64_t), (5000, uint8_t), (5000, uint16_t),   \
         (5000, uint32_t), (5000, uint64_t)
 
+#define AARITH_UINT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE                                         \
+    (8, uint8_t), (16, uint16_t), (32, uint32_t), (64, uint64_t)
+
+#define AARITH_SINT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE                                          \
+    (8, int8_t), (16, int16_t), (32, int32_t), (64, int64_t)
+
 #define AARITH_INT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE                                          \
-    (8, uint64_t), (16, uint64_t), (32, uint64_t), (64, uint64_t)
+    (8, uint8_t), (16, uint16_t), (32, uint32_t), (64, uint64_t), (8, int8_t), (16, int16_t), (32, int32_t), (64, int64_t)
 
 #define AARITH_FIXED_TEST_SIGNATURE ((size_t I, size_t F, typename WordType), I, F, WordType)
 #define AARITH_FIXED_TEST_PARAM_RANGE                                                              \
@@ -103,9 +109,9 @@
 #define AARITH_INT_EXTENDED_TEST_TEMPLATE_PARAM_RANGE                                              \
     AARITH_INT_EXTENDED_TEST_TEMPLATE_FULL_PARAM_RANGE
 #else
-#define AARITH_INT_TEST_TEMPLATE_PARAM_RANGE AARITH_INT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE
+#define AARITH_INT_TEST_TEMPLATE_PARAM_RANGE AARITH_UINT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE
 #define AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE                                                \
-    AARITH_INT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE
+    AARITH_UINT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE
 #define AARITH_INT_EXTENDED_TEST_TEMPLATE_PARAM_RANGE                                              \
     AARITH_INT_EXTENDED_TEST_TEMPLATE_FULL_PARAM_RANGE
 #endif

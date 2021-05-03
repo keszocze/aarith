@@ -6,7 +6,13 @@ option(BUILD_CORRECTNESS_EXPERIMENTS "build correctness experiments" OFF)
 option(BUILD_TESTS "build tests" ON)
 option(BUILD_EXAMPLES "build examples" ON)
 option(BUILD_DOCUMENTATION "Build documentation" OFF)
-option(USE_CLANGTIDY "Use clang-tidy" OFF)
+option(USE_CLANGTIDY "Use clang-tidy" ON)
+
+
+if (USE_CLANGTIDY)
+    set(CMAKE_CXX_CLANG_TIDY "clang-tidy")
+endif()
+
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/lib")
 find_package(MPIR)

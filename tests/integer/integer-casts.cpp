@@ -7,7 +7,7 @@
 
 using namespace aarith;
 
-TEMPLATE_TEST_CASE_SIG("Expanding integers", "[integer][signed][unsigned][casting][foo]",
+ TEMPLATE_TEST_CASE_SIG("Expanding integers", "[integer][signed][unsigned][casting]",
                        AARITH_INT_TEST_SIGNATURE,
                        //                       (8, uint64_t)
                        AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
@@ -47,8 +47,6 @@ TEMPLATE_TEST_CASE_SIG("Expanding integers", "[integer][signed][unsigned][castin
                 constexpr size_t S = W + extR - 1;
                 constexpr size_t E = extR;
                 auto slice = bit_range<S, E>(extended_right);
-                //                std::cout << to_binary(extended_right) << "\n" << to_binary(slice)
-                //                << "\n" << to_binary(a) << "\n\n";
                 REQUIRE(slice == a);
             }
         }
@@ -98,9 +96,9 @@ TEMPLATE_TEST_CASE_SIG("Expanding integers", "[integer][signed][unsigned][castin
     }
 }
 
-SCENARIO("Up-casting to the next larger native integer type", "[integer][unsigned][casting]")
+ SCENARIO("Up-casting to the next larger native integer type", "[integer][unsigned][casting]")
 {
-    GIVEN("An unsigned integer with 13 bidth")
+    GIVEN("An unsigned integer with 13 bits")
     {
         WHEN("Casting to an uint16_t")
         {
@@ -119,7 +117,7 @@ SCENARIO("Up-casting to the next larger native integer type", "[integer][unsigne
     }
 }
 
-SCENARIO("Casting unsigned integers to uint8_t", "[integer][unsigned][casting]")
+ SCENARIO("Casting unsigned integers to uint8_t", "[integer][unsigned][casting]")
 {
     GIVEN("An unsigned integer width bit-width <= 8")
     {
@@ -254,7 +252,7 @@ SCENARIO("Casting unsigned integers to uint8_t", "[integer][unsigned][casting]")
     }
 }
 
-SCENARIO("Casting unsigned integers to uint16_t", "[integer][unsigned][casting]")
+ SCENARIO("Casting unsigned integers to uint16_t", "[integer][unsigned][casting]")
 {
     using B = uint16_t;
     using BL = uint32_t;
@@ -394,7 +392,7 @@ SCENARIO("Casting unsigned integers to uint16_t", "[integer][unsigned][casting]"
     }
 }
 
-SCENARIO("Casting unsigned integers with various WordTypes to uint16_t",
+ SCENARIO("Casting unsigned integers with various WordTypes to uint16_t",
          "[integer][unsigned][casting]")
 {
     using B = uint16_t;
@@ -533,7 +531,7 @@ SCENARIO("Casting unsigned integers with various WordTypes to uint16_t",
     }
 }
 
-SCENARIO("Width casting of signed integers", "[integer][signed][utility][casting]")
+ SCENARIO("Width casting of signed integers", "[integer][signed][utility][casting]")
 {
     GIVEN("A positive integer")
     {
@@ -606,67 +604,50 @@ SCENARIO("Width casting of signed integers", "[integer][signed][utility][casting
     }
 }
 
-SCENARIO("Casting signed integers to uint8_t", "[integer][unsigned][casting]")
+TEMPLATE_TEST_CASE_SIG("Casting unsigned integers", "[integer][unsigned][casting]",
+                       AARITH_INT_TEST_SIGNATURE,
+                       //                       (8, uint64_t)
+                       AARITH_UINT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE)
 {
-    GIVEN("All of the 16 bit signed integers")
+    using I = aarith::uinteger<W>;
+    using N = WordType;
+
+    GIVEN("A random native integer")
     {
-        using I16 = integer<16>;
+        const N val = GENERATE(
+            take(50, random(std::numeric_limits<N>::min(), std::numeric_limits<N>::max())));
 
-        constexpr int32_t min16 = std::numeric_limits<int16_t>::min();
-        constexpr int32_t max16 = std::numeric_limits<int16_t>::max();
+        const I aarith_val{val};
 
-        constexpr int32_t min8 = std::numeric_limits<int8_t>::min();
-        constexpr int32_t max8 = std::numeric_limits<int8_t>::max();
-
-        THEN("Only casts with enough space should succeed")
+        WHEN("Casting the value back")
         {
-            for (int32_t i = min16; i <= max16; ++i)
-            {
-                const int16_t actual = static_cast<int16_t>(i);
-                const I16 i16(actual);
-
-                if (actual >= min8 && actual <= max8)
-                {
-                    // "actual" fits into 8 bits
-                    REQUIRE(narrow_cast<int8_t>(i16) == actual);
-                }
-                else
-                {
-                    // "actual" does not fit into 8 bits
-                    REQUIRE_THROWS_AS(narrow_cast<int8_t>(i16), std::domain_error);
-                }
-            }
+            const N cast = static_cast<N>(aarith_val);
+            CAPTURE(val, aarith_val, cast);
+            REQUIRE(cast == val);
         }
     }
 }
 
-SCENARIO("Casting uinteger<16> to integer<32>", "[integer][unsigned][signed][casting]")
+TEMPLATE_TEST_CASE_SIG("Casting signed integers", "[integer][signed][casting]",
+                       AARITH_INT_TEST_SIGNATURE,
+                       //                       (8, uint64_t)
+                       AARITH_SINT_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE)
 {
-    GIVEN("All of the 16 bit unsigned integers")
+    using I = aarith::integer<W>;
+    using N = WordType;
+
+    GIVEN("A random native integer")
     {
-        using U16 = uinteger<16, uint16_t>;
-        using I32 = integer<32, uint32_t>;
+        const N val = GENERATE(
+            take(50, random(std::numeric_limits<N>::min(), std::numeric_limits<N>::max())));
 
-        constexpr int32_t min16 = std::numeric_limits<uint16_t>::min();
-        constexpr int32_t max16 = std::numeric_limits<uint16_t>::max();
+        const I aarith_val{val};
 
-        THEN("Assert that the signed cast does not change the value")
+        WHEN("Casting the value back")
         {
-            for (int32_t i = min16; i <= max16; ++i)
-            {
-                const uint16_t u = static_cast<uint16_t>(i);
-                const U16 aarith_unsigned = u;
-
-                const I32 expected(i);
-
-                // try both template overloads
-                const I32 aarith_signed_easy = signed_width_cast<I32>(aarith_unsigned);
-                const I32 aarith_signed_explicit =
-                    signed_width_cast<32, uint32_t, 16, uint16_t>(aarith_unsigned);
-
-                REQUIRE(aarith_signed_easy == expected);
-                REQUIRE(aarith_signed_explicit == expected);
-            }
+            const N cast = static_cast<N>(aarith_val);
+            CAPTURE(val, aarith_val, to_binary(aarith_val), cast, W);
+            REQUIRE(cast == val);
         }
     }
 }

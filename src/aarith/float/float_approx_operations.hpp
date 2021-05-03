@@ -1,7 +1,7 @@
 #pragma once
 
 #include <aarith/float.hpp>
-#include <aarith/integer/approx_operations.hpp>
+#include <aarith/integer/integer_approx_operations.hpp>
 
 namespace aarith {
 
@@ -218,7 +218,7 @@ template <size_t E, size_t M, size_t LSP, size_t SHARED>
 [[nodiscard]] auto FAU_add(const floating_point<E, M> lhs, const floating_point<E, M> rhs)
     -> floating_point<E, M>
 {
-    return add_<E, M>(lhs, rhs, FAUadder<M + 1, LSP, SHARED>, FAU_sub<M + 1, LSP, SHARED>);
+    return add_<E, M>(lhs, rhs, FAUadder<M + 1, LSP, SHARED>, FAUsubtractor<M + 1, LSP, SHARED>);
 }
 
 /**
