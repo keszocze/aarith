@@ -7,14 +7,13 @@ namespace aarith {
 template <typename PositType>
 inline void for_each_posit(const std::function<void(const PositType&)>& operation)
 {
-    const auto min_bits = PositType::min().get_bits();
-    auto bits = min_bits;
+    PositType current = PositType::min();
 
     do
     {
-        const auto p = PositType::from(bits);
-        operation(p);
-    } while (++bits != min_bits);
+        operation(current);
+        current = current.incremented();
+    } while (current != PositType::min());
 }
 
 template <typename PositType>
