@@ -18,7 +18,7 @@ template <size_t E, size_t M, typename WordType = uint64_t> class floating_point
 
 using half_precision = floating_point<5, 10, uint64_t>;        // NOLINT
 using single_precision = floating_point<8, 23, uint64_t>;      // NOLINT
-using double_precision = floating_point<11, 52, uint64_t>;      // NOLINT
+using double_precision = floating_point<11, 52, uint64_t>;     // NOLINT
 using quadruple_precision = floating_point<15, 112, uint64_t>; // NOLINT
 using bfloat16 = floating_point<8, 7, uint64_t>;               // NOLINT
 using tensorfloat32 = floating_point<8, 10, uint64_t>;         // NOLINT
@@ -517,8 +517,8 @@ public:
         IntegerMant m = IntegerMant::all_zeroes();
         m.set_msb(true);
 
-        IntegerExp  e = IntegerExp::all_ones();
-        e.set_bit(0,false);
+        IntegerExp e = IntegerExp::all_ones();
+        e.set_bit(0, false);
         e.set_msb(false);
 
         const floating_point rounding_error(false, e, m);
@@ -730,6 +730,19 @@ public:
     void set_exponent(const uinteger<E, WordType>& set_to)
     {
         exponent = set_to;
+    }
+
+    [[nodiscard]] auto constexpr get_bits() const -> uinteger<1 + E + M>
+    {
+        constexpr size_t N = 1 + E + M;
+        using Int = uinteger<N>;
+
+        const Int s = width_cast<N>(Int(get_sign()));
+        const Int e = width_cast<N>(get_exponent());
+
+        const Int m = width_cast<N>(get_mantissa());
+
+        return (s << (E + M)) | (e << M) | m;
     }
 
     [[nodiscard]] auto constexpr get_full_mantissa() const -> uinteger<MW, WordType>
