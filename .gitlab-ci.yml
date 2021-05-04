@@ -84,7 +84,7 @@ test_clang:
         - compile_clang
     script:
         - cd build/clang
-        - rm CMakeCache.txt
+        - rm -f CMakeCache.txt
         - make CTEST_OUTPUT_ON_FAILURE=1 test
 
 test_gcc:
@@ -102,7 +102,7 @@ test_gcc:
         expire_in: 30 minutes
     script:
         - cd build/gcc
-        - rm CMakeCache.txt
+        - rm -f CMakeCache.txt
         - make CTEST_OUTPUT_ON_FAILURE=1 test
         - if !$?; then return 1; fi
         - cd tests
