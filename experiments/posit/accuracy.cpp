@@ -10,7 +10,9 @@
 #include <cassert>
 #include <cmath>
 #include <cstdint>
+#include <fstream>
 #include <iostream>
+#include <ostream>
 
 #include "support.hpp"
 
@@ -24,21 +26,21 @@ using namespace aarith;
  */
 static constexpr bool PRINT_STATS = false;
 
-template <typename Posit> static void reciprocal_posit_for()
+template <typename Posit> static void reciprocal_posit_for(std::ostream &os)
 {
     constexpr size_t N = Posit::width();
     constexpr size_t ES = Posit::exponent_size();
 
     if constexpr (PRINT_STATS)
     {
-        std::cout << "====== Reciprocal (Posit) ======" << std::endl;
-        std::cout << "N=" << N << std::endl;
-        std::cout << "ES=" << ES << std::endl;
+        os << "====== Reciprocal (Posit) ======" << std::endl;
+        os << "N=" << N << std::endl;
+        os << "ES=" << ES << std::endl;
     }
 
     if constexpr (!PRINT_STATS)
     {
-        std::cout << "x;actual;expected;error;\n";
+        os << "x;actual;expected;error;\n";
     }
 
     uint64_t ok = 0;
@@ -77,10 +79,10 @@ template <typename Posit> static void reciprocal_posit_for()
 
         if (!PRINT_STATS)
         {
-            std::cout << p << ";";
-            std::cout << quot << ";";
-            std::cout << expected << ";";
-            std::cout << error << ";\n";
+            os << p << ";";
+            os << quot << ";";
+            os << expected << ";";
+            os << error << ";\n";
         }
     });
 
@@ -91,28 +93,34 @@ template <typename Posit> static void reciprocal_posit_for()
 
     if constexpr (PRINT_STATS)
     {
-        std::cout << "ok=" << ok << " p=" << ok_percent << std::endl;
-        std::cout << "bad=" << bad << " p=" << bad_percent << std::endl;
-        std::cout << "mean_error=" << mean_error << std::endl;
-        std::cout << std::endl;
+        os << "ok=" << ok << " p=" << ok_percent << std::endl;
+        os << "bad=" << bad << " p=" << bad_percent << std::endl;
+        os << "mean_error=" << mean_error << std::endl;
+        os << std::endl;
     }
 }
 
-template <typename Posit> static void square_posit_for()
+template <typename Posit> static void reciprocal_posit_for(const std::string &filepath)
+{
+    std::ofstream os(filepath);
+    reciprocal_posit_for<Posit>(os);
+}
+
+template <typename Posit> static void square_posit_for(std::ostream &os)
 {
     constexpr size_t N = Posit::width();
     constexpr size_t ES = Posit::exponent_size();
 
     if constexpr (PRINT_STATS)
     {
-        std::cout << "====== Square (Posit) ======" << std::endl;
-        std::cout << "N=" << N << std::endl;
-        std::cout << "ES=" << ES << std::endl;
+        os << "====== Square (Posit) ======" << std::endl;
+        os << "N=" << N << std::endl;
+        os << "ES=" << ES << std::endl;
     }
 
     if constexpr (!PRINT_STATS)
     {
-        std::cout << "x;actual;expected;error;\n";
+        os << "x;actual;expected;error;\n";
     }
 
     uint64_t ok = 0;
@@ -151,10 +159,10 @@ template <typename Posit> static void square_posit_for()
 
         if (!PRINT_STATS)
         {
-            std::cout << p << ";";
-            std::cout << square << ";";
-            std::cout << expected << ";";
-            std::cout << error << ";\n";
+            os << p << ";";
+            os << square << ";";
+            os << expected << ";";
+            os << error << ";\n";
         }
     });
 
@@ -165,14 +173,20 @@ template <typename Posit> static void square_posit_for()
 
     if constexpr (PRINT_STATS)
     {
-        std::cout << "ok=" << ok << " p=" << ok_percent << std::endl;
-        std::cout << "bad=" << bad << " p=" << bad_percent << std::endl;
-        std::cout << "mean_error=" << mean_error << std::endl;
-        std::cout << std::endl;
+        os << "ok=" << ok << " p=" << ok_percent << std::endl;
+        os << "bad=" << bad << " p=" << bad_percent << std::endl;
+        os << "mean_error=" << mean_error << std::endl;
+        os << std::endl;
     }
 }
 
-template <typename Float> static void reciprocal_float_for()
+template <typename Posit> static void square_posit_for(const std::string& filepath)
+{
+    std::ofstream os(filepath);
+    square_posit_for<Posit>(os);
+}
+
+template <typename Float> static void reciprocal_float_for(std::ostream &os)
 {
     constexpr size_t E = Float::exponent_width();
     constexpr size_t M = Float::mantissa_width();
@@ -180,15 +194,15 @@ template <typename Float> static void reciprocal_float_for()
 
     if constexpr (PRINT_STATS)
     {
-        std::cout << "====== Reciprocal (Float) ======" << std::endl;
-        std::cout << "N=" << N << std::endl;
-        std::cout << "E=" << E << std::endl;
-        std::cout << "M=" << M << std::endl;
+        os << "====== Reciprocal (Float) ======" << std::endl;
+        os << "N=" << N << std::endl;
+        os << "E=" << E << std::endl;
+        os << "M=" << M << std::endl;
     }
 
     if constexpr (!PRINT_STATS)
     {
-        std::cout << "x;actual;expected;error;\n";
+        os << "x;actual;expected;error;\n";
     }
 
     uint64_t ok = 0;
@@ -225,10 +239,10 @@ template <typename Float> static void reciprocal_float_for()
 
         if (!PRINT_STATS)
         {
-            std::cout << f << ";";
-            std::cout << quot << ";";
-            std::cout << expected << ";";
-            std::cout << error << ";\n";
+            os << f << ";";
+            os << quot << ";";
+            os << expected << ";";
+            os << error << ";\n";
         }
     });
 
@@ -239,14 +253,20 @@ template <typename Float> static void reciprocal_float_for()
 
     if constexpr (PRINT_STATS)
     {
-        std::cout << "ok=" << ok << " p=" << ok_percent << std::endl;
-        std::cout << "bad=" << bad << " p=" << bad_percent << std::endl;
-        std::cout << "mean_error=" << mean_error << std::endl;
-        std::cout << std::endl;
+        os << "ok=" << ok << " p=" << ok_percent << std::endl;
+        os << "bad=" << bad << " p=" << bad_percent << std::endl;
+        os << "mean_error=" << mean_error << std::endl;
+        os << std::endl;
     }
 }
 
-template <typename Float> static void square_float_for()
+template <typename Float> static void reciprocal_float_for(const std::string& filepath)
+{
+    std::ofstream os(filepath);
+    reciprocal_float_for<Float>(os);
+}
+
+template <typename Float> static void square_float_for(std::ostream &os)
 {
     constexpr size_t E = Float::exponent_width();
     constexpr size_t M = Float::mantissa_width();
@@ -254,15 +274,15 @@ template <typename Float> static void square_float_for()
 
     if constexpr (PRINT_STATS)
     {
-        std::cout << "====== Square (Float) ======" << std::endl;
-        std::cout << "N=" << N << std::endl;
-        std::cout << "E=" << E << std::endl;
-        std::cout << "M=" << M << std::endl;
+        os << "====== Square (Float) ======" << std::endl;
+        os << "N=" << N << std::endl;
+        os << "E=" << E << std::endl;
+        os << "M=" << M << std::endl;
     }
 
     if constexpr (!PRINT_STATS)
     {
-        std::cout << "x;actual;expected;error;\n";
+        os << "x;actual;expected;error;\n";
     }
 
     uint64_t ok = 0;
@@ -299,10 +319,10 @@ template <typename Float> static void square_float_for()
 
         if (!PRINT_STATS)
         {
-            std::cout << f << ";";
-            std::cout << square << ";";
-            std::cout << expected << ";";
-            std::cout << error << ";\n";
+            os << f << ";";
+            os << square << ";";
+            os << expected << ";";
+            os << error << ";\n";
         }
     });
 
@@ -313,11 +333,17 @@ template <typename Float> static void square_float_for()
 
     if constexpr (PRINT_STATS)
     {
-        std::cout << "ok=" << ok << " p=" << ok_percent << std::endl;
-        std::cout << "bad=" << bad << " p=" << bad_percent << std::endl;
-        std::cout << "mean_error=" << mean_error << std::endl;
-        std::cout << std::endl;
+        os << "ok=" << ok << " p=" << ok_percent << std::endl;
+        os << "bad=" << bad << " p=" << bad_percent << std::endl;
+        os << "mean_error=" << mean_error << std::endl;
+        os << std::endl;
     }
+}
+
+template <typename Float> static void square_float_for(const std::string &filepath)
+{
+    std::ofstream os(filepath);
+    square_float_for<Float>(os);
 }
 
 int main()
@@ -328,12 +354,14 @@ int main()
     using F8 = floating_point<4, 3>;
     using F16 = half_precision;
 
-    reciprocal_posit_for<P8>();
-    reciprocal_posit_for<P16>();
-    reciprocal_float_for<F8>();
-    reciprocal_float_for<F16>();
-    square_posit_for<P8>();
-    square_posit_for<P16>();
-    square_float_for<F8>();
-    square_float_for<F16>();
+    std::ostream& os = std::cout;
+
+    reciprocal_posit_for<P8>("posit8-reciprocal-accuracy.csv");
+    reciprocal_posit_for<P16>("posit16-reciprocal-accuracy.csv");
+    reciprocal_float_for<F8>("float8-reciprocal-accuracy.csv");
+    reciprocal_float_for<F16>("float16-reciprocal-accuracy.csv");
+    square_posit_for<P8>("posit8-square-accuracy.csv");
+    square_posit_for<P16>("posit16-square-accuracy.csv");
+    square_float_for<F8>("float8-square-accuracy.csv");
+    square_float_for<F16>("float16-square-accuracy.csv");
 }
