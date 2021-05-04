@@ -40,9 +40,10 @@ template <typename Posit> static void reciprocal_posit_for(std::ostream &os)
 
     if constexpr (!PRINT_STATS)
     {
-        os << "x;actual;expected;error;\n";
+        os << "i;x;actual;expected;error;\n";
     }
 
+    uint64_t i = 0;
     uint64_t ok = 0;
     uint64_t bad = 0;
     double total_error = 0.0;
@@ -79,11 +80,14 @@ template <typename Posit> static void reciprocal_posit_for(std::ostream &os)
 
         if (!PRINT_STATS)
         {
+            os << i << ";";
             os << p << ";";
             os << quot << ";";
             os << expected << ";";
             os << error << ";\n";
         }
+
+	i += 1;
     });
 
     const auto total = ok + bad;
@@ -120,9 +124,10 @@ template <typename Posit> static void square_posit_for(std::ostream &os)
 
     if constexpr (!PRINT_STATS)
     {
-        os << "x;actual;expected;error;\n";
+        os << "i;x;actual;expected;error;\n";
     }
 
+    uint64_t i = 0;
     uint64_t ok = 0;
     uint64_t bad = 0;
     double total_error = 0.0;
@@ -159,11 +164,14 @@ template <typename Posit> static void square_posit_for(std::ostream &os)
 
         if (!PRINT_STATS)
         {
+            os << i << ";";
             os << p << ";";
             os << square << ";";
             os << expected << ";";
             os << error << ";\n";
         }
+
+	i += 1;
     });
 
     const auto total = ok + bad;
@@ -202,9 +210,10 @@ template <typename Float> static void reciprocal_float_for(std::ostream &os)
 
     if constexpr (!PRINT_STATS)
     {
-        os << "x;actual;expected;error;\n";
+        os << "i;x;actual;expected;error;\n";
     }
 
+    uint64_t i = 0;
     uint64_t ok = 0;
     uint64_t bad = 0;
     double total_error = 0.0;
@@ -239,11 +248,14 @@ template <typename Float> static void reciprocal_float_for(std::ostream &os)
 
         if (!PRINT_STATS)
         {
+            os << i << ";";
             os << f << ";";
             os << quot << ";";
             os << expected << ";";
             os << error << ";\n";
         }
+
+	i += 1;
     });
 
     const auto total = ok + bad;
@@ -282,9 +294,10 @@ template <typename Float> static void square_float_for(std::ostream &os)
 
     if constexpr (!PRINT_STATS)
     {
-        os << "x;actual;expected;error;\n";
+        os << "i;x;actual;expected;error;\n";
     }
 
+    uint64_t i = 0;
     uint64_t ok = 0;
     uint64_t bad = 0;
     double total_error = 0.0;
@@ -319,11 +332,14 @@ template <typename Float> static void square_float_for(std::ostream &os)
 
         if (!PRINT_STATS)
         {
+            os << i << ";";
             os << f << ";";
             os << square << ";";
             os << expected << ";";
             os << error << ";\n";
         }
+
+	i += 1;
     });
 
     const auto total = ok + bad;
