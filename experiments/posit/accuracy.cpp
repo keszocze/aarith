@@ -36,6 +36,11 @@ template <typename Posit> static void reciprocal_posit_for()
         std::cout << "ES=" << ES << std::endl;
     }
 
+    if constexpr (!PRINT_STATS)
+    {
+        std::cout << "x;actual;expected;error;\n";
+    }
+
     uint64_t ok = 0;
     uint64_t bad = 0;
     double total_error = 0.0;
@@ -72,7 +77,10 @@ template <typename Posit> static void reciprocal_posit_for()
 
         if (!PRINT_STATS)
         {
-            std::cout << error << "\n";
+            std::cout << p << ";";
+            std::cout << quot << ";";
+            std::cout << expected << ";";
+            std::cout << error << ";\n";
         }
     });
 
@@ -100,6 +108,11 @@ template <typename Posit> static void square_posit_for()
         std::cout << "====== Square (Posit) ======" << std::endl;
         std::cout << "N=" << N << std::endl;
         std::cout << "ES=" << ES << std::endl;
+    }
+
+    if constexpr (!PRINT_STATS)
+    {
+        std::cout << "x;actual;expected;error;\n";
     }
 
     uint64_t ok = 0;
@@ -138,7 +151,10 @@ template <typename Posit> static void square_posit_for()
 
         if (!PRINT_STATS)
         {
-            std::cout << error << "\n";
+            std::cout << p << ";";
+            std::cout << square << ";";
+            std::cout << expected << ";";
+            std::cout << error << ";\n";
         }
     });
 
@@ -168,6 +184,11 @@ template <typename Float> static void reciprocal_float_for()
         std::cout << "N=" << N << std::endl;
         std::cout << "E=" << E << std::endl;
         std::cout << "M=" << M << std::endl;
+    }
+
+    if constexpr (!PRINT_STATS)
+    {
+        std::cout << "x;actual;expected;error;\n";
     }
 
     uint64_t ok = 0;
@@ -204,7 +225,10 @@ template <typename Float> static void reciprocal_float_for()
 
         if (!PRINT_STATS)
         {
-            std::cout << error << "\n";
+            std::cout << f << ";";
+            std::cout << quot << ";";
+            std::cout << expected << ";";
+            std::cout << error << ";\n";
         }
     });
 
@@ -234,6 +258,11 @@ template <typename Float> static void square_float_for()
         std::cout << "N=" << N << std::endl;
         std::cout << "E=" << E << std::endl;
         std::cout << "M=" << M << std::endl;
+    }
+
+    if constexpr (!PRINT_STATS)
+    {
+        std::cout << "x;actual;expected;error;\n";
     }
 
     uint64_t ok = 0;
@@ -270,7 +299,10 @@ template <typename Float> static void square_float_for()
 
         if (!PRINT_STATS)
         {
-            std::cout << error << "\n";
+            std::cout << f << ";";
+            std::cout << square << ";";
+            std::cout << expected << ";";
+            std::cout << error << ";\n";
         }
     });
 
@@ -296,12 +328,12 @@ int main()
     using F8 = floating_point<4, 3>;
     using F16 = half_precision;
 
-    // reciprocal_posit_for<P8>();
-    // reciprocal_posit_for<P16>();
-    // reciprocal_float_for<F8>();
-    // reciprocal_float_for<F16>();
-    // square_posit_for<P8>();
-    // square_posit_for<P16>();
-    // square_float_for<F8>();
-    // square_float_for<F16>();
+    reciprocal_posit_for<P8>();
+    reciprocal_posit_for<P16>();
+    reciprocal_float_for<F8>();
+    reciprocal_float_for<F16>();
+    square_posit_for<P8>();
+    square_posit_for<P16>();
+    square_float_for<F8>();
+    square_float_for<F16>();
 }
