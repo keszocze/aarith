@@ -41,10 +41,10 @@ compile_clang:
         paths:
             - build/clang/tests
         exclude:
-            - build/gcc/tests/CMakeFiles
-            - build/gcc/tests/CMakeFiles/*
-            - build/gcc/tests/CMakeFiles/*/*
-            - build/gcc/tests/CMakeFiles/*/*/*
+            - build/clang/tests/CMakeFiles
+            - build/clang/tests/CMakeFiles/*
+            - build/clang/tests/CMakeFiles/*/*
+            - build/clang/tests/CMakeFiles/*/*/*
         expire_in: 30 minutes
     script:
         - mkdir -p build/clang
