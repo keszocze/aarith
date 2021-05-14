@@ -134,6 +134,14 @@ private:
 using quarter_precision = aarith::floating_point<4, 3>;
 
 /**
+ * Define floating point types that are easier to work with.
+ */
+using float8 = quarter_precision;
+using float16 = aarith::half_precision;
+using float32 = aarith::single_precision;
+using float64 = aarith::double_precision;
+
+/**
  * Implement sqrt for aarith floating points. Converts to double
  * and then does math with the libc sqrt implementation. Because
  * it does math in 64 bit, calling sqrt w/ floating points of greater
