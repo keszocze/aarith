@@ -20,12 +20,12 @@ public:
 
     static constexpr ::aarith::posit<N, ES, WT> min() noexcept
     {
-        return ::aarith::posit<N, ES, WT>::min();
+        return ::aarith::posit<N, ES, WT>::minpos();
     }
 
     static constexpr ::aarith::posit<N, ES, WT> lowest() noexcept
     {
-        return ::aarith::posit<N, ES, WT>::min();
+        return ::aarith::posit<N, ES, WT>::minpos();
     }
 
     static constexpr ::aarith::posit<N, ES, WT> max() noexcept
