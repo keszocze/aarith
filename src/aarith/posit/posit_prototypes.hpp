@@ -3009,6 +3009,7 @@ inline void for_each_regular_valid(const std::function<void(const ValidType&)>& 
 #include <aarith/posit/interval_bound_operations.hpp>
 #include <aarith/posit/interval_bound_operators.hpp>
 #include <aarith/posit/iter_tools.hpp>
+#include <aarith/posit/numeric_limits.hpp>
 #include <aarith/posit/posit.hpp>
 #include <aarith/posit/posit_casts.hpp>
 #include <aarith/posit/posit_fraction.hpp>
