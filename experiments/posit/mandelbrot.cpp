@@ -99,9 +99,9 @@ static void render_to_file(const std::string& filename, bool report_progress = t
 template <typename Real, size_t Width = 960, size_t Height = 640>
 static std::thread render_to_file_async(const std::string filename)
 {
-    const auto func = [=]() { render_to_file<Real, Width, Height>(filename, false); };
-
-    return std::thread(func);
+    return std::thread([=]() {
+	render_to_file<Real, Width, Height>(filename, false);
+    });
 }
 
 int main()
@@ -157,6 +157,10 @@ int main()
     tids.push_back(render_to_file_async<aarith::floating_point<5, 6>>("mandelbrot-f5-6.ppm"));
     tids.push_back(render_to_file_async<aarith::floating_point<5, 9>>("mandelbrot-f5-9.ppm"));
     tids.push_back(render_to_file_async<aarith::floating_point<5, 10>>("mandelbrot-f5-10.ppm"));
+
+    // standard types for comparison
+    tids.push_back(render_to_file_async<posit16>("mandelbrot-p16.ppm"));
+    tids.push_back(render_to_file_async<float16>("mandelbrot-f16.ppm"));
 
     for (std::thread& tid : tids)
     {
