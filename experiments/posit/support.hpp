@@ -140,6 +140,15 @@ using float8 = quarter_precision;
 using float16 = aarith::half_precision;
 using float32 = aarith::single_precision;
 using float64 = aarith::double_precision;
+using float128 = aarith::quadruple_precision;
+using float256 = aarith::floating_point<19, 236>;
+
+/**
+ * Define posit types that are not part of the core library.
+ */
+
+using posit128 = aarith::posit<128, 2>;
+using posit256 = aarith::posit<256, 2>;
 
 /**
  * Implement sqrt for aarith floating points. Converts to double

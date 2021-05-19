@@ -9,8 +9,7 @@
 
 using namespace aarith;
 
-template <typename Num>
-static std::tuple<Num, Num> get_limits_for()
+template <typename Num> static std::tuple<Num, Num> get_limits_for()
 {
     const Num min = std::numeric_limits<Num>::min();
     const Num max = std::numeric_limits<Num>::max();
@@ -32,9 +31,13 @@ int main()
     print_limits_for(float16);
     print_limits_for(float32);
     print_limits_for(float64);
+    print_limits_for(float128);
+    print_limits_for(float256);
 
     print_limits_for(posit8);
     print_limits_for(posit16);
     print_limits_for(posit32);
     print_limits_for(posit64);
+    print_limits_for(posit128);
+    print_limits_for(posit256);
 }
