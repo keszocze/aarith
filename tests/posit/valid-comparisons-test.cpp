@@ -34,9 +34,7 @@ TEMPLATE_TEST_CASE_SIG("full set is never less than anything", "[posit][valid][t
     using Valid = valid<N, ES>;
     const Valid full = Valid::full();
 
-    for_each_valid<Valid>([&](const Valid& v) {
-        REQUIRE_FALSE(v < full);
-    });
+    for_each_valid<Valid>([&](const Valid& v) { REQUIRE_FALSE(v < full); });
 }
 
 SCENARIO("arbitrary valid comparisons")

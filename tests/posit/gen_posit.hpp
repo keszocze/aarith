@@ -6,8 +6,7 @@
 
 namespace aarith {
 
-template <typename PositType>
-class PositGenerator : public Catch::Generators::IGenerator<PositType>
+template <typename PositType> class PositGenerator : public Catch::Generators::IGenerator<PositType>
 {
 public:
     using Storage = typename PositType::storage_type;
@@ -41,12 +40,10 @@ private:
     PositType current_posit;
 };
 
-template <typename PositType>
-Catch::Generators::GeneratorWrapper<PositType> random_posit()
+template <typename PositType> Catch::Generators::GeneratorWrapper<PositType> random_posit()
 {
     return Catch::Generators::GeneratorWrapper<PositType>(
-        std::unique_ptr<Catch::Generators::IGenerator<PositType>>(
-            new PositGenerator<PositType>()));
+        std::unique_ptr<Catch::Generators::IGenerator<PositType>>(new PositGenerator<PositType>()));
 }
 
 } // namespace aarith

@@ -229,7 +229,7 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> fabs(const posit<N, ES, WT>& p)
 {
-	return abs(p);
+    return abs(p);
 }
 
 template <size_t N, size_t ES, typename WT>

@@ -40,8 +40,7 @@ private:
 Catch::Generators::GeneratorWrapper<bool> random_bool()
 {
     return Catch::Generators::GeneratorWrapper<bool>(
-        std::unique_ptr<Catch::Generators::IGenerator<bool>>(
-            new BoolGenerator()));
+        std::unique_ptr<Catch::Generators::IGenerator<bool>>(new BoolGenerator()));
 }
 
 } // namespace aarith
