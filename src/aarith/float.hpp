@@ -7,4 +7,8 @@ using float_operators::operator/;
 using float_operators::operator*;
 using float_operators::operator+;
 using float_operators::operator-;
+using float_operators::operator/=;
+using float_operators::operator*=;
+using float_operators::operator+=;
+using float_operators::operator-=;
 } // namespace aarith

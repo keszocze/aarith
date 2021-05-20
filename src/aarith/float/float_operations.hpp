@@ -619,5 +619,37 @@ auto operator-(const floating_point<E, M, WordType>& x) -> floating_point<E, M, 
     return negate(x);
 }
 
+template <size_t E, size_t M, typename WordType>
+auto operator+=(floating_point<E, M, WordType>& lhs, const floating_point<E, M, WordType>& rhs)
+    -> floating_point<E, M, WordType>&
+{
+    lhs = lhs + rhs;
+    return lhs;
+}
+
+template <size_t E, size_t M, typename WordType>
+auto operator-=(floating_point<E, M, WordType>& lhs, const floating_point<E, M, WordType>& rhs)
+    -> floating_point<E, M, WordType>&
+{
+    lhs = lhs - rhs;
+    return lhs;
+}
+
+template <size_t E, size_t M, typename WordType>
+auto operator*=(floating_point<E, M, WordType>& lhs, const floating_point<E, M, WordType>& rhs)
+    -> floating_point<E, M, WordType>&
+{
+    lhs = lhs * rhs;
+    return lhs;
+}
+
+template <size_t E, size_t M, typename WordType>
+auto operator/=(floating_point<E, M, WordType>& lhs, const floating_point<E, M, WordType>& rhs)
+    -> floating_point<E, M, WordType>&
+{
+    lhs = lhs / rhs;
+    return lhs;
+}
+
 } // namespace float_operators
 } // namespace aarith
