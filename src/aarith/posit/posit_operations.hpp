@@ -329,13 +329,25 @@ template <size_t N, size_t ES, typename WT>
 
     const Int two = Int(2);
 
-    // Remove full rotations.
+    // Handle special case where x is NaR.
 
-    Posit arg = x;
+    if (x.is_nar())
+    {
+        return Posit::nar();
+    }
+
+    // Handle negative arguments and remove full rotations.
+
+    Posit arg = abs(x);
 
     while (arg > Posit::tau())
     {
         arg -= Posit::tau();
+    }
+
+    if (x.is_negative())
+    {
+        arg = Posit::tau() - arg;
     }
 
     // Iterate.

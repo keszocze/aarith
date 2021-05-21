@@ -7,6 +7,7 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
+#include <vector>
 
 using namespace aarith;
 
@@ -1292,6 +1293,37 @@ SCENARIO("factorial for posits")
             REQUIRE(factorial(Posit(8)) == Posit(40320));
             REQUIRE(factorial(Posit(9)) == Posit(362880));
             REQUIRE(factorial(Posit(10)) == Posit(3628800));
+        }
+    }
+}
+
+SCENARIO("Trigonometric functions")
+{
+    using Posit = posit32;
+
+    static const double EPS = 0.01;
+
+    GIVEN("Some standard floating point arguments")
+    {
+        const std::vector<double> arguments = {
+            100,    200,    300,    400,    500,    600,    700,    800,   900,   10,    20,
+            30,     40,     50,     60,     70,     80,     90,     1,     2,     3,     4,
+            5,      6,      7,      8,      9,      0.1,    0.2,    0.3,   0.4,   0.5,   0.6,
+            0.7,    0.8,    0.9,    0.01,   0.02,   0.03,   0.04,   0.05,  0.06,  0.07,  0.08,
+            0.09,   0.001,  0.002,  0.003,  0.004,  0.005,  0.006,  0.007, 0.008, 0.009, 0.0001,
+            0.0002, 0.0003, 0.0004, 0.0005, 0.0006, 0.0007, 0.0008, 0.0009};
+
+        THEN("Assert that sin, cos, tan are about the same for floating point and posits")
+        {
+            for (const double& x : arguments)
+            {
+                const Posit p = Posit(x);
+
+                CAPTURE(x);
+                REQUIRE(double(sin(p)) == Approx(sin(x)).epsilon(EPS));
+                REQUIRE(double(cos(p)) == Approx(cos(x)).epsilon(EPS));
+                REQUIRE(double(tan(p)) == Approx(tan(x)).epsilon(EPS));
+            }
         }
     }
 }
