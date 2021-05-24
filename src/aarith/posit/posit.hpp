@@ -359,6 +359,13 @@ template <size_t TargetWidth, typename TargetWordType>
 }
 
 template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT>::operator float() const
+{
+    const double ieee64 = static_cast<double>(*this);
+    return static_cast<float>(ieee64);
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT>::operator double() const
 {
     if (is_zero())

@@ -424,6 +424,15 @@ public:
     [[nodiscard]] explicit constexpr operator integer<TargetWidth, TargetWordType>() const;
 
     /**
+     * @brief Convert to IEEE single precision.
+     *
+     * @note It is the callers responsibility to ensure that the value
+     * represented by this posit actually fits in the returned type. If it
+     * does not, under or overflow will occur.
+     */
+    [[nodiscard]] explicit constexpr operator float() const;
+
+    /**
      * @brief Convert to IEEE double precision.
      *
      * @note It is the callers responsibility to ensure that the value
