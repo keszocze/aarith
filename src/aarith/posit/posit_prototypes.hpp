@@ -2941,6 +2941,22 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr valid<N, ES, WT> sqrt(const valid<N, ES, WT>& v);
 
 //
+// String Utilities for valid Class.
+//
+// For implementation, look at posit/valid_string_utils.hpp
+//
+
+/**
+ * @brief Convert valid to printable bitstring.
+ *
+ * This function prints the underlying bitstring as a std::string of zeroes
+ * and ones.
+ *
+ * @param v The valid from which to print the bitstring.
+ */
+template <size_t N, size_t ES, typename WT> std::string to_binary(const valid<N, ES, WT>& v);
+
+//
 // Functions for iterating over unum types. Useful for testing and
 // experiments.
 //
@@ -3038,4 +3054,5 @@ inline void for_each_regular_valid(const std::function<void(const ValidType&)>& 
 #include <aarith/posit/valid.hpp>
 #include <aarith/posit/valid_operations.hpp>
 #include <aarith/posit/valid_operators.hpp>
+#include <aarith/posit/valid_string_utils.hpp>
 #include <aarith/posit/valid_types.hpp>
