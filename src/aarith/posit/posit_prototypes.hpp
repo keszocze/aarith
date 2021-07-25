@@ -597,7 +597,7 @@ public:
     /**
      * @brief Set this to this multiplied with rhs.
      */
-    constexpr posit& operator*=(const posit& rhs);
+    posit& operator*=(const posit& rhs);
 
     /**
      * @brief Return this divided by other.
@@ -610,7 +610,7 @@ public:
     /**
      * @brief Set this to this divided by other.
      */
-    constexpr posit& operator/=(const posit& rhs);
+     posit& operator/=(const posit& rhs);
 
     //
     // Constants
