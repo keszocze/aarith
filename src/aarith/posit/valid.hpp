@@ -404,6 +404,13 @@ valid<N, ES, WT>::operator+(const valid<N, ES, WT>& other) const
 }
 
 template <size_t N, size_t ES, typename WT>
+valid<N, ES, WT>& valid<N, ES, WT>::operator+=(const valid<N, ES, WT>& rhs)
+{
+    *this = *this + rhs;
+    return *this;
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr valid<N, ES, WT> valid<N, ES, WT>::operator-() const
 {
     if (this->is_nar() || this->is_empty() || this->is_full() || this->is_all_reals())
@@ -425,6 +432,13 @@ template <size_t N, size_t ES, typename WT>
 valid<N, ES, WT>::operator-(const valid<N, ES, WT>& other) const
 {
     return *this + (-other);
+}
+
+template <size_t N, size_t ES, typename WT>
+valid<N, ES, WT>& valid<N, ES, WT>::operator-=(const valid<N, ES, WT>& rhs)
+{
+    *this = *this - rhs;
+    return *this;
 }
 
 namespace Impl {
@@ -580,6 +594,13 @@ valid<N, ES, WT>::operator*(const valid<N, ES, WT>& other) const
 }
 
 template <size_t N, size_t ES, typename WT>
+valid<N, ES, WT>& valid<N, ES, WT>::operator*=(const valid<N, ES, WT>& rhs)
+{
+    *this = *this * rhs;
+    return *this;
+}
+
+template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr valid<N, ES, WT>
 valid<N, ES, WT>::operator/(const valid<N, ES, WT>& other) const
 {
@@ -642,6 +663,13 @@ valid<N, ES, WT>::operator/(const valid<N, ES, WT>& other) const
     }
 
     return *this * reciprocal;
+}
+
+template <size_t N, size_t ES, typename WT>
+valid<N, ES, WT>& valid<N, ES, WT>::operator/=(const valid<N, ES, WT>& rhs)
+{
+    *this = *this / rhs;
+    return *this;
 }
 
 template <size_t N, size_t ES, typename WT>

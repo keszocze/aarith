@@ -610,7 +610,7 @@ public:
     /**
      * @brief Set this to this divided by other.
      */
-     posit& operator/=(const posit& rhs);
+    posit& operator/=(const posit& rhs);
 
     //
     // Constants
@@ -2649,6 +2649,13 @@ public:
     [[nodiscard]] constexpr valid operator+(const valid& other) const;
 
     /**
+     * @brief Add rhs to this.
+     *
+     * @param rhs The valid to add to this valid.
+     */
+    valid& operator+=(const valid& rhs);
+
+    /**
      * @brief Unary minus.
      *
      * Negating a valid {p, q} means returning valid {-q, p}. Note that
@@ -2668,14 +2675,31 @@ public:
     [[nodiscard]] constexpr valid operator-(const valid& other) const;
 
     /**
+     * @brief Subtract rhs from this.
+     *
+     * @param rhs The valid to subtract.
+     */
+    valid& operator-=(const valid& rhs);
+
+    /**
      * @brief Return the product of this multiplied with rhs.
      */
     [[nodiscard]] constexpr valid operator*(const valid& other) const;
 
     /**
+     * @brief Set this to this multiplied with rhs.
+     */
+    valid& operator*=(const valid& rhs);
+
+    /**
      * @brief Return this divided by other.
      */
     [[nodiscard]] constexpr valid operator/(const valid& other) const;
+
+    /**
+     * @brief Set this to this divided by other.
+     */
+    valid& operator/=(const valid& rhs);
 
     /**
      * @return Whether this valid represents the number zero.
