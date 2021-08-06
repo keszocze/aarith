@@ -46,6 +46,19 @@ public:
         return wc;
     }
 
+    static constexpr auto from_bit_string(const std::string bs) -> word_array
+    {
+        word_array wa;
+        for (auto i = bs.length(), pos = 0UL; i > 0 && pos < Width; --i, ++pos) 
+        {
+            if (bs[i-1] == '1')
+            {
+                wa.set_bit(pos, true);
+            }
+        }
+        return wa;
+    }
+
     template <size_t V, typename T> constexpr word_array(const word_array<V, T>& other) // NOLINT
     {
         static_assert(V <= Width, "Can not create a word_array from larger container");
