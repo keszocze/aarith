@@ -18,13 +18,6 @@ posit<N, ES, WT>::from(const posit<N, ES, WT>::storage_type& bits)
 }
 
 template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::from(const WT first_word)
-{
-    const storage_type bits(first_word);
-    return posit<N, ES, WT>::from(bits);
-}
-
-template <size_t N, size_t ES, typename WT>
 constexpr posit<N, ES, WT>::posit()
     : bits(0)
 {

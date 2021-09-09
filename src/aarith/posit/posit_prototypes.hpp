@@ -137,17 +137,6 @@ public:
      */
     [[nodiscard]] static constexpr posit from(const storage_type& bits);
 
-    /**
-     * @brief Construct this posit with given bits.
-     *
-     * Argument bits is not interpreted as an integer, rather it is used as
-     * the underlying bit pattern of the returned posit.
-     *
-     * @param n Bits used to initialize the underlying type.
-     */
-    // TODO (Schärtl) das funktioniert aber nur gut, so lange N <= 64!
-    [[nodiscard]] static constexpr posit from(const WT bits);
-
     //
     // Constructors
     //
