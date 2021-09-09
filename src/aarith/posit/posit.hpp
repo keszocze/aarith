@@ -294,8 +294,6 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT>::operator int64_t() const
 {
-    // TODO (Schärtl): Find a better way for this...
-
     const integer<64> signed64 = integer<64>(*this);
     const uinteger<64> unsigned64 = signed64;
     const uint64_t unsigned_stdint = uint64_t(unsigned64);
