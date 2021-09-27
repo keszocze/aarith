@@ -7,7 +7,7 @@
 #include <stdexcept>
 #include <string>
 
-#include <aarith/posit.hpp>
+#include <aarith/posit_no_operators.hpp>
 
 namespace aarith {
 

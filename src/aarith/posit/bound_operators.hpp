@@ -1,9 +1,8 @@
 #pragma once
 
+#include <aarith/posit_no_operators.hpp>
 #include <sstream>
 #include <string>
-
-#include <aarith/posit.hpp>
 
 namespace aarith {
 

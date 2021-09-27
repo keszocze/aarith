@@ -1,8 +1,7 @@
 #pragma once
 
+#include <aarith/posit_no_operators.hpp>
 #include <cassert>
-
-#include <aarith/posit.hpp>
 
 namespace aarith {
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <aarith/posit.hpp>
+#include <aarith/posit_no_operators.hpp>
 #include <cassert>
 #include <cmath>
 #include <cstdint>
@@ -9,6 +9,23 @@
 #include <stdexcept>
 
 namespace aarith {
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> negate(const posit<N, ES, WT>& self)
+{
+    if (self.is_zero())
+    {
+        return self;
+    }
+
+    if (self.is_nar())
+    {
+        return self;
+    }
+
+    const auto bits = negate(self.get_bits());
+    return posit<N, ES, WT>::from(bits);
+}
 
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr size_t get_num_regime_bits(const posit<N, ES, WT>& p)
@@ -218,7 +235,7 @@ template <size_t N, size_t ES, typename WT>
 {
     if (p < p.zero())
     {
-        return -p;
+        return negate(p);
     }
     else
     {

@@ -488,120 +488,6 @@ public:
     [[nodiscard]] constexpr bool operator>=(const posit& other) const;
 
     //
-    // Arithmetic Operators
-    //
-
-    /**
-     * @brief Unary plus.
-     *
-     * Returns the posit as-is. Sometimes it can be useful to be explicit
-     * about the sign of variables or literals. In these cases, an unary plus
-     * is useful.
-     *
-     * If this posit represents NaR, the result is also NaR.
-     */
-    [[nodiscard]] constexpr posit& operator+() const;
-
-    /**
-     * @brief Sum of two posits.
-     *
-     * If either operand is NaR, the result is also NaR. If neither operands
-     * are NaR, the result is guaranteed not to be NaR.
-     *
-     * @param rhs The posit to add to this posit.
-     * @return The sum of this and rhs.
-     */
-    [[nodiscard]] constexpr posit operator+(const posit& rhs) const;
-
-    /**
-     * @brief Add rhs to this.
-     *
-     * @param rhs The posit to add to this posit.
-     */
-    posit& operator+=(const posit& rhs);
-
-    /**
-     * @brief Pre-Increment.
-     *
-     * @return A reference to the incremented value.
-     */
-    constexpr posit& operator++();
-
-    /**
-     * @brief Post-Increment.
-     *
-     * @return A copy of the value before it was incremented.
-     */
-    constexpr posit operator++(int);
-
-    /**
-     * @brief Unary minus.
-     *
-     * If this posit represents NaR, the result is also NaR. Also, as posits
-     * only have one unique representation of zero, calling this operator on a
-     * posit that represents zero again returns zero.
-     */
-    [[nodiscard]] constexpr posit operator-() const;
-
-    /**
-     * @brief Posit subtraction.
-     *
-     * If either operand is NaR, the result is also NaR. If neither operands
-     * are NaR, the result is guaranteed not to be NaR.
-     *
-     * @param rhs The posit to add to this posit.
-     * @return The sum of this and rhs.
-     */
-    [[nodiscard]] constexpr posit operator-(const posit& rhs) const;
-
-    /**
-     * @brief Subtract rhs from this.
-     *
-     * @param rhs The posit to subtract.
-     */
-    posit& operator-=(const posit& rhs);
-
-    /**
-     * @brief Pre-Decrement
-     *
-     * @return A reference to the decremented value.
-     */
-    [[nodiscard]] constexpr posit& operator--();
-
-    /**
-     * @brief Post-Decrement.
-     *
-     * @return A copy of the value before it was decremented.
-     */
-    [[nodiscard]] constexpr posit operator--(int);
-
-    /**
-     * @brief Return the product of this multiplied with rhs.
-     *
-     * If either operand is NaR, the result is also NaR. If neither operands
-     * are NaR, the result is guaranteed not to be NaR.
-     */
-    [[nodiscard]] constexpr posit operator*(const posit& rhs) const;
-
-    /**
-     * @brief Set this to this multiplied with rhs.
-     */
-    posit& operator*=(const posit& rhs);
-
-    /**
-     * @brief Return this divided by other.
-     *
-     * If either operand is NaR, the result is also NaR. If neither operands
-     * are NaR, the result is guaranteed not to be NaR.
-     */
-    [[nodiscard]] constexpr posit operator/(const posit& rhs) const;
-
-    /**
-     * @brief Set this to this divided by other.
-     */
-    posit& operator/=(const posit& rhs);
-
-    //
     // Constants
     //
 
@@ -865,6 +751,16 @@ inline std::ostream& operator<<(std::ostream& os, const posit<N, ES, WT>& p);
 //
 // For implementations, look at posit/posit_operations.hpp.
 //
+
+/**
+ * @brief Unary minus.
+ *
+ * If this posit represents NaR, the result is also NaR. Also, as posits
+ * only have one unique representation of zero, calling this operator on a
+ * posit that represents zero again returns zero.
+ */
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr posit<N, ES, WT> negate(const posit<N, ES, WT>& p);
 
 /**
  * @brief Compute number of regime bits.

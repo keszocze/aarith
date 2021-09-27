@@ -1,7 +1,7 @@
 #pragma once
 
 #include <aarith/core/word_array_cast_operations.hpp>
-#include <aarith/posit.hpp>
+#include <aarith/posit_no_operators.hpp>
 
 namespace aarith {
 

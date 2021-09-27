@@ -1,6 +1,6 @@
 #pragma once
 
-#include <aarith/posit.hpp>
+#include <aarith/posit_no_operators.hpp>
 
 template <size_t N, size_t ES, typename WT> class std::numeric_limits<::aarith::posit<N, ES, WT>>
 {

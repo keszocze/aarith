@@ -1,4 +1,6 @@
-#include <aarith/posit.hpp>
+#pragma once
+
+#include <aarith/posit_no_operators.hpp>
 
 namespace aarith {
 

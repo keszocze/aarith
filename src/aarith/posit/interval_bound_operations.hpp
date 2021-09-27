@@ -1,6 +1,6 @@
 #include <stdexcept>
 
-#include <aarith/posit.hpp>
+#include <aarith/posit_no_operators.hpp>
 
 namespace aarith {
 

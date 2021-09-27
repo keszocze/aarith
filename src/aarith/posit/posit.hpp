@@ -1,6 +1,6 @@
 #pragma once
 
-#include <aarith/posit.hpp>
+#include <aarith/posit_no_operators.hpp>
 #include <cassert>
 #include <cstdint>
 #include <cstdlib>
@@ -496,127 +496,6 @@ template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool posit<N, ES, WT>::operator>=(const posit& other) const
 {
     return (*this == other) || (*this > other);
-}
-
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator+() const
-{
-    return *this;
-}
-
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr posit<N, ES, WT>
-posit<N, ES, WT>::operator+(const posit<N, ES, WT>& rhs) const
-{
-    const auto [sum, rbit] = add(*this, rhs);
-    return sum;
-}
-
-template <size_t N, size_t ES, typename WT>
-posit<N, ES, WT>& posit<N, ES, WT>::operator+=(const posit<N, ES, WT>& rhs)
-{
-
-    posit<N, ES, WT> sum = *this + rhs;
-    this->bits = sum.get_bits();
-    return *this;
-}
-
-template <size_t N, size_t ES, typename WT>
-constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator++()
-{
-    // ++x
-    *this += this->one();
-    return *this;
-}
-
-template <size_t N, size_t ES, typename WT>
-constexpr posit<N, ES, WT> posit<N, ES, WT>::operator++(int)
-{
-    // x++
-    auto copy = *this;
-    *this += this->one();
-    return *this;
-}
-
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::operator-() const
-{
-    if (is_zero())
-    {
-        return *this;
-    }
-
-    if (is_nar())
-    {
-        return *this;
-    }
-
-    const auto bits = negate(this->get_bits());
-    return posit<N, ES, WT>::from(bits);
-}
-
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr posit<N, ES, WT>
-posit<N, ES, WT>::operator-(const posit<N, ES, WT>& rhs) const
-{
-    return *this + (-rhs);
-}
-
-template <size_t N, size_t ES, typename WT>
-posit<N, ES, WT>& posit<N, ES, WT>::operator-=(const posit<N, ES, WT>& rhs)
-{
-    posit<N, ES, WT> sum = *this - rhs;
-    this->bits = sum.get_bits();
-    return *this;
-}
-
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr posit<N, ES, WT>& posit<N, ES, WT>::operator--()
-{
-    // --x
-    *this -= one();
-    return *this;
-}
-
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::operator--(int)
-{
-    // x--
-    auto copy = *this;
-    *this -= this->one();
-    return *this;
-}
-
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr posit<N, ES, WT>
-posit<N, ES, WT>::operator*(const posit<N, ES, WT>& rhs) const
-{
-    const auto [product, rbit] = mul(*this, rhs);
-    return product;
-}
-
-template <size_t N, size_t ES, typename WT>
-posit<N, ES, WT>& posit<N, ES, WT>::operator*=(const posit<N, ES, WT>& rhs)
-{
-    const auto product = *this * rhs;
-    bits = product.get_bits();
-    return *this;
-}
-
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr posit<N, ES, WT>
-posit<N, ES, WT>::operator/(const posit<N, ES, WT>& rhs) const
-{
-    const auto [quot, rbit] = div(*this, rhs);
-    return quot;
-}
-
-template <size_t N, size_t ES, typename WT>
-posit<N, ES, WT>& posit<N, ES, WT>::operator/=(const posit<N, ES, WT>& rhs)
-{
-    const auto product = *this / rhs;
-    bits = product.get_bits();
-    return *this;
 }
 
 template <size_t N, size_t ES, typename WT> [[nodiscard]] constexpr size_t posit<N, ES, WT>::width()
