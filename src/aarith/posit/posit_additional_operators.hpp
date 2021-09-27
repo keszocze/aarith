@@ -194,4 +194,128 @@ posit<N, ES, WT>& operator/=(posit<N, ES, WT>& lhs, const posit<N, ES, WT>& rhs)
 }
 
 } // namespace posit_operators
+
+namespace quire_operators {
+
+/**
+ * @brief Add rhs to this.
+ */
+template <size_t N, size_t ES, typename WT>
+quire<N, ES, WT>& operator+=(quire<N, ES, WT>& lhs, const quire<N, ES, WT>& rhs)
+{
+    if (lhs.is_nar() || rhs.is_nar())
+    {
+        lhs = lhs.nar();
+    }
+    else
+    {
+        const auto bits = lhs.get_bits() + rhs.get_bits();
+        lhs = quire<N, ES, WT>::from(bits);
+    }
+
+    return lhs;
+}
+
+/**
+ * @brief Subtract rhs from this.
+ */
+template <size_t N, size_t ES, typename WT>
+quire<N, ES, WT>& operator-=(quire<N, ES, WT>& lhs, const quire<N, ES, WT>& rhs)
+{
+    if (lhs.is_nar() || rhs.is_nar())
+    {
+        lhs = lhs.nar();
+    }
+    else
+    {
+        const auto bits = lhs.get_bits() - rhs.get_bits();
+        lhs = quire<N, ES, WT>::from(bits);
+    }
+
+    return lhs;
+}
+
+/**
+ * @brief Set this to this multiplied with rhs.
+ */
+template <size_t N, size_t ES, typename WT>
+quire<N, ES, WT>& operator*=(quire<N, ES, WT>& lhs, const quire<N, ES, WT>& rhs)
+{
+    if (lhs.is_nar() || rhs.is_nar())
+    {
+        lhs = lhs.nar();
+    }
+    else
+    {
+        const auto bits = lhs.get_bits() * rhs.get_bits();
+        lhs = quire<N, ES, WT>::from(bits);
+    }
+
+    return lhs;
+}
+
+/**
+ * @brief Set this to this divided by other.
+ */
+template <size_t N, size_t ES, typename WT>
+quire<N, ES, WT>& operator/=(quire<N, ES, WT>& lhs, const quire<N, ES, WT>& rhs)
+{
+    if (lhs.is_nar() || rhs.is_nar() || rhs.is_zero())
+    {
+        lhs = lhs.nar();
+    }
+    else
+    {
+        const auto bits = lhs.get_bits() / rhs.get_bits();
+        lhs = quire<N, ES, WT>::from(bits);
+    }
+
+    return lhs;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr auto operator-(const quire<N, ES, WT>& q) -> quire<N, ES, WT>
+{
+    const auto value = q.get_bits();
+    return quire<N, ES, WT>::from(-value);
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr quire<N, ES, WT> operator+(const quire<N, ES, WT>& lhs,
+                                                   const quire<N, ES, WT>& rhs)
+{
+    quire diff = lhs;
+    diff += rhs;
+    return diff;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr quire<N, ES, WT> operator-(const quire<N, ES, WT>& lhs,
+                                                   const quire<N, ES, WT>& rhs)
+{
+    quire diff = lhs;
+    diff -= rhs;
+    return diff;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr quire<N, ES, WT> operator*(const quire<N, ES, WT>& lhs,
+                                                   const quire<N, ES, WT>& rhs)
+{
+    quire prod = lhs;
+    prod *= rhs;
+    return prod;
+}
+
+template <size_t N, size_t ES, typename WT>
+[[nodiscard]] constexpr quire<N, ES, WT> operator/(const quire<N, ES, WT>& lhs,
+                                                   const quire<N, ES, WT>& rhs)
+{
+    quire quot = lhs;
+    quot /= rhs;
+    return quot;
+}
+
+} // namespace quire_operators
+
 } // namespace aarith

@@ -1899,26 +1899,6 @@ public:
     quire& operator=(const quire& other);
 
     /**
-     * @brief Add rhs to this.
-     */
-    quire& operator+=(const quire& rhs);
-
-    /**
-     * @brief Subtract rhs from this.
-     */
-    quire& operator-=(const quire& rhs);
-
-    /**
-     * @brief Set this to this multiplied with rhs.
-     */
-    quire& operator*=(const quire& rhs);
-
-    /**
-     * @brief Set this to this divided by other.
-     */
-    quire& operator/=(const quire& rhs);
-
-    /**
      * @brief Conversion to posit.
      *
      * Converts the quire back to a posit value.
@@ -1987,42 +1967,6 @@ template <size_t N, size_t ES, typename WT>
  */
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr bool operator<=(const quire<N, ES, WT>& lhs, const quire<N, ES, WT>& rhs);
-
-/**
- * @brief Quire Addition.
- */
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr quire<N, ES, WT> operator+(const quire<N, ES, WT>& lhs,
-                                                   const quire<N, ES, WT>& rhs);
-
-/**
- * @brief Unary minus.
- *
- * If this quire represents NaR, the result is also NaR.
- */
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr quire<N, ES, WT> operator-(const quire<N, ES, WT>& q);
-
-/**
- * @brief Quire Subtraction.
- */
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr quire<N, ES, WT> operator-(const quire<N, ES, WT>& lhs,
-                                                   const quire<N, ES, WT>& rhs);
-
-/**
- * @brief Quire Multiplication.
- */
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr quire<N, ES, WT> operator*(const quire<N, ES, WT>& lhs,
-                                                   const quire<N, ES, WT>& rhs);
-
-/**
- * @brief Quire Division.
- */
-template <size_t N, size_t ES, typename WT>
-[[nodiscard]] constexpr quire<N, ES, WT> operator/(const quire<N, ES, WT>& lhs,
-                                                   const quire<N, ES, WT>& rhs);
 
 /**
  * @brief Output a string representation of p to os.
