@@ -441,7 +441,7 @@ SCENARIO("Logical AND works as expected", "[integer][unsigned][bit_logic]")
             constexpr uinteger<Width> b{number_b};
 
             const auto result = a & b;
-            const auto result_ref = number_a & number_b;
+            const uint64_t result_ref = number_a & number_b;
             REQUIRE(result.word(0) == result_ref);
         }
     }
@@ -461,7 +461,7 @@ SCENARIO("Logical OR works as expected", "[integer][unsigned][bit_logic]")
             constexpr uinteger<Width> b{number_b};
 
             const auto result = a | b;
-            const auto result_ref = number_a | number_b;
+            const uint64_t result_ref = number_a | number_b;
             REQUIRE(result.word(0) == result_ref);
         }
     }
@@ -475,11 +475,13 @@ SCENARIO("Logical NOT works as expected", "[integer][unsigned][bit_logic]")
         {
             const size_t Width = 70;
 
+
+
             static constexpr uint16_t number_a = 7;
             constexpr uinteger<Width> a{number_a};
 
             constexpr auto result = ~a;
-            constexpr auto result_ref = ~number_a;
+            constexpr uint64_t result_ref = ~number_a;
             REQUIRE(result.word(0) == result_ref);
         }
     }
