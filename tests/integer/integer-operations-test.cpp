@@ -8,7 +8,7 @@
 
 using namespace aarith; // NOLINT
 
-TEMPLATE_TEST_CASE_SIG("Pre/postfix operator++", "[integer][arithmetic][foo]",
+TEMPLATE_TEST_CASE_SIG("Pre/postfix operator++", "[integer][arithmetic]",
                        AARITH_INT_EXTENDED_TEST_SIGNATURE,
                        AARITH_INT_EXTENDED_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE)
 {
@@ -1401,3 +1401,21 @@ SCENARIO("Computing the powers of integers", "[integer][signed][operation]")
         }
     }
 }
+
+TEMPLATE_TEST_CASE_SIG("Bit-wise negation", "[integer][arithmetic][foo]",
+                       AARITH_INT_EXTENDED_TEST_SIGNATURE,
+                       AARITH_INT_EXTENDED_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = Type<W, WordType>;
+    GIVEN("A random integer")
+    {
+        I a = GENERATE(take(10, random_integer<W, WordType>()));
+        THEN("Double negation should yield the original number")
+        {
+            GIVEN("A random integer and a random uint8_t")
+            {
+                REQUIRE(a == ~(~a));
+            }
+            }
+        }
+    }

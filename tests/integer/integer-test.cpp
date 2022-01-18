@@ -472,7 +472,7 @@ SCENARIO("Right shift operator works as expected", "[integer][signed][bit_logic]
     }
 }
 
-SCENARIO("Logical AND works as expected", "[integer][signed][bit_logic][utility]]")
+SCENARIO("Logical AND works as expected", "[integer][signed][bit_logic][utility]")
 {
     GIVEN("Two sintegers")
     {
@@ -512,7 +512,7 @@ SCENARIO("Logical OR works as expected", "[integer][signed][bit_logic][utility]"
     }
 }
 
-SCENARIO("Logical NOT works as expected", "[integer][signed][bit_logic][utility]")
+SCENARIO("Bit-wise NOT works as expected", "[integer][signed][bit_logic][utility]")
 {
     GIVEN("One sinteger consisting of a single word")
     {
@@ -524,7 +524,7 @@ SCENARIO("Logical NOT works as expected", "[integer][signed][bit_logic][utility]
         static constexpr uint16_t number_a = 7;
         constexpr T a{number_a};
 
-        WHEN("Performing bitwise negation")
+        WHEN("Performing bit-wise negation")
         {
 
             constexpr T result = ~a;
@@ -535,6 +535,7 @@ SCENARIO("Logical NOT works as expected", "[integer][signed][bit_logic][utility]
             }
         }
     }
+
 }
 
 SCENARIO("Checking whether an integer is not equal to zero/false", "[integer][signed][utility]")
