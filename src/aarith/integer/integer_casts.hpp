@@ -16,7 +16,7 @@ namespace aarith {
  * @param a The unsigned integer to convert into the type T
  * @return
  */
-template <typename T, size_t W, typename WordType>
+template <typename T, size_t W, typename WordType = uint64_t>
 constexpr T narrow_cast(const uinteger<W, WordType>& a)
 {
     constexpr T max = std::numeric_limits<T>::max();
