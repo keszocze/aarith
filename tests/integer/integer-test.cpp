@@ -484,8 +484,8 @@ SCENARIO("Logical AND works as expected", "[integer][signed][bit_logic][utility]
 
             static constexpr uint16_t number_a = 7;
             static constexpr uint16_t number_b = 14;
-            constexpr integer<Width,WT> a{number_a};
-            constexpr integer<Width,WT> b{number_b};
+            constexpr integer<Width, WT> a{number_a};
+            constexpr integer<Width, WT> b{number_b};
 
             const auto result = a & b;
             const WT result_ref = number_a & number_b;
@@ -505,8 +505,8 @@ SCENARIO("Logical OR works as expected", "[integer][signed][bit_logic][utility]"
 
             static constexpr uint16_t number_a = 7;
             static constexpr uint16_t number_b = 14;
-            constexpr integer<Width,WT> a{number_a};
-            constexpr integer<Width,WT> b{number_b};
+            constexpr integer<Width, WT> a{number_a};
+            constexpr integer<Width, WT> b{number_b};
 
             constexpr auto result = a | b;
             constexpr WT result_ref = number_a | number_b;
@@ -538,7 +538,6 @@ SCENARIO("Bit-wise NOT works as expected", "[integer][signed][bit_logic][utility
             }
         }
     }
-
 }
 
 SCENARIO("Checking whether an integer is not equal to zero/false", "[integer][signed][utility]")

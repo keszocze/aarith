@@ -1416,6 +1416,6 @@ TEMPLATE_TEST_CASE_SIG("Bit-wise negation", "[integer][arithmetic][foo]",
             {
                 REQUIRE(a == ~(~a));
             }
-            }
         }
     }
+}

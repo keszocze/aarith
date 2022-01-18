@@ -196,7 +196,8 @@ public:
         return static_cast<bit_type>(masked_bit > 0 ? 1 : 0);
     }
 
-    template <size_t Count> [[nodiscard]] constexpr auto bits(size_t index) const -> word_array<Count, WordType>
+    template <size_t Count>
+    [[nodiscard]] constexpr auto bits(size_t index) const -> word_array<Count, WordType>
     {
         word_array<Count, WordType> result;
         for (auto i = 0U; i < Count; ++i)

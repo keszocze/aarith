@@ -475,8 +475,6 @@ SCENARIO("Logical NOT works as expected", "[integer][unsigned][bit_logic]")
         {
             const size_t Width = 70;
 
-
-
             static constexpr uint16_t number_a = 7;
             constexpr uinteger<Width> a{number_a};
 
