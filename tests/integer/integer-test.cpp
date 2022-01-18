@@ -480,13 +480,15 @@ SCENARIO("Logical AND works as expected", "[integer][signed][bit_logic][utility]
         {
             constexpr size_t Width = 70;
 
+            using WT = uint64_t;
+
             static constexpr uint16_t number_a = 7;
             static constexpr uint16_t number_b = 14;
-            constexpr integer<Width> a{number_a};
-            constexpr integer<Width> b{number_b};
+            constexpr integer<Width,WT> a{number_a};
+            constexpr integer<Width,WT> b{number_b};
 
             const auto result = a & b;
-            const auto result_ref = number_a & number_b;
+            const WT result_ref = number_a & number_b;
             REQUIRE(result.word(0) == result_ref);
         }
     }
@@ -499,14 +501,15 @@ SCENARIO("Logical OR works as expected", "[integer][signed][bit_logic][utility]"
         WHEN("The sintegers consists of only one word")
         {
             constexpr size_t Width = 70;
+            using WT = uint64_t;
 
             static constexpr uint16_t number_a = 7;
             static constexpr uint16_t number_b = 14;
-            constexpr integer<Width> a{number_a};
-            constexpr integer<Width> b{number_b};
+            constexpr integer<Width,WT> a{number_a};
+            constexpr integer<Width,WT> b{number_b};
 
             constexpr auto result = a | b;
-            constexpr auto result_ref = number_a | number_b;
+            constexpr WT result_ref = number_a | number_b;
             REQUIRE(result.word(0) == result_ref);
         }
     }
