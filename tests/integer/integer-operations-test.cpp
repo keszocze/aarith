@@ -1142,7 +1142,7 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
 
                 integer<64> expected_integer{expected};
 
-                CHECK(expected == static_cast<int64_t>(result.word(0));
+                CHECK(expected == static_cast<int64_t>(result.word(0)));
                 REQUIRE(expected_integer == result);
 
                 CHECK(expected == static_cast<int64_t>(resultb.word(0)));
