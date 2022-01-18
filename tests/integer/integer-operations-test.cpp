@@ -698,7 +698,7 @@ SCENARIO("Division of signed integers", "[integer][signed][arithmetic][division]
                 const auto div2 = restoring_division(div1.first, two);
 
                 CHECK(div2.first.word(1) == 0U);
-                CHECK(div2.first.word(0) == (int64_t(1) << int64_t(63)));
+                CHECK(div2.first.word(0) == (uint64_t(1) << uint64_t(63)));
                 CHECK(div2.second == integer<70>::zero());
             }
         }
@@ -1142,13 +1142,13 @@ SCENARIO("Multiplication of numbers fitting in a uint64_t",
 
                 integer<64> expected_integer{expected};
 
-                CHECK(expected == result.word(0));
+                CHECK(expected == static_cast<int64_t>(result.word(0));
                 REQUIRE(expected_integer == result);
 
-                CHECK(expected == resultb.word(0));
+                CHECK(expected == static_cast<int64_t>(resultb.word(0)));
                 REQUIRE(expected_integer == resultb);
 
-                CHECK(expected == resulti.word(0));
+                CHECK(expected == static_cast<int64_t>(resulti.word(0)));
                 REQUIRE(expected_integer == resulti);
             }
         }
