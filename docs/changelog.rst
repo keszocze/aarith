@@ -10,6 +10,8 @@ v1.0.1 -- ???
 
 **Changed:**
 
+* Update to Catch2 v2.13.18
+
 **Removed:**
 
 **Fixed:**
