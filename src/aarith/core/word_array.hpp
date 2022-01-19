@@ -57,7 +57,7 @@ public:
      *
      * Example:
      *      word_array<5> w = word_array<5>::from_bit_string("11010");
-     *      
+     *
      * @param bs The bitstring to create the word array from
      * @return A word_array with the same bits set as in the paramater bs
      */

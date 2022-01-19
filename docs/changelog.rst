@@ -7,6 +7,8 @@ v1.0.1 -- ???
 **Added:**
 
 * Add specializations for ``std::numeric_limits`` for the ``aarith::floating_point`` numbers
+* Add ``from_bit_string`` method to the ``aarith::word_array`` class
+
 
 **Changed:**
 

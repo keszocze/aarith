@@ -257,6 +257,8 @@ public:
     {
     }
 
+
+
     template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
     explicit floating_point(const F f)
     {
