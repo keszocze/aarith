@@ -27,19 +27,25 @@ public:
      * Constructors etc.
      */
 
-    constexpr word_array() = default;
+    /**
+     * @brief Default constructor for the word array.
+     *
+     * Initializes the word array to store only zeros.
+     */
+    [[nodiscard]] constexpr word_array() = default;
 
-    explicit constexpr word_array(WordType w)
+    [[nodiscard]] explicit constexpr word_array(WordType w)
     {
         this->words[0] = w & word_mask(0);
     }
 
-    template <class... Args> explicit constexpr word_array(WordType w, Args... args)
+    template <class... Args> [[nodiscard]] explicit constexpr word_array(WordType w, Args... args)
     {
         set_words(w, args...);
     }
 
-    template <class... Args> static constexpr auto from_words(Args... args) -> word_array
+    template <class... Args>
+    [[nodiscard]] static constexpr auto from_words(Args... args) -> word_array
     {
         word_array wc;
         wc.set_words(args...);
@@ -59,7 +65,8 @@ public:
         return wa;
     }
 
-    template <size_t V, typename T> constexpr word_array(const word_array<V, T>& other) // NOLINT
+    template <size_t V, typename T>
+    [[nodiscard]] constexpr word_array(const word_array<V, T>& other) // NOLINT
     {
         static_assert(V <= Width, "Can not create a word_array from larger container");
         for (auto i = 0U; i < other.word_count(); ++i)
@@ -69,7 +76,7 @@ public:
     }
 
     template <size_t V, typename T>
-    constexpr word_array<Width, T>& operator=(const word_array<V, T>& other)
+    [[nodiscard]] constexpr word_array<Width, T>& operator=(const word_array<V, T>& other)
     {
 
         static_assert(V <= Width, "Can not create a word_array from larger container");
