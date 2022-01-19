@@ -472,7 +472,7 @@ SCENARIO("Right shift operator works as expected", "[integer][signed][bit_logic]
     }
 }
 
-SCENARIO("Logical AND works as expected", "[integer][signed][bit_logic][utility]]")
+SCENARIO("Logical AND works as expected", "[integer][signed][bit_logic][utility]")
 {
     GIVEN("Two sintegers")
     {
@@ -480,13 +480,15 @@ SCENARIO("Logical AND works as expected", "[integer][signed][bit_logic][utility]
         {
             constexpr size_t Width = 70;
 
+            using WT = uint64_t;
+
             static constexpr uint16_t number_a = 7;
             static constexpr uint16_t number_b = 14;
-            constexpr integer<Width> a{number_a};
-            constexpr integer<Width> b{number_b};
+            constexpr integer<Width, WT> a{number_a};
+            constexpr integer<Width, WT> b{number_b};
 
             const auto result = a & b;
-            const auto result_ref = number_a & number_b;
+            const WT result_ref = number_a & number_b;
             REQUIRE(result.word(0) == result_ref);
         }
     }
@@ -499,33 +501,41 @@ SCENARIO("Logical OR works as expected", "[integer][signed][bit_logic][utility]"
         WHEN("The sintegers consists of only one word")
         {
             constexpr size_t Width = 70;
+            using WT = uint64_t;
 
             static constexpr uint16_t number_a = 7;
             static constexpr uint16_t number_b = 14;
-            constexpr integer<Width> a{number_a};
-            constexpr integer<Width> b{number_b};
+            constexpr integer<Width, WT> a{number_a};
+            constexpr integer<Width, WT> b{number_b};
 
             constexpr auto result = a | b;
-            constexpr auto result_ref = number_a | number_b;
+            constexpr WT result_ref = number_a | number_b;
             REQUIRE(result.word(0) == result_ref);
         }
     }
 }
 
-SCENARIO("Logical NOT works as expected", "[integer][signed][bit_logic][utility]")
+SCENARIO("Bit-wise NOT works as expected", "[integer][signed][bit_logic][utility]")
 {
-    GIVEN("One sintegers")
+    GIVEN("One sinteger consisting of a single word")
     {
-        WHEN("The integer consists of only one word")
+
+        const size_t Width = 70;
+        using WT = uint64_t;
+        using T = integer<Width, WT>;
+
+        static constexpr uint16_t number_a = 7;
+        constexpr T a{number_a};
+
+        WHEN("Performing bit-wise negation")
         {
-            const size_t Width = 70;
 
-            static constexpr uint16_t number_a = 7;
-            constexpr integer<Width> a{number_a};
-
-            constexpr auto result = ~a;
-            constexpr auto result_ref = ~number_a;
-            REQUIRE(result.word(0) == result_ref);
+            constexpr T result = ~a;
+            constexpr WT result_ref = ~number_a;
+            THEN("The result for the wordtype and the sinteger should match")
+            {
+                REQUIRE(result.word(0) == result_ref);
+            }
         }
     }
 }
