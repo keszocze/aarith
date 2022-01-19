@@ -32,20 +32,19 @@ public:
      *
      * Initializes the word array to store only zeros.
      */
-    [[nodiscard]] constexpr word_array() = default;
+    constexpr word_array() = default;
 
-    [[nodiscard]] explicit constexpr word_array(WordType w)
+    explicit constexpr word_array(WordType w)
     {
         this->words[0] = w & word_mask(0);
     }
 
-    template <class... Args> [[nodiscard]] explicit constexpr word_array(WordType w, Args... args)
+    template <class... Args> explicit constexpr word_array(WordType w, Args... args)
     {
         set_words(w, args...);
     }
 
-    template <class... Args>
-    [[nodiscard]] static constexpr auto from_words(Args... args) -> word_array
+    template <class... Args> static constexpr auto from_words(Args... args) -> word_array
     {
         word_array wc;
         wc.set_words(args...);
@@ -61,7 +60,7 @@ public:
      * @param bs The bitstring to create the word array from
      * @return A word_array with the same bits set as in the paramater bs
      */
-    [[nodiscard]] static constexpr auto from_bit_string(std::string_view bs) -> word_array
+    static constexpr auto from_bit_string(std::string_view bs) -> word_array
     {
         word_array wa;
         for (auto i = bs.length(), pos = 0UL; i > 0 && pos < Width; --i, ++pos)
@@ -74,8 +73,7 @@ public:
         return wa;
     }
 
-    template <size_t V, typename T>
-    [[nodiscard]] constexpr word_array(const word_array<V, T>& other) // NOLINT
+    template <size_t V, typename T> constexpr word_array(const word_array<V, T>& other) // NOLINT
     {
         static_assert(V <= Width, "Can not create a word_array from larger container");
         for (auto i = 0U; i < other.word_count(); ++i)
@@ -85,7 +83,7 @@ public:
     }
 
     template <size_t V, typename T>
-    [[nodiscard]] constexpr word_array<Width, T>& operator=(const word_array<V, T>& other)
+    constexpr word_array<Width, T>& operator=(const word_array<V, T>& other)
     {
 
         static_assert(V <= Width, "Can not create a word_array from larger container");
@@ -137,10 +135,10 @@ public:
 
     /**
      *
-     * @tparam V
-     * @tparam T
+     * @tparam V Bit width of the word_array
+     * @tparam T Word type to store the data in
      * @param end
-     * @param other
+     * @param other The word_array to take the values from
      */
     template <size_t V, typename T> void set_bits(size_t end, const word_array<V, T>& other)
     {
