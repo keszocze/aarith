@@ -46,12 +46,12 @@ public:
         return wc;
     }
 
-    static constexpr auto from_bit_string(const std::string bs) -> word_array
+    [[nodiscard]] static constexpr auto from_bit_string(std::string_view bs) -> word_array
     {
         word_array wa;
-        for (auto i = bs.length(), pos = 0UL; i > 0 && pos < Width; --i, ++pos) 
+        for (auto i = bs.length(), pos = 0UL; i > 0 && pos < Width; --i, ++pos)
         {
-            if (bs[i-1] == '1')
+            if (bs[i - 1] == '1')
             {
                 wa.set_bit(pos, true);
             }
