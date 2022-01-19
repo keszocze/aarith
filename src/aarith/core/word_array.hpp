@@ -52,6 +52,15 @@ public:
         return wc;
     }
 
+    /**
+     * @brief Creates a word_array from a given bit string.
+     *
+     * Example:
+     *      word_array<5> w = word_array<5>::from_bit_string("11010");
+     *      
+     * @param bs The bitstring to create the word array from
+     * @return A word_array with the same bits set as in the paramater bs
+     */
     [[nodiscard]] static constexpr auto from_bit_string(std::string_view bs) -> word_array
     {
         word_array wa;
