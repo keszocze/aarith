@@ -41,7 +41,7 @@ TEMPLATE_TEST_CASE_SIG("Constructing larger normalized floats from smaller ones"
 
                 THEN("The value should not have changed")
                 {
-                    CAPTURE(f,to_binary(f), g, to_binary(g), h, to_binary(h),j, to_binary(j));
+                    CAPTURE(f, to_binary(f), g, to_binary(g), h, to_binary(h), j, to_binary(j));
                     CHECK(f == g);
                     CHECK(f == h);
                     CHECK(g == f);
@@ -171,6 +171,50 @@ TEMPLATE_TEST_CASE_SIG("Investigating the minimal exponent",
             constexpr Exp min_exp{F::min_exp};
 
             REQUIRE(min_exp > b);
+        }
+    }
+}
+
+SCENARIO("Creating a floating point value from a bitstring")
+{
+    // to have the s suffix for strings available
+    GIVEN("a random single precision number x")
+    {
+        float x = GENERATE(
+            take(50, random(std::numeric_limits<float>::min(), std::numeric_limits<float>::max())));
+        WHEN("Creating an aarith floating point value from the bit representation")
+        {
+            //            std::cout << "x= " << x << "\n";
+
+            // this seems to be the only reasonable way to get the float into its binary
+            // representation it is stolen from https://stackoverflow.com/a/22494098
+            std::string xstring = std::bitset<32>(*(uint64_t*)(&x)).to_string(); // NO-LINT
+            //            std::cout << "xstring= " << xstring << "\n";
+            aarith::single_precision fpx{x};
+            aarith::single_precision fpb{xstring};
+
+            //            std::cout << "fpx= " << aarith::to_binary(fpx) << "\n";
+            //            std::cout << "fpb= " << aarith::to_binary(fpb) << "\n";
+
+            THEN("The value should match the one from the constructor taking a float value")
+            {
+
+                REQUIRE(fpx == fpb);
+            }
+        }
+    }
+
+    GIVEN("A hand-written test case")
+    {
+        THEN("Everything should work smoothly")
+        {
+            using namespace std::string_literals;
+
+            static const std::string s = "1"s + "01111111"s + "11000000000000000000000"s;
+
+            static const aarith::single_precision a{s};
+
+            REQUIRE(a == aarith::single_precision{-1.75});
         }
     }
 }

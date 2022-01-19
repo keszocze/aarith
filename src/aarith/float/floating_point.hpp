@@ -261,7 +261,13 @@ public:
     {
     }
 
+    constexpr explicit floating_point(std::string_view other)
+        : floating_point(other.front() == '1',
+                         aarith::word_array<E, WordType>::from_bit_string(other.substr(1, E)),
+                         aarith::word_array<M, WordType>::from_bit_string(other.substr(E + 1, M)))
 
+    {
+    }
 
     template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
     explicit floating_point(const F f)

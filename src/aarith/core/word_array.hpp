@@ -62,6 +62,7 @@ public:
      */
     static constexpr auto from_bit_string(std::string_view bs) -> word_array
     {
+        // TODO (keszocze) discuss the change to a constructor for the word_array
         word_array wa;
         for (auto i = bs.length(), pos = 0UL; i > 0 && pos < Width; --i, ++pos)
         {
