@@ -1,6 +1,6 @@
 ---
 Checks:
-'*,-llvm-else-after-return,-readability-else-after-return,-fuchsia-trailing-return,-fuchsia-default-arguments-declarations,-fuchsia-default-arguments,-hicpp-use-auto,-modernize-use-auto,-modernize-use-trailing-return-type,-fuchsia-overloaded-operator,-fuchsia-default-arguments-calls,-llvm-header-guard,-altera-unroll-loops,-llvmlibc-*'
+'*,-bugprone-easily-swappable-parameters,-llvm-else-after-return,-readability-else-after-return,-fuchsia-trailing-return,-fuchsia-default-arguments-declarations,-fuchsia-default-arguments,-hicpp-use-auto,-modernize-use-auto,-modernize-use-trailing-return-type,-fuchsia-overloaded-operator,-fuchsia-default-arguments-calls,-llvm-header-guard,-altera-*,-llvmlibc-*'
 WarningsAsErrors: ''
 HeaderFilterRegex: '.'
 ...

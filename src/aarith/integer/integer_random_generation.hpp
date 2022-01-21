@@ -16,7 +16,7 @@ public:
     using internal_type = uinteger<BitWidth + 1, WordType>;
 
     explicit uniform_uinteger_distribution(const input_type& min_ = input_type::min(),
-                                           const input_type& max_ = input_type::max()) // NO-LINT
+                                           const input_type& max_ = input_type::max()) // NOLINT
         : min(min_)
         , max(add(internal_type{max_}, internal_type::one()))
         , length(sub(max, min))
