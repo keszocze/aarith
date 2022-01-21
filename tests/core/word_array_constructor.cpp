@@ -114,9 +114,59 @@ SCENARIO("Generating word arrays from strings", "[word_array]")
     }
 }
 
-SCENARIO("from bit string is constexpr")
+SCENARIO("from_bit_string is constexpr")
 {
+    // simply use a hand-picked constant value to check, if this compiles everything should be fine
     static constexpr aarith::word_array<32> vals = aarith::word_array<32>::from_bit_string("1101");
     static constexpr aarith::word_array<32> valn = aarith::word_array<32>{13};
+
+
     REQUIRE(vals == valn);
+}
+
+SCENARIO("Feeding from_bit_string with invalid data")
+{
+    GIVEN("A string with characters not '0' or '1'")
+    {
+        constexpr std::string_view s{"11incorrect input"};
+
+        WHEN("Trying to create a word_array from this data")
+        {
+            THEN("The function should throw an exception")
+            {
+                REQUIRE_THROWS(aarith::word_array<24>::from_bit_string(s));
+            }
+        }
+    }
+}
+SCENARIO("Bit strings lengths' and word_arrays's lengths ")
+{
+    GIVEN("A bit string that is longer than the word_array")
+    {
+        constexpr std::string_view s{"100011"};
+
+        WHEN("Constructing the word_array from the bit string")
+        {
+            constexpr aarith::word_array<5> a{aarith::word_array<5>::from_bit_string(s)};
+
+            THEN("The correct bits should be truncated correctly")
+            {
+                aarith::word_array<5> expected{3};
+                REQUIRE(a == expected);
+            }
+        }
+    }
+    GIVEN("A bit string that is shorter than the word_array")
+    {
+        constexpr std::string_view w{"11111"};
+        WHEN("Constructing the word_array from the bit string")
+        {
+            constexpr aarith::word_array<10> b{aarith::word_array<10>::from_bit_string(w)};
+            THEN("The correct bits should be truncated correctly")
+            {
+                aarith::word_array<10> ex{31};
+                REQUIRE(b == ex);
+            }
+        }
+    }
 }
