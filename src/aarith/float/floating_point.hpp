@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <ctime>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <type_traits>
 
@@ -261,12 +262,63 @@ public:
     {
     }
 
-    constexpr explicit floating_point(std::string_view other)
-        : floating_point(other.front() == '1',
-                         aarith::word_array<E, WordType>::from_bit_string(other.substr(1, E)),
-                         aarith::word_array<M, WordType>::from_bit_string(other.substr(E + 1, M)))
-
+    explicit floating_point(std::string_view other)
     {
+
+        if (other.length() != 1 + E + M)
+        {
+            throw std::invalid_argument(
+                std::string("Length of bit string (") + std::to_string(other.length()) +
+                std::string(") does not match the number of bits in the aarith::floating_point (") +
+                std::to_string(1 + E + M) + std::string("you are trying to create"));
+        }
+
+        switch (other.front())
+        {
+        case '1': {
+            this->sign_neg = true;
+            break;
+        }
+        case '0': {
+            this->sign_neg = false;
+            break;
+        }
+        default:
+            throw std::invalid_argument(std::string("Unexpected character at sign position: '") +
+                                        std::string(other) +
+                                        std::string("': expecting '1' and '0' only"));
+        }
+        try
+        {
+            this->exponent = aarith::word_array<E, WordType>{other.substr(1, E)};
+        }
+        catch (const std::invalid_argument& e)
+        {
+            throw std::invalid_argument(std::string("Unexpected character in exponent: ") +
+                                        std ::string(e.what()));
+        }
+
+        aarith::word_array<M, WordType> mant;
+        try
+        {
+            mant = aarith::word_array<M, WordType>{other.substr(E + 1, M)};
+        }
+        catch (const std::invalid_argument& e)
+        {
+            throw std::invalid_argument(std::string("Unexpected character in mantissa: ") +
+                                        std ::string(e.what()));
+        }
+        {
+        }
+
+        if (exponent == IntegerExp::zero())
+        {
+            this->mantissa = IntegerMant{mant};
+        }
+        else
+        {
+            this->mantissa = msb_one(IntegerMant{mant});
+        }
     }
 
     template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>

@@ -4,14 +4,14 @@
 #include <bitset>
 #include <catch.hpp>
 #include <cmath>
-using namespace aarith;
+using namespace aarith; // NO-LINT
 
 template <typename N>
 // it is not really "full range" but at least it works
 auto full_native_range()
 {
-    return Catch::Generators::random<N>(std::numeric_limits<N>::lowest() / 100.0f,
-                                        std::numeric_limits<N>::max() / 100.0f);
+    return Catch::Generators::random<N>(std::numeric_limits<N>::lowest() / 100.0F,
+                                        std::numeric_limits<N>::max() / 100.0F);
 }
 
 TEMPLATE_TEST_CASE_SIG("Constructing larger normalized floats from smaller ones",
@@ -19,10 +19,11 @@ TEMPLATE_TEST_CASE_SIG("Constructing larger normalized floats from smaller ones"
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, float), (11, 52, double))
 {
+    static constexpr uint delta = 80;
     using F = floating_point<E, M>;
-    using G = floating_point<E + 80, M>;
-    using H = floating_point<M, M + 80>;
-    using J = floating_point<E + 80, M + 80>;
+    using G = floating_point<E + delta, M>;
+    using H = floating_point<M, M + delta>;
+    using J = floating_point<E + delta, M + delta>;
 
     GIVEN("A random floating point value")
     {
@@ -87,10 +88,12 @@ TEMPLATE_TEST_CASE_SIG("Width-casting special values into larger floats",
                        ((size_t E, size_t M, typename Native), E, M, Native), (8, 23, float),
                        (11, 52, float), (11, 52, double))
 {
+
+    static constexpr uint delta = 80;
     using F = floating_point<E, M>;
-    using G = floating_point<E + 80, M>;
-    using H = floating_point<M, M + 80>;
-    using J = floating_point<E + 80, M + 80>;
+    using G = floating_point<E + delta, M>;
+    using H = floating_point<M, M + delta>;
+    using J = floating_point<E + delta, M + delta>;
 
     GIVEN("Infinity")
     {
@@ -177,6 +180,7 @@ TEMPLATE_TEST_CASE_SIG("Investigating the minimal exponent",
 
 SCENARIO("Creating a floating point value from a bitstring")
 {
+    using namespace std::string_literals;
     // to have the s suffix for strings available
     GIVEN("a random single precision number x")
     {
@@ -184,11 +188,10 @@ SCENARIO("Creating a floating point value from a bitstring")
             take(50, random(std::numeric_limits<float>::min(), std::numeric_limits<float>::max())));
         WHEN("Creating an aarith floating point value from the bit representation")
         {
-            //            std::cout << "x= " << x << "\n";
 
-            // this seems to be the only reasonable way to get the float into its binary
-            // representation it is stolen from https://stackoverflow.com/a/22494098
-            std::string xstring = std::bitset<32>(*(uint64_t*)(&x)).to_string(); // NO-LINT
+            static constexpr uint float_width = 32;
+            std::string xstring =
+                std::bitset<float_width>(aarith::bit_cast<uint32_t>(x)).to_string(); // NO-LINT
             //            std::cout << "xstring= " << xstring << "\n";
             aarith::single_precision fpx{x};
             aarith::single_precision fpb{xstring};
@@ -208,13 +211,74 @@ SCENARIO("Creating a floating point value from a bitstring")
     {
         THEN("Everything should work smoothly")
         {
-            using namespace std::string_literals;
 
             static const std::string s = "1"s + "01111111"s + "11000000000000000000000"s;
 
             static const aarith::single_precision a{s};
-
-            REQUIRE(a == aarith::single_precision{-1.75});
+            static constexpr float val = -1.75;
+            REQUIRE(a == aarith::single_precision{val});
         }
     }
+
+    GIVEN("An invalid bit string")
+    {
+
+        WHEN("The string just doesn't make sense")
+        {
+            static const std::string s = "A"s + "01111111"s + "1100000000000000asdasda0000000"s;
+            THEN("An exception should be thrown")
+            {
+                REQUIRE_THROWS(aarith::single_precision{s});
+            }
+        }
+        WHEN("The string is too long or to short ")
+        {
+            THEN("The corresponding exception should be thrown")
+            {
+                static const std::string s1 = "A"s + "01111111"s + "11short"s;
+                static const std::string s2 =
+                    "A"s + "01111111"s + "110verymuchtooolongtoactuallycontainafloatingpointvalue"s;
+                REQUIRE_THROWS_WITH(
+                    aarith::single_precision{s1},
+                    Catch::Matchers::Contains(
+                        "oes not match the number of bits in the aarith::floating_point"));
+                REQUIRE_THROWS_WITH(
+                    aarith::single_precision{s2},
+                    Catch::Matchers::Contains(
+                        "oes not match the number of bits in the aarith::floating_point"));
+            }
+        }
+
+        WHEN("The sign bit makes no sense")
+        {
+            static const std::string s = "A"s + "01111111"s + "11000000000000000000000"s;
+            THEN("A corresponding exception should be thrown")
+            {
+                REQUIRE_THROWS_WITH(
+                    aarith::single_precision{s},
+                    Catch::Matchers::Contains("Unexpected character at sign position: "));
+            }
+        }
+        WHEN("The exponent bits are invalid")
+        {
+            static const std::string s = "1"s + "0NOPE111"s + "11000000000000000000000"s;
+            THEN("A corresponding exception should be thrown")
+            {
+                REQUIRE_THROWS_WITH(aarith::single_precision{s},
+                                    Catch::Matchers::Contains("Unexpected character in exponent:"));
+            }
+        }
+
+        WHEN("The mantissa bits are invalid")
+        {
+            static const std::string s = "1"s + "01111111"s + "110000000000NOPE0000001"s;
+            THEN("A corresponding exception should be thrown")
+            {
+                REQUIRE_THROWS_WITH(aarith::single_precision{s},
+                                    Catch::Matchers::Contains("Unexpected character in mantissa:"));
+            }
+        }
+    }
+
+    // TODO Add testcase for constexpr'nes
 }
