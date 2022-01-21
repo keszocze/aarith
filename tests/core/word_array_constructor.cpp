@@ -28,7 +28,7 @@ SCENARIO("Generating word arrays from strings", "[word_array]")
         {
             THEN("Using n and the string representation of n should yield the same word_array")
             {
-                REQUIRE(T1{n} == T1::from_bit_string(std::bitset<W1>(n).to_string()));
+                REQUIRE(T1{n} == T1{std::bitset<W1>(n).to_string()});
             }
         }
         WHEN("n has more bits than the word array (with a single word stored)")
@@ -36,8 +36,8 @@ SCENARIO("Generating word arrays from strings", "[word_array]")
             THEN("Using n and the string representation of n should yield the same word_array")
             {
                 //                std::cout << T2{n} << " == " <<
-                //                T2::from_bit_string(std::bitset<W2>(n).to_string()) << "\n";
-                REQUIRE(T2{n} == T2::from_bit_string(std::bitset<W2>(n).to_string()));
+                //                T2{std::bitset<W2>(n).to_string()) << "\n";
+                REQUIRE(T2{n} == T2{std::bitset<W2>(n).to_string()});
             }
         }
         WHEN("n has less bits than the word array (with a single word stored)")
@@ -45,8 +45,8 @@ SCENARIO("Generating word arrays from strings", "[word_array]")
             THEN("Using n and the string representation of n should yield the same word_array")
             {
                 //                std::cout << T2{n} << " == " <<
-                //                T2::from_bit_string(std::bitset<W2>(n).to_string()) << "\n";
-                REQUIRE(T3{n} == T3::from_bit_string(std::bitset<W3>(n).to_string()));
+                //                T2{std::bitset<W2>(n).to_string()) << "\n";
+                REQUIRE(T3{n} == T3{std::bitset<W3>(n).to_string()});
             }
         }
 
@@ -55,8 +55,8 @@ SCENARIO("Generating word arrays from strings", "[word_array]")
             THEN("Using n and the string representation of n should yield the same word_array")
             {
                 //                std::cout << T2{n} << " == " <<
-                //                T2::from_bit_string(std::bitset<W2>(n).to_string()) << "\n";
-                REQUIRE(T3{n} == T3::from_bit_string(std::bitset<W3>(n).to_string()));
+                //                T2{std::bitset<W2>(n).to_string()) << "\n";
+                REQUIRE(T3{n} == T3{std::bitset<W3>(n).to_string()});
             }
         }
 
@@ -65,8 +65,8 @@ SCENARIO("Generating word arrays from strings", "[word_array]")
             THEN("Using n and the string representation of n should yield the same word_array")
             {
                 //                std::cout << T2{n} << " == " <<
-                //                T2::from_bit_string(std::bitset<W2>(n).to_string()) << "\n";
-                REQUIRE(T4{n} == T4::from_bit_string(std::bitset<W4>(n).to_string()));
+                //                T2{std::bitset<W2>(n).to_string()) << "\n";
+                REQUIRE(T4{n} == T4{std::bitset<W4>(n).to_string()});
             }
         }
     }
@@ -79,7 +79,7 @@ SCENARIO("Generating word arrays from strings", "[word_array]")
         {
             THEN("Using n and the string representation of n should yield the same word_array")
             {
-                REQUIRE(T3{n} == T3::from_bit_string(std::bitset<W3>(n).to_string()));
+                REQUIRE(T3{n} == T3{std::bitset<W3>(n).to_string()});
             }
         }
         WHEN("n has more bits than the word array (with a single word stored)")
@@ -87,9 +87,9 @@ SCENARIO("Generating word arrays from strings", "[word_array]")
             THEN("Using n and the string representation of n should yield the same word_array")
             {
                 //                std::cout << T2{n} << " == " <<
-                //                T2::from_bit_string(std::bitset<W2>(n).to_string()) << "\n";
-                REQUIRE(T1{n} == T1::from_bit_string(std::bitset<W1>(n).to_string()));
-                REQUIRE(T2{n} == T2::from_bit_string(std::bitset<W2>(n).to_string()));
+                //                T2{std::bitset<W2>(n).to_string()) << "\n";
+                REQUIRE(T1{n} == T1{std::bitset<W1>(n).to_string()});
+                REQUIRE(T2{n} == T2{std::bitset<W2>(n).to_string()});
             }
         }
         WHEN("n has less bits than the word array (with a single word stored)")
@@ -97,8 +97,8 @@ SCENARIO("Generating word arrays from strings", "[word_array]")
             THEN("Using n and the string representation of n should yield the same word_array")
             {
                 //                std::cout << T2{n} << " == " <<
-                //                T2::from_bit_string(std::bitset<W2>(n).to_string()) << "\n";
-                REQUIRE(T3{n} == T3::from_bit_string(std::bitset<W3>(n).to_string()));
+                //                T2{std::bitset<W2>(n).to_string()) << "\n";
+                REQUIRE(T3{n} == T3{std::bitset<W3>(n).to_string()});
             }
         }
 
@@ -107,8 +107,8 @@ SCENARIO("Generating word arrays from strings", "[word_array]")
             THEN("Using n and the string representation of n should yield the same word_array")
             {
                 //                std::cout << T2{n} << " == " <<
-                //                T2::from_bit_string(std::bitset<W2>(n).to_string()) << "\n";
-                REQUIRE(T4{n} == T4::from_bit_string(std::bitset<W4>(n).to_string()));
+                //                T2{std::bitset<W2>(n).to_string()) << "\n";
+                REQUIRE(T4{n} == T4{std::bitset<W4>(n).to_string()});
             }
         }
     }
@@ -117,8 +117,8 @@ SCENARIO("Generating word arrays from strings", "[word_array]")
 SCENARIO("from_bit_string is constexpr")
 {
     // simply use a hand-picked constant value to check, if this compiles everything should be fine
-    static constexpr aarith::word_array<32> vals = aarith::word_array<32>::from_bit_string("1101");
-    static constexpr aarith::word_array<32> valn = aarith::word_array<32>{13};
+    static const aarith::word_array<32> vals{"1101"};
+    static constexpr aarith::word_array<32> valn{13};
 
 
     REQUIRE(vals == valn);
@@ -134,7 +134,7 @@ SCENARIO("Feeding from_bit_string with invalid data")
         {
             THEN("The function should throw an exception")
             {
-                REQUIRE_THROWS(aarith::word_array<24>::from_bit_string(s));
+                REQUIRE_THROWS(aarith::word_array<24>{s});
             }
         }
     }
@@ -147,7 +147,7 @@ SCENARIO("Bit strings lengths' and word_arrays's lengths ")
 
         WHEN("Constructing the word_array from the bit string")
         {
-            constexpr aarith::word_array<5> a{aarith::word_array<5>::from_bit_string(s)};
+            const aarith::word_array<5> a{aarith::word_array<5>{s}};
 
             THEN("The correct bits should be truncated correctly")
             {
@@ -161,7 +161,7 @@ SCENARIO("Bit strings lengths' and word_arrays's lengths ")
         constexpr std::string_view w{"11111"};
         WHEN("Constructing the word_array from the bit string")
         {
-            constexpr aarith::word_array<10> b{aarith::word_array<10>::from_bit_string(w)};
+            const aarith::word_array<10> b{aarith::word_array<10>{w}};
             THEN("The correct bits should be truncated correctly")
             {
                 aarith::word_array<10> ex{31};
