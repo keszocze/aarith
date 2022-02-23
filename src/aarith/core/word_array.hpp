@@ -27,6 +27,11 @@ public:
      * Constructors etc.
      */
 
+    /**
+     * @brief Default constructor for the word array.
+     *
+     * Initializes the word array to store only zeros.
+     */
     constexpr word_array() = default;
 
     explicit constexpr word_array(WordType w)
@@ -86,6 +91,41 @@ public:
         return *this;
     }
 
+
+    /**
+     * @brief Creates a word_array from a given bit string.
+     *
+     * Example:
+     *      word_array<5> w = word_array<5>::from_bit_string("11010");
+     *
+     * If the supplied bit string is longer than the word_array to be created, the rest of the bits
+     * will be ignored. If the word_array has more bits than the string, these bits are initialized
+     * with zero.
+     *
+     * @param bs The bitstring to create the word array from
+     * @return A word_array with the same bits set as in the paramater bs
+     */
+    explicit word_array(std::string_view bs)     {
+        // TODO (keszocze) why isn't it constexpr? --> build a test case for that
+        for (auto i = bs.length(), pos = 0UL; i > 0 && pos < Width; --i, ++pos)
+        {
+            switch (bs[i - 1])
+            {
+            case '1': this->set_bit(pos, true); break;
+            case '0':
+                // it is already set to zero so we don't do anything
+                // this is just here to make explicit that we check for '1' and '0' only
+                break;
+            default:
+                throw std::invalid_argument(std::string("Unexpected character at position ") +
+                                            std::to_string(i - 1) + std::string(" in \"") +
+                                            std::string(bs) +
+                                            std::string("\": expecting '1' and '0'only"));
+            }
+        }
+    }
+
+
     template <size_t V, typename T> void set_bits(const word_array<V, T>& other)
     {
 
@@ -108,10 +148,10 @@ public:
 
     /**
      *
-     * @tparam V
-     * @tparam T
+     * @tparam V Bit width of the word_array
+     * @tparam T Word type to store the data in
      * @param end
-     * @param other
+     * @param other The word_array to take the values from
      */
     template <size_t V, typename T> void set_bits(size_t end, const word_array<V, T>& other)
     {

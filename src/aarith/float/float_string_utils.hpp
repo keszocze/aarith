@@ -117,7 +117,7 @@ template <size_t E, size_t M, typename WordType>
 auto compute_nearest_exponent10(const floating_point<E, M, WordType>& nf) -> decimal_conversion
 {
     // TODO (keszocze) float pow and log functions
-    if constexpr (E > sizeof(size_t) * 8)
+    if constexpr (E > sizeof(size_t) * CHAR_BIT)
     {
         decimal_conversion conv{0U, 0., false, true};
         return conv;

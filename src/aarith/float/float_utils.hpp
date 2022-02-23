@@ -249,7 +249,7 @@ template <typename F> Radix constexpr radix([[maybe_unused]] const F& f)
 }
 
 /**
- * @brief Tests whether a floating-point number canoncial
+ * @brief Tests whether a floating-point number is canonical
  *
  * Aarith does not support non-canonical numbers hence this method always returns true.
  *

@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <ctime>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <type_traits>
 
@@ -18,7 +19,7 @@ template <size_t E, size_t M, typename WordType = uint64_t> class floating_point
 
 using half_precision = floating_point<5, 10, uint64_t>;        // NOLINT
 using single_precision = floating_point<8, 23, uint64_t>;      // NOLINT
-using double_precision = floating_point<11, 52, uint64_t>;      // NOLINT
+using double_precision = floating_point<11, 52, uint64_t>;     // NOLINT
 using quadruple_precision = floating_point<15, 112, uint64_t>; // NOLINT
 using bfloat16 = floating_point<8, 7, uint64_t>;               // NOLINT
 using tensorfloat32 = floating_point<8, 10, uint64_t>;         // NOLINT
@@ -202,12 +203,10 @@ public:
     }
 
     explicit constexpr floating_point(const word_array<1 + E + M>& w)
-        : sign_neg(w.msb())
-        , exponent(bit_range<(E + M) - 1, M>(w))
-        , mantissa(exponent == IntegerExp::all_zeroes()
-                       ? IntegerMant{bit_range<M - 1, 0>(w)}
-                       : msb_one(IntegerMant{bit_range<M - 1, 0>(w)}))
+        : floating_point((w.msb() != 0U), bit_range<(E + M) - 1, M>(w), bit_range<M - 1, 0>(w))
     {
+        // the equality check ensures that we have a bool (instead of an uint) so that the compiler
+        // knows which constructor to call
     }
 
     explicit constexpr floating_point(const bool is_neg, IntegerExp exp,
@@ -217,6 +216,13 @@ public:
         , mantissa((exponent == IntegerExp::zero()) ? IntegerMant{frac}
                                                     : msb_one(IntegerMant{frac}))
     {
+        /*
+         * How this constructors works:
+         * frac has only M bits but IntegerMant stores MW (i.e., M+1) bits. Putting frac in an
+         * IntegerMant adds an additional bit to the left that is pre-filled with the value 0. In
+         * case of denormalized numbers, this is fine. In the other case, the most significant bit
+         * hast to be manually set to 1, as is done by the msb_one function.
+         */
     }
 
     explicit constexpr floating_point(const bool is_neg, IntegerExp exp,
@@ -229,11 +235,10 @@ public:
 
     explicit constexpr floating_point(const unsigned int is_neg, IntegerExp exp,
                                       word_array<M, WordType> frac)
-        : sign_neg(is_neg) // NOLINT
-        , exponent(exp)
-        , mantissa((exponent == IntegerExp::zero()) ? IntegerMant{frac}
-                                                    : msb_one(IntegerMant{frac}))
+        : floating_point((is_neg != 0U), exp, frac)
     {
+        // the equality check ensures that we have a bool (instead of an uint) so that the compiler
+        // knows which constructor to call
     }
 
     explicit constexpr floating_point(const unsigned int is_neg, const IntegerExp& exp,
@@ -255,6 +260,65 @@ public:
     constexpr explicit floating_point(const floating_point<E_, M_, WordType>& f)
         : floating_point(width_cast<E, M, E_, M_, WordType>(f))
     {
+    }
+
+    explicit floating_point(std::string_view other)
+    {
+
+        if (other.length() != 1 + E + M)
+        {
+            throw std::invalid_argument(
+                std::string("Length of bit string (") + std::to_string(other.length()) +
+                std::string(") does not match the number of bits in the aarith::floating_point (") +
+                std::to_string(1 + E + M) + std::string("you are trying to create"));
+        }
+
+        switch (other.front())
+        {
+        case '1': {
+            this->sign_neg = true;
+            break;
+        }
+        case '0': {
+            this->sign_neg = false;
+            break;
+        }
+        default:
+            throw std::invalid_argument(std::string("Unexpected character at sign position: '") +
+                                        std::string(other) +
+                                        std::string("': expecting '1' and '0' only"));
+        }
+        try
+        {
+            this->exponent = aarith::word_array<E, WordType>{other.substr(1, E)};
+        }
+        catch (const std::invalid_argument& e)
+        {
+            throw std::invalid_argument(std::string("Unexpected character in exponent: ") +
+                                        std ::string(e.what()));
+        }
+
+        aarith::word_array<M, WordType> mant;
+        try
+        {
+            mant = aarith::word_array<M, WordType>{other.substr(E + 1, M)};
+        }
+        catch (const std::invalid_argument& e)
+        {
+            throw std::invalid_argument(std::string("Unexpected character in mantissa: ") +
+                                        std ::string(e.what()));
+        }
+        {
+        }
+
+        if (exponent == IntegerExp::zero())
+        {
+            this->mantissa = IntegerMant{mant};
+        }
+        else
+        {
+            this->mantissa = msb_one(IntegerMant{mant});
+        }
     }
 
     template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
@@ -517,8 +581,8 @@ public:
         IntegerMant m = IntegerMant::all_zeroes();
         m.set_msb(true);
 
-        IntegerExp  e = IntegerExp::all_ones();
-        e.set_bit(0,false);
+        IntegerExp e = IntegerExp::all_ones();
+        e.set_bit(0, false);
         e.set_msb(false);
 
         const floating_point rounding_error(false, e, m);
