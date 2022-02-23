@@ -77,7 +77,7 @@ We also refer the interested user to the publication listed below.
 
 ## License
 
-Aarith *does* use a license! At some point in time, we will even tell you which one
+Aarith comes under the Apache 2 licence (for detais, see the [license file](LICENSE)).
 
 ## Publication
 
