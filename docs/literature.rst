@@ -3,7 +3,7 @@ Literature
 
 .. [Keszocze2021] If you use Aarith (e.g., in your publication), please cite
 
-    Oliver Keszocze, Marcel Brand, Christian Heidorn, und Jürgen Teich. „Aarith: An Arbitrary Precision Number Library“,
+    Oliver Keszocze, Marcel Brand, Christian Heidorn, and Jürgen Teich. „Aarith: An Arbitrary Precision Number Library“,
     In: ACM/SIGAPP Symposium On Applied Computing (SAC'21). March 2021.
 
     Bibtex:
