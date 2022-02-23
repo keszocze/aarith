@@ -1,9 +1,7 @@
+#include "gen_float.hpp"
 #include <aarith/float.hpp>
 #include <bitset>
 #include <catch.hpp>
-#include "gen_float.hpp"
-
-#include "../test-signature-ranges.hpp"
 
 using namespace aarith;
 
@@ -79,14 +77,16 @@ TEMPLATE_TEST_CASE_SIG("String generation for negative floating-points",
     {
         F a = GENERATE(take(100, random_float<E, M, FloatGenerationModes::NonSpecial>()));
         a.set_sign(1);
-        WHEN("Creating the scientific notation string") {
+        WHEN("Creating the scientific notation string")
+        {
             std::string s = to_sci_string(a);
 
-            THEN("There should only be one minus sign") {
-                CAPTURE(a,s);
-                CHECK(s.substr(0,1) == "-");
-                CHECK(s.substr(0,2) != "--");
-                REQUIRE(s.substr(1,1) != "-");
+            THEN("There should only be one minus sign")
+            {
+                CAPTURE(a, s);
+                CHECK(s.substr(0, 1) == "-");
+                CHECK(s.substr(0, 2) != "--");
+                REQUIRE(s.substr(1, 1) != "-");
             }
         }
     }

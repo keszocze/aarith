@@ -351,7 +351,7 @@ template <typename W, typename = std::enable_if_t<is_word_array_v<W>>>
 constexpr W& rotate_left(W& lhs, size_t rotate = 1)
 {
 
-    // TODO offer this as a compile-time optimized version?
+    // TODO (keszocze) offer this as a compile-time optimized version?
     //    constexpr size_t width = W::width();
     //    const auto slice = bit_range<width-1, width-R>(lhs);
     //
