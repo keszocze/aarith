@@ -9,7 +9,7 @@ v1.0.1 -- ???
 * Add specializations for ``std::numeric_limits`` for the ``aarith::floating_point`` numbers
 * Add a constructor for ``aarith::word_array`` that takes a bit string as a parameter
 * Add a constructor for ``aarith::floating_point`` that takes a bit string as a parameter
-
+* Switched to Apache 2 license
 
 **Changed:**
 
