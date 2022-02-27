@@ -6,7 +6,22 @@ option(BUILD_CORRECTNESS_EXPERIMENTS "build correctness experiments" OFF)
 option(BUILD_TESTS "build tests" ON)
 option(BUILD_EXAMPLES "build examples" ON)
 option(BUILD_DOCUMENTATION "Build documentation" OFF)
-option(USE_CLANGTIDY "Use clang-tidy" OFF)
+option(USE_CLANGTIDY "Use clang-tidy" ON)
+
+set(default_build_type "Release")
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+  message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
+  set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
+      STRING "Choose the type of build." FORCE)
+  # Set the possible values of build type for cmake-gui
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS
+    "Debug" "Release")
+endif()
+
+if (USE_CLANGTIDY)
+    set(CMAKE_CXX_CLANG_TIDY "clang-tidy")
+endif()
+
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/lib")
 find_package(MPIR)

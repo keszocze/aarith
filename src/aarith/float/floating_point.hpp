@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <ctime>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <type_traits>
 
@@ -16,12 +17,12 @@ namespace aarith {
 
 template <size_t E, size_t M, typename WordType = uint64_t> class floating_point; // NOLINT
 
-using half_precision = floating_point<5, 10, uint64_t>; // NOLINT
-using single_precision = floating_point<8, 23, uint64_t>; // NOLINT
-using double_precison = floating_point<11, 52, uint64_t>; // NOLINT
+using half_precision = floating_point<5, 10, uint64_t>;        // NOLINT
+using single_precision = floating_point<8, 23, uint64_t>;      // NOLINT
+using double_precision = floating_point<11, 52, uint64_t>;     // NOLINT
 using quadruple_precision = floating_point<15, 112, uint64_t>; // NOLINT
-using bfloat16 = floating_point<8, 7, uint64_t>; // NOLINT
-using tensorfloat32 = floating_point<8, 10, uint64_t>; // NOLINT
+using bfloat16 = floating_point<8, 7, uint64_t>;               // NOLINT
+using tensorfloat32 = floating_point<8, 10, uint64_t>;         // NOLINT
 
 /**
  * @brief Expands the mantissa by correctly shifting the bits in the larger uinteger
@@ -37,7 +38,6 @@ template <size_t MS, size_t E, size_t M, typename WordType>
     mantissa_ <<= (size_t{MS} - size_t{M});
     return mantissa_;
 }
-
 
 /**
  * @brief Creates a bitstring representation of the floating point number.
@@ -188,7 +188,7 @@ public:
     static constexpr IntegerExp bias = uinteger<E - 1, WordType>::all_ones();
     static constexpr IntegerUnbiasedExp max_exp = uinteger<E - 1, WordType>::all_ones();
     static constexpr IntegerUnbiasedExp min_exp = []() {
-        const IntegerExp bias_ = uinteger<E - 1, WordType>::all_ones();
+        const IntegerExp bias_ = IntegerExp{uinteger<E - 1, WordType>::all_ones()};
         IntegerUnbiasedExp min_exp_{bias_};
         IntegerUnbiasedExp one = IntegerUnbiasedExp::one();
         min_exp_ = negate(sub(min_exp_, one));
@@ -203,12 +203,10 @@ public:
     }
 
     explicit constexpr floating_point(const word_array<1 + E + M>& w)
-        : sign_neg(w.msb())
-        , exponent(bit_range<(E + M) - 1, M>(w))
-        , mantissa(exponent == IntegerExp::all_zeroes()
-                       ? IntegerMant{bit_range<M - 1, 0>(w)}
-                       : msb_one(IntegerMant{bit_range<M - 1, 0>(w)}))
+        : floating_point((w.msb() != 0U), bit_range<(E + M) - 1, M>(w), bit_range<M - 1, 0>(w))
     {
+        // the equality check ensures that we have a bool (instead of an uint) so that the compiler
+        // knows which constructor to call
     }
 
     explicit constexpr floating_point(const bool is_neg, IntegerExp exp,
@@ -218,6 +216,13 @@ public:
         , mantissa((exponent == IntegerExp::zero()) ? IntegerMant{frac}
                                                     : msb_one(IntegerMant{frac}))
     {
+        /*
+         * How this constructors works:
+         * frac has only M bits but IntegerMant stores MW (i.e., M+1) bits. Putting frac in an
+         * IntegerMant adds an additional bit to the left that is pre-filled with the value 0. In
+         * case of denormalized numbers, this is fine. In the other case, the most significant bit
+         * hast to be manually set to 1, as is done by the msb_one function.
+         */
     }
 
     explicit constexpr floating_point(const bool is_neg, IntegerExp exp,
@@ -230,11 +235,10 @@ public:
 
     explicit constexpr floating_point(const unsigned int is_neg, IntegerExp exp,
                                       word_array<M, WordType> frac)
-        : sign_neg(is_neg) // NOLINT
-        , exponent(exp)
-        , mantissa((exponent == IntegerExp::zero()) ? IntegerMant{frac}
-                                                    : msb_one(IntegerMant{frac}))
+        : floating_point((is_neg != 0U), exp, frac)
     {
+        // the equality check ensures that we have a bool (instead of an uint) so that the compiler
+        // knows which constructor to call
     }
 
     explicit constexpr floating_point(const unsigned int is_neg, const IntegerExp& exp,
@@ -256,6 +260,65 @@ public:
     constexpr explicit floating_point(const floating_point<E_, M_, WordType>& f)
         : floating_point(width_cast<E, M, E_, M_, WordType>(f))
     {
+    }
+
+    explicit floating_point(std::string_view other)
+    {
+
+        if (other.length() != 1 + E + M)
+        {
+            throw std::invalid_argument(
+                std::string("Length of bit string (") + std::to_string(other.length()) +
+                std::string(") does not match the number of bits in the aarith::floating_point (") +
+                std::to_string(1 + E + M) + std::string("you are trying to create"));
+        }
+
+        switch (other.front())
+        {
+        case '1': {
+            this->sign_neg = true;
+            break;
+        }
+        case '0': {
+            this->sign_neg = false;
+            break;
+        }
+        default:
+            throw std::invalid_argument(std::string("Unexpected character at sign position: '") +
+                                        std::string(other) +
+                                        std::string("': expecting '1' and '0' only"));
+        }
+        try
+        {
+            this->exponent = aarith::word_array<E, WordType>{other.substr(1, E)};
+        }
+        catch (const std::invalid_argument& e)
+        {
+            throw std::invalid_argument(std::string("Unexpected character in exponent: ") +
+                                        std ::string(e.what()));
+        }
+
+        aarith::word_array<M, WordType> mant;
+        try
+        {
+            mant = aarith::word_array<M, WordType>{other.substr(E + 1, M)};
+        }
+        catch (const std::invalid_argument& e)
+        {
+            throw std::invalid_argument(std::string("Unexpected character in mantissa: ") +
+                                        std ::string(e.what()));
+        }
+        {
+        }
+
+        if (exponent == IntegerExp::zero())
+        {
+            this->mantissa = IntegerMant{mant};
+        }
+        else
+        {
+            this->mantissa = msb_one(IntegerMant{mant});
+        }
     }
 
     template <typename F, typename = std::enable_if_t<std::is_floating_point<F>::value>>
@@ -468,6 +531,28 @@ public:
 
     /**
      *
+     * @return The smallest finite value
+     */
+    [[nodiscard]] static constexpr floating_point min()
+    {
+        word_array<E, WordType> exp = word_array<E, WordType>::all_ones();
+        exp.set_bit(0, false);
+        return floating_point(true, exp, IntegerMant::all_ones());
+    }
+
+    /**
+     *
+     * @return The largest finite value
+     */
+    [[nodiscard]] static constexpr floating_point max()
+    {
+        word_array<E, WordType> exp = word_array<E, WordType>::all_ones();
+        exp.set_bit(0, false);
+        return floating_point(false, exp, IntegerMant::all_ones());
+    }
+
+    /**
+     *
      * @return Smallest positive normalized value
      */
     [[nodiscard]] static constexpr floating_point smallest_normalized()
@@ -485,6 +570,23 @@ public:
     {
         constexpr floating_point small_denorm(false, IntegerExp::all_zeroes(), IntegerMant::one());
         return small_denorm;
+    }
+
+    /**
+     *
+     * @return The maximal rounding error (assuming round-to-nearest)
+     */
+    [[nodiscard]] static constexpr floating_point round_error()
+    {
+        IntegerMant m = IntegerMant::all_zeroes();
+        m.set_msb(true);
+
+        IntegerExp e = IntegerExp::all_ones();
+        e.set_bit(0, false);
+        e.set_msb(false);
+
+        const floating_point rounding_error(false, e, m);
+        return rounding_error;
     }
 
     /**
@@ -544,7 +646,7 @@ public:
         sign_neg = (sign & 1U) > 0;
     }
 
-    [[nodiscard]]  auto get_exponent() const -> uinteger<E, WordType>
+    [[nodiscard]] auto get_exponent() const -> uinteger<E, WordType>
     {
         return exponent;
     }
@@ -621,7 +723,7 @@ public:
      * @brief Checks if the number is a quiet NaN
      * @return True iff the number is a quiet NaN
      */
-    [[nodiscard]]  constexpr bool is_qNaN() const
+    [[nodiscard]] constexpr bool is_qNaN() const
     {
         const bool exp_all_ones = exponent == IntegerExp ::all_ones();
         const bool first_bit_set = width_cast<M>(mantissa).msb();
@@ -632,7 +734,7 @@ public:
      * @brief Checks if the number is a signalling NaN
      * @return True iff the number is a signalling NaN
      */
-    [[nodiscard]]  constexpr bool is_sNaN() const
+    [[nodiscard]] constexpr bool is_sNaN() const
     {
         const bool exp_all_ones = exponent == IntegerExp ::all_ones();
         const auto fraction = width_cast<M>(mantissa);
@@ -822,7 +924,8 @@ public:
 
     floating_point<E, M, WordType>& operator=(const floating_point<E, M, WordType>& f)
     {
-        if (this == &f) {
+        if (this == &f)
+        {
             return *this;
         }
         this->sign_neg = f.sign_neg;
@@ -1058,7 +1161,6 @@ auto rshift_and_round(const uinteger<M, WordType>& m, const size_t shift_by)
 template <size_t E, size_t M1, size_t M2 = M1, typename WordType = uint64_t>
 auto normalize(const floating_point<E, M1, WordType>& num) -> floating_point<E, M2, WordType>
 {
-
     auto exponent = width_cast<E + 1>(num.get_exponent());
     auto mantissa = num.get_full_mantissa();
 

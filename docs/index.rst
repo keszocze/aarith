@@ -28,13 +28,16 @@ Aarith currently supports
    usecases
    philosophy
    literature
+   changelog
 
 
 .. toctree::
     :maxdepth: 1
     :caption: Integers
 
-    api/integer
+    api/integer/class
+    api/integer/operations
+    api/integer/comparisons
 
 .. toctree::
     :maxdepth: 1
@@ -45,11 +48,16 @@ Aarith currently supports
     api/float/comparisons
     api/float/utilities
 
+.. toctree::
+    :maxdepth: 1
+    :caption: Approximate Computing
+
+    approx/anytime
+    approx/fau
 
 
 Publication
 -----------
-
 
 If you use Aarith (e.g., in your publication), please cite
 
@@ -68,7 +76,6 @@ Bibtex:
       location = {{Virtual Event, South Korea}},
       series = {{{SAC}}'21}
     }
-
 
 
 

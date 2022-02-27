@@ -1,6 +1,6 @@
 #include "../test-signature-ranges.hpp"
 #include <aarith/float.hpp>
-#include <aarith/float/approx_operations.hpp>
+#include <aarith/float/float_approx_operations.hpp>
 #include <catch.hpp>
 
 using namespace aarith;

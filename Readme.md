@@ -64,7 +64,7 @@ To make usage of Aarith more convenient, the following type aliases are shipped 
 ```c++
 using half_precision = floating_point<5, 10, uint64_t>;
 using single_precision = floating_point<8, 23, uint64_t>;
-using double_precison = floating_point<11, 52, uint64_t>;
+using double_precision = floating_point<11, 52, uint64_t>;
 using quadruple_precision = floating_point<15, 112, uint64_t>;
 using bfloat16 = floating_point<8, 7, uint64_t>;
 using tensorfloat32 = floating_point<8, 10, uint64_t>;

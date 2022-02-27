@@ -7,6 +7,7 @@ add_aarith_test(word_array-random-generation FILES core/word_array-generation-te
 add_aarith_test(word_array-bit-operations FILES core/bit_operations-test.cpp)
 add_aarith_test(word_array-extraction FILES core/word_array-extraction-test.cpp)
 add_aarith_test(word_array-utility FILES core/word_array-utility-test.cpp)
+add_aarith_test(word_array-construction FILES core/word_array_constructor.cpp)
 
 
 add_aarith_test(uint-general FILES integer/uint-test.cpp)
@@ -39,6 +40,7 @@ add_aarith_test(float-multiplication FILES float/float_mul.cpp)
 add_aarith_test(float-addition FILES float/float_addition.cpp)
 add_aarith_test(float-subtraction FILES float/float_subtraction.cpp)
 add_aarith_test(float-classify-methods FILES float/classify-methods.cpp)
+add_aarith_test(float-numeric_limits FILES float/float_numeric_limits.cpp)
 
 add_aarith_test(fau-adder FILES uint-approx-test.cpp)
 

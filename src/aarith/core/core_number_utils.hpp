@@ -1,5 +1,9 @@
 #pragma once
 
+#include <cstddef>
+#include <limits>
+#include <stdexcept>
+
 namespace aarith {
 
 /**
@@ -14,7 +18,6 @@ namespace aarith {
  * @return The logarithm of Value base Base
  */
 template <unsigned Base, unsigned Value> constexpr double log();
-
 
 /**
  * @brief The constexpr value of log_2(10)
@@ -48,6 +51,17 @@ template <class Result> constexpr Result ceil(double num)
     return (static_cast<double>(static_cast<Result>(num)) == num)
                ? static_cast<Result>(num)
                : static_cast<Result>(num) + ((num > 0) ? 1 : 0);
+}
+
+/*
+ * This method is necessary as not all compilers support constexpr
+ * in the math library
+ */
+template <class Result> constexpr Result floor(double num)
+{
+    return (static_cast<double>(static_cast<Result>(num)) == num)
+               ? static_cast<Result>(num)
+               : static_cast<Result>(num) - ((num < 0) ? 1 : 0);
 }
 
 /**
