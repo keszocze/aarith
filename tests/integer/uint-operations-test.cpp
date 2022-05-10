@@ -35,6 +35,37 @@ TEMPLATE_TEST_CASE_SIG("Unsigned integer addition is commutative",
     }
 }
 
+TEMPLATE_TEST_CASE_SIG("Arithmetic should be associative", "[integer][unsigned][arithmetic]",
+                       AARITH_INT_TEST_SIGNATURE, AARITH_INT_TEST_TEMPLATE_PARAM_RANGE)
+{
+    using I = uinteger<W, WordType>;
+
+    GIVEN("Given three integers")
+    {
+        I a = GENERATE(take(10, random_uinteger<W, WordType>()));
+        I b = GENERATE(take(10, random_uinteger<W, WordType>()));
+        I c = GENERATE(take(10, random_uinteger<W, WordType>()));
+        WHEN("Adding these numbers")
+        {
+            const I res1 = add(add(a, b), c);
+            const I res2 = add(a, add(b, c));
+            THEN("Associativity should hold")
+            {
+                REQUIRE(res1 == res2);
+            }
+        }
+        WHEN("Multiplying these numbers")
+        {
+            const I res1 = mul(mul(a, b), c);
+            const I res2 = mul(a, mul(b, c));
+            THEN("Associativity should hold")
+            {
+                REQUIRE(res1 == res2);
+            }
+        }
+    }
+}
+
 TEMPLATE_TEST_CASE_SIG(
     "Unsigned integer addition is commutative for addends with different bit widths",
     "[integer][unsigned][arithmetic][addition]", AARITH_INT_TEST_SIGNATURE,
