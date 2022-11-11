@@ -18,7 +18,12 @@ compile_gcc:
     stage: compile
     artifacts:
         paths:
-            - build/gcc
+            - build/gcc/tests
+        exclude:
+            - build/gcc/tests/CMakeFiles
+            - build/gcc/tests/CMakeFiles/*
+            - build/gcc/tests/CMakeFiles/*/*
+            - build/gcc/tests/CMakeFiles/*/*/*
         expire_in: 30 minutes
 
     script:
@@ -34,7 +39,12 @@ compile_clang:
     stage: compile
     artifacts:
         paths:
-            - build/clang
+            - build/clang/tests
+        exclude:
+            - build/clang/tests/CMakeFiles
+            - build/clang/tests/CMakeFiles/*
+            - build/clang/tests/CMakeFiles/*/*
+            - build/clang/tests/CMakeFiles/*/*/*
         expire_in: 30 minutes
     script:
         - mkdir -p build/clang
@@ -56,7 +66,7 @@ test_clang:
         - compile_clang
     script:
         - cd build/clang
-        - rm CMakeCache.txt
+        - rm -f CMakeCache.txt
         - make CTEST_OUTPUT_ON_FAILURE=1 test
 
 test_gcc:
@@ -74,7 +84,7 @@ test_gcc:
         expire_in: 30 minutes
     script:
         - cd build/gcc
-        - rm CMakeCache.txt
+        - rm -f CMakeCache.txt
         - make CTEST_OUTPUT_ON_FAILURE=1 test
         - if !$?; then return 1; fi
         - cd tests

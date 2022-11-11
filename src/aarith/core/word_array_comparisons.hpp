@@ -34,11 +34,19 @@ constexpr bool operator==(const word_array<W, WordType>& a, const word_array<V, 
     }
 }
 
-template <typename W, typename V> constexpr bool operator!=(const W& a, const V& b)
+/**
+ * @brief Tests if two word arrays are unequal
+ *
+ * @tparam W Width of the first word array
+ * @tparam V Width of the second word array
+ * @tparam WordType Data type usd to store the actual data
+ * @param a First word array
+ * @param b Second word array
+ * @return a != b
+ */
+template <size_t W, size_t V, typename WordType>
+constexpr bool operator!=(const word_array<W, WordType>& a, const word_array<V, WordType>& b)
 {
-    static_assert(::aarith::is_word_array_v<W>);
-    static_assert(::aarith::is_word_array_v<V>);
-
     // we do not care about speed and simply call the equality function....
     return !(a == b);
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <aarith/core/traits.hpp>
 #include <aarith/integer/integers.hpp>
+#include <cassert>
 #include <type_traits>
 
 namespace aarith {
@@ -400,6 +401,71 @@ template <typename I>
 }
 
 /**
+ * @brief Divides one integer by another integer with floor division
+ *
+ * Floor division rounds towards negative infinity. For example, when
+ * computing 4/5, the result is 0 and when computing -4/5 the result is -1.
+ *
+ * @note integer<W>::min/integer<W>(-1) will return <integer<W>::min,0>,
+ * i.e. some weird overflow happens for signed integers
+ *
+ * @tparam I Integer type to work on
+ * @param numerator The number that is to be divided
+ * @param denominator The number that divides the other number
+ * @return The quotient of the division operation
+ */
+template <typename I>
+[[nodiscard]] constexpr auto floordiv(const I& numerator, const I& denominator) -> I
+{
+    const bool result_is_negative = numerator.msb() ^ denominator.msb();
+    const auto [quotient, remainder] = restoring_division(numerator, denominator);
+
+    if (result_is_negative)
+    {
+        // for negative quotients, round towards -inf if the numerator does
+        // not perfectly divide by denominator
+
+        if (remainder.is_zero())
+        {
+            return quotient;
+        }
+        else
+        {
+            return quotient - quotient.one();
+        }
+    }
+    else
+    {
+        // for positive quotients, floor division behaves like normal
+        // (truncating) division
+
+        return quotient;
+    }
+}
+
+/**
+ * @brief Compute the greatest common divisor.
+ */
+template <size_t Width, typename WordType>
+[[nodiscard]] constexpr auto gcd(const integer<Width, WordType>& x,
+                                 const integer<Width, WordType>& y)
+{
+    using Int = integer<Width, WordType>;
+
+    Int a = x;
+    Int b = y;
+
+    while (!b.is_zero())
+    {
+        const Int t = b;
+        b = a % b;
+        a = t;
+    }
+
+    return a;
+}
+
+/**
  * @brief Computes the absolute value of a given signed integer.
  *
  * @warn There is a potential loss of precision as abs(integer::min) > integer::max
@@ -430,6 +496,25 @@ template <size_t Width, typename WordType>
 {
     uinteger<Width, WordType> abs_ = n.is_negative() ? negate(n) : n;
     return abs_;
+}
+
+/**
+ * @brief Computes the absolute value of a given integer.
+ *
+ * Overload for unsigned integers. As all arguments are unsigned, this
+ * function returns the argument extended by one bit.
+ *
+ * Having this overloard is useful when writing generic template code.
+ *
+ * @tparam Width The width of the integer
+ * @param n The integer to be "absolute valued"
+ * @return The absolute value of the integer
+ */
+template <size_t Width, typename WordType>
+[[nodiscard]] constexpr auto expanding_abs(const uinteger<Width, WordType>& n)
+    -> uinteger<Width, WordType>
+{
+    return n;
 }
 
 /**
@@ -842,15 +927,16 @@ template <size_t W, typename WordType>
 
 /**
  * @brief Negates the value
- * @tparam W The width of the signed integer
- * @param n  The signed integer whose sign is to be changed
- * @return  The negative value of the signed integer
+ *
+ * Negating an integer means applying the twos complement.
+ *
+ * @tparam Integer The integer type to negate.
+ * @param n  The signed integer to negate.
+ * @return  The negative value of the integer to negate.
  */
-template <size_t W, typename WordType>
-constexpr auto negate(const integer<W, WordType>& n) -> integer<W, WordType>
+template <typename Integer> constexpr auto negate(const Integer& n) -> Integer
 {
-    const integer<W, WordType> one(1U);
-    return add(~n, one);
+    return add(~n, Integer::one());
 }
 
 /**
@@ -1008,8 +1094,10 @@ auto constexpr expanding_mul(const I& a, const I& b)
  * @param exponent
  * @return The base to the power of the exponent
  */
-template <typename IntegerType> IntegerType pow(const IntegerType& base, const size_t exponent)
+template <size_t N, typename WT>
+constexpr integer<N, WT> pow(const integer<N, WT>& base, const size_t exponent)
 {
+    using IntegerType = integer<N, WT>;
 
     if (exponent == std::numeric_limits<size_t>::max())
     {
@@ -1026,10 +1114,51 @@ template <typename IntegerType> IntegerType pow(const IntegerType& base, const s
 
     IntegerType result = IntegerType::one();
 
-    for (size_t i = 0U; i <= exponent; ++i)
+    for (size_t i = 0U; i < exponent; ++i)
     {
-        result = mul(result, base);
+        result = result * base;
     }
+
+    return result;
+}
+
+/**
+ * @brief Exponentiation function
+ *
+ * @note This function does not make any attempts to be fast or to prevent overflows!
+ *
+ * @note If exponent equals std::numeric_limits<size_t>::max(), this method throws an exception,
+ * unless base equals zero
+ * @tparam W Bit width of the integer
+ * @param base
+ * @param exponent
+ * @return The base to the power of the exponent
+ */
+template <size_t N, typename WT>
+constexpr integer<N, WT> pow(const uinteger<N, WT>& base, const size_t exponent)
+{
+    using IntegerType = uinteger<N, WT>;
+
+    if (exponent == std::numeric_limits<size_t>::max())
+    {
+        if (base.is_zero())
+        {
+            return IntegerType::zero();
+        }
+        else
+        {
+            throw std::runtime_error(
+                "Attempted exponentiation by std::numeric_limits<size_t>::max()");
+        }
+    }
+
+    IntegerType result = IntegerType::one();
+
+    for (size_t i = 0U; i < exponent; ++i)
+    {
+        result = result * base;
+    }
+
     return result;
 }
 
@@ -1048,7 +1177,7 @@ template <typename IntegerType> IntegerType pow(const IntegerType& base, const s
  * @return The base to the power of the exponent
  */
 template <typename IntegerType>
-IntegerType pow(const IntegerType& base, const IntegerType& exponent)
+constexpr IntegerType pow(const IntegerType& base, const IntegerType& exponent)
 {
 
     static_assert(aarith::is_integral_v<IntegerType>,
@@ -1079,6 +1208,75 @@ IntegerType pow(const IntegerType& base, const IntegerType& exponent)
 }
 
 /**
+ * @brief Compute the integer logarithm.
+ *
+ * This function computes ceil(log_base(n)).
+ */
+template <size_t N, class WT>
+constexpr integer<N, WT> ilog(const integer<N, WT>& n, const integer<N, WT>& base)
+{
+    // based on "Hacker's Delight", second edition, pp. 291
+
+    using IntegerType = integer<N, WT>;
+    using BoundType = integer<2 * N, WT>;
+
+    constexpr auto max = IntegerType::max();
+    const auto factor = BoundType(base);
+
+    BoundType i = -BoundType::one();
+    BoundType x = n;
+    BoundType p = BoundType::one();
+
+    for (; i <= max; ++i)
+    {
+        if (x < p)
+        {
+            return i;
+        }
+
+        p = factor * p;
+    }
+
+    assert(i <= max);
+
+    return IntegerType(i);
+}
+
+template <size_t N, class WT>
+constexpr uinteger<N, WT> ilog(const uinteger<N, WT>& n, const uinteger<N, WT>& base)
+{
+    const integer<N + 1, WT> signed_n = width_cast<N + 1>(n);
+    const integer<N + 1, WT> signed_base = width_cast<N + 1>(base);
+
+    const auto signed_result = ilog(signed_n, signed_base);
+    return width_cast<N>(signed_result);
+}
+
+/**
+ * @brief Compute the integer logarithm to base 2.
+ *
+ * This function computes ceil(log_2(n)).
+ */
+template <typename Integer> constexpr Integer ilog2(const Integer& n)
+{
+    const auto two = n.one() + n.one();
+    return ilog(n, two);
+}
+
+/**
+ * @brief Computes k mod n.
+ *
+ * Unlike the C mod operation, this operation always returns non-negative
+ * results, which is closer to what is commonly used in mathematics.
+ */
+template <size_t N, class WT>
+[[nodiscard]] constexpr integer<N, WT> absmod(const integer<N, WT>& k, const integer<N, WT>& n)
+{
+    // https://stackoverflow.com/questions/1907565/
+    return ((k % n) + n) % n;
+}
+
+/**
  * @brief Multiplies two unsigned integers using the Karazuba algorithm
  *
  * This implements the karazuba multiplication algorithm (divide and conquer).
@@ -1106,6 +1304,22 @@ template <typename Integer>
 [[nodiscard]] constexpr Integer distance(const Integer& a, const Integer& b)
 {
     return (a <= b) ? sub(b, a) : sub(a, b);
+}
+
+/**
+ * @brief Left-shift assignment operator
+ * @tparam W The word_container type to work on
+ * @param lhs The word_container to be shifted
+ * @param rhs The number of bits to shift
+ * @return The shifted word_container
+ */
+template <typename W, typename I,
+          typename = std::enable_if_t<is_word_array_v<W> && is_integral_v<I> && is_unsigned_v<I>>>
+constexpr auto operator<<=(W& lhs, const I rhs) -> W
+{
+    const size_t shift = static_cast<size_t>(rhs);
+    lhs <<= shift;
+    return lhs;
 }
 
 /**
@@ -1166,7 +1380,7 @@ auto constexpr operator-(const I& lhs, const I& rhs) -> I
     return sub(lhs, rhs);
 }
 
-template <typename I, typename = std::enable_if_t<is_integral_v<I>>>
+template <typename I, typename = std::enable_if_t<is_integral<I>::value>>
 auto constexpr operator*(const I& lhs, const I& rhs) -> I
 {
     return mul(lhs, rhs);

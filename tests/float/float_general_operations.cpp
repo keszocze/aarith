@@ -67,3 +67,30 @@ TEMPLATE_TEST_CASE_SIG("Generating NaN as a result", "[floating_point][arithmeti
         }
     }
 }
+
+TEMPLATE_TEST_CASE_SIG("Infering float bits from fields", "[floating_point][arithmetic][addition]",
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE)
+{
+    using F = floating_point<E, M>;
+
+    GIVEN("Random floats")
+    {
+        const F x = GENERATE(take(1000, random_float<E, M, FloatGenerationModes::FullyRandom>()));
+
+        const auto eq = [](const F& f0, const F& f1) -> bool {
+            return (f0.is_nan() && f1.is_nan()) || (f0 == f1);
+        };
+
+        WHEN("Converting to bits and back again")
+        {
+            const auto bits = x.get_bits();
+            const auto from_bits = F(bits);
+
+            THEN("The result should be unchanged")
+            {
+                REQUIRE(eq(x, from_bits));
+                REQUIRE(from_bits.get_bits() == bits);
+            }
+        }
+    }
+}

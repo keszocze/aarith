@@ -4,6 +4,7 @@
 #include <aarith/integer.hpp>
 #include <iostream>
 
+
 int main()
 {
     using namespace aarith; // NOLINT
@@ -37,3 +38,4 @@ int main()
 
     return 0;
 }
+

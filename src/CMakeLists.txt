@@ -7,6 +7,7 @@ target_sources(aarith INTERFACE
         aarith/float_no_operators.hpp
         aarith/float/float_approx_operations.hpp
         aarith/integer/integer_approx_operations.hpp
+        aarith/posit.hpp
 )
 
 target_include_directories(aarith INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})

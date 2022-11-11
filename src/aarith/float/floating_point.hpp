@@ -796,6 +796,19 @@ public:
         exponent = set_to;
     }
 
+    [[nodiscard]] auto constexpr get_bits() const -> uinteger<1 + E + M>
+    {
+        constexpr size_t N = 1 + E + M;
+        using Int = uinteger<N>;
+
+        const Int s = width_cast<N>(Int(get_sign()));
+        const Int e = width_cast<N>(get_exponent());
+
+        const Int m = width_cast<N>(get_mantissa());
+
+        return (s << (E + M)) | (e << M) | m;
+    }
+
     [[nodiscard]] auto constexpr get_full_mantissa() const -> uinteger<MW, WordType>
     {
         return mantissa;

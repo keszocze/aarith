@@ -63,9 +63,9 @@ template <size_t E, size_t M, class Function_add, class Function_sub>
 /**
  * @brief Generic subtraction of two `floating_point` values
  *
- * This method computes the difference of two floating-point values using the provided functions `fun_add`
- * and `fun_sub` to compute the new mantissa. This generic function allows to easily implement
- * own adders, e.g. to develop new hardware implementations.*
+ * This method computes the difference of two floating-point values using the provided functions
+ * `fun_add` and `fun_sub` to compute the new mantissa. This generic function allows to easily
+ * implement own adders, e.g. to develop new hardware implementations.*
  *
  * @note As an end-user of aarith, you will, most likely, never need to call this function.
  *
@@ -152,7 +152,6 @@ template <size_t E, size_t M>
     {
         return rhs;
     }
-
 
     return add_<
         E, M,
@@ -268,7 +267,8 @@ template <size_t E, size_t M, typename WordType>
         {
             ext_esum = ~ext_esum;
             ext_esum = add(ext_esum, uinteger<ext_esum.width()>(2));
-            if (ext_esum < uinteger<64>(M + 1)) // TODO remove this number? it should bit bit-width of size_t?
+            if (ext_esum <
+                uinteger<64>(M + 1)) // TODO remove this number? it should bit bit-width of size_t?
             {
                 mproduct = mproduct >> ext_esum.word(0);
                 product.set_full_mantissa(width_cast<M + 1>(mproduct));
@@ -360,6 +360,7 @@ template <size_t E, size_t M, typename WordType>
             }
         }();
     }
+
     auto dividend = width_cast<2 * M + 1>(lhs.get_full_mantissa());
     auto divisor = width_cast<2 * M + 1>(rhs.get_full_mantissa());
     // shift to use integer division for producing 1,M
@@ -497,6 +498,61 @@ copySign(const floating_point<E, M, WordType>& x, const floating_point<E, M, Wor
     return copied;
 }
 
+template <size_t E, size_t M, typename WordType>
+[[nodiscard]] constexpr floating_point<E, M, WordType>
+nextafter(const floating_point<E, M, WordType>& x, const floating_point<E, M, WordType>& y)
+{
+    // Inspired by the implementation of nextafter(3) provided by musl,
+    // https://git.musl-libc.org/cgit/musl/tree/src/math/nextafter.c
+
+    constexpr size_t N = 1 + E + M;
+
+    using Float = floating_point<E, M, WordType>;
+    using Int = uinteger<N, WordType>;
+
+    if (x.is_nan() || y.is_nan())
+    {
+        return x + y;
+    }
+
+    Int ux = x.get_bits();
+    Int uy = y.get_bits();
+
+    if (ux == uy)
+    {
+        return y;
+    }
+
+    const Int mask = Int(Int::all_ones()) / Int(2);
+    Int ax = ux & mask;
+    Int ay = uy & mask;
+
+    if (ax.is_zero())
+    {
+        if (ay.is_zero())
+        {
+            return y;
+        }
+        else
+        {
+            ux = (uy & (Int::one() << (N - 1))) | Int::one();
+        }
+    }
+    else if (ax > ay || ((ux ^ uy) & (Int::one() << (N - 1))))
+    {
+        ux--;
+    }
+    else
+    {
+        ux++;
+    }
+
+    // Musl sets flags here by doing some special computations. We
+    // skip this part.
+
+    return Float(ux);
+}
+
 /**
  * @brief Extracts a bitstring range from the bit representation of the float
  *
@@ -517,7 +573,6 @@ bit_range(const floating_point<E, M, WordType>& f)
 {
     return bit_range<Start, End>(f.as_word_array());
 }
-
 
 /**
  * This additional nesting of a namespace allows to include aarith without having the usual
@@ -562,6 +617,38 @@ template <size_t E, size_t M, typename WordType>
 auto operator-(const floating_point<E, M, WordType>& x) -> floating_point<E, M, WordType>
 {
     return negate(x);
+}
+
+template <size_t E, size_t M, typename WordType>
+auto operator+=(floating_point<E, M, WordType>& lhs, const floating_point<E, M, WordType>& rhs)
+    -> floating_point<E, M, WordType>&
+{
+    lhs = lhs + rhs;
+    return lhs;
+}
+
+template <size_t E, size_t M, typename WordType>
+auto operator-=(floating_point<E, M, WordType>& lhs, const floating_point<E, M, WordType>& rhs)
+    -> floating_point<E, M, WordType>&
+{
+    lhs = lhs - rhs;
+    return lhs;
+}
+
+template <size_t E, size_t M, typename WordType>
+auto operator*=(floating_point<E, M, WordType>& lhs, const floating_point<E, M, WordType>& rhs)
+    -> floating_point<E, M, WordType>&
+{
+    lhs = lhs * rhs;
+    return lhs;
+}
+
+template <size_t E, size_t M, typename WordType>
+auto operator/=(floating_point<E, M, WordType>& lhs, const floating_point<E, M, WordType>& rhs)
+    -> floating_point<E, M, WordType>&
+{
+    lhs = lhs / rhs;
+    return lhs;
 }
 
 } // namespace float_operators

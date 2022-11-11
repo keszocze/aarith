@@ -143,14 +143,14 @@ SCENARIO("Manually setting ranges of bits", "[word_array][utility]")
     }
 }
 
-TEMPLATE_TEST_CASE_SIG("Counting bits in word_array", "[word_array][utility]",
+TEMPLATE_TEST_CASE_SIG("Counting zero bits in word_array", "[word_array][utility]",
                        AARITH_INT_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
 {
     GIVEN("A word container")
     {
         using I = word_array<W, WordType>;
 
-        THEN("The leading zero index should be computed correctly")
+        THEN("The leading zero count should be computed correctly")
         {
             constexpr I zero{I::all_zeroes()};
             constexpr I one{1U};
@@ -159,10 +159,35 @@ TEMPLATE_TEST_CASE_SIG("Counting bits in word_array", "[word_array][utility]",
             constexpr I ones{I::all_ones()};
 
             CHECK(count_leading_zeroes(zero) == W);
+            CHECK(count_leading_zeroes(zero, W) == 0);
             REQUIRE(count_leading_zeroes(one) == W - 1);
             REQUIRE(count_leading_zeroes(two) == W - 2);
+            REQUIRE(count_leading_zeroes(one, 1) == W - 1 - 1);
+            REQUIRE(count_leading_zeroes(two, 2) == W - 2 - 2);
             REQUIRE(count_leading_zeroes(three) == W - 2);
             REQUIRE(count_leading_zeroes(ones) == 0);
+            REQUIRE(count_leading_zeroes(ones) == 0);
+        }
+    }
+}
+
+TEMPLATE_TEST_CASE_SIG("Counting one bits in word_array", "[word_array][utility]",
+                       AARITH_INT_TEST_SIGNATURE, AARITH_WORD_ARRAY_TEST_TEMPLATE_PARAM_RANGE)
+{
+    GIVEN("A word container")
+    {
+        using I = word_array<W, WordType>;
+
+        THEN("The leading one count should be computed correctly")
+        {
+            constexpr I zero{I::all_zeroes()};
+            constexpr I ones{I::all_ones()};
+
+            CHECK(count_leading_ones(zero) == 0);
+            REQUIRE(count_leading_ones(ones, 1) == W - 1);
+            REQUIRE(count_leading_ones(ones, 2) == W - 2);
+            REQUIRE(count_leading_ones(ones, W) == 0);
+            REQUIRE(count_leading_ones(ones) == W);
         }
     }
 }

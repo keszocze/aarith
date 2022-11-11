@@ -9,7 +9,8 @@ of the native data types.
 
 Aarith currently supports
 
-* IEEE 754 like floating-point numbers of arbitrary bit-width for both, the exponent and the mantissa
+* IEEE 754 like floating-point numbers of arbitrary bit-width for both the exponent and the mantissa
+* [Posits and quires](https://posithub.org/) of arbitrary bit-width and exponent size
 * Two's complement integers of arbitrary bit-width (signed and unsigned)
 
 [Read the full documentation](https://aarith.readthedocs.io)

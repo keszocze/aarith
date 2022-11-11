@@ -128,6 +128,14 @@ public:
     static constexpr bool value = false;
 };
 
+template <typename Type> class is_fixed_point
+{
+public:
+    static constexpr bool value = false;
+};
+
+template <typename Type> inline constexpr bool is_fixed_point_v = is_fixed_point<Type>::value;
+
 /**
  * @brief Tests if a type is an aarith floating_point
  *

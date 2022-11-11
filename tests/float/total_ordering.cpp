@@ -349,3 +349,19 @@ TEMPLATE_TEST_CASE_SIG("Total ordering mag with a two NaN values",
         }
     }
 }
+
+TEMPLATE_TEST_CASE_SIG("Iteration starts at smallest and arrives at biggest", "[float][template]",
+                       AARITH_FLOAT_TEST_SIGNATURE, AARITH_FLOAT_TEMPLATE_RANGE_EXHAUSTABLE)
+{
+    using Float = floating_point<E, M>;
+    Float last = Float::NaN();
+
+    for_each_regular_float<Float>([&](const Float& current) {
+        if (!last.is_nan() && !last.is_inf())
+        {
+            REQUIRE(current >= last);
+        }
+
+        last = current;
+    });
+}

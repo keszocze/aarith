@@ -8,41 +8,95 @@
 namespace aarith {
 
 /**
- * @brief  Counts the number of bits set to zero before the first one appears (from MSB to LSB)
- * @tparam Width Width of the word_array
- * @param value The word to count the leading zeroes in
- * @return
+ * @brief Return word array in reverse order.
  */
-template <size_t Width, typename WordType>
-constexpr size_t count_leading_zeroes(const word_array<Width, WordType>& value)
+template <size_t W, typename WordType>
+[[nodiscard]] constexpr word_array<W, WordType> flip(const word_array<W, WordType>& w)
 {
-    for (auto i = Width; i > 0; --i)
+    word_array<W, WordType> copy;
+
+    for (size_t widx = 0; widx < W; ++widx)
     {
-        if (value.bit(i - 1))
-        {
-            return (Width - i);
-        }
+        const size_t copyidx = W - 1 - widx;
+        copy.set_bit(copyidx, w.bit(widx));
     }
-    return Width;
+
+    return copy;
 }
 
 /**
- * @brief  Counts the number of bits set to one before the first zero appears (from MSB to LSB)
+ * @brief  Counts the number of bits set to zero before the first one appears (from MSB to LSB)
  * @tparam Width Width of the word_array
- * @param value The word to count the leading ones in
- * @return
+ * @param value The word to count the leading zeroes in
+ * @param offset The number of MSB to skip before conuting.
+ * @return The number of zeroes
  */
 template <size_t Width, typename WordType>
-constexpr size_t count_leading_ones(const word_array<Width, WordType>& value)
+constexpr size_t count_leading_zeroes(const word_array<Width, WordType>& value, size_t offset = 0)
 {
-    for (auto i = Width; i > 0; --i)
+    // if offset is chosen too big, skip all bits, counting none
+
+    if (offset >= Width)
     {
-        if (!value.bit(i - 1))
+        return 0;
+    }
+
+    // if offset is set to a reasonable value, count bit by bit
+
+    const size_t start = Width - offset;
+
+    for (auto i = start; i > 0; --i)
+    {
+        if (value.bit(i - 1))
         {
-            return (Width - i);
+            return (Width - i - offset);
         }
     }
-    return Width;
+
+    return Width - offset;
+}
+
+/**
+ * @brief Counts the number of bits set to ones before the first zero appears
+ * (from MSB to LSB).
+ *
+ * Optional parameter offset makes it possible to skip the first offset-many
+ * MSB. For example, calling count_leading_ones(0b011000, offset=1) would
+ * return 2 as the first zero is skipped.
+ *
+ * @tparam Width Width of the word_array
+ * @param value The word to count the leading ones in
+ * @param offset The number of MSB to skip before conuting.
+ * @return The number of ones
+ */
+template <size_t Width, typename WordType>
+constexpr size_t count_leading_ones(const word_array<Width, WordType>& value, size_t offset = 0)
+{
+    return count_leading_zeroes(~value, offset);
+}
+
+/**
+ * @brief Return a mask that has the n least significant bits set to one
+ * and all other bits set to zero.
+ *
+ * If n is greater than Width, this function returns a word array with
+ * all Width-many bits set to one.
+ *
+ * @tparam Width Width of the returned word_array
+ * @param n The number of ones in the returned array
+ * @return The mask with n-many bits set to one.
+ */
+template <size_t Width, typename WordType>
+[[nodiscard]] constexpr word_array<Width, WordType> get_low_mask(size_t n)
+{
+    word_array<Width, WordType> w(0);
+
+    for (size_t idx = 0; idx < n && idx < Width; ++idx)
+    {
+        w.set_bit(idx, true);
+    }
+
+    return w;
 }
 
 /**

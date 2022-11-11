@@ -8,7 +8,7 @@
 
 using namespace aarith; // NOLINT
 
-TEMPLATE_TEST_CASE_SIG("Pre/postfix operator++", "[integer][arithmetic]",
+TEMPLATE_TEST_CASE_SIG("Pre/postfix operator++", "[integer][arithmetic][foo]",
                        AARITH_INT_EXTENDED_TEST_SIGNATURE,
                        AARITH_INT_EXTENDED_TEST_TEMPLATE_NATIVE_SIZES_PARAM_RANGE)
 {
@@ -1428,6 +1428,75 @@ SCENARIO("Computing the powers of integers", "[integer][signed][operation]")
             CHECK(pow(Integer(2), Integer(2)) == Integer(4));
             CHECK(pow(Integer(2), Integer(3)) == Integer(8));
             CHECK(pow(Integer(2), Integer(4)) == Integer(16));
+        }
+    }
+}
+
+SCENARIO("Computing the integer logarithm of integers", "[integer][signed][operation]")
+{
+    GIVEN("Some integers")
+    {
+        THEN("Compute the integer base 2 logarithm")
+        {
+            using Integer = integer<32>;
+
+            constexpr auto base = Integer(2);
+
+            CHECK(ilog(Integer(2LL), base) == Integer(1));
+            CHECK(ilog(Integer(3LL), base) == Integer(1));
+            CHECK(ilog(Integer(4LL), base) == Integer(2));
+            CHECK(ilog(Integer(5LL), base) == Integer(2));
+            CHECK(ilog(Integer(8LL), base) == Integer(3));
+            CHECK(ilog(Integer(9LL), base) == Integer(3));
+            CHECK(ilog(Integer(16LL), base) == Integer(4));
+            CHECK(ilog(Integer(17LL), base) == Integer(4));
+            CHECK(ilog(Integer(32LL), base) == Integer(5));
+            CHECK(ilog(Integer(45LL), base) == Integer(5));
+            CHECK(ilog(Integer(64LL), base) == Integer(6));
+            CHECK(ilog(Integer(100LL), base) == Integer(6));
+            CHECK(ilog(Integer(128LL), base) == Integer(7));
+            CHECK(ilog(Integer(200LL), base) == Integer(7));
+            CHECK(ilog(Integer(256LL), base) == Integer(8));
+            CHECK(ilog(Integer(300LL), base) == Integer(8));
+        }
+
+        THEN("Compute the integer base 10 logarithm")
+        {
+            using Integer = integer<32>;
+
+            constexpr auto base = Integer(10);
+
+            CHECK(ilog(Integer(10LL), base) == Integer(1));
+            CHECK(ilog(Integer(11LL), base) == Integer(1));
+            CHECK(ilog(Integer(100LL), base) == Integer(2));
+            CHECK(ilog(Integer(120LL), base) == Integer(2));
+            CHECK(ilog(Integer(1000LL), base) == Integer(3));
+            CHECK(ilog(Integer(1300LL), base) == Integer(3));
+            CHECK(ilog(Integer(10000LL), base) == Integer(4));
+            CHECK(ilog(Integer(14000LL), base) == Integer(4));
+            CHECK(ilog(Integer(100000LL), base) == Integer(5));
+            CHECK(ilog(Integer(150000LL), base) == Integer(5));
+            CHECK(ilog(Integer(1000000LL), base) == Integer(6));
+            CHECK(ilog(Integer(1600000LL), base) == Integer(6));
+            CHECK(ilog(Integer(10000000LL), base) == Integer(7));
+            CHECK(ilog(Integer(17000000LL), base) == Integer(7));
+        }
+    }
+}
+
+SCENARIO("Computing the greatest common divisor of integers", "[integer][signed][operation]")
+{
+    GIVEN("Some integers")
+    {
+        THEN("Compute their GCD correctly")
+        {
+            using Integer = integer<32>;
+
+            CHECK(gcd(Integer(12), Integer(15)) == Integer(3));
+            CHECK(gcd(Integer(9), Integer(10)) == Integer(1));
+            CHECK(gcd(Integer(9), Integer(21)) == Integer(3));
+            CHECK(gcd(Integer(1701), Integer(3768)) == Integer(3));
+            CHECK(gcd(Integer(12345678), Integer(87654321)) == Integer(9));
         }
     }
 }

@@ -28,6 +28,12 @@ constexpr bool operator==(const Int<W, T>& a, const Int<V, T>& b)
     return true;
 }
 
+template <size_t W, size_t V, typename T, template <size_t, typename> typename Int>
+constexpr bool operator!=(const Int<W, T>& a, const Int<V, T>& b)
+{
+    return !(a == b);
+}
+
 template <size_t W, size_t V, typename WordType>
 constexpr bool operator<(const uinteger<W, WordType>& a, const uinteger<V, WordType>& b)
 {
@@ -83,21 +89,24 @@ constexpr bool operator<(const uinteger<W, WordType>& a, const uinteger<V, WordT
     return false;
 }
 
-template <typename W, typename V> constexpr bool operator<=(const W& a, const V& b)
+template <size_t W, size_t V, typename T, template <size_t, typename> typename Int>
+constexpr bool operator<=(const Int<W, T>& a, const Int<V, T>& b)
 {
-    static_assert(same_signedness<W, V>);
+    static_assert(same_signedness<Int<W, T>, Int<V, T>>);
     return (a < b) || (a == b);
 }
 
-template <typename W, typename V> constexpr bool operator>=(const W& a, const V& b)
+template <size_t W, size_t V, typename T, template <size_t, typename> typename Int>
+constexpr bool operator>=(const Int<W, T>& a, const Int<V, T>& b)
 {
-    static_assert(same_signedness<W, V>);
+    static_assert(same_signedness<Int<W, T>, Int<V, T>>);
     return b <= a;
 }
 
-template <typename W, typename V> constexpr bool operator>(const W& a, const V& b)
+template <size_t W, size_t V, typename T, template <size_t, typename> typename Int>
+constexpr bool operator>(const Int<W, T>& a, const Int<V, T>& b)
 {
-    static_assert(same_signedness<W, V>);
+    static_assert(same_signedness<Int<W, T>, Int<V, T>>);
     return b < a;
 }
 

@@ -8,8 +8,8 @@ namespace aarith {
 /**
  * @brief Performs a runtime-checked conversion.
  *
- * @warning The conversion will throw a runtime exception of the value does not fit into the desired
- * data type!
+ * @warning The conversion will throw a runtime exception of the value does
+ * not fit into the desired data type!
  *
  * @tparam T The type the number is to be converted to
  * @tparam W The width of the supplied unsigned integer
@@ -49,6 +49,63 @@ constexpr T narrow_cast(const uinteger<W, WordType>& a)
     else
     {
         throw std::domain_error("Can not cast the uinteger in a type of provided size");
+    }
+}
+
+/**
+ * @brief Performs a runtime-checked conversion.
+ *
+ * @warning The conversion will throw a runtime exception of the value does
+ * not fit into the desired data type!
+ *
+ * @tparam T The type the number is to be converted to
+ * @tparam W The width of the supplied signed integer
+ * @param a The signed integer to convert into the type T
+ * @return
+ */
+template <typename T, size_t W, typename WordType>
+constexpr T narrow_cast(const integer<W, WordType>& a)
+{
+    constexpr T min = std::numeric_limits<T>::min();
+    constexpr T max = std::numeric_limits<T>::max();
+
+    using TInt = integer<sizeof(T) * 8 + 1, WordType>;
+    constexpr TInt imin(min);
+    constexpr TInt imax(max);
+
+    if (a >= imin && a <= imax)
+    {
+        if (a >= a.zero())
+        {
+            // handle non-negative values like unsigned values
+
+            const uinteger<W, WordType> ua(a);
+            return narrow_cast<T>(ua);
+        }
+        else if (a != imin)
+        {
+            // negative values a where abs(a) fits into type T are handled by
+            // taking the twos complement from tc and treating that like an
+            // unsigned integer
+
+            uinteger<W, WordType> ua(a);
+
+            const auto tc = (~ua) + ua.one();
+            const T converted = narrow_cast<T>(tc);
+            return (-1) * converted;
+        }
+        else
+        {
+            // special case where a == imin; using the approach for a != imin
+            // does not work because for our value a, abs(a) does not fit into
+            // type T
+
+            return min;
+        }
+    }
+    else
+    {
+        throw std::domain_error("Can not cast the integer in a type of provided size");
     }
 }
 
