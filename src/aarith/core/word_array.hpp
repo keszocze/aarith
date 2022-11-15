@@ -107,7 +107,7 @@ public:
      */
     explicit word_array(std::string_view bs)     {
         // TODO (keszocze) why isn't it constexpr? --> build a test case for that
-        for (auto i = bs.length(), pos = 0UL; i > 0 && pos < Width; --i, ++pos)
+        for (size_t i = bs.length(), pos = 0UL; i > 0 && pos < Width; --i, ++pos)
         {
             switch (bs[i - 1])
             {
