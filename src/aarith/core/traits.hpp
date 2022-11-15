@@ -168,14 +168,9 @@ inline constexpr bool same_signedness = (is_unsigned_v<A> == is_unsigned_v<B>);
 /**
  * @brief Type trait to check a type for being an unsigned integer
  *
- * It seems that the type traits of C++ have no reasonable concept of "unsigned integer" so we have
- * to add this ourselves.
- *
  * @tparam T The type to check for "unsigned int'nes"
  */
 template <typename T>
-inline constexpr bool is_unsigned_int =
-    std::is_same_v<T, std::size_t> || std::is_same_v<T, uint64_t> || std::is_same_v<T, uint32_t> ||
-    std::is_same_v<T, uint16_t> || std::is_same_v<T, uint8_t>;
+inline constexpr bool is_unsigned_int = std::is_integral_v<T> && !std::is_signed_v<T>;
 
 } // namespace aarith
