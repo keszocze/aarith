@@ -582,9 +582,11 @@ template <size_t N, size_t ES, typename WT>
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> posit<N, ES, WT>::pi()
 {
+    constexpr double pi = 3.14159265358979323846;
+
     // This sucks because for big posit types (N >> 32), we will get
     // increasingly inaccurate results.
-    return posit(M_PI);
+    return posit(pi);
 }
 
 template <size_t N, size_t ES, typename WT>

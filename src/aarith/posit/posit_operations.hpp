@@ -10,6 +10,8 @@
 
 namespace aarith {
 
+using ssize_t = std::ptrdiff_t;
+
 template <size_t N, size_t ES, typename WT>
 [[nodiscard]] constexpr posit<N, ES, WT> negate(const posit<N, ES, WT>& self)
 {
